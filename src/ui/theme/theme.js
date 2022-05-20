@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material";
+import Card from '../../assets/Card.svg';
 
 const themeDefault = createTheme({
     typography: {
@@ -266,6 +267,10 @@ const themeDefault = createTheme({
     },
 });
 
+themeDefault.container = {
+    backgroundImage : `url(${Card})`
+}
+
 themeDefault.typography.h1 = {
     fontSize: "3.125rem",
     fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
@@ -351,5 +356,10 @@ themeDefault.typography.subtitle2 = {
         fontSize: ".7rem",
     },
 };
+themeDefault.typography.lightText = {
+    fontSize: "0.75rem",
+    fontFamily: "'Roboto', sans-serif",
+    fontWeight: "500"
+}
 
 export default themeDefault;

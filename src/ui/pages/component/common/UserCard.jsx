@@ -12,14 +12,13 @@ const UserCard = () => {
     return(
         <Card
         sx={{
-          minWidth : "80%", 
-          maxWidth : "80%", 
+          width : 350, 
           backgroundImage : `url(${Wave})`, 
           backgroundRepeat : 'round',
         }}
         >
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography gutterBottom variant='h5'>
           Welcome Username!
         </Typography>
       </CardContent>
@@ -28,7 +27,7 @@ const UserCard = () => {
         <Box
           sx={{ border : 1, borderColor : 'error.main', borderRadius : 1, padding : 1}}
         >
-          <Typography variant='span' color='error.main'>Admin</Typography>
+          <Typography variant='lightText' color='error.main'>Admin</Typography>
         </Box>
         
       </CardActions>

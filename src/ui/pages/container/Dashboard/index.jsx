@@ -1,9 +1,11 @@
-import { Button, Grid, Link, Paper, styled, ThemeProvider, Typography } from "@mui/material";
+import { Button, Divider, Grid, Link, Paper, styled, ThemeProvider, Typography } from "@mui/material";
 import React from "react";
 import { translate } from "../../../../config/localisation";
 import themeDefault from "../../../theme/theme";
 import Header from "../../component/common/Header";
+import ProjectCard from "../../component/common/ProjectCard";
 import UserCard from "../../component/common/UserCard";
+import WorkspaceTable from "../../component/common/WorkspaceTable";
 
 const Dashboard = () => {
 
@@ -19,20 +21,20 @@ const Dashboard = () => {
             <Header />
             <Grid
                 container
-                // direction="column"
-                // alignItems="center"
-                justifyContent="center"
+                direction="row"
+                alignItems="center"
+                justifyContent="space-around"
                 style={{ minHeight: "100vh" }}
                 spacing={2}
             >
-                <Grid item xs={3} sm={12} md={12}>
+                <Grid item xs={3}>
                     <Grid
                         container
                         direction="column"
                         alignItems="center"
-                        justifyContent="space-around"
+                        justifyContent="space-between"
                         style={{ height: "100%" }}
-                        spacing={2}
+                        spacing={1}
                     >
                         <UserCard />
                         <Item style={{ visibility: "hidden" }}></Item>
@@ -44,12 +46,13 @@ const Dashboard = () => {
                         container
                         direction="column"
                         alignItems="left"
-                        justifyContent="space-around"
-                        style={{ height: "100%" }}
+                        justifyContent="space-between"
+                        style={{ minHeight: "70vh" }}
                         spacing={2}
                     >
-                        {/* Project List */}
-                        {/* Workspace List */}
+                        <ProjectCard />
+                        <Divider />
+                        <WorkspaceTable />
                     </Grid>
 
                 </Grid>
