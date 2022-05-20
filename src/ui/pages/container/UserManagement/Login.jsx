@@ -1,16 +1,26 @@
 import { Grid, Link, Typography } from "@mui/material";
 import { useState } from "react";
-import { translate } from "../../../config/localisation";
-import LoginAPI from "../../../redux/actions/api/UserManagement/Login";
-import Button from "../../component/Button";
-import CustomCard from "../../component/Card";
-import OutlinedTextField from "../../component/OutlinedTextField";
+import { useNavigate } from "react-router-dom";
+import { translate } from "../../../../config/localisation";
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import Button from "../../component/common/Button";
+import CustomCard from "../../component/common/Card";
+import OutlinedTextField from "../../component/common/OutlinedTextField";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
+
+
+  let navigate = useNavigate();
+  
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: '',
+    variant: 'success'
+  })
 
   const createToken = () => {
     const apiObj = new LoginAPI(credentials.email, credentials.password);
@@ -21,8 +31,15 @@ const Login = () => {
     }).then(async (res) => {
       const rsp_data = await res.json();
       console.log(rsp_data);
-    });
-  };
+      if (!res.ok) {
+        // return Promise.reject('');
+        console.log("res -", res);
+      } else {
+        localStorage.setItem('shoonya_access_token', rsp_data.access);
+        localStorage.setItem('shoonya_refresh_token', rsp_data.refresh);
+        navigate("/dashboard");
+    }})
+  }
 
   const handleFieldChange = (event) => {
     event.preventDefault();
@@ -48,6 +65,7 @@ const Login = () => {
           <OutlinedTextField
             fullWidth
             name="password"
+            type="password"
             onChange={handleFieldChange}
             value={credentials["password"]}
             placeholder={translate("enterPassword")}
@@ -57,16 +75,16 @@ const Login = () => {
     );
   };
   const renderCardContent = () => (
-    <CustomCard title={"Login"} cardContent={<TextFields />}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <Button fullWidth onClick={createToken} label={"Login"} />
+    <CustomCard title={"Login"} cardContent={TextFields()}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Button fullWidth onClick={createToken} label={"Login"} />
+          </Grid>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Link href="/forgot-password">{translate("forgotPassword")}</Link>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <Link href="/forgot-password">{translate("forgotPassword")}</Link>
-        </Grid>
-      </Grid>
-    </CustomCard>
+      </CustomCard>
   );
 
   return (

@@ -1,8 +1,8 @@
-import CustomCard from "../../component/Card";
+import CustomCard from "../../component/common/Card";
 import { Grid } from "@mui/material";
-import Button from "../../component/Button";
-import OutlinedTextField from "../../component/OutlinedTextField";
-import { translate } from "../../../config/localisation";
+import Button from "../../component/common/Button";
+import OutlinedTextField from "../../component/common/OutlinedTextField";
+import { translate } from "../../../../config/localisation";
 
 const forgotPassword = () => {
 

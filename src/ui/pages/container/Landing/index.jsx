@@ -1,7 +1,7 @@
 import { Grid, Link, Typography } from "@mui/material";
-import { translate } from "../../../config/localisation";
-import history from "../../../web.history";
-import Button from "../../component/Button";
+import { translate } from "../../../../config/localisation";
+import history from "../../../../web.history";
+import Button from "../../component/common/Button";
 
 const Landing = () => {
   const onClickHandler = () => {
