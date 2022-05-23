@@ -6,6 +6,7 @@ import Header from "../../component/common/Header";
 import ProjectCard from "../../component/common/ProjectCard";
 import UserCard from "../../component/common/UserCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
+import dashboardStyle from "../../../styles/dashboard";
 
 const Dashboard = () => {
 
@@ -16,39 +17,32 @@ const Dashboard = () => {
         textAlign: 'center',
         color: themeDefault.palette.text.secondary,
     }));
+
+    const classes = dashboardStyle();
     return (
-        <ThemeProvider theme={themeDefault}>
+        <React.Fragment>
             <Header />
             <Grid
                 container
-                direction="row"
-                alignItems="center"
-                justifyContent="space-around"
-                style={{ minHeight: "100vh" }}
+                className={classes.parentContainer}               
                 spacing={2}
             >
                 <Grid item xs={3}>
                     <Grid
                         container
-                        direction="column"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        style={{ height: "100%" }}
+                        className={classes.userCardContainer}
                         spacing={1}
                     >
                         <UserCard />
-                        <Item style={{ visibility: "hidden" }}></Item>
                     </Grid>
 
                 </Grid>
                 <Grid item xs={9}>
                     <Grid
                         container
-                        direction="column"
-                        alignItems="left"
-                        justifyContent="space-between"
-                        style={{ minHeight: "70vh" }}
-                        spacing={2}
+                        direction='column'
+                        className={classes.dashboardContentContainer}
+                        spacing={1}
                     >
                         <ProjectCard />
                         <Divider />
@@ -57,7 +51,7 @@ const Dashboard = () => {
 
                 </Grid>
             </Grid>
-        </ThemeProvider>
+        </React.Fragment>
 
     )
 }

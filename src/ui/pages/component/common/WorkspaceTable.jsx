@@ -8,11 +8,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { ThemeProvider } from '@mui/material';
+import themeDefault from '../../../theme/theme';
 
 const WorkspaceTable = () => {
     return (
-        <div>
-            <Typography style={{ marginBottom: "10px" }} variant='body1'>Visit Workspaces</Typography>
+        <ThemeProvider theme={themeDefault}>
+            <Typography variant='body1'>Visit Workspaces</Typography>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
@@ -41,7 +43,7 @@ const WorkspaceTable = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-        </div>
+        </ThemeProvider>
 
     )
 }

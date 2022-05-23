@@ -5,18 +5,18 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { Box, Divider } from '@mui/material';
+import { Box, Divider, ThemeProvider } from '@mui/material';
+import themeDefault from '../../../theme/theme';
 
 const ProjectCard = () => {
     return (
-        <div>
+        <ThemeProvider theme={themeDefault}>
             <Typography style={{marginBottom : "10px"}} variant='body1'>Projects</Typography>
             <Card
                 sx={{
                     width: 400,
                     padding : 2,
-                    minHeight : 150,
-                    maxHeight : 250,
+                    minHeight : 100,
                 }}
             >
                 <CardContent>
@@ -33,7 +33,7 @@ const ProjectCard = () => {
                     </Typography>
                 </CardContent>
             </Card>
-        </div>
+        </ThemeProvider>
 
     )
 }

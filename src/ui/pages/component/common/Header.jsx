@@ -1,6 +1,7 @@
 import { AppBar, Avatar, Box, Button, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import headerStyle from "../../../styles/header";
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
@@ -14,13 +15,16 @@ const Header = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+
+    const classes = headerStyle();
+
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar style={{ backgroundColor: "#ffffff" }} position="fixed">
-                <Toolbar style={{justifyContent : "space-between"}}>
+        <Box className={classes.parentContainer}>
+            <AppBar style={{ backgroundColor: "#ffffff", position: 'inherit'}}>
+                <Toolbar className={classes.toolbar}>
                 <Box sx={{ flexGrow: 0 }} xs={6}>
                     <Link to="/">
-                        <img src={"logo.svg"} alt="logo" style={{ height: "30%", width: "30%" }} />
+                        <img src={"logo.svg"} alt="logo" className={classes.headerLogo} style={{ }} />
                     </Link>
                 </Box>
                     <Box sx={{ flexGrow: 0 }} xs={6}>
