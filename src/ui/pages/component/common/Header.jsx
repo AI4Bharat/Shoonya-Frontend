@@ -2,6 +2,7 @@ import { AppBar, Avatar, Box, Button, Grid, IconButton, Menu, MenuItem, Toolbar,
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import headerStyle from "../../../styles/header";
+import Logo from '../../../../assets/logo.svg'
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
@@ -20,14 +21,18 @@ const Header = () => {
 
     return (
         <Box className={classes.parentContainer}>
-            <AppBar style={{ backgroundColor: "#ffffff", position: 'inherit'}}>
+            <AppBar style={{ backgroundColor: "#ffffff"}}>
                 <Toolbar className={classes.toolbar}>
-                <Box sx={{ flexGrow: 0 }} xs={6}>
+                <Box sx={{ flexGrow: 0 }} xs={8}>
                     <Link to="/">
-                        <img src={"logo.svg"} alt="logo" className={classes.headerLogo} style={{ }} />
+                        <img src={Logo} alt="logo" className={classes.headerLogo} style={{ }} />
                     </Link>
                 </Box>
-                    <Box sx={{ flexGrow: 0 }} xs={6}>
+                <Box sx={{ flexGrow: 0 }} xs={2}>
+                    <Typography variant="h6" sx={{color : "#000000", display: "inline"}}>Username </Typography>
+                    <Typography variant="caption" sx={{color : "red", display: "inline", p : 0.3, border : "1px solid red", borderRadius : 2}}>admin</Typography>
+                </Box>
+                    <Box sx={{ flexGrow: 0 }} xs={2}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />

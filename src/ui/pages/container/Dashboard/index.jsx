@@ -1,4 +1,4 @@
-import { Button, Divider, Grid, Link, Paper, styled, ThemeProvider, Typography } from "@mui/material";
+import { Box, Button, Card, Divider, Grid, Link, Paper, styled, ThemeProvider, Typography } from "@mui/material";
 import React from "react";
 import { translate } from "../../../../config/localisation";
 import themeDefault from "../../../theme/theme";
@@ -7,52 +7,35 @@ import ProjectCard from "../../component/common/ProjectCard";
 import UserCard from "../../component/common/UserCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
 import dashboardStyle from "../../../styles/dashboard";
+import { projectCardData } from "../../../../constants/projectCardData/projectCardData";
 
 const Dashboard = () => {
-
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: themeDefault.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...themeDefault.typography.body2,
-        padding: themeDefault.spacing(1),
-        textAlign: 'center',
-        color: themeDefault.palette.text.secondary,
-    }));
-
     const classes = dashboardStyle();
     return (
         <React.Fragment>
             <Header />
-            <Grid
-                container
-                className={classes.parentContainer}               
-                spacing={2}
-            >
-                <Grid item xs={3}>
-                    <Grid
-                        container
-                        className={classes.userCardContainer}
-                        spacing={1}
-                    >
-                        <UserCard />
-                    </Grid>
-
+            <Box sx={{ width: window.innerWidth*0.8, margin : "0 auto", pb : 5 }}>
+                <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography>
+                <Grid container rowSpacing={4} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                    {
+                        projectCardData.map((el,i)=>{
+                            return(
+                                <Grid item xs={1} sm={2} md={3}
+                                >
+                                    <ProjectCard 
+                                        classAssigned = {i % 2 === 0 ? classes.projectCardContainer2 : classes.projectCardContainer1}
+                                        projectObj = {el}
+                                    />
+                                </Grid>
+                            )
+                        })
+                    }
                 </Grid>
-                <Grid item xs={9}>
-                    <Grid
-                        container
-                        direction='column'
-                        className={classes.dashboardContentContainer}
-                        spacing={1}
-                    >
-                        <ProjectCard />
-                        <Divider />
-                        <WorkspaceTable />
-                    </Grid>
-
-                </Grid>
-            </Grid>
+                <Divider sx={{mt : 3, mb : 3}} />
+                <Typography variant="h5" sx={{mt : 2, mb : 2}}>Visit Workspaces</Typography>
+                <WorkspaceTable />
+            </Box>
         </React.Fragment>
-
     )
 }
 

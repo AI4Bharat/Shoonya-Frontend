@@ -5,7 +5,7 @@ import { Wave } from '../../assets/Wave.svg';
 const headerStyle = makeStyles({
     parentContainer: {
         flexGrow : 1,
-        marginBottom : '4%',
+        marginBottom : window.innerHeight*0.13,
         width : window.innerWidth*(98/100)
     },
     appBar: {
