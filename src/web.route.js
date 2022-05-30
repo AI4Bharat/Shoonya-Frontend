@@ -4,6 +4,8 @@ import Login from "./ui/pages/container/UserManagement/Login";
 import ForgotPassword from "./ui/pages/container/UserManagement/ForgotPassword";
 import Dashboard from "./ui/pages/container/Dashboard";
 import Projects from "./ui/pages/container/Projects";
+import { ThemeProvider } from "@mui/material/styles";
+import themeDefault from "./ui/theme/theme";
 
 const App = () => {
   let routes = useRoutes([
@@ -19,7 +21,9 @@ const App = () => {
 const AppWrapper = () => {
   return (
     <Router>
+      <ThemeProvider theme={themeDefault}>
       <App />
+      </ThemeProvider>
     </Router>
   );
 };
