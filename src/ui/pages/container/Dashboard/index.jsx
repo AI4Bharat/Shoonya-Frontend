@@ -16,11 +16,11 @@ const Dashboard = () => {
             <Header />
             <Box sx={{ width: window.innerWidth*0.8, margin : "0 auto", pb : 5 }}>
                 <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography>
-                <Grid container rowSpacing={4} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                <Grid container rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                     {
                         projectCardData.map((el,i)=>{
                             return(
-                                <Grid item xs={1} sm={2} md={3}
+                                <Grid item xs={12} sm={12} md={3}
                                 >
                                     <ProjectCard 
                                         classAssigned = {i % 2 === 0 ? classes.projectCardContainer2 : classes.projectCardContainer1}

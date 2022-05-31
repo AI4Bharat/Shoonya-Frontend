@@ -14,6 +14,7 @@ const dashboardStyle = makeStyles({
         backgroundImage: "linear-gradient(to right, #d030c4, #660867a1)",
         height : "100%",
         width : "100%"
+        
     },
     projectCardContainer2 : {
         // backgroundImage : "linear-gradient(to right, #d030c4, #660867a1)",
