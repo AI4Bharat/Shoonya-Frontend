@@ -7,18 +7,18 @@ const dashboardStyle = makeStyles({
         minHeight: "100vh",
         // direction: "row",
         alignItems: "center",
-        paddingBottom : "5vh"
+        paddingBottom : "5vh",
         // justifyContent: "space-around",
     },
     projectCardContainer1 : {
-        backgroundImage: "linear-gradient(to right, #d030c4, #660867a1)",
+        backgroundImage: "linear-gradient(to top, #2A61AD 0%, #6f86d6 100%)",
         height : "100%",
         width : "100%"
         
     },
     projectCardContainer2 : {
-        // backgroundImage : "linear-gradient(to right, #d030c4, #660867a1)",
-        backgroundImage : "linear-gradient(to right, #c593fb, #660867)",
+        backgroundImage : "linear-gradient(to top, #119DA4 0%, #72afd3 100%)",
+        // backgroundImage : "linear-gradient(to right, #c593fb, #660867)",
         // backgroundImage: "linear-gradient(to right, #43e97b, #38f9d7)",
         height : "100%",
         width : "100%"

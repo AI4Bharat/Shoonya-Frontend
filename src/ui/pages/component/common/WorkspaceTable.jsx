@@ -18,8 +18,8 @@ import CustomButton from '../../component/common/Button'
 const WorkspaceTable = () => {
     return (
         // <ThemeProvider theme={themeDefault}>
-            <TableContainer sx={{ width: window.innerWidth * 0.8, padding: 2 }} component={Paper}>
-                <Table sx={{ width: window.innerWidth * 0.8 }} aria-label="simple table">
+            <TableContainer sx={{ width: window.innerWidth*0.7, padding: 2 }} component={Paper}>
+                <Table sx={{ width: window.innerWidth*0.7 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -42,6 +42,7 @@ const WorkspaceTable = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <CustomButton
+                                            sx={{borderRadius : 2}}
                                             label = "View"
                                         />
                                     </TableCell>

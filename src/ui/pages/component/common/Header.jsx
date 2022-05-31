@@ -21,23 +21,47 @@ const Header = () => {
 
     return (
         <Box className={classes.parentContainer}>
-            <AppBar style={{ backgroundColor: "#ffffff"}}>
+            <AppBar style={{ backgroundColor: "#ffffff" }}>
                 <Toolbar className={classes.toolbar}>
-                <Box sx={{ flexGrow: 0 }} xs={8}>
-                    <Link to="/">
-                        <img src={Logo} alt="logo" className={classes.headerLogo} style={{ }} />
-                    </Link>
-                </Box>
-                <Box sx={{ flexGrow: 0 }} xs={2}>
+                    <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={7}>
+                        <Link to="/">
+                            <img src={Logo} alt="logo" className={classes.headerLogo} />
+                        </Link>
+                    </Box>
+                    {/* <Box sx={{ flexGrow: 0 }} xs={2}>
                     <Typography variant="h6" sx={{color : "#000000", display: "inline"}}>Username </Typography>
                     <Typography variant="caption" sx={{color : "red", display: "inline", p : 0.3, border : "1px solid red", borderRadius : 2}}>admin</Typography>
-                </Box>
-                    <Box sx={{ flexGrow: 0 }} xs={2}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                            </IconButton>
-                        </Tooltip>
+                </Box> */}
+                    <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={5}>
+                        
+                            <Grid
+                                container
+                                direction="row"
+                                justifyContent="center"
+                                spacing={1}
+                                sx={{textAlign : "center", alignItems : "center"}}
+                            >
+                                <Grid 
+                                    item 
+                                    xs={12}
+                                    sm={12}
+                                    md={6}
+                                >
+                                    <Tooltip title="Open settings">
+                                    <IconButton onClick={handleOpenUserMenu}>
+                                        <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                    </IconButton>
+                                    </Tooltip>
+                                </Grid>
+                                <Grid 
+                                    item
+                                    xs={12}
+                                    sm={12}
+                                    md={6}
+                                >
+                                    <Typography variant="body1" color="primary.dark" sx={{p:0}}>Username</Typography>
+                                </Grid>
+                            </Grid>
                         <Menu
                             sx={{ mt: '45px' }}
                             id="menu-appbar"
@@ -49,14 +73,14 @@ const Header = () => {
                             keepMounted
                             transformOrigin={{
                                 vertical: 'top',
-                                horizontal: 'right',
+                                horizontal: 'center',
                             }}
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
                             {settings.map((setting) => (
                                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
+                                    <Typography variant="body2" textAlign="center">{setting}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>

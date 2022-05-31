@@ -186,6 +186,7 @@ const themeDefault = createTheme({
                     boxSizing: "border-box",
                     margin: "-1px",
                     padding: "0px",
+                    backgroundImage : "linear-gradient(to right, #f1f1f1, #ffffff)"
                 },
             }
         },
@@ -361,9 +362,10 @@ themeDefault.container = {
 }
 
 themeDefault.typography.lightText = {
-    fontSize: "0.75rem",
+    fontSize: "0.73rem",
     fontFamily: "'Roboto', sans-serif",
-    fontWeight: "500"
+    fontWeight: "500",
+    color : "rgb(255 255 255 / 82%)"
 }
 
 export default themeDefault;

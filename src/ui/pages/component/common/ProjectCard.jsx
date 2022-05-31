@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { Box, Divider, Grid, ThemeProvider } from '@mui/material';
+import { Box, Chip, Divider, Grid, ThemeProvider } from '@mui/material';
 import themeDefault from '../../../theme/theme';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import projectCardStyles from '../../../styles/projectCard';
@@ -20,25 +20,58 @@ const ProjectCard = (props) => {
     // }
 
     const classes = projectCardStyles();
-
+    const { projectObj, index } = props
     return (
         <Link to={`/projects/1}`} style={{ textDecoration: "none" }}>
             <Grid
                 elevation={2}
                 className={props.classAssigned}
                 sx={{
-                    minHeight: 200,
-                    width: 350,
-                    cursor: "pointer"
+                    minHeight: 250,
+                    cursor: "pointer",
+                    borderRadius: 5,
+                    p: 2
                 }}
             >
-                <Typography variant="h6" sx={{ mt: 2, textAlign: "center", color: "primary.contrastText" }}>{props.projectObj.name}</Typography>
-                <Divider sx={{ mt: 2, mb: 2 }} />
+                <Typography variant="caption" sx={{ background: "#FFD981", p: 1, borderRadius: 3 }}>{projectObj.status}</Typography>
+                <Typography
+                    variant="h5"
+                    sx={{ mt: 4, textAlign: "center", color: "secondary.contrastText", backgroundColor: "primary.contrastText", borderRadius: 3, pt: 1, pb: 1 }}
+                >{projectObj.name}
+                </Typography>
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    sx={{mt:3, mb:3}}
+                    spacing={2}
+                >
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={6}
+                    >
+                        <Typography variant="lightText">Type</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.type}</Typography>
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={6}
+                    >
+                        <Typography variant="lightText">Project ID</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{index+1}</Typography>
+                    </Grid>
+                </Grid>
+                
+                <Typography variant="lightText">Description</Typography>
+                <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.desc}</Typography>
 
+                {/* <Typography variant="body2" sx={{ mt: 2, ml: 5, color: "primary.contrastText" }}>{projectObj.desc}</Typography> */}
+                {/* <Divider sx={{ mt: 7 }} variant="inset" /> */}
 
-                <Typography variant="body2" sx={{ mt: 2, ml: 5, color: "primary.contrastText" }}>{props.projectObj.desc}</Typography>
-                <Divider sx={{ mt: 7 }} variant="inset" />
-                <Typography variant="subtitle2" sx={{ mt: 1, mr: 2, textAlign: "end", color: "primary.contrastText" }}>{props.projectObj.type}</Typography>
             </Grid>
         </Link>
     )
