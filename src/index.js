@@ -3,11 +3,15 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './web.route';
 import reportWebVitals from './reportWebVitals';
+import { ThemeProvider } from '@mui/material';
+import themeDefault from './ui/theme/theme';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={themeDefault}>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>
 );
 
