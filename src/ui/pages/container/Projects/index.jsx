@@ -91,7 +91,8 @@ const Projects = () => {
                         sx={{
                             marginTop: 2,
                             padding: 1,
-                            backgroundColor: "primary"
+                            backgroundColor: "primary",
+                            borderRadius : 2
                         }}
                         variant="contained"
                     >
