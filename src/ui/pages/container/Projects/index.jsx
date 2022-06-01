@@ -61,7 +61,6 @@ const Projects = () => {
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-                width={window.innerWidth}
             >
                 <Card
                     sx={{
@@ -82,16 +81,17 @@ const Projects = () => {
                                     paddingTop: 2
                                 }}
                             >
-                                <Typography variant="body2" fontWeight='700'>{el.name} : </Typography>
-                                <Typography variant="caption"> {el.value}</Typography>
+                                <Typography variant="body2" fontWeight='700' pr={1}>{el.name} :</Typography>
+                                <Typography variant="caption">{el.value}</Typography>
                             </Grid>
                         )
                     })}
                     <Button
                         sx={{
                             marginTop: 2,
+                            marginBottom: 2,
                             padding: 1,
-                            backgroundColor: "primary",
+                            backgroundColor: "primary.main",
                             borderRadius : 2
                         }}
                         variant="contained"
@@ -99,7 +99,7 @@ const Projects = () => {
                         <Typography variant="caption">Show Project Setting</Typography>
                     </Button>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" TabIndicatorProps={{style: {backgroundColor: "#271e4f"}}}>
                             <Tab label="Tasks" {...a11yProps(0)} />
                             <Tab label="Members" {...a11yProps(1)} />
                             <Tab label="Reports" {...a11yProps(2)} />
