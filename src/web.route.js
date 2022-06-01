@@ -5,6 +5,7 @@ import ForgotPassword from "./ui/pages/container/UserManagement/ForgotPassword";
 import Dashboard from "./ui/pages/container/Dashboard";
 import Projects from "./ui/pages/container/Projects";
 import { ThemeProvider } from "@mui/material/styles";
+import ProjectSetting from "./ui/pages/container/Projects/ProjectSetting"
 import themeDefault from "./ui/theme/theme";
 
 const App = () => {
@@ -14,6 +15,7 @@ const App = () => {
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "dashboard", element: <Dashboard />},
     { path: "projects/:id", element: <Projects />},
+    { path: "projects/:id/projectsetting", element: <ProjectSetting />},
   ]);
   return routes;
 };

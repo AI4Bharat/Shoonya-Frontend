@@ -2,6 +2,7 @@ import { Box, Button, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@
 import React, { useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const projectData = [
     { name: "Project ID", value: "1" },
@@ -17,6 +18,7 @@ const menuOptions = [
 ]
 
 function TabPanel(props) {
+    
     const { children, value, index, ...other } = props;
 
     return (
@@ -87,6 +89,7 @@ const Projects = () => {
                             </Grid>
                         )
                     })}
+                     <Link to={`/projects/1/projectsetting`} style={{ textDecoration: "none" }}>
                     <Button
                         sx={{
                             marginTop: 2,
@@ -97,6 +100,7 @@ const Projects = () => {
                     >
                         <Typography variant="caption">Show Project Setting</Typography>
                     </Button>
+                    </Link>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                             <Tab label="Tasks" {...a11yProps(0)} />
