@@ -2,6 +2,9 @@ import { Box, Button, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@
 import React, { useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
+import TaskTable from "../../component/Project/TaskTable";
+import MembersTable from "../../component/Project/MembersTable";
+import ReportsTable from "../../component/Project/ReportsTable";
 
 const projectData = [
     { name: "Project ID", value: "1" },
@@ -36,14 +39,6 @@ function TabPanel(props) {
     );
 }
 
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
-
 
 const Projects = () => {
 
@@ -61,7 +56,6 @@ const Projects = () => {
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-                width={window.innerWidth}
             >
                 <Card
                     sx={{
@@ -82,16 +76,17 @@ const Projects = () => {
                                     paddingTop: 2
                                 }}
                             >
-                                <Typography variant="body2" fontWeight='700'>{el.name} : </Typography>
-                                <Typography variant="caption"> {el.value}</Typography>
+                                <Typography variant="body2" fontWeight='700' pr={1}>{el.name} :</Typography>
+                                <Typography variant="caption">{el.value}</Typography>
                             </Grid>
                         )
                     })}
                     <Button
                         sx={{
                             marginTop: 2,
+                            marginBottom: 2,
                             padding: 1,
-                            backgroundColor: "primary",
+                            backgroundColor: "primary.main",
                             borderRadius : 2
                         }}
                         variant="contained"
@@ -99,20 +94,20 @@ const Projects = () => {
                         <Typography variant="caption">Show Project Setting</Typography>
                     </Button>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                            <Tab label="Tasks" {...a11yProps(0)} />
-                            <Tab label="Members" {...a11yProps(1)} />
-                            <Tab label="Reports" {...a11yProps(2)} />
+                        <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{style: {backgroundColor: "#2C2799"}}}>
+                            <Tab label="Tasks" sx={{fontSize : 16, fontWeight : '700'}} />
+                            <Tab label="Members" sx={{fontSize : 16, fontWeight : '700'}} />
+                            <Tab label="Reports" sx={{fontSize : 16, fontWeight : '700'}} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
-                        Item One
+                        <TaskTable />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        Item Two
+                        <MembersTable />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        Item Three
+                        <ReportsTable />
                     </TabPanel>
                 </Card>
             </Grid>
