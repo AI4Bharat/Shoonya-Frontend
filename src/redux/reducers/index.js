@@ -1,8 +1,11 @@
-import apistatus from './apistatus/apistatus';
+import apiStatus from './apistatus/apistatus';
 import getProjects from './Dashboard/GetProjects';
+import getWorkspaces from './Dashboard/GetWorkspaces';
+
 const index = {
-    apistatus,
-    getProjects
+    apiStatus,
+    getProjects,
+    getWorkspaces
 };
 
 export default index;

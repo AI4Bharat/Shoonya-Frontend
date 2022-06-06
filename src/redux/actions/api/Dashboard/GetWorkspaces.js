@@ -5,17 +5,17 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constant from '../../../constants';
 
- export default class GetProjectsAPI extends API {
-   constructor(timeout = 2000) {
+ export default class GetWorkspacesAPI extends API {
+   constructor(pageNo,timeout = 2000) {
      super("GET", timeout, false);
-     this.type = constant.GET_PROJECT_DATA
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}`;
+     this.type = constant.GET_WORKSPACES_DATA
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}?page=${pageNo}`;
    }
 
    processResponse(res) {
     super.processResponse(res);
     if (res) {
-        this.projectData = res;
+        this.workspaceData = res;
     }
 }
  
@@ -36,7 +36,7 @@
    }
  
    getPayload() {
-     return this.projectData;
+     return this.workspaceData;
    }
  }
  

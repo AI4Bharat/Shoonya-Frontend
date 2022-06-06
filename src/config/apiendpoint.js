@@ -1,4 +1,5 @@
 export default {
   login: "/users/auth/jwt/create",
-  getProjects:"/projects/"
+  getProjects:"/projects/",
+  getWorkspaces:"/workspaces/"
 };

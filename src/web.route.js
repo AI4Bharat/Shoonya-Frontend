@@ -10,10 +10,11 @@ import WorkSpace from "./ui/pages/container/workspace/WorkSpace"
 import themeDefault from "./ui/theme/theme";
 import CreateAnnotationProject from "./ui/pages/container/workspace/CreateAnnotationProject"
 
+
 const App = () => {
   let routes = useRoutes([
-    { path: "/", element: <Landing /> },
-    { path: "login", element: <Login /> },
+    // { path: "/", element: <Landing /> },
+    { path: "/", element: <Login /> },
     { path: "forgot-password", element: <ForgotPassword /> },
     { path: "dashboard", element: <Dashboard />},
     { path: "projects/:id", element: <Projects />},

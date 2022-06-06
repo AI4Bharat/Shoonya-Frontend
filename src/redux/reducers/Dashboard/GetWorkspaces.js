@@ -5,10 +5,10 @@ let initialState = {
 }
 const reducer = (state=initialState,action)=>{
     switch(action.type){
-        case constants.GET_PROJECT_DATA:
+        case constants.GET_WORKSPACES_DATA:
             return {
                 ...state,
-                data:action.payload
+                data:action.payload.results
             } 
 
         default:

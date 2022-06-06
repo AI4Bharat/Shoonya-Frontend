@@ -1,31 +1,32 @@
-import { Box, Button, Card, Divider, Grid, Link, Paper, styled, ThemeProvider, Typography } from "@mui/material";
+import { Box, Divider, Grid, Typography } from "@mui/material";
 import React, { useEffect } from "react";
-import { translate } from "../../../../config/localisation";
-import themeDefault from "../../../theme/theme";
 import Header from "../../component/common/Header";
 import ProjectCard from "../../component/common/ProjectCard";
-import UserCard from "../../component/common/UserCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
 import dashboardStyle from "../../../styles/dashboard";
-// import { projectCardData } from "../../../../constants/projectCardData/projectCardData";
 import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
 import {useDispatch,useSelector} from 'react-redux';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
 const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
-    const {data} = useSelector(state=>state.getProjects);
+    const projectData = useSelector(state=>state.getProjects.data);
+    const workspaceData = useSelector(state=>state.getWorkspaces.data);
 
     const getDashboardData = ()=>{
-        const apiObj = new GetProjectsAPI();
-        dispatch(APITransport(apiObj));
+        const projectObj = new GetProjectsAPI();
+        const workspaceObj = new GetWorkspacesAPI(1);
+        dispatch(APITransport(projectObj));
+        dispatch(APITransport(workspaceObj));
     }
     
     useEffect(()=>{
-        if(!data.length)
         getDashboardData();
-    },[data]);
+    });
+
+    // console.log(projectData,workspaceData);
 
     return (
         <React.Fragment>
@@ -34,10 +35,9 @@ const Dashboard = () => {
                 <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography>
                 <Grid container sx={{alignItems : "center"}} rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }}>
                     {
-                        data.map((el,i)=>{
+                        projectData.map((el,i)=>{
                             return(
-                                <Grid item xs={12} sm={12} md={4}
-                                >
+                                <Grid key={el.id} item xs={12} sm={12} md={4} lg={4} xl={4}>
                                     <ProjectCard 
                                         classAssigned = {i % 2 === 0 ? classes.projectCardContainer2 : classes.projectCardContainer1}
                                         projectObj = {el}
@@ -50,7 +50,7 @@ const Dashboard = () => {
                 </Grid>
                 <Divider sx={{mt : 3, mb : 3}} />
                 <Typography variant="h5" sx={{mt : 2, mb : 2}}>Visit Workspaces</Typography>
-                <WorkspaceTable />
+                <WorkspaceTable workspaceData={workspaceData} />
             </Box>
         </React.Fragment>
     )

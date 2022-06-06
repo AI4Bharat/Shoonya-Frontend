@@ -5,7 +5,6 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { persistCombineReducers } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import combineReducers from '../reducers';
-import * as stateData from '../data/initialstate.json';
 
 const middlewares = [];
 const config = {
@@ -32,7 +31,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const store = createStore(
     rootReducer,
-    stateData.default,
+    {},
     (process.env.NODE_ENV === 'development') ? composeWithDevTools(applyMiddleware(...middlewares)) : compose(applyMiddleware(...middlewares))
 );
 
