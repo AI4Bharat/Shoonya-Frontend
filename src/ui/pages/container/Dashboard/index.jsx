@@ -12,6 +12,7 @@ import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspa
 const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
+    console.log('dahsboard')
     // const projectData = useSelector(state=>state.getProjects.data);
     // const workspaceData = useSelector(state=>state.getWorkspaces.data);
     const [projectData,setProjectData] = useState([]);
