@@ -14,6 +14,7 @@ import { ThemeProvider } from '@mui/material';
 import themeDefault from '../../../theme/theme';
 import { workspaceData } from '../../../../constants/workspaceData/workspaceData';
 import CustomButton from '../../component/common/Button'
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const WorkspaceTable = () => {
     return (
@@ -41,10 +42,12 @@ const WorkspaceTable = () => {
                                         {el.name}
                                     </TableCell>
                                     <TableCell align="center">
+                                    <Link to={`/workspace/1}`} style={{ textDecoration: "none" }}>
                                         <CustomButton
                                             sx={{borderRadius : 2}}
                                             label = "View"
                                         />
+                                     </Link>
                                     </TableCell>
                                 </TableRow>
                             )

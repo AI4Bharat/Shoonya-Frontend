@@ -6,12 +6,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
-import { withStyles } from '@mui/styles';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 
 
 const ProjectSetting = (props) => {
-    const { classes } = props;
+   
+    const classes = DatasetStyle();
+
     return (
         <ThemeProvider theme={themeDefault}>
 
@@ -29,7 +30,21 @@ const ProjectSetting = (props) => {
                         minHeight: 500,
                         padding: 5
                     }}
+
                 >
+                    <Link to={`/projects/1}`} style={{ textDecoration: "none" }}>
+                    <Button 
+                    sx={{
+                        margin: "0px 0px 20px 0px",
+                        backgroundColor:"transparent",
+                         color:"black",
+                        '&:hover': {
+                            backgroundColor:"transparent",
+                      },
+                    }}
+                    
+                    label=" < Back to project" />
+                    </Link>
                     <Grid
                         item
                         xs={12}
@@ -57,30 +72,27 @@ const ProjectSetting = (props) => {
                     <Grid
                         container
                         direction='row'
-                        // justifyContent='center'
-                        // alignItems='center'
-                        // width={window.innerWidth}
-                        style={{ margin: "20px 0px 0px 0px" }}
+                       style={{ margin: "20px 0px 0px 0px" }}
                     >
                         <Grid
                             items
-                            xs={2}
-                            sm={2}
-                            md={2}
+                            xs={12}
+                            sm={12}
+                            md={12}
                             lg={2}
                             xl={2}
                         >
-                            <Typography variant="h6" gutterBottom component="div">
+                            <Typography  gutterBottom component="div"  label="Required">
                                 Project Name :
                             </Typography>
                         </Grid>
                         <Grid
                             item
-                            xs={9}
-                            md={9}
+                            xs={12}
+                            md={12}
                             lg={9}
                             xl={9}
-                            sm={9}
+                            sm={12}
                         >
                             <OutlinedTextField
                                 fullWidth
@@ -92,31 +104,28 @@ const ProjectSetting = (props) => {
                     <Grid
                         container
                         direction='row'
-                        // justifyContent='center'
-                        // alignItems='center'
-                        // width={window.innerWidth}
                         style={{ margin: "20px 0px 0px 0px" }}
                     >
                         <Grid
                             items
-                            xs={2}
-                            sm={2}
-                            md={2}
+                            xs={12}
+                            sm={12}
+                            md={12}
                             lg={2}
                             xl={2}
                         >
 
-                            <Typography variant="h6" gutterBottom component="div">
+                            <Typography  gutterBottom component="div">
                                 Project Description :
                             </Typography>
                         </Grid>
                         <Grid
                             item
-                            xs={9}
-                            md={9}
+                            xs={12}
+                            md={12}
                             lg={9}
                             xl={9}
-                            sm={9}
+                            sm={12}
                         >
                             <OutlinedTextField
                                 fullWidth
@@ -126,14 +135,14 @@ const ProjectSetting = (props) => {
                         </Grid>
                     </Grid>
                     <Grid
-                        className={classes.abc}
+                        
                         style={{ margin: "15px 0px 10px 0px", }}
                         item
-                        xs={7}
-                        md={7}
-                        lg={7}
-                        xl={7}
-                        sm={7}
+                        xs={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+                        sm={12}
                     >
                         <Button
 
@@ -141,25 +150,25 @@ const ProjectSetting = (props) => {
                     </Grid>
                     <Grid
                         item
-                        xs={7}
-                        md={7}
-                        lg={7}
-                        xl={7}
-                        sm={7}
+                        xs={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+                        sm={12}
                     >
-                        <Typography variant="h4" gutterBottom component="div">
+                        <Typography variant="h4" gutterBottom component="div" style={{ margin: "15px 0px 10px 0px", }}>
                             Add Annotators To The Project
                         </Typography>
                     </Grid>
                     <Grid
                         item
-                        xs={7}
-                        md={7}
-                        lg={7}
-                        xl={7}
-                        sm={7}
+                        xs={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+                        sm={12}
                     >
-                        <Typography variant="h6" gutterBottom component="div">
+                        <Typography  gutterBottom component="div">
                             Emails :
                         </Typography>
                     </Grid>
@@ -174,39 +183,50 @@ const ProjectSetting = (props) => {
                         <TextareaAutosize
                             fullWidth
                             aria-label="minimum height"
-                            minRows={8}
+                            minRows={6}
                             placeholder="Enter emails of Annotators separated by commas(,)"
-                            style={{ width: "100%" }}
+                            className={classes.Projectsettingtextarea}
+                           
                         />
                     </Grid>
                     <Grid
                         container
                         direction='row'
-                    // justifyContent='center'
-                    // alignItems='center'
-                    // width={window.innerWidth}
+                        sx={{maxWidth:" 70%",
+                        "@media (max-width:650px)": {
+                           
+                            maxWidth:" 100%"
+                          },
+                    }}
+                        
+                   
                     >
                         <Grid
-                            style={{ margin: "15px 0px 10px 0px", }}
-                            item
-                            xs={2}
-                            md={2}
+                         sx={{
+                            marginTop: 2,
+                           
+                        }}
+                         item
+                            xs={6}
+                            md={6}
                             lg={2}
                             xl={2}
-                            sm={2}
+                            sm={6}
                         >
-                            <Button label="Add Annotators" />
+                            <Button style={{lineHeight: "16.3px"}} label="Add Annotators" />
                         </Grid>
                         <Grid
-                            style={{ margin: "15px 0px 10px 0px", }}
-                            item
-                            xs={2}
-                            md={2}
+                            sx={{
+                                marginTop: 2
+                            }}
+                           item
+                            xs={6}
+                            md={6}
                             lg={2}
                             xl={2}
-                            sm={2}
+                            sm={6}
                         >
-                            <Button label="Publish Project" />
+                            <Button style={{lineHeight: "16.3px"}} label="Publish Project" />
                         </Grid>
                     </Grid>
                     <Grid
@@ -217,49 +237,56 @@ const ProjectSetting = (props) => {
                         xl={12}
                         sm={12}
                     >
-                        <Typography variant="h4" gutterBottom component="div">
-                            Add Annotators To The Project
+                        <Typography variant="h4" gutterBottom component="div"  style={{ margin: "15px 0px 10px 0px", }}>
+                        Advanced Operation
                         </Typography>
                     </Grid>
                     <Grid
                         container
                         direction='row'
-                    // justifyContent='center'
-                    // alignItems='center'
-                    // width={window.innerWidth}
+                        sx={{maxWidth:" 70%"}}
+
+                   
                     >
                         <Grid
-                            style={{ margin: "15px 0px 10px 0px", }}
+                            sx={{
+                                marginTop: 2
+                            }}
                             item
-                            xs={3}
-                            md={3}
+                            xs={12}
+                            md={12}
                             lg={3}
                             xl={3}
-                            sm={3}
+                            sm={12}
                         >
-                            <Button label="Export Project into Dataset" />
+                            <Button style={{lineHeight: "16.3px"}} label="Export Project into Dataset" />
                         </Grid>
                         <Grid
-                            style={{ margin: "15px 0px 10px 0px", }}
+                             sx={{
+                                marginTop: 2,
+                                lineHeight: 2,
+                            }}    
                             item
-                            xs={4}
-                            md={4}
+                            xs={12}
+                            md={12}
                             lg={4}
                             xl={4}
-                            sm={4}
+                            sm={12}
                         >
-                            <Button label="Pull New Data Items from Source Dataset" />
+                            <Button style={{lineHeight: "16.3px"}}label="Pull New Data Items from Source Dataset" />
                         </Grid>
                         <Grid
-                            style={{ margin: "15px 0px 10px 0px", }}
+                            sx={{
+                                marginTop: 2
+                            }}    
                             item
-                            xs={3}
-                            md={3}
+                            xs={12}
+                            md={12}
                             lg={3}
                             xl={3}
-                            sm={3}
+                            sm={12}
                         >
-                            <Button label="Download project" />
+                            <Button style={{lineHeight: "16.3px"}} label="Download project" />
 
                         </Grid>
                     </Grid>
@@ -271,4 +298,4 @@ const ProjectSetting = (props) => {
     )
 }
 
-export default withStyles(DatasetStyle)(ProjectSetting);
+export default ProjectSetting;
