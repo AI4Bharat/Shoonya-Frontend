@@ -67,7 +67,12 @@ const LoginStyle = makeStyles({
           width: "85%",
         },
       },
-    
+      parent: {
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+        justifyContent: "center",
+      },
      
 })
 
