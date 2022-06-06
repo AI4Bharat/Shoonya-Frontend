@@ -1,0 +1,77 @@
+
+import { makeStyles } from '@mui/styles';
+import { Wave } from '../../assets/Wave.svg';
+
+
+const LoginStyle = makeStyles({
+    appInfo: {
+        background: "rgba(44, 39, 153, 1)",
+        minHeight: "100vh",
+        color:"white",
+        // color: theme.palette.primary.contrastText,
+        "@media (max-width:650px)": {
+          background: "white",
+          minHeight: "15vh",
+         
+        },
+        
+      
+      },
+      title: {
+        width: "20%",
+        height: "auto",
+        margin: "22% 294px 10% 39px",
+        cursor:"pointer",
+        lineHeight: "1.53",
+        letterSpacing: "3.9px",
+        textAlign: "left",
+        "@media (max-width:650px)": {
+          margin: "5% 10% 5% 40%",
+          color: "black",
+         
+        },
+      
+    
+      },
+      subTitle: {
+        width: "80%",
+        height: "auto",
+        maxWidth: "300px",
+        margin: "20% 70px 15% 39px",
+        lineHeight: "1.5",
+        letterSpacing: "1.6px",
+        textAlign: "left",
+        "@media (max-width:1040px)": {
+          letterSpacing: "1px",
+          maxWidth: "280px",
+          width: "80%",
+        },
+        "@media (min-width:1790px)": {
+          width: "68%",
+        },
+      },
+      body: {
+        width: "80%",
+        height: "auto",
+        margin: "30px 0px 50px 39px",
+        lineHeight: "1.5",
+        letterSpacing: "1.6px",
+        textAlign: "left",
+        color: "#f2f2f4",
+        "@media (max-width:1040px)": {
+          letterSpacing: "1px",
+          maxWidth: "280px",
+        },
+        "@media (min-width:1790px)": {
+          
+          width: "85%",
+        },
+      },
+    
+     
+})
+
+export default  LoginStyle
+
+
+  

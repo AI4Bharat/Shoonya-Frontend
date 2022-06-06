@@ -192,6 +192,7 @@ const ProjectSetting = (props) => {
                     <Grid
                         container
                         direction='row'
+                        spacing={2}
                         sx={{maxWidth:" 70%",
                         "@media (max-width:650px)": {
                            
@@ -244,6 +245,7 @@ const ProjectSetting = (props) => {
                     <Grid
                         container
                         direction='row'
+                        spacing={2}
                         sx={{maxWidth:" 70%"}}
 
                    
