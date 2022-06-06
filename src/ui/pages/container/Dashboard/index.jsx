@@ -12,43 +12,20 @@ import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspa
 const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
-    // const projectData = useSelector(state=>state.getProjects.data);
-    // const workspaceData = useSelector(state=>state.getWorkspaces.data);
-    const [projectData,setProjectData] = useState([]);
-    const [workspaceData,setWorkspaceData] = useState([]);
+    const projectData = useSelector(state=>state.getProjects.data);
+    const workspaceData = useSelector(state=>state.getWorkspaces.data);
 
     const getDashboardData = ()=>{
         const projectObj = new GetProjectsAPI();
         const workspaceObj = new GetWorkspacesAPI(1);
-        // dispatch(APITransport(projectObj));
-        // dispatch(APITransport(workspaceObj));
-        fetch(projectObj.apiEndPoint(),{
-            method:"GET",
-            headers:projectObj.getHeaders().headers
-        }).then(async res=>{
-            const rsp_data = await res.json();
-            if(res.ok){
-                setProjectData(rsp_data);
-            }
-        })
-
-        fetch(workspaceObj.apiEndPoint(),{
-            method:"GET",
-            headers:workspaceObj.getHeaders().headers
-        }).then(async res=>{
-            const rsp_data = await res.json();
-            if(res.ok){
-                setWorkspaceData(rsp_data.results);
-            }
-        })
+        dispatch(APITransport(projectObj));
+        dispatch(APITransport(workspaceObj));
     }
     
     useEffect(()=>{
-        if(!workspaceData.length || !projectData.length)
         getDashboardData();
     },[]);
 
-    // console.log(projectData,workspaceData);
 
     return (
         <React.Fragment>
