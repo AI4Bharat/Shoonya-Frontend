@@ -1,5 +1,5 @@
 import { Box, Button, Card, Divider, Grid, Link, Paper, styled, ThemeProvider, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { translate } from "../../../../config/localisation";
 import themeDefault from "../../../theme/theme";
 import Header from "../../component/common/Header";
@@ -8,9 +8,24 @@ import UserCard from "../../component/common/UserCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
 import dashboardStyle from "../../../styles/dashboard";
 import { projectCardData } from "../../../../constants/projectCardData/projectCardData";
+import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
+import {useDispatch} from 'react-redux';
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
 
 const Dashboard = () => {
     const classes = dashboardStyle();
+    const dispatch = useDispatch();
+
+
+    const getDashboardData = ()=>{
+        const apiObj = new GetProjectsAPI();
+        dispatch(APITransport(apiObj));
+    }
+    
+    useEffect(()=>{
+        getDashboardData();
+    },[]);
+
     return (
         <React.Fragment>
             <Header />
