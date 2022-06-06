@@ -1,5 +1,5 @@
 import { Box, Divider, Grid, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import ProjectCard from "../../component/common/ProjectCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
@@ -12,19 +12,41 @@ import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspa
 const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
-    const projectData = useSelector(state=>state.getProjects.data);
-    const workspaceData = useSelector(state=>state.getWorkspaces.data);
+    // const projectData = useSelector(state=>state.getProjects.data);
+    // const workspaceData = useSelector(state=>state.getWorkspaces.data);
+    const [projectData,setProjectData] = useState([]);
+    const [workspaceData,setWorkspaceData] = useState([]);
 
     const getDashboardData = ()=>{
         const projectObj = new GetProjectsAPI();
         const workspaceObj = new GetWorkspacesAPI(1);
-        dispatch(APITransport(projectObj));
-        dispatch(APITransport(workspaceObj));
+        // dispatch(APITransport(projectObj));
+        // dispatch(APITransport(workspaceObj));
+        fetch(projectObj.apiEndPoint(),{
+            method:"GET",
+            headers:projectObj.getHeaders().headers
+        }).then(async res=>{
+            const rsp_data = await res.json();
+            if(res.ok){
+                setProjectData(rsp_data);
+            }
+        })
+
+        fetch(workspaceObj.apiEndPoint(),{
+            method:"GET",
+            headers:workspaceObj.getHeaders().headers
+        }).then(async res=>{
+            const rsp_data = await res.json();
+            if(res.ok){
+                setWorkspaceData(rsp_data.results);
+            }
+        })
     }
     
     useEffect(()=>{
+        if(!workspaceData.length || !projectData.length)
         getDashboardData();
-    });
+    },[]);
 
     // console.log(projectData,workspaceData);
 
