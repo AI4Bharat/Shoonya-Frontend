@@ -12,11 +12,12 @@ import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
 import { ThemeProvider } from '@mui/material';
 import themeDefault from '../../../theme/theme';
-import { workspaceData } from '../../../../constants/workspaceData/workspaceData';
+// import { workspaceData } from '../../../../constants/workspaceData/workspaceData';
 import CustomButton from '../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-const WorkspaceTable = () => {
+const WorkspaceTable = (props) => {
+    const  {workspaceData} = props;
     return (
         // <ThemeProvider theme={themeDefault}>
             <TableContainer sx={{ width: window.innerWidth*0.7, padding: 2 }} component={Paper}>
@@ -39,7 +40,7 @@ const WorkspaceTable = () => {
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
-                                        {el.name}
+                                        {el.workspace_name}
                                     </TableCell>
                                     <TableCell align="center">
                                     <Link to={`/workspace/1}`} style={{ textDecoration: "none" }}>

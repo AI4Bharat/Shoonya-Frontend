@@ -20,9 +20,9 @@ const ProjectCard = (props) => {
     // }
 
     const classes = projectCardStyles();
-    const { projectObj, index } = props
+    const { projectObj} = props
     return (
-        <Link to={`/projects/1}`} style={{ textDecoration: "none" }}>
+        <Link to={`/projects/${projectObj.id}}`} style={{ textDecoration: "none" }}>
             <Grid
                 elevation={2}
                 className={props.classAssigned}
@@ -33,11 +33,11 @@ const ProjectCard = (props) => {
                     p: 2
                 }}
             >
-                <Typography variant="caption" sx={{ background: "#FFD981", p: 1, borderRadius: 3 }}>{projectObj.status}</Typography>
+                <Typography variant="caption" sx={{ background: "#FFD981", p: 1, borderRadius: 3 }}>{projectObj.project_mode}</Typography>
                 <Typography
                     variant="h5"
                     sx={{ mt: 4, textAlign: "center", color: "secondary.contrastText", backgroundColor: "primary.contrastText", borderRadius: 3, pt: 1, pb: 1 }}
-                >{projectObj.name}
+                >{projectObj.title}
                 </Typography>
                 <Grid
                     container
@@ -53,7 +53,7 @@ const ProjectCard = (props) => {
                         md={6}
                     >
                         <Typography variant="lightText">Type</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.type}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.project_type}</Typography>
                     </Grid>
                     <Grid
                         item
@@ -62,12 +62,12 @@ const ProjectCard = (props) => {
                         md={6}
                     >
                         <Typography variant="lightText">Project ID</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{index+1}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.id}</Typography>
                     </Grid>
                 </Grid>
                 
                 <Typography variant="lightText">Description</Typography>
-                <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.desc}</Typography>
+                <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.description}</Typography>
 
                 {/* <Typography variant="body2" sx={{ mt: 2, ml: 5, color: "primary.contrastText" }}>{projectObj.desc}</Typography> */}
                 {/* <Divider sx={{ mt: 7 }} variant="inset" /> */}
