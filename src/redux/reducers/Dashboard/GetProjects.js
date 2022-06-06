@@ -1,9 +1,16 @@
 import constants from "../../constants";
 
-const reducer = (state,action)=>{
+const initialState = {
+    data:[]
+}
+const reducer = (state=initialState,action)=>{
     switch(action.type){
         case constants.GET_PROJECT_DATA:
-            return {...action.payload} 
+
+            return {
+                ...state,
+                data:action.payload
+            } 
 
         default:
             return {

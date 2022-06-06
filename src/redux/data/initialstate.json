@@ -1,6 +1,6 @@
 {
     
-    "apiStatus": {
+    "apistatus": {
       "progress": false,
       "error": false,
       "message": null

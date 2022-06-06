@@ -7,15 +7,15 @@ import ProjectCard from "../../component/common/ProjectCard";
 import UserCard from "../../component/common/UserCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
 import dashboardStyle from "../../../styles/dashboard";
-import { projectCardData } from "../../../../constants/projectCardData/projectCardData";
+// import { projectCardData } from "../../../../constants/projectCardData/projectCardData";
 import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
-import {useDispatch} from 'react-redux';
+import {useDispatch,useSelector} from 'react-redux';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 
 const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
-
+    const {data} = useSelector(state=>state.getProjects);
 
     const getDashboardData = ()=>{
         const apiObj = new GetProjectsAPI();
@@ -23,8 +23,9 @@ const Dashboard = () => {
     }
     
     useEffect(()=>{
+        if(!data.length)
         getDashboardData();
-    },[]);
+    },[data]);
 
     return (
         <React.Fragment>
@@ -33,7 +34,7 @@ const Dashboard = () => {
                 <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography>
                 <Grid container sx={{alignItems : "center"}} rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }}>
                     {
-                        projectCardData.map((el,i)=>{
+                        data.map((el,i)=>{
                             return(
                                 <Grid item xs={12} sm={12} md={4}
                                 >
