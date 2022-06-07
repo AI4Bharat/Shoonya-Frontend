@@ -1,4 +1,4 @@
-import { AppBar, Avatar, Box, Button, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
+import { AppBar, Avatar, Box, Button, Divider, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import headerStyle from "../../../styles/header";
@@ -78,6 +78,8 @@ const Header = () => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
+                            <Typography variant="body2" sx={{pl:"1rem", mt:1}}>Signed in as <b>Admin</b></Typography>
+                            <Divider sx={{mb:2}}/>
                             {settings.map((setting) => (
                                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                                     <Typography variant="body2" textAlign="center">{setting}</Typography>

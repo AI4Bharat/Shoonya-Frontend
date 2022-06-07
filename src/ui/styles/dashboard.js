@@ -11,15 +11,13 @@ const dashboardStyle = makeStyles({
         // justifyContent: "space-around",
     },
     projectCardContainer1 : {
-        backgroundImage: "linear-gradient(to top, #2A61AD 0%, #6f86d6 100%)",
+        backgroundColor: "#2A61AD",
         height : "100%",
         width : "100%"
         
     },
     projectCardContainer2 : {
-        backgroundImage : "linear-gradient(to top, #119DA4 0%, #72afd3 100%)",
-        // backgroundImage : "linear-gradient(to right, #c593fb, #660867)",
-        // backgroundImage: "linear-gradient(to right, #43e97b, #38f9d7)",
+        backgroundColor : "#119DA4",
         height : "100%",
         width : "100%"
     },

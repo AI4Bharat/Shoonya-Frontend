@@ -362,9 +362,9 @@ themeDefault.container = {
 }
 
 themeDefault.typography.lightText = {
-    fontSize: "0.73rem",
+    fontSize: "0.75rem",
     fontFamily: "'Roboto', sans-serif",
-    fontWeight: "500",
+    fontWeight: "400",
     color : "rgb(255 255 255 / 82%)"
 }
 

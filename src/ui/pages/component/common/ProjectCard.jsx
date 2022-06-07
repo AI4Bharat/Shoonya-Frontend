@@ -33,18 +33,27 @@ const ProjectCard = (props) => {
                     p: 2
                 }}
             >
-                <Typography variant="caption" sx={{ background: "#FFD981", p: 1, borderRadius: 3 }}>{projectObj.status}</Typography>
+                <Typography variant="lightText" sx={{ background: "#FFD981", color : "#0C0F0F", p: 1, borderRadius: 3, fontSize : "0.875rem" }}>{projectObj.status}</Typography>
                 <Typography
-                    variant="h5"
-                    sx={{ mt: 4, textAlign: "center", color: "secondary.contrastText", backgroundColor: "primary.contrastText", borderRadius: 3, pt: 1, pb: 1 }}
+                    variant="h6"
+                    className={classes.modelname}
+                    sx={{ 
+                            marginTop : 2,
+                            color: "secondary.contrastText", 
+                            // backgroundColor: "primary.contrastText", 
+                            // borderRadius: 3, pt: 1, pb: 1,
+                            // height : 64,
+                            // alignItems : "center"
+                        }}
                 >{projectObj.name}
                 </Typography>
                 <Grid
                     container
                     direction="row"
                     justifyContent="space-between"
-                    sx={{mt:3, mb:3}}
-                    spacing={2}
+                    sx={{mt:1, mb:2}}
+                    spacing={3}
+                    columnSpacing={{xs: 1, sm: 1, md: 10}}
                 >
                     <Grid
                         item
@@ -53,7 +62,7 @@ const ProjectCard = (props) => {
                         md={6}
                     >
                         <Typography variant="lightText">Type</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.type}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}><b>{projectObj.type}</b></Typography>
                     </Grid>
                     <Grid
                         item
@@ -62,12 +71,12 @@ const ProjectCard = (props) => {
                         md={6}
                     >
                         <Typography variant="lightText">Project ID</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{index+1}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}><b>{projectObj.id}</b></Typography>
                     </Grid>
                 </Grid>
                 
                 <Typography variant="lightText">Description</Typography>
-                <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.desc}</Typography>
+                <Typography variant="body2" sx={{ color: "primary.contrastText" }}><b>{projectObj.desc}</b></Typography>
 
                 {/* <Typography variant="body2" sx={{ mt: 2, ml: 5, color: "primary.contrastText" }}>{projectObj.desc}</Typography> */}
                 {/* <Divider sx={{ mt: 7 }} variant="inset" /> */}
