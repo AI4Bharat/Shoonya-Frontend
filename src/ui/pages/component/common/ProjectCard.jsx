@@ -22,7 +22,7 @@ const ProjectCard = (props) => {
     const classes = projectCardStyles();
     const { projectObj} = props
     return (
-        <Link to={`/projects/${projectObj.id}}`} style={{ textDecoration: "none" }}>
+        <Link to={`/projects/${projectObj.id}`} style={{ textDecoration: "none" }}>
             <Grid
                 elevation={2}
                 className={props.classAssigned}
@@ -43,8 +43,9 @@ const ProjectCard = (props) => {
                     container
                     direction="row"
                     justifyContent="space-between"
-                    sx={{mt:3, mb:3}}
-                    spacing={2}
+                    sx={{mt:1, mb:2}}
+                    spacing={3}
+                    columnSpacing={{xs: 1, sm: 1, md: 10}}
                 >
                     <Grid
                         item

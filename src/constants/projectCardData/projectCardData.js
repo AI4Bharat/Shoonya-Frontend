@@ -1,62 +1,93 @@
 export const projectCardData = [
     {
-        name: "Shoonya Tarento",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Punjabi Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Punjabi Contextual Translation Editing Project.",
+        status : "Draft",
+        id : "134"
     },
     {
-        name: "Bangalore Cup",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Assamese Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Assamese Contextual Translation Editing Project.",
+        status : "Published",
+        id : "115"
     },
     {
-        name: "Grow More",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Marathi Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Marathi Contextual Translation Editing Project.",
+        status : "Published",
+        id : "122"
     },
     {
-        name: "Windows",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name:"English-Bengali Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Dogri Contextual Translation Editing Project.",
+        status : "Published",
+        id : "119"
     },
     {
-        name: "Dummy Project",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Dogri Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Punjabi Contextual Translation Editing Project.",
+        status : "Published",
+        id : "116"
     },
     {
-        name: "Decorative",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Gujarati Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Gujarati Contextual Translation Editing Project.",
+        status : "Published",
+        id : "117"
     },
     {
-        name: "Firewall",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Manipuri Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Manipuri Contextual Translation Editing Project.",
+        status : "Published",
+        id : "130"
     },
     {
-        name: "Delhi People",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Telugu Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Telugu Contextual Translation Editing Project.",
+        status : "Published",
+        id : "126"
     },
     {
-        name: "Food Recipes",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English Source Sentence Verification - B1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English Source Sentence Verification - Batch 1 with 3500 sentences",
+        status : "Published",
+        id : "112"
     },
     {
-        name: "Students",
-        type: "Annotation",
-        desc: "description of project",
-        status : "ACTIVE",
+        name: "English-Nepali Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Nepali Contextual Translation Editing Project.",
+        status : "Published",
+        id : "123"
+    },
+    {
+        name: "English-Urdu Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Urdu Contextual Translation Editing Project.",
+        status : "Draft",
+        id : "127"
+    },
+    {
+        name: "Speed Test",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "none",
+        status : "Draft",
+        id : "144"
+    },
+    {
+        name: "English-Sanskrit Translation -- Wikipedia History Batch-1",
+        type: "Annotation - ContextualTranslationEditing",
+        desc: "English-Sanskrit Contextual Translation Editing Project.",
+        status : "Draft",
+        id : "131"
     },
 ]

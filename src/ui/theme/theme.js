@@ -22,7 +22,7 @@ const themeDefault = createTheme({
     typography: {
         fontFamily: '"Roboto"',
         fontWeight: "400",
-        h1:{
+        h1: {
             fontSize: "3.125rem",
             fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
             fontWeight: "300",
@@ -30,7 +30,7 @@ const themeDefault = createTheme({
                 fontSize: "2rem",
             },
         },
-        h2:{
+        h2: {
             fontSize: "2.5rem",
             fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
             fontWeight: "300",
@@ -38,7 +38,7 @@ const themeDefault = createTheme({
                 fontSize: "1.5rem",
             },
         },
-        h3:{
+        h3: {
             fontSize: "1.6875rem",
             fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
             fontWeight: "300",
@@ -47,7 +47,7 @@ const themeDefault = createTheme({
                 fontSize: "1.3rem",
             },
         },
-        h4:{
+        h4: {
             fontSize: "1.5rem",
             fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
             fontWeight: "300",
@@ -55,7 +55,7 @@ const themeDefault = createTheme({
                 fontSize: "0.9rem",
             },
         },
-        h5:{
+        h5: {
             fontSize: "1.3125rem",
             fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
             fontWeight: "300",
@@ -63,7 +63,7 @@ const themeDefault = createTheme({
                 fontSize: "1rem",
             },
         },
-        h6:{
+        h6: {
             fontSize: "1.125rem",
             fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
             fontWeight: "300",
@@ -72,19 +72,19 @@ const themeDefault = createTheme({
                 fontSize: "1rem",
             },
         },
-        body1 :{
+        body1: {
             fontSize: "1.25rem",
             fontFamily: '"Roboto", sans-serif ,sans-serif',
             fontWeight: "400",
         },
-        body2 :{
+        body2: {
             fontSize: "0.875rem",
             fontFamily: '"Roboto", sans-serif',
             fontWeight: "400",
             color: "#0C0F0F",
             lineHeight: "22px",
         },
-        caption:{
+        caption: {
             fontSize: "0.75rem",
             fontFamily: "'Roboto', sans-serif",
             fontWeight: "400",
@@ -97,7 +97,7 @@ const themeDefault = createTheme({
                 fontSize: ".9rem",
             },
         },
-        subtitle2:{
+        subtitle2: {
             fontSize: "1rem",
             fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
             fontWeight: "300",
@@ -106,9 +106,9 @@ const themeDefault = createTheme({
             },
         }
     },
-    components:{
+    components: {
         MuiTableRow: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     height: "60px",
                     margin: "10px",
@@ -118,15 +118,46 @@ const themeDefault = createTheme({
                 },
             }
         },
+        MUIDataTableBodyRow: {
+            styleOverrides: {
+                root: {
+                    "&:nth-child(odd)": {
+                        backgroundColor: "#D6EAF8",
+                    },
+                    "&:nth-child(even)": {
+                        backgroundColor: "#E9F7EF",
+                    },
+                },
+            }
+        },
+        MUIDataTableFilterList: {
+            styleOverrides: {
+                chip: {
+                    display: "none",
+                },
+            }
+        },
         MuiMenu: {
-            styleOverrides:{
+            styleOverrides: {
                 list: {
                     minWidth: "210px",
                 },
             }
         },
+        MUIDataTableFilter: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "white",
+                    width: "80%",
+                    fontFamily: '"Roboto" ,sans-serif',
+                },
+                checkboxFormControl: {
+                    minWidth: "200px",
+                },
+            }
+        },
         MuiMenuItem: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     "@media (max-width:670px)": {
                         fontSize: '0.875rem'
@@ -135,7 +166,7 @@ const themeDefault = createTheme({
             }
         },
         MuiList: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     fontFamily: '"Roboto" ,sans-serif',
                 },
@@ -147,15 +178,52 @@ const themeDefault = createTheme({
                 }
             }
         },
+        MUIDataTable: {
+            styleOverrides: {
+                paper: {
+                    minHeight: "674px",
+                    boxShadow: "0px 0px 2px #00000029",
+                    border: "0",
+
+                },
+                responsiveBase: {
+                    minHeight: "560px",
+                },
+            }
+        },
+        MUIDataTableToolbar: {
+            styleOverrides: {
+                filterPaper: {
+                    width: "310px",
+                },
+                MuiButton: {
+                    root: {
+                        display: "none",
+                    },
+                },
+            }
+        },
+        MUIDataTableBodyCell: {
+            styleOverrides: {
+                root: { padding: ".5rem .5rem .5rem .8rem", textTransform: "capitalize" },
+
+                stackedParent: {
+                    "@media (max-width: 400px)": {
+                        display: "table-row",
+
+                    }
+                },
+            }
+        },
         MuiGrid: {
-            styleOverrides:{
+            styleOverrides: {
                 grid: {
                     maxWidth: "100%",
                 },
             }
         },
         MuiTableCell: {
-            styleOverrides:{
+            styleOverrides: {
                 head: {
                     padding: ".6rem .5rem .6rem 1.5rem",
                     backgroundColor: "#F8F8FA !important",
@@ -167,7 +235,7 @@ const themeDefault = createTheme({
             }
         },
         MuiPaper: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     boxShadow: "none !important",
                     borderRadius: 0,
@@ -176,29 +244,29 @@ const themeDefault = createTheme({
             }
         },
         MuiDialog: {
-            styleOverrides:{
+            styleOverrides: {
                 paper: { minWidth: "360px", minHeight: "116px" },
             }
         },
         MuiAppBar: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     boxSizing: "border-box",
                     margin: "-1px",
                     padding: "0px",
-                    backgroundImage : "linear-gradient(to right, #f1f1f1, #ffffff)"
+                    backgroundImage: "linear-gradient(to right, #f1f1f1, #ffffff)"
                 },
             }
         },
         MuiToolbar: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     padding: 0,
                 },
             }
         },
         MuiFormControlLabel: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     height: "36px",
                 },
@@ -212,10 +280,11 @@ const themeDefault = createTheme({
             }
         },
         MuiButton: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     minWidth: "25",
                     borderRadius: "none",
+                    textTransform: "none"
                 },
                 label: {
                     textTransform: "none",
@@ -245,14 +314,14 @@ const themeDefault = createTheme({
             }
         },
         MuiTabs: {
-            styleOverrides:{
+            styleOverrides: {
                 indicator: {
                     backgroundColor: "#FD7F23",
                 },
             }
         },
         MuiTab: {
-            styleOverrides:{
+            styleOverrides: {
                 root: {
                     width: "auto",
                     fontSize: "18px",
@@ -358,14 +427,14 @@ const themeDefault = createTheme({
 });
 
 themeDefault.container = {
-    backgroundImage : `url(${Card})`
+    backgroundImage: `url(${Card})`
 }
 
 themeDefault.typography.lightText = {
-    fontSize: "0.73rem",
+    fontSize: "0.75rem",
     fontFamily: "'Roboto', sans-serif",
-    fontWeight: "500",
-    color : "rgb(255 255 255 / 82%)"
+    fontWeight: "400",
+    color: "rgb(255 255 255 / 82%)"
 }
 
 export default themeDefault;
