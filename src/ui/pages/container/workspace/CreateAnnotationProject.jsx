@@ -9,12 +9,15 @@ import DatasetStyle from "../../../styles/Dataset";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import StandardTextField from "../../component/common/StandardTextField";
+import NativeSelect from '@mui/material/NativeSelect';
 
 
 const ProjectSetting = (props) => {
 
     const classes = DatasetStyle();
     const [selectmenu, setselectmenu] = React.useState('');
+    const [selectvalue, setselectvalue] = useState("")
 
     const handleChange = (event) => {
         setselectmenu(event.target.value);
@@ -27,51 +30,180 @@ const ProjectSetting = (props) => {
             <Grid
                 container
                 direction='row'
-                justifyContent='center'
-                alignItems='center'
-                width={window.innerWidth}
+                justifyContent='left'
+                alignItems='left'
+
+
             >
-                <Card
-                    sx={{
-                        width: window.innerWidth * 0.8,
-                        minHeight: 500,
-                        padding: 5
-                    }}
-
+                <Grid
+                    item
+                    xs={5}
+                    sm={5}
+                    md={5}
+                    lg={5}
+                    xl={5}
                 >
-
-                    <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                    >
-                        <Typography variant="h2" gutterBottom component="div">
-
-                            Create a Project
-                        </Typography>
-                    </Grid>
-
                     <Grid
                         container
                         direction='row'
-                        style={{ margin: "20px 0px 0px 0px" }}
+                        style={{ boxShadow: "4px 4px 4px -4px #00000029" }}
                     >
                         <Grid
-                            items
+                            item
+                            xs={2}
+                            sm={2}
+                            md={2}
+                            lg={2}
+                            xl={2}
+                        ></Grid>
+                        <Grid
+                            item
+                            xs={9}
+                            sm={9}
+                            md={9}
+                            lg={9}
+                            xl={9}
+                        >
+
+                        <Grid
+                            item
                             xs={12}
                             sm={12}
                             md={12}
                             lg={12}
                             xl={12}
                         >
-                            <Typography gutterBottom component="div" label="Required">
-                                Title:
+                            <Typography variant="h2" gutterBottom component="div">
+
+                                Create a Project
                             </Typography>
                         </Grid>
+
                         <Grid
+                            container
+                            direction='row'
+                            style={{ margin: "20px 0px 0px 0px" }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                            >
+                                <Typography gutterBottom component="div" label="Required">
+                                    Title:
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                md={12}
+                                lg={12}
+                                xl={12}
+                                sm={12}
+                                xs={12}
+                            >
+                                <StandardTextField
+                                    fullWidth
+
+
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction='row'
+                            style={{ margin: "20px 0px 0px 0px" }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                            >
+
+                                <Typography gutterBottom component="div">
+                                    Description:
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                                sm={12}
+                            >
+                                <StandardTextField
+                                    fullWidth
+
+
+                                />
+                            </Grid>
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                            >
+
+                                <Typography gutterBottom component="div">
+                                    Select a domain to work in:
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                                sm={12}
+                            >
+
+                                <Box sx={{ minWidth: 120 }}>
+                                    <FormControl fullWidth>
+
+                                        <NativeSelect
+                                       
+                                            defaultValue={"none"}
+                                            inputProps={{
+                                                name: 'age',
+                                                id: 'uncontrolled-native',
+                                            }}
+                                        >
+                                            <option value={"none"}></option>
+                                            <option value={"Translation"}>Translation</option>
+                                            <option value={"OCR"}>OCR</option>
+                                            <option value={"Monolingual"}>Monolingual</option>
+                                        </NativeSelect>
+                                    </FormControl>
+                                </Box>
+                            </Grid>
+
+                        </Grid>
+                        <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                            >
+
+                                <Typography gutterBottom component="div">
+                                Finalize Project
+                                </Typography>
+                            </Grid>
+                        
+                  
+                        <Grid
+
+                            style={{ margin: "15px 0px 10px 0px", }}
                             item
                             xs={12}
                             md={12}
@@ -79,101 +211,16 @@ const ProjectSetting = (props) => {
                             xl={12}
                             sm={12}
                         >
-                            <OutlinedTextField
-                                fullWidth
-
-
-                            />
+                            <Button label="Create Project" />
+                            <Button label="Cancel" />
                         </Grid>
-                    </Grid>
-                    <Grid
-                        container
-                        direction='row'
-                        style={{ margin: "20px 0px 0px 0px" }}
-                    >
-                        <Grid
-                            items
-                            xs={12}
-                            sm={12}
-                            md={12}
-                            lg={12}
-                            xl={12}
-                        >
-
-                            <Typography gutterBottom component="div">
-                                Description:
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                            md={12}
-                            lg={12}
-                            xl={12}
-                            sm={12}
-                        >
-                            <OutlinedTextField
-                                fullWidth
 
 
-                            />
-                        </Grid>
-                        <Grid
-                            items
-                            xs={12}
-                            sm={12}
-                            md={12}
-                            lg={12}
-                            xl={12}
-                        >
 
-                            <Typography gutterBottom component="div">
-                                Select a domain to work in:
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                            md={12}
-                            lg={12}
-                            xl={12}
-                            sm={12}
-                        >
-                            <Box sx={{ minWidth: 120 }}>
-                                <FormControl fullWidth>
-
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        value={selectmenu}
-                                        onChange={handleChange}
-                                    >
-                                        <MenuItem value={"Translation"}>Translation</MenuItem>
-                                        <MenuItem value={"OCR"}>OCR</MenuItem>
-                                        <MenuItem value={"Monolingual"}>Monolingual</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Box>
-                        </Grid>
 
                     </Grid>
-                    <Grid
-
-                        style={{ margin: "15px 0px 10px 0px", }}
-                        item
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        sm={12}
-                    >
-                        <Button label="Create Project" />
-                        <Button label="Cancel" />
                     </Grid>
-
-
-
-                </Card>
+                </Grid>
             </Grid>
         </ThemeProvider>
 

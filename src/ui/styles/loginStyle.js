@@ -26,8 +26,9 @@ const LoginStyle = makeStyles({
         letterSpacing: "3.9px",
         textAlign: "left",
         "@media (max-width:650px)": {
-          margin: "5% 10% 5% 40%",
+          margin: "0% 0% 00% 90%",
           color: "black",
+         
          
         },
       
@@ -73,6 +74,15 @@ const LoginStyle = makeStyles({
         flexDirection: "column",
         justifyContent: "center",
       },
+      containerForgotPassword:{
+        marginTop: "2px",
+        width:"70%",
+        "@media (max-width:650px)": {
+          width:"100%",
+         
+         
+        },
+      }
      
 })
 
