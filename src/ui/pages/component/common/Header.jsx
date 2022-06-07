@@ -1,11 +1,29 @@
 import { AppBar, Avatar, Box, Button, Divider, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import headerStyle from "../../../styles/header";
-import Logo from '../../../../assets/logo.svg'
+import Logo from '../../../../assets/logo.svg';
+import {useDispatch,useSelector} from 'react-redux';
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
+
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
+
+    const dispatch = useDispatch();
+
+    const loggedInUserData = useSelector(state=>state.fetchLoggedInUserData.data);
+
+    const getLoggedInUserData = ()=>{
+        const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
+        dispatch(APITransport(loggedInUserObj))
+    }
+    
+    useEffect(()=>{
+        getLoggedInUserData();
+        console.log("loggedInUserData", loggedInUserData);
+    },[]);
 
     const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -60,7 +78,7 @@ const Header = () => {
                                     sm={12}
                                     md={6}
                                 >
-                                    <Typography variant="body1" color="primary.dark" sx={{p:0}}>Username</Typography>
+                                    <Typography variant="body1" color="primary.dark" sx={{p:0}}>{loggedInUserData.username}</Typography>
                                 </Grid>
                             </Grid>
                         <Menu
@@ -79,7 +97,7 @@ const Header = () => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            <Typography variant="body2" sx={{pl:"1rem", mt:1}}>Signed in as <b>Admin</b></Typography>
+                            <Typography variant="body2" sx={{pl:"1rem", mt:1}}>Signed in as <b>{loggedInUserData.last_name}</b></Typography>
                             <Divider sx={{mb:2}}/>
                             {settings.map((setting) => (
                                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
