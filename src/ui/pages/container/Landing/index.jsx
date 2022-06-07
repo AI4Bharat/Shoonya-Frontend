@@ -7,7 +7,7 @@ const Landing = () => {
   const onClickHandler = () => {
     history.push(`${process.env.PUBLIC_URL}/login`);
   };
-
+ console.log('Test..')
   return (
     <Grid
       container

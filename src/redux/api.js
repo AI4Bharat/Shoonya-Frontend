@@ -1,6 +1,7 @@
 /**
  * base class for API object
  */
+import config from '../config/config';
 
 export default class API {
   constructor(method = "POST", timeout = 2000, auth = false, reqType = "") {
@@ -11,8 +12,8 @@ export default class API {
     this.method = method;
     this.timeout = timeout;
     this.auth = auth;
-    this.baseUrl = "http://localhost:8000";
-    this.baseUrlAuto = "http://localhost:8000";
+    this.baseUrl = config.BASE_URL;
+    this.baseUrlAuto = config.BASE_URL_AUTO;
   }
 
   toString() {
