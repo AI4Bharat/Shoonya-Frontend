@@ -15,6 +15,7 @@ const Header = () => {
 
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
+      
     };
 
     const classes = headerStyle();
@@ -82,7 +83,7 @@ const Header = () => {
                             <Divider sx={{mb:2}}/>
                             {settings.map((setting) => (
                                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography variant="body2" textAlign="center">{setting}</Typography>
+                                    <Typography variant="body2" textAlign="center" >{setting}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
