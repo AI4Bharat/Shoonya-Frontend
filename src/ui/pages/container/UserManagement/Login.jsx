@@ -1,5 +1,5 @@
 import { Grid, Link, Typography, Hidden,ThemeProvider } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { translate } from "../../../../config/localisation";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
@@ -24,6 +24,15 @@ const Login = () => {
     open: false,
     message: '',
     variant: 'success'
+  })
+
+  useEffect(()=>{
+    localStorage.clear();
+    window.addEventListener('keypress', (key) => {
+      if (key.code === 'Enter') {
+        createToken();
+      }
+    })
   })
 
   const createToken = () => {
