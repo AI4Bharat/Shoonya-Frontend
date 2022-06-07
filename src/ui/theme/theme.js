@@ -113,8 +113,8 @@ const themeDefault = createTheme({
                     height: "60px",
                     margin: "10px",
                     cursor: "pointer",
-                    "&$hover:hover:nth-child(odd)": { backgroundColor: "#D6EAF8" },
-                    "&$hover:hover:nth-child(even)": { backgroundColor: "#E9F7EF" },
+                    "&$hover:hover:nth-of-type(odd)": { backgroundColor: "#D6EAF8" },
+                    "&$hover:hover:nth-of-type(even)": { backgroundColor: "#E9F7EF" },
                 },
             }
         },
@@ -292,10 +292,10 @@ const themeDefault = createTheme({
         },
         MUIDataTableBodyRow: {
             root: {
-                "&:nth-child(odd)": {
+                "&:nth-of-type(odd)": {
                     backgroundColor: "#D6EAF8",
                 },
-                "&:nth-child(even)": {
+                "&:nth-of-type(even)": {
                     backgroundColor: "#E9F7EF",
                 },
             },
@@ -337,16 +337,16 @@ const themeDefault = createTheme({
         },
         MUIDataTableHeadCell: {
             root: {
-                "&:nth-child(1)": {
+                "&:nth-of-type(1)": {
                     width: "25%",
                 },
-                "&:nth-child(2)": {
+                "&:nth-of-type(2)": {
                     width: "18%",
                 },
-                "&:nth-child(3)": {
+                "&:nth-of-type(3)": {
                     width: "18%",
                 },
-                "&:nth-child(4)": {
+                "&:nth-of-type(4)": {
                     width: "18%",
                 },
             },

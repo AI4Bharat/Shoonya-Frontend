@@ -3,27 +3,41 @@ import {
   CardActions,
   CardContent,
   Divider,
+  Grid,
   Typography,
 } from "@mui/material";
 
 const CustomCard = ({ title, children, cardContent }) => {
   return (
-    <div style={{ width: "30%" }}>
-      <Card elevation={3}>
+
+    <Grid container alignItems="center" justifyContent="center">
+      <Card elevation={3} style={{ border: "none", boxShadow: "none" }}>
         <CardContent>
-          <Typography
-            style={{ marginBottom: "15px" }}
-            textAlign={"center"}
-            variant="h5"
-          >
-            {title}
-          </Typography>
-          <Divider />
-          {cardContent}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Typography
+              style={{ marginBottom: "15px" }}
+              textAlign={"Left"}
+              variant="h3"
+            >
+              {title}
+            </Typography>
+          </Grid>
+
+          {/* <Divider /> */}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            {cardContent}
+          </Grid>
+
         </CardContent>
-        <CardActions style={{ marginBottom: "15px" }}>{children}</CardActions>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <CardActions style={{ marginBottom: "15px" }}>{children}</CardActions>
+        </Grid>
+
       </Card>
-    </div>
+
+    </Grid>
+
+
   );
 };
 

@@ -2,9 +2,10 @@ import { Box, Button, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@
 import React, { useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
-import TaskTable from "../../component/Project/TaskTable";
-import MembersTable from "../../component/Project/MembersTable";
-import ReportsTable from "../../component/Project/ReportsTable";
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import TaskTable from "../../component/Project/TaskTable"
+import MembersTable from "../../component/Project/MembersTable"
+import ReportsTable from "../../component/Project/ReportsTable"
 
 const projectData = [
     { name: "Project ID", value: "1" },
@@ -20,6 +21,7 @@ const menuOptions = [
 ]
 
 function TabPanel(props) {
+    
     const { children, value, index, ...other } = props;
 
     return (
@@ -81,6 +83,7 @@ const Projects = () => {
                             </Grid>
                         )
                     })}
+                     <Link to={`/projects/1/projectsetting`} style={{ textDecoration: "none" }}>
                     <Button
                         sx={{
                             marginTop: 2,
@@ -93,6 +96,7 @@ const Projects = () => {
                     >
                         <Typography variant="caption">Show Project Setting</Typography>
                     </Button>
+                    </Link>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{style: {backgroundColor: "#2C2799"}}}>
                             <Tab label="Tasks" sx={{fontSize : 16, fontWeight : '700'}} />
