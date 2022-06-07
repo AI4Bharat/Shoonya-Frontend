@@ -22,7 +22,7 @@ const ProjectCard = (props) => {
     const classes = projectCardStyles();
     const { projectObj} = props
     return (
-        <Link to={`/projects/${projectObj.id}}`} style={{ textDecoration: "none" }}>
+        <Link to={`/projects/${projectObj.id}`} style={{ textDecoration: "none" }}>
             <Grid
                 elevation={2}
                 className={props.classAssigned}
