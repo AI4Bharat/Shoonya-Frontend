@@ -226,7 +226,7 @@ const ProjectSetting = (props) => {
                                 xl={12}
                             >
                                 {valuesdata !== "" && ( <Typography gutterBottom component="div">
-                                    Description:
+                                Select sources to fetch data from:
                                 </Typography>)}
                                
                             </Grid>

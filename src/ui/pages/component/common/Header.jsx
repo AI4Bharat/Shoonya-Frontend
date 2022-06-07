@@ -6,12 +6,13 @@ import Logo from '../../../../assets/logo.svg';
 import {useDispatch,useSelector} from 'react-redux';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
-
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
 
     const dispatch = useDispatch();
+    let navigate = useNavigate();
 
     const loggedInUserData = useSelector(state=>state.fetchLoggedInUserData.data);
 
@@ -25,7 +26,21 @@ const Header = () => {
         console.log("loggedInUserData", loggedInUserData);
     },[]);
 
-    const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+    // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
+    const onLogoutClick = () => {
+        handleCloseUserMenu();
+        // ExpireSession();
+        localStorage.clear();
+        navigate("/");
+    }
+
+    const settings = [
+        {name : "Profile", onclick:()=>handleCloseUserMenu()},
+        {name : "Account", onclick:()=>handleCloseUserMenu()},
+        {name : "Dashboard", onclick:()=>handleCloseUserMenu()},
+        {name : "Logout", onclick:()=>onLogoutClick()},
+    ]
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -100,8 +115,8 @@ const Header = () => {
                             <Typography variant="body2" sx={{pl:"1rem", mt:1}}>Signed in as <b>{loggedInUserData.last_name}</b></Typography>
                             <Divider sx={{mb:2}}/>
                             {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography variant="body2" textAlign="center" >{setting}</Typography>
+                                <MenuItem key={setting} onClick={setting.onclick}>
+                                    <Typography variant="body2" textAlign="center">{setting.name}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
