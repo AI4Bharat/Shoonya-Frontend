@@ -3,4 +3,5 @@ export default {
   getProjects:"/projects/",
   getWorkspaces:"/workspaces/",
   fetch:"/users/account/",
+  getTasks:"/task/"
 };
