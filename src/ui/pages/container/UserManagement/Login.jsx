@@ -42,7 +42,24 @@ const Login = () => {
     })
   })
 
-  
+  const createToken = () => {
+    const apiObj = new LoginAPI(credentials.email, credentials.password);
+    fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    }).then(async (res) => {
+      const rsp_data = await res.json();
+      console.log(rsp_data);
+      if (!res.ok) {
+        // return Promise.reject('');
+        console.log("res -", res);
+      } else {
+        localStorage.setItem('shoonya_access_token', rsp_data.access);
+        localStorage.setItem('shoonya_refresh_token', rsp_data.refresh);
+        navigate("/dashboard");
+    }})
+  }
 
   const handleFieldChange = (event) => {
     event.preventDefault();
