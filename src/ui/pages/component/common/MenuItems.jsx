@@ -9,20 +9,19 @@ export default function MenuItems(props) {
 
   const handleChange = (event) => {
     props.handleChange(event.target.value)
-    console.log(event.target.value)
     setselectmen(event.target.value);
   };
 console.log(props,"asdfghhjj")
   return (
     <div>
-      <FormControl fullWidth variant="standard" sx={{ m: 1, minWidth: 120 }}>
-        {/* <InputLabel id="demo-simple-select-standard-label">Age</InputLabel> */}
+      <FormControl fullWidth variant="standard" sx={{minWidth: 120 }}>
+        
         <Select
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
           value={props.value}
           onChange={handleChange}
-        //   label="Age"
+       
         >
            { 
             props.menuOptions.map(menu  => {

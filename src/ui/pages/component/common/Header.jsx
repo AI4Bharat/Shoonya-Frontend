@@ -1,4 +1,4 @@
-import { AppBar, Avatar, Box, Button, Divider, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
+import { AppBar, Avatar, Box, Divider, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import headerStyle from "../../../styles/header";
@@ -7,9 +7,11 @@ import {useDispatch,useSelector} from 'react-redux';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useNavigate } from "react-router-dom";
+import CustomButton from "../common/Button"
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
+    
 
     const dispatch = useDispatch();
     let navigate = useNavigate();
@@ -50,6 +52,12 @@ const Header = () => {
         setAnchorElUser(null);
       
     };
+    const onWorkspaceClick = () =>{
+        navigate("/WorkSpaces");
+    }
+    const onProjectClick = ()=>{
+        navigate("/dashboard");
+    }
 
     const classes = headerStyle();
 
@@ -66,6 +74,61 @@ const Header = () => {
                     <Typography variant="h6" sx={{color : "#000000", display: "inline"}}>Username </Typography>
                     <Typography variant="caption" sx={{color : "red", display: "inline", p : 0.3, border : "1px solid red", borderRadius : 2}}>admin</Typography>
                 </Box> */}
+                 <Grid
+                                container
+                                direction="row"
+                                justifyContent="left"
+                                spacing={1}
+                                // sx={{textAlign : "center", alignItems : "center"}}
+                            >
+                                <Grid 
+                                
+                                    item 
+                                    xs={2}
+                                    sm={2}
+                                    md={2}
+                                >
+
+
+                                   <CustomButton 
+                                   sx={{
+                                    borderRadius: "inherit",
+                                    backgroundColor: "transparent",
+                                    color: "black",
+                                    boxShadow: "none",
+                                    fontSize: "19px",
+                                    '&:hover': {
+                                        backgroundColor:"#E0E0E0",
+                                        boxShadow: "none",
+                                  },
+                                   }}
+                                    label={"Projects"} onClick={onProjectClick}/> 
+                                    
+                                </Grid>
+                                <Grid 
+                                    item 
+                                    xs={2}
+                                    sm={2}
+                                    md={2}
+                                >
+                                    <CustomButton 
+                                     sx={{
+                                        borderRadius: "inherit",
+                                        backgroundColor: "transparent",
+                                        color: "black",
+                                        boxShadow: "none",
+                                        fontSize: "19px",
+                                        '&:hover': {
+                                            backgroundColor:"#E0E0E0",
+                                            boxShadow: "none",
+                                      },
+                                       }}
+                                    label={"Workspaces"} onClick={onWorkspaceClick}/>
+               
+                                </Grid>
+                                </Grid>
+
+               
                     <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={5}>
                         
                             <Grid

@@ -15,32 +15,47 @@ import MenuItems from "../../component/common/MenuItems";
 
 let data1 = [{ name: "Translation", value: "Translation" }, { name: "OCR", value: "OCR" }, { name: "Monolingual", value: "Monolingual" }]
 let data2 = [{ name: "MonolingualTranslation", value: "MonolingualTranslation" }, { name: "TranslationEditing", value: "TranslationEditing" }, { name: "ContextualTranslationEditing", value: "ContextualTranslationEditing" }]
+let data3 =[{name:"data",value:"data"},{name:"data1",value:"data1"}]
+let data4 =[{name:"Random",value:"Random"},{name:"Full",value:"Full"},{name:"Batch",value:"Batch"}]
 const ProjectSetting = (props) => {
 
     const classes = DatasetStyle();
     const [selectmenu, setselectmenu] = React.useState('');
     const [selectvalue, setselectvalue] = useState(false)
-    const [values, setValues] = useState("")
-    const [valuesdata, setValuesdata] = useState("")
+    const [domain, setDomain] = useState("")
+    const [projecttype, setProjecttype] = useState("")
+    const [sources, setSources] = useState("")
+    const [samplingtype, setSamplingtype] = useState("")
+    const [confirmselections, setConfirmselections] = useState(false)
 
     const handleChange = (event) => {
         setselectmenu(event.target.value);
     };
 
-    const selectdata = (e) => {
-        setValuesdata(e)
+    const onSelectProjectType = (e) => {
+        setProjecttype(e)
     }
+    const onSelectsources = (e) => {
+        setSources(e)
+    }
+    const onSelectSamplingType = (e) => {
+        setSamplingtype(e)
+    }
+    
 
-    const selectDatas = (e) => {
+    const onSelectDemain = (e) => {
         console.log(e, "e")
-        setValues(e)
+        setDomain(e)
     }
-    console.log(values, "value")
+    const onConfirmSelections =()=>{
+        setConfirmselections(true)
+    }
+  
     return (
         <ThemeProvider theme={themeDefault}>
 
             <Header />
-            <Grid
+            {/* <Grid
                 container
                 direction='row'
                 justifyContent='left'
@@ -55,11 +70,11 @@ const ProjectSetting = (props) => {
                     md={5}
                     lg={5}
                     xl={5}
-                >
+                > */}
                     <Grid
                         container
                         direction='row'
-                        style={{ boxShadow: "4px 4px 4px -4px #00000029" }}
+                       
                     >
                         <Grid
                             item
@@ -71,11 +86,11 @@ const ProjectSetting = (props) => {
                         ></Grid>
                         <Grid
                             item
-                            xs={9}
-                            sm={9}
-                            md={9}
-                            lg={9}
-                            xl={9}
+                            xs={8}
+                            sm={8}
+                            md={8}
+                            lg={8}
+                            xl={8}
                         >
 
                             <Grid
@@ -117,7 +132,7 @@ const ProjectSetting = (props) => {
                                     sm={12}
                                     xs={12}
                                 >
-                                    <StandardTextField
+                                    <OutlinedTextField
                                         fullWidth
 
 
@@ -150,7 +165,7 @@ const ProjectSetting = (props) => {
                                     xl={12}
                                     sm={12}
                                 >
-                                    <StandardTextField
+                                    <OutlinedTextField
                                         fullWidth
 
 
@@ -158,6 +173,7 @@ const ProjectSetting = (props) => {
                                 </Grid>
 
                                 <Grid
+                                 style={{ margin: "20px 0px 0px 0px", }}
                                     items
                                     xs={12}
                                     sm={12}
@@ -171,6 +187,7 @@ const ProjectSetting = (props) => {
                                     </Typography>
                                 </Grid>
                                 <Grid
+                                
                                     item
                                     xs={12}
                                     md={12}
@@ -181,13 +198,14 @@ const ProjectSetting = (props) => {
 
                                     <MenuItems
                                         menuOptions={data1}
-                                        handleChange={selectDatas}
-                                        value={values}
+                                        handleChange={onSelectDemain}
+                                        value={domain}
                                     />
                                 </Grid>
 
                             </Grid>
                             <Grid
+                             style={{ margin: "15px 0px 0px 0px", }}
                                 items
                                 xs={12}
                                 sm={12}
@@ -195,7 +213,7 @@ const ProjectSetting = (props) => {
                                 lg={12}
                                 xl={12}
                             >
-                                {values !== "" && (
+                                {domain !== "" && (
                                     <Typography gutterBottom component="div">
                                        Select a Project Type:
                                     </Typography>)}
@@ -208,16 +226,17 @@ const ProjectSetting = (props) => {
                                 xl={12}
                                 sm={12}
                             >
-                                {values !== "" && (<MenuItems
+                                {domain !== "" && (<MenuItems
                                     menuOptions={data2}
-                                    handleChange={selectdata}
-                                    value={valuesdata}
+                                    handleChange={onSelectProjectType}
+                                    value={projecttype}
 
                                 />)}
 
                             </Grid>
                            
                             <Grid
+                             style={{ margin: "15px 0px 0px 0px", }}
                                 items
                                 xs={12}
                                 sm={12}
@@ -225,7 +244,7 @@ const ProjectSetting = (props) => {
                                 lg={12}
                                 xl={12}
                             >
-                                {valuesdata !== "" && ( <Typography gutterBottom component="div">
+                                {projecttype !== "" && ( <Typography gutterBottom component="div">
                                 Select sources to fetch data from:
                                 </Typography>)}
                                
@@ -238,16 +257,189 @@ const ProjectSetting = (props) => {
                                 xl={12}
                                 sm={12}
                             >
-                                 {valuesdata !== "" && (
-                                      <StandardTextField
-                                      fullWidth
-  
-  
-                                  />
+                                {projecttype !== "" && (  <MenuItems
+                                  menuOptions={data3}
+                                  handleChange={onSelectsources}
+                                    value={sources}
+
+                                />)}
+                               
+                            </Grid> 
+
+
+                          
+                            <Grid
+
+                                style={{ margin: "15px 0px 10px 0px", }}
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                                sm={12}
+                            >
+                                 {sources !== "" && ( <Button onClick={onConfirmSelections}  style={{ margin: "0px 20px 0px 0px", }} label={"Confirm Selections"} />
+                              
+
+                                 )}
+                                 {sources !== "" && ( 
+                                <Button  label={"Change Sources"} />
+
                                  )}
                                
                             </Grid>
+                            <Grid
+                             style={{ margin: "15px 0px 0px 0px", }}
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                            >
+                                {confirmselections && ( <Typography gutterBottom component="div">
+                                Select Sampling Type:
+                                </Typography>)}
+                               
+                               
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                                sm={12}
+                            >
+                                 {confirmselections && (
+                                <MenuItems
+                                  menuOptions={data4}
+                                  handleChange={onSelectSamplingType}
+                                    value={samplingtype}
 
+                                />)}
+                               
+                            </Grid> 
+                            <Grid
+                                    items
+                                    xs={12}
+                                    sm={12}
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                >
+                                    {samplingtype==="Random" && (
+                                         <Typography gutterBottom component="div" label="Required">
+                                        Sampling Percentage:
+                                         </Typography>
+                                    )}
+                                   
+                                </Grid>
+                                <Grid
+                                    item
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                    sm={12}
+                                    xs={12}
+                                >
+                                     {samplingtype==="Random" && (
+                                    <OutlinedTextField
+                                        fullWidth
+                                        defaultValue={5}
+
+
+                                    />)}
+                                </Grid>
+                                <Grid
+                                    items
+                                    xs={12}
+                                    sm={12}
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                >
+                                    {samplingtype==="Batch" && (
+                                         <Typography gutterBottom component="div" label="Required">
+                                       Enter Batch size:
+                                         </Typography>
+                                    )}
+                                   
+                                </Grid>
+                                <Grid
+                                    item
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                    sm={12}
+                                    xs={12}
+                                >
+                                     {samplingtype==="Batch" && (
+                                    <OutlinedTextField
+                                        fullWidth
+
+
+                                    />)}
+                                </Grid>
+                                <Grid
+                                    items
+                                    xs={12}
+                                    sm={12}
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                >
+                                    {samplingtype==="Batch" && (
+                                         <Typography gutterBottom component="div" label="Required">
+                                        Enter Batch Number:
+                                         </Typography>
+                                    )}
+                                   
+                                </Grid>
+                                <Grid
+                                    item
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                    sm={12}
+                                    xs={12}
+                                >
+                                     {samplingtype==="Batch" && (
+                                    <OutlinedTextField
+                                        fullWidth
+
+
+                                    />)}
+                                </Grid>
+                                <Grid
+                                    items
+                                    xs={12}
+                                    sm={12}
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                >
+                                     {samplingtype !=="" &&(
+                                    <Typography gutterBottom component="div" label="Required">
+                                    Annotators Per Task :
+                                    </Typography>)}
+                                </Grid>
+                                <Grid
+                                    item
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                    sm={12}
+                                    xs={12}
+                                >
+                                     {samplingtype !=="" && (
+                                    <OutlinedTextField
+                                    defaultValue={1}
+                                        fullWidth
+
+
+                                    />)}
+                                </Grid>
 
                             <Grid
                                 items
@@ -257,33 +449,13 @@ const ProjectSetting = (props) => {
                                 lg={12}
                                 xl={12}
                             >
-                                 {valuesdata !== "" && (<Typography gutterBottom component="div">
+                                <Typography gutterBottom component="div">
                                     Finalize Project
                                 </Typography>
 
-                                 )}
+                               
                                 
                             </Grid>
-                            <Grid
-
-                                style={{ margin: "15px 0px 10px 0px", }}
-                                item
-                                xs={12}
-                                md={12}
-                                lg={12}
-                                xl={12}
-                                sm={12}
-                            >
-                                 {valuesdata !== "" && ( <Button label="Confirm Selections" />
-                              
-
-                                 )}
-                                 {valuesdata !== "" && ( 
-                                <Button label="Change Sources" />
-
-                                 )}
-                               
-                            </Grid>
 
 
                             <Grid
@@ -296,8 +468,8 @@ const ProjectSetting = (props) => {
                                 xl={12}
                                 sm={12}
                             >
-                                <Button label="Create Project" />
-                                <Button label="Cancel" />
+                                <Button style={{ margin: "0px 20px 0px 0px", }} label={"Create Project"} />
+                                <Button label={"Cancel"} />
                             </Grid>
 
 
@@ -305,8 +477,8 @@ const ProjectSetting = (props) => {
 
                         </Grid>
                     </Grid>
-                </Grid>
-            </Grid>
+                {/* </Grid>
+            </Grid> */}
         </ThemeProvider>
 
     )

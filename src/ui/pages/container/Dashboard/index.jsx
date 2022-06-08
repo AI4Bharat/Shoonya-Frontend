@@ -13,7 +13,7 @@ const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
     const projectData = useSelector(state=>state.getProjects.data);
-    const workspaceData = useSelector(state=>state.getWorkspaces.data);
+    
 
     const getDashboardData = ()=>{
         const projectObj = new GetProjectsAPI();
@@ -47,9 +47,7 @@ const Dashboard = () => {
                         })
                     }
                 </Grid>
-                <Divider sx={{mt : 3, mb : 3}} />
-                <Typography variant="h5" sx={{mt : 2, mb : 2}}>Visit Workspaces</Typography>
-                <WorkspaceTable workspaceData={workspaceData} />
+                
             </Box>
         </React.Fragment>
     )

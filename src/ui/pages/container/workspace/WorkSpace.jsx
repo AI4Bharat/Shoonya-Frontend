@@ -80,10 +80,10 @@ const ProjectSetting = (props) => {
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
-                    <Link to={`/create-annotation-project/1}`} style={{ textDecoration: "none" }}>
-                    <Button  sx={{ width:"50%" }} label="Add new Annotation Project" />
+                    <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none" }}>
+                    <Button  sx={{ width:"50%" }} label={"Add New Annotation Project"} />
                     </Link>
-                    <Button   sx={{ width:"50%" }} label="Add new Collection Project" />
+                    <Button   sx={{ width:"50%" }} label={"Add New Collection Project"} />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         Item Two
