@@ -28,11 +28,8 @@ const Header = () => {
         console.log("loggedInUserData", loggedInUserData);
     },[]);
 
-    // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
     const onLogoutClick = () => {
         handleCloseUserMenu();
-        // ExpireSession();
         localStorage.clear();
         navigate("/");
     }

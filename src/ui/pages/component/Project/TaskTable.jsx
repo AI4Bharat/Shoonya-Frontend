@@ -1,17 +1,31 @@
 // TaskTable
 
-import * as React from 'react';
 import MUIDataTable from "mui-datatables";
+import { Fragment, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import CustomButton from '../common/Button';
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import { useDispatch, useSelector } from "react-redux";
+import { Typography } from "@mui/material";
 
 const columns = [
+    {
+        name: "ID",
+        label: "ID",
+        options: {
+            filter: false,
+            sort: false,
+            align: "center"
+        }
+    },
     {
         name: "Context",
         label: "Context",
         options: {
             filter: false,
             sort: false,
-            align : "center"
+            align: "center"
         }
     },
     {
@@ -47,14 +61,6 @@ const columns = [
         }
     },
     {
-        name: "Key",
-        label: "Key",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    },
-    {
         name: "Status",
         label: "Status",
         options: {
@@ -70,27 +76,56 @@ const columns = [
             sort: false,
         }
     }];
-const data = [
-    ["Task 1", "Display", "English", "Hindi", "प्रदर्शन", "1", "skipped", <CustomButton sx={{ p: 1, borderRadius: 2 }} label={"Edit"} />]
-];
 
 const options = {
     filterType: 'checkbox',
-    selectableRows: "none"
+    selectableRows: "none",
+    download : false,
+    filter : false,
+    print : false
 };
 
+
+
 const TaskTable = () => {
+    const { id } = useParams();
+    const dispatch = useDispatch();
+    const taskList = useSelector(state => state.getTasksByProjectId.data.results);
+
+    const getTaskListData = () => {
+        const taskObj = new GetTasksByProjectIdAPI(id);
+        dispatch(APITransport(taskObj));
+    }
+
+    useEffect(() => {
+        getTaskListData();
+    }, []);
+
+    const data = taskList && taskList.length > 0 ? taskList.map((el,i)=>{
+        return [
+                el.id, 
+                el.data.context, 
+                el.data.input_text, 
+                el.data.input_language, 
+                el.data.output_language, 
+                el.data.machine_translation, 
+                el.task_status, 
+                <CustomButton onClick={()=>console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{inlineSize : "max-content",}} variant="caption">Annotate This Task</Typography>} /> ]
+    }) : []
+
+    // console.log("taskList", taskList);
+
     return (
-        <React.Fragment>
+        <Fragment>
             <CustomButton sx={{ p: 1, width: '100%', borderRadius: 2, mb: 3 }} label={"Disabled"} />
             <MUIDataTable
                 title={""}
                 data={data}
                 columns={columns}
                 options={options}
-                // filter={false}
+            // filter={false}
             />
-        </React.Fragment>
+        </Fragment>
     )
 }
 

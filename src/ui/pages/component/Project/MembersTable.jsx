@@ -4,6 +4,7 @@ import * as React from 'react';
 import MUIDataTable from "mui-datatables";
 import CustomButton from '../common/Button';
 import { Typography } from '@mui/material';
+import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 
 const columns = [
     {
@@ -39,9 +40,12 @@ const columns = [
             sort: false,
         }
     }];
-const data = [
-    ["Shoonya User", "user123@tarento.com", <Typography variant="caption" sx={{p:1, backgroundColor:"rgb(255, 99, 71,0.2)", color:"rgb(255, 99, 71)", borderRadius : 2}}>Admin</Typography>, <CustomButton sx={{ p: 1, borderRadius: 2 }} label={"View"} />]
-];
+
+
+
+// const data = [
+//     ["Shoonya User", "user123@tarento.com", <Typography variant="caption" sx={{p:1, backgroundColor:"rgb(255, 99, 71,0.2)", color:"rgb(255, 99, 71)", borderRadius : 2}}>Admin</Typography>, <CustomButton sx={{ p: 1, borderRadius: 2 }} label={"View"} />]
+// ];
 
 const options = {
     filterType: 'checkbox',
@@ -51,7 +55,15 @@ const options = {
     print : false
 };
 
-const MembersTable = () => {
+const MembersTable = (props) => {
+    const {dataSource} = props;
+
+    console.log(dataSource);
+    const data = dataSource && dataSource.length > 0 ? dataSource.map((el,i)=>{
+        const userRole = UserMappedByRole(el.role).element;
+        return [el.username, el.email,  userRole, <CustomButton sx={{ p: 1, borderRadius: 2 }} onClick={()=>{console.log(el.id)}} label={"View"} />]
+    }) : null
+
     return (
         <React.Fragment>
             <MUIDataTable

@@ -1,0 +1,6 @@
+const GetColumnsByData = () => {
+
+}
+ 
+
+export {GetColumnsByData}
