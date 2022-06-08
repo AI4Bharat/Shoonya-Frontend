@@ -67,8 +67,8 @@ const ProjectCard = (props) => {
                     </Grid>
                 </Grid>
                 
-                <Typography variant="lightText">Description</Typography>
-                <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.description}</Typography>
+                {/* <Typography variant="lightText">Description</Typography>
+                <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.description}</Typography> */}
 
                 {/* <Typography variant="body2" sx={{ mt: 2, ml: 5, color: "primary.contrastText" }}>{projectObj.desc}</Typography> */}
                 {/* <Divider sx={{ mt: 7 }} variant="inset" /> */}
