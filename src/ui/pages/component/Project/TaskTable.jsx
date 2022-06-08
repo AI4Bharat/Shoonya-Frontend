@@ -1,7 +1,7 @@
 // TaskTable
 
 import MUIDataTable from "mui-datatables";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import CustomButton from '../common/Button';
@@ -77,13 +77,7 @@ const columns = [
         }
     }];
 
-const options = {
-    filterType: 'checkbox',
-    selectableRows: "none",
-    download : false,
-    filter : false,
-    print : false
-};
+
 
 
 
@@ -91,15 +85,61 @@ const TaskTable = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
+    
+
+    const [currentPageNumber, setCurrentPageNumber] = useState(1);
+    const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
+    const [totalTasks, setTotalTasks] = useState(10);
 
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage);
         dispatch(APITransport(taskObj));
     }
+    
+    const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
+    
 
     useEffect(() => {
         getTaskListData();
-    }, []);
+        setTotalTasks(totalTaskCount);
+    },[]);
+
+    // useEffect(() => {
+    //     const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, totalTaskCount);
+    //     dispatch(APITransport(taskObj));
+    // },[totalTaskCount]);
+
+    useEffect(() => {
+        getTaskListData();
+        console.log("fired now")
+    }, [currentPageNumber]);
+
+    useEffect(() => {
+        getTaskListData();
+        console.log("fired now")
+    }, [currentRowPerPage]);
+
+    const options = {
+        count : totalTaskCount,
+        rowsPerPage : currentRowPerPage,
+        page : currentPageNumber - 1,
+        rowsPerPageOptions: [10, 25, 50, 100],
+        textLabels:{
+            pagination: {
+              next: "Next >",
+              previous: "< Previous",
+              rowsPerPage: "currentRowPerPage",
+              displayRows: "OF"
+            }
+          },
+        onChangePage:(currentPage)=>{currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1)},
+        onChangeRowsPerPage:(rowPerPageCount)=>{setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount)},
+        filterType: 'checkbox',
+        selectableRows: "none",
+        download : false,
+        filter : false,
+        print : false
+    };
 
     const data = taskList && taskList.length > 0 ? taskList.map((el,i)=>{
         return [
