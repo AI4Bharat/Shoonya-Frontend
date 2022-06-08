@@ -120,9 +120,9 @@ const TaskTable = () => {
     }, [currentRowPerPage]);
 
     const options = {
-        count : currentRowPerPage,
+        count : totalTaskCount,
         rowsPerPage : currentRowPerPage,
-        page : Math.ceil(totalTaskCount%currentRowPerPage),
+        page : currentPageNumber - 1,
         rowsPerPageOptions: [10, 25, 50, 100],
         textLabels:{
             pagination: {
@@ -132,7 +132,7 @@ const TaskTable = () => {
               displayRows: "OF"
             }
           },
-        onChangePage:(currentPage)=>{setCurrentPageNumber(currentPage)},
+        onChangePage:(currentPage)=>{currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1)},
         onChangeRowsPerPage:(rowPerPageCount)=>{setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount)},
         filterType: 'checkbox',
         selectableRows: "none",
