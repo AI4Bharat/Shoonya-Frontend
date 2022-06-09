@@ -5,6 +5,8 @@ const localisation = {
   forgotPassword: "Forgot Password?",
   "label.ulcaInfo":
     "Shoonya is an open-sourced API and data platform to collect, curate and discover datasets in Indian languages.",
+    "button.clearAll" : "Clear All",
+    "label.filter.status" : "Status",
 };
 
 export const translate = (prop) => localisation[prop];
