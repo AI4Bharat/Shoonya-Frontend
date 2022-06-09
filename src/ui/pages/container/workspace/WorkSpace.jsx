@@ -116,11 +116,13 @@ const ProjectSetting = (props) => {
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                     <Button sx={{ width:"100%" }}  label={"Add Annotators to Workspace"} />
-                       <AnnotatorsTable workspaceData={workspaceData} />
+                       {/* <AnnotatorsTable workspaceData={workspaceData} /> */}
+                       Item Three
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                     <Button sx={{ width:"100%" }}  label={"Assign Managers"} />
-                      <ManagersTable workspaceData={workspaceData} />
+                      {/* <ManagersTable workspaceData={workspaceData} /> */}
+                      Item Three
                     </TabPanel>
                     <TabPanel value={value} index={3}>
                         Item Three
