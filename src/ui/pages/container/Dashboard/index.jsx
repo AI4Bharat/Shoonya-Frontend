@@ -13,17 +13,16 @@ const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
     const projectData = useSelector(state=>state.getProjects.data);
-    const workspaceData = useSelector(state=>state.getWorkspaces.data);
+  
 
-    const getDashboardData = ()=>{
+    const getDashboardprojectData = ()=>{
         const projectObj = new GetProjectsAPI();
-        const workspaceObj = new GetWorkspacesAPI(1);
         dispatch(APITransport(projectObj));
-        dispatch(APITransport(workspaceObj));
+        
     }
     
     useEffect(()=>{
-        getDashboardData();
+        getDashboardprojectData();
     },[]);
 
 

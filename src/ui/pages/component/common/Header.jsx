@@ -62,7 +62,7 @@ const Header = () => {
 
     }
     const onProjectClick = ()=>{
-        navigate("/projects");
+        navigate("/dashboard");
         setActiveproject("activeButtonproject")
         setActiveworkspace("")
       

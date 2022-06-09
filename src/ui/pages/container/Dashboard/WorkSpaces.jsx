@@ -14,13 +14,13 @@ export default function WorkSpaces() {
     const dispatch = useDispatch();
     const workspaceData = useSelector(state=>state.getWorkspaces.data);
 
-    const getDashboardData = ()=>{
+    const getDashboardWorkspaceData = ()=>{
     const workspaceObj = new GetWorkspacesAPI(1);
     dispatch(APITransport(workspaceObj));
   }
   
   useEffect(()=>{
-      getDashboardData();
+    getDashboardWorkspaceData();
   },[]);
     
 
