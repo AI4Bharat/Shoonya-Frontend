@@ -8,10 +8,12 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../common/Button"
+import "../../../styles/background.css"
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
-    
+    const [activeproject ,setActiveproject] = useState("activeButtonproject")
+    const [activeworkspace ,setActiveworkspace] = useState("")
 
     const dispatch = useDispatch();
     let navigate = useNavigate();
@@ -28,8 +30,11 @@ const Header = () => {
         console.log("loggedInUserData", loggedInUserData);
     },[]);
 
+    // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
     const onLogoutClick = () => {
         handleCloseUserMenu();
+        // ExpireSession();
         localStorage.clear();
         navigate("/");
     }
@@ -51,11 +56,20 @@ const Header = () => {
     };
     const onWorkspaceClick = () =>{
         navigate("/WorkSpaces");
+        setActiveworkspace("activeButtonworkspace")
+        setActiveproject("")
+       
+
     }
     const onProjectClick = ()=>{
-        navigate("/dashboard");
+        navigate("/projects");
+        setActiveproject("activeButtonproject")
+        setActiveworkspace("")
+      
+        
+        
     }
-
+  
     const classes = headerStyle();
 
     return (
@@ -85,9 +99,8 @@ const Header = () => {
                                     sm={2}
                                     md={2}
                                 >
-
-
-                                   <CustomButton 
+                                     <div  className={activeproject}>
+                                             <CustomButton 
                                    sx={{
                                     borderRadius: "inherit",
                                     backgroundColor: "transparent",
@@ -100,6 +113,11 @@ const Header = () => {
                                   },
                                    }}
                                     label={"Projects"} onClick={onProjectClick}/> 
+
+                                        </div>
+
+
+                                 
                                     
                                 </Grid>
                                 <Grid 
@@ -108,6 +126,7 @@ const Header = () => {
                                     sm={2}
                                     md={2}
                                 >
+                                    <div   className={activeworkspace}>
                                     <CustomButton 
                                      sx={{
                                         borderRadius: "inherit",
@@ -121,6 +140,7 @@ const Header = () => {
                                       },
                                        }}
                                     label={"Workspaces"} onClick={onWorkspaceClick}/>
+                                    </div>
                
                                 </Grid>
                                 </Grid>
