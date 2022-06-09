@@ -205,7 +205,7 @@ const ProjectSetting = (props) => {
 
                             </Grid>
                             <Grid
-                             style={{ margin: "15px 0px 0px 0px", }}
+                             style={{ margin: "20px 0px 0px 0px", }}
                                 items
                                 xs={12}
                                 sm={12}
@@ -236,7 +236,7 @@ const ProjectSetting = (props) => {
                             </Grid>
                            
                             <Grid
-                             style={{ margin: "15px 0px 0px 0px", }}
+                             style={{ margin: "20px 0px 0px 0px", }}
                                 items
                                 xs={12}
                                 sm={12}
@@ -270,7 +270,7 @@ const ProjectSetting = (props) => {
                           
                             <Grid
 
-                                style={{ margin: "15px 0px 10px 0px", }}
+                                style={{ margin: "20px 0px 10px 0px", }}
                                 item
                                 xs={12}
                                 md={12}
@@ -289,7 +289,7 @@ const ProjectSetting = (props) => {
                                
                             </Grid>
                             <Grid
-                             style={{ margin: "15px 0px 0px 0px", }}
+                             style={{ margin: "20px 0px 0px 0px", }}
                                 items
                                 xs={12}
                                 sm={12}
@@ -327,6 +327,7 @@ const ProjectSetting = (props) => {
                                     md={12}
                                     lg={12}
                                     xl={12}
+                                    style={{ margin: "20px 0px 0px 0px" }}
                                 >
                                     {samplingtype==="Random" && (
                                          <Typography gutterBottom component="div" label="Required">
@@ -358,6 +359,7 @@ const ProjectSetting = (props) => {
                                     md={12}
                                     lg={12}
                                     xl={12}
+                                    style={{ margin: "20px 0px 0px 0px" }}
                                 >
                                     {samplingtype==="Batch" && (
                                          <Typography gutterBottom component="div" label="Required">
@@ -388,6 +390,7 @@ const ProjectSetting = (props) => {
                                     md={12}
                                     lg={12}
                                     xl={12}
+                                    style={{ margin: "20px 0px 0px 0px" }}
                                 >
                                     {samplingtype==="Batch" && (
                                          <Typography gutterBottom component="div" label="Required">
@@ -412,6 +415,7 @@ const ProjectSetting = (props) => {
                                     />)}
                                 </Grid>
                                 <Grid
+                                style={{ margin: "20px 0px 0px 0px", }}
                                     items
                                     xs={12}
                                     sm={12}
@@ -442,6 +446,7 @@ const ProjectSetting = (props) => {
                                 </Grid>
 
                             <Grid
+                            style={{ margin: "20px 0px 0px 0px", }}
                                 items
                                 xs={12}
                                 sm={12}
