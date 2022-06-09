@@ -14,13 +14,21 @@ export default function WorkSpaces() {
     const dispatch = useDispatch();
     const workspaceData = useSelector(state=>state.getWorkspaces.data);
 
+    const getDashboardData = ()=>{
+    const workspaceObj = new GetWorkspacesAPI(1);
+    dispatch(APITransport(workspaceObj));
+  }
+  
+  useEffect(()=>{
+      getDashboardData();
+  },[]);
     
 
   return (
     <React.Fragment>
     <Header />
     <Box sx={{ width: window.innerWidth*0.7, margin : "0 auto", pb : 5 }}>
-        <Typography variant="h5" sx={{mt : 2, mb : 2}}>Visit Workspaces</Typography>
+        {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Visit Workspaces</Typography> */}
         <WorkspaceTable workspaceData={workspaceData} />
     </Box>
 </React.Fragment>

@@ -1,5 +1,5 @@
 import { Box, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -7,6 +7,15 @@ import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+import ProjectTable from '../../component/WorkspaceTables/ProjectTable';
+import  AnnotatorsTable from "../../component/WorkspaceTables/AnnotatorsTable";
+import ManagersTable from "../../component/WorkspaceTables/ManagersTable";
+import GetWorkspacesProjectDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
+
+import {useDispatch,useSelector} from 'react-redux';
+
 
 function TabPanel(props) {
     
@@ -40,12 +49,27 @@ function a11yProps(index) {
 const ProjectSetting = (props) => {
    
     const classes = DatasetStyle();
+    const dispatch = useDispatch();
+    
+    const workspaceData = useSelector(state=>state.getWorkspaces.data);
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+  
+    const getDashboardData = ()=>{
+        
+        const workspaceObj = new GetWorkspacesAPI(1);
+       
+        dispatch(APITransport(workspaceObj));
+    }
+    
+    useEffect(()=>{
+        getDashboardData();
+    },[]);
 
+   
     return (
         <ThemeProvider theme={themeDefault}>
 
@@ -81,15 +105,22 @@ const ProjectSetting = (props) => {
                     </Box>
                     <TabPanel value={value} index={0}>
                     <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none" }}>
+                     
                     <Button  sx={{ width:"50%" }} label={"Add New Annotation Project"} />
                     </Link>
                     <Button   sx={{ width:"50%" }} label={"Add New Collection Project"} />
+                    <div style={{marginTop:"20px"}}>
+                    <ProjectTable /> 
+                    </div>
+                    
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        Item Two
+                    <Button sx={{ width:"100%" }}  label={"Add Annotators to Workspace"} />
+                       <AnnotatorsTable workspaceData={workspaceData} />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        Item Three
+                    <Button sx={{ width:"100%" }}  label={"Assign Managers"} />
+                      <ManagersTable workspaceData={workspaceData} />
                     </TabPanel>
                     <TabPanel value={value} index={3}>
                         Item Three

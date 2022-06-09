@@ -13,7 +13,7 @@ const Dashboard = () => {
     const classes = dashboardStyle();
     const dispatch = useDispatch();
     const projectData = useSelector(state=>state.getProjects.data);
-    
+    const workspaceData = useSelector(state=>state.getWorkspaces.data);
 
     const getDashboardData = ()=>{
         const projectObj = new GetProjectsAPI();
