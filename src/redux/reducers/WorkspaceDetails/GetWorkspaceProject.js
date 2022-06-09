@@ -8,7 +8,7 @@ const reducer = (state=initialState,action)=>{
         case constants.GET_WORKSPACE_PROJECT_DETAILS:
             return {
                 ...state,
-                data:action.payload.results
+                data:action.payload
             } 
 
         default:

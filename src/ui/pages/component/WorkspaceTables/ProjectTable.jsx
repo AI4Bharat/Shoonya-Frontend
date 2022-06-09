@@ -9,7 +9,7 @@ import {useDispatch,useSelector} from 'react-redux';
 const ProjectTable = (props) => {
    
     const dispatch = useDispatch();
-    const workspacesproject = useSelector(state=>state.getWorkspacesProjectDetails.data);
+    
     const {id} = useParams();
     const getDashboardDatas = ()=>{
         
@@ -21,6 +21,8 @@ const ProjectTable = (props) => {
     useEffect(()=>{
         getDashboardDatas();
     },[]);
+
+    const workspacesproject = useSelector(state=>state.getWorkspacesProjectDetails.data);
 
     console.log("workspacesproject", workspacesproject);
     const columns = [
@@ -42,8 +44,6 @@ const ProjectTable = (props) => {
                 align : "center"
             }
         },
-        
-        
         {
             name: "Actions",
             label: "Actions",
@@ -56,17 +56,18 @@ const ProjectTable = (props) => {
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data = workspacesproject.map((el,i)=>{
+        const data = workspacesproject && workspacesproject.length > 0 ? workspacesproject.map((el,i)=>{
             return [
-                        el.workspace_name, 
-                        <Link  style={{ textDecoration: "none" }}>
+                        el.title, 
+                        el.created_by,
+                        // <Link  style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}
                                 label = "View"
                             />
-                        </Link>
-                    ]
-        });
+                        // </Link>
+            ]
+        }) : [];
 
         const options = {
             textLabels: {
