@@ -179,7 +179,7 @@ const Projects = () => {
                         <TaskTable />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        <MembersTable />
+                        <MembersTable dataSource={ProjectDetails.users} />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         <ReportsTable />
