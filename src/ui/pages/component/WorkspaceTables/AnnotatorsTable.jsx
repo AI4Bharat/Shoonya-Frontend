@@ -11,22 +11,25 @@ const ManagersTable = (props) => {
     const dispatch = useDispatch();
     
     const {id} = useParams();
+    
+    const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
+
     const getWorkspaceAnnotatorsData = ()=>{
         
-        const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(id);
+        const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(orgId);
        
         dispatch(APITransport(workspaceObjs));
     }
-    
+
+    const workspaceAnnotators = useSelector(state=>state.getWorkspacesAnnotatorsData.data);
+
     useEffect(()=>{
         getWorkspaceAnnotatorsData();
     },[]);
-
-    const workspaceAnnotators = useSelector(state=>state.getWorkspacesAnnotatorsData.data);
     // const orgId = workspaceAnnotators &&  workspaceAnnotators
     console.log("workspaceAnnotators", workspaceAnnotators);
 
-
+// getWorkspacesProjectData
    
 
     const columns = [
@@ -72,12 +75,14 @@ const ManagersTable = (props) => {
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
         const data =  workspaceAnnotators && workspaceAnnotators.length > 0 ? workspaceAnnotators.map((el,i)=>{
-            const userRole = UserMappedByRole(el.role).element;
+            const userRole = el.role && UserMappedByRole(el.role).element;
+            console.log("userRole", userRole);
             return [
                         el.username, 
                         el.email,
-                        el.role,
-                       
+                        userRole ? userRole : el.role,
+                        // userRole ? userRole : el.role,
+                        // el.role,
                         <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2,marginRight: 2}}
