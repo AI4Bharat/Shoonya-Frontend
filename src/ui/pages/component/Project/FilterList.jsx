@@ -17,6 +17,8 @@ import TaskTableFilter from "../../../styles/TaskTableFilter";
 const FilterList = (props) => {
   const classes = TaskTableFilter();
   const { filter, selectedFilter, clearAll, apply } = props;
+  const [selectedStatus, setSelectedStatus] = useState("unlabeled");
+
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
   // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
   // const handleDatasetChange = (e) => {
@@ -57,6 +59,11 @@ const FilterList = (props) => {
   //   return false;
   // };
 
+  const onStatusChange = (value) => {
+    console.log(value);
+    setSelectedStatus(value)
+  }
+
   return (
     <div>
       <Popover
@@ -94,12 +101,36 @@ const FilterList = (props) => {
                   <FormControlLabel
                     control={
                       <Radio
-                        // checked={isChecked(type, "dataset")}
-                        // onChange={(e) => handleDatasetChange(e)}
+                        checked={selectedStatus === type ? true : false}
                         name={type}
                         color="primary"
                       />
                     }
+                    onChange={(e) => onStatusChange(e.target.value)}
+                    value={type}
+                    label={type}
+                  />
+                );
+              })}
+            </FormGroup>
+          </Grid>
+          <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+            <Typography variant="body2" className={classes.filterTypo}>
+                {translate("label.filter.status")}
+            </Typography>
+            <FormGroup>
+              {filter.Status.map((type) => {
+                return (
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={selectedStatus === type ? true : false}
+                        name={type}
+                        color="primary"
+                      />
+                    }
+                    onChange={(e) => onStatusChange(e.target.value)}
+                    value={type}
                     label={type}
                   />
                 );
