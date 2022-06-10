@@ -9,6 +9,8 @@ import ProjectSetting from "./ui/pages/container/Projects/ProjectSetting"
 import WorkSpace from "./ui/pages/container/workspace/WorkSpace"
 import themeDefault from "./ui/theme/theme";
 import CreateAnnotationProject from "./ui/pages/container/workspace/CreateAnnotationProject"
+import WorkSpaces from "./ui/pages/container/Dashboard/WorkSpaces"
+
 
 const ProtectedRoute = ({ user, children }) => {
   if (!authenticateUser()) {
@@ -40,6 +42,8 @@ const App = () => {
     { path: "projects/:id/projectsetting", element: ProtectedRouteWrapper(<ProjectSetting />) },
     { path: "workspace/:id", element: ProtectedRouteWrapper(<WorkSpace />) },
     { path: "create-annotation-project/:id", element: ProtectedRouteWrapper(<CreateAnnotationProject />) },
+    { path: "Workspaces",type:"Workspaces", element: <WorkSpaces /> },
+    
   ]);
   return routes;
 };

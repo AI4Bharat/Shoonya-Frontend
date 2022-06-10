@@ -19,7 +19,8 @@ const headerStyle = makeStyles({
     headerLogo: {
         height: "30%", 
         width: "30%" 
-    }
+    },
+   
 })
 
 export default headerStyle

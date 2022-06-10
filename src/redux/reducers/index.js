@@ -4,6 +4,10 @@ import getWorkspaces from './Dashboard/GetWorkspaces';
 import fetchLoggedInUserData from './UserManagement/FetchLoggedInUserData';
 import getProjectDetails from './ProjectDetails/GetProjectDetails';
 import getTasksByProjectId from './Tasks/GetTasksByProjectId';
+import  getWorkspacesProjectData from './WorkspaceDetails/GetWorkspaceProject'
+import  getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotators'
+import  getWorkspacesManagersData from './WorkspaceDetails/GetWorkspaceManagers'
+
 
 const index = {
     apiStatus,
@@ -12,6 +16,12 @@ const index = {
     fetchLoggedInUserData,
     getProjectDetails,
     getTasksByProjectId,
+    getWorkspacesProjectData,
+    getWorkspacesAnnotatorsData,
+    getWorkspacesManagersData,
+  
+
+    
 };
 
 export default index;
