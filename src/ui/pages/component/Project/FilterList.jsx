@@ -9,6 +9,7 @@ import {
   Checkbox,
   FormControlLabel,
   Radio,
+  Autocomplete,
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import TaskTableFilter from "../../../styles/TaskTableFilter";
@@ -16,8 +17,9 @@ import TaskTableFilter from "../../../styles/TaskTableFilter";
 
 const FilterList = (props) => {
   const classes = TaskTableFilter();
-  const { filter, selectedFilter, clearAll, apply } = props;
+  const { filterStatusData, selectedFilter, clearAll, apply } = props;
   const [selectedStatus, setSelectedStatus] = useState("unlabeled");
+  const [selectAnnotator, setSelectAnnotator] = useState("All");
 
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
   // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
@@ -81,22 +83,13 @@ const FilterList = (props) => {
           horizontal: "right",
         }}
       >
-        <Button
-          // onClick={handleClearAll}
-          color="primary"
-          size="small"
-          className={classes.clearAllBtn}
-        >
-          {" "}
-          {translate("button.clearAll")}
-        </Button>
-        <Grid container className={classes.filterContainer}>
-          <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
-            <Typography variant="body2" className={classes.filterTypo}>
-                {translate("label.filter.status")}
+        <Grid container direction="column" className={classes.filterContainer}>
+          <Grid item xs={6} sm={6} md={6} lg={6} xl={6} sx={{p:2}} className={classes.statusFilterContainer}>
+            <Typography variant="body2" sx={{ mr: 5, fontWeight: "700" }} className={classes.filterTypo}>
+              {translate("label.filter.status")} :
             </Typography>
-            <FormGroup>
-              {filter.Status.map((type) => {
+            <FormGroup sx={{ display: "inline" }}>
+              {filterStatusData.Status.map((type) => {
                 return (
                   <FormControlLabel
                     control={
@@ -114,29 +107,42 @@ const FilterList = (props) => {
               })}
             </FormGroup>
           </Grid>
-          <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
-            <Typography variant="body2" className={classes.filterTypo}>
-                {translate("label.filter.status")}
+          <Divider />
+          <Grid item xs={6} sm={6} md={6} lg={6} xl={6} sx={{p:2}} className={classes.statusFilterContainer}>
+            <Typography variant="body2" sx={{ mr: 5, fontWeight: "700" }} className={classes.filterTypo}>
+              {translate("label.filter.byAnnotator")} :
             </Typography>
-            <FormGroup>
-              {filter.Status.map((type) => {
-                return (
-                  <FormControlLabel
-                    control={
-                      <Radio
-                        checked={selectedStatus === type ? true : false}
-                        name={type}
-                        color="primary"
-                      />
-                    }
-                    onChange={(e) => onStatusChange(e.target.value)}
-                    value={type}
-                    label={type}
-                  />
-                );
-              })}
-            </FormGroup>
+                  
           </Grid>
+          <Divider />
+          <Grid container sx={{p : 2}}>
+            <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+              <Button
+                // onClick={handleClearAll}
+                variant="outlined"
+                color="primary"
+                size="small"
+                className={classes.clearAllBtn}
+              >
+                {" "}
+                {translate("button.cancel")}
+              </Button>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+              <Button
+                // onClick={handleClearAll}
+                variant="contained"
+                color="primary"
+                size="small"
+                className={classes.clearAllBtn}
+              >
+                {" "}
+                {translate("button.Filter")}
+              </Button>
+            </Grid>
+
+          </Grid>
+
         </Grid>
       </Popover>
     </div>

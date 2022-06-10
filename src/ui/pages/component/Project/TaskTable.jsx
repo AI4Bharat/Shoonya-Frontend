@@ -227,7 +227,7 @@ const TaskTable = () => {
                     open={popoverOpen}
                     anchorEl={anchorEl}
                     handleClose={handleClose}
-                    filter={filterData}
+                    filterStatusData={filterData}
                     // selectedFilter={myContributionReport.selectedFilter}
                     // clearAll={(data) => clearAll(data, handleClose)}
                     // apply={(data) => apply(data, handleClose)}

@@ -19,8 +19,13 @@ const TaskTableFilter = makeStyles({
           maxHeight: "170px",
         },
       },
+      statusFilterContainer : {
+        // display : 'contents',
+        alignItems: "center",
+      },
       filterTypo: {
-        marginBottom: "9px",
+        // marginBottom: "9px",
+        // marginRight : "20px"
       },
       applyBtn: {
         float: "right",
