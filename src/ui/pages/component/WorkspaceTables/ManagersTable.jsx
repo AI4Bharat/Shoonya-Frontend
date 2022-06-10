@@ -1,26 +1,33 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import Paper from '@mui/material/Paper';
-import { ThemeProvider } from '@mui/material';
-import themeDefault from '../../../theme/theme';
-// import { workspaceData } from '../../../../constants/workspaceData/workspaceData';
+import React, { useState, useEffect } from "react";
 import CustomButton from '../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
+import  GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import {useDispatch,useSelector} from 'react-redux';
 
 const ManagersTable = (props) => {
-    const  {workspaceData} = props;
 
-    console.log("workspaceData", workspaceData);
+    const dispatch = useDispatch();
+    
+    const {id} = useParams();
+    const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
+    const getWorkspaceManagersData = ()=>{
+        
+        const workspaceObjs = new GetWorkspacesManagersDataAPI( orgId);
+       
+        dispatch(APITransport(workspaceObjs));
+    }
+    
+    useEffect(()=>{
+        getWorkspaceManagersData();
+    },[]);
+
+    const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
+   
+    console.log("workspaceManagers", workspaceManagers);
+
+   
 
     const columns = [
         {
@@ -55,17 +62,23 @@ const ManagersTable = (props) => {
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data = workspaceData.map((el,i)=>{
+        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.map((el,i)=>{
             return [
-                        el.workspace_name, 
-                        <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
-                            <CustomButton
-                                sx={{borderRadius : 2}}
-                                label = "View"
-                            />
-                        </Link>
+                el.username, 
+                el.email,
+               
+                <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
+                    <CustomButton
+                        sx={{borderRadius : 2,marginRight: 2}}
+                        label = "View"
+                    />
+                    <CustomButton
+                        sx={{borderRadius : 2,backgroundColor:"red"}}
+                        label = "Remove"
+                    />
+                </Link>
                     ]
-        });
+        }) : [];
 
         const options = {
             textLabels: {

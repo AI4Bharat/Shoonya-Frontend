@@ -5,17 +5,17 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
- export default class GetWorkspacesProjectDetailsAPI extends API {
+ export default class GetWorkspacesAnnotatorsDataAPI extends API {
    constructor(workspaceId, timeout = 2000) {
      super("GET", timeout, false);
-     this.type = constants.GET_WORKSPACE_PROJECT_DATA;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${workspaceId}/projects/`;
+     this.type = constants. GET_WORKSPACE_ANNOTATORS_DATA;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}${workspaceId}/users/`;
    }
  
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-         this.workspaceProjectDetails = res;
+         this.workspaceAnnotatorsData = res;
      }
  }
  
@@ -36,7 +36,7 @@ import constants from "../../../constants";
    }
  
    getPayload() {
-     return this.workspaceProjectDetails
+     return this.workspaceAnnotatorsData
    }
  }
  

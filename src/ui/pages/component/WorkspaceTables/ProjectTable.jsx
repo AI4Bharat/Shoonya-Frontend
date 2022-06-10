@@ -11,7 +11,7 @@ const ProjectTable = (props) => {
     const dispatch = useDispatch();
     
     const {id} = useParams();
-    const getDashboardDatas = ()=>{
+    const getWorkspaceProjectData = ()=>{
         
         const workspaceObjs = new GetWorkspacesProjectDetailsAPI(id);
        
@@ -19,10 +19,10 @@ const ProjectTable = (props) => {
     }
     
     useEffect(()=>{
-        getDashboardDatas();
+        getWorkspaceProjectData();
     },[]);
 
-    const workspacesproject = useSelector(state=>state.getWorkspacesProjectDetails.data);
+    const workspacesproject = useSelector(state=>state.getWorkspacesProjectData.data);
 
     console.log("workspacesproject", workspacesproject);
     const columns = [
@@ -50,6 +50,7 @@ const ProjectTable = (props) => {
             options: {
                 filter: false,
                 sort: false,
+                align : "center"
             }
         }];
 

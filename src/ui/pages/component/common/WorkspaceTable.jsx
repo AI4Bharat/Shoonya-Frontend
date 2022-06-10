@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from "react";
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
@@ -13,14 +13,19 @@ import Paper from '@mui/material/Paper';
 import { ThemeProvider } from '@mui/material';
 import themeDefault from '../../../theme/theme';
 // import { workspaceData } from '../../../../constants/workspaceData/workspaceData';
+import {useDispatch,useSelector} from 'react-redux';
 import CustomButton from '../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 
+
 const WorkspaceTable = (props) => {
-    const  {workspaceData} = props;
+   
+    const  {workspaceData,} = props;
 
     console.log("workspaceData", workspaceData);
+
+    
 
     const columns = [
         {
@@ -44,7 +49,7 @@ const WorkspaceTable = (props) => {
         const data = workspaceData.map((el,i)=>{
             return [
                         el.workspace_name, 
-                        <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
+                        <Link to={`/workspace/${el.id}`}  style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}
                                 label = "View"
