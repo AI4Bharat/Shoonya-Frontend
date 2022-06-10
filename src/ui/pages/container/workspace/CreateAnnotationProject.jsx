@@ -17,7 +17,7 @@ let data1 = [{ name: "Translation", value: "Translation" }, { name: "OCR", value
 let data2 = [{ name: "MonolingualTranslation", value: "MonolingualTranslation" }, { name: "TranslationEditing", value: "TranslationEditing" }, { name: "ContextualTranslationEditing", value: "ContextualTranslationEditing" }]
 let data3 =[{name:"data",value:"data"},{name:"data1",value:"data1"}]
 let data4 =[{name:"Random",value:"Random"},{name:"Full",value:"Full"},{name:"Batch",value:"Batch"}]
-const ProjectSetting = (props) => {
+const CreateAnnotationProject = (props) => {
 
     const classes = DatasetStyle();
     const [selectmenu, setselectmenu] = React.useState('');
@@ -489,4 +489,4 @@ const ProjectSetting = (props) => {
     )
 }
 
-export default ProjectSetting;
+export default  CreateAnnotationProject;

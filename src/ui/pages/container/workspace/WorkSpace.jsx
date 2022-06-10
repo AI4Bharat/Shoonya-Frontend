@@ -10,6 +10,8 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import ProjectTable from '../../component/WorkspaceTables/ProjectTable';
 import AnnotatorsTable from "../../component/WorkspaceTables/AnnotatorsTable";
 import ManagersTable from "../../component/WorkspaceTables/ManagersTable";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,19 +47,30 @@ function a11yProps(index) {
 }
 
 
-const ProjectSetting = (props) => {
+const Workspace = (props) => {
 
     const classes = DatasetStyle();
     const dispatch = useDispatch();
-    const  {workspaceData} = props;
+   
 
-    console.log("workspaceData", workspaceData);
+    
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
    
+    const workspaceData = useSelector(state=>state.getWorkspaces.data);
+    console.log( workspaceData," workspaceData")
+    const getDashboardWorkspaceData = ()=>{
+        const workspaceObj = new GetWorkspacesAPI(1);
+        dispatch(APITransport(workspaceObj));
+      }
+      
+      useEffect(()=>{
+        getDashboardWorkspaceData();
+      },[]);
+        
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -79,10 +92,11 @@ const ProjectSetting = (props) => {
 
                 >
                     <Typography variant="h2" gutterBottom component="div">
-                       demo
+                       
+                       {workspaceData.length > 0 && workspaceData[0].workspace_name} 
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                        Created by: example123@gmail.com
+                    Created_by:  {workspaceData.length > 0 && workspaceData[0].created_by.email}
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
@@ -125,4 +139,4 @@ const ProjectSetting = (props) => {
     )
 }
 
-export default ProjectSetting;
+export default Workspace;

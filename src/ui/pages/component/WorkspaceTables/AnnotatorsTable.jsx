@@ -7,7 +7,7 @@ import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/Worksp
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 
-const ManagersTable = (props) => {
+const AnnotatorsTable = (props) => {
     const dispatch = useDispatch();
     
     const {id} = useParams();
@@ -137,4 +137,4 @@ const ManagersTable = (props) => {
     )
 }
 
-export default ManagersTable;
+export default AnnotatorsTable;

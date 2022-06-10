@@ -9,7 +9,8 @@ import {useDispatch,useSelector} from 'react-redux';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
-export default function WorkSpaces() {
+export default function WorkSpaces(props) {
+ 
     const classes = dashboardStyle();
     const dispatch = useDispatch();
     const workspaceData = useSelector(state=>state.getWorkspaces.data);

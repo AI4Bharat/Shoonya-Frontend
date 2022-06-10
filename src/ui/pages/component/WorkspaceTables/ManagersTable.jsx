@@ -58,11 +58,18 @@ const ManagersTable = (props) => {
                 sort: false,
             }
         }];
-
+       
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.map((el,i)=>{
+        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.filter((item) => {
+            if (
+                  item.role===2
+                    
+                ) {
+                  return item;
+                }
+              }).map((el,i)=>{
             return [
                 el.username, 
                 el.email,
