@@ -8,17 +8,16 @@ import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import ProjectTable from '../../component/WorkspaceTables/ProjectTable';
-import  AnnotatorsTable from "../../component/WorkspaceTables/AnnotatorsTable";
+import AnnotatorsTable from "../../component/WorkspaceTables/AnnotatorsTable";
 import ManagersTable from "../../component/WorkspaceTables/ManagersTable";
-import GetWorkspacesProjectDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
-import {useDispatch,useSelector} from 'react-redux';
+
+import { useDispatch, useSelector } from 'react-redux';
+
 
 
 function TabPanel(props) {
-    
+
     const { children, value, index, ...other } = props;
 
     return (
@@ -47,29 +46,19 @@ function a11yProps(index) {
 
 
 const ProjectSetting = (props) => {
-   
+
     const classes = DatasetStyle();
     const dispatch = useDispatch();
-    
-    const workspaceData = useSelector(state=>state.getWorkspaces.data);
+    const  {workspaceData} = props;
+
+    console.log("workspaceData", workspaceData);
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-  
-    const getDashboardData = ()=>{
-        
-        const workspaceObj = new GetWorkspacesAPI(1);
-       
-        dispatch(APITransport(workspaceObj));
-    }
-    
-    useEffect(()=>{
-        getDashboardData();
-    },[]);
-
    
+
     return (
         <ThemeProvider theme={themeDefault}>
 
@@ -89,13 +78,13 @@ const ProjectSetting = (props) => {
                     }}
 
                 >
-                     <Typography variant="h2" gutterBottom component="div">
-                            WorkSpace 1
-                        </Typography>
-                        <Typography variant="body1" gutterBottom component="div">
+                    <Typography variant="h2" gutterBottom component="div">
+                       demo
+                    </Typography>
+                    <Typography variant="body1" gutterBottom component="div">
                         Created by: example123@gmail.com
-                        </Typography>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    </Typography>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                             <Tab label="Projects" {...a11yProps(0)} />
                             <Tab label="Annotators" {...a11yProps(1)} />
@@ -104,30 +93,30 @@ const ProjectSetting = (props) => {
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
-                    <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none" }}>
-                     
-                    <Button  sx={{ width:"50%" }} label={"Add New Annotation Project"} />
-                    </Link>
-                    <Button   sx={{ width:"50%" }} label={"Add New Collection Project"} />
-                    <div style={{marginTop:"20px"}}>
-                    <ProjectTable /> 
-                    </div>
-                    
-                    </TabPanel>
+                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none" }}>
+                            <Button sx={{ width: "50%" }} label={"Add New Annotation Project"} />
+                        </Link>
+                             <Button sx={{ width: "50%" }} label={"Add New Collection Project"} />
+                             <div style={{marginTop:"20px"}}>
+                        <ProjectTable />
+                        </div>
+                   </TabPanel>
                     <TabPanel value={value} index={1}>
-                    <Button sx={{ width:"100%" }}  label={"Add Annotators to Workspace"} />
-                       {/* <AnnotatorsTable workspaceData={workspaceData} /> */}
-                       Item Three
+                          <Button sx={{ width: "100%" }} label={"Add Annotators to Workspace"} />
+                          <div style={{marginTop:"20px"}}>
+                     <AnnotatorsTable />
+                     </div>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                    <Button sx={{ width:"100%" }}  label={"Assign Managers"} />
-                      {/* <ManagersTable workspaceData={workspaceData} /> */}
-                      Item Three
+                           <Button sx={{ width: "100%" }} label={"Assign Managers"} />
+                           <div style={{marginTop:"20px"}}>
+                        <ManagersTable />
+                        </div>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                        Item Three
+                    <Button sx={{ width: "100%",backgroundColor:"red" }} label={"Archive Workspace"} />
                     </TabPanel>
-                   
+
 
                 </Card>
             </Grid>

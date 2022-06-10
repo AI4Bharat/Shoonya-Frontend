@@ -1,26 +1,33 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import Paper from '@mui/material/Paper';
-import { ThemeProvider } from '@mui/material';
-import themeDefault from '../../../theme/theme';
-// import { workspaceData } from '../../../../constants/workspaceData/workspaceData';
+import React, { useState, useEffect } from "react";
 import CustomButton from '../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
+import {useDispatch,useSelector} from 'react-redux';
+import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 
 const ManagersTable = (props) => {
-    const  {workspaceData} = props;
+    const dispatch = useDispatch();
+    
+    const {id} = useParams();
+    const getWorkspaceAnnotatorsData = ()=>{
+        
+        const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(id);
+       
+        dispatch(APITransport(workspaceObjs));
+    }
+    
+    useEffect(()=>{
+        getWorkspaceAnnotatorsData();
+    },[]);
 
-    console.log("workspaceData", workspaceData);
+    const workspaceAnnotators = useSelector(state=>state.getWorkspacesAnnotatorsData.data);
+    // const orgId = workspaceAnnotators &&  workspaceAnnotators
+    console.log("workspaceAnnotators", workspaceAnnotators);
+
+
+   
 
     const columns = [
         {
@@ -41,6 +48,15 @@ const ManagersTable = (props) => {
                 align : "center"
             }
         },
+        {
+            name: "Role",
+            label: "Role",
+            options: {
+                filter: false,
+                sort: false,
+                align : "center"
+            }
+        },
         
         
         {
@@ -55,17 +71,25 @@ const ManagersTable = (props) => {
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data = workspaceData.map((el,i)=>{
+        const data =  workspaceAnnotators && workspaceAnnotators.length > 0 ? workspaceAnnotators.map((el,i)=>{
+            const userRole = UserMappedByRole(el.role).element;
             return [
-                        el.workspace_name, 
+                        el.username, 
+                        el.email,
+                        el.role,
+                       
                         <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
                             <CustomButton
-                                sx={{borderRadius : 2}}
+                                sx={{borderRadius : 2,marginRight: 2}}
                                 label = "View"
+                            />
+                            <CustomButton
+                                sx={{borderRadius : 2,backgroundColor:"red"}}
+                                label = "Remove"
                             />
                         </Link>
                     ]
-        });
+        }) :[];
 
         const options = {
             textLabels: {

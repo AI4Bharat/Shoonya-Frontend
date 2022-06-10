@@ -5,7 +5,7 @@ let initialState = {
 }
 const reducer = (state=initialState,action)=>{
     switch(action.type){
-        case constants.GET_WORKSPACE_PROJECT_DATA:
+        case constants.GET_WORKSPACE_ANNOTATORS_DATA:
             return {
                 ...state,
                 data:action.payload

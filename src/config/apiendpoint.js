@@ -3,6 +3,6 @@ export default {
   getProjects:"/projects/",
   getWorkspaces:"/workspaces/",
   fetch:"/users/account/",
-  getTasks:"/task/",
-  getWorkspaceProject:`/workspaces/`,
+  getTasks:"/task/",  
+  getOrganizations:"/organizations/",
 };
