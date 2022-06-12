@@ -1,6 +1,6 @@
 import { AppBar, Avatar, Box, Divider, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import headerStyle from "../../../styles/header";
 import Logo from '../../../../assets/logo.svg';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,8 +12,8 @@ import "../../../styles/background.css"
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
-    const [activeproject, setActiveproject] = useState("activeButtonproject")
-    const [activeworkspace, setActiveworkspace] = useState("")
+    const [activeproject, setActiveproject] = useState("activeButtonproject");
+    const [activeworkspace, setActiveworkspace] = useState("");
 
     const dispatch = useDispatch();
     let navigate = useNavigate();
@@ -40,9 +40,6 @@ const Header = () => {
     }
 
     const settings = [
-        { name: "Profile", onclick: () => handleCloseUserMenu() },
-        { name: "Account", onclick: () => handleCloseUserMenu() },
-        { name: "Dashboard", onclick: () => handleCloseUserMenu() },
         { name: "Logout", onclick: () => onLogoutClick() },
     ]
 
@@ -54,21 +51,6 @@ const Header = () => {
         setAnchorElUser(null);
 
     };
-    const onWorkspaceClick = () => {
-        navigate("/WorkSpaces");
-        setActiveworkspace("activeButtonworkspace")
-        setActiveproject("")
-
-
-    }
-    const onProjectClick = () => {
-        navigate("/dashboard");
-        setActiveproject("activeButtonproject")
-        setActiveworkspace("")
-
-
-
-    }
 
     const classes = headerStyle();
 
@@ -86,10 +68,9 @@ const Header = () => {
                         direction="row"
                         justifyContent="left"
                         spacing={1}
-                        xs={12} 
+                        xs={12}
                         sm={12}
-                        md={5}
-                    // sx={{textAlign : "center", alignItems : "center"}}
+                        md={7}
                     >
                         <Grid
 
@@ -98,22 +79,13 @@ const Header = () => {
                             sm={12}
                             md={2}
                         >
-                            <div className={activeproject}>
-                                <CustomButton
-                                    sx={{
-                                        borderRadius: "inherit",
-                                        backgroundColor: "transparent",
-                                        color: "black",
-                                        boxShadow: "none",
-                                        fontSize: "19px",
-                                        '&:hover': {
-                                            backgroundColor: "#E0E0E0",
-                                            boxShadow: "none",
-                                        },
-                                    }}
-                                    label={"Projects"} onClick={onProjectClick} />
-
-                            </div>
+                            <NavLink
+                                to="/projects"
+                                className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
+                                activeClassName={classes.highlightedMenu}
+                            >
+                                Projects
+                            </NavLink>
                         </Grid>
                         <Grid
                             item
@@ -121,27 +93,32 @@ const Header = () => {
                             sm={12}
                             md={2}
                         >
-                            <div className={activeworkspace}>
-                                <CustomButton
-                                    sx={{
-                                        borderRadius: "inherit",
-                                        backgroundColor: "transparent",
-                                        color: "black",
-                                        boxShadow: "none",
-                                        fontSize: "19px",
-                                        '&:hover': {
-                                            backgroundColor: "#E0E0E0",
-                                            boxShadow: "none",
-                                        },
-                                    }}
-                                    label={"Workspaces"} onClick={onWorkspaceClick} />
-                            </div>
-
+                            <NavLink
+                                to="/workspaces"
+                                className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
+                                activeClassName={classes.highlightedMenu}
+                            >
+                                Workspaces
+                            </NavLink>
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            md={2}
+                        >
+                            <NavLink
+                                to="/my-organization"
+                                className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
+                                activeClassName={classes.highlightedMenu}
+                            >
+                                My Organization
+                            </NavLink>
                         </Grid>
                     </Grid>
 
 
-                    <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={5}>
+                    <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={3}>
 
                         <Grid
                             container
@@ -199,23 +176,6 @@ const Header = () => {
                 </Toolbar>
             </AppBar>
         </Box>
-        // <Grid
-        //     container
-        //     flexDirection="row"
-        //     justifyContent="space-between"
-        //     alignItems="center"
-        //     spacing={1}
-        //     padding="1%"
-        //     style={{ backgroundColor : "#fff"}}
-        // >
-        //     <Grid xs={6}>
-        //         <img src={"logo.svg"} alt="logo" style={{height: "30%",verticalAlign: "middle"}}/>
-        //     </Grid>
-
-        //     <Grid >
-
-        //     </Grid>
-        // </Grid>
     )
 }
 

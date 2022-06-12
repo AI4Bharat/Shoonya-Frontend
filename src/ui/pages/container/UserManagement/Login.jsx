@@ -57,7 +57,7 @@ const Login = () => {
       } else {
         localStorage.setItem('shoonya_access_token', rsp_data.access);
         localStorage.setItem('shoonya_refresh_token', rsp_data.refresh);
-        navigate("/dashboard");
+        navigate("/projects");
     }})
   }
 
