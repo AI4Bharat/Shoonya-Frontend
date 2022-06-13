@@ -1,6 +1,4 @@
 import { makeStyles } from '@mui/styles';
-import { Wave } from '../../assets/Wave.svg';
-
 
 const TaskTableStyle = makeStyles({
 

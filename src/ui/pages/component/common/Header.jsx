@@ -9,7 +9,6 @@ import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManageme
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../common/Button"
 
-
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [activeproject, setActiveproject] = useState("activeButtonproject");

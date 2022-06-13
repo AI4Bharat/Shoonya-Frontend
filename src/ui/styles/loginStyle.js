@@ -1,7 +1,5 @@
 
 import { makeStyles } from '@mui/styles';
-import { Wave } from '../../assets/Wave.svg';
-
 
 const LoginStyle = makeStyles({
     appInfo: {

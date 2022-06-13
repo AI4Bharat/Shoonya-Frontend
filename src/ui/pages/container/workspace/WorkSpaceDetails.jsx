@@ -7,10 +7,10 @@ import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import ProjectTable from './WorkspaceTables/ProjectTable';
-import AnnotatorsTable from "./WorkspaceTables/AnnotatorsTable";
-import ManagersTable from "./WorkspaceTables/ManagersTable";
-import SettingsTable from "./WorkspaceTables/SettingsTable";
+import ProjectTable from './Tabs/ProjectTable';
+import AnnotatorsTable from "./Tabs/Annotators";
+import ManagersTable from "./Tabs/ManagersTable";
+import SettingsTable from "./Tabs/SettingsTable";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
@@ -82,7 +82,7 @@ const Workspace = (props) => {
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-                width={window.innerWidth}
+                // width={window.innerWidth}
             >
                 <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
