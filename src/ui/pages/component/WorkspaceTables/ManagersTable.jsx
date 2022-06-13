@@ -25,9 +25,7 @@ const ManagersTable = (props) => {
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
    
-    console.log("workspaceManagers", workspaceManagers);
-
-   
+    console.log("workspaceManagers ", workspaceManagers);
 
     const columns = [
         {
