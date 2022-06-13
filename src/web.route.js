@@ -6,9 +6,9 @@ import Dashboard from "./ui/pages/container/Dashboard";
 import Projects from "./ui/pages/container/Projects";
 import { ThemeProvider } from "@mui/material/styles";
 import ProjectSetting from "./ui/pages/container/Projects/ProjectSetting"
-import WorkSpace from "./ui/pages/container/workspace/WorkSpace"
+import WorkSpace from "./ui/pages/container/Workspace/WorkSpace"
 import themeDefault from "./ui/theme/theme";
-import AnnotationProject from "./ui/pages/container/workspace/AnnotationProject"
+import AnnotationProject from "./ui/pages/container/Workspace/AnnotationProject"
 import WorkSpaces from "./ui/pages/container/Dashboard/WorkSpaces"
 import Layout from "./ui/Layout";
 
