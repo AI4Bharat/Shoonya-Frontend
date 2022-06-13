@@ -24,12 +24,6 @@ const ManagersTable = (props) => {
     },[]);
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
-   
-<<<<<<< HEAD:src/ui/pages/component/WorkspaceTables/ManagersTable.jsx
-    console.log("workspaceManagers ", workspaceManagers);
-=======
-    console.log(" WorkspaceManagers", workspaceManagers);
->>>>>>> feature-migration:src/ui/pages/container/workspace/Tabs/ManagersTable.jsx
 
     const columns = [
         {
