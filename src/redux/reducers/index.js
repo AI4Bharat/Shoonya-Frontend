@@ -7,6 +7,7 @@ import getTasksByProjectId from './Tasks/GetTasksByProjectId';
 import  getWorkspacesProjectData from './WorkspaceDetails/GetWorkspaceProject'
 import  getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotators'
 import  getWorkspacesManagersData from './WorkspaceDetails/GetWorkspaceManagers'
+import  getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
 
 
 const index = {
@@ -19,6 +20,7 @@ const index = {
     getWorkspacesProjectData,
     getWorkspacesAnnotatorsData,
     getWorkspacesManagersData,
+    getWorkspaceDetails,
   
 
     

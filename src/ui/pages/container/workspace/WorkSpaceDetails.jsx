@@ -12,7 +12,7 @@ import AnnotatorsTable from "./Tabs/Annotators";
 import ManagersTable from "./Tabs/ManagersTable";
 import SettingsTable from "./Tabs/SettingsTable";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
+import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,19 +60,23 @@ const Workspace = (props) => {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+    const {id} = useParams();
+    
+     
    
-    const workspaceData = useSelector(state=>state.getWorkspaces.data);
-    console.log( workspaceData," workspaceData")
-    const getDashboardWorkspaceData = ()=>{
-        const workspaceObj = new GetWorkspacesAPI(1);
+   
+    const workspaceDtails = useSelector(state=>state.getWorkspaceDetails.data);
+    const getWorkspaceDetails = ()=>{
+        const workspaceObj = new GetWorkspacesDetailsAPI(id);
         dispatch(APITransport(workspaceObj));
       }
+     
       
       useEffect(()=>{
-        getDashboardWorkspaceData();
+        getWorkspaceDetails();
       },[]);
         
-
+      console.log( workspaceDtails," workspaceDtails")
     return (
         <ThemeProvider theme={themeDefault}>
 
@@ -86,11 +90,15 @@ const Workspace = (props) => {
             >
                 <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
-                       
-                       {workspaceData.length > 0 && workspaceData[0].workspace_name} 
+                       {workspaceDtails && workspaceDtails.workspace_name}
+                       {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                    Created_by:  {workspaceData.length > 0 && workspaceData[0].created_by.email}
+                    {/* Created_by:  {workspaceData.length > 0 && workspaceData[0].created_by.email} */}
+                    Created_by: 
+                     {workspaceDtails && workspaceDtails.created_by ?.username}
+                    {/* {!workspaceDtails.created_by.username ? " ":  workspaceDtails.created_by.username} */}
+                     
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
