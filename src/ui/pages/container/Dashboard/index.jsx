@@ -28,9 +28,9 @@ const Dashboard = () => {
 
     return (
         <React.Fragment>
-            <Header />
+            {/* <Header /> */}
             <Box sx={{ width: window.innerWidth*0.7, margin : "0 auto", pb : 5 }}>
-                <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography>
+                {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
                 <Grid container sx={{alignItems : "center"}} rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }}>
                     {
                         projectData.map((el,i)=>{

@@ -1,37 +1,30 @@
 import React, { useState, useEffect } from "react";
-import CustomButton from '../../component/common/Button'
+import CustomButton from '../../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
+import GetWorkspacesProjectDetailsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
+import APITransport from '../../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
-import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 
-const ManagersTable = (props) => {
+const ProjectTable = (props) => {
+   
     const dispatch = useDispatch();
     
     const {id} = useParams();
-    
-    const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
-
-    const getWorkspaceAnnotatorsData = ()=>{
+    const getWorkspaceProjectData = ()=>{
         
-        const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(orgId);
+        const workspaceObjs = new GetWorkspacesProjectDetailsAPI(id);
        
         dispatch(APITransport(workspaceObjs));
     }
-
-    const workspaceAnnotators = useSelector(state=>state.getWorkspacesAnnotatorsData.data);
-
+    
     useEffect(()=>{
-        getWorkspaceAnnotatorsData();
+        getWorkspaceProjectData();
     },[]);
-    // const orgId = workspaceAnnotators &&  workspaceAnnotators
-    console.log("workspaceAnnotators", workspaceAnnotators);
 
-// getWorkspacesProjectData
-   
+    const workspacesproject = useSelector(state=>state.getWorkspacesProjectData.data);
 
+    console.log("workspacesproject", workspacesproject);
     const columns = [
         {
             name: "Name",
@@ -43,58 +36,39 @@ const ManagersTable = (props) => {
             }
         },
         {
-            name: "Email",
-            label: "Email",
+            name: "Created By",
+            label: "Created By",
             options: {
                 filter: false,
                 sort: false,
                 align : "center"
             }
         },
-        {
-            name: "Role",
-            label: "Role",
-            options: {
-                filter: false,
-                sort: false,
-                align : "center"
-            }
-        },
-        
-        
         {
             name: "Actions",
             label: "Actions",
             options: {
                 filter: false,
                 sort: false,
+                align : "center"
             }
         }];
 
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data =  workspaceAnnotators && workspaceAnnotators.length > 0 ? workspaceAnnotators.map((el,i)=>{
-            const userRole = el.role && UserMappedByRole(el.role).element;
-            console.log("userRole", userRole);
+        const data = workspacesproject && workspacesproject.length > 0 ? workspacesproject.map((el,i)=>{
             return [
-                        el.username, 
-                        el.email,
-                        userRole ? userRole : el.role,
-                        // userRole ? userRole : el.role,
-                        // el.role,
-                        <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
+                        el.title, 
+                        el.created_by,
+                        // <Link  style={{ textDecoration: "none" }}>
                             <CustomButton
-                                sx={{borderRadius : 2,marginRight: 2}}
+                                sx={{borderRadius : 2}}
                                 label = "View"
                             />
-                            <CustomButton
-                                sx={{borderRadius : 2,backgroundColor:"red"}}
-                                label = "Remove"
-                            />
-                        </Link>
-                    ]
-        }) :[];
+                        // </Link>
+            ]
+        }) : [];
 
         const options = {
             textLabels: {
@@ -137,4 +111,4 @@ const ManagersTable = (props) => {
     )
 }
 
-export default ManagersTable;
+export default ProjectTable;

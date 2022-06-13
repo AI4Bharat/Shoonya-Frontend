@@ -49,7 +49,7 @@ const WorkspaceTable = (props) => {
         const data = workspaceData.map((el,i)=>{
             return [
                         el.workspace_name, 
-                        <Link to={`/workspace/${el.id}`}  style={{ textDecoration: "none" }}>
+                        <Link to={`/workspaces/${el.id}`}  style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}
                                 label = "View"
@@ -109,65 +109,6 @@ const WorkspaceTable = (props) => {
                 options={options}
             />
         </div>
-        // <ThemeProvider theme={themeDefault}>
-            // <TableContainer sx={{ width: window.innerWidth*0.7, padding: 2 }} component={Paper}>
-            //     <Table sx={{ width: window.innerWidth*0.7 }} aria-label="simple table">
-            //         <TableHead>
-            //             <TableRow>
-            //                 <TableCell>
-            //                     <Typography variant='subtitle2'>Name</Typography>
-            //                 </TableCell>
-            //                 <TableCell align="center">
-            //                     <Typography variant='subtitle2'>Action</Typography>
-            //                 </TableCell>
-            //             </TableRow>
-            //         </TableHead>
-            //         <TableBody>
-            //             {workspaceData.map((el, i) => {
-            //                 return (
-            //                     <TableRow
-            //                         key={el.id}
-            //                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            //                     >
-            //                         <TableCell component="th" scope="row">
-            //                             {el.workspace_name}
-            //                         </TableCell>
-            //                         <TableCell align="center">
-            //                         <Link to={`/workspace/1}`} style={{ textDecoration: "none" }}>
-            //                             <CustomButton
-            //                                 sx={{borderRadius : 2}}
-            //                                 label = "View"
-            //                             />
-            //                          </Link>
-            //                         </TableCell>
-            //                     </TableRow>
-            //                 )
-            //             })}
-            //         </TableBody>
-            //         <TableFooter>
-            //             <TableRow>
-            //                 <TablePagination
-            //                     rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-            //                     colSpan={3}
-            //                     count={10}
-            //                     rowsPerPage={5}
-            //                     page={1}
-            //                     SelectProps={{
-            //                         inputProps: {
-            //                             'aria-label': 'rows per page',
-            //                         },
-            //                         native: true,
-            //                     }}
-            //                     onPageChange={() => null}
-            //                     onRowsPerPageChange={() => null}
-            //                     ActionsComponent={() => null}
-            //                 />
-            //             </TableRow>
-            //         </TableFooter>
-            //     </Table>
-            // </TableContainer>
-        // </ThemeProvider>
-
     )
 }
 

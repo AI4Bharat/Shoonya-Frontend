@@ -8,8 +8,9 @@ import { ThemeProvider } from "@mui/material/styles";
 import ProjectSetting from "./ui/pages/container/Projects/ProjectSetting"
 import WorkSpace from "./ui/pages/container/workspace/WorkSpace"
 import themeDefault from "./ui/theme/theme";
-import CreateAnnotationProject from "./ui/pages/container/workspace/CreateAnnotationProject"
+import AnnotationProject from "./ui/pages/container/workspace/AnnotationProject"
 import WorkSpaces from "./ui/pages/container/Dashboard/WorkSpaces"
+import Layout from "./ui/Layout";
 
 
 const ProtectedRoute = ({ user, children }) => {
@@ -34,16 +35,44 @@ const authenticateUser = () => {
 
 const App = () => {
   let routes = useRoutes([
-    // { path: "/", element: <Landing /> },
-    { path: "/", element: <Login /> },
-    { path: "forgot-password", element: <ForgotPassword /> },
-    { path: "dashboard", element: ProtectedRouteWrapper(<Dashboard />) },
-    { path: "projects/:id", element: ProtectedRouteWrapper(<Projects />) },
-    { path: "projects/:id/projectsetting", element: ProtectedRouteWrapper(<ProjectSetting />) },
-    { path: "workspace/:id", element: ProtectedRouteWrapper(<WorkSpace />) },
-    { path: "create-annotation-project/:id", element: ProtectedRouteWrapper(<CreateAnnotationProject />) },
-    { path: "Workspaces",type:"Workspaces", element: <WorkSpaces /> },
-    
+    // { path: "/", element: <Landing /> }, my-organization
+    {
+      path: "/",
+      element: <Login />
+    },
+    {
+      path: "forgot-password",
+      element: <ForgotPassword />
+    },
+    {
+      path: "projects",
+      element: ProtectedRouteWrapper(<Layout component={<Dashboard />} />)
+    },
+    {
+      path: "projects/:id",
+      element: ProtectedRouteWrapper(<Layout component={<Projects />} />)
+    },
+    {
+      path: "projects/:id/projectsetting",
+      element: ProtectedRouteWrapper(<Layout component={<ProjectSetting />} />)
+    },
+    {
+      path: "workspaces/:id",
+      element: ProtectedRouteWrapper(<Layout component={<WorkSpace />} />)
+    },
+    {
+      path: "create-annotation-project/:id",
+      element: ProtectedRouteWrapper(<Layout component={<AnnotationProject />} />)
+    },
+    {
+      path: "workspaces",
+      element: ProtectedRouteWrapper(<Layout component={<WorkSpaces />} />)
+    },
+    {
+      path: "my-organization",
+      element: ProtectedRouteWrapper(<Layout component={null} />)
+    },
+
   ]);
   return routes;
 };

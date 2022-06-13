@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import CustomButton from '../../component/common/Button'
+import CustomButton from '../../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
-import  GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import GetWorkspacesManagersDataAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
+import APITransport from '../../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
 
 const ManagersTable = (props) => {
@@ -25,9 +25,7 @@ const ManagersTable = (props) => {
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
    
-    console.log("workspaceManagers", workspaceManagers);
-
-   
+    console.log(" WorkspaceManagers", workspaceManagers);
 
     const columns = [
         {
@@ -58,11 +56,18 @@ const ManagersTable = (props) => {
                 sort: false,
             }
         }];
-
+       
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.map((el,i)=>{
+        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.filter((item) => {
+            if (
+                  item.role===2
+                    
+                ) {
+                  return item;
+                }
+              }).map((el,i)=>{
             return [
                 el.username, 
                 el.email,

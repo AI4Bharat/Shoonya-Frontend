@@ -9,50 +9,53 @@ import {  ThemeProvider,  } from "@mui/material";
 // import Theme from "./theme/theme-default";
 // import { withStyles, MuiThemeProvider } from "@material-ui/core/styles";
 // import GlobalStyles from "./styles/Styles";
-import Spinner from "./pages/component/common/Spinner";
-import Snackbar from "./pages/component/common/Snackbar";
+// import Spinner from "./pages/component/common/Spinner";
+// import Snackbar from "./pages/component/common/Snackbar";
 import themeDefault from './theme/theme'
+import GlobalStyles from "./styles/style";
 
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 
-function App(props) {
-  const Component = props.component;
-  const { classes, type, index, userRoles } = props;
+const Layout= (props) => {
+  // const Component = props.component;
+  const { type, index, userRoles, component } = props;
   const [show, setShow] = useState(false);
   const [popUp, setPopup] = useState(true);
   const apiStatus = useSelector((state) => state.apiStatus);
+
+  const classes = GlobalStyles();
 //   const history = useHistory();
   let navigate = useNavigate();
-  const renderSpinner = () => {
-    if (apiStatus.progress) {
-      return <Spinner />;
-    }
-  };
+  // const renderSpinner = () => {
+  //   if (apiStatus.progress) {
+  //     return <Spinner />;
+  //   }
+  // };
 
   const handleClose = () => {
     setPopup(false);
   };
 
-  const renderError = () => {
-    if (apiStatus.unauthrized) {
-      setTimeout(
-        () => navigate("/"),
-        3000
-      );
-    }
-    if (apiStatus.error && apiStatus.message && popUp) {
-      return (
-        <Snackbar
-          open={true}
-          handleClose={handleClose}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          message={apiStatus.message}
-          variant={"error"}
-        />
-      );
-    }
-  };
+  // const renderError = () => {
+  //   if (apiStatus.unauthrized) {
+  //     setTimeout(
+  //       () => navigate("/"),
+  //       3000
+  //     );
+  //   }
+  //   if (apiStatus.error && apiStatus.message && popUp) {
+  //     return (
+  //       <Snackbar
+  //         open={true}
+  //         handleClose={handleClose}
+  //         anchorOrigin={{ vertical: "top", horizontal: "right" }}
+  //         message={apiStatus.message}
+  //         variant={"error"}
+  //       />
+  //     );
+  //   }
+  // };
 
   useEffect(() => {
     if (show) {
@@ -68,7 +71,9 @@ function App(props) {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      <div className={classes.root}>
+      <div 
+      className={classes.root}
+      >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
             type={type}
@@ -76,11 +81,13 @@ function App(props) {
             className={classes.headerContainer}
           />
         </Suspense>
-        <div className={classes.container}>
-          {renderSpinner()}
-          {renderError()}
+        <div 
+        className={classes.container}
+        >
+          {/* {renderSpinner()}
+          {renderError()} */}
           <Suspense fallback={<div>Loading....</div>}>
-            <Component />
+            {component}
           </Suspense>
         </div>
        
@@ -88,4 +95,4 @@ function App(props) {
     </ThemeProvider >
   );
 }
-export default App;
+export default Layout;
