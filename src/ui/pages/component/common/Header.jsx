@@ -63,7 +63,59 @@ const Header = () => {
                             <img src={Logo} alt="logo" className={classes.headerLogo} />
                         </Link>
                     </Box>
-                   
+                    <Grid
+                        container
+                        direction="row"
+                        justifyContent="left"
+                        spacing={1}
+                        xs={12}
+                        sm={12}
+                        md={7}
+                    >
+                        <Grid
+
+                            item
+                            xs={12}
+                            sm={12}
+                            md={2}
+                        >
+                            <NavLink
+                                to="/projects"
+                                className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
+                                activeClassName={classes.highlightedMenu}
+                            >
+                                Projects
+                            </NavLink>
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            md={2}
+                        >
+                            <NavLink
+                                to="/workspaces"
+                                className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
+                                activeClassName={classes.highlightedMenu}
+                            >
+                                Workspaces
+                            </NavLink>
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            md={2}
+                        >
+                            <NavLink
+                                to="/my-organization"
+                                className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
+                                activeClassName={classes.highlightedMenu}
+                            >
+                                My Organization
+                            </NavLink>
+                        </Grid>
+                    </Grid>
 
 
                     <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={3}>
