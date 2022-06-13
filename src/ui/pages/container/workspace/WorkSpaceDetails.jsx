@@ -16,6 +16,7 @@ import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDeta
 
 
 import { useDispatch, useSelector } from 'react-redux';
+import DetailsViewPage from "../../component/common/DetailsViewPage";
 
 
 
@@ -79,9 +80,13 @@ const Workspace = (props) => {
       console.log( workspaceDtails," workspaceDtails")
     return (
         <ThemeProvider theme={themeDefault}>
+            <DetailsViewPage 
+                title={workspaceData.length > 0 && workspaceData[0].workspace_name} 
+                createdBy={workspaceData.length > 0 && workspaceData[0].created_by.email}
+            />
 
             {/* <Header /> */}
-            <Grid
+            {/* <Grid
                 container
                 direction='row'
                 justifyContent='center'
@@ -135,7 +140,7 @@ const Workspace = (props) => {
 
 
                 </Card>
-            </Grid>
+            </Grid> */}
         </ThemeProvider>
 
     )

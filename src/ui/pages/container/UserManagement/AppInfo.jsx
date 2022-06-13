@@ -35,7 +35,7 @@ export default function AppInfo() {
             </Grid>
          <Hidden only="xs">
          <Typography variant={"body1"} className={classes.body} style={{ margin: "20px 0px 50px 39px",}}>
-         {translate("label.ulcaInfo")}
+         {translate("label.shoonyaInfo")}
          </Typography>
          </Hidden>
        
