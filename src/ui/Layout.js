@@ -12,7 +12,7 @@ import {  ThemeProvider,  } from "@mui/material";
 // import Spinner from "./pages/component/common/Spinner";
 // import Snackbar from "./pages/component/common/Snackbar";
 import themeDefault from './theme/theme'
-import GlobalStyles from "./styles/style";
+import GlobalStyles from "./styles/LayoutStyles";
 
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
