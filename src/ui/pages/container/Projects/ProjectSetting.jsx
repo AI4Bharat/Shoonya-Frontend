@@ -8,7 +8,6 @@ import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 
-
 const ProjectSetting = (props) => {
 
     const classes = DatasetStyle();
@@ -297,7 +296,6 @@ const ProjectSetting = (props) => {
                 </Card>
             </Grid>
         </ThemeProvider>
-
     )
 }
 
