@@ -54,7 +54,7 @@ const AnnotationProject = (props) => {
     return (
         <ThemeProvider theme={themeDefault}>
 
-            <Header />
+            {/* <Header /> */}
             {/* <Grid
                 container
                 direction='row'
