@@ -7,9 +7,9 @@ import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import ProjectTable from '../../component/WorkspaceTables/ProjectTable';
-import AnnotatorsTable from "../../component/WorkspaceTables/AnnotatorsTable";
-import ManagersTable from "../../component/WorkspaceTables/ManagersTable";
+import ProjectTable from './WorkspaceTables/ProjectTable';
+import AnnotatorsTable from "./WorkspaceTables/Annotators";
+import ManagersTable from "./WorkspaceTables/ManagersTable";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
@@ -83,14 +83,7 @@ const Workspace = (props) => {
                 alignItems='center'
                 width={window.innerWidth}
             >
-                <Card
-                    sx={{
-                        width: window.innerWidth * 0.8,
-                        minHeight: 500,
-                        padding: 5
-                    }}
-
-                >
+                <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
                        
                        {workspaceData.length > 0 && workspaceData[0].workspace_name} 
@@ -106,29 +99,29 @@ const Workspace = (props) => {
                             <Tab label="Settings" {...a11yProps(3)} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0}>
-                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none" }}>
-                            <Button sx={{ width: "50%" }} label={"Add New Annotation Project"} />
+                    <TabPanel value={value} index={0} style={{ textAlign:"center"}}>
+                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none",marginRight:"200px" }}>
+                            <Button className={classes.projectButton}  label={"Add New Annotation Project"} />
                         </Link>
-                             <Button sx={{ width: "50%" }} label={"Add New Collection Project"} />
-                             <div style={{marginTop:"20px"}}>
+                             <Button className={classes.projectButton} label={"Add New Collection Project"} />
+                             <div className={classes.workspaceTables} >
                         <ProjectTable />
                         </div>
                    </TabPanel>
                     <TabPanel value={value} index={1}>
-                          <Button sx={{ width: "100%" }} label={"Add Annotators to Workspace"} />
-                          <div style={{marginTop:"20px"}}>
+                          <Button className={classes.annotatorsButton}  label={"Add Annotators to Workspace"} />
+                          <div className={classes.workspaceTables}>
                      <AnnotatorsTable />
                      </div>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                           <Button sx={{ width: "100%" }} label={"Assign Managers"} />
-                           <div style={{marginTop:"20px"}}>
+                           <Button className={classes.managersButton} label={"Assign Managers"} />
+                           <div className={classes.workspaceTables}>
                         <ManagersTable />
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                    <Button sx={{ width: "100%",backgroundColor:"red" }} label={"Archive Workspace"} />
+                    <Button className={classes.settingsButton}  label={"Archive Workspace"} />
                     </TabPanel>
 
 

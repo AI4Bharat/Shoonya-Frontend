@@ -8,7 +8,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import ProjectSetting from "./ui/pages/container/Projects/ProjectSetting"
 import WorkSpace from "./ui/pages/container/workspace/WorkSpace"
 import themeDefault from "./ui/theme/theme";
-import CreateAnnotationProject from "./ui/pages/container/workspace/CreateAnnotationProject"
+import AnnotationProject from "./ui/pages/container/workspace/AnnotationProject"
 import WorkSpaces from "./ui/pages/container/Dashboard/WorkSpaces"
 
 
@@ -41,7 +41,7 @@ const App = () => {
     { path: "projects/:id", element: ProtectedRouteWrapper(<Projects />) },
     { path: "projects/:id/projectsetting", element: ProtectedRouteWrapper(<ProjectSetting />) },
     { path: "workspace/:id", element: ProtectedRouteWrapper(<WorkSpace />) },
-    { path: "create-annotation-project/:id", element: ProtectedRouteWrapper(<CreateAnnotationProject />) },
+    { path: "create-annotation-project/:id", element: ProtectedRouteWrapper(<AnnotationProject />) },
     { path: "Workspaces",type:"Workspaces", element: <WorkSpaces /> },
     
   ]);

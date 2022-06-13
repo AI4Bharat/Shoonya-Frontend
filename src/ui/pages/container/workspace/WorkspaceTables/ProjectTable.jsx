@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import CustomButton from '../../component/common/Button'
+import CustomButton from '../../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
-import GetWorkspacesProjectDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import GetWorkspacesProjectDetailsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
+import APITransport from '../../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
 
 const ProjectTable = (props) => {
