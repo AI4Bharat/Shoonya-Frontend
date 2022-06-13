@@ -80,10 +80,10 @@ const Workspace = (props) => {
       console.log( workspaceDtails," workspaceDtails")
     return (
         <ThemeProvider theme={themeDefault}>
-            <DetailsViewPage 
+            {/* <DetailsViewPage 
                 title={workspaceData.length > 0 && workspaceData[0].workspace_name} 
                 createdBy={workspaceData.length > 0 && workspaceData[0].created_by.email}
-            />
+            /> */}
 
             {/* <Header /> */}
             {/* <Grid
@@ -97,7 +97,11 @@ const Workspace = (props) => {
                     <Typography variant="h2" gutterBottom component="div">
                        {workspaceDtails && workspaceDtails.workspace_name}
                        {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
-                    </Typography>
+                    {/* </Typography> */}
+                    <Typography variant="h2" gutterBottom component="div">
+                       {workspaceDtails && workspaceDtails.workspace_name}
+                       {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
+                     </Typography> 
                     <Typography variant="body1" gutterBottom component="div">
                     {/* Created_by:  {workspaceData.length > 0 && workspaceData[0].created_by.email} */}
                     Created_by: 
@@ -139,8 +143,8 @@ const Workspace = (props) => {
                     </TabPanel>
 
 
-                </Card>
-            </Grid> */}
+                {/* </Card>
+             </Grid>  */}
         </ThemeProvider>
 
     )
