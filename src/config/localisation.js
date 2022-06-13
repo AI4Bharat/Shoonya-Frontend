@@ -3,7 +3,7 @@ const localisation = {
   enterEmailId: "Enter your Email ID*",
   enterPassword: "Enter your Password*",
   forgotPassword: "Forgot Password?",
-  "label.ulcaInfo":
+  "label.shoonyaInfo":
     "Shoonya is an open-sourced API and data platform to collect, curate and discover datasets in Indian languages.",
     "button.clearAll" : "Clear All",
     "button.Filter" : "Filter",

@@ -4,7 +4,7 @@ const headerStyle = makeStyles({
     parentContainer: {
         // flexGrow : 1,
         marginBottom : window.innerHeight*0.13,
-        width : window.innerWidth*(98/100)
+        width : window.innerWidth*0.98
     },
     appBar: {
         // backgroundColor: "#ffffff", 
@@ -15,8 +15,8 @@ const headerStyle = makeStyles({
         justifyContent : "space-between"
     },
     headerLogo: {
-        height: "30%", 
-        width: "30%" 
+        height: "2rem", 
+        width: "10rem" 
     },
     headerMenu : {
         textDecoration : "none",

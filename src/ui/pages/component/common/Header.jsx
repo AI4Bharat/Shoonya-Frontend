@@ -57,11 +57,11 @@ const Header = () => {
         <Box className={classes.parentContainer}>
             <AppBar style={{ backgroundColor: "#ffffff" }}>
                 <Toolbar className={classes.toolbar}>
-                    <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
+                    <Grid sx={{ flexGrow: 0, display:"inline-grid" }} xs={12} sm={12} md={2}>
                         <Link to="/">
                             <img src={Logo} alt="logo" className={classes.headerLogo} />
                         </Link>
-                    </Box>
+                    </Grid>
                     <Grid
                         container
                         direction="row"
@@ -76,7 +76,7 @@ const Header = () => {
                             item
                             xs={12}
                             sm={12}
-                            md={2}
+                            md={4}
                         >
                             <NavLink
                                 to="/projects"
@@ -90,7 +90,7 @@ const Header = () => {
                             item
                             xs={12}
                             sm={12}
-                            md={2}
+                            md={4}
                         >
                             <NavLink
                                 to="/workspaces"
@@ -104,7 +104,7 @@ const Header = () => {
                             item
                             xs={12}
                             sm={12}
-                            md={2}
+                            md={4}
                         >
                             <NavLink
                                 to="/my-organization"
@@ -116,7 +116,7 @@ const Header = () => {
                         </Grid>
                     </Grid>
 
-                    <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={3}>
+                    <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={4}>
 
                         <Grid
                             container

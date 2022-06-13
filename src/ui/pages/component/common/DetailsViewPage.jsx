@@ -50,6 +50,7 @@ function a11yProps(index) {
 
 
 const DetailsViewPage = (props) => {
+    const {title, createdBy} = props;
 
     const classes = DatasetStyle();
     // const dispatch = useDispatch();
@@ -87,11 +88,11 @@ const DetailsViewPage = (props) => {
             >
                 <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
-                       
+                       {title}
                        {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                    Created_by:  
+                    Created_by:  {createdBy}
                     {/* {workspaceData.length > 0 && workspaceData[0].created_by.email} */}
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
