@@ -8,8 +8,9 @@ import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import ProjectTable from './WorkspaceTables/ProjectTable';
-import AnnotatorsTable from "./WorkspaceTables/Annotators";
+import AnnotatorsTable from "./WorkspaceTables/AnnotatorsTable";
 import ManagersTable from "./WorkspaceTables/ManagersTable";
+import SettingsTable from "./WorkspaceTables/SettingsTable";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
@@ -121,7 +122,7 @@ const Workspace = (props) => {
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                    <Button className={classes.settingsButton}  label={"Archive Workspace"} />
+                    <SettingsTable/>
                     </TabPanel>
 
 
