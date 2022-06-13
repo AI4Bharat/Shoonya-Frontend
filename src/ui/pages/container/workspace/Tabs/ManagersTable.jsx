@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from "react";
-import CustomButton from '../../component/common/Button'
+import CustomButton from '../../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
+import GetWorkspacesManagersDataAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
+import APITransport from '../../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
-import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 
 const ManagersTable = (props) => {
+
     const dispatch = useDispatch();
     
     const {id} = useParams();
-    
     const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
-
-    const getWorkspaceAnnotatorsData = ()=>{
+    const getWorkspaceManagersData = ()=>{
         
-        const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(orgId);
+        const workspaceObjs = new GetWorkspacesManagersDataAPI( orgId);
        
         dispatch(APITransport(workspaceObjs));
     }
-
-    const workspaceAnnotators = useSelector(state=>state.getWorkspacesAnnotatorsData.data);
-
+    
     useEffect(()=>{
-        getWorkspaceAnnotatorsData();
+        getWorkspaceManagersData();
     },[]);
-    // const orgId = workspaceAnnotators &&  workspaceAnnotators
-    console.log("workspaceAnnotators", workspaceAnnotators);
 
-// getWorkspacesProjectData
+    const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
    
+<<<<<<< HEAD:src/ui/pages/component/WorkspaceTables/ManagersTable.jsx
+    console.log("workspaceManagers ", workspaceManagers);
+=======
+    console.log(" WorkspaceManagers", workspaceManagers);
+>>>>>>> feature-migration:src/ui/pages/container/workspace/Tabs/ManagersTable.jsx
 
     const columns = [
         {
@@ -51,15 +50,6 @@ const ManagersTable = (props) => {
                 align : "center"
             }
         },
-        {
-            name: "Role",
-            label: "Role",
-            options: {
-                filter: false,
-                sort: false,
-                align : "center"
-            }
-        },
         
         
         {
@@ -70,31 +60,34 @@ const ManagersTable = (props) => {
                 sort: false,
             }
         }];
-
+       
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data =  workspaceAnnotators && workspaceAnnotators.length > 0 ? workspaceAnnotators.map((el,i)=>{
-            const userRole = el.role && UserMappedByRole(el.role).element;
-            console.log("userRole", userRole);
+        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.filter((item) => {
+            if (
+                  item.role===2
+                    
+                ) {
+                  return item;
+                }
+              }).map((el,i)=>{
             return [
-                        el.username, 
-                        el.email,
-                        userRole ? userRole : el.role,
-                        // userRole ? userRole : el.role,
-                        // el.role,
-                        <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
-                            <CustomButton
-                                sx={{borderRadius : 2,marginRight: 2}}
-                                label = "View"
-                            />
-                            <CustomButton
-                                sx={{borderRadius : 2,backgroundColor:"red"}}
-                                label = "Remove"
-                            />
-                        </Link>
+                el.username, 
+                el.email,
+               
+                <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
+                    <CustomButton
+                        sx={{borderRadius : 2,marginRight: 2}}
+                        label = "View"
+                    />
+                    <CustomButton
+                        sx={{borderRadius : 2,backgroundColor:"red"}}
+                        label = "Remove"
+                    />
+                </Link>
                     ]
-        }) :[];
+        }) : [];
 
         const options = {
             textLabels: {

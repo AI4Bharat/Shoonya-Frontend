@@ -1,6 +1,4 @@
 import { makeStyles } from '@mui/styles';
-import { Wave } from '../../assets/Wave.svg';
-
 
 const dashboardStyle = makeStyles({
     parentContainer: {
@@ -9,6 +7,7 @@ const dashboardStyle = makeStyles({
         alignItems: "center",
         paddingBottom : "5vh",
         // justifyContent: "space-around",
+        flexGrow : 0
     },
     projectCardContainer1 : {
         backgroundColor: "#2A61AD",

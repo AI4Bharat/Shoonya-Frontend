@@ -1,32 +1,30 @@
 import React, { useState, useEffect } from "react";
-import CustomButton from '../../component/common/Button'
+import CustomButton from '../../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
-import  GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import GetWorkspacesProjectDetailsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
+import APITransport from '../../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
 
-const ManagersTable = (props) => {
-
+const ProjectTable = (props) => {
+   
     const dispatch = useDispatch();
     
     const {id} = useParams();
-    const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
-    const getWorkspaceManagersData = ()=>{
+    const getWorkspaceProjectData = ()=>{
         
-        const workspaceObjs = new GetWorkspacesManagersDataAPI( orgId);
+        const workspaceObjs = new GetWorkspacesProjectDetailsAPI(id);
        
         dispatch(APITransport(workspaceObjs));
     }
     
     useEffect(()=>{
-        getWorkspaceManagersData();
+        getWorkspaceProjectData();
     },[]);
 
-    const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
-   
-    console.log("workspaceManagers ", workspaceManagers);
+    const workspacesproject = useSelector(state=>state.getWorkspacesProjectData.data);
 
+    console.log("workspacesproject", workspacesproject);
     const columns = [
         {
             name: "Name",
@@ -38,44 +36,38 @@ const ManagersTable = (props) => {
             }
         },
         {
-            name: "Email",
-            label: "Email",
+            name: "Created By",
+            label: "Created By",
             options: {
                 filter: false,
                 sort: false,
                 align : "center"
             }
         },
-        
-        
         {
             name: "Actions",
             label: "Actions",
             options: {
                 filter: false,
                 sort: false,
+                align : "center"
             }
         }];
 
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.map((el,i)=>{
+        const data = workspacesproject && workspacesproject.length > 0 ? workspacesproject.map((el,i)=>{
             return [
-                el.username, 
-                el.email,
-               
-                <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
-                    <CustomButton
-                        sx={{borderRadius : 2,marginRight: 2}}
-                        label = "View"
-                    />
-                    <CustomButton
-                        sx={{borderRadius : 2,backgroundColor:"red"}}
-                        label = "Remove"
-                    />
-                </Link>
-                    ]
+                        el.title, 
+                        el.created_by,
+                        // <Link  style={{ textDecoration: "none" }}>
+                            <CustomButton
+                                sx={{borderRadius : 2}}
+                                label = "View"
+                            />
+                        // </Link>
+            ]
         }) : [];
 
         const options = {
@@ -119,4 +111,4 @@ const ManagersTable = (props) => {
     )
 }
 
-export default ManagersTable;
+export default ProjectTable;

@@ -8,7 +8,6 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../common/Button"
-import "../../../styles/background.css"
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
@@ -116,7 +115,6 @@ const Header = () => {
                             </NavLink>
                         </Grid>
                     </Grid>
-
 
                     <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={3}>
 

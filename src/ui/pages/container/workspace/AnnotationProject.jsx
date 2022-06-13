@@ -17,7 +17,7 @@ let data1 = [{ name: "Translation", value: "Translation" }, { name: "OCR", value
 let data2 = [{ name: "MonolingualTranslation", value: "MonolingualTranslation" }, { name: "TranslationEditing", value: "TranslationEditing" }, { name: "ContextualTranslationEditing", value: "ContextualTranslationEditing" }]
 let data3 =[{name:"data",value:"data"},{name:"data1",value:"data1"}]
 let data4 =[{name:"Random",value:"Random"},{name:"Full",value:"Full"},{name:"Batch",value:"Batch"}]
-const ProjectSetting = (props) => {
+const AnnotationProject = (props) => {
 
     const classes = DatasetStyle();
     const [selectmenu, setselectmenu] = React.useState('');
@@ -110,7 +110,7 @@ const ProjectSetting = (props) => {
                             <Grid
                                 container
                                 direction='row'
-                                style={{ margin: "20px 0px 0px 0px" }}
+                               
                             >
                                 <Grid
                                     items
@@ -119,6 +119,7 @@ const ProjectSetting = (props) => {
                                     md={12}
                                     lg={12}
                                     xl={12}
+                                    className={classes.projectsettingGrid}
                                 >
                                     <Typography gutterBottom component="div" label="Required">
                                         Title:
@@ -139,12 +140,9 @@ const ProjectSetting = (props) => {
                                     />
                                 </Grid>
                             </Grid>
-                            <Grid
-                                container
-                                direction='row'
-                                style={{ margin: "20px 0px 0px 0px" }}
-                            >
+                           
                                 <Grid
+                                 className={classes.projectsettingGrid}
                                     items
                                     xs={12}
                                     sm={12}
@@ -173,7 +171,7 @@ const ProjectSetting = (props) => {
                                 </Grid>
 
                                 <Grid
-                                 style={{ margin: "20px 0px 0px 0px", }}
+                                className={classes.projectsettingGrid}
                                     items
                                     xs={12}
                                     sm={12}
@@ -203,9 +201,9 @@ const ProjectSetting = (props) => {
                                     />
                                 </Grid>
 
-                            </Grid>
+                           
                             <Grid
-                             style={{ margin: "20px 0px 0px 0px", }}
+                             className={classes.projectsettingGrid}
                                 items
                                 xs={12}
                                 sm={12}
@@ -236,7 +234,7 @@ const ProjectSetting = (props) => {
                             </Grid>
                            
                             <Grid
-                             style={{ margin: "20px 0px 0px 0px", }}
+                            className={classes.projectsettingGrid}
                                 items
                                 xs={12}
                                 sm={12}
@@ -269,14 +267,13 @@ const ProjectSetting = (props) => {
 
                           
                             <Grid
-
-                                style={{ margin: "20px 0px 10px 0px", }}
                                 item
                                 xs={12}
                                 md={12}
                                 lg={12}
                                 xl={12}
                                 sm={12}
+                                sx={{  margin: "20px 0px 10px 0px",}}
                             >
                                  {sources !== "" && ( <Button onClick={onConfirmSelections}  style={{ margin: "0px 20px 0px 0px", }} label={"Confirm Selections"} />
                               
@@ -289,7 +286,7 @@ const ProjectSetting = (props) => {
                                
                             </Grid>
                             <Grid
-                             style={{ margin: "20px 0px 0px 0px", }}
+                             className={classes.projectsettingGrid}
                                 items
                                 xs={12}
                                 sm={12}
@@ -327,7 +324,7 @@ const ProjectSetting = (props) => {
                                     md={12}
                                     lg={12}
                                     xl={12}
-                                    style={{ margin: "20px 0px 0px 0px" }}
+                                    className={classes.projectsettingGrid}
                                 >
                                     {samplingtype==="Random" && (
                                          <Typography gutterBottom component="div" label="Required">
@@ -359,7 +356,7 @@ const ProjectSetting = (props) => {
                                     md={12}
                                     lg={12}
                                     xl={12}
-                                    style={{ margin: "20px 0px 0px 0px" }}
+                                    className={classes.projectsettingGrid}
                                 >
                                     {samplingtype==="Batch" && (
                                          <Typography gutterBottom component="div" label="Required">
@@ -390,7 +387,7 @@ const ProjectSetting = (props) => {
                                     md={12}
                                     lg={12}
                                     xl={12}
-                                    style={{ margin: "20px 0px 0px 0px" }}
+                                    className={classes.projectsettingGrid}
                                 >
                                     {samplingtype==="Batch" && (
                                          <Typography gutterBottom component="div" label="Required">
@@ -415,7 +412,7 @@ const ProjectSetting = (props) => {
                                     />)}
                                 </Grid>
                                 <Grid
-                                style={{ margin: "20px 0px 0px 0px", }}
+                                className={classes.projectsettingGrid}
                                     items
                                     xs={12}
                                     sm={12}
@@ -446,7 +443,7 @@ const ProjectSetting = (props) => {
                                 </Grid>
 
                             <Grid
-                            style={{ margin: "20px 0px 0px 0px", }}
+                            className={classes.projectsettingGrid}
                                 items
                                 xs={12}
                                 sm={12}
@@ -464,8 +461,8 @@ const ProjectSetting = (props) => {
 
 
                             <Grid
-
-                                style={{ margin: "15px 0px 10px 0px", }}
+                                 className={classes.projectsettingGrid}
+                                style={{ }}
                                 item
                                 xs={12}
                                 md={12}
@@ -489,4 +486,4 @@ const ProjectSetting = (props) => {
     )
 }
 
-export default ProjectSetting;
+export default  AnnotationProject;

@@ -1,16 +1,17 @@
 import { BrowserRouter as Router, Navigate, useRoutes } from "react-router-dom";
-import Landing from "./ui/pages/container/Landing/index";
+// import Landing from "./ui/pages/container/Landing/index";
 import Login from "./ui/pages/container/UserManagement/Login";
 import ForgotPassword from "./ui/pages/container/UserManagement/ForgotPassword";
-import Dashboard from "./ui/pages/container/Dashboard";
-import Projects from "./ui/pages/container/Projects";
+import Dashboard from "./ui/pages/container/Project/ProjectList";
+import Projects from "./ui/pages/container/Project/ProjectDetails";
 import { ThemeProvider } from "@mui/material/styles";
-import ProjectSetting from "./ui/pages/container/Projects/ProjectSetting"
-import WorkSpace from "./ui/pages/container/workspace/WorkSpace"
+import ProjectSetting from "./ui/pages/container/Project/ProjectSetting"
+import WorkSpace from "./ui/pages/container/Workspace/WorkSpaceDetails"
 import themeDefault from "./ui/theme/theme";
-import CreateAnnotationProject from "./ui/pages/container/workspace/CreateAnnotationProject"
-import WorkSpaces from "./ui/pages/container/Dashboard/WorkSpaces"
+import AnnotationProject from "./ui/pages/container/Workspace/AnnotationProject"
+import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList"
 import Layout from "./ui/Layout";
+import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
 
 
 const ProtectedRoute = ({ user, children }) => {
@@ -62,7 +63,7 @@ const App = () => {
     },
     {
       path: "create-annotation-project/:id",
-      element: ProtectedRouteWrapper(<Layout component={<CreateAnnotationProject />} />)
+      element: ProtectedRouteWrapper(<Layout component={<AnnotationProject />} />)
     },
     {
       path: "workspaces",
@@ -70,7 +71,7 @@ const App = () => {
     },
     {
       path: "my-organization",
-      element: ProtectedRouteWrapper(<Layout component={null} />)
+      element: ProtectedRouteWrapper(<Layout component={<MyOrganization />} />)
     },
 
   ]);

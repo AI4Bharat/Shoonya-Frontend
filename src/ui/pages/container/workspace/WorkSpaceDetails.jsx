@@ -7,9 +7,11 @@ import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import ProjectTable from '../../component/WorkspaceTables/ProjectTable';
-import AnnotatorsTable from "../../component/WorkspaceTables/AnnotatorsTable";
-import ManagersTable from "../../component/WorkspaceTables/ManagersTable";
+import ProjectTable from './Tabs/ProjectTable';
+import AnnotatorsTable from "./Tabs/Annotators";
+import ManagersTable from "./Tabs/ManagersTable";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,19 +47,30 @@ function a11yProps(index) {
 }
 
 
-const ProjectSetting = (props) => {
+const Workspace = (props) => {
 
     const classes = DatasetStyle();
     const dispatch = useDispatch();
-    const  {workspaceData} = props;
+   
 
-    console.log("workspaceData", workspaceData);
+    
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
    
+    const workspaceData = useSelector(state=>state.getWorkspaces.data);
+    console.log( workspaceData," workspaceData")
+    const getDashboardWorkspaceData = ()=>{
+        const workspaceObj = new GetWorkspacesAPI(1);
+        dispatch(APITransport(workspaceObj));
+      }
+      
+      useEffect(()=>{
+        getDashboardWorkspaceData();
+      },[]);
+        
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -68,21 +81,15 @@ const ProjectSetting = (props) => {
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-                width={window.innerWidth}
+                // width={window.innerWidth}
             >
-                <Card
-                    sx={{
-                        width: window.innerWidth * 0.8,
-                        minHeight: 500,
-                        padding: 5
-                    }}
-
-                >
+                <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
-                       demo
+                       
+                       {workspaceData.length > 0 && workspaceData[0].workspace_name} 
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                        Created by: example123@gmail.com
+                    Created_by:  {workspaceData.length > 0 && workspaceData[0].created_by.email}
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
@@ -92,29 +99,29 @@ const ProjectSetting = (props) => {
                             <Tab label="Settings" {...a11yProps(3)} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0}>
-                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none" }}>
-                            <Button sx={{ width: "50%" }} label={"Add New Annotation Project"} />
+                    <TabPanel value={value} index={0} style={{ textAlign:"center"}}>
+                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none",marginRight:"200px" }}>
+                            <Button className={classes.projectButton}  label={"Add New Annotation Project"} />
                         </Link>
-                             <Button sx={{ width: "50%" }} label={"Add New Collection Project"} />
-                             <div style={{marginTop:"20px"}}>
+                             <Button className={classes.projectButton} label={"Add New Collection Project"} />
+                             <div className={classes.workspaceTables} >
                         <ProjectTable />
                         </div>
                    </TabPanel>
                     <TabPanel value={value} index={1}>
-                          <Button sx={{ width: "100%" }} label={"Add Annotators to Workspace"} />
-                          <div style={{marginTop:"20px"}}>
+                          <Button className={classes.annotatorsButton}  label={"Add Annotators to Workspace"} />
+                          <div className={classes.workspaceTables}>
                      <AnnotatorsTable />
                      </div>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                           <Button sx={{ width: "100%" }} label={"Assign Managers"} />
-                           <div style={{marginTop:"20px"}}>
+                           <Button className={classes.managersButton} label={"Assign Managers"} />
+                           <div className={classes.workspaceTables}>
                         <ManagersTable />
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                    <Button sx={{ width: "100%",backgroundColor:"red" }} label={"Archive Workspace"} />
+                    <Button className={classes.settingsButton}  label={"Archive Workspace"} />
                     </TabPanel>
 
 
@@ -125,4 +132,4 @@ const ProjectSetting = (props) => {
     )
 }
 
-export default ProjectSetting;
+export default Workspace;
