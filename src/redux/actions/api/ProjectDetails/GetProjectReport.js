@@ -11,7 +11,7 @@ export default class GetProjectReportAPI extends API {
      this.startDate = startDate;
      this.endDate = endDate;
      this.type = constants.GET_PROJECT_REPORT;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/get_analytics`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/get_analytics/`;
    }
  
    processResponse(res) {

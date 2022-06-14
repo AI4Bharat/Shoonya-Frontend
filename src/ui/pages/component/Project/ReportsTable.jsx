@@ -22,18 +22,11 @@ const ReportsTable = () => {
     const [endDate, setEndDate] = React.useState(format(Date.now(), 'yyyy-MM-dd'));
     const [selectRange, setSelectRange] = React.useState("This Month");
     const [rangeValue, setRangeValue] = React.useState([startOfMonth(Date.now()), Date.now()]);
-    const [reportData, setReportData] = React.useState([[]]);
     const [showPicker, setShowPicker] = React.useState(false);
-    const [showTable, setShowTable] = React.useState(true);
 
     const { id } = useParams();
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
-
-    const getProjectReport = () => {
-        const projectObj = new GetProjectReportAPI(id, startDate, endDate);
-        dispatch(APITransport(projectObj));
-    }
 
     const columns = [
         {
@@ -71,7 +64,7 @@ const ReportsTable = () => {
         },
         {
             name: "total_assigned_tasks",
-            label: "Total Assigned Time",
+            label: "Total Assigned Tasks",
             options: {
                 filter: false,
                 sort: false,
@@ -79,7 +72,7 @@ const ReportsTable = () => {
         },
         {
             name: "skipped_tasks",
-            label: "Skipped Time",
+            label: "Skipped Tasks",
             options: {
                 filter: false,
                 sort: false,
@@ -87,7 +80,7 @@ const ReportsTable = () => {
         },
         {
             name: "total_pending_tasks",
-            label: "Total Pending Time",
+            label: "Total Pending Tasks",
             options: {
                 filter: false,
                 sort: false,
@@ -140,9 +133,8 @@ const ReportsTable = () => {
     };
 
     const handleDateSubmit = () => {
-        getProjectReport();
-        setReportData(ProjectReport);
-        if(ProjectReport.length > 0) setShowTable(true);
+        const projectObj = new GetProjectReportAPI(id, startDate, endDate);
+        dispatch(APITransport(projectObj));
     }
 
     return (
@@ -187,10 +179,10 @@ const ReportsTable = () => {
                     </LocalizationProvider>}
                 <Button variant="contained" onClick={handleDateSubmit}>Submit</Button>
             </Stack>
-            {showTable &&
+            {ProjectReport.length > 0 &&
                 <MUIDataTable
                     title={""}
-                    data={reportData}
+                    data={ProjectReport}
                     columns={columns}
                     options={options}
                     // filter={false}
