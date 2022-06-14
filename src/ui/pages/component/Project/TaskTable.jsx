@@ -8,7 +8,7 @@ import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Grid, Typography } from "@mui/material";
-import TaskTableStyle from "../../../styles/TaskTable";
+import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
 
@@ -85,7 +85,7 @@ const columns = [
 
 
 const TaskTable = () => {
-    const classes = TaskTableStyle();
+    const classes = DatasetStyle();
     const { id } = useParams();
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
@@ -146,7 +146,7 @@ const TaskTable = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
             <Grid container spacing={0} md={12}>
-                <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterContainer}>
+                <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
                     <Button onClick={handleShowFilter}>
                         <FilterListIcon />
                     </Button>

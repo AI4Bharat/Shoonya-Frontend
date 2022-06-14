@@ -9,6 +9,7 @@ import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+import componentType from "../../../../config/pageType"
 // import ProjectTable from './Tabs/ProjectTable';
 // import AnnotatorsTable from "./Tabs/Annotators";
 // import ManagersTable from "./Tabs/ManagersTable";
@@ -50,30 +51,30 @@ function a11yProps(index) {
 
 
 const DetailsViewPage = (props) => {
-    const {title, createdBy} = props;
+    const { pageType, title, createdBy } = props;
 
     const classes = DatasetStyle();
     // const dispatch = useDispatch();
-   
 
-    
+
+
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-   
+
     // const workspaceData = useSelector(state=>state.getWorkspaces.data);
     // console.log( workspaceData," workspaceData")
     // const getDashboardWorkspaceData = ()=>{
     //     const workspaceObj = new GetWorkspacesAPI(1);
     //     dispatch(APITransport(workspaceObj));
     //   }
-      
-      useEffect(()=>{
+
+    useEffect(() => {
         // getDashboardWorkspaceData();
-      },[]);
-        
+    }, []);
+
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -84,51 +85,54 @@ const DetailsViewPage = (props) => {
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-                // width={window.innerWidth}
+            // width={window.innerWidth}
             >
                 <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
-                       {title}
-                       {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
+                        {title}
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                    Created_by:  {createdBy}
-                    {/* {workspaceData.length > 0 && workspaceData[0].created_by.email} */}
+                        Created_by : {createdBy}
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                            <Tab label="Projects" {...a11yProps(0)} />
-                            <Tab label="Annotators" {...a11yProps(1)} />
-                            <Tab label="Managers" {...a11yProps(2)} />
+
+                            {pageType === componentType.Type_Workspace && <Tab label="Projects" {...a11yProps(0)} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Workspaces" {...a11yProps(0)} />}
+
+                            {pageType === componentType.Type_Workspace && <Tab label="Annotators" {...a11yProps(1)} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Members" {...a11yProps(1)} />}
+
+                            {pageType === componentType.Type_Organization && <Tab label="Invites" {...a11yProps(2)} />}
+                            {pageType === componentType.Type_Workspace && <Tab label="Managers" {...a11yProps(2)} />}
+
                             <Tab label="Settings" {...a11yProps(3)} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0} style={{ textAlign:"center"}}>
-                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none",marginRight:"200px" }}>
-                            <Button className={classes.projectButton}  label={"Add New Annotation Project"} />
+                    <TabPanel value={value} index={0} style={{ textAlign: "center" }}>
+                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none", marginRight: "200px" }}>
+                            <Button className={classes.projectButton} label={"Add New Annotation Project"} />
                         </Link>
-                             <Button className={classes.projectButton} label={"Add New Collection Project"} />
-                             <div className={classes.workspaceTables} >
-                        {/* <ProjectTable /> */}
+                        <Button className={classes.projectButton} label={"Add New Collection Project"} />
+                        <div className={classes.workspaceTables} >
+                            {/* <ProjectTable /> */}
                         </div>
-                   </TabPanel>
+                    </TabPanel>
                     <TabPanel value={value} index={1}>
-                          <Button className={classes.annotatorsButton}  label={"Add Annotators to Workspace"} />
-                          <div className={classes.workspaceTables}>
-                     {/* <AnnotatorsTable /> */}
-                     </div>
+                        <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />
+                        <div className={classes.workspaceTables}>
+                            {/* <AnnotatorsTable /> */}
+                        </div>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                           <Button className={classes.managersButton} label={"Assign Managers"} />
-                           <div className={classes.workspaceTables}>
-                        {/* <ManagersTable /> */}
+                        <Button className={classes.managersButton} label={"Assign Managers"} />
+                        <div className={classes.workspaceTables}>
+                            {/* <ManagersTable /> */}
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                    <Button className={classes.settingsButton}  label={"Archive Workspace"} />
+                        <Button className={classes.settingsButton} label={"Archive Workspace"} />
                     </TabPanel>
-
-
                 </Card>
             </Grid>
         </ThemeProvider>

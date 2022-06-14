@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import { Box, Chip, Divider, Grid, ThemeProvider } from '@mui/material';
 import themeDefault from '../../../theme/theme';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import projectCardStyles from '../../../styles/projectCard';
+import DatasetStyle from '../../../styles/Dataset';
 
 const ProjectCard = (props) => {
 
@@ -19,7 +19,7 @@ const ProjectCard = (props) => {
     //     navigate('/projects/1');
     // }
 
-    const classes = projectCardStyles();
+    const classes = DatasetStyle();
     const { projectObj} = props
     return (
         <Link to={`/projects/${projectObj.id}`} style={{ textDecoration: "none" }}>

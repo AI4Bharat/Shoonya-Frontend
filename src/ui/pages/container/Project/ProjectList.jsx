@@ -3,14 +3,14 @@ import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import ProjectCard from "../../component/common/ProjectCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
-import dashboardStyle from "../../../styles/dashboard";
+import DatasetStyle from "../../../styles/Dataset";
 import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
 import {useDispatch,useSelector} from 'react-redux';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
 const Dashboard = () => {
-    const classes = dashboardStyle();
+    const classes = DatasetStyle();
     const dispatch = useDispatch();
     const projectData = useSelector(state=>state.getProjects.data);
   

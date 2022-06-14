@@ -12,11 +12,11 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
-import TaskTableFilter from "../../../styles/TaskTableFilter";
+import DatasetStyle from "../../../styles/Dataset";
 // import { translate } from "../../../../assets/localisation";
 
 const FilterList = (props) => {
-  const classes = TaskTableFilter();
+  const classes = DatasetStyle();
   const { filterStatusData, selectedFilter, clearAll, apply } = props;
   const [selectedStatus, setSelectedStatus] = useState("unlabeled");
   const [selectAnnotator, setSelectAnnotator] = useState("All");
