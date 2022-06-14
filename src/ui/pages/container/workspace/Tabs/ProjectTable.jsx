@@ -60,7 +60,7 @@ const ProjectTable = (props) => {
         const data = workspacesproject && workspacesproject.length > 0 ? workspacesproject.map((el,i)=>{
             return [
                         el.title, 
-                        el.created_by,
+                        el.created_by && el.created_by.username,
                         // <Link  style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}
@@ -69,6 +69,8 @@ const ProjectTable = (props) => {
                         // </Link>
             ]
         }) : [];
+
+        console.log("data values", data);
 
         const options = {
             textLabels: {
