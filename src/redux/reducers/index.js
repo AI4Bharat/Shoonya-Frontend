@@ -3,6 +3,7 @@ import getProjects from './Dashboard/GetProjects';
 import getWorkspaces from './Dashboard/GetWorkspaces';
 import fetchLoggedInUserData from './UserManagement/FetchLoggedInUserData';
 import getProjectDetails from './ProjectDetails/GetProjectDetails';
+import getProjectReport from './ProjectDetails/GetProjectReport';
 import getTasksByProjectId from './Tasks/GetTasksByProjectId';
 import  getWorkspacesProjectData from './WorkspaceDetails/GetWorkspaceProject'
 import  getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotators'
@@ -15,6 +16,7 @@ const index = {
     getWorkspaces,
     fetchLoggedInUserData,
     getProjectDetails,
+    getProjectReport,
     getTasksByProjectId,
     getWorkspacesProjectData,
     getWorkspacesAnnotatorsData,
