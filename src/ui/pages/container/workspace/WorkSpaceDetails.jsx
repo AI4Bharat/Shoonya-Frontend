@@ -7,12 +7,13 @@ import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import ProjectTable from './Tabs/ProjectTable';
-import AnnotatorsTable from "./Tabs/Annotators";
-import ManagersTable from "./Tabs/ManagersTable";
-import SettingsTable from "./Tabs/SettingsTable";
+// import ProjectTable from './Tabs/ProjectTable';
+// import AnnotatorsTable from "./Tabs/Annotators";
+// import ManagersTable from "./Tabs/ManagersTable";
+// import SettingsTable from "./Tabs/SettingsTable";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
+import componentType from "../../../../config/pageType";
 
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -80,30 +81,24 @@ const Workspace = (props) => {
       console.log( workspaceDtails," workspaceDtails")
     return (
         <ThemeProvider theme={themeDefault}>
-            {/* <DetailsViewPage 
-                title={workspaceData.length > 0 && workspaceData[0].workspace_name} 
-                createdBy={workspaceData.length > 0 && workspaceData[0].created_by.email}
-            /> */}
-
-            {/* <Header /> */}
-            <Grid
+            <DetailsViewPage 
+                title={workspaceDtails && workspaceDtails.workspace_name}
+                createdBy={workspaceDtails && workspaceDtails.created_by ?.username}
+                pageType = {componentType.Type_Workspace}
+            />
+            {/* <Grid
                 container
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-                // width={window.innerWidth}
             >
                 <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
                        {workspaceDtails && workspaceDtails.workspace_name}
-                        {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                    {/* Created_by:  {workspaceData.length > 0 && workspaceData[0].created_by.email} */}
                     Created_by: 
-                     {workspaceDtails && workspaceDtails.created_by ?.username}
-                    {/* {!workspaceDtails.created_by.username ? " ":  workspaceDtails.created_by.username} */}
-                     
+                     {workspaceDtails && workspaceDtails.created_by ?.username}                     
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
@@ -140,10 +135,8 @@ const Workspace = (props) => {
                     <TabPanel value={value} index={3}>
                     <SettingsTable/>
                     </TabPanel>
-
-
                 </Card>
-             </Grid> 
+             </Grid>  */}
         </ThemeProvider>
 
     )

@@ -10,13 +10,9 @@ import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import componentType from "../../../../config/pageType"
-// import ProjectTable from './Tabs/ProjectTable';
-// import AnnotatorsTable from "./Tabs/Annotators";
-// import ManagersTable from "./Tabs/ManagersTable";
-// import APITransport from '../../../../redux/actions/apitransport/apitransport';
-// import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
-
-
+import ProjectTable from "../Tabs/ProjectTable";
+import AnnotatorsTable from "../Tabs/Annotators";
+import ManagersTable from "../Tabs/ManagersTable";
 // import { useDispatch, useSelector } from 'react-redux';
 
 
@@ -115,19 +111,21 @@ const DetailsViewPage = (props) => {
                         </Link>
                         <Button className={classes.projectButton} label={"Add New Collection Project"} />
                         <div className={classes.workspaceTables} >
-                            {/* <ProjectTable /> */}
+                            {pageType === componentType.Type_Workspace && <ProjectTable />}
+                            {/* if pagetype === organization add another component with it's condition */}
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />
                         <div className={classes.workspaceTables}>
-                            {/* <AnnotatorsTable /> */}
+                            {pageType === componentType.Type_Workspace && <AnnotatorsTable />}
+                            {/* if pagetype === organization add another component with it's condition */}
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         <Button className={classes.managersButton} label={"Assign Managers"} />
                         <div className={classes.workspaceTables}>
-                            {/* <ManagersTable /> */}
+                            {pageType === componentType.Type_Workspace && <ManagersTable />}
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
