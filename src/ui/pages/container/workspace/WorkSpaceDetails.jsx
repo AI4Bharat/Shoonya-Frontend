@@ -46,7 +46,8 @@ function a11yProps(index) {
     };
 }
 
-console.log("WorkspaceDetails..")
+console.log("WorkSpaceDetails..")
+
 const Workspace = (props) => {
 
     const classes = DatasetStyle();
