@@ -23,10 +23,6 @@ const WorkspaceTable = (props) => {
    
     const  {workspaceData,} = props;
 
-    console.log("workspaceData", workspaceData);
-
-    
-
     const columns = [
         {
             name: "Name",

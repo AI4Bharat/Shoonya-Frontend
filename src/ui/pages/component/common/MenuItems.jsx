@@ -11,7 +11,6 @@ export default function MenuItems(props) {
     props.handleChange(event.target.value)
     setselectmen(event.target.value);
   };
-console.log(props,"asdfghhjj")
   return (
     <div>
       <FormControl fullWidth variant="standard" sx={{minWidth: 120 }}>

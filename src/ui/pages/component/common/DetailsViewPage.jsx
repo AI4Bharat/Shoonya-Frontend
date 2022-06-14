@@ -61,7 +61,6 @@ const DetailsViewPage = (props) => {
     };
 
     // const workspaceData = useSelector(state=>state.getWorkspaces.data);
-    // console.log( workspaceData," workspaceData")
     // const getDashboardWorkspaceData = ()=>{
     //     const workspaceObj = new GetWorkspacesAPI(1);
     //     dispatch(APITransport(workspaceObj));
