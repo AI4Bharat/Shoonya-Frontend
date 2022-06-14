@@ -121,8 +121,11 @@ const Workspace = (props) => {
                         <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none",marginRight:"200px" }}>
                             <Button className={classes.projectButton}  label={"Add New Annotation Project"} />
                         </Link>
+                        <Link to={`/create-collection-project/1`}>
                              <Button className={classes.projectButton} label={"Add New Collection Project"} />
+                             </Link>
                              <div className={classes.workspaceTables} >
+                                
                         <ProjectTable />
                         </div>
                    </TabPanel>

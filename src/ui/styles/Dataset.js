@@ -34,6 +34,10 @@ const DatasetStyle = makeStyles({
    projectsettingGrid:{
     margin: "20px 0px 10px 0px",
 
+   },
+   settingsdiv:{
+    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+    marginTop:"100px"
    }
   
 })
