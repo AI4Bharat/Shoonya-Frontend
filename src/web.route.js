@@ -6,13 +6,13 @@ import Dashboard from "./ui/pages/container/Project/ProjectList";
 import Projects from "./ui/pages/container/Project/ProjectDetails";
 import { ThemeProvider } from "@mui/material/styles";
 import ProjectSetting from "./ui/pages/container/Project/ProjectSetting"
-import WorkSpace from "./ui/pages/container/Workspace/WorkSpaceDetails"
+import WorkSpace from "./ui/pages/container/WorkspaceFolder/WorkSpaceDetails"
 import themeDefault from "./ui/theme/theme";
-import AnnotationProject from "./ui/pages/container/Workspace/AnnotationProject"
-import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList"
+import AnnotationProject from "./ui/pages/container/WorkspaceFolder/AnnotationProject"
+import WorkSpaces from "./ui/pages/container/WorkspaceFolder/WorkSpaceList"
 import Layout from "./ui/Layout";
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
-import CollectionProject from "./ui/pages/container/Workspace/CollectionProject"
+import CollectionProject from "./ui/pages/container/WorkspaceFolder/CollectionProject"
 
 
 const ProtectedRoute = ({ user, children }) => {
