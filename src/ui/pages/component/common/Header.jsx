@@ -210,7 +210,6 @@ const Header = () => {
                                     <FormControlLabel
                                         control={
                                             <Checkbox
-                                                value="Enable RTL-typing"
                                                 onChange={handleRTLChange}
                                                 defaultChecked={localStorage.getItem('rtl') === "true"}
                                             />}
