@@ -155,20 +155,27 @@ const Header = () => {
                             container
                             direction="row"
                             justifyContent="center"
-                            spacing={1}
+                            spacing={2}
                             sx={{ textAlign: "center", alignItems: "center" }}
                         >
                             <Grid
                                 item
-                                xs={12}
-                                sm={12}
-                                md={6}
+                                xs={6}
+                                sm={6}
+                                md={3}
                             >
                                 <Tooltip title="Settings">
                                     <IconButton onClick={handleOpenSettingsMenu}>
                                         <SettingsOutlinedIcon color="primary.dark" fontSize="large" />
                                     </IconButton>
                                 </Tooltip>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={6}
+                                sm={6}
+                                md={3}
+                            >
                                 <Tooltip title="User Options">
                                     <IconButton onClick={handleOpenUserMenu}>
                                         <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -177,9 +184,8 @@ const Header = () => {
                             </Grid>
                             <Grid
                                 item
-                                xs={12}
-                                sm={12}
                                 md={6}
+                                display={{ xs: "none", sm: "none", md: "block" }}
                             >
                                 <Typography variant="body1" color="primary.dark" sx={{ p: 0 }}>{loggedInUserData.username}</Typography>
                             </Grid>
