@@ -18,6 +18,8 @@ import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDeta
 import { useDispatch, useSelector } from 'react-redux';
 import DetailsViewPage from "../../component/common/DetailsViewPage";
 
+
+
 function TabPanel(props) {
 
     const { children, value, index, ...other } = props;
@@ -46,12 +48,14 @@ function a11yProps(index) {
     };
 }
 
-console.log("WorkSpaceDetails..")
 
 const Workspace = (props) => {
 
     const classes = DatasetStyle();
     const dispatch = useDispatch();
+   
+
+    
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
@@ -82,7 +86,7 @@ const Workspace = (props) => {
             /> */}
 
             {/* <Header /> */}
-            {/* <Grid
+            <Grid
                 container
                 direction='row'
                 justifyContent='center'
@@ -92,12 +96,8 @@ const Workspace = (props) => {
                 <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
                        {workspaceDtails && workspaceDtails.workspace_name}
-                       {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
-                    {/* </Typography> */}
-                    <Typography variant="h2" gutterBottom component="div">
-                       {workspaceDtails && workspaceDtails.workspace_name}
-                       {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
-                     </Typography> 
+                        {/* {workspaceData.length > 0 && workspaceData[0].workspace_name}  */}
+                    </Typography>
                     <Typography variant="body1" gutterBottom component="div">
                     {/* Created_by:  {workspaceData.length > 0 && workspaceData[0].created_by.email} */}
                     Created_by: 
@@ -142,8 +142,8 @@ const Workspace = (props) => {
                     </TabPanel>
 
 
-                {/* </Card>
-             </Grid>  */}
+                </Card>
+             </Grid> 
         </ThemeProvider>
 
     )

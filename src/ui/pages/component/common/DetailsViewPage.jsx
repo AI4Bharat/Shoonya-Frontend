@@ -97,16 +97,16 @@ const DetailsViewPage = (props) => {
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Projects" {...a11yProps(0)} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Workspaces" {...a11yProps(0)} />}
+                            {pageType === componentType.Type_Workspace && <Tab label="Projects" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Workspaces" sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Annotators" {...a11yProps(1)} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Members" {...a11yProps(1)} />}
+                            {pageType === componentType.Type_Workspace && <Tab label="Annotators" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Members" sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            {pageType === componentType.Type_Organization && <Tab label="Invites" {...a11yProps(2)} />}
-                            {pageType === componentType.Type_Workspace && <Tab label="Managers" {...a11yProps(2)} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Invites" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label="Managers" sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            <Tab label="Settings" {...a11yProps(3)} />
+                            <Tab label="Settings" sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0} style={{ textAlign: "center" }}>
