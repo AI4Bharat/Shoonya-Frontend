@@ -18,8 +18,6 @@ import componentType from "../../../../config/pageType";
 import { useDispatch, useSelector } from 'react-redux';
 import DetailsViewPage from "../../component/common/DetailsViewPage";
 
-
-
 function TabPanel(props) {
 
     const { children, value, index, ...other } = props;
@@ -48,14 +46,11 @@ function a11yProps(index) {
     };
 }
 
-
+console.log("WorkspaceDetails..")
 const Workspace = (props) => {
 
     const classes = DatasetStyle();
     const dispatch = useDispatch();
-   
-
-    
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
