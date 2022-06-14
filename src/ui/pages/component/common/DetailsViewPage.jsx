@@ -9,6 +9,7 @@ import Button from "../../component/common/Button"
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+import componentType from "../../../../config/pageType"
 // import ProjectTable from './Tabs/ProjectTable';
 // import AnnotatorsTable from "./Tabs/Annotators";
 // import ManagersTable from "./Tabs/ManagersTable";
@@ -50,7 +51,7 @@ function a11yProps(index) {
 
 
 const DetailsViewPage = (props) => {
-    const {title, createdBy} = props;
+    const {pageType, title, createdBy} = props;
 
     const classes = DatasetStyle();
     // const dispatch = useDispatch();
@@ -97,9 +98,16 @@ const DetailsViewPage = (props) => {
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                            <Tab label="Projects" {...a11yProps(0)} />
-                            <Tab label="Annotators" {...a11yProps(1)} />
-                            <Tab label="Managers" {...a11yProps(2)} />
+
+                            {pageType === componentType.Type_Workspace && <Tab label="Projects" {...a11yProps(0)} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Workspaces" {...a11yProps(0)} />}
+
+                            {pageType === componentType.Type_Workspace && <Tab label="Annotators" {...a11yProps(1)} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Members" {...a11yProps(1)} />}
+
+                            {pageType === componentType.Type_Organization && <Tab label="Invites" {...a11yProps(2)} />}
+                            {pageType === componentType.Type_Workspace && <Tab label="Managers" {...a11yProps(2)} />}
+
                             <Tab label="Settings" {...a11yProps(3)} />
                         </Tabs>
                     </Box>

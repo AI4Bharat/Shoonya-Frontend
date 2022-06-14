@@ -12,6 +12,7 @@ import AnnotatorsTable from "./Tabs/Annotators";
 import ManagersTable from "./Tabs/ManagersTable";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
+import componentType from "../../../../config/pageType";
 
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -78,6 +79,7 @@ const Workspace = (props) => {
             <DetailsViewPage 
                 title={workspaceData.length > 0 && workspaceData[0].workspace_name} 
                 createdBy={workspaceData.length > 0 && workspaceData[0].created_by.email}
+                pageType = {componentType.Type_Workspace}
             />
 
             {/* <Header /> */}
