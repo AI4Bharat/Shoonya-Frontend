@@ -12,6 +12,7 @@ import AnnotationProject from "./ui/pages/container/Workspace/AnnotationProject"
 import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList"
 import Layout from "./ui/Layout";
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
+import CollectionProject from "./ui/pages/container/Workspace/CollectionProject"
 
 
 const ProtectedRoute = ({ user, children }) => {
@@ -64,6 +65,10 @@ const App = () => {
     {
       path: "create-annotation-project/:id",
       element: ProtectedRouteWrapper(<Layout component={<AnnotationProject />} />)
+    },
+    {
+      path: "create-collection-project/:id",
+      element: ProtectedRouteWrapper(<Layout component={<CollectionProject />} />)
     },
     {
       path: "workspaces",
