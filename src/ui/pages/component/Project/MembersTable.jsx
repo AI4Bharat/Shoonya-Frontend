@@ -58,7 +58,6 @@ const options = {
 const MembersTable = (props) => {
     const {dataSource} = props;
 
-    console.log(dataSource);
     const data = dataSource && dataSource.length > 0 ? dataSource.map((el,i)=>{
         const userRole = UserMappedByRole(el.role).element;
         return [el.username, el.email,  userRole, <CustomButton sx={{ p: 1, borderRadius: 2 }} onClick={()=>{console.log(el.id)}} label={"View"} />]

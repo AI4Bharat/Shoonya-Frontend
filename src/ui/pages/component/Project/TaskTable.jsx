@@ -212,8 +212,6 @@ const TaskTable = () => {
             ]
     }) : []
 
-    // console.log("taskList", taskList);
-
     return (
         <Fragment>
             <CustomButton sx={{ p: 1, width: '100%', borderRadius: 2, mb: 3 }} label={"Disabled"} />

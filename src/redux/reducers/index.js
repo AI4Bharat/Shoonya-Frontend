@@ -10,6 +10,7 @@ import getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotato
 import getWorkspacesManagersData from './WorkspaceDetails/GetWorkspaceManagers';
 import getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
 import getTaskPrediction from './Tasks/GetTaskPrediction';
+import fetchLanguages from './UserManagement/FetchLanguages';
 
 
 const index = {
@@ -25,6 +26,10 @@ const index = {
     getWorkspacesManagersData,
     getWorkspaceDetails,
     getTaskPrediction,    
+    fetchLanguages
+  
+
+    
 };
 
 export default index;

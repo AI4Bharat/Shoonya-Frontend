@@ -46,6 +46,17 @@ const DetailsViewPage = (props) => {
         setValue(newValue);
     };
 
+    // const workspaceData = useSelector(state=>state.getWorkspaces.data);
+    // const getDashboardWorkspaceData = ()=>{
+    //     const workspaceObj = new GetWorkspacesAPI(1);
+    //     dispatch(APITransport(workspaceObj));
+    //   }
+
+    useEffect(() => {
+        // getDashboardWorkspaceData();
+    }, []);
+
+
     return (
         <ThemeProvider theme={themeDefault}>
             <Grid
@@ -82,7 +93,8 @@ const DetailsViewPage = (props) => {
                             <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none", marginRight: "200px" }}>
                                 <Button className={classes.projectButton} label={"Add New Annotation Project"} />
                             </Link>
-                            <Button className={classes.projectButton} label={"Add New Collection Project"} />
+                            <Link to={`/create-collection-project/1`}  style={{ textDecoration: "none" }}>
+                            <Button className={classes.projectButton} label={"Add New Collection Project"} /></Link>
                             <div className={classes.workspaceTables} >
                                 <ProjectTable />
                             </div>

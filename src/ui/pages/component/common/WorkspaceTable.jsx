@@ -23,10 +23,6 @@ const WorkspaceTable = (props) => {
    
     const  {workspaceData, showManager, showCreatedBy} = props;
 
-    console.log("workspaceData", showManager, showCreatedBy );
-
-    
-
     const columns = [
         {
             name: "Name",
