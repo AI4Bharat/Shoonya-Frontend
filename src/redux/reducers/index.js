@@ -9,6 +9,7 @@ import  getWorkspacesProjectData from './WorkspaceDetails/GetWorkspaceProject'
 import  getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotators'
 import  getWorkspacesManagersData from './WorkspaceDetails/GetWorkspaceManagers'
 import  getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
+import fetchLanguages from './UserManagement/FetchLanguages';
 
 
 const index = {
@@ -23,6 +24,7 @@ const index = {
     getWorkspacesAnnotatorsData,
     getWorkspacesManagersData,
     getWorkspaceDetails,
+    fetchLanguages
   
 
     
