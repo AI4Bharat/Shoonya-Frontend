@@ -78,6 +78,19 @@ const GlobalStyles = makeStyles({
     padding: "0 15px",
     borderRadius: "12px",
   },
+
+  textAreaTransliteration: {
+    backgroundColor: "inherit",
+    border: "none",
+    width: "100%",
+    resize: "none",
+    outline: "none",
+    fontSize: "18px",
+    lineHeight: "32px",
+    color: "black",
+    fontFamily: "Roboto",
+    height : "14rem"
+  },
 });
 
 export default GlobalStyles;
