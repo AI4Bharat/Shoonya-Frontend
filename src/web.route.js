@@ -13,6 +13,7 @@ import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList"
 import Layout from "./ui/Layout";
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
 import CollectionProject from "./ui/pages/container/Workspace/CollectionProject"
+import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
 
 
 const ProtectedRoute = ({ user, children }) => {
@@ -45,6 +46,10 @@ const App = () => {
     {
       path: "forgot-password",
       element: <ForgotPassword />
+    },
+    {
+      path: "my-profile",
+      element: ProtectedRouteWrapper(<Layout component={<MyProfile />} />)
     },
     {
       path: "projects",
