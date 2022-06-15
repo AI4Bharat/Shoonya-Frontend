@@ -21,9 +21,9 @@ import MUIDataTable from "mui-datatables";
 
 const WorkspaceTable = (props) => {
    
-    const  {workspaceData,} = props;
+    const  {workspaceData, showManager, showCreatedBy} = props;
 
-    console.log("workspaceData", workspaceData);
+    console.log("workspaceData", showManager, showCreatedBy );
 
     
 
@@ -34,7 +34,27 @@ const WorkspaceTable = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align : "center"
+                align : "center",
+            }
+        },
+        {
+            name: "Manager",
+            label: "Manager",
+            options: {
+                filter: false,
+                sort: false,
+                align : "center",
+                display : showManager ? "true" : "exclude"
+            }
+        },
+        {
+            name: "Created By",
+            label: "Created By",
+            options: {
+                filter: false,
+                sort: false,
+                align : "center",
+                display : showCreatedBy ? "true": "exclude"
             }
         },
         {
@@ -49,6 +69,10 @@ const WorkspaceTable = (props) => {
         const data = workspaceData.map((el,i)=>{
             return [
                         el.workspace_name, 
+                        el.managers.map((manager,index)=>{
+                            return manager.username
+                        }).join(", "),
+                        el.created_by && el.created_by.username,
                         <Link to={`/workspaces/${el.id}`}  style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}

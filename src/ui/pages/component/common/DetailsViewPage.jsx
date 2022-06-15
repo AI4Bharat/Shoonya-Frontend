@@ -1,5 +1,3 @@
-// DetailsViewPage
-
 import { Box, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import Header from "../../component/common/Header";
@@ -13,9 +11,10 @@ import componentType from "../../../../config/pageType"
 import ProjectTable from "../Tabs/ProjectTable";
 import AnnotatorsTable from "../Tabs/Annotators";
 import ManagersTable from "../Tabs/ManagersTable";
-// import { useDispatch, useSelector } from 'react-redux';
-
-
+import Workspaces from "../Tabs/Workspaces";
+import CustomButton from "../../component/common/Button";
+import { translate } from "../../../../config/localisation";
+import MembersTable from "../Project/MembersTable";
 
 function TabPanel(props) {
 
@@ -38,50 +37,22 @@ function TabPanel(props) {
     );
 }
 
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
 
 const DetailsViewPage = (props) => {
     const { pageType, title, createdBy } = props;
-
     const classes = DatasetStyle();
-    // const dispatch = useDispatch();
-
-
-
     const [value, setValue] = React.useState(0);
-
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
 
-    // const workspaceData = useSelector(state=>state.getWorkspaces.data);
-    // console.log( workspaceData," workspaceData")
-    // const getDashboardWorkspaceData = ()=>{
-    //     const workspaceObj = new GetWorkspacesAPI(1);
-    //     dispatch(APITransport(workspaceObj));
-    //   }
-
-    useEffect(() => {
-        // getDashboardWorkspaceData();
-    }, []);
-
-
     return (
         <ThemeProvider theme={themeDefault}>
-
-            {/* <Header /> */}
             <Grid
                 container
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-            // width={window.innerWidth}
             >
                 <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
@@ -116,14 +87,26 @@ const DetailsViewPage = (props) => {
                                 <ProjectTable />
                             </div>
                         </>}
-                        {/* if pagetype === organization add another component with it's condition */}
+                        {pageType === componentType.Type_Organization &&
+                            <>
+                                <CustomButton label={translate("button.addNewWorkspace")} sx={{ width: "100%", mb: 2 }} />
+                                <Workspaces />
+                            </>
+                        }
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />
-                        <div className={classes.workspaceTables}>
-                            {pageType === componentType.Type_Workspace && <AnnotatorsTable />}
-                            {/* if pagetype === organization add another component with it's condition */}
-                        </div>
+                        {pageType === componentType.Type_Workspace &&
+                            <>
+                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />
+                                <AnnotatorsTable />
+                            </>
+                        }
+                        {pageType === componentType.Type_Organization &&
+                            <>
+                                <CustomButton label={translate("button.inviteNewMEmbersToOrganization")} sx={{ width: "100%", mb: 2 }} />
+                                {/* <MembersTable /> */}
+                            </>
+                        }
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         <Button className={classes.managersButton} label={"Assign Managers"} />

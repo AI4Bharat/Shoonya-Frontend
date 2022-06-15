@@ -79,7 +79,7 @@ const Header = () => {
                         >
                             <Typography variant="body1">
                                 <NavLink
-                                    to="/my-organization"
+                                    to={loggedInUserData && loggedInUserData.organization ?`/my-organization/${loggedInUserData.organization.id}` : `/my-organization/1`}
                                     className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
                                     activeClassName={classes.highlightedMenu}
                                 >

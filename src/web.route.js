@@ -13,6 +13,7 @@ import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList"
 import Layout from "./ui/Layout";
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
 import CollectionProject from "./ui/pages/container/Workspace/CollectionProject"
+import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
 
 
 const ProtectedRoute = ({ user, children }) => {
@@ -59,6 +60,10 @@ const App = () => {
       element: ProtectedRouteWrapper(<Layout component={<ProjectSetting />} />)
     },
     {
+      path: "projects/:projectId/task/:taskId",
+      element: ProtectedRouteWrapper(<Layout component={<AnnotateTask />} />)
+    },
+    {
       path: "workspaces/:id",
       element: ProtectedRouteWrapper(<Layout component={<WorkSpace />} />)
     },
@@ -75,7 +80,7 @@ const App = () => {
       element: ProtectedRouteWrapper(<Layout component={<WorkSpaces />} />)
     },
     {
-      path: "my-organization",
+      path: "my-organization/:orgId",
       element: ProtectedRouteWrapper(<Layout component={<MyOrganization />} />)
     },
 
