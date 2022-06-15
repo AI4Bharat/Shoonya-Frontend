@@ -7,6 +7,7 @@ import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/Fetc
 import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import Snackbar from "../../component/common/Snackbar";
+import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
@@ -42,12 +43,6 @@ const MyProfile = () => {
       phone: userDetails.phone,
     });
   }, [userDetails]);
-
-  const roleMap = {
-    1: "Admin",
-    2: "Manager",
-    3: "Annotator",
-  };
 
   const handleFieldChange = (event) => {
     event.preventDefault();
@@ -146,7 +141,7 @@ const MyProfile = () => {
                 disabled
                 fullWidth
                 label="Role"
-                value={roleMap[userDetails.role]}
+                value={UserMappedByRole(userDetails.role)?.name}
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
