@@ -165,13 +165,26 @@ const MyProfile = () => {
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
+            {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+            <InputLabel id="availability-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Availability Status</InputLabel>
+              <Select
+                fullWidth
+                labelId="availability-label"
+                name="availability_status"
+                value={newDetails?.availability_status}
+                onChange={handleFieldChange}
+                InputLabelProps={{ shrink: true }}
+              >
+                <MenuItem value="1">Available</MenuItem>
+                <MenuItem value="2">Unavailable</MenuItem>
+              </Select>
+            </Grid> */}
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
               <InputLabel id="lang-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Languages</InputLabel>
               <Select
                 multiple
                 fullWidth
                 labelId="lang-label"
-                label="Languages"
                 name="languages"
                 value={newDetails?.languages? newDetails.languages : []}
                 onChange={handleFieldChange}
