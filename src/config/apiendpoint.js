@@ -5,4 +5,5 @@ export default {
   fetch:"/users/account/",
   getTasks:"/task/",  
   getOrganizations:"/organizations/",
+  getLanguages:"/users/languages/",
 };

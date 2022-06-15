@@ -1,13 +1,35 @@
-import { Button, Card, Grid, ThemeProvider, Typography } from "@mui/material";
+import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem } from "@mui/material";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
+import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
+  const [initLangs, setInitLangs] = useState([]);
 
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+  const dispatch = useDispatch();
+  const LanguageList = useSelector(state => state.fetchLanguages.data);
+
+  const getLanguageList = () => {
+      const langObj = new FetchLanguagesAPI();
+
+      dispatch(APITransport(langObj));
+  }
+
+  useEffect(() => {
+    getLanguageList();
+  }, []);
+
+  useEffect(() => {
+    if (LanguageList) {
+      setInitLangs(LanguageList.language);
+    }
+  }, [LanguageList]);
 
   useEffect(() => {
     setNewDetails({
@@ -32,6 +54,23 @@ const MyProfile = () => {
       [event.target.name]: event.target.value,
     }));
   };
+
+  const handleSubmit = () => {
+    const apiObj = new UpdateProfileAPI(
+      newDetails.username,
+      newDetails.first_name,
+      newDetails.last_name,
+      newDetails.languages,
+      newDetails.phone
+    );
+    fetch(apiObj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    }).then(async (res) => {
+      const rsp_data = await res.json();
+    });
+  }
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -124,14 +163,31 @@ const MyProfile = () => {
               ></OutlinedTextField>
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
+              <Select
+                multiple
                 fullWidth
                 label="Languages"
                 name="languages"
-                value={newDetails?.languages}
+                value={newDetails?.languages? newDetails.languages : []}
                 onChange={handleFieldChange}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
+                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {initLangs?.length && initLangs.map((lang) => (
+                  <MenuItem
+                    key={lang}
+                    value={lang}
+                  >
+                    {lang}
+                  </MenuItem>
+                ))}
+              </Select>
             </Grid>
             <Grid 
                 container 
@@ -142,10 +198,8 @@ const MyProfile = () => {
                 <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => {
-                        console.log(newDetails);
-                    }
-                }>
+                    onClick={handleSubmit}
+                >
                     Update Profile
                 </Button>
             </Grid>
