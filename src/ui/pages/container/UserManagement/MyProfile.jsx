@@ -1,4 +1,4 @@
-import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem } from "@mui/material";
+import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel } from "@mui/material";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
@@ -171,13 +171,16 @@ const MyProfile = () => {
               ></OutlinedTextField>
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <InputLabel id="lang-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Languages</InputLabel>
               <Select
                 multiple
                 fullWidth
+                labelId="lang-label"
                 label="Languages"
                 name="languages"
                 value={newDetails?.languages? newDetails.languages : []}
                 onChange={handleFieldChange}
+                style={{zIndex: "0"}}
                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
