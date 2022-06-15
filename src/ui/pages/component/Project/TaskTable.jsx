@@ -209,8 +209,6 @@ const TaskTable = () => {
             <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />]
     }) : []
 
-    // console.log("taskList", taskList);
-
     return (
         <Fragment>
             <CustomButton sx={{ p: 1, width: '100%', borderRadius: 2, mb: 3 }} label={"Disabled"} />

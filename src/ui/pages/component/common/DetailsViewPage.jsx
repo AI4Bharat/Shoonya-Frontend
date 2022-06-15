@@ -61,7 +61,6 @@ const DetailsViewPage = (props) => {
     };
 
     // const workspaceData = useSelector(state=>state.getWorkspaces.data);
-    // console.log( workspaceData," workspaceData")
     // const getDashboardWorkspaceData = ()=>{
     //     const workspaceObj = new GetWorkspacesAPI(1);
     //     dispatch(APITransport(workspaceObj));
@@ -99,23 +98,25 @@ const DetailsViewPage = (props) => {
                             {pageType === componentType.Type_Workspace && <Tab label="Annotators" sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {pageType === componentType.Type_Organization && <Tab label="Members" sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            {pageType === componentType.Type_Organization && <Tab label="Invites" sx={{ fontSize: 16, fontWeight: '700' }} />}
+
                             {pageType === componentType.Type_Workspace && <Tab label="Managers" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label="Invites" sx={{ fontSize: 16, fontWeight: '700' }} />}
 
                             <Tab label="Settings" sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0} style={{ textAlign: "center" }}>
-                        <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none", marginRight: "200px" }}>
-                            <Button className={classes.projectButton} label={"Add New Annotation Project"} />
-                        </Link>
-                        <Link  to={`/create-collection-project/1`} style={{ textDecoration: "none" }}>
-                        <Button className={classes.projectButton} label={"Add New Collection Project"} />
-                        </Link>
-                        <div className={classes.workspaceTables} >
-                            {pageType === componentType.Type_Workspace && <ProjectTable />}
-                            {/* if pagetype === organization add another component with it's condition */}
-                        </div>
+                        {pageType === componentType.Type_Workspace && <>
+                            <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none", marginRight: "200px" }}>
+                                <Button className={classes.projectButton} label={"Add New Annotation Project"} />
+                            </Link>
+                            <Link to={`/create-collection-project/1`}  style={{ textDecoration: "none" }}></Link>
+                            <Button className={classes.projectButton} label={"Add New Collection Project"} />
+                            <div className={classes.workspaceTables} >
+                                <ProjectTable />
+                            </div>
+                        </>}
+                        {/* if pagetype === organization add another component with it's condition */}
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />

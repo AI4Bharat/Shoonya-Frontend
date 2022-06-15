@@ -28,65 +28,16 @@ const ReportsTable = () => {
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
 
-    const columns = [
-        {
-            name: "username",
-            label: "Username",
-            options: {
-                filter: false,
-                sort: false,
-                align : "center"
-            }
-        },
-        {
-            name: "mail",
-            label: "Mail",
-            options: {
-                filter: false,
-                sort: false,
-            }
-        },
-        {
-            name: "total_annoted_tasks",
-            label: "Total Annoted Tasks",
-            options: {
-                filter: false,
-                sort: false,
-            }
-        },
-        {
-            name: "avg_lead_time",
-            label: "Avg Lead Time",
-            options: {
-                filter: false,
-                sort: false,
-            }
-        },
-        {
-            name: "total_assigned_tasks",
-            label: "Total Assigned Tasks",
-            options: {
-                filter: false,
-                sort: false,
-            }
-        },
-        {
-            name: "skipped_tasks",
-            label: "Skipped Tasks",
-            options: {
-                filter: false,
-                sort: false,
-            }
-        },
-        {
-            name: "total_pending_tasks",
-            label: "Total Pending Tasks",
+    const columns = ProjectReport[0] ? Object.keys(ProjectReport[0]).map(key => {
+        return {
+            name: key,
+            label: key,
             options: {
                 filter: false,
                 sort: false,
             }
         }
-    ];
+    }) : [];
 
     const options = {
         filterType: 'checkbox',
