@@ -41,7 +41,10 @@ const Header = () => {
     }
 
     const userSettings = [
-        { name: "My Profile", onclick: () => navigate("/my-profile") },
+        { name: "My Profile", onclick: () => {
+            handleCloseUserMenu();
+            navigate("/my-profile");
+        } },
         { name: "Logout", onclick: () => onLogoutClick() },
     ]
 
