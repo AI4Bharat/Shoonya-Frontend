@@ -6,10 +6,12 @@ import { useSelector, useDispatch } from "react-redux";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import Snackbar from "../../component/common/Snackbar";
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
   const [initLangs, setInitLangs] = useState([]);
+  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
 
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const dispatch = useDispatch();
@@ -69,9 +71,15 @@ const MyProfile = () => {
       headers: apiObj.getHeaders().headers,
     }).then(async (res) => {
       const rsp_data = await res.json();
+      setSnackbarState({
+        open: true,
+        message: rsp_data.message,
+        variant: res.status === 200 ? "success" : "error",
+      })
     });
   }
 
+  console.log(snackbarState)
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
@@ -206,6 +214,12 @@ const MyProfile = () => {
           </Grid>
         </Card>
       </Grid>
+      <Snackbar 
+        {...snackbarState} 
+        handleClose={()=> setSnackbarState({...snackbarState, open: false})} 
+        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+        hide={2000}
+      />
     </ThemeProvider>
   );
 };
