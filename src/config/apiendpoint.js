@@ -6,4 +6,5 @@ export default {
   getTasks:"/task/",  
   getOrganizations:"/organizations/",
   getLanguages:"/users/languages/",
+  getDatasets:"/data/",
 };
