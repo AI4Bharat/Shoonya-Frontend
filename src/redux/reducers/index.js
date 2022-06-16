@@ -13,7 +13,7 @@ import getTaskPrediction from './Tasks/GetTaskPrediction';
 import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
 import getDatasetList from './Dataset/GetDatasetList';
-
+import getTaskDetails from './Tasks/GetTaskDetails'
 
 const index = {
     apiStatus,
@@ -30,7 +30,8 @@ const index = {
     getTaskPrediction,    
     fetchLanguages,
     getOrganizationUsers, 
-    getDatasetList   
+    getDatasetList,
+    getTaskDetails,
 };
 
 export default index;
