@@ -12,6 +12,8 @@ import getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
 import getTaskPrediction from './Tasks/GetTaskPrediction';
 import fetchLanguages from './UserManagement/FetchLanguages';
 import getDatasetList from './Dataset/GetDatasetList';
+import getDatasetDetails from './Dataset/GetDatasetDetails';
+import getDataitemsById from './Dataset/GetDataitemsById';
 
 
 const index = {
@@ -28,7 +30,9 @@ const index = {
     getWorkspaceDetails,
     getTaskPrediction,    
     fetchLanguages,
-    getDatasetList
+    getDatasetList,
+    getDatasetDetails,
+    getDataitemsById
 };
 
 export default index;
