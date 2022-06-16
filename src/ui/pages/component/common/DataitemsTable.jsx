@@ -15,6 +15,7 @@ const excludeKeys = [
   "instance_id_id",
   "datasetbase_ptr_id",
   "key",
+  "instance_id",
 ];
 
 const DataitemsTable = () => {
