@@ -82,7 +82,7 @@ const DetailsViewPage = (props) => {
                 alignItems='center'
             // width={window.innerWidth}
             >
-                <Card className={classes.workspaceCard}>
+                <Card className={classes.workspaceCard}> 
                     <Typography variant="h2" gutterBottom component="div">
                         {title}
                     </Typography>
@@ -105,8 +105,9 @@ const DetailsViewPage = (props) => {
                             <Tab label="Settings" sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0} style={{ textAlign: "center" }}>
+                    <TabPanel value={value} index={0} style={{ textAlign: "center",maxWidth:"100%" }}>
                         {pageType === componentType.Type_Workspace && <>
+                        
                             <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none", marginRight: "200px" }}>
                                 <Button className={classes.projectButton} label={"Add New Annotation Project"} />
                             </Link>

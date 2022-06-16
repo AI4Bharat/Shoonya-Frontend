@@ -9,7 +9,10 @@ import  getWorkspacesProjectData from './WorkspaceDetails/GetWorkspaceProject'
 import  getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotators'
 import  getWorkspacesManagersData from './WorkspaceDetails/GetWorkspaceManagers'
 import  getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
-
+import getSaveButton from './ProjectDetails/EditUpdate'
+import getExportProjectButton from './ProjectDetails/GetExportProjectButton'
+import getPublishProjectButton from './ProjectDetails/GetPublishProject'
+import getPullNewItems from './ProjectDetails/PullNewItems'
 
 const index = {
     apiStatus,
@@ -23,6 +26,10 @@ const index = {
     getWorkspacesAnnotatorsData,
     getWorkspacesManagersData,
     getWorkspaceDetails,
+    getSaveButton,
+    getExportProjectButton,
+    getPublishProjectButton,
+    getPullNewItems,
   
 
     
