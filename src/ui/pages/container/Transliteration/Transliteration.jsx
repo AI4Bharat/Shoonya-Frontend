@@ -16,6 +16,7 @@ const Transliteration = () => {
       />
     );
   };
+  console.log('...transliteration')
 
   return (
     <ReactTransliterate
