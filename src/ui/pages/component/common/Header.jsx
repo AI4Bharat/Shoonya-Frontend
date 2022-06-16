@@ -56,7 +56,16 @@ const Header = () => {
     navigate("/");
   };
 
-  const userSettings = [{ name: "Logout", onclick: () => onLogoutClick() }];
+  const userSettings = [
+    {
+      name: "My Profile",
+      onclick: () => {
+        handleCloseUserMenu();
+        navigate("/my-profile");
+      },
+    },
+    { name: "Logout", onclick: () => onLogoutClick() },
+  ];
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -114,10 +123,14 @@ const Header = () => {
             sm={12}
             md={5}
           >
-            <Grid item xs={12} sm={12} md={4}>
+            <Grid item xs={12} sm={12} md={3}>
               <Typography variant="body1">
                 <NavLink
-                  to="/my-organization"
+                  to={
+                    loggedInUserData && loggedInUserData.organization
+                      ? `/my-organization/${loggedInUserData.organization.id}`
+                      : `/my-organization/1`
+                  }
                   className={({ isActive }) =>
                     isActive ? classes.highlightedMenu : classes.headerMenu
                   }
@@ -127,7 +140,7 @@ const Header = () => {
                 </NavLink>
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={12} md={4}>
+            <Grid item xs={12} sm={12} md={3}>
               <Typography variant="body1">
                 <NavLink
                   to="/workspaces"
@@ -140,7 +153,7 @@ const Header = () => {
                 </NavLink>
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={12} md={4}>
+            <Grid item xs={12} sm={12} md={3}>
               <Typography variant="body1">
                 <NavLink
                   to="/projects"
@@ -150,6 +163,19 @@ const Header = () => {
                   activeClassName={classes.highlightedMenu}
                 >
                   Projects
+                </NavLink>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={3}>
+              <Typography variant="body1">
+                <NavLink
+                  to="/datasets"
+                  className={({ isActive }) =>
+                    isActive ? classes.highlightedMenu : classes.headerMenu
+                  }
+                  activeClassName={classes.highlightedMenu}
+                >
+                  Datasets
                 </NavLink>
               </Typography>
             </Grid>
@@ -211,12 +237,10 @@ const Header = () => {
             >
               <MenuItem
                 key={1}
-                onClick={() =>
-                  {
+                onClick={() => {
                   handleCloseSettingsMenu();
-                  navigate(`${process.env.PUBLIC_URL}/transliteration`)
-                }
-                }
+                  navigate(`${process.env.PUBLIC_URL}/transliteration`);
+                }}
               >
                 <Typography variant="body2" textAlign="center">
                   Transliteration
