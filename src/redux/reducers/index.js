@@ -12,6 +12,7 @@ import getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
 import getTaskPrediction from './Tasks/GetTaskPrediction';
 import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
+import getDatasetList from './Dataset/GetDatasetList';
 
 
 const index = {
@@ -28,7 +29,8 @@ const index = {
     getWorkspaceDetails,
     getTaskPrediction,    
     fetchLanguages,
-    getOrganizationUsers,    
+    getOrganizationUsers, 
+    getDatasetList   
 };
 
 export default index;

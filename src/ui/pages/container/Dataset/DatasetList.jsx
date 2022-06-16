@@ -10,8 +10,6 @@ const DatasetList = () => {
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const datasetList = useSelector(state=>state.getDatasetList.data);
-  
-
     const getDatasetList = ()=>{
         const datasetObj = new GetDatasetsAPI();
         dispatch(APITransport(datasetObj));
@@ -21,8 +19,6 @@ const DatasetList = () => {
     useEffect(()=>{
         getDatasetList();
     },[]);
-
-    console.log(datasetList);
 
     return (
         <React.Fragment>
