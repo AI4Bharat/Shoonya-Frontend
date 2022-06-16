@@ -14,6 +14,9 @@ import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
 import getDatasetList from './Dataset/GetDatasetList';
 import getTaskDetails from './Tasks/GetTaskDetails'
+import getDatasetDetails from './Dataset/GetDatasetDetails';
+import getDataitemsById from './Dataset/GetDataitemsById';
+
 
 const index = {
     apiStatus,
@@ -32,6 +35,10 @@ const index = {
     getOrganizationUsers, 
     getDatasetList,
     getTaskDetails,
+    getDatasetList,
+    getDatasetDetails,
+    getDataitemsById,
+    getOrganizationUsers 
 };
 
 export default index;

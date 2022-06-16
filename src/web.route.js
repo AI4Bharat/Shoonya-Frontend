@@ -16,6 +16,7 @@ import CollectionProject from "./ui/pages/container/Workspace/CollectionProject"
 import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
 import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
 import DatasetList from "./ui/pages/container/Dataset/DatasetList";
+import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 
 
 const ProtectedRoute = ({ user, children }) => {
@@ -92,6 +93,10 @@ const App = () => {
     {
       path: "datasets",
       element: ProtectedRouteWrapper(<Layout component={<DatasetList />} />)
+    },
+    {
+      path: "datasets/:datasetId",
+      element: ProtectedRouteWrapper(<Layout component={<DatasetDetails />} />)
     },
 
   ]);

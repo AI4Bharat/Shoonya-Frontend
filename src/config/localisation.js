@@ -9,6 +9,7 @@ const localisation = {
     "button.Filter" : "Filter",
     "label.filter.status" : "Status",
     "label.filter.byAnnotator" : "Filter by Annotators",
+    "label.filter.column": "Filter by Columns",
     "button.cancel" : "Cancel",
     "button.addNewWorkspace" : "Add New Workspace",
     "button.inviteNewMEmbersToOrganization":"Invite new members to organization",
