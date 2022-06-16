@@ -1,4 +1,4 @@
-import { Box, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
+import { Box, Card, Divider, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
@@ -12,6 +12,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
 import GetExportProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetExportProject';
 import GetPublishProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetPublishProject';
+import CustomButton from "../../component/common/Button";
 
 
 const ProjectSetting = (props) => {
@@ -21,12 +22,12 @@ const ProjectSetting = (props) => {
         { name: "Project Type", value: null },
         { name: "Status", value: null },
     ])
-       const { id } = useParams();
-      
+    const { id } = useParams();
+
     const classes = DatasetStyle();
     const dispatch = useDispatch();
 
-    
+
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
 
     const getProjectDetails = () => {
@@ -37,28 +38,28 @@ const ProjectSetting = (props) => {
 
     useEffect(() => {
         getProjectDetails();
-       
+
     }, []);
-    console.log(ProjectDetails,"ProjectDetails")
+    console.log(ProjectDetails, "ProjectDetails")
 
 
 
-  
+
 
     const getSaveButtonAPI = () => {
-        const projectObj = new GetSaveButtonAPI(id,ProjectDetails);
+        const projectObj = new GetSaveButtonAPI(id, ProjectDetails);
 
         dispatch(APITransport(projectObj));
     }
     useEffect(() => {
         getSaveButtonAPI()
-       
+
     }, []);
 
-    
-   
 
-    
+
+
+
 
     const getExportProjectButton = () => {
         const projectObj = new GetExportProjectButtonAPI(id);
@@ -66,8 +67,8 @@ const ProjectSetting = (props) => {
         dispatch(APITransport(projectObj));
     }
     useEffect(() => {
-        getExportProjectButton() 
-       
+        getExportProjectButton()
+
     }, []);
 
     const publishProject = useSelector(state => state.getPublishProjectButton.data);
@@ -78,25 +79,25 @@ const ProjectSetting = (props) => {
         dispatch(APITransport(projectObj));
     }
     useEffect(() => {
-        getPublishProjectButton() 
-       
+        getPublishProjectButton()
+
     }, []);
-    
-    const handleSave =() =>{
+
+    const handleSave = () => {
         getSaveButtonAPI()
     }
-   const handleExportProject = ()=>{
-    getExportProjectButton();
-   }
-   const handlePublishProject=()=>{
-    getPublishProjectButton()
-   }
+    const handleExportProject = () => {
+        getExportProjectButton();
+    }
+    const handlePublishProject = () => {
+        getPublishProjectButton()
+    }
 
-   const handlePullNewData =()=>{
-  
-   }
-   
-  console.log(props,"processResponse")
+    const handlePullNewData = () => {
+
+    }
+
+    console.log(props, "processResponse")
     return (
         <ThemeProvider theme={themeDefault}>
 
@@ -106,7 +107,7 @@ const ProjectSetting = (props) => {
                 direction='row'
                 justifyContent='center'
                 alignItems='center'
-                
+
             >
                 <Card
                     sx={{
@@ -136,7 +137,7 @@ const ProjectSetting = (props) => {
                         md={12}
                         lg={12}
                         xl={12}
-                        style={{margin: "38px 0px 30px 0px"}}
+                        style={{ margin: "38px 0px 30px 0px" }}
                     >
                         <Typography variant="h4" gutterBottom component="div"  >
                             Basic Settings
@@ -145,7 +146,10 @@ const ProjectSetting = (props) => {
                     <Grid
                         container
                         direction='row'
-                        style={{ margin: "20px 0px 0px 0px" }}
+                        sx={{
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
                     >
                         <Grid
                             items
@@ -167,13 +171,17 @@ const ProjectSetting = (props) => {
                             xl={9}
                             sm={12}
                         >
-                            <OutlinedTextField fullWidth value={ProjectDetails.title} /> 
+                            <OutlinedTextField fullWidth value={ProjectDetails.title} />
                         </Grid>
                     </Grid>
                     <Grid
                         container
                         direction='row'
-                        style={{ margin: "20px 0px 0px 0px" }}
+                        sx={{
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            mt: 2
+                        }}
                     >
                         <Grid
                             items
@@ -203,132 +211,75 @@ const ProjectSetting = (props) => {
                         </Grid>
                     </Grid>
                     <Grid
-
-                        style={{ margin: "15px 0px 10px 0px", }}
-                        item
+                        container
                         xs={12}
                         md={12}
                         lg={12}
                         xl={12}
                         sm={12}
+                        sx={{
+                            mt: 5,
+                            mb: 2,
+                            justifyContent: "flex-end"
+                        }}
                     >
-                        <Button
-                            style={{padding: "0px 25px 0px 25px"}}
+                        <CustomButton sx={{ inlineSize: "max-content" }}
+                            style={{ padding: "0px 25px 0px 25px" }}
                             onClick={handleSave}
                             label="Save" />
-                             
+
                     </Grid>
-                  
-                   
+
+                    <Divider />
+
                     <Grid
                         container
-                        direction='row'
-                        spacing={2}
-                        sx={{
-                            maxWidth: " 70%",
-                            "@media (max-width:650px)": {
-
-                                maxWidth: " 100%"
-                            },
-                        }}
-
-
-                    >
-                       
-                        
-                    </Grid>
-                  
-                    <Grid
-                        container
-                        direction='row'
-                        spacing={2}
-                        sx={{ maxWidth: " 100%" ,margin: "15px 0px 0px 0px"}}
-
-
-                    >
-                          <Grid
-                        item
                         xs={12}
                         md={12}
                         lg={12}
                         xl={12}
                         sm={12}
+                        sx={{
+                            mt: 3,
+                            mb: 3,
+                            // justifyContent: "flex-end"
+                        }}
                     >
-                        <Typography variant="h4" gutterBottom component="div" style={{ margin: "15px 0px 0px 0px", }}>
+                        <Typography variant="h4" gutterBottom component="div">
                             Advanced Operation
                         </Typography>
                     </Grid>
-                         <Grid
-                            sx={{
-                                marginTop: 2,
-                                marginRight: "-50px"
-                            }}
-                            item
-                            xs={6}
-                            md={6}
-                            lg={2}
-                            xl={2}
-                            sm={6}
-                        >
-                            <Button onClick={handlePublishProject} style={{ lineHeight: "16.3px",     }} label="Publish Project" />
-                        </Grid>
-                        <Grid
-                            sx={{
-                                marginTop: 2
-                            }}
-                            item
-                            xs={12}
-                            md={12}
-                            lg={2}
-                            xl={2}
-                            sm={12}
-                        >
-                            <Button onClick={handleExportProject} style={{ lineHeight: "16.3px" }} label="Export Project into Dataset" />
-                        </Grid>
-                        <Grid
-                            sx={{
-                                marginTop: 2,
-                                marginRight: "-50px"
-                            }}
-                            item
-                            xs={6}
-                            md={6}
-                            lg={2}
-                            xl={2}
-                            sm={6}
-                        >
-                            <Button style={{ lineHeight: "16.3px" }} label="Archive Project" />
-                        </Grid>
-                        <Grid
-                            sx={{
-                                marginTop: 2,
-                                lineHeight: 2,
-                            }}
-                            item
-                            xs={12}
-                            md={12}
-                            lg={2}
-                            xl={2}
-                            sm={12}
-                        >
-                            <Button onClick={handlePullNewData} style={{ lineHeight: "16.3px",padding: "0px" }} label="Pull New Data Items from Source Dataset" />
-                        </Grid>
-                        <Grid
-                            sx={{
-                                marginTop: 2
-                            }}
-                            item
-                            xs={12}
-                            md={12}
-                            lg={2}
-                            xl={2}
-                            sm={12}
-                        >
-                            <Button style={{ lineHeight: "16.3px" }} label="Download project" />
 
-                        </Grid>
-                        </Grid>
-                        <Grid
+                    <Grid
+                        container
+                        direction="row"
+                        xs={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+                        sm={12}
+                        spacing={1}
+                        rowGap={2}
+                        // columnSpacing={2}
+                        sx={{
+                            // direction : "row",
+                            mb: 2,
+                            justifyContent: "space-between"
+                        }}
+                    >
+                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handlePublishProject} label="Publish Project" />
+                        
+                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handleExportProject} label="Export Project into Dataset" />
+                        
+                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} label="Archive Project" />
+                        
+                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
+                        
+                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} label="Download project" />
+
+                    </Grid>
+                    <Divider />
+                    <Grid
                         item
                         xs={12}
                         md={12}
@@ -360,7 +311,7 @@ const ProjectSetting = (props) => {
                         xl={12}
                         sm={12}
                     >
-                        <Typography  gutterBottom component="div" style={{ margin: "15px 0px 10px 0px", }}>
+                        <Typography gutterBottom component="div" style={{ margin: "15px 0px 10px 0px", }}>
                             Sampling Mode :
                         </Typography>
                     </Grid>
