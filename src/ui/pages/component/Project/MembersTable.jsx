@@ -13,7 +13,7 @@ const columns = [
         options: {
             filter: false,
             sort: false,
-            align : "center"
+            align: "center"
         }
     },
     {
@@ -50,18 +50,21 @@ const columns = [
 const options = {
     filterType: 'checkbox',
     selectableRows: "none",
-    download : false,
-    filter : false,
-    print : false
+    download: false,
+    filter: false,
+    print: false,
+    search: false,
+    viewColumns: false,
 };
 
 const MembersTable = (props) => {
-    const {dataSource} = props;
+    const { dataSource } = props;
 
-    const data = dataSource && dataSource.length > 0 ? dataSource.map((el,i)=>{
-        const userRole = UserMappedByRole(el.role).element;
-        return [el.username, el.email,  userRole, <CustomButton sx={{ p: 1, borderRadius: 2 }} onClick={()=>{console.log(el.id)}} label={"View"} />]
-    }) : null
+    console.log(dataSource);
+    const data = dataSource && dataSource.length > 0 ? dataSource.map((el, i) => {
+        const userRole = el.role && UserMappedByRole(el.role).element;
+        return [el.username, el.email, userRole ? userRole : el.role, <CustomButton sx={{ p: 1, borderRadius: 2 }} onClick={() => { console.log(el.id) }} label={"View"} />]
+    }) : []
 
     return (
         <React.Fragment>
@@ -70,7 +73,7 @@ const MembersTable = (props) => {
                 data={data}
                 columns={columns}
                 options={options}
-                // filter={false}
+            // filter={false}
             />
         </React.Fragment>
     )
