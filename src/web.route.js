@@ -12,7 +12,10 @@ import AnnotationProject from "./ui/pages/container/Workspace/AnnotationProject"
 import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList";
 import Layout from "./ui/Layout";
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
-import CollectionProject from "./ui/pages/container/Workspace/CollectionProject";
+import CollectionProject from "./ui/pages/container/Workspace/CollectionProject"
+import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
+import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
+import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import Transliteration from './ui/pages/container/Transliteration/Transliteration';
 
 const ProtectedRoute = ({ user, children }) => {
@@ -47,6 +50,10 @@ const App = () => {
       element: <ForgotPassword />,
     },
     {
+      path: "my-profile",
+      element: ProtectedRouteWrapper(<Layout component={<MyProfile />} />)
+    },
+    {
       path: "projects",
       element: ProtectedRouteWrapper(<Layout component={<Dashboard />} />),
     },
@@ -57,6 +64,10 @@ const App = () => {
     {
       path: "projects/:id/projectsetting",
       element: ProtectedRouteWrapper(<Layout component={<ProjectSetting />} />),
+    },
+    {
+      path: "projects/:projectId/task/:taskId",
+      element: ProtectedRouteWrapper(<Layout component={<AnnotateTask />} />)
     },
     {
       path: "workspaces/:id",
@@ -79,8 +90,8 @@ const App = () => {
       element: ProtectedRouteWrapper(<Layout component={<WorkSpaces />} />),
     },
     {
-      path: "my-organization",
-      element: ProtectedRouteWrapper(<Layout component={<MyOrganization />} />),
+      path: "my-organization/:orgId",
+      element: ProtectedRouteWrapper(<Layout component={<MyOrganization />} />)
     },
     {
       path: "transliteration",
@@ -88,6 +99,11 @@ const App = () => {
         <Layout component={<Transliteration />} />
       ),
     },
+    {
+      path: "datasets",
+      element: ProtectedRouteWrapper(<Layout component={<DatasetList />} />)
+    },
+
   ]);
   return routes;
 };

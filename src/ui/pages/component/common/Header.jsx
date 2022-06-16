@@ -23,13 +23,14 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../common/Button";
+import history from "../../../../web.history";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
-  const history = useNavigate();
+
   const dispatch = useDispatch();
   let navigate = useNavigate();
 

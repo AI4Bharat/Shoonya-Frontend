@@ -9,7 +9,9 @@ const localisation = {
     "button.Filter" : "Filter",
     "label.filter.status" : "Status",
     "label.filter.byAnnotator" : "Filter by Annotators",
-    "button.cancel" : "Cancel"
+    "button.cancel" : "Cancel",
+    "button.addNewWorkspace" : "Add New Workspace",
+    "button.inviteNewMEmbersToOrganization":"Invite new members to organization"
 };
 
 export const translate = (prop) => localisation[prop];
