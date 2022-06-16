@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useEffect } from "react";
+import DataitemsTable from "../../component/common/DataitemsTable";
 
 const DatasetDetails = () => {
 
@@ -39,18 +40,47 @@ const DatasetDetails = () => {
                         padding: 5,
                     }}
                 >
-                    <Typography variant="h2" gutterBottom component="div">
+                    <Typography variant="h3">
                         {DatasetDetails.instance_name}
                     </Typography>
-                    <Typography variant="body1" gutterBottom component="div">
-                        Instance Id : {DatasetDetails.instance_id}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom component="div">
-                        Dataset Type : {DatasetDetails.dataset_type}
-                    </Typography>
-                    {DatasetDetails.instance_description && <Typography variant="body1" gutterBottom component="div">
-                        Description : {DatasetDetails.instance_description}
-                    </Typography>}
+                    <Grid
+                        container
+                        alignItems="center"
+                        direction="row"
+                        justifyContent="flex-start"
+                        sx={{
+                            paddingTop: 2,
+                            paddingBottom: 2
+                        }}
+                    >
+                        <Typography variant="body2" fontWeight='700' pr={1}>Instance ID :</Typography>
+                        <Typography variant="caption">{DatasetDetails.instance_id}</Typography>
+                    </Grid>
+                    <Grid
+                        container
+                        alignItems="center"
+                        direction="row"
+                        justifyContent="flex-start"
+                        sx={{
+                            paddingBottom: 2
+                        }}
+                    >
+                        <Typography variant="body2" fontWeight='700' pr={1}>Dataset Type :</Typography>
+                        <Typography variant="caption">{DatasetDetails.dataset_type}</Typography>
+                    </Grid>
+                    {DatasetDetails.instance_description && <Grid
+                        container
+                        alignItems="center"
+                        direction="row"
+                        justifyContent="flex-start"
+                        sx={{
+                            paddingTop: 2
+                        }}
+                    >
+                        <Typography variant="body2" fontWeight='700' pr={1}>Description :</Typography>
+                        <Typography variant="caption">{DatasetDetails.instance_description}</Typography>
+                    </Grid>}
+                    <DataitemsTable />
                 </Card>
             </Grid>
         </ThemeProvider>
