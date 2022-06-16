@@ -1,4 +1,3 @@
-import { withStyles } from "@mui/styles";
 import React, { useState } from "react";
 import { ReactTransliterate } from "react-transliterate";
 import "react-transliterate/dist/index.css";
@@ -30,4 +29,4 @@ const Transliteration = () => {
   );
 };
 
-export default withStyles(GlobalStyles)(Transliteration);
+export default Transliteration;
