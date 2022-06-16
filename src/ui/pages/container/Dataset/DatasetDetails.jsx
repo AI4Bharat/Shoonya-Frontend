@@ -24,8 +24,6 @@ const DatasetDetails = () => {
         getDatasetDetails();
     }, []);
 
-    console.log(DatasetDetails);
-
     return (
         <ThemeProvider theme={themeDefault}>
             <Grid

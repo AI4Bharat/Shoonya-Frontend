@@ -25,12 +25,8 @@ const DataitemsTable = () => {
 
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
-  const [totalDataitems, setTotalDataitems] = useState(
-    dataitemsList.count ? dataitemsList.count : 10
-  );
-  const [dataitems, setDataitems] = useState(
-    dataitemsList.results ? dataitemsList.results : []
-  );
+  const [totalDataitems, setTotalDataitems] = useState(10);
+  const [dataitems, setDataitems] = useState([]);
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
 
@@ -44,33 +40,31 @@ const DataitemsTable = () => {
   };
 
   const setData = () => {
-    if (dataitemsList) {
-      setTotalDataitems(dataitemsList.count);
-      setDataitems(dataitemsList.results);
-      let tempColumns = [];
-      if (dataitems?.length) {
-        Object.keys(dataitems[0]).forEach((key) => {
-          if (!excludeKeys.includes(key)) {
-            tempColumns.push({
-              name: key,
-              label: snakeToTitleCase(key),
-              options: {
-                filter: false,
-                sort: false,
-                align: "center",
-              },
-            });
-          }
-        });
-      }
-      setColumns(tempColumns);
-      setSelectedColumns(tempColumns);
+    setTotalDataitems(dataitemsList.count);
+    let fetchedItems = dataitemsList.results;
+    setDataitems(fetchedItems);
+    let tempColumns = [];
+    if (fetchedItems?.length) {
+      Object.keys(fetchedItems[0]).forEach((key) => {
+        if (!excludeKeys.includes(key)) {
+          tempColumns.push({
+            name: key,
+            label: snakeToTitleCase(key),
+            options: {
+              filter: false,
+              sort: false,
+              align: "center",
+            },
+          });
+        }
+      });
     }
+    setColumns(tempColumns);
+    setSelectedColumns(tempColumns);
   };
 
   useEffect(() => {
     getDataitems();
-    setData();
   }, []);
 
   useEffect(() => {
