@@ -119,11 +119,6 @@ const TaskTable = () => {
         setTotalTasks(totalTaskCount);
     }, []);
 
-    // useEffect(() => {
-    //     const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, totalTaskCount);
-    //     dispatch(APITransport(taskObj));
-    // },[totalTaskCount]);
-
     useEffect(() => {
         getTaskListData();
         console.log("fired now")

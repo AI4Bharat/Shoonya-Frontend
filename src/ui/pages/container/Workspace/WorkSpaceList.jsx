@@ -11,18 +11,18 @@ import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspa
 
 export default function WorkSpaces(props) {
  
-    const classes = DatasetStyle();
-    const dispatch = useDispatch();
-    const workspaceData = useSelector(state=>state.getWorkspaces.data);
+  //   const classes = DatasetStyle();
+  //   const dispatch = useDispatch();
+  //   const workspaceData = useSelector(state=>state.getWorkspaces.data);
 
-    const getDashboardWorkspaceData = ()=>{
-    const workspaceObj = new GetWorkspacesAPI(1);
-    dispatch(APITransport(workspaceObj));
-  }
+  //   const getDashboardWorkspaceData = ()=>{
+  //   const workspaceObj = new GetWorkspacesAPI(1);
+  //   dispatch(APITransport(workspaceObj));
+  // }
   
-  useEffect(()=>{
-    getDashboardWorkspaceData();
-  },[]);
+  // useEffect(()=>{
+  //   getDashboardWorkspaceData();
+  // },[]);
     
 
   return (
@@ -30,7 +30,11 @@ export default function WorkSpaces(props) {
     {/* <Header /> */}
     <Box sx={{ width: window.innerWidth*0.7, margin : "0 auto", pb : 5 }}>
         {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Visit Workspaces</Typography> */}
-        <WorkspaceTable showManager={false} showCreatedBy={false} workspaceData={workspaceData} />
+        <WorkspaceTable 
+          showManager={false} 
+          showCreatedBy={false} 
+          // workspaceData={workspaceData} 
+        />
     </Box>
 </React.Fragment>
   )
