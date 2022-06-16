@@ -1,5 +1,3 @@
-// TaskTable
-
 import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -8,77 +6,8 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Grid, Typography } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { snakeToTitleCase } from "../../../../utils/utils";
-// import FilterList from "./FilterList";
-
-// const columns = [
-//     {
-//         name: "ID",
-//         label: "ID",
-//         options: {
-//             filter: false,
-//             sort: false,
-//             align: "center"
-//         }
-//     },
-//     {
-//         name: "Context",
-//         label: "Context",
-//         options: {
-//             filter: false,
-//             sort: false,
-//             align: "center"
-//         }
-//     },
-//     {
-//         name: "Input Text",
-//         label: "Input Text",
-//         options: {
-//             filter: false,
-//             sort: false,
-//         }
-//     },
-//     {
-//         name: "Input Language",
-//         label: "Input Language",
-//         options: {
-//             filter: false,
-//             sort: false,
-//         }
-//     },
-//     {
-//         name: "Output Language",
-//         label: "Output Language",
-//         options: {
-//             filter: false,
-//             sort: false,
-//         }
-//     },
-//     {
-//         name: "Machine translation",
-//         label: "Machine translation",
-//         options: {
-//             filter: false,
-//             sort: false,
-//         }
-//     },
-//     {
-//         name: "Status",
-//         label: "Status",
-//         options: {
-//             filter: false,
-//             sort: false,
-//         }
-//     },
-//     {
-//         name: "Actions",
-//         label: "Actions",
-//         options: {
-//             filter: false,
-//             sort: false,
-//         }
-//     }];
+import ColumnList from "./ColumnList";
 
 const excludeKeys = [
   "parent_data_id",
@@ -96,16 +25,14 @@ const DataitemsTable = () => {
 
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
-  const [totalDataitems, setTotalDataitems] = useState(10);
-  const [dataitems, setDataitems] = useState([]);
+  const [totalDataitems, setTotalDataitems] = useState(
+    dataitemsList.count ? dataitemsList.count : 10
+  );
+  const [dataitems, setDataitems] = useState(
+    dataitemsList.results ? dataitemsList.results : []
+  );
   const [columns, setColumns] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const popoverOpen = Boolean(anchorEl);
-  const filterId = popoverOpen ? "simple-popover" : undefined;
-
-  const filterData = {
-    Status: ["unlabeled", "skipped", "accepted"],
-  };
+  const [selectedColumns, setSelectedColumns] = useState([]);
 
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
@@ -116,61 +43,49 @@ const DataitemsTable = () => {
     dispatch(APITransport(dataObj));
   };
 
-  const totalTaskCount = useSelector(
-    (state) => state.getTasksByProjectId.data.count
-  );
+  const setData = () => {
+    if (dataitemsList) {
+      setTotalDataitems(dataitemsList.count);
+      setDataitems(dataitemsList.results);
+      let tempColumns = [];
+      if (dataitems?.length) {
+        Object.keys(dataitems[0]).forEach((key) => {
+          if (!excludeKeys.includes(key)) {
+            tempColumns.push({
+              name: key,
+              label: snakeToTitleCase(key),
+              options: {
+                filter: false,
+                sort: false,
+                align: "center",
+              },
+            });
+          }
+        });
+      }
+      setColumns(tempColumns);
+      setSelectedColumns(tempColumns);
+    }
+  };
 
   useEffect(() => {
     getDataitems();
+    setData();
   }, []);
 
   useEffect(() => {
-    setTotalDataitems(dataitemsList.count);
-    setDataitems(dataitemsList.results);
-    let tempColumns = [];
-    if (dataitems?.length) {
-      console.log(Object.keys(dataitems[0]));
-      Object.keys(dataitems[0]).forEach((key) => {
-        if (!excludeKeys.includes(key)) {
-          tempColumns.push({
-            name: key,
-            label: snakeToTitleCase(key),
-            options: {
-              filter: false,
-              sort: false,
-              align: "center",
-            },
-          });
-        }
-      });
-    }
-    //   tempCheckOptions.push({
-    //     label: snakeToTitleCase(key),
-    //     value: key,
-    //   });
-    setColumns(tempColumns);
+    setData();
   }, [dataitemsList]);
 
   useEffect(() => {
     getDataitems();
-    console.log("fired now");
   }, [currentPageNumber]);
 
   useEffect(() => {
     getDataitems();
-    console.log("fired now");
   }, [currentRowPerPage]);
 
-  const handleShowFilter = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const renderToolBar = () => {
-    const buttonSXStyle = { borderRadius: 2, margin: 2 };
     return (
       <Grid container spacing={0} md={12}>
         <Grid
@@ -182,13 +97,13 @@ const DataitemsTable = () => {
           xl={12}
           className={classes.filterToolbarContainer}
         >
-          <Button onClick={handleShowFilter}>
-            <FilterListIcon />
-          </Button>
-          {/* <Typography variant="caption">Filter by Status:</Typography>
-                    <Button variant={filterTypeValue == "unlabeled" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("unlabeled")}>unlabeled</Button>
-                    <Button variant={filterTypeValue == "skipped" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("skipped")}>skipped</Button>
-                    <Button variant={filterTypeValue == "accepted" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("accepted")}>accepted</Button> */}
+          <Grid container direction="row" justifyContent={"flex-end"}>
+            <ColumnList
+              columns={columns}
+              setColumns={setSelectedColumns}
+              selectedColumns={selectedColumns}
+            />
+          </Grid>
         </Grid>
       </Grid>
     );
@@ -243,23 +158,9 @@ const DataitemsTable = () => {
       <MUIDataTable
         title={""}
         data={dataitems}
-        columns={columns}
+        columns={columns.filter((column) => selectedColumns.includes(column))}
         options={options}
-        // filter={false}
       />
-      {/* {popoverOpen && (
-                <FilterList
-                    id={filterId}
-                    open={popoverOpen}
-                    anchorEl={anchorEl}
-                    handleClose={handleClose}
-                    filterStatusData={filterData}
-                    // selectedFilter={myContributionReport.selectedFilter}
-                    // clearAll={(data) => clearAll(data, handleClose)}
-                    // apply={(data) => apply(data, handleClose)}
-                    // task={props.task}
-                />
-            )} */}
     </Fragment>
   );
 };
