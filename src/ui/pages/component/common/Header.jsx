@@ -41,7 +41,10 @@ const Header = () => {
     }
 
     const userSettings = [
-        { name: "My Profile", onclick: () => navigate("/my-profile") },
+        { name: "My Profile", onclick: () => {
+            handleCloseUserMenu();
+            navigate("/my-profile");
+        } },
         { name: "Logout", onclick: () => onLogoutClick() },
     ]
 
@@ -103,7 +106,7 @@ const Header = () => {
                             item
                             xs={12}
                             sm={12}
-                            md={4}
+                            md={3}
                         >
                             <Typography variant="body1">
                                 <NavLink
@@ -119,7 +122,7 @@ const Header = () => {
                             item
                             xs={12}
                             sm={12}
-                            md={4}
+                            md={3}
                         >
                             <Typography variant="body1">
                                 <NavLink
@@ -136,7 +139,7 @@ const Header = () => {
                             item
                             xs={12}
                             sm={12}
-                            md={4}
+                            md={3}
                         >
                             <Typography variant="body1">
                                 <NavLink
@@ -145,6 +148,23 @@ const Header = () => {
                                     activeClassName={classes.highlightedMenu}
                                 >
                                     Projects
+                                </NavLink>
+                            </Typography>
+                        </Grid>
+                        <Grid
+
+                            item
+                            xs={12}
+                            sm={12}
+                            md={3}
+                        >
+                            <Typography variant="body1">
+                                <NavLink
+                                    to="/datasets"
+                                    className={({ isActive }) => isActive ? classes.highlightedMenu : classes.headerMenu}
+                                    activeClassName={classes.highlightedMenu}
+                                >
+                                    Datasets
                                 </NavLink>
                             </Typography>
                         </Grid>

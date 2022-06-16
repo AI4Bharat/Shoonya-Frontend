@@ -1,4 +1,4 @@
-import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem } from "@mui/material";
+import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel } from "@mui/material";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/Fetc
 import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import Snackbar from "../../component/common/Snackbar";
+import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
@@ -42,12 +43,6 @@ const MyProfile = () => {
       phone: userDetails.phone,
     });
   }, [userDetails]);
-
-  const roleMap = {
-    1: "Admin",
-    2: "Manager",
-    3: "Annotator",
-  };
 
   const handleFieldChange = (event) => {
     event.preventDefault();
@@ -146,7 +141,7 @@ const MyProfile = () => {
                 disabled
                 fullWidth
                 label="Role"
-                value={roleMap[userDetails.role]}
+                value={UserMappedByRole(userDetails.role)?.name}
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
@@ -170,14 +165,30 @@ const MyProfile = () => {
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
+            {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+            <InputLabel id="availability-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Availability Status</InputLabel>
+              <Select
+                fullWidth
+                labelId="availability-label"
+                name="availability_status"
+                value={newDetails?.availability_status}
+                onChange={handleFieldChange}
+                InputLabelProps={{ shrink: true }}
+              >
+                <MenuItem value="1">Available</MenuItem>
+                <MenuItem value="2">Unavailable</MenuItem>
+              </Select>
+            </Grid> */}
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <InputLabel id="lang-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Languages</InputLabel>
               <Select
                 multiple
                 fullWidth
-                label="Languages"
+                labelId="lang-label"
                 name="languages"
                 value={newDetails?.languages? newDetails.languages : []}
                 onChange={handleFieldChange}
+                style={{zIndex: "0"}}
                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

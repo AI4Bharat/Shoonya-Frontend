@@ -15,6 +15,7 @@ import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
 import CollectionProject from "./ui/pages/container/Workspace/CollectionProject"
 import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
 import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
+import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 
 
 const ProtectedRoute = ({ user, children }) => {
@@ -87,6 +88,10 @@ const App = () => {
     {
       path: "my-organization/:orgId",
       element: ProtectedRouteWrapper(<Layout component={<MyOrganization />} />)
+    },
+    {
+      path: "datasets",
+      element: ProtectedRouteWrapper(<Layout component={<DatasetList />} />)
     },
 
   ]);
