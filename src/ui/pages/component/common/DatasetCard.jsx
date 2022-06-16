@@ -7,7 +7,7 @@ const DatasetCard = (props) => {
 
     const { datasetObj } = props
     return (
-        <a href={`/datasets/${datasetObj.instance_id}`} style={{ textDecoration: "none" }}>
+        <Link to={`/datasets/${datasetObj.instance_id}`} style={{ textDecoration: "none" }}>
             <Grid
                 elevation={2}
                 className={props.classAssigned}
@@ -58,7 +58,7 @@ const DatasetCard = (props) => {
                 {/* <Divider sx={{ mt: 7 }} variant="inset" /> */}
 
             </Grid>
-        </a>
+        </Link>
     )
 }
 

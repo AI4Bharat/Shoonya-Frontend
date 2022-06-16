@@ -122,7 +122,6 @@ const DataitemsTable = () => {
     },
     onChangeRowsPerPage: (rowPerPageCount) => {
       setCurrentRowPerPage(rowPerPageCount);
-      console.log("rowPerPageCount", rowPerPageCount);
     },
     filterType: "checkbox",
     selectableRows: "none",

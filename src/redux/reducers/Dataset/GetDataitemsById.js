@@ -10,7 +10,9 @@ const reducer = (state=initialState,action)=>{
             let data = action.payload;
             const prevResult = state.data.hasOwnProperty('results')?state.data.results:[];
             const currentResult = action.payload.results;
-            data.results = getUniqueListBy([...prevResult,...currentResult],'id')
+            if (prevResult?.length && currentResult?.length && prevResult[0]?.instance_id == currentResult[0]?.instance_id) {
+                data.results = getUniqueListBy([...prevResult,...currentResult],'id')
+            }
             return {
                 ...state,
                 data
