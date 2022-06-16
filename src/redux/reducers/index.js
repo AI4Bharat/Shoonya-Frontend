@@ -17,7 +17,6 @@ import getTaskDetails from './Tasks/GetTaskDetails'
 import getDatasetDetails from './Dataset/GetDatasetDetails';
 import getDataitemsById from './Dataset/GetDataitemsById';
 
-
 const index = {
     apiStatus,
     getProjects,
