@@ -9,20 +9,12 @@ import WorkspaceTable from "../common/WorkspaceTable";
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
 const Workspaces = () => {
-    const dispatch = useDispatch();
-    const workspaceData = useSelector(state=>state.getWorkspaces.data);
-
-    const getDashboardWorkspaceData = ()=>{
-        const workspaceObj = new GetWorkspacesAPI(1);
-        dispatch(APITransport(workspaceObj));
-      }
-      
-      useEffect(()=>{
-        getDashboardWorkspaceData();
-      },[]);
     
     return(
-        <WorkspaceTable showManager={true} showCreatedBy={true} workspaceData={workspaceData} />
+        <WorkspaceTable 
+          showManager={true} 
+          showCreatedBy={true} 
+        />
     )
 }
 

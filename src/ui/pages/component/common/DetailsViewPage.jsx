@@ -15,6 +15,8 @@ import Workspaces from "../Tabs/Workspaces";
 import CustomButton from "../../component/common/Button";
 import { translate } from "../../../../config/localisation";
 import MembersTable from "../Project/MembersTable";
+import Members from "../Tabs/Members";
+import Invites from "../Tabs/Invites";
 
 function TabPanel(props) {
 
@@ -105,6 +107,7 @@ const DetailsViewPage = (props) => {
                                 <Workspaces />
                             </>
                         }
+                        
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         {pageType === componentType.Type_Workspace &&
@@ -116,15 +119,18 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Organization &&
                             <>
                                 <CustomButton label={translate("button.inviteNewMEmbersToOrganization")} sx={{ width: "100%", mb: 2 }} />
-                                {/* <MembersTable /> */}
+                                <Members />
                             </>
                         }
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        <Button className={classes.managersButton} label={"Assign Managers"} />
-                        <div className={classes.workspaceTables}>
-                            {pageType === componentType.Type_Workspace && <ManagersTable />}
-                        </div>
+                            {pageType === componentType.Type_Workspace && 
+                                <>
+                                    <CustomButton label={"Assign Managers"} sx={{ width: "100%", mb: 2 }} />
+                                    <ManagersTable />
+                                </>
+                            }
+                            {pageType === componentType.Type_Organization && <Invites />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
                         <Button className={classes.settingsButton} label={"Archive Workspace"} />
