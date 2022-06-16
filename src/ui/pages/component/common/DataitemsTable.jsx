@@ -4,11 +4,11 @@ import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import GetDataitemsById from "../../../../redux/actions/api/Dataset/GetDataitemsById";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Grid, Typography } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
-import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { snakeToTitleCase } from "../../../../utils/utils";
 // import FilterList from "./FilterList";
 
@@ -80,174 +80,174 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 //         }
 //     }];
 
-
-    const excludeKeys = [
-        "parent_data_id",
-        "metadata_json",
-        "instance_id_id",
-        "datasetbase_ptr_id",
-        "key",
-      ];
+const excludeKeys = [
+  "parent_data_id",
+  "metadata_json",
+  "instance_id_id",
+  "datasetbase_ptr_id",
+  "key",
+];
 
 const DataitemsTable = () => {
-    const classes = DatasetStyle();
-    const { datasetId } = useParams();
-    const dispatch = useDispatch();
-    const dataitemsList = useSelector(state => state.getDataitemsById.data);
+  const classes = DatasetStyle();
+  const { datasetId } = useParams();
+  const dispatch = useDispatch();
+  const dataitemsList = useSelector((state) => state.getDataitemsById.data);
 
-    console.log(dataitemsList);
+  const [currentPageNumber, setCurrentPageNumber] = useState(1);
+  const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
+  const [totalDataitems, setTotalDataitems] = useState(10);
+  const [dataitems, setDataitems] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const popoverOpen = Boolean(anchorEl);
+  const filterId = popoverOpen ? "simple-popover" : undefined;
 
+  const filterData = {
+    Status: ["unlabeled", "skipped", "accepted"],
+  };
 
-    const [currentPageNumber, setCurrentPageNumber] = useState(1);
-    const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
-    const [totalDataitems, setTotalDataitems] = useState(10);
-    const [dataitems, setDataitems] = useState([]);
-    const [columns, setColumns] = useState([]);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const popoverOpen = Boolean(anchorEl);
-    const filterId = popoverOpen ? "simple-popover" : undefined;
+  const getDataitems = () => {
+    const dataObj = new GetDataitemsById(
+      datasetId,
+      currentPageNumber,
+      currentRowPerPage
+    );
+    dispatch(APITransport(dataObj));
+  };
 
-    const filterData = {
-        Status : ["unlabeled", "skipped", "accepted"],
-    }
+  const totalTaskCount = useSelector(
+    (state) => state.getTasksByProjectId.data.count
+  );
 
-    const getDataitems = () => {
-        const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage);
-        dispatch(APITransport(dataObj));
-    }
+  useEffect(() => {
+    getDataitems();
+  }, []);
 
-    const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
-
-
-    useEffect(() => {
-        getDataitems();
-    }, []);
-
-    useEffect(() => {
-        setTotalDataitems(dataitemsList.count);
-        setDataitems(dataitemsList.results);
-        let tempColumns = [];
-        console.log(Object.keys(dataitems[0]))
-        Object.keys(dataitems[0]).forEach((key) => {
-            if (!excludeKeys.includes(key)) {
-              tempColumns.push({
-                title: snakeToTitleCase(key),
-                dataIndex: key,
-                key: key,
-              });
-            //   tempCheckOptions.push({
-            //     label: snakeToTitleCase(key),
-            //     value: key,
-            //   });
-            }
+  useEffect(() => {
+    setTotalDataitems(dataitemsList.count);
+    setDataitems(dataitemsList.results);
+    let tempColumns = [];
+    if (dataitems?.length) {
+      console.log(Object.keys(dataitems[0]));
+      Object.keys(dataitems[0]).forEach((key) => {
+        if (!excludeKeys.includes(key)) {
+          tempColumns.push({
+            name: key,
+            label: snakeToTitleCase(key),
+            options: {
+              filter: false,
+              sort: false,
+              align: "center",
+            },
           });
-          console.log(tempColumns)
-        //   setColumns(tempColumns);
-    }, [dataitemsList])
+        }
+      });
+    }
+    //   tempCheckOptions.push({
+    //     label: snakeToTitleCase(key),
+    //     value: key,
+    //   });
+    setColumns(tempColumns);
+  }, [dataitemsList]);
 
-    // useEffect(() => {
-    //     const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, totalTaskCount);
-    //     dispatch(APITransport(taskObj));
-    // },[totalTaskCount]);
+  useEffect(() => {
+    getDataitems();
+    console.log("fired now");
+  }, [currentPageNumber]);
 
-    useEffect(() => {
-        getDataitems();
-        console.log("fired now")
-    }, [currentPageNumber]);
+  useEffect(() => {
+    getDataitems();
+    console.log("fired now");
+  }, [currentRowPerPage]);
 
-    useEffect(() => {
-        getDataitems();
-        console.log("fired now")
-    }, [currentRowPerPage]);
+  const handleShowFilter = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleShowFilter = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const renderToolBar = () => {
-        const buttonSXStyle = { borderRadius: 2, margin: 2 }
-        return (
-            <Grid container spacing={0} md={12}>
-                <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
-                    <Button onClick={handleShowFilter}>
-                        <FilterListIcon />
-                    </Button>
-                    {/* <Typography variant="caption">Filter by Status:</Typography>
+  const renderToolBar = () => {
+    const buttonSXStyle = { borderRadius: 2, margin: 2 };
+    return (
+      <Grid container spacing={0} md={12}>
+        <Grid
+          item
+          xs={8}
+          sm={8}
+          md={12}
+          lg={12}
+          xl={12}
+          className={classes.filterToolbarContainer}
+        >
+          <Button onClick={handleShowFilter}>
+            <FilterListIcon />
+          </Button>
+          {/* <Typography variant="caption">Filter by Status:</Typography>
                     <Button variant={filterTypeValue == "unlabeled" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("unlabeled")}>unlabeled</Button>
                     <Button variant={filterTypeValue == "skipped" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("skipped")}>skipped</Button>
                     <Button variant={filterTypeValue == "accepted" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("accepted")}>accepted</Button> */}
-                </Grid>
-            </Grid>
-        )
-    }
+        </Grid>
+      </Grid>
+    );
+  };
 
-    const options = {
-        count: totalTaskCount,
-        rowsPerPage: currentRowPerPage,
-        page: currentPageNumber - 1,
-        rowsPerPageOptions: [10, 25, 50, 100],
-        textLabels: {
-            pagination: {
-                next: "Next >",
-                previous: "< Previous",
-                rowsPerPage: "currentRowPerPage",
-                displayRows: "OF"
-            }
-        },
-        onChangePage: (currentPage) => { currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1) },
-        onChangeRowsPerPage: (rowPerPageCount) => { setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount) },
-        filterType: 'checkbox',
-        selectableRows: "none",
-        download: false,
-        filter: false,
-        print: false,
-        search: false,
-        viewColumns: false,
-        textLabels: {
-            body: {
-                noMatch: "No records ",
-            },
-            toolbar: {
-                search: "Search",
-                viewColumns: "View Column",
-            },
-            pagination: {
-                rowsPerPage: "Rows per page",
-            },
-            options: { sortDirection: "desc" },
-        },
-        customToolbar: renderToolBar,
-    };
+  const options = {
+    count: totalDataitems,
+    rowsPerPage: currentRowPerPage,
+    page: currentPageNumber - 1,
+    rowsPerPageOptions: [10, 25, 50, 100],
+    textLabels: {
+      pagination: {
+        next: "Next >",
+        previous: "< Previous",
+        rowsPerPage: "currentRowPerPage",
+        displayRows: "OF",
+      },
+    },
+    onChangePage: (currentPage) => {
+      currentPage + 1 > currentPageNumber &&
+        setCurrentPageNumber(currentPage + 1);
+    },
+    onChangeRowsPerPage: (rowPerPageCount) => {
+      setCurrentRowPerPage(rowPerPageCount);
+      console.log("rowPerPageCount", rowPerPageCount);
+    },
+    filterType: "checkbox",
+    selectableRows: "none",
+    download: false,
+    filter: false,
+    print: false,
+    search: false,
+    viewColumns: false,
+    textLabels: {
+      body: {
+        noMatch: "No records ",
+      },
+      toolbar: {
+        search: "Search",
+        viewColumns: "View Column",
+      },
+      pagination: {
+        rowsPerPage: "Rows per page",
+      },
+      options: { sortDirection: "desc" },
+    },
+    customToolbar: renderToolBar,
+  };
 
-    // const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
-    //     return [
-    //         el.id,
-    //         el.data.context,
-    //         el.data.input_text,
-    //         el.data.input_language,
-    //         el.data.output_language,
-    //         el.data.machine_translation,
-    //         el.task_status,
-    //         <Link to={`task/${el.id}`}>
-    //             <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />
-    //         </Link>
-    //         ]
-    // }) : []
-
-    return (
-        <Fragment>
-            <MUIDataTable
-                title={""}
-                data={dataitems}
-                columns={columns}
-                options={options}
-            // filter={false}
-            />
-            {/* {popoverOpen && (
+  return (
+    <Fragment>
+      <MUIDataTable
+        title={""}
+        data={dataitems}
+        columns={columns}
+        options={options}
+        // filter={false}
+      />
+      {/* {popoverOpen && (
                 <FilterList
                     id={filterId}
                     open={popoverOpen}
@@ -260,8 +260,8 @@ const DataitemsTable = () => {
                     // task={props.task}
                 />
             )} */}
-        </Fragment>
-    )
-}
+    </Fragment>
+  );
+};
 
 export default DataitemsTable;
