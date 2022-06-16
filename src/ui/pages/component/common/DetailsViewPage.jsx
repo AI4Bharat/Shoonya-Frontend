@@ -118,7 +118,6 @@ const DetailsViewPage = (props) => {
                         }
                         {pageType === componentType.Type_Organization &&
                             <>
-                                <CustomButton label={translate("button.inviteNewMEmbersToOrganization")} sx={{ width: "100%", mb: 2 }} />
                                 <Members />
                             </>
                         }
