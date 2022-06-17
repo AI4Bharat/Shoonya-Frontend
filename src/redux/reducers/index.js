@@ -21,11 +21,12 @@ import getExportProject from './ProjectDetails/GetExportProjectButton';
 import getPullNewData from './ProjectDetails/PullNewItems';
 import getPublishProject from './ProjectDetails/GetPublishProject';
 import getEditUpdate from './ProjectDetails/EditUpdate'
-
 import getDatasetsByType from './Dataset/GetDatasetsByType';
 import getDatasetFields from './Dataset/GetDatasetFields';
 import getProjectDomains from './ProjectDetails/GetProjectDomains';
 import createProject from './ProjectDetails/CreateProject';
+import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
+import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
 
 const index = {
     apiStatus,
@@ -58,7 +59,8 @@ const index = {
     getDatasetFields,
     getProjectDomains,
     createProject,
-
+    getWorkspaceUserReports,
+    getWorkspaceProjectReports
 };
 
 export default index;
