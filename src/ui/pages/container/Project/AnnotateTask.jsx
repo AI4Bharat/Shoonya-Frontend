@@ -31,9 +31,9 @@ const AnnotateTask = () => {
     getTaskDetails();
   }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
     setTranslatedText(taskDetails && taskDetails.data ? taskDetails.data.machine_translation : "");
-  },[taskDetails])
+  }, [taskDetails])
 
   console.log("taskDetails", taskDetails);
 
@@ -43,38 +43,47 @@ const AnnotateTask = () => {
       sx={{
         minHeight: 600,
         padding: 5,
-        mb : 5
+        mb: 5
       }}
     >
-      <Typography variant="body1" sx={{mb : 5}}><b>Annotate Task - #{urlParams && urlParams.taskId}</b></Typography>
-      <CustomButton
-        label={translate("button.notes")}
-        onClick={()=>setShowNotes(!showNotes)}
-        endIcon={showNotes ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon /> }
-        sx={{
-          borderRadius: 2,
-          mb: 2
-        }}
-      />
-      {showNotes && <Grid
+      <Grid
         container
         direction={"row"}
         justifyContent={"space-between"}
+        sx={{
+          mb : 2
+        }}
+      >
+        <Typography variant="body1"><b>Annotate Task - #{urlParams && urlParams.taskId}</b></Typography>
+        <CustomButton
+          label={translate("button.notes")}
+          onClick={() => setShowNotes(!showNotes)}
+          endIcon={showNotes ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          sx={{
+            borderRadius: 2,
+          }}
+        />
+      </Grid>
+
+      {showNotes && <Grid
+        // container
+        // direction={"row"}
+        // justifyContent={"space-between"}
         sx={{
           mt: 2,
           mb: 2,
           alignItems: "center",
         }}
       >
-        <Alert severity="warning" sx={{width : "100%"}}>Please do not add notes if you are going to skip the task!</Alert>
+        <Alert severity="warning" sx={{ width: "auto" }}>Please do not add notes if you are going to skip the task!</Alert>
         <TextField
-            // value={translatedText}
-            // onChange={(e)=>setTranslatedText(e.target.value)}
-            placeholder="Place your remarks here..."
-            multiline
-            rows={3}
-            sx={{ border: "none", width : "100%", mt:4 }}
-          />
+          // value={translatedText}
+          // onChange={(e)=>setTranslatedText(e.target.value)}
+          placeholder="Place your remarks here..."
+          multiline
+          rows={3}
+          sx={{ border: "none", width: "100%", mt: 2 }}
+        />
       </Grid>}
       <Divider />
       <Grid
@@ -87,7 +96,7 @@ const AnnotateTask = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="body2">Task : #<b>{urlParams && urlParams.taskId}</b></Typography>
+        {/* <Typography variant="body2">Task : #<b>{urlParams && urlParams.taskId}</b></Typography> */}
         <Typography variant="body2">Task Status : <b>{taskDetails && taskDetails.task_status}</b></Typography>
         <Grid
           direction={"row"}
@@ -97,7 +106,7 @@ const AnnotateTask = () => {
           }}
         >
           <CustomButton label={translate("button.draft")} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
-          <CustomButton label={translate("button.next")} endIcon={<NavigateNextIcon />} buttonVariant="outlined" sx={{ borderRadius: 2 }} />
+          <CustomButton label={translate("button.next")} endIcon={<NavigateNextIcon />} sx={{ borderRadius: 2 }} />
         </Grid>
       </Grid>
       <Divider />
@@ -115,7 +124,7 @@ const AnnotateTask = () => {
           lg={3.5}
           xl={3.5}
           sm={12}
-          sx={{ minHeight: 250, mt: 3, p: 2, backgroundColor:"#f5f5f5" }}
+          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
         >
           <Typography variant="body1">Source sentence</Typography>
           <Typography variant="body2" sx={{ mt: 4 }}>{taskDetails && taskDetails.data && taskDetails.data.input_text}</Typography>
@@ -127,15 +136,15 @@ const AnnotateTask = () => {
           lg={3.5}
           xl={3.5}
           sm={12}
-          sx={{ minHeight: 250, mt: 3, p: 2, backgroundColor:"#f5f5f5" }}
+          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
         >
           <Typography variant="body1">{taskDetails && taskDetails.data && taskDetails.data.output_language} translation</Typography>
           <TextField
             value={translatedText}
-            onChange={(e)=>setTranslatedText(e.target.value)}
+            onChange={(e) => setTranslatedText(e.target.value)}
             multiline
-            rows={10}
-            sx={{ border: "none", width : "100%", mt:4 }}
+            rows={6}
+            sx={{ border: "none", width: "100%", mt: 4 }}
           />
         </Grid>
         <Grid
@@ -145,7 +154,7 @@ const AnnotateTask = () => {
           lg={3.5}
           xl={3.5}
           sm={12}
-          sx={{ minHeight: 250, mt: 3, p: 2, backgroundColor:"#f5f5f5" }}
+          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
         >
           <Typography variant="body1">Machine translation</Typography>
           <Typography variant="body2" sx={{ mt: 4 }}>{taskDetails && taskDetails.data && taskDetails.data.machine_translation}</Typography>
@@ -157,9 +166,9 @@ const AnnotateTask = () => {
         justifyContent={"space-around"}
         columnSpacing={5}
         sx={{
-          mt:3,
-          mb:3,
-          textAlign : "end"
+          mt: 3,
+          mb: 3,
+          textAlign: "end"
         }}
       >
         <CustomButton label={translate("button.skip")} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
@@ -176,8 +185,8 @@ const AnnotateTask = () => {
           alignItems: "center",
         }}
       >
-          <Typography variant="body1">Context</Typography>
-          <Typography variant="body2" sx={{ mt: 4 }}>{taskDetails && taskDetails.data && taskDetails.data.context}</Typography>
+        <Typography variant="body1">Context</Typography>
+        <Typography variant="body2" sx={{ mt: 4 }}>{taskDetails && taskDetails.data && taskDetails.data.context}</Typography>
       </Grid>
     </Card>
   )
