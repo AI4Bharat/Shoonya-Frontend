@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, ThemeProvider, Typography } from "@mui/material";
+import { Box, Chip, Grid, ThemeProvider, Typography,Card } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
@@ -316,6 +316,7 @@ const AnnotationProject = (props) => {
                     xl={5}
                 > */}
       <Grid container direction="row">
+      <Card className={classes.workspaceCard}>
         <Grid item xs={2} sm={2} md={2} lg={2} xl={2}></Grid>
         <Grid item xs={8} sm={8} md={8} lg={8} xl={8} sx={{ pb: "6rem" }}>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -769,7 +770,8 @@ const AnnotationProject = (props) => {
           </Grid>
           <Grid item xs={12} md={12} lg={12} xl={12} sm={12} />
         </Grid>
-      </Grid>
+     
+        </Card> </Grid>
       {/* </Grid>
             </Grid> */}
     </ThemeProvider>

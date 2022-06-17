@@ -14,6 +14,7 @@ import {  ThemeProvider,  } from "@mui/material";
 import themeDefault from './theme/theme'
 import GlobalStyles from "./styles/LayoutStyles";
 import BackButton from "./pages/component/common/BackButton";
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 
@@ -87,8 +88,7 @@ const Layout= (props) => {
           {/* {renderSpinner()}
           {renderError()} */}
           { Backbutton  && 
-           < BackButton  sx={{ color:"black" , background:"transparent",  mb:2, "&:hover": {  backgroundColor: "transparent", },
-         }}  label="< Back To previous page"/>
+           < BackButton  sx={{ color:"white" ,   mb:2,   }}  label="< Back To previous page"/>
            }
           <Suspense fallback={<div>Loading....</div>}>
             {component}
