@@ -1,27 +1,43 @@
 import React, { useState, useEffect } from "react";
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import Paper from '@mui/material/Paper';
-import { ThemeProvider } from '@mui/material';
-import themeDefault from '../../../theme/theme';
-// import { workspaceData } from '../../../../constants/workspaceData/workspaceData';
 import {useDispatch,useSelector} from 'react-redux';
 import CustomButton from '../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
+// import WorkspaceTable from "../common/WorkspaceTable";
+import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
 
 
 const WorkspaceTable = (props) => {
+
+    const dispatch = useDispatch();
+    const  {showManager, showCreatedBy} = props;
+    const workspaceData = useSelector(state=>state.getWorkspaces.data.results);
+
+    const [currentPageNumber, setCurrentPageNumber] = useState(1);
+    const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
+    const [totalWorkspaces, setTotalWorkspaces] = useState(10);
+
+    const totalWorkspaceCount = useSelector(state =>state.getWorkspaces.data.count);
    
-    const  {workspaceData,} = props;
+    const getWorkspaceData = ()=>{
+        const workspaceObj = new GetWorkspacesAPI(currentPageNumber);
+        dispatch(APITransport(workspaceObj));
+      }
+
+      useEffect(() => {
+        getWorkspaceData();
+        console.log("fired now")
+    }, [currentPageNumber]);
+
+    // useEffect(() => {
+    //     getWorkspaceData();
+    //     console.log("fired now")
+    // }, [currentRowPerPage]);
+      
+      useEffect(()=>{
+        getWorkspaceData();
+      },[]);
 
     const columns = [
         {
@@ -30,7 +46,27 @@ const WorkspaceTable = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align : "center"
+                align : "center",
+            }
+        },
+        {
+            name: "Manager",
+            label: "Manager",
+            options: {
+                filter: false,
+                sort: false,
+                align : "center",
+                display : showManager ? "true" : "exclude"
+            }
+        },
+        {
+            name: "Created By",
+            label: "Created By",
+            options: {
+                filter: false,
+                sort: false,
+                align : "center",
+                display : showCreatedBy ? "true": "exclude"
             }
         },
         {
@@ -42,9 +78,13 @@ const WorkspaceTable = (props) => {
             }
         }];
 
-        const data = workspaceData.map((el,i)=>{
+        const data = workspaceData && workspaceData.map((el,i)=>{
             return [
                         el.workspace_name, 
+                        el.managers.map((manager,index)=>{
+                            return manager.username
+                        }).join(", "),
+                        el.created_by && el.created_by.username,
                         <Link to={`/workspaces/${el.id}`}  style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}
@@ -55,55 +95,51 @@ const WorkspaceTable = (props) => {
         });
 
         const options = {
+            count: totalWorkspaceCount,
+            rowsPerPage: currentRowPerPage,
+            page: currentPageNumber - 1,
+            rowsPerPageOptions: [],
             textLabels: {
-              body: {
-                noMatch: "No records",
-              },
-              toolbar: {
-                search: "Search",
-                viewColumns: "View Column",
-              },
-              pagination: { rowsPerPage: "Rows per page" },
-              options: { sortDirection: "desc" },
+                pagination: {
+                    next: "Next >",
+                    previous: "< Previous",
+                    rowsPerPage: "currentRowPerPage",
+                    displayRows: "OF"
+                }
             },
-            // customToolbar: fetchHeaderButton,
-            displaySelectToolbar: false,
-            fixedHeader: false,
-            filterType: "checkbox",
-            download: false,
-            print: false,
-            rowsPerPageOptions: [10, 25, 50, 100],
-            // rowsPerPage: PageInfo.count,
-            filter: false,
-            // page: PageInfo.page,
-            viewColumns: false,
+            onChangePage: (currentPage) => { currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1) },
+            // onChangeRowsPerPage: (rowPerPageCount) => { setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount) },
+            filterType: 'checkbox',
             selectableRows: "none",
+            download: false,
+            filter: false,
+            print: false,
             search: false,
-            // onTableChange: (action, tableState) => {
-            //   switch (action) {
-            //     case "changePage":
-            //       processTableClickedNextOrPrevious(tableState.page);
-            //       break;
-            //     case "changeRowsPerPage":
-            //       dispatch(
-            //         RowChange(tableState.rowsPerPage, C.SEARCH_ROW_COUNT_CHANGE)
-            //       );
-            //       break;
-            //     default:
-            //   }
-            // },
-        
-            // onRowClick: (rowData, rowMeta) => rowData[3] && renderAction(rowData),
-          };
+            viewColumns: false,
+            textLabels: {
+                body: {
+                    noMatch: "No records ",
+                },
+                toolbar: {
+                    search: "Search",
+                    viewColumns: "View Column",
+                },
+                pagination: {
+                    rowsPerPage: "",
+                },
+                options: { sortDirection: "desc" },
+            },
+            // customToolbar: renderToolBar,
+        };
 
     return (
         <div>
-            <MUIDataTable
+            {workspaceData && <MUIDataTable
                 // title={""}
                 data={data}
                 columns={columns}
                 options={options}
-            />
+            />}
         </div>
     )
 }

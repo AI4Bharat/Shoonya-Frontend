@@ -2,7 +2,7 @@
 
 import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
@@ -119,11 +119,6 @@ const TaskTable = () => {
         setTotalTasks(totalTaskCount);
     }, []);
 
-    // useEffect(() => {
-    //     const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, totalTaskCount);
-    //     dispatch(APITransport(taskObj));
-    // },[totalTaskCount]);
-
     useEffect(() => {
         getTaskListData();
         console.log("fired now")
@@ -206,7 +201,10 @@ const TaskTable = () => {
             el.data.output_language,
             el.data.machine_translation,
             el.task_status,
-            <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />]
+            <Link to={`task/${el.id}`}>
+                <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />
+            </Link>
+            ]
     }) : []
 
     return (

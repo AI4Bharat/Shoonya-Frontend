@@ -66,7 +66,7 @@ const ProjectSetting = (props) => {
     }
    
 
-    const publishProject = useSelector(state => state.getPublishProjectButton.data);
+   
 
     const getPublishProjectButton = () => {
         const projectObj = new GetPublishProjectButtonAPI(id);

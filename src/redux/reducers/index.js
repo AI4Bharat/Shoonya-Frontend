@@ -5,15 +5,17 @@ import fetchLoggedInUserData from './UserManagement/FetchLoggedInUserData';
 import getProjectDetails from './ProjectDetails/GetProjectDetails';
 import getProjectReport from './ProjectDetails/GetProjectReport';
 import getTasksByProjectId from './Tasks/GetTasksByProjectId';
-import  getWorkspacesProjectData from './WorkspaceDetails/GetWorkspaceProject'
-import  getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotators'
-import  getWorkspacesManagersData from './WorkspaceDetails/GetWorkspaceManagers'
-import  getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
-import getSaveButton from './ProjectDetails/EditUpdate'
-import getExportProjectButton from './ProjectDetails/GetExportProjectButton'
-import getPublishProjectButton from './ProjectDetails/GetPublishProject'
-import getPullNewItems from './ProjectDetails/PullNewItems'
-import getArchiveProject from './ProjectDetails/ArchiveProject'
+import getWorkspacesProjectData from './WorkspaceDetails/GetWorkspaceProject';
+import getWorkspacesAnnotatorsData from './WorkspaceDetails/GetWorkspaceAnnotators';
+import getWorkspacesManagersData from './WorkspaceDetails/GetWorkspaceManagers';
+import getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
+import getTaskPrediction from './Tasks/GetTaskPrediction';
+import fetchLanguages from './UserManagement/FetchLanguages';
+import getOrganizationUsers from './Organization/GetOragnizationUsers';
+import getDatasetList from './Dataset/GetDatasetList';
+import getTaskDetails from './Tasks/GetTaskDetails'
+import getDatasetDetails from './Dataset/GetDatasetDetails';
+import getDataitemsById from './Dataset/GetDataitemsById';
 
 const index = {
     apiStatus,
@@ -27,14 +29,15 @@ const index = {
     getWorkspacesAnnotatorsData,
     getWorkspacesManagersData,
     getWorkspaceDetails,
-    getSaveButton,
-    getExportProjectButton,
-    getPublishProjectButton,
-    getPullNewItems,
-    getArchiveProject,
-  
-
-    
+    getTaskPrediction,    
+    fetchLanguages,
+    getOrganizationUsers, 
+    getDatasetList,
+    getTaskDetails,
+    getDatasetList,
+    getDatasetDetails,
+    getDataitemsById,
+    getOrganizationUsers 
 };
 
 export default index;
