@@ -144,7 +144,7 @@ const AnnotateTask = () => {
             onChange={(e) => setTranslatedText(e.target.value)}
             multiline
             rows={6}
-            sx={{ border: "none", width: "100%", mt: 4 }}
+            sx={{ border: "none", width: "100%", mt: 4, background : "#ffffff" }}
           />
         </Grid>
         <Grid

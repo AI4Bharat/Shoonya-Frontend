@@ -73,7 +73,7 @@ const DetailsViewPage = (props) => {
                         {title}
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                        Created_by : {createdBy}
+                        Created by : {createdBy}
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
