@@ -316,7 +316,7 @@ const ProjectSetting = (props) => {
                         sx={{
                             // direction : "row",
                             mb: 2,
-                            justifyContent: "space-between"
+                            justifyContent: "space-evenly"
                         }}
                     >
                         <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handlePublishProject} label="Publish Project" />
