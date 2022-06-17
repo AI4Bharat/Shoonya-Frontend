@@ -13,7 +13,7 @@ export default function MenuItems(props) {
   };
   return (
     <div>
-      <FormControl fullWidth variant="standard" sx={{minWidth: 120 }}>
+      <FormControl fullWidth sx={{minWidth: 120 }}>
         
         <Select
           labelId="demo-simple-select-standard-label"

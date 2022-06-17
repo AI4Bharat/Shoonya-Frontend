@@ -42,6 +42,7 @@ function TabPanel(props) {
 
 const DetailsViewPage = (props) => {
     const { pageType, title, createdBy } = props;
+    const { id } = useParams();
     const classes = DatasetStyle();
     const [value, setValue] = React.useState(0);
     const handleChange = (event, newValue) => {
@@ -92,11 +93,10 @@ const DetailsViewPage = (props) => {
                     </Box>
                     <TabPanel value={value} index={0} style={{ textAlign: "center",maxWidth:"100%" }}>
                         {pageType === componentType.Type_Workspace && <>
-                        
-                            <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none", marginRight: "200px" }}>
+                            <Link to={`/create-annotation-project/${id}`} style={{ textDecoration: "none", marginRight: "200px" }}>
                                 <Button className={classes.projectButton} label={"Add New Annotation Project"} />
                             </Link>
-                            <Link to={`/create-collection-project/1`}  style={{ textDecoration: "none" }}>
+                            <Link to={`/create-collection-project/${id}`}  style={{ textDecoration: "none" }}>
                             <Button className={classes.projectButton} label={"Add New Collection Project"} /></Link>
                             <div className={classes.workspaceTables} >
                                 <ProjectTable />
