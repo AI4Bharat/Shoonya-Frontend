@@ -13,9 +13,9 @@ import getTaskPrediction from './Tasks/GetTaskPrediction';
 import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
 import getDatasetList from './Dataset/GetDatasetList';
+import getTaskDetails from './Tasks/GetTaskDetails'
 import getDatasetDetails from './Dataset/GetDatasetDetails';
 import getDataitemsById from './Dataset/GetDataitemsById';
-
 
 const index = {
     apiStatus,
@@ -31,6 +31,9 @@ const index = {
     getWorkspaceDetails,
     getTaskPrediction,    
     fetchLanguages,
+    getOrganizationUsers, 
+    getDatasetList,
+    getTaskDetails,
     getDatasetList,
     getDatasetDetails,
     getDataitemsById,

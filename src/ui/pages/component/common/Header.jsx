@@ -117,13 +117,14 @@ const Header = () => {
           <Grid
             container
             direction="row"
-            justifyContent="space-around"
+            justifyContent="center"
             // spacing={0}
+            columnGap={5}
+            rowGap={2}
             xs={12}
             sm={12}
             md={5}
           >
-            <Grid item xs={12} sm={12} md={3}>
               <Typography variant="body1">
                 <NavLink
                   to={
@@ -139,8 +140,6 @@ const Header = () => {
                   Organization
                 </NavLink>
               </Typography>
-            </Grid>
-            <Grid item xs={12} sm={12} md={3}>
               <Typography variant="body1">
                 <NavLink
                   to="/workspaces"
@@ -152,8 +151,6 @@ const Header = () => {
                   Workspaces
                 </NavLink>
               </Typography>
-            </Grid>
-            <Grid item xs={12} sm={12} md={3}>
               <Typography variant="body1">
                 <NavLink
                   to="/projects"
@@ -165,8 +162,6 @@ const Header = () => {
                   Projects
                 </NavLink>
               </Typography>
-            </Grid>
-            <Grid item xs={12} sm={12} md={3}>
               <Typography variant="body1">
                 <NavLink
                   to="/datasets"
@@ -178,7 +173,6 @@ const Header = () => {
                   Datasets
                 </NavLink>
               </Typography>
-            </Grid>
           </Grid>
 
           <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
