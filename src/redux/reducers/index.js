@@ -16,6 +16,10 @@ import getDatasetList from './Dataset/GetDatasetList';
 import getTaskDetails from './Tasks/GetTaskDetails'
 import getDatasetDetails from './Dataset/GetDatasetDetails';
 import getDataitemsById from './Dataset/GetDataitemsById';
+import getDatasetsByType from './Dataset/GetDatasetsByType';
+import getDatasetFields from './Dataset/GetDatasetFields';
+import getProjectDomains from './ProjectDetails/GetProjectDomains';
+import createProject from './ProjectDetails/CreateProject';
 
 const index = {
     apiStatus,
@@ -37,7 +41,11 @@ const index = {
     getDatasetList,
     getDatasetDetails,
     getDataitemsById,
-    getOrganizationUsers 
+    getOrganizationUsers,
+    getDatasetsByType,
+    getDatasetFields,
+    getProjectDomains,
+    createProject,
 };
 
 export default index;
