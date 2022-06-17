@@ -78,6 +78,8 @@ const GlobalStyles = makeStyles({
     padding: "0 15px",
     borderRadius: "12px",
   },
+ 
+  
 });
 
 export default GlobalStyles;

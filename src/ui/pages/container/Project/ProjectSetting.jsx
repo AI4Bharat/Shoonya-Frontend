@@ -1,4 +1,4 @@
-import { Box, Card, Divider, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
+import { Box, Card, Divider, Grid, Tab, Tabs, ThemeProvider, Typography, Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
@@ -12,7 +12,14 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
 import GetExportProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetExportProject';
 import GetPublishProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetPublishProject';
+import GetPullNewDataAPI from '../../../../redux/actions/api/ProjectDetails/PullNewData';
+import GetArchiveProjectAPI from '../../../../redux/actions/api/ProjectDetails/ArchiveProject'
 import CustomButton from "../../component/common/Button";
+import  BackButton from "../../component/common/Button"
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 
 
 const ProjectSetting = (props) => {
@@ -22,6 +29,8 @@ const ProjectSetting = (props) => {
         { name: "Project Type", value: null },
         { name: "Status", value: null },
     ])
+    const [isArchived, setIsArchived] = useState(false);
+    const [open, setOpen] = useState(false);
     const { id } = useParams();
 
     const classes = DatasetStyle();
@@ -40,10 +49,6 @@ const ProjectSetting = (props) => {
         getProjectDetails();
 
     }, []);
-    console.log(ProjectDetails, "ProjectDetails")
-
-
-
 
 
     const getSaveButtonAPI = () => {
@@ -51,14 +56,7 @@ const ProjectSetting = (props) => {
 
         dispatch(APITransport(projectObj));
     }
-    useEffect(() => {
-        getSaveButtonAPI()
-
-    }, []);
-
-
-
-
+   
 
 
     const getExportProjectButton = () => {
@@ -66,10 +64,7 @@ const ProjectSetting = (props) => {
 
         dispatch(APITransport(projectObj));
     }
-    useEffect(() => {
-        getExportProjectButton()
-
-    }, []);
+   
 
     const publishProject = useSelector(state => state.getPublishProjectButton.data);
 
@@ -78,10 +73,23 @@ const ProjectSetting = (props) => {
 
         dispatch(APITransport(projectObj));
     }
-    useEffect(() => {
-        getPublishProjectButton()
+   
 
-    }, []);
+    const getPullNewDataAPI = () => {
+        const projectObj = new GetPullNewDataAPI(id);
+
+        dispatch(APITransport(projectObj));
+    }
+  
+
+    const ArchiveProject = useSelector(state => state.getArchiveProject.data);
+    const getArchiveProjectAPI = () => {
+        const projectObj = new GetArchiveProjectAPI(id);
+
+        dispatch(APITransport(projectObj));
+    }
+    
+    console.log(ArchiveProject, "ArchiveProject")
 
     const handleSave = () => {
         getSaveButtonAPI()
@@ -94,10 +102,53 @@ const ProjectSetting = (props) => {
     }
 
     const handlePullNewData = () => {
+        getPullNewDataAPI()
+
+    }
+    const data = {
+
+
+        "is_archived": true,
+
+    }
+    const handleClickOpen = () => {
+        setOpen(true);
+      };
+    
+      const handleClose = () => {
+        setOpen(false);
+      };
+     
+      const handleok =()=>{
+        getArchiveProjectAPI()
+        
+        if (ArchiveProject.is_archived) {
+         
+          setIsArchived(true)
+            setOpen(false);
+        } else {
+          setIsArchived(false)
+            setOpen(false);
+        }
+       
+      }
+     
+    const handleArchiveProject = (res) => {
+     
+
 
     }
 
     console.log(props, "processResponse")
+
+
+    let archivebutton = "Archived project "
+    if (ArchiveProject.is_archived) {
+        archivebutton = "UnArchived project"
+
+    } else {
+        archivebutton = "Archived project"
+    }
     return (
         <ThemeProvider theme={themeDefault}>
 
@@ -109,6 +160,7 @@ const ProjectSetting = (props) => {
                 alignItems='center'
 
             >
+               
                 <Card
                     sx={{
                         width: window.innerWidth * 0.8,
@@ -117,7 +169,7 @@ const ProjectSetting = (props) => {
                     }}
 
                 >
-
+                    
                     <Grid
                         item
                         xs={12}
@@ -267,15 +319,15 @@ const ProjectSetting = (props) => {
                             justifyContent: "space-between"
                         }}
                     >
-                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handlePublishProject} label="Publish Project" />
-                        
-                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handleExportProject} label="Export Project into Dataset" />
-                        
-                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} label="Archive Project" />
-                        
-                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
-                        
-                            <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} label="Download project" />
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handlePublishProject} label="Publish Project" />
+
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handleExportProject} label="Export Project into Dataset" />
+
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handleClickOpen} label= {isArchived?"unArchived":"Archived"}  />
+
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
+
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 }} label="Download project" />
 
                     </Grid>
                     <Divider />
@@ -311,12 +363,31 @@ const ProjectSetting = (props) => {
                         xl={12}
                         sm={12}
                     >
-                        <Typography gutterBottom component="div" style={{ margin: "15px 0px 10px 0px", }}>
+                        <Typography gutterBottom component="div" >
                             Sampling Mode :
                         </Typography>
                     </Grid>
                 </Card>
             </Grid>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to unarchive this project?"
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button  onClick={handleClose} label="Cancle"/>
+                    <Button onClick={handleok} label="Ok" autoFocus/>
+                        
+                 
+                </DialogActions>
+            </Dialog>
         </ThemeProvider>
     )
 }
