@@ -12,6 +12,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 
 
 
+
 const menuOptions = [
     { name: "Tasks", isChecked: false, component: () => null },
     { name: "Members", isChecked: false, component: () => null },
@@ -105,6 +106,7 @@ const Projects = () => {
                         padding: 5
                     }}
                 >
+                  
                     <Typography variant="h3">{ProjectDetails.title}</Typography>
                     <Grid
                         container

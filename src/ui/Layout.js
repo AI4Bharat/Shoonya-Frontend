@@ -13,13 +13,13 @@ import {  ThemeProvider,  } from "@mui/material";
 // import Snackbar from "./pages/component/common/Snackbar";
 import themeDefault from './theme/theme'
 import GlobalStyles from "./styles/LayoutStyles";
-
+import BackButton from "./pages/component/common/BackButton";
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 
 const Layout= (props) => {
   // const Component = props.component;
-  const { type, index, userRoles, component } = props;
+  const { type, index, userRoles, component,Backbutton } = props;
   const [show, setShow] = useState(false);
   const [popUp, setPopup] = useState(true);
   const apiStatus = useSelector((state) => state.apiStatus);
@@ -86,6 +86,10 @@ const Layout= (props) => {
         >
           {/* {renderSpinner()}
           {renderError()} */}
+          { Backbutton  && 
+           < BackButton  sx={{ color:"black" , background:"transparent",  mb:2, "&:hover": {  backgroundColor: "transparent", },
+         }}  label="< Back To previous page"/>
+           }
           <Suspense fallback={<div>Loading....</div>}>
             {component}
           </Suspense>

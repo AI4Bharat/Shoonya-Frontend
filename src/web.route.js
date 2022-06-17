@@ -60,11 +60,11 @@ const App = () => {
     },
     {
       path: "projects/:id",
-      element: ProtectedRouteWrapper(<Layout component={<Projects />} />)
+      element: ProtectedRouteWrapper(<Layout component={<Projects />}  Backbutton={true}/>)
     },
     {
       path: "projects/:id/projectsetting",
-      element: ProtectedRouteWrapper(<Layout component={<ProjectSetting />} />)
+      element: ProtectedRouteWrapper(<Layout component={<ProjectSetting />}  Backbutton={true}/>)
     },
     {
       path: "projects/:projectId/task/:taskId",
@@ -72,19 +72,19 @@ const App = () => {
     },
     {
       path: "workspaces/:id",
-      element: ProtectedRouteWrapper(<Layout component={<WorkSpace />} />)
+      element: ProtectedRouteWrapper(<Layout component={<WorkSpace />} Backbutton={true}/>)
     },
     {
       path: "create-annotation-project/:id",
-      element: ProtectedRouteWrapper(<Layout component={<AnnotationProject />} />)
+      element: ProtectedRouteWrapper(<Layout component={<AnnotationProject />} Backbutton={true}/>)
     },
     {
       path: "create-collection-project/:id",
-      element: ProtectedRouteWrapper(<Layout component={<CollectionProject />} />)
+      element: ProtectedRouteWrapper(<Layout component={<CollectionProject />} Backbutton={true}/>)
     },
     {
       path: "workspaces",
-      element: ProtectedRouteWrapper(<Layout component={<WorkSpaces />} />)
+      element: ProtectedRouteWrapper(<Layout component={<WorkSpaces />}   />)
     },
     {
       path: "my-organization/:orgId",
@@ -96,7 +96,7 @@ const App = () => {
     },
     {
       path: "datasets/:datasetId",
-      element: ProtectedRouteWrapper(<Layout component={<DatasetDetails />} />)
+      element: ProtectedRouteWrapper(<Layout component={<DatasetDetails />} Backbutton={true}/>)
     },
 
   ]);
