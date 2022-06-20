@@ -90,7 +90,6 @@ const TaskTable = () => {
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
 
-
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
     const [totalTasks, setTotalTasks] = useState(10);
@@ -98,16 +97,18 @@ const TaskTable = () => {
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
+    const [selectedStatus, setSelectedStatus] = useState("unlabeled");
+    const [tasks, setTasks] = useState([]);
 
     const filterData = {
-        Status : ["unlabeled", "skipped", "accepted"],
-        Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
-            return el.username
-        }) : []
+        Status : ["unlabeled", "skipped", "accepted", "draft"],
+        // Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
+        //     return el.username
+        // }) : []
     }
 
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedStatus);
         dispatch(APITransport(taskObj));
     }
 
@@ -116,18 +117,45 @@ const TaskTable = () => {
 
     useEffect(() => {
         getTaskListData();
-        setTotalTasks(totalTaskCount);
     }, []);
 
     useEffect(() => {
         getTaskListData();
-        console.log("fired now")
     }, [currentPageNumber]);
 
     useEffect(() => {
+        if (currentPageNumber !== 1){
+            setCurrentPageNumber(1);
+        } else {
+            getTaskListData();
+        }
+    }, [selectedStatus]);
+
+    useEffect(() => {
         getTaskListData();
-        console.log("fired now")
     }, [currentRowPerPage]);
+
+    useEffect(() => {
+        setTotalTasks(totalTaskCount);
+    }, [totalTaskCount])
+
+    useEffect(() => {
+        const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
+            return [
+                el.id,
+                el.data.context,
+                el.data.input_text,
+                el.data.input_language,
+                el.data.output_language,
+                el.data.machine_translation,
+                el.task_status,
+                <Link to={`task/${el.id}`}>
+                    <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />
+                </Link>
+                ]
+        }) : []
+        setTasks(data);
+    }, [taskList])
 
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
@@ -192,27 +220,14 @@ const TaskTable = () => {
         customToolbar: renderToolBar,
     };
 
-    const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
-        return [
-            el.id,
-            el.data.context,
-            el.data.input_text,
-            el.data.input_language,
-            el.data.output_language,
-            el.data.machine_translation,
-            el.task_status,
-            <Link to={`task/${el.id}`}>
-                <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />
-            </Link>
-            ]
-    }) : []
+    
 
     return (
         <Fragment>
             <CustomButton sx={{ p: 1, width: '100%', borderRadius: 2, mb: 3 }} label={"Disabled"} />
             <MUIDataTable
                 title={""}
-                data={data}
+                data={tasks}
                 columns={columns}
                 options={options}
             // filter={false}
@@ -224,6 +239,8 @@ const TaskTable = () => {
                     anchorEl={anchorEl}
                     handleClose={handleClose}
                     filterStatusData={filterData}
+                    updateStatus={setSelectedStatus}
+                    currentStatus={selectedStatus}
                     // selectedFilter={myContributionReport.selectedFilter}
                     // clearAll={(data) => clearAll(data, handleClose)}
                     // apply={(data) => apply(data, handleClose)}
