@@ -178,7 +178,7 @@ const ProjectSetting = (props) => {
                         lg={12}
                         xl={12}
                     >
-                        <Typography variant="h2" gutterBottom component="div">
+                        <Typography variant="h3" gutterBottom component="div">
                             Project Settings
                         </Typography>
                     </Grid>
@@ -339,7 +339,7 @@ const ProjectSetting = (props) => {
                         xl={12}
                         sm={12}
                     >
-                        <Typography variant="h3" gutterBottom component="div" style={{ margin: "35px 0px 10px 0px", }}>
+                        <Typography variant="h4" gutterBottom component="div" style={{ margin: "30px 0px 10px 0px", }}>
                             Read-only Configurations
                         </Typography>
                     </Grid>
