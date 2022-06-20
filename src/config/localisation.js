@@ -7,6 +7,7 @@ const localisation = {
     "Shoonya is an open-sourced API and data platform to collect, curate and discover datasets in Indian languages.",
     "button.clearAll" : "Clear All",
     "button.Filter" : "Filter",
+    "button.Apply" : "Apply",
     "label.filter.status" : "Status",
     "label.filter.byAnnotator" : "Filter by Annotators",
     "label.filter.column": "Filter by Columns",
