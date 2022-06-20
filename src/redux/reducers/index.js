@@ -63,11 +63,8 @@ const index = {
     createProject,
     getWorkspaceUserReports,
     getWorkspaceProjectReports,
-<<<<<<< HEAD
     downloadProjectButton,
-=======
     getFilteredTasks
->>>>>>> develop
 };
 
 export default index;
