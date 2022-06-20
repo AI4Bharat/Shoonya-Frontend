@@ -19,27 +19,27 @@ import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 
 
-const ProtectedRoute = ({ user, children }) => {
-  if (!authenticateUser()) {
-    return <Navigate to="/" replace />;
-  }
-  return children;
-};
-
-const ProtectedRouteWrapper = (component) => {
-  return <ProtectedRoute>{component}</ProtectedRoute>
-}
-
-const authenticateUser = () => {
-  const access_token = localStorage.getItem("shoonya_access_token");
-  if (access_token) {
-    return true
-  } else {
-    return false;
-  }
-}
-
 const App = () => {
+  const ProtectedRoute = ({ user, children }) => {
+    if (!authenticateUser()) {
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
+  
+  const ProtectedRouteWrapper = (component) => {
+    return <ProtectedRoute>{component}</ProtectedRoute>
+  }
+  
+  const authenticateUser = () => {
+    const access_token = localStorage.getItem("shoonya_access_token");
+    if (access_token) {
+      return true
+    } else {
+      return false;
+    }
+  }
+  
   let routes = useRoutes([
     // { path: "/", element: <Landing /> }, my-organization
     {
