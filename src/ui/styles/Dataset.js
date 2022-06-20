@@ -142,6 +142,9 @@ dashboardContentContainer: {
   minHeight: "70vh",
   borderLeft: '1px solid lightgray',
   paddingLeft: '5%'
+},
+link : {
+  textDecoration : "none"
 }
   
 })
