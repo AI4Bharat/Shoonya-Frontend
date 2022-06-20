@@ -27,6 +27,7 @@ import getProjectDomains from './ProjectDetails/GetProjectDomains';
 import createProject from './ProjectDetails/CreateProject';
 import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
 import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
+import  downloadProjectButton from './ProjectDetails/DownloadProject'
 import getFilteredTasks from './Tasks/GetFilteredTasks';
 
 const index = {
@@ -62,6 +63,7 @@ const index = {
     createProject,
     getWorkspaceUserReports,
     getWorkspaceProjectReports,
+    downloadProjectButton,
     getFilteredTasks
 };
 
