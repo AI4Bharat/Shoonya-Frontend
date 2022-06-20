@@ -201,7 +201,7 @@ const TaskTable = () => {
             el.data.output_language,
             el.data.machine_translation,
             el.task_status,
-            <Link to={`task/${el.id}`}>
+            <Link to={`task/${el.id}`} className={classes.link}>
                 <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />
             </Link>
             ]
