@@ -51,6 +51,7 @@ const Header = () => {
 
   const onLogoutClick = () => {
     handleCloseUserMenu();
+    disableRTL();
     // ExpireSession();
     localStorage.clear();
     navigate("/");
@@ -84,18 +85,21 @@ const Header = () => {
   };
 
   const handleRTLChange = (event) => {
-    let style;
     if (event.target.checked) {
       localStorage.setItem("rtl", true);
-      style = document.createElement("style");
+      let style = document.createElement("style");
       style.innerHTML = "input, textarea { direction: RTL; }";
       document.head.appendChild(style);
     } else {
-      localStorage.setItem("rtl", false);
-      style = document.createElement("style");
-      style.innerHTML = "input, textarea { direction: unset; }";
-      document.head.appendChild(style);
+      localStorage.removeItem("rtl");
+      disableRTL();
     }
+  };
+  
+  const disableRTL = () => {
+    let style = document.createElement("style");
+    style.innerHTML = "input, textarea { direction: unset; }";
+    document.head.appendChild(style);
   };
 
   const classes = headerStyle();
