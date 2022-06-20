@@ -17,6 +17,7 @@ import { translate } from "../../../../config/localisation";
 import MembersTable from "../Project/MembersTable";
 import Members from "../Tabs/Members";
 import Invites from "../Tabs/Invites";
+import OrganizationSettings from "../Tabs/OrganizationSettings";
 
 function TabPanel(props) {
 
@@ -68,7 +69,7 @@ const DetailsViewPage = (props) => {
                 justifyContent='center'
                 alignItems='center'
             >
-                <Card className={classes.workspaceCard}> 
+                <Card className={classes.workspaceCard}>
                     <Typography variant="h2" gutterBottom component="div">
                         {title}
                     </Typography>
@@ -91,13 +92,13 @@ const DetailsViewPage = (props) => {
                             <Tab label="Settings" sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0} style={{ textAlign: "center",maxWidth:"100%" }}>
+                    <TabPanel value={value} index={0} style={{ textAlign: "center", maxWidth: "100%" }}>
                         {pageType === componentType.Type_Workspace && <>
                             <Link to={`/create-annotation-project/${id}`} style={{ textDecoration: "none", marginRight: "200px" }}>
                                 <Button className={classes.projectButton} label={"Add New Annotation Project"} />
                             </Link>
-                            <Link to={`/create-collection-project/${id}`}  style={{ textDecoration: "none" }}>
-                            <Button className={classes.projectButton} label={"Add New Collection Project"} /></Link>
+                            <Link to={`/create-collection-project/${id}`} style={{ textDecoration: "none" }}>
+                                <Button className={classes.projectButton} label={"Add New Collection Project"} /></Link>
                             <div className={classes.workspaceTables} >
                                 <ProjectTable />
                             </div>
@@ -108,7 +109,7 @@ const DetailsViewPage = (props) => {
                                 <Workspaces />
                             </>
                         }
-                        
+
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         {pageType === componentType.Type_Workspace &&
@@ -124,16 +125,21 @@ const DetailsViewPage = (props) => {
                         }
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                            {pageType === componentType.Type_Workspace && 
-                                <>
-                                    <CustomButton label={"Assign Managers"} sx={{ width: "100%", mb: 2 }} />
-                                    <ManagersTable />
-                                </>
-                            }
-                            {pageType === componentType.Type_Organization && <Invites />}
+                        {pageType === componentType.Type_Workspace &&
+                            <>
+                                <CustomButton label={"Assign Managers"} sx={{ width: "100%", mb: 2 }} />
+                                <ManagersTable />
+                            </>
+                        }
+                        {pageType === componentType.Type_Organization && <Invites />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                        <Button className={classes.settingsButton} label={"Archive Workspace"} />
+                        {pageType === componentType.Type_Workspace &&
+                            <>
+                                <Button className={classes.settingsButton} label={"Archive Workspace"} />
+                            </>
+                        }
+                        {pageType === componentType.Type_Organization && <OrganizationSettings />}
                     </TabPanel>
                 </Card>
             </Grid>
