@@ -17,8 +17,8 @@ import DatasetStyle from "../../../styles/Dataset";
 
 const FilterList = (props) => {
   const classes = DatasetStyle();
-  const { filterStatusData, selectedFilter, clearAll, apply } = props;
-  const [selectedStatus, setSelectedStatus] = useState(props.currentStatus);
+  const { filterStatusData } = props;
+  const [selectedStatus, setSelectedStatus] = useState(props.currentFilters.task_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
 
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
@@ -36,8 +36,9 @@ const FilterList = (props) => {
   //   }
   // };
   const handleStatusChange = (e) => {
-    console.log(selectedStatus);
-    props.updateStatus(selectedStatus)
+    props.updateFilters({
+      task_status: selectedStatus,
+    })
     props.handleClose();
   };
   // const handleClearAll = () => {

@@ -4,6 +4,7 @@ import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
+import filterTasks from "../../../../redux/actions/Tasks/FilterTasks";
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
@@ -89,6 +90,7 @@ const TaskTable = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
+    const filteredList = useSelector(state => state.getFilteredTasks.data);
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
@@ -97,7 +99,7 @@ const TaskTable = () => {
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
-    const [selectedStatus, setSelectedStatus] = useState("unlabeled");
+    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled"});
     const [tasks, setTasks] = useState([]);
 
     const filterData = {
@@ -108,28 +110,32 @@ const TaskTable = () => {
     }
 
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedStatus);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage);
         dispatch(APITransport(taskObj));
     }
 
     const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
-
 
     useEffect(() => {
         getTaskListData();
     }, []);
 
     useEffect(() => {
-        getTaskListData();
-    }, [currentPageNumber]);
+        if (taskList?.length > 0) {
+            dispatch(filterTasks(taskList, selectedFilters));
+        }
+    }, [taskList]);
 
     useEffect(() => {
-        if (currentPageNumber !== 1){
+        if (taskList?.length > 0) {
+            dispatch(filterTasks(taskList, selectedFilters));
             setCurrentPageNumber(1);
-        } else {
-            getTaskListData();
         }
-    }, [selectedStatus]);
+    }, [selectedFilters])
+
+    useEffect(() => {
+        getTaskListData();
+    }, [currentPageNumber]);
 
     useEffect(() => {
         getTaskListData();
@@ -140,7 +146,7 @@ const TaskTable = () => {
     }, [totalTaskCount])
 
     useEffect(() => {
-        const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
+        const data = filteredList && filteredList.length > 0 ? filteredList.map((el, i) => {
             return [
                 el.id,
                 el.data.context,
@@ -155,7 +161,7 @@ const TaskTable = () => {
                 ]
         }) : []
         setTasks(data);
-    }, [taskList])
+    }, [filteredList])
 
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
@@ -239,12 +245,8 @@ const TaskTable = () => {
                     anchorEl={anchorEl}
                     handleClose={handleClose}
                     filterStatusData={filterData}
-                    updateStatus={setSelectedStatus}
-                    currentStatus={selectedStatus}
-                    // selectedFilter={myContributionReport.selectedFilter}
-                    // clearAll={(data) => clearAll(data, handleClose)}
-                    // apply={(data) => apply(data, handleClose)}
-                    // task={props.task}
+                    updateFilters={setsSelectedFilters}
+                    currentFilters={selectedFilters}
                 />
             )}
         </Fragment>
