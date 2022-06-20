@@ -127,6 +127,7 @@ const Header = () => {
           >
               <Typography variant="body1">
                 <NavLink
+                  hidden = {loggedInUserData.role === 1}
                   to={
                     loggedInUserData && loggedInUserData.organization
                       ? `/my-organization/${loggedInUserData.organization.id}`
@@ -142,6 +143,7 @@ const Header = () => {
               </Typography>
               <Typography variant="body1">
                 <NavLink
+                  hidden = {loggedInUserData.role === 1}
                   to="/workspaces"
                   className={({ isActive }) =>
                     isActive ? classes.highlightedMenu : classes.headerMenu

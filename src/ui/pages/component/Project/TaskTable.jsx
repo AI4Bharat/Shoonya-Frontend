@@ -226,7 +226,20 @@ const TaskTable = () => {
         customToolbar: renderToolBar,
     };
 
-    
+    const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
+        return [
+            el.id,
+            el.data.context,
+            el.data.input_text,
+            el.data.input_language,
+            el.data.output_language,
+            el.data.machine_translation,
+            el.task_status,
+            <Link to={`task/${el.id}`} className={classes.link}>
+                <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />
+            </Link>
+            ]
+    }) : []
 
     return (
         <Fragment>
