@@ -18,6 +18,7 @@ import MembersTable from "../Project/MembersTable";
 import Members from "../Tabs/Members";
 import Invites from "../Tabs/Invites";
 import OrganizationSettings from "../Tabs/OrganizationSettings";
+import WorkspaceReports from "./WorkspaceReports";
 
 function TabPanel(props) {
 
@@ -88,6 +89,8 @@ const DetailsViewPage = (props) => {
 
                             {pageType === componentType.Type_Workspace && <Tab label="Managers" sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {pageType === componentType.Type_Organization && <Tab label="Invites" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            
+                            {pageType === componentType.Type_Workspace && <Tab label="Reports" sx={{ fontSize: 16, fontWeight: '700' }} />}
 
                             <Tab label="Settings" sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
@@ -134,12 +137,11 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Organization && <Invites />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                        {pageType === componentType.Type_Workspace &&
-                            <>
-                                <Button className={classes.settingsButton} label={"Archive Workspace"} />
-                            </>
-                        }
                         {pageType === componentType.Type_Organization && <OrganizationSettings />}
+                        {pageType === componentType.Type_Workspace && <WorkspaceReports />}
+                    </TabPanel>
+                    <TabPanel value={value} index={4}>
+                        {pageType === componentType.Type_Workspace && <Button className={classes.settingsButton} label={"Archive Workspace"} />}
                     </TabPanel>
                 </Card>
             </Grid>
