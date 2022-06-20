@@ -27,6 +27,7 @@ import getProjectDomains from './ProjectDetails/GetProjectDomains';
 import createProject from './ProjectDetails/CreateProject';
 import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
 import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
+import  downloadProjectButton from './ProjectDetails/DownloadProject'
 
 const index = {
     apiStatus,
@@ -60,7 +61,8 @@ const index = {
     getProjectDomains,
     createProject,
     getWorkspaceUserReports,
-    getWorkspaceProjectReports
+    getWorkspaceProjectReports,
+    downloadProjectButton,
 };
 
 export default index;
