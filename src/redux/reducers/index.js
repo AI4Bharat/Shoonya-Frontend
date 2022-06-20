@@ -28,6 +28,7 @@ import createProject from './ProjectDetails/CreateProject';
 import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
 import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
 import  downloadProjectButton from './ProjectDetails/DownloadProject'
+import getFilteredTasks from './Tasks/GetFilteredTasks';
 
 const index = {
     apiStatus,
@@ -62,7 +63,11 @@ const index = {
     createProject,
     getWorkspaceUserReports,
     getWorkspaceProjectReports,
+<<<<<<< HEAD
     downloadProjectButton,
+=======
+    getFilteredTasks
+>>>>>>> develop
 };
 
 export default index;

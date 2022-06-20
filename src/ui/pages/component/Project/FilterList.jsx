@@ -17,8 +17,8 @@ import DatasetStyle from "../../../styles/Dataset";
 
 const FilterList = (props) => {
   const classes = DatasetStyle();
-  const { filterStatusData, selectedFilter, clearAll, apply } = props;
-  const [selectedStatus, setSelectedStatus] = useState("unlabeled");
+  const { filterStatusData } = props;
+  const [selectedStatus, setSelectedStatus] = useState(props.currentFilters.task_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
 
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
@@ -35,18 +35,12 @@ const FilterList = (props) => {
   //     }
   //   }
   // };
-  // const handleStatusChange = (e) => {
-  //   if (e.target.checked) setSelectedStatus([...selectedStatus, e.target.name]);
-  //   else {
-  //     const selected = Object.assign([], selectedStatus);
-  //     const index = selected.indexOf(e.target.name);
-
-  //     if (index > -1) {
-  //       selected.splice(index, 1);
-  //       setSelectedStatus(selected);
-  //     }
-  //   }
-  // };
+  const handleStatusChange = (e) => {
+    props.updateFilters({
+      task_status: selectedStatus,
+    })
+    props.handleClose();
+  };
   // const handleClearAll = () => {
   //   setSelectedStatus([]);
   //   setSelectedType([]);
@@ -61,15 +55,9 @@ const FilterList = (props) => {
   //   return false;
   // };
 
-  const onStatusChange = (value) => {
-    console.log(value);
-    setSelectedStatus(value)
-  }
-
   return (
     <div>
       <Popover
-        // style={{ width: '399px', minHeight: '246px' }}
         id={props.id}
         open={props.open}
         anchorEl={props.anchorEl}
@@ -99,7 +87,7 @@ const FilterList = (props) => {
                         color="primary"
                       />
                     }
-                    onChange={(e) => onStatusChange(e.target.value)}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
                     value={type}
                     label={type}
                   />
@@ -108,15 +96,15 @@ const FilterList = (props) => {
             </FormGroup>
           </Grid>
           <Divider />
-          <Grid item xs={6} sm={6} md={6} lg={6} xl={6} sx={{p:2}} className={classes.statusFilterContainer}>
+          {/* <Grid item xs={6} sm={6} md={6} lg={6} xl={6} sx={{p:2}} className={classes.statusFilterContainer}>
             <Typography variant="body2" sx={{ mr: 5, fontWeight: "700" }} className={classes.filterTypo}>
               {translate("label.filter.byAnnotator")} :
             </Typography>
                   
           </Grid>
-          <Divider />
-          <Grid container sx={{p : 2}}>
-            <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+          <Divider /> */}
+          <Grid container direction="row" justifyContent={"flex-end"} spacing={2} sx={{p:2}}>
+            <Grid item>
               <Button
                 onClick={props.handleClose}
                 variant="outlined"
@@ -128,21 +116,19 @@ const FilterList = (props) => {
                 {translate("button.cancel")}
               </Button>
             </Grid>
-            <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+            <Grid item>
               <Button
-                // onClick={handleClearAll}
+                onClick={handleStatusChange}
                 variant="contained"
                 color="primary"
                 size="small"
                 className={classes.clearAllBtn}
               >
                 {" "}
-                {translate("button.Filter")}
+                {translate("button.Apply")}
               </Button>
             </Grid>
-
           </Grid>
-
         </Grid>
       </Popover>
     </div>
