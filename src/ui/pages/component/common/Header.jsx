@@ -108,6 +108,7 @@ const Header = () => {
     <Box className={classes.parentContainer}>
       <AppBar style={{ backgroundColor: "#ffffff" }}>
         <Toolbar className={classes.toolbar}>
+        <div className={classes.menu}>
           <Grid
             sx={{ flexGrow: 0, display: "inline-grid" }}
             xs={12}
@@ -123,11 +124,11 @@ const Header = () => {
             direction="row"
             justifyContent="center"
             // spacing={0}
-            columnGap={5}
-            rowGap={2}
-            xs={12}
-            sm={12}
-            md={5}
+            columnGap={2}
+            rowGap={1}
+            // xs={8}
+            // sm={8}
+            // md={8}
           >
               <Typography variant="body1">
                 <NavLink
@@ -181,7 +182,7 @@ const Header = () => {
               </Typography>
           </Grid>
 
-          <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
+          {/* <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}> */}
             <Grid
               container
               direction="row"
@@ -211,6 +212,7 @@ const Header = () => {
               </Grid>
               <Grid
                 item
+                
                 md={6}
                 display={{ xs: "none", sm: "none", md: "block" }}
               >
@@ -287,8 +289,10 @@ const Header = () => {
                 </MenuItem>
               ))}
             </Menu>
-          </Box>
+          {/* </Box> */}
+           </div>
         </Toolbar>
+       
       </AppBar>
     </Box>
   );
