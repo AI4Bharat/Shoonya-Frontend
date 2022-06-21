@@ -4,7 +4,8 @@ const headerStyle = makeStyles({
     parentContainer: {
         // flexGrow : 1,
         marginBottom : window.innerHeight*0.13,
-        width : window.innerWidth*0.98
+        width : window.innerWidth*0.98,
+       
     },
     appBar: {
         // backgroundColor: "#ffffff", 
@@ -12,7 +13,24 @@ const headerStyle = makeStyles({
         // marginBotto m : '5%'
     },
     toolbar: {
-        justifyContent : "space-between"
+        justifyContent : "space-between",
+        maxWidth: "1272px",
+        width: "100%",
+        margin: "0 auto",
+        display: "flex",
+        alignItems: "center",
+        padding: "0",
+        boxSizing: "border-box",
+        minHeight: "54px",
+       
+      
+    },
+    menu:{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        cursor: "pointer",
+
     },
     headerLogo: {
         height: "2rem", 

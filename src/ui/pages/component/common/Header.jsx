@@ -98,12 +98,14 @@ const Header = () => {
         }
     };
 
+  
     const classes = headerStyle();
 
     return (
         <Box className={classes.parentContainer}>
             <AppBar style={{ backgroundColor: "#ffffff" }}>
                 <Toolbar className={classes.toolbar}>
+                <div className={classes.menu}>
                     <Grid
                         sx={{ flexGrow: 0, display: "inline-grid" }}
                         xs={12}
@@ -119,7 +121,7 @@ const Header = () => {
                         direction="row"
                         justifyContent="flex-start"
                         // spacing={0}
-                        columnGap={5}
+                        columnGap={3}
                         rowGap={2}
                         xs={12}
                         sm={12}
@@ -279,6 +281,7 @@ const Header = () => {
                             ))}
                         </Menu>
                     </Box>
+                    </div>
                 </Toolbar>
             </AppBar>
         </Box>
