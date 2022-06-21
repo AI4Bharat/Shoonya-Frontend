@@ -1,5 +1,3 @@
-import { Navigate } from "react-router-dom";
-
 export function authenticateUser() {
   const access_token = localStorage.getItem("shoonya_access_token");
   if (access_token) {
@@ -7,13 +5,6 @@ export function authenticateUser() {
   } else {
     return false;
   }
-}
-
-export function detectAuthenticationAndRedirect(path, component){
-  if(authenticateUser()){
-    return <Navigate to="/projects" />
-  }
-  return component
 }
 
 export function getUniqueListBy(arr, key) {

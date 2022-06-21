@@ -2,8 +2,10 @@ import {
   BrowserRouter as Router,
   HashRouter,
   Link,
+  Navigate,
   Route,
   Routes,
+  useRoutes,
 } from "react-router-dom";
 // import Landing from "./ui/pages/container/Landing/index";
 import Login from "./ui/pages/container/UserManagement/Login";
@@ -23,10 +25,9 @@ import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
 import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
 import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
-import { authenticateUser, detectAuthenticationAndRedirect } from "./utils/utils";
+import { authenticateUser } from "./utils/utils";
 
 const App = () => {
-  
   const ProtectedRoute = ({ user, children }) => {
     if (!authenticateUser()) {
       return <Link href="/" />;
@@ -113,8 +114,8 @@ const App = () => {
   return (
     <HashRouter>
       <Routes>
-        <Route exact path="/" element={detectAuthenticationAndRedirect("/",<Login />)} />
-        <Route path="/forgot-password" element={detectAuthenticationAndRedirect("/",<ForgotPassword />)} />
+        <Route path="/" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/profile"
           element={ProtectedRouteWrapper(<Layout component={<MyProfile />} />)}

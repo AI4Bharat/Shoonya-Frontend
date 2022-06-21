@@ -108,7 +108,7 @@ const Header = () => {
                         sx={{ flexGrow: 0, display: "inline-grid" }}
                         xs={12}
                         sm={12}
-                        md={5}
+                        md={2}
                     >
                         <Link to="/">
                             <img src={Logo} alt="logo" className={classes.headerLogo} />
@@ -117,13 +117,13 @@ const Header = () => {
                     <Grid
                         container
                         direction="row"
-                        justifyContent="center"
+                        justifyContent="flex-start"
                         // spacing={0}
                         columnGap={5}
                         rowGap={2}
                         xs={12}
                         sm={12}
-                        md={5}
+                        md={8}
                     >
                         <Typography variant="body1">
                             <NavLink
