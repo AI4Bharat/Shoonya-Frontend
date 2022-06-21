@@ -86,7 +86,8 @@ const MyProfile = () => {
       >
         <Card
           sx={{
-            width: window.innerWidth * 0.8,
+            // width: window.innerWidth * 0.8,
+            width: "100%",
             minHeight: 500,
             padding: 5,
           }}

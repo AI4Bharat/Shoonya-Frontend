@@ -62,7 +62,7 @@ const Header = () => {
       name: "My Profile",
       onclick: () => {
         handleCloseUserMenu();
-        navigate("/my-profile");
+        navigate("/profile");
       },
     },
     { name: "Logout", onclick: () => onLogoutClick() },
@@ -112,7 +112,7 @@ const Header = () => {
             sx={{ flexGrow: 0, display: "inline-grid" }}
             xs={12}
             sm={12}
-            md={5}
+            md={4}
           >
             <Link to="/">
               <img src={Logo} alt="logo" className={classes.headerLogo} />
@@ -127,7 +127,7 @@ const Header = () => {
             rowGap={2}
             xs={12}
             sm={12}
-            md={5}
+            md={6}
           >
               <Typography variant="body1">
                 <NavLink
