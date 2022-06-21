@@ -18,7 +18,16 @@ const localisation = {
     "button.draft":"Draft",
     "button.next":"Next",
     "button.skip":"Skip",
-    "button.submit":"Submit"
+    "button.submit":"Submit",
+    "label.workspaces":"Workspaces",
+    "label.members":"Members",
+    "label.invites":"Invites",
+    "label.settings":"Settings",
+    "label.tasks":"Tasks",
+    "label.reports":"Reports",
+    "label.projects":"Projects",
+    "label.annotators":"Annotators",
+    "label.managers":"Managers",
 };
 
 export const translate = (prop) => localisation[prop];

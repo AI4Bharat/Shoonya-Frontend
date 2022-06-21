@@ -9,6 +9,7 @@ import ReportsTable from "../../component/Project/ReportsTable"
 import { useDispatch, useSelector } from "react-redux";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import { translate } from "../../../../config/localisation";
 
 
 
@@ -118,7 +119,7 @@ const Projects = () => {
                         }}
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Project ID :</Typography>
-                        <Typography variant="caption">{ProjectDetails.id}</Typography>
+                        <Typography variant="body2">{ProjectDetails.id}</Typography>
                     </Grid>
                     <Grid
                         container
@@ -130,7 +131,7 @@ const Projects = () => {
                         }}
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Description :</Typography>
-                        <Typography variant="caption">{ProjectDetails.description}</Typography>
+                        <Typography variant="body2">{ProjectDetails.description}</Typography>
                     </Grid>
                     <Grid
                         container
@@ -142,7 +143,7 @@ const Projects = () => {
                         }}
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Project Type :</Typography>
-                        <Typography variant="caption">{ProjectDetails.project_type}</Typography>
+                        <Typography variant="body2">{ProjectDetails.project_type}</Typography>
                     </Grid>
                     <Grid
                         container
@@ -154,7 +155,7 @@ const Projects = () => {
                         }}
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Status :</Typography>
-                        <Typography variant="caption">{ProjectDetails.is_published ? "Published" : ProjectDetails.is_archived ? "Archived" : "Draft"}</Typography>
+                        <Typography variant="body2">{ProjectDetails.is_published ? "Published" : ProjectDetails.is_archived ? "Archived" : "Draft"}</Typography>
                     </Grid>
                     <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
                         <Button
@@ -167,14 +168,14 @@ const Projects = () => {
                             }}
                             variant="contained"
                         >
-                            <Typography variant="caption">Show Project Setting</Typography>
+                            <Typography variant="caption" sx={{color : "#FFFFFF"}}>Show Project Setting</Typography>
                         </Button>
                     </Link>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
-                            <Tab label="Tasks" sx={{ fontSize: 16, fontWeight: '700' }} />
-                            <Tab label="Members" sx={{ fontSize: 16, fontWeight: '700' }} />
-                            <Tab label="Reports" sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.tasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>

@@ -52,7 +52,18 @@ const headerStyle = makeStyles({
             backgroundColor: "#E0E0E0",
             boxShadow: "none",
         },
-    }
+    },
+    avatar: {
+        width: "36px",
+        height: "36px",
+        backgroundColor: "#2A61AD",
+        fontSize: "14px",
+        color: "#FFFFFF",
+        "@media (max-width:640px)": {
+          width: "26px",
+          height: "26px",
+        },
+      },
 })
 
 export default headerStyle
