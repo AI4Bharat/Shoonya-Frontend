@@ -145,7 +145,7 @@ dashboardContentContainer: {
 },
 link : {
   textDecoration : "none"
-}
+},
   
 })
 

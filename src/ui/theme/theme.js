@@ -88,6 +88,7 @@ const themeDefault = createTheme({
       fontSize: "0.75rem",
       fontFamily: "'Roboto', sans-serif",
       fontWeight: "400",
+      color : "#3A3A3A"
     },
     subtitle1: {
       fontSize: "1.125rem",
@@ -162,6 +163,7 @@ const themeDefault = createTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: {
+            fontSize: "0.875rem",
           "@media (max-width:670px)": {
             fontSize: "0.875rem",
           },
@@ -329,11 +331,17 @@ const themeDefault = createTheme({
         root: {
           width: "auto",
           fontSize: "18px",
-          fontWeight: "300",
+          fontWeight: "600",
           letterSpacing: "0px",
           fontFamily: "Roboto",
           padding: "0",
+          textTransform : "none",
           marginRight: "28px",
+          opacity: 1,
+          color: "#3A3A3A",
+          "&.Mui-selected": {
+            color: "#3A3A3A",
+          },
           "@media (min-width:600px)": {
             minWidth: "auto",
           },

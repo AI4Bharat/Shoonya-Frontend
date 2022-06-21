@@ -101,6 +101,7 @@ const ReportsTable = () => {
                                 defaultValue={"This Month"}
                                 label="Date Range"
                                 onChange={handleOptionChange}
+                                // sx={{fontSize : "0.875rem"}}
                             >
                                 <MenuItem value={"Today"}>Today</MenuItem>
                                 <MenuItem value={"Yesterday"}>Yesterday</MenuItem>
