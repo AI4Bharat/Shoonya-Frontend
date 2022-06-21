@@ -80,19 +80,19 @@ const DetailsViewPage = (props) => {
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Projects" sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Workspaces" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label={translate("label.workspaces")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Annotators" sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Members" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Managers" sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Invites" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.managers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label={translate("label.invites")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             
-                            {pageType === componentType.Type_Workspace && <Tab label="Reports" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            <Tab label="Settings" sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0} style={{ textAlign: "center", maxWidth: "100%" }}>
