@@ -254,6 +254,21 @@ const themeDefault = createTheme({
         paper: { minWidth: "360px", minHeight: "116px" },
       },
     },
+    MuiAvatar : {
+        styleOverrides : {
+            root : {
+                backgroundColor : "#271e4f",
+                color : "#FFFFFF"
+            }
+        }
+    },
+    MuiIconButton : {
+        styleOverrides : {
+            root : {
+                borderRadius : "5%"
+            }
+        }
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
