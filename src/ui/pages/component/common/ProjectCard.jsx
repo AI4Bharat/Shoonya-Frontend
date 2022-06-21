@@ -53,25 +53,18 @@ const ProjectCard = (props) => {
                 <Grid
                     container
                     direction="row"
-                    justifyContent="space-between"
                     sx={{mt:1, mb:2}}
                     spacing={3}
-                    columnSpacing={{xs: 1, sm: 1, md: 10}}
+                    columnSpacing={{xs: 10, sm: 10, md: 10}}
                 >
                     <Grid
                         item
-                        xs={12}
-                        sm={12}
-                        md={6}
                     >
                         <Typography variant="lightText">Type</Typography>
                         <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.project_type}</Typography>
                     </Grid>
                     <Grid
                         item
-                        xs={12}
-                        sm={12}
-                        md={6}
                     >
                         <Typography variant="lightText">Project ID</Typography>
                         <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.id}</Typography>
