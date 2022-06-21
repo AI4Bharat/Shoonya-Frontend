@@ -98,7 +98,8 @@ const TaskTable = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
-    const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
+    const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users);
+    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled"});
     const [tasks, setTasks] = useState([]);
 
@@ -156,12 +157,17 @@ const TaskTable = () => {
                 el.data.machine_translation,
                 el.task_status,
                 <Link to={`task/${el.id}`} className={classes.link}>
-                    <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{color : "#FFFFFF"}} variant="body2">Annotate</Typography>} />
+                    <CustomButton
+                        onClick={() => console.log("task id === ", el.id)}
+                        sx={{ p: 1, borderRadius: 2 }}
+                        label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
+                            {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
+                        </Typography>} />
                 </Link>
                 ]
         }) : []
         setTasks(data);
-    }, [filteredList])
+    }, [filteredList, ProjectDetails])
 
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
