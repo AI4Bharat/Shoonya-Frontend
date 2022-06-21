@@ -76,6 +76,8 @@ const Layout= (props) => {
       style.innerHTML = 'input, textarea { direction: RTL; }'
       document.head.appendChild(style);
     }
+
+    console.log("layout page rendered.")
   }, []);
 
   return (

@@ -40,7 +40,7 @@ const Login = () => {
   });
 
   useEffect(() => {
-    localStorage.clear();
+    // localStorage.clear();
     window.addEventListener("keypress", (key) => {
       if (key.code === "Enter") {
         createToken();
