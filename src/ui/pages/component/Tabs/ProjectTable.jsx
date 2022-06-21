@@ -61,16 +61,14 @@ const ProjectTable = (props) => {
             return [
                         el.title, 
                         el.created_by && el.created_by.username,
-                        // <Link  style={{ textDecoration: "none" }}>
+                        <Link  to={`projects/${id}`} style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}
                                 label = "View"
                             />
-                        // </Link>
+                         </Link>
             ]
         }) : [];
-
-        console.log("data values", data);
 
         const options = {
             textLabels: {
