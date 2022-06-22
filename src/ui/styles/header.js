@@ -14,12 +14,12 @@ const headerStyle = makeStyles({
     },
     toolbar: {
         justifyContent : "space-between",
-        // maxWidth: "1272px",
+        maxWidth: "1272px",
         width: "100%",
         margin: "0 auto",
         display: "flex",
         alignItems: "center",
-        padding: "0",
+        padding: "inherit !important",
         boxSizing: "border-box",
         minHeight: "54px",
        
