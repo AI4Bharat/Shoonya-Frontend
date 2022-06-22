@@ -76,7 +76,7 @@ const ManagersTable = (props) => {
                         label = "View"
                     />
                     <CustomButton
-                        sx={{borderRadius : 2,backgroundColor:"red"}}
+                        sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
                         label = "Remove"
                     />
                 </Link>
