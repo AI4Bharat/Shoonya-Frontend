@@ -14,7 +14,7 @@ const headerStyle = makeStyles({
     },
     toolbar: {
         justifyContent : "space-between",
-        maxWidth: "1272px",
+        // maxWidth: "1272px",
         width: "100%",
         margin: "0 auto",
         display: "flex",
