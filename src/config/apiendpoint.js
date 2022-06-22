@@ -7,4 +7,5 @@ export default {
   getOrganizations:"/organizations/",
   getLanguages:"/users/languages/",
   getDatasets:"/data/",
+  annotations:"/annotation/",
 };

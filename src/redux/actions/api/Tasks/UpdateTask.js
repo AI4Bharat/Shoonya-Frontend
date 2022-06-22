@@ -1,22 +1,22 @@
 /**
- * Create Project API
+ * Update Task API
  */
 import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
-export default class CreateProjectAPI extends API {
-  constructor(projectObj, timeout = 2000) {
-    super("POST", timeout, false);
-    this.projectObj = projectObj;
-    this.type = constants.CREATE_PROJECT;
-    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}`;
+export default class UpdateTaskAPI extends API {
+  constructor(taskId, taskObj, timeout = 2000) {
+    super("PATCH", timeout, false);
+    this.taskObj = taskObj;
+    this.type = constants.UPDATE_TASK;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks}${taskId}/`;
   }
 
   processResponse(res) {
     super.processResponse(res);
     if (res) {
-      this.newProject = res;
+      this.updatedTask = res;
     }
   }
 
@@ -25,7 +25,7 @@ export default class CreateProjectAPI extends API {
   }
 
   getBody() {
-    return this.projectObj;
+    return this.taskObj;
   }
 
   getHeaders() {
@@ -39,6 +39,6 @@ export default class CreateProjectAPI extends API {
   }
 
   getPayload() {
-    return this.newProject;
+    return this.updatedTask;
   }
 }
