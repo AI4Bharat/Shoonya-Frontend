@@ -26,6 +26,7 @@ import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
 import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
+import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -180,6 +181,12 @@ const App = () => {
           path="datasets/:datasetId"
           element={ProtectedRouteWrapper(
             <Layout component={<DatasetDetails />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="transliteration/"
+          element={ProtectedRouteWrapper(
+            <Layout component={<Transliteration />} Backbutton={true} />
           )}
         />
       </Routes>
