@@ -1,10 +1,12 @@
 import { makeStyles } from '@mui/styles';
+import { padding } from '@mui/system';
 
 const headerStyle = makeStyles({
     parentContainer: {
         // flexGrow : 1,
         marginBottom : window.innerHeight*0.13,
         width : window.innerWidth*0.98,
+      
        
     },
     appBar: {
@@ -19,33 +21,36 @@ const headerStyle = makeStyles({
         margin: "0 auto",
         display: "flex",
         alignItems: "center",
-        padding: "inherit !important",
+        // padding: "inherit !important",
+        padding:"0px !important",
         boxSizing: "border-box",
         minHeight: "54px",
-       
+        fontFamily: '"Roboto" ,sans-serif',
       
     },
     menu:{
+        maxWidth: "1272px",
         width: "100%",
+        margin: "0 auto",
         display: "flex",
         alignItems: "center",
         cursor: "pointer",
+     
 
     },
     headerLogo: {
         height: "2rem", 
-        width: "10rem" 
+        width: "10rem", 
     },
     headerMenu : {
         textDecoration : "none",
         borderRadius: "inherit",
         backgroundColor: "transparent",
-        padding : "15px",
+        padding : "18px ",
         color: "black",
         boxShadow: "none",
-        fontSize: "17px",
-        lineHeight : 1.75,
-        fontFamily: `"Roboto", "Segoe UI"`, 
+        fontSize: "19px",
+        fontFamily: "Roboto", 
         fontWeight: 500,
         letterSpacing: "0.5px",
         borderRadius:3,
@@ -59,12 +64,11 @@ const headerStyle = makeStyles({
         backgroundColor: "#E0E0E0",
         textDecoration : "none",
         borderRadius: "inherit",
-        padding : "15px",
+        padding : "18px ",
         color: "black",
         boxShadow: "none",
-        fontSize: "17px",
-        lineHeight : 1.75,
-        fontFamily: `"Roboto", "Segoe UI"`, 
+        fontSize: "19px",
+        fontFamily: "Roboto", 
         fontWeight: 500,
         borderRadius:3,
         letterSpacing: "0.5px",

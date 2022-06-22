@@ -61,7 +61,7 @@ const ProjectTable = (props) => {
             return [
                         el.title, 
                         el.created_by && el.created_by.username,
-                        <Link  to={`projects/${id}`} style={{ textDecoration: "none" }}>
+                        <Link  to={`/projects/${el.id}`} style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2}}
                                 label = "View"
