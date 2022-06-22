@@ -185,7 +185,7 @@ const Header = () => {
       <Grid
       container
       direction="row"  
-      style={{padding:"30px"}}
+     
   >
         <Box className={classes.parentContainer}>
         {isMobile ? <MobileNavbar tabs={tabs} userSettings={userSettings} appSettings={appSettings} loggedInUserData={loggedInUserData}/> :
@@ -204,13 +204,13 @@ const Header = () => {
                     <Grid
                         container
                         direction="row"
-                        justifyContent="space-evenly"
+                        // justifyContent="space-evenly"
                         // spacing={0}
-                        columnGap={3}
+                        columnGap={2}
                         rowGap={2}
                         xs={12}
                         sm={12}
-                        md={7}
+                        md={8}
                     >
                         {tabs.map((tab) => (tab))}
                     </Grid>
