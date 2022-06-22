@@ -53,7 +53,7 @@ const headerStyle = makeStyles({
         fontFamily: "Roboto", 
         fontWeight: 500,
         letterSpacing: "0.5px",
-        borderRadius:3,
+        borderRadius:12,
         '&:hover': {
             backgroundColor: "#E0E0E0",
             boxShadow: "none",
@@ -70,7 +70,7 @@ const headerStyle = makeStyles({
         fontSize: "19px",
         fontFamily: "Roboto", 
         fontWeight: 500,
-        borderRadius:3,
+        borderRadius:12,
         letterSpacing: "0.5px",
         '&:hover': {
             backgroundColor: "#E0E0E0",
