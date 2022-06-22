@@ -182,6 +182,11 @@ const Header = () => {
     ]
 
     return (
+      <Grid
+      container
+      direction="row"  
+     
+  >
         <Box className={classes.parentContainer}>
         {isMobile ? <MobileNavbar tabs={tabs} userSettings={userSettings} appSettings={appSettings} loggedInUserData={loggedInUserData}/> :
             (<AppBar style={{ backgroundColor: "#ffffff" }}>
@@ -190,7 +195,7 @@ const Header = () => {
                         sx={{ flexGrow: 0, display: "inline-grid" }}
                         xs={12}
                         sm={12}
-                        md={2}
+                        md={3}
                     >
                         <Link to="/">
                             <img src={Logo} alt="logo" className={classes.headerLogo} />
@@ -199,9 +204,9 @@ const Header = () => {
                     <Grid
                         container
                         direction="row"
-                        justifyContent="space-evenly"
+                        // justifyContent="space-evenly"
                         // spacing={0}
-                        columnGap={3}
+                        columnGap={2}
                         rowGap={2}
                         xs={12}
                         sm={12}
@@ -305,6 +310,7 @@ const Header = () => {
                 </Toolbar>
             </AppBar>)}
         </Box>
+        </Grid>
     );
 };
 
