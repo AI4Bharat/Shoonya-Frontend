@@ -117,7 +117,7 @@ const DetailsViewPage = (props) => {
                     <TabPanel value={value} index={1}>
                         {pageType === componentType.Type_Workspace &&
                             <>
-                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />
+                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} sx={{ width: "100%", mb: 2 }} />
                                 <AnnotatorsTable />
                             </>
                         }
