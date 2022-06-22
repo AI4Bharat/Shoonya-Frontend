@@ -102,6 +102,11 @@ const Header = () => {
     const classes = headerStyle();
 
     return (
+      <Grid
+      container
+      direction="row"  
+      style={{padding:"30px"}}
+  >
         <Box className={classes.parentContainer}>
             <AppBar style={{ backgroundColor: "#ffffff" }}>
                 <Toolbar className={classes.toolbar}>
@@ -110,7 +115,7 @@ const Header = () => {
                         sx={{ flexGrow: 0, display: "inline-grid" }}
                         xs={12}
                         sm={12}
-                        md={2}
+                        md={3}
                     >
                         <Link to="/">
                             <img src={Logo} alt="logo" className={classes.headerLogo} />
@@ -125,7 +130,7 @@ const Header = () => {
                         rowGap={2}
                         xs={12}
                         sm={12}
-                        md={8}
+                        md={7}
                     >
                         <Typography variant="body1">
                             <NavLink
@@ -285,6 +290,7 @@ const Header = () => {
                 </Toolbar>
             </AppBar>
         </Box>
+        </Grid>
     );
 };
 
