@@ -168,7 +168,7 @@ const Projects = () => {
                             }}
                             variant="contained"
                         >
-                            <Typography variant="caption" sx={{color : "#FFFFFF"}}>Show Project Setting</Typography>
+                            <Typography variant="body2" sx={{color : "#FFFFFF"}}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
                     </Link>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

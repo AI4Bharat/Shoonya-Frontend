@@ -25,6 +25,7 @@ import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
 import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
 import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
+import { authenticateUser } from "./utils/utils";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -36,15 +37,6 @@ const App = () => {
 
   const ProtectedRouteWrapper = (component) => {
     return <ProtectedRoute>{component}</ProtectedRoute>;
-  };
-
-  const authenticateUser = () => {
-    const access_token = localStorage.getItem("shoonya_access_token");
-    if (access_token) {
-      return true;
-    } else {
-      return false;
-    }
   };
 
   // let routes = useRoutes([
