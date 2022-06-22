@@ -33,10 +33,21 @@ const ProjectCard = (props) => {
                     p: 2
                 }}
             >
-                <Typography variant="caption" sx={{ background: "#FFD981", p: 1, borderRadius: 3 }}>{projectObj.project_mode}</Typography>
+                <Typography variant="body2" sx={{ background: "#FFD981", p: 1, borderRadius: 5, width : "fit-content"}}>{projectObj.project_mode}</Typography>
                 <Typography
-                    variant="h5"
-                    sx={{ mt: 4, textAlign: "center", color: "secondary.contrastText", backgroundColor: "primary.contrastText", borderRadius: 3, pt: 1, pb: 1 }}
+                    variant="h6"
+                    sx={{ 
+                            mt: 3, 
+                            textAlign: "center", 
+                            color: "secondary.contrastText", 
+                            backgroundColor: "primary.contrastText", 
+                            borderRadius: 3, 
+                            pt: 1, 
+                            pb: 1, 
+                            minHeight : 64, 
+                            alignItems : "center", 
+                            display:"grid" 
+                        }}
                 >{projectObj.title}
                 </Typography>
                 <Grid
@@ -50,13 +61,13 @@ const ProjectCard = (props) => {
                         item
                     >
                         <Typography variant="lightText">Type</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.project_type}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText", mt : 0.5, fontWeight : "500" }}>{projectObj.project_type}</Typography>
                     </Grid>
                     <Grid
                         item
                     >
                         <Typography variant="lightText">Project ID</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.id}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText", mt : 0.5, fontWeight : "500" }}>{projectObj.id}</Typography>
                     </Grid>
                 </Grid>
                 

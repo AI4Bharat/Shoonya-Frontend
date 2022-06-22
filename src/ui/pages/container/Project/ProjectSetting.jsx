@@ -30,8 +30,8 @@ const ProjectSetting = (props) => {
         { name: "Project Type", value: null },
         { name: "Status", value: null },
     ])
-    const [isArchived, setIsArchived] = useState(false);
     const [open, setOpen] = useState(false);
+    const [value, setValue] = useState();
     const { id } = useParams();
 
     const classes = DatasetStyle();
@@ -50,6 +50,7 @@ const ProjectSetting = (props) => {
         getProjectDetails();
 
     }, []);
+    console.log(ProjectDetails, "ProjectDetails")
 
 
     const getSaveButtonAPI = () => {
@@ -84,6 +85,7 @@ const ProjectSetting = (props) => {
 
 
     const ArchiveProject = useSelector(state => state.getArchiveProject.data);
+    const [isArchived, setIsArchived] = useState(ArchiveProject.is_archived);
     const getArchiveProjectAPI = () => {
         const projectObj = new GetArchiveProjectAPI(id);
 
@@ -117,30 +119,15 @@ const ProjectSetting = (props) => {
 
     const handleok = () => {
         getArchiveProjectAPI()
-
-        if (ArchiveProject.is_archived) {
-
-            setIsArchived(true)
-            setOpen(false);
-        } else {
-            setIsArchived(false)
-            setOpen(false);
-        }
-
+        setIsArchived(!isArchived)
+        setOpen(false);
+    }
+    function snakeToTitleCase(str) {
+        return str.split("_").map((word) => {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(" ");
     }
 
-
-
-    console.log(props, "processResponse")
-
-
-    let archivebutton = "Archived project "
-    if (ArchiveProject.is_archived) {
-        archivebutton = "UnArchived project"
-
-    } else {
-        archivebutton = "Archived project"
-    }
     return (
         <ThemeProvider theme={themeDefault}>
 
@@ -216,7 +203,7 @@ const ProjectSetting = (props) => {
                             xl={9}
                             sm={12}
                         >
-                            <OutlinedTextField fullWidth value={ProjectDetails.title} />
+                            <OutlinedTextField fullWidth value={ProjectDetails.title} onChange={(e) => setValue(e.target.value)} />
                         </Grid>
                     </Grid>
                     <Grid
@@ -252,6 +239,7 @@ const ProjectSetting = (props) => {
                             <OutlinedTextField
                                 fullWidth
                                 value={ProjectDetails.description}
+                                onChange={(e) => setValue(e.target.value)}
                             />
                         </Grid>
                     </Grid>
@@ -310,19 +298,17 @@ const ProjectSetting = (props) => {
                             // direction : "row",
                             mb: 2,
                             justifyContent: "flex-start",
-                           
+
                         }}
                     >
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 , ml:2}} onClick={handlePublishProject} label="Publish Project" />
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePublishProject} label="Publish Project" />
+                        {ProjectDetails.sampling_mode == "f" ? <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleExportProject} label="Export Project into Dataset" /> : " "}
 
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 , ml:2}} onClick={handleExportProject} label="Export Project into Dataset" />
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleClickOpen} label={isArchived ? "unArchived" : "Archived"} />
 
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 , ml:2}} onClick={handleClickOpen} label={isArchived ? "unArchived" : "Archived"} />
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
 
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 , ml:2}} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
-
-                        {/* <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3 , ml:2}} label="Download project" /> */}
-                        <DownloadProjectButton/>
+                        <DownloadProjectButton />
 
                     </Grid>
                     <Divider />
@@ -338,30 +324,43 @@ const ProjectSetting = (props) => {
                             Read-only Configurations
                         </Typography>
                     </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        sm={12}
-                    >
-                        <Typography variant="h5" gutterBottom component="div" style={{ margin: "15px 0px 10px 0px", }}>
-                            Sampling Parameters
-                        </Typography>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        sm={12}
-                    >
-                        <Typography gutterBottom component="div" >
-                            Sampling Mode :
-                        </Typography>
-                    </Grid>
+                    {ProjectDetails && ProjectDetails.sampling_mode && (
+                        <div>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                                sm={12}
+                            >
+
+                                <Typography variant="h5" gutterBottom component="div" style={{ margin: "15px 0px 10px 0px", }}>
+                                    Sampling Parameters
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={12}
+                                sm={12}
+                            >
+                                <Typography gutterBottom component="div" style={{ float: "left", marginRight: "150px" }} >
+                                    Sampling Mode :
+                                </Typography>
+
+                                <Typography  >
+                                    {ProjectDetails.sampling_mode == "f" && "Full"}
+                                    {ProjectDetails.sampling_mode == "b" && "Batch"}
+                                    {ProjectDetails.sampling_mode == "r" && "Random"}
+
+                                </Typography>
+
+                            </Grid>
+                        </div>
+                    )}
                 </Card>
             </Grid>
             <Dialog
@@ -371,8 +370,9 @@ const ProjectSetting = (props) => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogContent>
+
                     <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to unarchive this project?"
+                        Are you sure you want to {!isArchived ? "unarchive" : "archive"} this project?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
