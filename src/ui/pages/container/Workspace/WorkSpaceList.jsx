@@ -28,7 +28,7 @@ export default function WorkSpaces(props) {
   return (
     <React.Fragment>
     {/* <Header /> */}
-    <Box sx={{ width: window.innerWidth*0.7, margin : "0 auto", pb : 5 }}>
+    <Box sx={{ margin : "0 auto", pb : 5 }}>
         {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Visit Workspaces</Typography> */}
         <WorkspaceTable 
           showManager={false} 
