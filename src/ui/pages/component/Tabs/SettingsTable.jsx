@@ -6,7 +6,7 @@ import { Box, Card, Grid, Tab, Tabs,CardContent, ThemeProvider, Typography } fro
 export default function SettingsTable() {
     const classes = DatasetStyle();
   return (
-    <div className={classes.settingsdiv} style={{}} >
+    <div className={classes.settingsdiv}  >
       <Card>
       <CardContent>
       <Button className={classes.settingsButton}  label={"Archive Workspace"} />

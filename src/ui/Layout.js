@@ -13,13 +13,15 @@ import {  ThemeProvider,  } from "@mui/material";
 // import Snackbar from "./pages/component/common/Snackbar";
 import themeDefault from './theme/theme'
 import GlobalStyles from "./styles/LayoutStyles";
-
+import BackButton from "./pages/component/common/BackButton";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { translate } from "../config/localisation";
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 
 const Layout= (props) => {
   // const Component = props.component;
-  const { type, index, userRoles, component } = props;
+  const { type, index, userRoles, component,Backbutton } = props;
   const [show, setShow] = useState(false);
   const [popUp, setPopup] = useState(true);
   const apiStatus = useSelector((state) => state.apiStatus);
@@ -69,6 +71,16 @@ const Layout= (props) => {
     }
   })
 
+  useEffect(() => {
+    if (localStorage.getItem('rtl') === "true") {
+      let style = document.createElement('style');
+      style.innerHTML = 'input, textarea { direction: RTL; }'
+      document.head.appendChild(style);
+    }
+
+    console.log("layout page rendered.")
+  }, []);
+
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
@@ -86,6 +98,9 @@ const Layout= (props) => {
         >
           {/* {renderSpinner()}
           {renderError()} */}
+          { Backbutton  && 
+           < BackButton startIcon={<  ArrowBackIcon />} sx={{ color:"white" ,   mb:2  }} label={translate("label.backToPreviousPage")}/>
+           }
           <Suspense fallback={<div>Loading....</div>}>
             {component}
           </Suspense>

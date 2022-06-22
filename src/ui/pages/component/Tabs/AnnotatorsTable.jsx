@@ -83,16 +83,18 @@ const AnnotatorsTable = (props) => {
                         userRole ? userRole : el.role,
                         // userRole ? userRole : el.role,
                         // el.role,
+                        <>
                         <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2,marginRight: 2}}
                                 label = "View"
                             />
-                            <CustomButton
+                        </Link>
+                        <CustomButton
                                 sx={{borderRadius : 2,backgroundColor:"red"}}
                                 label = "Remove"
                             />
-                        </Link>
+                        </>
                     ]
         }) :[];
 

@@ -3,300 +3,193 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Button, Tooltip } from "@mui/material";
+import { Alert, Box, Button, Card, Divider, Grid, TextField, Tooltip, Typography } from "@mui/material";
 import CustomButton from "../../component/common/Button";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import GetTaskPredictionAPI from "../../../../redux/actions/api/Tasks/GetTaskPrediction";
-
-const LabelStudioWrapper = ({ }) => {
-    // we need a reference to a DOM node here so LSF knows where to render
-    const rootRef = useRef();
-    // this reference will be populated when LSF initialized and can be used somewhere else
-    const lsfRef = useRef();
-
-    const [labelConfig, setLabelConfig] = useState();
-    const [taskData, setTaskData] = useState(undefined);
-    const { projectId, taskId } = useParams();
-    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-
-    // function LSFRoot(
-    //     rootRef,
-    //     lsfRef,
-    //     userContext,
-    //     projectId,
-    //     taskData,
-    //     labelConfig,
-    //     annotations,
-    //     predictions,
-    //     notesRef
-    //   ) {
-    //     let load_time;
-    //     let interfaces = [];
-    //     if (predictions == null) predictions = [];
-    
-    //     if (taskData.task_status == "freezed") {
-    //       interfaces = [
-    //         "panel",
-    //         // "update",
-    //         // "submit",
-    //         "skip",
-    //         "controls",
-    //         "infobar",
-    //         "topbar",
-    //         "instruction",
-    //         // "side-column",
-    //         "annotations:history",
-    //         "annotations:tabs",
-    //         "annotations:menu",
-    //         "annotations:current",
-    //         // "annotations:add-new",
-    //         "annotations:delete",
-    //         // "annotations:view-all",
-    //         "predictions:tabs",
-    //         "predictions:menu",
-    //         // "auto-annotation",
-    //         "edit-history",
-    //       ];
-    //     } else {
-    //       interfaces = [
-    //         "panel",
-    //         "update",
-    //         "submit",
-    //         "skip",
-    //         "controls",
-    //         "infobar",
-    //         "topbar",
-    //         "instruction",
-    //         // "side-column",
-    //         "annotations:history",
-    //         "annotations:tabs",
-    //         "annotations:menu",
-    //         "annotations:current",
-    //         // "annotations:add-new",
-    //         "annotations:delete",
-    //         // "annotations:view-all",
-    //         "predictions:tabs",
-    //         "predictions:menu",
-    //         // "auto-annotation",
-    //         "edit-history",
-    //       ];
-    //     }
-    
-    //     if (rootRef.current) {
-    //       lsfRef.current = new LabelStudio(rootRef.current, {
-    //         /* all the options according to the docs */
-    //         config: labelConfig,
-    
-    //         interfaces: interfaces,
-    
-    //         user: {
-    //           pk: userContext.user.id,
-    //           firstName: userContext.user.first_name,
-    //           lastName: userContext.user.last_name,
-    //         },
-    
-    //         task: {
-    //           annotations: annotations,
-    //           predictions: predictions,
-    //           id: taskData.id,
-    //           data: taskData.data,
-    //         },
-    
-    //         onLabelStudioLoad: function (ls) {
-    //           var c = ls.annotationStore.addAnnotation({
-    //             userGenerate: true,
-    //           });
-    //           ls.annotationStore.selectAnnotation(c.id);
-    //           load_time = new Date();
-    //         },
-    //         onSubmitAnnotation: function (ls, annotation) {
-    //           showLoader();
-    //           if (taskData.task_status != "freezed") {
-    //             postAnnotation(
-    //               annotation.serializeAnnotation(),
-    //               taskData.id,
-    //               userContext.user.id,
-    //               load_time,
-    //               annotation.lead_time,
-    //               task_status,
-    //               notesRef.current
-    //             )
-    //           }
-    //           else message.error("Task is freezed");
-    
-    //           if (localStorage.getItem("labelAll"))
-    //             getNextProject(projectId, taskData.id).then((res) => {
-    //               hideLoader();
-    //               window.location.href = `/projects/${projectId}/task/${res.id}`;
-    //             })
-    //           else {
-    //             hideLoader();
-    //             window.location.reload();
-    //           }
-    //         },
-    
-    //         onSkipTask: function () {
-    //           message.warning('Notes will not be saved for skipped tasks!');
-    //           showLoader();
-    //           updateTask(taskData.id).then(() => {
-    //             getNextProject(projectId, taskData.id).then((res) => {
-    //               hideLoader();
-    //               window.location.href = `/projects/${projectId}/task/${res.id}`;
-    //             });
-    //           })
-    //         },
-    
-    //         onUpdateAnnotation: function (ls, annotation) {
-    //           if (taskData.task_status != "freezed") {
-    //             showLoader();
-    //             for (let i = 0; i < annotations.length; i++) {
-    //               if (annotation.serializeAnnotation().id == annotations[i].result.id) {
-    //                 let temp = annotation.serializeAnnotation()
-    
-    //                 for (let i = 0; i < temp.length; i++) {
-    //                   if (temp[i].value.text) {
-    //                     temp[i].value.text = [temp[i].value.text[0]]
-    //                   }
-    //                 }
-    //                 patchAnnotation(
-    //                   temp,
-    //                   annotations[i].id,
-    //                   load_time,
-    //                   annotations[i].lead_time,
-    //                   task_status,
-    //                   notesRef.current
-    //                   ).then(() => {
-    //                     if (localStorage.getItem("labelAll"))
-    //                       getNextProject(projectId, taskData.id).then((res) => {
-    //                         hideLoader();
-    //                         window.location.href = `/projects/${projectId}/task/${res.id}`;
-    //                       })
-    //                     else{
-    //                       hideLoader();
-    //                       window.location.reload();
-    //                     }
-    //                   });
-    //               }
-    //             }
-    //           } else message.error("Task is freezed");
-    //         },
-    
-    //         onDeleteAnnotation: function (ls, annotation) {
-    //           for (let i = 0; i < annotations.length; i++) {
-    //             if (annotation.serializeAnnotation().id == annotations[i].result.id)
-    //               deleteAnnotation(
-    //                 annotations[i].id
-    //               );
-    //           }
-    //         }
-    //       });
-    //     }
-    //   }
-
-    useEffect(() => {
-        console.log("ProjectDetails", ProjectDetails);
-    }, [])
-
-    return (
-        <div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                {/* <div>
-            <Tooltip title="Save task for later">
-              <Button
-                value="Draft"
-                type="default"
-                onClick={onDraftAnnotation}
-                style={{minWidth: "160px", borderColor:"#e5e5e5", color: "#e80", fontWeight: "500"}}
-              >
-                Draft
-              </Button>
-            </Tooltip>
-            {localStorage.getItem("labelAll") != "true" ? (
-              <Tooltip title="Go to next task">
-                <Button
-                  value="Next"
-                  type="default"
-                  onClick={onNextAnnotation}
-                  style={{minWidth: "160px", borderColor:"#e5e5e5", color: "#09f", fontWeight: "500"}}
-                >
-                  Next
-                </Button>
-              </Tooltip>
-            ) : (
-              <div style={{minWidth: "160px"}}/>
-            )}
-          </div> */}
-            </div>
-            <div className="label-studio-root" ref={rootRef}></div>
-        </div>
-    )
-}
+// import GetTaskPredictionAPI from "../../../../redux/actions/api/Tasks/GetTaskPrediction";
+import { translate } from "../../../../config/localisation";
+import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails";
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const AnnotateTask = () => {
-    const [collapseHeight, setCollapseHeight] = useState('0');
-    const notesRef = useRef('');
-    const {taskId} = useParams()
-    const [notesValue, setNotesValue] = useState('');
-    const dispatch = useDispatch();
+  const urlParams = useParams();
+  const dispatch = useDispatch();
+  const taskDetails = useSelector(state => state.getTaskDetails.data);
 
-    const handleCollapseClick = () => {
-        if(collapseHeight === '0') {
-          setCollapseHeight('auto')
-        } else {
-          setCollapseHeight('0');
-        }
-      }
+  const [translatedText, setTranslatedText] = useState("");
+  const [showNotes, setShowNotes] = useState(false);
 
-      const getTaskPrediction = () => {
-        const taskPredictionObj = new GetTaskPredictionAPI(taskId);
-        dispatch(APITransport(taskPredictionObj));
-      }
+  const getTaskDetails = () => {
+    const taskListObj = new GetTaskDetailsAPI(urlParams.taskId);
+    dispatch(APITransport(taskListObj));
+  }
 
-      useEffect(()=>{
-        getTaskPrediction();   
-      },[])
-    
-    //   useEffect(()=>{
-    //     fetchAnnotation(task_id).then((data)=>{
-    //       if(data && Array.isArray(data) && data.length > 0) {
-    //         setNotesValue(data[0].notes);
-    //       }
-    //     })
-    //   }, [setNotesValue, task_id]);
-    
-    //   useEffect(()=>{
-    //     notesRef.current = notesValue;
-    //   }, [notesValue])
-  
-      
-    return (
-        <div style={{ maxHeight: "100%", maxWidth: "90%" }}>
-            <div style={{ maxWidth: "100%", display: "flex", justifyContent: "space-between" }}>
-                <div style={{ display: "flex" }}>
-                    <CustomButton
-                        label="Back to Project"
-                        onClick={() => {
-                            // localStorage.removeItem("labelAll");
-                            var id = window.location.href.split("/")[4];
-                            window.location.href = `/projects/${id}`;
-                        }}
-                    />
-                    <Button sx={{ ml: 2 }} 
-                        onClick={handleCollapseClick}
-                    >
-                        Notes
-                    </Button>
-                </div>
-            </div>
-            {/* <div className={styles.collapse} style={{ height: collapseHeight }}>
-                <Alert message="Please do not add notes if you are going to skip the task!" type="warning" showIcon style={{ marginBottom: '1%' }} />
-                <Input.TextArea placeholder="Place your remarks here ..." value={notesValue} onChange={event => setNotesValue(event.target.value)} />
-            </div> */}
-            <LabelStudioWrapper 
-            // notesRef={notesRef} 
-            />
-        </div>
-    )
+
+  useEffect(() => {
+    getTaskDetails();
+  }, [])
+
+  useEffect(() => {
+    setTranslatedText(taskDetails && taskDetails.data ? taskDetails.data.machine_translation : "");
+  }, [taskDetails])
+
+  console.log("taskDetails", taskDetails);
+
+  return (
+    <Card
+      elevation={2}
+      sx={{
+        minHeight: 600,
+        padding: 5,
+        mb: 5
+      }}
+    >
+      <Grid
+        container
+        direction={"row"}
+        justifyContent={"space-between"}
+        sx={{
+          mb : 2
+        }}
+      >
+        <Typography variant="body1"><b>Annotate Task - #{urlParams && urlParams.taskId}</b></Typography>
+        <CustomButton
+          label={translate("button.notes")}
+          onClick={() => setShowNotes(!showNotes)}
+          endIcon={showNotes ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          sx={{
+            borderRadius: 2,
+          }}
+        />
+      </Grid>
+
+      {showNotes && <Grid
+        // container
+        // direction={"row"}
+        // justifyContent={"space-between"}
+        sx={{
+          mt: 2,
+          mb: 2,
+          alignItems: "center",
+        }}
+      >
+        <Alert severity="warning" sx={{ width: "auto" }}>Please do not add notes if you are going to skip the task!</Alert>
+        <TextField
+          // value={translatedText}
+          // onChange={(e)=>setTranslatedText(e.target.value)}
+          placeholder="Place your remarks here..."
+          multiline
+          rows={3}
+          sx={{ border: "none", width: "100%", mt: 2 }}
+        />
+      </Grid>}
+      <Divider />
+      <Grid
+        container
+        direction={"row"}
+        justifyContent={"space-between"}
+        sx={{
+          mt: 5,
+          mb: 2,
+          alignItems: "center",
+        }}
+      >
+        {/* <Typography variant="body2">Task : #<b>{urlParams && urlParams.taskId}</b></Typography> */}
+        <Typography variant="body2">Task Status : <b>{taskDetails && taskDetails.task_status}</b></Typography>
+        <Grid
+          direction={"row"}
+          justifyContent={"space-around"}
+          columnSpacing={5}
+          sx={{
+          }}
+        >
+          <CustomButton label={translate("button.draft")} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
+          <CustomButton label={translate("button.next")} endIcon={<NavigateNextIcon />} sx={{ borderRadius: 2 }} />
+        </Grid>
+      </Grid>
+      <Divider />
+      <Grid
+        container
+        direction={"row"}
+        justifyContent={"space-between"}
+        columnGap={1}
+        sx={{ mb: 3 }}
+      >
+        <Grid
+          item
+          xs={12}
+          md={3.5}
+          lg={3.5}
+          xl={3.5}
+          sm={12}
+          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
+        >
+          <Typography variant="body1">Source sentence</Typography>
+          <Typography variant="body2" sx={{ mt: 4 }}>{taskDetails && taskDetails.data && taskDetails.data.input_text}</Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={3.5}
+          lg={3.5}
+          xl={3.5}
+          sm={12}
+          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
+        >
+          <Typography variant="body1">{taskDetails && taskDetails.data && taskDetails.data.output_language} translation</Typography>
+          <TextField
+            value={translatedText}
+            onChange={(e) => setTranslatedText(e.target.value)}
+            multiline
+            rows={6}
+            sx={{ border: "none", width: "100%", mt: 4, background : "#ffffff" }}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={3.5}
+          lg={3.5}
+          xl={3.5}
+          sm={12}
+          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
+        >
+          <Typography variant="body1">Machine translation</Typography>
+          <Typography variant="body2" sx={{ mt: 4 }}>{taskDetails && taskDetails.data && taskDetails.data.machine_translation}</Typography>
+        </Grid>
+
+      </Grid>
+      <Grid
+        direction={"row"}
+        justifyContent={"space-around"}
+        columnSpacing={5}
+        sx={{
+          mt: 3,
+          mb: 3,
+          textAlign: "end"
+        }}
+      >
+        <CustomButton label={translate("button.skip")} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
+        <CustomButton label={translate("button.submit")} sx={{ borderRadius: 2 }} />
+      </Grid>
+      <Divider />
+      <Grid
+        container
+        direction={"row"}
+        justifyContent={"space-between"}
+        sx={{
+          mt: 2,
+          mb: 2,
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="body1">Context</Typography>
+        <Typography variant="body2" sx={{ mt: 4 }}>{taskDetails && taskDetails.data && taskDetails.data.context}</Typography>
+      </Grid>
+    </Card>
+  )
 }
 
 export default AnnotateTask;

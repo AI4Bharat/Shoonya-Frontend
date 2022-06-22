@@ -12,7 +12,23 @@ import getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
 import getTaskPrediction from './Tasks/GetTaskPrediction';
 import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
-
+import getDatasetList from './Dataset/GetDatasetList';
+import getTaskDetails from './Tasks/GetTaskDetails'
+import getDatasetDetails from './Dataset/GetDatasetDetails';
+import getDataitemsById from './Dataset/GetDataitemsById';
+import getArchiveProject from './ProjectDetails/ArchiveProject';
+import getExportProject from './ProjectDetails/GetExportProjectButton';
+import getPullNewData from './ProjectDetails/PullNewItems';
+import getPublishProject from './ProjectDetails/GetPublishProject';
+import getEditUpdate from './ProjectDetails/EditUpdate'
+import getDatasetsByType from './Dataset/GetDatasetsByType';
+import getDatasetFields from './Dataset/GetDatasetFields';
+import getProjectDomains from './ProjectDetails/GetProjectDomains';
+import createProject from './ProjectDetails/CreateProject';
+import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
+import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
+import  downloadProjectButton from './ProjectDetails/DownloadProject'
+import getFilteredTasks from './Tasks/GetFilteredTasks';
 
 const index = {
     apiStatus,
@@ -28,7 +44,27 @@ const index = {
     getWorkspaceDetails,
     getTaskPrediction,    
     fetchLanguages,
-    getOrganizationUsers,    
+    getOrganizationUsers, 
+    getDatasetList,
+    getTaskDetails,
+    getDatasetList,
+    getDatasetDetails,
+    getDataitemsById,
+    getOrganizationUsers ,
+    getArchiveProject,
+    getExportProject,
+    getPullNewData,
+    getPublishProject,
+    getEditUpdate,
+    getOrganizationUsers,
+    getDatasetsByType,
+    getDatasetFields,
+    getProjectDomains,
+    createProject,
+    getWorkspaceUserReports,
+    getWorkspaceProjectReports,
+    downloadProjectButton,
+    getFilteredTasks
 };
 
 export default index;

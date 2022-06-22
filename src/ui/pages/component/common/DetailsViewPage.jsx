@@ -17,6 +17,10 @@ import { translate } from "../../../../config/localisation";
 import MembersTable from "../Project/MembersTable";
 import Members from "../Tabs/Members";
 import Invites from "../Tabs/Invites";
+import OrganizationSettings from "../Tabs/OrganizationSettings";
+import WorkspaceReports from "./WorkspaceReports";
+import AddUsersDialog from "./AddUsersDialog";
+import addUserTypes from "../../../../constants/addUserTypes";
 
 function TabPanel(props) {
 
@@ -42,8 +46,11 @@ function TabPanel(props) {
 
 const DetailsViewPage = (props) => {
     const { pageType, title, createdBy } = props;
+    const { id } = useParams();
     const classes = DatasetStyle();
     const [value, setValue] = React.useState(0);
+    const [addAnnotatorsDialogOpen, setAddAnnotatorsDialogOpen] = React.useState(false);
+    const [addManagersDialogOpen, setAddManagersDialogOpen] = React.useState(false);
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -58,6 +65,22 @@ const DetailsViewPage = (props) => {
         // getDashboardWorkspaceData();
     }, []);
 
+    
+    const handleAnnotatorDialogClose = () => {
+        setAddAnnotatorsDialogOpen(false);
+    };
+    
+    const handleAnnotatorDialogOpen = () => {
+        setAddAnnotatorsDialogOpen(true);
+    };
+    
+    const handleManagerDialogClose = () => {
+        setAddManagersDialogOpen(false);
+    };
+
+    const handleManagerDialogOpen = () => {
+        setAddManagersDialogOpen(true);
+    };
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -72,31 +95,33 @@ const DetailsViewPage = (props) => {
                         {title}
                     </Typography>
                     <Typography variant="body1" gutterBottom component="div">
-                        Created_by : {createdBy}
+                        Created by : {createdBy}
                     </Typography>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Projects" sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Workspaces" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label={translate("label.workspaces")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Annotators" sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Members" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
 
-                            {pageType === componentType.Type_Workspace && <Tab label="Managers" sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {pageType === componentType.Type_Organization && <Tab label="Invites" sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.managers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label={translate("label.invites")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            <Tab label="Settings" sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+
+                            <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0} style={{ textAlign: "center" }}>
+                    <TabPanel value={value} index={0} style={{ textAlign: "center", maxWidth: "100%" }}>
                         {pageType === componentType.Type_Workspace && <>
-                            <Link to={`/create-annotation-project/1`} style={{ textDecoration: "none", marginRight: "200px" }}>
+                            <Link to={`/create-annotation-project/${id}`} style={{ textDecoration: "none", marginRight: "200px" }}>
                                 <Button className={classes.projectButton} label={"Add New Annotation Project"} />
                             </Link>
-                            <Link to={`/create-collection-project/1`}  style={{ textDecoration: "none" }}>
-                            <Button className={classes.projectButton} label={"Add New Collection Project"} /></Link>
+                            <Link to={`/create-collection-project/${id}`} style={{ textDecoration: "none" }}>
+                                <Button className={classes.projectButton} label={"Add New Collection Project"} /></Link>
                             <div className={classes.workspaceTables} >
                                 <ProjectTable />
                             </div>
@@ -107,33 +132,48 @@ const DetailsViewPage = (props) => {
                                 <Workspaces />
                             </>
                         }
-                        
+
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         {pageType === componentType.Type_Workspace &&
                             <>
-                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />
+                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} onClick={handleAnnotatorDialogOpen} />
                                 <AnnotatorsTable />
+                                <AddUsersDialog
+                                    handleDialogClose={handleAnnotatorDialogClose}
+                                    isOpen={addAnnotatorsDialogOpen}
+                                    userType={addUserTypes.ANNOTATOR}
+                                    id={id}
+                                />
                             </>
                         }
                         {pageType === componentType.Type_Organization &&
                             <>
-                                <CustomButton label={translate("button.inviteNewMEmbersToOrganization")} sx={{ width: "100%", mb: 2 }} />
                                 <Members />
                             </>
                         }
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                            {pageType === componentType.Type_Workspace && 
-                                <>
-                                    <CustomButton label={"Assign Managers"} sx={{ width: "100%", mb: 2 }} />
-                                    <ManagersTable />
-                                </>
-                            }
-                            {pageType === componentType.Type_Organization && <Invites />}
+                        {pageType === componentType.Type_Workspace &&
+                            <>
+                                <CustomButton label={"Assign Managers"} sx={{ width: "100%", mb: 2 }} onClick={handleManagerDialogOpen} />
+                                <ManagersTable />
+                                <AddUsersDialog
+                                    handleDialogClose={handleManagerDialogClose}
+                                    isOpen={addManagersDialogOpen}
+                                    userType={addUserTypes.MANAGER}
+                                    id={id}
+                                />
+                            </>
+                        }
+                        {pageType === componentType.Type_Organization && <Invites />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                        <Button className={classes.settingsButton} label={"Archive Workspace"} />
+                        {pageType === componentType.Type_Organization && <OrganizationSettings />}
+                        {pageType === componentType.Type_Workspace && <WorkspaceReports />}
+                    </TabPanel>
+                    <TabPanel value={value} index={4}>
+                        {pageType === componentType.Type_Workspace && <Button className={classes.settingsButton} label={"Archive Workspace"} />}
                     </TabPanel>
                 </Card>
             </Grid>

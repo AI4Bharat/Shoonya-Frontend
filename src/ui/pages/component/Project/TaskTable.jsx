@@ -4,6 +4,7 @@ import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
+import filterTasks from "../../../../redux/actions/Tasks/FilterTasks";
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
@@ -89,7 +90,7 @@ const TaskTable = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
-
+    const filteredList = useSelector(state => state.getFilteredTasks.data);
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
@@ -98,12 +99,14 @@ const TaskTable = () => {
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
+    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled"});
+    const [tasks, setTasks] = useState([]);
 
     const filterData = {
-        Status : ["unlabeled", "skipped", "accepted"],
-        Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
-            return el.username
-        }) : []
+        Status : ["unlabeled", "skipped", "accepted", "draft"],
+        // Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
+        //     return el.username
+        // }) : []
     }
 
     const getTaskListData = () => {
@@ -113,21 +116,52 @@ const TaskTable = () => {
 
     const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
 
-
     useEffect(() => {
         getTaskListData();
-        setTotalTasks(totalTaskCount);
     }, []);
 
     useEffect(() => {
+        if (taskList?.length > 0) {
+            dispatch(filterTasks(taskList, selectedFilters));
+        }
+    }, [taskList]);
+
+    useEffect(() => {
+        if (taskList?.length > 0) {
+            dispatch(filterTasks(taskList, selectedFilters));
+            setCurrentPageNumber(1);
+        }
+    }, [selectedFilters])
+
+    useEffect(() => {
         getTaskListData();
-        console.log("fired now")
     }, [currentPageNumber]);
 
     useEffect(() => {
         getTaskListData();
-        console.log("fired now")
     }, [currentRowPerPage]);
+
+    useEffect(() => {
+        setTotalTasks(totalTaskCount);
+    }, [totalTaskCount])
+
+    useEffect(() => {
+        const data = filteredList && filteredList.length > 0 ? filteredList.map((el, i) => {
+            return [
+                el.id,
+                el.data.context,
+                el.data.input_text,
+                el.data.input_language,
+                el.data.output_language,
+                el.data.machine_translation,
+                el.task_status,
+                <Link to={`task/${el.id}`} className={classes.link}>
+                    <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{color : "#FFFFFF"}} variant="body2">Annotate</Typography>} />
+                </Link>
+                ]
+        }) : []
+        setTasks(data);
+    }, [filteredList])
 
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
@@ -192,27 +226,12 @@ const TaskTable = () => {
         customToolbar: renderToolBar,
     };
 
-    const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
-        return [
-            el.id,
-            el.data.context,
-            el.data.input_text,
-            el.data.input_language,
-            el.data.output_language,
-            el.data.machine_translation,
-            el.task_status,
-            <Link to={`task/${el.id}`}>
-                <CustomButton onClick={() => console.log("task id === ", el.id)} sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ inlineSize: "max-content", }} variant="caption">Annotate This Task</Typography>} />
-            </Link>
-            ]
-    }) : []
-
     return (
         <Fragment>
             <CustomButton sx={{ p: 1, width: '100%', borderRadius: 2, mb: 3 }} label={"Disabled"} />
             <MUIDataTable
                 title={""}
-                data={data}
+                data={tasks}
                 columns={columns}
                 options={options}
             // filter={false}
@@ -224,10 +243,8 @@ const TaskTable = () => {
                     anchorEl={anchorEl}
                     handleClose={handleClose}
                     filterStatusData={filterData}
-                    // selectedFilter={myContributionReport.selectedFilter}
-                    // clearAll={(data) => clearAll(data, handleClose)}
-                    // apply={(data) => apply(data, handleClose)}
-                    // task={props.task}
+                    updateFilters={setsSelectedFilters}
+                    currentFilters={selectedFilters}
                 />
             )}
         </Fragment>
