@@ -201,7 +201,7 @@ const Header = () => {
                         direction="row"
                         justifyContent="space-evenly"
                         // spacing={0}
-                        columnGap={5}
+                        columnGap={3}
                         rowGap={2}
                         xs={12}
                         sm={12}
