@@ -761,7 +761,7 @@ const AnnotationProject = (props) => {
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Create Project"}
                 onClick={handleCreateProject}
-                disabled={ ( title && description && selectedDomain && selectedType && selectedInstances && domains && samplingMode  ) ? false : true}
+                disabled={ ( title && description && selectedDomain && selectedType && selectedInstances && domains && samplingMode && selectedVariableParameters ) ? false : true}
               />
              {/* )}  */}
             <Button
