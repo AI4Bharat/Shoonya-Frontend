@@ -23,6 +23,9 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../common/Button";
+import MobileNavbar from "./MobileNavbar";
+import { useTheme } from "@emotion/react";
+import { useMediaQuery } from "@material-ui/core";
 
 const Header = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
@@ -30,8 +33,13 @@ const Header = () => {
     const [activeproject, setActiveproject] = useState("activeButtonproject");
     const [activeworkspace, setActiveworkspace] = useState("");
 
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
     const dispatch = useDispatch();
     let navigate = useNavigate();
+
+    const classes = headerStyle();
 
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
@@ -55,17 +63,6 @@ const Header = () => {
         localStorage.clear();
         navigate("/");
     };
-
-    const userSettings = [
-        {
-            name: "My Profile",
-            onclick: () => {
-                handleCloseUserMenu();
-                navigate("/my-profile");
-            },
-        },
-        { name: "Logout", onclick: () => onLogoutClick() },
-    ];
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -98,12 +95,96 @@ const Header = () => {
         }
     };
 
-  
-    const classes = headerStyle();
+    const tabs = [
+        <Typography variant="body1">
+            <NavLink
+                hidden={loggedInUserData.role === 1}
+                to={
+                    loggedInUserData && loggedInUserData.organization
+                        ? `/my-organization/${loggedInUserData.organization.id}`
+                        : `/my-organization/1`
+                }
+                className={({ isActive }) =>
+                    isActive ? classes.highlightedMenu : classes.headerMenu
+                }
+                activeClassName={classes.highlightedMenu}
+            >
+                Organization
+            </NavLink>
+        </Typography>,
+        <Typography variant="body1">
+            <NavLink
+                hidden={loggedInUserData.role === 1}
+                to="/workspaces"
+                className={({ isActive }) =>
+                    isActive ? classes.highlightedMenu : classes.headerMenu
+                }
+                activeClassName={classes.highlightedMenu}
+            >
+                Workspaces
+            </NavLink>
+        </Typography>,
+        <Typography variant="body1">
+            <NavLink
+                to="/projects"
+                className={({ isActive }) =>
+                    isActive ? classes.highlightedMenu : classes.headerMenu
+                }
+                activeClassName={classes.highlightedMenu}
+            >
+                Projects
+            </NavLink>
+        </Typography>,
+        <Typography variant="body1">
+            <NavLink
+                to="/datasets"
+                className={({ isActive }) =>
+                    isActive ? classes.highlightedMenu : classes.headerMenu
+                }
+                activeClassName={classes.highlightedMenu}
+            >
+                Datasets
+            </NavLink>
+        </Typography>
+    ]
+
+    const userSettings = [
+        {
+            name: "My Profile",
+            onclick: () => {
+                handleCloseUserMenu();
+                navigate("/profile");
+            },
+        },
+        { name: "Logout", onclick: () => onLogoutClick() },
+    ];
+
+    const appSettings = [
+        {
+            name: "Transliteration",
+            onclick: () => {
+
+            }
+        },
+        {
+            name: "Enable RTL-typing",
+            control: (<Checkbox
+                onChange={handleRTLChange}
+                defaultChecked={localStorage.getItem("rtl") === "true"}
+            />)
+        },
+        {
+            name: "Help",
+            onclick: () => {
+
+            }
+        }
+    ]
 
     return (
         <Box className={classes.parentContainer}>
-            <AppBar style={{ backgroundColor: "#ffffff" }}>
+        {isMobile ? <MobileNavbar tabs={tabs} userSettings={userSettings} appSettings={appSettings} loggedInUserData={loggedInUserData}/> :
+            (<AppBar style={{ backgroundColor: "#ffffff" }}>
                 <Toolbar className={classes.toolbar}>
                 <div className={classes.menu}>
                     <Grid
@@ -119,7 +200,7 @@ const Header = () => {
                     <Grid
                         container
                         direction="row"
-                        justifyContent="flex-start"
+                        justifyContent="space-evenly"
                         // spacing={0}
                         columnGap={3}
                         rowGap={2}
@@ -127,56 +208,7 @@ const Header = () => {
                         sm={12}
                         md={8}
                     >
-                        <Typography variant="body1">
-                            <NavLink
-                                hidden={loggedInUserData.role === 1}
-                                to={
-                                    loggedInUserData && loggedInUserData.organization
-                                        ? `/my-organization/${loggedInUserData.organization.id}`
-                                        : `/my-organization/1`
-                                }
-                                className={({ isActive }) =>
-                                    isActive ? classes.highlightedMenu : classes.headerMenu
-                                }
-                                activeClassName={classes.highlightedMenu}
-                            >
-                                Organization
-                            </NavLink>
-                        </Typography>
-                        <Typography variant="body1">
-                            <NavLink
-                                hidden={loggedInUserData.role === 1}
-                                to="/workspaces"
-                                className={({ isActive }) =>
-                                    isActive ? classes.highlightedMenu : classes.headerMenu
-                                }
-                                activeClassName={classes.highlightedMenu}
-                            >
-                                Workspaces
-                            </NavLink>
-                        </Typography>
-                        <Typography variant="body1">
-                            <NavLink
-                                to="/projects"
-                                className={({ isActive }) =>
-                                    isActive ? classes.highlightedMenu : classes.headerMenu
-                                }
-                                activeClassName={classes.highlightedMenu}
-                            >
-                                Projects
-                            </NavLink>
-                        </Typography>
-                        <Typography variant="body1">
-                            <NavLink
-                                to="/datasets"
-                                className={({ isActive }) =>
-                                    isActive ? classes.highlightedMenu : classes.headerMenu
-                                }
-                                activeClassName={classes.highlightedMenu}
-                            >
-                                Datasets
-                            </NavLink>
-                        </Typography>
+                        {tabs.map((tab) => (tab))}
                     </Grid>
 
                     <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
@@ -228,29 +260,19 @@ const Header = () => {
                             open={Boolean(anchorElSettings)}
                             onClose={handleCloseSettingsMenu}
                         >
-                            <MenuItem key={1}>
-                                <Typography variant="body2" textAlign="center">
-                                    Transliteration
-                                </Typography>
-                            </MenuItem>
-                            <MenuItem key={2}>
-                                <Typography variant="body2" textAlign="center">
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                onChange={handleRTLChange}
-                                                defaultChecked={localStorage.getItem("rtl") === "true"}
-                                            />
-                                        }
-                                        label="Enable RTL-typing"
-                                    />
-                                </Typography>
-                            </MenuItem>
-                            <MenuItem key={3}>
-                                <Typography variant="body2" textAlign="center">
-                                    Help
-                                </Typography>
-                            </MenuItem>
+                            {appSettings.map((setting) => (
+                                <MenuItem key={setting} onClick={setting.onclick}>
+                                    {setting.control ? 
+                                        <FormControlLabel
+                                            control={setting.control}
+                                            label={setting.name}
+                                        />
+                                        : 
+                                        <Typography variant="body2" textAlign="center">
+                                            {setting.name}
+                                        </Typography>}
+                                </MenuItem>
+                            ))}
                         </Menu>
                         <Menu
                             sx={{ mt: "45px" }}
@@ -283,7 +305,7 @@ const Header = () => {
                     </Box>
                     </div>
                 </Toolbar>
-            </AppBar>
+            </AppBar>)}
         </Box>
     );
 };

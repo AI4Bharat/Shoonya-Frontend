@@ -76,9 +76,9 @@ const headerStyle = makeStyles({
     avatar: {
         width: "36px",
         height: "36px",
-        backgroundColor: "#2A61AD",
+        backgroundColor: "#2A61AD !important",
         fontSize: "14px",
-        color: "#FFFFFF",
+        color: "#FFFFFF !important",
         "@media (max-width:640px)": {
           width: "26px",
           height: "26px",
