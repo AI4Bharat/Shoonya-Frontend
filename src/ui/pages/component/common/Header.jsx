@@ -74,10 +74,6 @@ const Header = () => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleOpenSettingsMenu = (event) => {
-    setAnchorElSettings(event.currentTarget);
-  };
-
   const handleCloseSettingsMenu = () => {
     setAnchorElSettings(null);
   };
@@ -164,7 +160,9 @@ const Header = () => {
   const appSettings = [
     {
       name: "Transliteration",
-      onclick: () => {navigate("/transliteration")},
+      onclick: () => {
+        navigate("/transliteration");
+      },
     },
     {
       name: "Enable RTL-typing",
