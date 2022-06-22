@@ -186,7 +186,6 @@ const Header = () => {
         {isMobile ? <MobileNavbar tabs={tabs} userSettings={userSettings} appSettings={appSettings} loggedInUserData={loggedInUserData}/> :
             (<AppBar style={{ backgroundColor: "#ffffff" }}>
                 <Toolbar className={classes.toolbar}>
-                <div className={classes.menu}>
                     <Grid
                         sx={{ flexGrow: 0, display: "inline-grid" }}
                         xs={12}
@@ -303,7 +302,6 @@ const Header = () => {
                             ))}
                         </Menu>
                     </Box>
-                    </div>
                 </Toolbar>
             </AppBar>)}
         </Box>

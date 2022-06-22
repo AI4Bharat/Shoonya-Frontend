@@ -19,7 +19,7 @@ const headerStyle = makeStyles({
         margin: "0 auto",
         display: "flex",
         alignItems: "center",
-        padding: "0",
+        padding: "inherit !important",
         boxSizing: "border-box",
         minHeight: "54px",
        
