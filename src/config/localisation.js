@@ -28,6 +28,8 @@ const localisation = {
     "label.projects":"Projects",
     "label.annotators":"Annotators",
     "label.managers":"Managers",
+    "label.backToPreviousPage":"Back To Previous Page",
+    "label.showProjectSettings":"Show Project Settings"
 };
 
 export const translate = (prop) => localisation[prop];

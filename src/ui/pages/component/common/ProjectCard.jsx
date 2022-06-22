@@ -44,7 +44,7 @@ const ProjectCard = (props) => {
                             borderRadius: 3, 
                             pt: 1, 
                             pb: 1, 
-                            minHeight : 56, 
+                            minHeight : 64, 
                             alignItems : "center", 
                             display:"grid" 
                         }}
@@ -61,13 +61,13 @@ const ProjectCard = (props) => {
                         item
                     >
                         <Typography variant="lightText">Type</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.project_type}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText", mt : 0.5, fontWeight : "500" }}>{projectObj.project_type}</Typography>
                     </Grid>
                     <Grid
                         item
                     >
                         <Typography variant="lightText">Project ID</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{projectObj.id}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText", mt : 0.5, fontWeight : "500" }}>{projectObj.id}</Typography>
                     </Grid>
                 </Grid>
                 

@@ -102,7 +102,8 @@ const Projects = () => {
             >
                 <Card
                     sx={{
-                        width: window.innerWidth * 0.8,
+                        // width: window.innerWidth * 0.8,
+                        width: "100%",
                         minHeight: 500,
                         padding: 5
                     }}
@@ -168,7 +169,7 @@ const Projects = () => {
                             }}
                             variant="contained"
                         >
-                            <Typography variant="caption" sx={{color : "#FFFFFF"}}>Show Project Setting</Typography>
+                            <Typography variant="body2" sx={{color : "#FFFFFF"}}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
                     </Link>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

@@ -15,6 +15,7 @@ import themeDefault from './theme/theme'
 import GlobalStyles from "./styles/LayoutStyles";
 import BackButton from "./pages/component/common/BackButton";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { translate } from "../config/localisation";
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 
@@ -76,6 +77,8 @@ const Layout= (props) => {
       style.innerHTML = 'input, textarea { direction: RTL; }'
       document.head.appendChild(style);
     }
+
+    console.log("layout page rendered.")
   }, []);
 
   return (
@@ -96,7 +99,7 @@ const Layout= (props) => {
           {/* {renderSpinner()}
           {renderError()} */}
           { Backbutton  && 
-           < BackButton startIcon={<  ArrowBackIcon />} sx={{ color:"white" ,   mb:2  }}  label="Back To previous page"/>
+           < BackButton startIcon={<  ArrowBackIcon />} sx={{ color:"white" ,   mb:2  }} label={translate("label.backToPreviousPage")}/>
            }
           <Suspense fallback={<div>Loading....</div>}>
             {component}
