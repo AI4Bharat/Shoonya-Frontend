@@ -74,6 +74,10 @@ const Header = () => {
     setAnchorElUser(event.currentTarget);
   };
 
+  const handleOpenSettingsMenu = (event) => {
+    setAnchorElSettings(event.currentTarget);
+  };
+
   const handleCloseSettingsMenu = () => {
     setAnchorElSettings(null);
   };
