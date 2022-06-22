@@ -34,7 +34,8 @@ const DatasetDetails = () => {
             >
                 <Card
                     sx={{
-                        width: window.innerWidth * 0.8,
+                        // width: window.innerWidth * 0.8,
+                        width: '100%',
                         padding: 5,
                     }}
                 >
