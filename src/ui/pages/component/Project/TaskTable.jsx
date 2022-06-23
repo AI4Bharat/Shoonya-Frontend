@@ -11,6 +11,8 @@ import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Bo
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
+import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 const columns = [
     {
@@ -102,10 +104,17 @@ const TaskTable = () => {
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState();
     const [pullDisabled, setPullDisabled] = useState("");
+    const PullBatchRes = useSelector(state => state.pullNewBatch);
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
+    const [pullClicked, setPullClicked] = useState(false);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
+        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
             return {
                 label: el.username,
                 value: el.id
@@ -116,6 +125,12 @@ const TaskTable = () => {
     const getTaskListData = () => {
         const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
         dispatch(APITransport(taskObj));
+    }
+
+    const fetchNewTasks = () => {
+        setPullClicked(true);
+        const batchObj = new PullNewBatchAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+        dispatch(APITransport(batchObj));
     }
 
     const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
@@ -131,6 +146,23 @@ const TaskTable = () => {
             getTaskListData();
         }
     }, [selectedFilters]);
+
+    useEffect(() => {
+        if(pullClicked && PullBatchRes.status === 200) {
+            getTaskListData();
+            setSnackbarInfo({
+                open: true,
+                message: PullBatchRes.data.message,
+                variant: "success",
+            })
+            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+                getTaskListData();
+            } else {
+                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setCurrentPageNumber(1);
+            }
+        }
+    }, [PullBatchRes]);
 
     useEffect(() => {
         const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
@@ -213,6 +245,21 @@ const TaskTable = () => {
         )
     }
 
+    const renderSnackBar = () => {
+        return (
+          <CustomizedSnackbars
+            open={snackbar.open}
+            handleClose={() =>
+              setSnackbarInfo({ open: false, message: "", variant: "" })
+            }
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            variant={snackbar.variant}
+            message={snackbar.message}
+            autoHideDuration={2000}
+          />
+        );
+      };
+
     const options = {
         count: totalTaskCount,
         rowsPerPage: currentRowPerPage,
@@ -259,7 +306,7 @@ const TaskTable = () => {
 
     return (
         <Fragment>
-        {ProjectDetails.project_mode === "Annotation" ? (
+        {userDetails?.role === 1 && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
                 <Box
                 style={{
@@ -288,7 +335,12 @@ const TaskTable = () => {
                 </FormControl>
                 <Tooltip title={pullDisabled}>
                     <Box sx={{width: '38%', ml: "1%", mr:"1%", mb: 3}}>
-                        <CustomButton sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} label={"Pull New Batch"} disabled={pullDisabled} />
+                        <CustomButton 
+                            sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
+                            label={"Pull New Batch"} 
+                            disabled={pullDisabled} 
+                            onClick={fetchNewTasks} 
+                        />
                     </Box>
                 </Tooltip>
                 <CustomButton sx={{ p: 1, width: '38%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} label={"Start Labelling Now"} />
@@ -305,9 +357,9 @@ const TaskTable = () => {
                 Disabled
                 </Button>
             )
-            ) : (
+            ) : ( 
                 <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} label={"Add New Item"} />
-            )}
+            ))}
             <MUIDataTable
                 title={""}
                 data={tasks}
@@ -326,6 +378,7 @@ const TaskTable = () => {
                     currentFilters={selectedFilters}
                 />
             )}
+            {renderSnackBar()}
         </Fragment>
     )
 }
