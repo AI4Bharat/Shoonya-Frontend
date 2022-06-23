@@ -7,83 +7,14 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
 import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
 import CustomizedSnackbars from "../../component/common/Snackbar";
-
-const columns = [
-    {
-        name: "ID",
-        label: "ID",
-        options: {
-            filter: false,
-            sort: false,
-            align: "center"
-        }
-    },
-    {
-        name: "Context",
-        label: "Context",
-        options: {
-            filter: false,
-            sort: false,
-            align: "center"
-        }
-    },
-    {
-        name: "Input Text",
-        label: "Input Text",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    },
-    {
-        name: "Input Language",
-        label: "Input Language",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    },
-    {
-        name: "Output Language",
-        label: "Output Language",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    },
-    {
-        name: "Machine translation",
-        label: "Machine translation",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    },
-    {
-        name: "Status",
-        label: "Status",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    },
-    {
-        name: "Actions",
-        label: "Actions",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    }];
-
-
-
+import SearchIcon from '@mui/icons-material/Search';
+import SearchPopup from "./SearchPopup";
 
 
 const TaskTable = () => {
@@ -105,6 +36,9 @@ const TaskTable = () => {
     const [pullSize, setPullSize] = useState();
     const [pullDisabled, setPullDisabled] = useState("");
     const PullBatchRes = useSelector(state => state.pullNewBatch);
+    const [searchAnchor, setSearchAnchor] = useState(null);
+    const searchOpen = Boolean(searchAnchor);
+    const [searchedCol, setSearchedCol] = useState();
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -121,6 +55,108 @@ const TaskTable = () => {
             }
         }) : []
     }
+
+    const handleShowSearch = (col, event) => {
+        setSearchAnchor(event.currentTarget);
+        setSearchedCol(col);
+    }
+
+    const customColumnHead = (col) => {
+        return (
+            <th
+                className={"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium tss-10syd3x-MUIDataTableHeadCell-root tss-gm6zfk-MUIDataTableHeadCell-fixedHeader css-seprji-MuiTableCell-root"}
+            >
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                            columnGap: "10px",
+                            flexGrow: "1",
+                            alignItems: "center",
+                        }}
+                    >
+                        {col.label}
+                        <IconButton sx={{borderRadius: "100%"}} onClick={(e) => handleShowSearch(col.name, e)}>
+                            <SearchIcon id={col.name + "_btn"}/>
+                        </IconButton>
+                    </Box>
+            </th>);
+    }
+    
+    const columns = [
+        {
+            name: "id",
+            label: "ID",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center",
+                customHeadRender: customColumnHead,
+            },
+        },
+        {
+            name: "context",
+            label: "Context",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center",
+                customHeadRender: customColumnHead,
+            },
+        },
+        {
+            name: "input_text",
+            label: "Input Text",
+            options: {
+                filter: false,
+                sort: false,
+                customHeadRender: customColumnHead,
+            }
+        },
+        {
+            name: "input_language",
+            label: "Input Language",
+            options: {
+                filter: false,
+                sort: false,
+                customHeadRender: customColumnHead,
+            },
+        },
+        {
+            name: "output_language",
+            label: "Output Language",
+            options: {
+                filter: false,
+                sort: false,
+                customHeadRender: customColumnHead,
+            },
+        },
+        {
+            name: "machine_translation",
+            label: "Machine translation",
+            options: {
+                filter: false,
+                sort: false,
+                customHeadRender: customColumnHead,
+            },
+        },
+        {
+            name: "status",
+            label: "Status",
+            options: {
+                filter: false,
+                sort: false,
+            }
+        },
+        {
+            name: "actions",
+            label: "Actions",
+            options: {
+                filter: false,
+                sort: false,
+            }
+        }];
 
     const getTaskListData = () => {
         const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
@@ -212,6 +248,10 @@ const TaskTable = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleSearchClose = () => {
+        setSearchAnchor(null);
+    }
 
     const renderToolBar = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -365,6 +405,14 @@ const TaskTable = () => {
                 options={options}
             // filter={false}
             />
+            {searchOpen && <SearchPopup 
+                open={searchOpen}
+                anchorEl={searchAnchor}
+                handleClose={handleSearchClose}
+                updateFilters={setsSelectedFilters}
+                currentFilters={selectedFilters}
+                searchedCol={searchedCol}
+            />}
             {popoverOpen && (
                 <FilterList
                     id={filterId}
