@@ -97,6 +97,7 @@ const TaskTable = () => {
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
     const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled", user_filter: -1});
+    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const [tasks, setTasks] = useState([]);
 
     const filterData = {
@@ -159,7 +160,7 @@ const TaskTable = () => {
         return (
             <Grid container spacing={0} md={12}>
                 <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
-                    <FormControl size="small" sx={{width: "30%"}}>
+                    {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%"}}>
                         <InputLabel id="demo-simple-select-label">Filter by Annotator</InputLabel>
                         <Select
                         labelId="demo-simple-select-label"
@@ -173,7 +174,7 @@ const TaskTable = () => {
                             <MenuItem value={el.value}>{el.label}</MenuItem>
                         ))}
                         </Select>
-                    </FormControl>
+                    </FormControl>}
                     <Button onClick={handleShowFilter}>
                         <FilterListIcon />
                     </Button>
