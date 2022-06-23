@@ -14,7 +14,7 @@ import DatasetStyle from "../../../styles/Dataset";
 
 const SearchPopup = (props) => {
     const classes = DatasetStyle();
-  const { currentFilters, updateFilters, searchedCol, updateSearched } = props;
+  const { currentFilters, updateFilters, searchedCol } = props;
   const [searchValue, setSearchValue] = useState(currentFilters["search_"+searchedCol]);
   
   const handleSearchSubmit = (e) => {
@@ -22,7 +22,7 @@ const SearchPopup = (props) => {
       ...currentFilters,
       ["search_"+searchedCol]: searchValue,
     });
-    updateSearched((prev) => [...prev, searchedCol]);
+    document.getElementById(searchedCol + "_btn").style.color = "#2C2799";
     props.handleClose();
   };
 
@@ -32,7 +32,7 @@ const SearchPopup = (props) => {
         ["search_"+searchedCol]: "",
     });
     setSearchValue("");
-    updateSearched((prev) => prev.filter((col) => col !== searchedCol));
+    document.getElementById(searchedCol + "_btn").style.color = "rgba(0, 0, 0, 0.54)";
     props.handleClose();
     };
 

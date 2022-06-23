@@ -78,7 +78,7 @@ const TaskTable = () => {
                     >
                         {col.label}
                         <IconButton sx={{borderRadius: "100%"}} onClick={(e) => handleShowSearch(col.name, e)}>
-                            <SearchIcon />
+                            <SearchIcon id={col.name + "_btn"}/>
                         </IconButton>
                     </Box>
             </th>);
