@@ -188,7 +188,7 @@ const WorkspaceReports = () => {
       >
         <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
           <FormControl fullWidth>
-            <InputLabel id="date-range-select-label">Date Range</InputLabel>
+            <InputLabel id="date-range-select-label"sx={{fontSize:"16px"}}>Date Range</InputLabel>
             <Select
               labelId="date-range-select-label"
               id="date-range-select"
@@ -226,7 +226,7 @@ const WorkspaceReports = () => {
         </Grid>}
         <Grid item xs={12} sm={12} md={showPicker ? 5 : 3} lg={showPicker ? 5 : 3} xl={showPicker ? 5 : 3}>
           <FormControl fullWidth>
-            <InputLabel id="project-type-label">Project Type</InputLabel>
+            <InputLabel id="project-type-label" sx={{fontSize:"16px"}}>Project Type</InputLabel>
             <Select
               labelId="project-type-label"
               id="project-type-select"
@@ -244,7 +244,7 @@ const WorkspaceReports = () => {
         </Grid>
         <Grid item xs={12} sm={12} md={showPicker ? 5 : 3} lg={showPicker ? 5 : 3} xl={showPicker ? 5 : 3}>
           <FormControl fullWidth>
-            <InputLabel id="report-type-label">Report Type</InputLabel>
+            <InputLabel id="report-type-label" sx={{fontSize:"16px"}}>Report Type</InputLabel>
             <Select
               labelId="report-type-label"
               id="report-select"
@@ -263,6 +263,7 @@ const WorkspaceReports = () => {
                 onClick={handleDateSubmit}
                 sx={{
                     width: "100%",
+                   mt:2,
                 }}
             >
                 Submit
