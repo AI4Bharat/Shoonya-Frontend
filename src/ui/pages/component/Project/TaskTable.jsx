@@ -219,13 +219,14 @@ const TaskTable = () => {
             <Grid container spacing={0} md={12}>
                 <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
                     {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%"}}>
-                        <InputLabel id="annotator-filter-label">Filter by Annotator</InputLabel>
+                        <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
                         <Select
                         labelId="annotator-filter-label"
                         id="annotator-filter"
                         value={selectedFilters.user_filter}
                         label="Filter by Annotator"
                         onChange={(e) => setsSelectedFilters({...selectedFilters, user_filter: e.target.value})}
+                        sx={{fontSize: "16px"}}
                         >
                         <MenuItem value={-1}>All</MenuItem>
                         {filterData.Annotators.map((el, i) => (
@@ -236,10 +237,6 @@ const TaskTable = () => {
                     <Button onClick={handleShowFilter}>
                         <FilterListIcon />
                     </Button>
-                    {/* <Typography variant="caption">Filter by Status:</Typography>
-                    <Button variant={filterTypeValue == "unlabeled" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("unlabeled")}>unlabeled</Button>
-                    <Button variant={filterTypeValue == "skipped" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("skipped")}>skipped</Button>
-                    <Button variant={filterTypeValue == "accepted" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("accepted")}>accepted</Button> */}
                 </Grid>
             </Grid>
         )
@@ -319,7 +316,7 @@ const TaskTable = () => {
                 }}
                 >
                 <FormControl size="small" sx={{width: "18%", ml: "1%", mr:"1%", mb: 3}}>
-                    <InputLabel id="pull-select-label">Pull Size</InputLabel>
+                    <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
                     <Select
                     labelId="pull-select-label"
                     id="pull-select"
@@ -327,6 +324,7 @@ const TaskTable = () => {
                     label="Pull Size"
                     onChange={(e) => setPullSize(e.target.value)}
                     disabled={pullDisabled}
+                    sx={{fontSize: "16px"}}
                     >
                     <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch*0.5}>{ProjectDetails?.tasks_pull_count_per_batch*0.5}</MenuItem>
                     <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch}>{ProjectDetails?.tasks_pull_count_per_batch}</MenuItem>
