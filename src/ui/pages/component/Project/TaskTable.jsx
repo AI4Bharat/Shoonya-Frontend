@@ -7,12 +7,36 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
 import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import SearchIcon from '@mui/icons-material/Search';
+
+const customColumnHead = (col) => {
+    return (
+        <th
+            className={"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium tss-10syd3x-MUIDataTableHeadCell-root tss-gm6zfk-MUIDataTableHeadCell-fixedHeader css-seprji-MuiTableCell-root"}
+        >
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-around",
+                        columnGap: "10px",
+                        flexGrow: "1",
+                        alignItems: "center",
+                    }}
+                >
+                    {col.label}
+                    <IconButton sx={{borderRadius: "100%"}}>
+                        <SearchIcon />
+                    </IconButton>
+                </Box>
+        </th>);
+}
 
 const columns = [
     {
@@ -21,8 +45,9 @@ const columns = [
         options: {
             filter: false,
             sort: false,
-            align: "center"
-        }
+            align: "center",
+            customHeadRender: customColumnHead,
+        },
     },
     {
         name: "Context",
@@ -30,8 +55,9 @@ const columns = [
         options: {
             filter: false,
             sort: false,
-            align: "center"
-        }
+            align: "center",
+            customHeadRender: customColumnHead,
+        },
     },
     {
         name: "Input Text",
@@ -39,6 +65,7 @@ const columns = [
         options: {
             filter: false,
             sort: false,
+            customHeadRender: customColumnHead,
         }
     },
     {
@@ -47,7 +74,8 @@ const columns = [
         options: {
             filter: false,
             sort: false,
-        }
+            customHeadRender: customColumnHead,
+        },
     },
     {
         name: "Output Language",
@@ -55,7 +83,8 @@ const columns = [
         options: {
             filter: false,
             sort: false,
-        }
+            customHeadRender: customColumnHead,
+        },
     },
     {
         name: "Machine translation",
@@ -63,7 +92,8 @@ const columns = [
         options: {
             filter: false,
             sort: false,
-        }
+            customHeadRender: customColumnHead,
+        },
     },
     {
         name: "Status",
