@@ -7,10 +7,12 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
+import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 const columns = [
     {
@@ -100,10 +102,19 @@ const TaskTable = () => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const [tasks, setTasks] = useState([]);
+    const [pullSize, setPullSize] = useState();
+    const [pullDisabled, setPullDisabled] = useState("");
+    const PullBatchRes = useSelector(state => state.pullNewBatch);
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
+    const [pullClicked, setPullClicked] = useState(false);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
+        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
             return {
                 label: el.username,
                 value: el.id
@@ -114,6 +125,12 @@ const TaskTable = () => {
     const getTaskListData = () => {
         const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
         dispatch(APITransport(taskObj));
+    }
+
+    const fetchNewTasks = () => {
+        setPullClicked(true);
+        const batchObj = new PullNewBatchAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+        dispatch(APITransport(batchObj));
     }
 
     const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
@@ -129,6 +146,23 @@ const TaskTable = () => {
             getTaskListData();
         }
     }, [selectedFilters]);
+
+    useEffect(() => {
+        if(pullClicked && PullBatchRes.status === 200) {
+            getTaskListData();
+            setSnackbarInfo({
+                open: true,
+                message: PullBatchRes.data.message,
+                variant: "success",
+            })
+            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+                getTaskListData();
+            } else {
+                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setCurrentPageNumber(1);
+            }
+        }
+    }, [PullBatchRes]);
 
     useEffect(() => {
         const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
@@ -153,6 +187,24 @@ const TaskTable = () => {
         setTasks(data);
     }, [taskList, ProjectDetails.project_mode]);
 
+    useEffect(() => {
+        if (ProjectDetails) {
+            if (ProjectDetails.unassigned_task_count === 0)
+                setPullDisabled("No more unassigned tasks in this project")
+            ProjectDetails.frozen_users?.forEach((user) => {
+                if (user.id === userDetails?.id) 
+                    setPullDisabled("You're no more a part of this project");
+            })
+            setPullSize(ProjectDetails.tasks_pull_count_per_batch*0.5);
+        }
+    }, [ProjectDetails, userDetails])
+
+    useEffect(() => {
+        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user) {
+            setPullDisabled("You have too many unlabeled tasks")
+        }
+    }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters.task_status])
+
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -167,13 +219,14 @@ const TaskTable = () => {
             <Grid container spacing={0} md={12}>
                 <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
                     {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%"}}>
-                        <InputLabel id="demo-simple-select-label">Filter by Annotator</InputLabel>
+                        <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
                         <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
+                        labelId="annotator-filter-label"
+                        id="annotator-filter"
                         value={selectedFilters.user_filter}
                         label="Filter by Annotator"
                         onChange={(e) => setsSelectedFilters({...selectedFilters, user_filter: e.target.value})}
+                        sx={{fontSize: "16px"}}
                         >
                         <MenuItem value={-1}>All</MenuItem>
                         {filterData.Annotators.map((el, i) => (
@@ -184,14 +237,25 @@ const TaskTable = () => {
                     <Button onClick={handleShowFilter}>
                         <FilterListIcon />
                     </Button>
-                    {/* <Typography variant="caption">Filter by Status:</Typography>
-                    <Button variant={filterTypeValue == "unlabeled" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("unlabeled")}>unlabeled</Button>
-                    <Button variant={filterTypeValue == "skipped" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("skipped")}>skipped</Button>
-                    <Button variant={filterTypeValue == "accepted" ? "outlined" : "contained"} sx={buttonSXStyle} className={classes.filterButtons} onClick={()=>setFilterTypeValue("accepted")}>accepted</Button> */}
                 </Grid>
             </Grid>
         )
     }
+
+    const renderSnackBar = () => {
+        return (
+          <CustomizedSnackbars
+            open={snackbar.open}
+            handleClose={() =>
+              setSnackbarInfo({ open: false, message: "", variant: "" })
+            }
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            variant={snackbar.variant}
+            message={snackbar.message}
+            autoHideDuration={2000}
+          />
+        );
+      };
 
     const options = {
         count: totalTaskCount,
@@ -239,7 +303,61 @@ const TaskTable = () => {
 
     return (
         <Fragment>
-            <CustomButton sx={{ p: 1, width: '100%', borderRadius: 2, mb: 3 }} label={"Disabled"} />
+        {userDetails?.role === 1 && (ProjectDetails.project_mode === "Annotation" ? (
+            ProjectDetails.is_published ? (
+                <Box
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    width: "100%",
+                    marginBottom: "1%",
+                    flexWrap: "wrap",
+                    alignItems: "flex-end",
+                }}
+                >
+                <FormControl size="small" sx={{width: "18%", ml: "1%", mr:"1%", mb: 3}}>
+                    <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
+                    <Select
+                    labelId="pull-select-label"
+                    id="pull-select"
+                    value={pullSize}
+                    label="Pull Size"
+                    onChange={(e) => setPullSize(e.target.value)}
+                    disabled={pullDisabled}
+                    sx={{fontSize: "16px"}}
+                    >
+                    <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch*0.5}>{ProjectDetails?.tasks_pull_count_per_batch*0.5}</MenuItem>
+                    <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch}>{ProjectDetails?.tasks_pull_count_per_batch}</MenuItem>
+                    <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch*1.5}>{ProjectDetails?.tasks_pull_count_per_batch*1.5}</MenuItem>
+                    </Select>
+                </FormControl>
+                <Tooltip title={pullDisabled}>
+                    <Box sx={{width: '38%', ml: "1%", mr:"1%", mb: 3}}>
+                        <CustomButton 
+                            sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
+                            label={"Pull New Batch"} 
+                            disabled={pullDisabled} 
+                            onClick={fetchNewTasks} 
+                        />
+                    </Box>
+                </Tooltip>
+                <CustomButton sx={{ p: 1, width: '38%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} label={"Start Labelling Now"} />
+                </Box>
+            ) : (
+                <Button
+                type="primary"
+                style={{
+                    width: "100%",
+                    marginBottom: "1%",
+                    marginRight: "1%",
+                }}
+                >
+                Disabled
+                </Button>
+            )
+            ) : ( 
+                <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} label={"Add New Item"} />
+            ))}
             <MUIDataTable
                 title={""}
                 data={tasks}
@@ -258,6 +376,7 @@ const TaskTable = () => {
                     currentFilters={selectedFilters}
                 />
             )}
+            {renderSnackBar()}
         </Fragment>
     )
 }

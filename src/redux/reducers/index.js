@@ -35,6 +35,7 @@ import deleteAnnotation from './Annotation/DeleteAnnotation';
 import getNextTask from './Tasks/GetNextTask';
 import getTaskAnnotations from './Tasks/GetTaskAnnotations';
 import updateTask from './Tasks/UpdateTask';
+import pullNewBatch from "./Tasks/PullNewBatch";
 
 const index = {
     apiStatus,
@@ -77,7 +78,7 @@ const index = {
     getNextTask,
     getTaskAnnotations,
     updateTask,
-    
+    pullNewBatch,
 };
 
 export default index;
