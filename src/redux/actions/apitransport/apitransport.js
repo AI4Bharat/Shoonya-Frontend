@@ -72,6 +72,18 @@ export default function dispatchAPI(api) {
           error(err, api, dispatch);
         });
     };
+  } else if (api.method === "PATCH") {
+    return dispatch => {
+      dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, ""));
+      axios
+        .patch(api.apiEndPoint(), api.getBody(), api.getHeaders())
+        .then(res => {
+          success(res, api, dispatch);
+        })
+        .catch(err => {
+          error(err, api, dispatch);
+        });
+    };
   } else if (api.method === "POST") {
     return dispatch => {
       dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, "", null, null, true));
