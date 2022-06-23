@@ -4,7 +4,6 @@ import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
-import filterTasks from "../../../../redux/actions/Tasks/FilterTasks";
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
@@ -90,7 +89,6 @@ const TaskTable = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
-    const filteredList = useSelector(state => state.getFilteredTasks.data);
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
@@ -110,7 +108,7 @@ const TaskTable = () => {
     }
 
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
         dispatch(APITransport(taskObj));
     }
 
@@ -118,35 +116,22 @@ const TaskTable = () => {
 
     useEffect(() => {
         getTaskListData();
-    }, []);
+    }, [currentPageNumber, currentRowPerPage]);
 
     useEffect(() => {
-        if (taskList?.length > 0) {
-            dispatch(filterTasks(taskList, selectedFilters));
-        }
-    }, [taskList]);
-
-    useEffect(() => {
-        if (taskList?.length > 0) {
-            dispatch(filterTasks(taskList, selectedFilters));
+        if (currentPageNumber !== 1) {
             setCurrentPageNumber(1);
+        } else {
+            getTaskListData();
         }
-    }, [selectedFilters])
-
-    useEffect(() => {
-        getTaskListData();
-    }, [currentPageNumber]);
-
-    useEffect(() => {
-        getTaskListData();
-    }, [currentRowPerPage]);
+    }, [selectedFilters]);
 
     useEffect(() => {
         setTotalTasks(totalTaskCount);
     }, [totalTaskCount])
 
     useEffect(() => {
-        const data = filteredList && filteredList.length > 0 ? filteredList.map((el, i) => {
+        const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
             return [
                 el.id,
                 el.data.context,
@@ -161,7 +146,7 @@ const TaskTable = () => {
                 ]
         }) : []
         setTasks(data);
-    }, [filteredList])
+    }, [taskList])
 
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
@@ -201,8 +186,14 @@ const TaskTable = () => {
                 displayRows: "OF"
             }
         },
-        onChangePage: (currentPage) => { currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1) },
-        onChangeRowsPerPage: (rowPerPageCount) => { setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount) },
+        onChangePage: (currentPage) => { 
+            currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1);
+        },
+        onChangeRowsPerPage: (rowPerPageCount) => { 
+            setCurrentPageNumber(1); 
+            setCurrentRowPerPage(rowPerPageCount); 
+            console.log("rowPerPageCount", rowPerPageCount) 
+        },
         filterType: 'checkbox',
         selectableRows: "none",
         download: false,
