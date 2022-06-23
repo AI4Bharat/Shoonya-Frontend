@@ -4,11 +4,10 @@ import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
-import filterTasks from "../../../../redux/actions/Tasks/FilterTasks";
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
@@ -90,28 +89,30 @@ const TaskTable = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
-    const filteredList = useSelector(state => state.getFilteredTasks.data);
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
-    const [totalTasks, setTotalTasks] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
-    const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users);
+    const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
+    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled", user_filter: -1});
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled"});
+    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const [tasks, setTasks] = useState([]);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
-        // Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
-        //     return el.username
-        // }) : []
+        Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
+            return {
+                label: el.username,
+                value: el.id
+            }
+        }) : []
     }
 
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
         dispatch(APITransport(taskObj));
     }
 
@@ -119,35 +120,18 @@ const TaskTable = () => {
 
     useEffect(() => {
         getTaskListData();
-    }, []);
+    }, [currentPageNumber, currentRowPerPage]);
 
     useEffect(() => {
-        if (taskList?.length > 0) {
-            dispatch(filterTasks(taskList, selectedFilters));
-        }
-    }, [taskList]);
-
-    useEffect(() => {
-        if (taskList?.length > 0) {
-            dispatch(filterTasks(taskList, selectedFilters));
+        if (currentPageNumber !== 1) {
             setCurrentPageNumber(1);
+        } else {
+            getTaskListData();
         }
-    }, [selectedFilters])
+    }, [selectedFilters]);
 
     useEffect(() => {
-        getTaskListData();
-    }, [currentPageNumber]);
-
-    useEffect(() => {
-        getTaskListData();
-    }, [currentRowPerPage]);
-
-    useEffect(() => {
-        setTotalTasks(totalTaskCount);
-    }, [totalTaskCount])
-
-    useEffect(() => {
-        const data = filteredList && filteredList.length > 0 ? filteredList.map((el, i) => {
+        const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
             return [
                 el.id,
                 el.data.context,
@@ -167,7 +151,7 @@ const TaskTable = () => {
                 ]
         }) : []
         setTasks(data);
-    }, [filteredList, ProjectDetails])
+    }, [taskList, ProjectDetails.project_mode]);
 
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
@@ -182,6 +166,21 @@ const TaskTable = () => {
         return (
             <Grid container spacing={0} md={12}>
                 <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
+                    {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%"}}>
+                        <InputLabel id="demo-simple-select-label">Filter by Annotator</InputLabel>
+                        <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={selectedFilters.user_filter}
+                        label="Filter by Annotator"
+                        onChange={(e) => setsSelectedFilters({...selectedFilters, user_filter: e.target.value})}
+                        >
+                        <MenuItem value={-1}>All</MenuItem>
+                        {filterData.Annotators.map((el, i) => (
+                            <MenuItem value={el.value}>{el.label}</MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>}
                     <Button onClick={handleShowFilter}>
                         <FilterListIcon />
                     </Button>
@@ -207,8 +206,14 @@ const TaskTable = () => {
                 displayRows: "OF"
             }
         },
-        onChangePage: (currentPage) => { currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1) },
-        onChangeRowsPerPage: (rowPerPageCount) => { setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount) },
+        onChangePage: (currentPage) => { 
+            currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1);
+        },
+        onChangeRowsPerPage: (rowPerPageCount) => { 
+            setCurrentPageNumber(1); 
+            setCurrentRowPerPage(rowPerPageCount); 
+            console.log("rowPerPageCount", rowPerPageCount) 
+        },
         filterType: 'checkbox',
         selectableRows: "none",
         download: false,

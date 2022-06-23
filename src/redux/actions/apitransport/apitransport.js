@@ -5,6 +5,7 @@ import Strings from "../../string";
 function dispatchAPIAsync(api) {
   return {
     type: api.type,
+    endpoint: api.apiEndPoint(),
     payload: api.getPayload()
   };
 }
