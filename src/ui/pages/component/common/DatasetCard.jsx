@@ -35,13 +35,13 @@ const DatasetCard = (props) => {
                         item
                     >
                         <Typography variant="lightText">Type</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{datasetObj.dataset_type}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText", mt : 0.5, fontWeight : "500" }}>{datasetObj.dataset_type}</Typography>
                     </Grid>
                     <Grid
                         item
                     >
                         <Typography variant="lightText">Dataset ID</Typography>
-                        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>{datasetObj.instance_id}</Typography>
+                        <Typography variant="body2" sx={{ color: "primary.contrastText" , mt : 0.5, fontWeight : "500"}}>{datasetObj.instance_id}</Typography>
                     </Grid>
                 </Grid>
                 
