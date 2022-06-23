@@ -27,7 +27,7 @@ const DatasetStyle = makeStyles({
     backgroundColor:"red"
    },
    workspaceCard:{
-    width: window.innerWidth * 0.8,
+    width: "100%",
     minHeight: "500px",
     padding: "40px",
     justifyContent:"center"  ,justifyItems:"center"
