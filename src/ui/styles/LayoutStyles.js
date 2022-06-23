@@ -4,7 +4,7 @@ const GlobalStyles = makeStyles({
   container: {
     maxWidth: "1272px",
     width: "100%",
-    margin: "0 auto",
+    margin: "-20px auto",
     // background: theme.palette.background.default,
     // fontFamily: theme.typography.fontFamily,
   },
