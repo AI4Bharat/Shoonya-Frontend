@@ -7,7 +7,7 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
@@ -92,19 +92,21 @@ const TaskTable = () => {
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
-    const [totalTasks, setTotalTasks] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
-    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled"});
+    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled", user_filter: -1});
     const [tasks, setTasks] = useState([]);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
-        // Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
-        //     return el.username
-        // }) : []
+        Annotators : getProjectUsers && getProjectUsers.length > 0 ? getProjectUsers.map((el,i)=>{
+            return {
+                label: el.username,
+                value: el.id
+            }
+        }) : []
     }
 
     const getTaskListData = () => {
@@ -125,10 +127,6 @@ const TaskTable = () => {
             getTaskListData();
         }
     }, [selectedFilters]);
-
-    useEffect(() => {
-        setTotalTasks(totalTaskCount);
-    }, [totalTaskCount])
 
     useEffect(() => {
         const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
@@ -161,6 +159,21 @@ const TaskTable = () => {
         return (
             <Grid container spacing={0} md={12}>
                 <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
+                    <FormControl size="small" sx={{width: "30%"}}>
+                        <InputLabel id="demo-simple-select-label">Filter by Annotator</InputLabel>
+                        <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={selectedFilters.user_filter}
+                        label="Filter by Annotator"
+                        onChange={(e) => setsSelectedFilters({...selectedFilters, user_filter: e.target.value})}
+                        >
+                        <MenuItem value={-1}>All</MenuItem>
+                        {filterData.Annotators.map((el, i) => (
+                            <MenuItem value={el.value}>{el.label}</MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
                     <Button onClick={handleShowFilter}>
                         <FilterListIcon />
                     </Button>
