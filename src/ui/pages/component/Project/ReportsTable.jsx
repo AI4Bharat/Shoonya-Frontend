@@ -93,7 +93,7 @@ const ReportsTable = () => {
             <Stack direction="row" spacing={2} sx={{ marginBottom: "12px", alignItems: "center" }}>
                 <Box sx={{ width: "200px" }}>
                     <FormControl variant="standard" fullWidth>
-                        <InputLabel id="date-range-select-label">Date Range</InputLabel>
+                        <InputLabel id="date-range-select-label" sx={{fontSize:"16px"}}>Date Range</InputLabel>
                             <Select
                                 labelId="date-range-select-label"
                                 id="date-range-select"
