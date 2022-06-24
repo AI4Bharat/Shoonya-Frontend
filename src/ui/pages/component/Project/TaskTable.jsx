@@ -68,25 +68,22 @@ const TaskTable = () => {
 
     const customColumnHead = (col) => {
         return (
-            <th
-                className={classes.tableHeader}
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    columnGap: "10px",
+                    flexGrow: "1",
+                    alignItems: "center",
+                }}
             >
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-around",
-                            columnGap: "10px",
-                            flexGrow: "1",
-                            alignItems: "center",
-                        }}
-                    >
-                        {col.label}
-                        {!excludeSearch.includes(col.name) && <IconButton sx={{borderRadius: "100%"}} onClick={(e) => handleShowSearch(col.name, e)}>
-                            <SearchIcon id={col.name + "_btn"}/>
-                        </IconButton>}
-                    </Box>
-            </th>);
+                {col.label}
+                {!excludeSearch.includes(col.name) && <IconButton sx={{borderRadius: "100%"}} onClick={(e) => handleShowSearch(col.name, e)}>
+                    <SearchIcon id={col.name + "_btn"}/>
+                </IconButton>}
+            </Box>
+        );
     }
     
     const initColList = initColumns.map((col) => {
@@ -97,7 +94,7 @@ const TaskTable = () => {
                 filter: false,
                 sort: false,
                 align: "center",
-                customHeadRender: customColumnHead,
+                customHeadLabelRender: customColumnHead,
             }
         }
     })
