@@ -5,6 +5,7 @@ import Strings from "../../string";
 function dispatchAPIAsync(api) {
   return {
     type: api.type,
+    endpoint: api.apiEndPoint(),
     payload: api.getPayload()
   };
 }
@@ -65,6 +66,18 @@ export default function dispatchAPI(api) {
       dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, ""));
       axios
         .post(api.apiEndPoint(), api.getFormData(), api.getHeaders())
+        .then(res => {
+          success(res, api, dispatch);
+        })
+        .catch(err => {
+          error(err, api, dispatch);
+        });
+    };
+  } else if (api.method === "PATCH") {
+    return dispatch => {
+      dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, ""));
+      axios
+        .patch(api.apiEndPoint(), api.getBody(), api.getHeaders())
         .then(res => {
           success(res, api, dispatch);
         })

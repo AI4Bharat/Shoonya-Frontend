@@ -4,8 +4,9 @@ const localisation = {
   enterPassword: "Enter your Password*",
   forgotPassword: "Forgot Password?",
   "label.shoonyaInfo":
-    "Shoonya is an open-sourced API and data platform to collect, curate and discover datasets in Indian languages.",
+    "Shoonya is an open source platform to annotate and label data at scale, built with a vision to enhance digital presence of under-represented languages in India.",
     "button.clearAll" : "Clear All",
+    "button.clear" : "Clear",
     "button.Filter" : "Filter",
     "button.Apply" : "Apply",
     "label.filter.status" : "Status",

@@ -4,7 +4,7 @@ const GlobalStyles = makeStyles({
   container: {
     maxWidth: "1272px",
     width: "100%",
-    margin: "0 auto",
+    margin: "-20px auto",
     // background: theme.palette.background.default,
     // fontFamily: theme.typography.fontFamily,
   },
@@ -78,8 +78,19 @@ const GlobalStyles = makeStyles({
     padding: "0 15px",
     borderRadius: "12px",
   },
- 
-  
+
+  textAreaTransliteration: {
+    backgroundColor: "inherit",
+    border: "none",
+    width: "100%",
+    resize: "none",
+    outline: "none",
+    fontSize: "18px",
+    lineHeight: "32px",
+    color: "black",
+    fontFamily: "Roboto",
+    height : "14rem"
+  },
 });
 
 export default GlobalStyles;

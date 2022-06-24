@@ -27,7 +27,7 @@ const DatasetStyle = makeStyles({
     backgroundColor:"red"
    },
    workspaceCard:{
-    width: window.innerWidth * 0.8,
+    width: "100%",
     minHeight: "500px",
     padding: "40px",
     justifyContent:"center"  ,justifyItems:"center"
@@ -37,9 +37,14 @@ const DatasetStyle = makeStyles({
 
    },
    filterToolbarContainer : {
-    alignItems : 'center',
-    display : 'inline',
-    textAlign : "end"
+    // alignItems : 'center',
+    // display : 'inline',
+    // textAlign : "end"
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    columnGap: "20px",
 },
 clearAllBtn: {
   float: "right",

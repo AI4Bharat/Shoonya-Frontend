@@ -29,6 +29,13 @@ import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports'
 import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
 import  downloadProjectButton from './ProjectDetails/DownloadProject'
 import getFilteredTasks from './Tasks/GetFilteredTasks';
+import postAnnotation from './Annotation/PostAnnotation';
+import updateAnnotation from './Annotation/UpdateAnnotation';
+import deleteAnnotation from './Annotation/DeleteAnnotation';
+import getNextTask from './Tasks/GetNextTask';
+import getTaskAnnotations from './Tasks/GetTaskAnnotations';
+import updateTask from './Tasks/UpdateTask';
+import pullNewBatch from "./Tasks/PullNewBatch";
 
 const index = {
     apiStatus,
@@ -64,7 +71,14 @@ const index = {
     getWorkspaceUserReports,
     getWorkspaceProjectReports,
     downloadProjectButton,
-    getFilteredTasks
+    getFilteredTasks,
+    postAnnotation,
+    updateAnnotation,
+    deleteAnnotation,
+    getNextTask,
+    getTaskAnnotations,
+    updateTask,
+    pullNewBatch,
 };
 
 export default index;

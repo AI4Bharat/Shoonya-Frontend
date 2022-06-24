@@ -19,6 +19,8 @@ import Members from "../Tabs/Members";
 import Invites from "../Tabs/Invites";
 import OrganizationSettings from "../Tabs/OrganizationSettings";
 import WorkspaceReports from "./WorkspaceReports";
+import AddUsersDialog from "./AddUsersDialog";
+import addUserTypes from "../../../../constants/addUserTypes";
 
 function TabPanel(props) {
 
@@ -47,6 +49,8 @@ const DetailsViewPage = (props) => {
     const { id } = useParams();
     const classes = DatasetStyle();
     const [value, setValue] = React.useState(0);
+    const [addAnnotatorsDialogOpen, setAddAnnotatorsDialogOpen] = React.useState(false);
+    const [addManagersDialogOpen, setAddManagersDialogOpen] = React.useState(false);
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -61,6 +65,22 @@ const DetailsViewPage = (props) => {
         // getDashboardWorkspaceData();
     }, []);
 
+    
+    const handleAnnotatorDialogClose = () => {
+        setAddAnnotatorsDialogOpen(false);
+    };
+    
+    const handleAnnotatorDialogOpen = () => {
+        setAddAnnotatorsDialogOpen(true);
+    };
+    
+    const handleManagerDialogClose = () => {
+        setAddManagersDialogOpen(false);
+    };
+
+    const handleManagerDialogOpen = () => {
+        setAddManagersDialogOpen(true);
+    };
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -89,7 +109,7 @@ const DetailsViewPage = (props) => {
 
                             {pageType === componentType.Type_Workspace && <Tab label={translate("label.managers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {pageType === componentType.Type_Organization && <Tab label={translate("label.invites")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            
+
                             {pageType === componentType.Type_Workspace && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
                             <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
@@ -117,8 +137,15 @@ const DetailsViewPage = (props) => {
                     <TabPanel value={value} index={1}>
                         {pageType === componentType.Type_Workspace &&
                             <>
-                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"} />
+                                
+                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"}sx={{ width: "100%", mb: 2 }} onClick={handleAnnotatorDialogOpen} />
                                 <AnnotatorsTable />
+                                <AddUsersDialog
+                                    handleDialogClose={handleAnnotatorDialogClose}
+                                    isOpen={addAnnotatorsDialogOpen}
+                                    userType={addUserTypes.ANNOTATOR}
+                                    id={id}
+                                />
                             </>
                         }
                         {pageType === componentType.Type_Organization &&
@@ -130,8 +157,14 @@ const DetailsViewPage = (props) => {
                     <TabPanel value={value} index={2}>
                         {pageType === componentType.Type_Workspace &&
                             <>
-                                <CustomButton label={"Assign Managers"} sx={{ width: "100%", mb: 2 }} />
+                                <CustomButton label={"Assign Managers"} sx={{ width: "100%", mb: 2 }} onClick={handleManagerDialogOpen} />
                                 <ManagersTable />
+                                <AddUsersDialog
+                                    handleDialogClose={handleManagerDialogClose}
+                                    isOpen={addManagersDialogOpen}
+                                    userType={addUserTypes.MANAGER}
+                                    id={id}
+                                />
                             </>
                         }
                         {pageType === componentType.Type_Organization && <Invites />}

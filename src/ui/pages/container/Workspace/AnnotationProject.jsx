@@ -756,13 +756,14 @@ const AnnotationProject = (props) => {
             xl={12}
             sm={12}
           >
-            {title !== "" && selectedType !== "" && (
+            {/* {title !== "" && selectedType !== "" && ( */}
               <Button
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Create Project"}
                 onClick={handleCreateProject}
+                disabled={ ( title && description && selectedDomain && selectedType && selectedInstances && domains && samplingMode && selectedVariableParameters ) ? false : true}
               />
-            )}
+             {/* )}  */}
             <Button
               label={"Cancel"}
               onClick={() => navigate(`/workspaces/${id}`)}
