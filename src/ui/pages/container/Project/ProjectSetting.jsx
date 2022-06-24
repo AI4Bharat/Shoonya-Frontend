@@ -376,7 +376,7 @@ const ProjectSetting = (props) => {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} label="Cancle" />
+                    <Button onClick={handleClose} label="Cancel" />
                     <Button onClick={handleok} label="Ok" autoFocus />
                 </DialogActions>
             </Dialog>
