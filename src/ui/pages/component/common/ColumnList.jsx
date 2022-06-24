@@ -13,6 +13,7 @@ import {
   Radio,
   Autocomplete,
   Tooltip,
+  Box
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
@@ -44,77 +45,61 @@ const ColumnList = (props) => {
           horizontal: "right",
         }}
       >
-        <Grid
-          container
-          direction="column"
-          className={classes.filterContainer}
-          sx={{ width: "250px" }}
+      <Box className={classes.filterContainer}>
+        <Typography
+          variant="body2"
+          sx={{ mr: 5, fontWeight: "700" }}
+          className={classes.filterTypo}
         >
-          <Grid
-            item
-            xs={6}
-            sm={6}
-            md={6}
-            lg={6}
-            xl={6}
-            sx={{ p: 2 }}
-            className={classes.statusFilterContainer}
-          >
-            <Typography
-              variant="body2"
-              sx={{ mr: 5, fontWeight: "700" }}
-              className={classes.filterTypo}
-            >
-              {translate("label.filter.column")} :
-            </Typography>
-            <List sx={{ width: "100%" }}>
-              {props.columns.map((column, index) => (
-                <ListItem key={index}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={props.selectedColumns.includes(column.name)}
-                        onChange={() => {
-                          if (props.selectedColumns.includes(column.name)) {
-                            props.setColumns(
-                              props.selectedColumns.filter(
-                                (selectedColumn) => selectedColumn !== column.name
-                              )
-                            );
-                          } else {
-                            props.setColumns((prev) => [...prev, column.name]);
-                          }
-                        }}
-                      />
-                    }
-                    label={column.label}
+          {translate("label.filter.column")} :
+        </Typography>
+        <List sx={{ width: "100%" }}>
+          {props.columns.map((column, index) => (
+            <ListItem key={index} sx={{padding: "0"}}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={props.selectedColumns.includes(column.name)}
+                    onChange={() => {
+                      if (props.selectedColumns.includes(column.name)) {
+                        props.setColumns(
+                          props.selectedColumns.filter(
+                            (selectedColumn) => selectedColumn !== column.name
+                          )
+                        );
+                      } else {
+                        props.setColumns((prev) => [...prev, column.name]);
+                      }
+                    }}
                   />
-                </ListItem>
-              ))}
-            </List>
-            <Grid
-              container
-              sx={{ p: 2 }}
-              spacing={2}
-              direction="column"
-              justify="flex-end"
-            >
-              <Divider />
-              <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  variant="outlined"
-                  color="primary"
-                  size="small"
-                  className={classes.clearAllBtn}
-                >
-                  {" "}
-                  Close
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
+                }
+                label={column.label}
+              />
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <Box 
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            columnGap: "10px",
+          }}
+        >
+          <Button
+            onClick={() => setIsOpen(false)}
+            variant="outlined"
+            color="primary"
+            size="small"
+            className={classes.clearAllBtn}
+          >
+            {" "}
+            Close
+          </Button>
+        </Box>
+      </Box>
       </Popover>
     </div>
   );

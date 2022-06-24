@@ -228,7 +228,7 @@ const AddUsersDialog = ({
               placeholder="Add Users"
             />
           )}
-          sx={{ width: "500px" }}
+          sx={{ width: "100%" }}
         />
       </DialogContent>
       <DialogActions style={{ padding: 24 }}>
