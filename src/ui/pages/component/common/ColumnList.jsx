@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   Radio,
   Autocomplete,
+  Tooltip,
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
@@ -24,9 +25,11 @@ const ColumnList = (props) => {
 
   return (
     <div>
-      <Button onClick={() => setIsOpen(!isOpen)} ref={buttonRef}>
-        <ViewColumnIcon />
-      </Button>
+      <Tooltip title="View Columns">
+        <Button onClick={() => setIsOpen(!isOpen)} ref={buttonRef}>
+          <ViewColumnIcon />
+        </Button>
+      </Tooltip>
       <Popover
         id={props.id}
         open={isOpen}
@@ -70,16 +73,16 @@ const ColumnList = (props) => {
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={props.selectedColumns.includes(column)}
+                        checked={props.selectedColumns.includes(column.name)}
                         onChange={() => {
-                          if (props.selectedColumns.includes(column)) {
+                          if (props.selectedColumns.includes(column.name)) {
                             props.setColumns(
                               props.selectedColumns.filter(
-                                (selectedColumn) => selectedColumn !== column
+                                (selectedColumn) => selectedColumn !== column.name
                               )
                             );
                           } else {
-                            props.setColumns((prev) => [...prev, column]);
+                            props.setColumns((prev) => [...prev, column.name]);
                           }
                         }}
                       />
