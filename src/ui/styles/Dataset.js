@@ -151,6 +151,25 @@ dashboardContentContainer: {
 link : {
   textDecoration : "none"
 },
+tableHeader: {
+  fontSize: "0.875rem",
+  fontFamily: "Roboto, sans-serif",
+  fontWeight: "600",
+  color: "rgba(0, 0, 0, 0.87)",
+  lineHeight: "1.5rem",
+  display: "table-cell",
+  verticalAlign: "inherit",
+  borderBottom: "1px solid rgba(224, 224, 224, 1)",
+  textAlign: "left",
+  padding: ".6rem .5rem .6rem 1.5rem",
+  backgroundColor: "#F8F8FA !important",
+  minHeight: "700px",
+  position: "sticky",
+  top: "0px",
+  zIndex: "100",
+  borderCollapse: "collapse",
+  borderSpacing: "0",
+}
   
 })
 

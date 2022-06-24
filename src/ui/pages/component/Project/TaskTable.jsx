@@ -69,7 +69,7 @@ const TaskTable = () => {
     const customColumnHead = (col) => {
         return (
             <th
-                className={"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium tss-10syd3x-MUIDataTableHeadCell-root tss-gm6zfk-MUIDataTableHeadCell-fixedHeader css-seprji-MuiTableCell-root"}
+                className={classes.tableHeader}
             >
                     <Box
                         sx={{
@@ -82,23 +82,15 @@ const TaskTable = () => {
                         }}
                     >
                         {col.label}
-                        <IconButton sx={{borderRadius: "100%"}} onClick={(e) => handleShowSearch(col.name, e)}>
+                        {!excludeSearch.includes(col.name) && <IconButton sx={{borderRadius: "100%"}} onClick={(e) => handleShowSearch(col.name, e)}>
                             <SearchIcon id={col.name + "_btn"}/>
-                        </IconButton>
+                        </IconButton>}
                     </Box>
             </th>);
     }
     
     const initColList = initColumns.map((col) => {
-        return excludeSearch.includes(col) ? {
-            name: col,
-            label: snakeToTitleCase(col),
-            options: {
-                filter: false,
-                sort: false,
-                align: "center",
-            }
-        } : {
+        return {
             name: col,
             label: snakeToTitleCase(col),
             options: {
