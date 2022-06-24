@@ -12,6 +12,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
 import GetExportProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetExportProject';
 import GetPublishProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetPublishProject';
+import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import GetPullNewDataAPI from '../../../../redux/actions/api/ProjectDetails/PullNewData';
 import GetArchiveProjectAPI from '../../../../redux/actions/api/ProjectDetails/ArchiveProject'
 import CustomButton from "../../component/common/Button";
@@ -21,6 +22,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DownloadProjectButton from './DownloadProjectButton';
+import MenuItems from "../../component/common/MenuItems";
 
 
 const ProjectSetting = (props) => {
@@ -32,6 +34,10 @@ const ProjectSetting = (props) => {
     ])
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState();
+    const [showLanguage, setShowLanguage] = useState(false);
+    const [sourceLanguage, setSourceLanguage] = useState("");
+    const [targetLanguage, setTargetLanguage] = useState("");
+    const [languageOptions, setLanguageOptions] = useState([]);
     const { id } = useParams();
 
     const classes = DatasetStyle();
@@ -51,6 +57,13 @@ const ProjectSetting = (props) => {
 
     }, []);
     console.log(ProjectDetails, "ProjectDetails")
+
+    useEffect(() => {
+        if(ProjectDetails.project_type === "MonolingualTranslation" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
+            getLanguageChoices();
+            setShowLanguage(true);
+        }
+    }, [ProjectDetails]);
 
 
     const getSaveButtonAPI = () => {
@@ -93,6 +106,26 @@ const ProjectSetting = (props) => {
     }
 
     console.log(ArchiveProject, "ArchiveProject")
+
+    const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
+
+    const getLanguageChoices = () => {
+        const langObj = new GetLanguageChoicesAPI();
+        dispatch(APITransport(langObj));
+    };
+
+    useEffect(() => {
+        if (LanguageChoices && LanguageChoices.length > 0) {
+          let temp = [];
+          LanguageChoices.forEach((element) => {
+            temp.push({
+              name: element[0],
+              value: element[0],
+            });
+          });
+          setLanguageOptions(temp);
+        }
+      }, [LanguageChoices]);
 
     const handleSave = () => {
         getSaveButtonAPI()
@@ -243,6 +276,81 @@ const ProjectSetting = (props) => {
                             />
                         </Grid>
                     </Grid>
+                    {showLanguage && (
+                    <>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                mt: 2
+                            }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={2}
+                                xl={2}
+                            >
+                                <Typography gutterBottom component="div" label="Required">
+                                    Source Language:
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={9}
+                                xl={9}
+                                sm={12}
+                            >
+                                <MenuItems
+                                    menuOptions={languageOptions}
+                                    handleChange={(value) => setSourceLanguage(value)}
+                                    value={ProjectDetails.src_language}
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                mt: 2
+                            }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={2}
+                                xl={2}
+                            >
+                                <Typography gutterBottom component="div" label="Required">
+                                    Target Language:
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={9}
+                                xl={9}
+                                sm={12}
+                            >
+                                <MenuItems
+                                    menuOptions={languageOptions}
+                                    handleChange={(value) => setTargetLanguage(value)}
+                                    value={ProjectDetails.tgt_language}
+                                />
+                            </Grid>
+                        </Grid>
+                    </>)}
                     <Grid
                         container
                         xs={12}
