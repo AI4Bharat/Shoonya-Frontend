@@ -188,7 +188,7 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Workspace && <WorkspaceReports />}
                     </TabPanel>
                     <TabPanel value={value} index={4}>
-                        {pageType === componentType.Type_Workspace && <Button className={classes.settingsButton} label={"Archive Workspace"} />}
+                        {pageType === componentType.Type_Workspace && <Button className={classes.settingsButton} label={"Archive Workspace"} buttonVariant="outlined" color="error" />}
                     </TabPanel>
                 </Card>
             </Grid>
