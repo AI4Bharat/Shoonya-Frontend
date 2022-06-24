@@ -18,7 +18,7 @@ import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
 
-const initColumns = ["id", "context", "input_text", "input_language", "output_language", "machine_translation", "status", "actions"];
+const initColumns = ["id", "input_text", "machine_translation", "status", "actions"];
 const excludeSearch = ["status", "actions"];
 
 
@@ -155,10 +155,7 @@ const TaskTable = () => {
         const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
             return [
                 el.id,
-                el.data.context,
                 el.data.input_text,
-                el.data.input_language,
-                el.data.output_language,
                 el.data.machine_translation,
                 el.task_status,
                 <Link to={`task/${el.id}`} className={classes.link}>
