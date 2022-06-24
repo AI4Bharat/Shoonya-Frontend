@@ -17,6 +17,7 @@ import CreateProjectAPI from "../../../../redux/actions/api/ProjectDetails/Creat
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetsByType";
 import GetDatasetFieldsAPI from "../../../../redux/actions/api/Dataset/GetDatasetFields";
+import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
 const AnnotationProject = (props) => {
@@ -32,6 +33,7 @@ const AnnotationProject = (props) => {
     (state) => state.getDatasetsByType.data
   );
   const DatasetFields = useSelector((state) => state.getDatasetFields.data);
+  const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -39,12 +41,15 @@ const AnnotationProject = (props) => {
   const [instanceIds, setInstanceIds] = useState(null);
   const [columnFields, setColumnFields] = useState(null);
   const [variableParameters, setVariableParameters] = useState(null);
+  const [languageOptions, setLanguageOptions] = useState([]);
 
   //Form related state variables
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedType, setSelectedType] = useState("");
+  const [sourceLanguage, setSourceLanguage] = useState("");
+  const [targetLanguage, setTargetLanguage] = useState("");
   const [samplingMode, setSamplingMode] = useState(null);
   const [random, setRandom] = useState(5);
   const [batchSize, setBatchSize] = useState(null);
@@ -158,9 +163,26 @@ const AnnotationProject = (props) => {
   }, [DatasetFields]);
 
   useEffect(() => {
+    if (LanguageChoices && LanguageChoices.length > 0) {
+      let temp = [];
+      LanguageChoices.forEach((element) => {
+        temp.push({
+          name: element[0],
+          value: element[0],
+        });
+      });
+      setLanguageOptions(temp);
+    }
+  }, [LanguageChoices]);
+
+  useEffect(() => {
     setSelectedType("");
     setSamplingParameters(null);
     setConfirmed(false);
+    if(selectedDomain === "Translation") {
+      const langChoicesObj = new GetLanguageChoicesAPI();
+      dispatch(APITransport(langChoicesObj));
+    }
     //setTableData(null);
   }, [selectedDomain]);
 
@@ -291,6 +313,8 @@ const AnnotationProject = (props) => {
       variable_parameters: temp,
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
+      src_language: sourceLanguage,
+      tgt_language: targetLanguage,
     };
     const projectObj = new CreateProjectAPI(newProject);
     dispatch(APITransport(projectObj));
@@ -420,6 +444,50 @@ const AnnotationProject = (props) => {
             </>
           )}
 
+          {selectedDomain === "Translation" && (
+            <>
+              <Grid
+                className={classes.projectsettingGrid}
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+              >
+                <Typography gutterBottom component="div">
+                  Source Language:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                <MenuItems
+                  menuOptions={languageOptions}
+                  handleChange={(value) => setSourceLanguage(value)}
+                  value={sourceLanguage}
+                />
+              </Grid>
+
+              <Grid
+                className={classes.projectsettingGrid}
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+              >
+                <Typography gutterBottom component="div">
+                  Target Language:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                <MenuItems
+                  menuOptions={languageOptions}
+                  handleChange={(value) => setTargetLanguage(value)}
+                  value={targetLanguage}
+                />
+              </Grid>
+            </>
+          )}
+
           {instanceIds && (
             <>
               {selectedVariableParameters.map((parameter, index) => (
@@ -433,7 +501,7 @@ const AnnotationProject = (props) => {
                     xl={12}
                   >
                     <Typography gutterBottom component="div">
-                      {processNameString(parameter["name"])}
+                      {processNameString(parameter["name"])}:
                     </Typography>
                   </Grid>
                   <Grid
@@ -541,14 +609,12 @@ const AnnotationProject = (props) => {
                                     }
                                   />
                                 }
-                                onDelete={() => {
-                                  if (!confirmed) {
-                                    setSelectedInstances(
+                                onDelete={confirmed ? undefined : () => {
+                                  setSelectedInstances(
                                       selectedInstances.filter(
                                         (instance) => instance !== key
                                       )
                                     );
-                                  }
                                 }}
                               />
                             ))}
@@ -578,10 +644,12 @@ const AnnotationProject = (props) => {
                           onClick={onConfirmSelections}
                           style={{ margin: "0px 20px 0px 0px" }}
                           label={"Confirm Selections"}
+                          disabled={confirmed}
                         />
                         <Button
                           onClick={handleChangeInstances}
                           label={"Change Sources"}
+                          disabled={!confirmed}
                         />
                       </>
                     )}

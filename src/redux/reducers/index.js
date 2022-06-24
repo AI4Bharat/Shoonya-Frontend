@@ -24,6 +24,7 @@ import getEditUpdate from './ProjectDetails/EditUpdate'
 import getDatasetsByType from './Dataset/GetDatasetsByType';
 import getDatasetFields from './Dataset/GetDatasetFields';
 import getProjectDomains from './ProjectDetails/GetProjectDomains';
+import getLanguageChoices from './ProjectDetails/GetLanguageChoices';
 import createProject from './ProjectDetails/CreateProject';
 import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
 import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
@@ -67,6 +68,7 @@ const index = {
     getDatasetsByType,
     getDatasetFields,
     getProjectDomains,
+    getLanguageChoices,
     createProject,
     getWorkspaceUserReports,
     getWorkspaceProjectReports,
