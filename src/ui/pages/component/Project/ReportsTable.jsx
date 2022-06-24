@@ -1,9 +1,9 @@
 // ReportsTable
 
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
 import CustomButton from '../common/Button';
-import { Typography, TextField, Box, Stack, Button } from '@mui/material';
+import { Typography, TextField, Box, Stack, Button, Grid } from '@mui/material';
 import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import InputLabel from '@mui/material/InputLabel';
@@ -15,36 +15,70 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetProjectReportAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectReport";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-
+import DatasetStyle from "../../../styles/Dataset";
+import ColumnList from '../common/ColumnList';
 
 const ReportsTable = () => {
-    const [startDate, setStartDate] = React.useState(format(startOfMonth(Date.now()), 'yyyy-MM-dd'));
-    const [endDate, setEndDate] = React.useState(format(Date.now(), 'yyyy-MM-dd'));
-    const [selectRange, setSelectRange] = React.useState("This Month");
-    const [rangeValue, setRangeValue] = React.useState([startOfMonth(Date.now()), Date.now()]);
-    const [showPicker, setShowPicker] = React.useState(false);
+    const [startDate, setStartDate] = useState(format(startOfMonth(Date.now()), 'yyyy-MM-dd'));
+    const [endDate, setEndDate] = useState(format(Date.now(), 'yyyy-MM-dd'));
+    const [selectRange, setSelectRange] = useState("This Month");
+    const [rangeValue, setRangeValue] = useState([startOfMonth(Date.now()), Date.now()]);
+    const [showPicker, setShowPicker] = useState(false);
+    const [selectedColumns, setSelectedColumns] = useState([]);
+    const [columns, setColumns] = useState([]);
 
     const { id } = useParams();
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
+    const classes = DatasetStyle();
 
-    const columns = ProjectReport[0] ? Object.keys(ProjectReport[0]).map(key => {
-        return {
-            name: key,
-            label: key,
-            options: {
-                filter: false,
-                sort: false,
-            }
+    useEffect(() => {
+        if (ProjectReport?.length > 0) {
+            let cols = [];
+            let selected = [];
+            Object.keys(ProjectReport[0]).forEach((key) => {
+                cols.push({
+                    name: key,
+                    label: key,
+                    options: {
+                        filter: false,
+                        sort: false,
+                    }
+                })
+                selected.push(key);
+            });
+            setSelectedColumns(selected);
+            setColumns(cols);
+        } else {
+            setColumns([]);
+            setSelectedColumns([]);
         }
-    }) : [];
+    }, [ProjectReport]);
+
+    const renderToolBar = () => {
+        const buttonSXStyle = { borderRadius: 2, margin: 2 }
+        return (
+            <Grid container spacing={0} md={12}>
+                <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
+                    <ColumnList
+                        columns={columns}
+                        setColumns={setSelectedColumns}
+                        selectedColumns={selectedColumns}
+                    />
+                </Grid>
+            </Grid>
+        )
+    }
 
     const options = {
         filterType: 'checkbox',
         selectableRows: "none",
-        download : false,
-        filter : false,
-        print : false
+        download: false,
+        filter: false,
+        print: false,
+        search: false,
+        viewColumns: false,
+        customToolbar: renderToolBar,
     };
 
     const handleOptionChange = (e) => {
@@ -135,7 +169,7 @@ const ReportsTable = () => {
                 <MUIDataTable
                     title={""}
                     data={ProjectReport}
-                    columns={columns}
+                    columns={columns.filter(col => selectedColumns.includes(col.name))}
                     options={options}
                     // filter={false}
                 />}

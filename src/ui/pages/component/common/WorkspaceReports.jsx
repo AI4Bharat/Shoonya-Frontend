@@ -23,6 +23,8 @@ import GetWorkspaceUserReportsAPI from "../../../../redux/actions/api/WorkspaceD
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetWorkspaceProjectReportAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProjectReports";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import DatasetStyle from "../../../styles/Dataset";
+import ColumnList from '../common/ColumnList';
 
 const WorkspaceReports = () => {
   const [startDate, setStartDate] = useState(
@@ -39,7 +41,9 @@ const WorkspaceReports = () => {
   const [selectedType, setSelectedType] = useState("");
   const [reportType, setReportType] = useState("project");
   const [columns, setColumns] = useState([]);
+  const [selectedColumns, setSelectedColumns] = useState([]);
   const [reportData, setReportData] = useState([]);
+  const classes = DatasetStyle();
 
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -71,6 +75,7 @@ const WorkspaceReports = () => {
   useEffect(() => {
     if (UserReports?.length) {
       let tempColumns = [];
+      let tempSelected = [];
       Object.keys(UserReports[0]).forEach((key) => {
         tempColumns.push({
           name: key,
@@ -81,18 +86,22 @@ const WorkspaceReports = () => {
             align: "center",
           },
         });
+        tempSelected.push(key);
       });
       setColumns(tempColumns);
       setReportData(UserReports);
+      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setReportData([]);
+      setSelectedColumns([]);
     }
   }, [UserReports]);
 
   useEffect(() => {
     if (ProjectReports?.length) {
       let tempColumns = [];
+      let tempSelected = [];
       Object.keys(ProjectReports[0]).forEach((key) => {
         tempColumns.push({
           name: key,
@@ -103,22 +112,43 @@ const WorkspaceReports = () => {
             align: "center",
           },
         });
+        tempSelected.push(key);
       });
       setColumns(tempColumns);
       setReportData(ProjectReports);
+      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setReportData([]);
+      setSelectedColumns([]);
     }
   }, [ProjectReports]);
 
-  const options = {
-    filterType: "checkbox",
+  const renderToolBar = () => {
+    const buttonSXStyle = { borderRadius: 2, margin: 2 }
+    return (
+        <Grid container spacing={0} md={12}>
+            <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
+                <ColumnList
+                    columns={columns}
+                    setColumns={setSelectedColumns}
+                    selectedColumns={selectedColumns}
+                />
+            </Grid>
+        </Grid>
+    )
+}
+
+const options = {
+    filterType: 'checkbox',
     selectableRows: "none",
     download: false,
     filter: false,
     print: false,
-  };
+    search: false,
+    viewColumns: false,
+    customToolbar: renderToolBar,
+};
 
   const handleOptionChange = (e) => {
     setSelectRange(e.target.value);
@@ -274,7 +304,7 @@ const WorkspaceReports = () => {
         <MUIDataTable
           title={""}
           data={reportData}
-          columns={columns}
+          columns={columns.filter((col) => selectedColumns.includes(col.name))}
           options={options}
         />
       )}

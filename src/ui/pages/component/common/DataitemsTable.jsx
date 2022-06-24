@@ -45,6 +45,7 @@ const DataitemsTable = () => {
     let fetchedItems = dataitemsList.results;
     setDataitems(fetchedItems);
     let tempColumns = [];
+    let tempSelected = [];
     if (fetchedItems?.length) {
       Object.keys(fetchedItems[0]).forEach((key) => {
         if (!excludeKeys.includes(key)) {
@@ -57,11 +58,12 @@ const DataitemsTable = () => {
               align: "center",
             },
           });
+          tempSelected.push(key);
         }
       });
     }
     setColumns(tempColumns);
-    setSelectedColumns(tempColumns);
+    setSelectedColumns(tempSelected);
   };
 
   useEffect(() => {
@@ -152,7 +154,7 @@ const DataitemsTable = () => {
       <MUIDataTable
         title={""}
         data={dataitems}
-        columns={columns.filter((column) => selectedColumns.includes(column))}
+        columns={columns.filter((column) => selectedColumns.includes(column.name))}
         options={options}
       />
     </Fragment>

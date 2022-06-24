@@ -15,6 +15,11 @@ import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
+import { snakeToTitleCase } from "../../../../utils/utils";
+import ColumnList from "../common/ColumnList";
+
+const initColumns = ["id", "context", "input_text", "input_language", "output_language", "machine_translation", "status", "actions"];
+const excludeSearch = ["status", "actions"];
 
 
 const TaskTable = () => {
@@ -22,7 +27,6 @@ const TaskTable = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
-
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -45,6 +49,7 @@ const TaskTable = () => {
         variant: "success",
       });
     const [pullClicked, setPullClicked] = useState(false);
+    const [selectedColumns, setSelectedColumns] = useState(initColumns);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
@@ -84,79 +89,28 @@ const TaskTable = () => {
             </th>);
     }
     
-    const columns = [
-        {
-            name: "id",
-            label: "ID",
+    const initColList = initColumns.map((col) => {
+        return excludeSearch.includes(col) ? {
+            name: col,
+            label: snakeToTitleCase(col),
+            options: {
+                filter: false,
+                sort: false,
+                align: "center",
+            }
+        } : {
+            name: col,
+            label: snakeToTitleCase(col),
             options: {
                 filter: false,
                 sort: false,
                 align: "center",
                 customHeadRender: customColumnHead,
-            },
-        },
-        {
-            name: "context",
-            label: "Context",
-            options: {
-                filter: false,
-                sort: false,
-                align: "center",
-                customHeadRender: customColumnHead,
-            },
-        },
-        {
-            name: "input_text",
-            label: "Input Text",
-            options: {
-                filter: false,
-                sort: false,
-                customHeadRender: customColumnHead,
             }
-        },
-        {
-            name: "input_language",
-            label: "Input Language",
-            options: {
-                filter: false,
-                sort: false,
-                customHeadRender: customColumnHead,
-            },
-        },
-        {
-            name: "output_language",
-            label: "Output Language",
-            options: {
-                filter: false,
-                sort: false,
-                customHeadRender: customColumnHead,
-            },
-        },
-        {
-            name: "machine_translation",
-            label: "Machine translation",
-            options: {
-                filter: false,
-                sort: false,
-                customHeadRender: customColumnHead,
-            },
-        },
-        {
-            name: "status",
-            label: "Status",
-            options: {
-                filter: false,
-                sort: false,
-            }
-        },
-        {
-            name: "actions",
-            label: "Actions",
-            options: {
-                filter: false,
-                sort: false,
-            }
-        }];
+        }
+    })
+    
+    const [columns, setColumns] = useState(initColList);
 
     const getTaskListData = () => {
         const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
@@ -170,6 +124,14 @@ const TaskTable = () => {
     }
 
     const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
+
+    useEffect(() => {
+        const newCols = initColList.map(col => {
+            col.options.display = selectedColumns.includes(col.name) ? "true" : "false";
+            return col;
+        });
+        setColumns(newCols);
+    }, [selectedColumns]);
 
     useEffect(() => {
         getTaskListData();
@@ -274,9 +236,16 @@ const TaskTable = () => {
                         ))}
                         </Select>
                     </FormControl>}
-                    <Button onClick={handleShowFilter}>
-                        <FilterListIcon />
-                    </Button>
+                    <ColumnList
+                        columns={columns}
+                        setColumns={setSelectedColumns}
+                        selectedColumns={selectedColumns}
+                    />
+                    <Tooltip title="Filter Table">
+                        <Button onClick={handleShowFilter}>
+                            <FilterListIcon />
+                        </Button>
+                    </Tooltip>
                 </Grid>
             </Grid>
         )
