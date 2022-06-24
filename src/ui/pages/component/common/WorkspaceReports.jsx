@@ -127,15 +127,13 @@ const WorkspaceReports = () => {
   const renderToolBar = () => {
     const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
-        <Grid container spacing={0} md={12}>
-            <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
-                <ColumnList
-                    columns={columns}
-                    setColumns={setSelectedColumns}
-                    selectedColumns={selectedColumns}
-                />
-            </Grid>
-        </Grid>
+      <Box className={classes.filterToolbarContainer}>
+        <ColumnList
+            columns={columns}
+            setColumns={setSelectedColumns}
+            selectedColumns={selectedColumns}
+        />
+      </Box>
     )
 }
 

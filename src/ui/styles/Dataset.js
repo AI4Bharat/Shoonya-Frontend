@@ -14,7 +14,8 @@ const DatasetStyle = makeStyles({
     marginTop:"20px"
    },
    projectButton:{
-    width: "40%",
+    width: "100%",
+    textDecoration: "none",
    },
    annotatorsButton:{
     width: "100%"
@@ -44,7 +45,7 @@ const DatasetStyle = makeStyles({
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    columnGap: "20px",
+    columnGap: "10px",
 },
 clearAllBtn: {
   float: "right",

@@ -204,36 +204,34 @@ const TaskTable = () => {
     const renderToolBar = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
-            <Grid container spacing={0} md={12}>
-                <Grid item xs={8} sm={8} md={12} lg={12} xl={12} className={classes.filterToolbarContainer}>
-                    {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%"}}>
-                        <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
-                        <Select
-                        labelId="annotator-filter-label"
-                        id="annotator-filter"
-                        value={selectedFilters.user_filter}
-                        label="Filter by Annotator"
-                        onChange={(e) => setsSelectedFilters({...selectedFilters, user_filter: e.target.value})}
-                        sx={{fontSize: "16px"}}
-                        >
-                        <MenuItem value={-1}>All</MenuItem>
-                        {filterData.Annotators.map((el, i) => (
-                            <MenuItem value={el.value}>{el.label}</MenuItem>
-                        ))}
-                        </Select>
-                    </FormControl>}
-                    <ColumnList
-                        columns={columns}
-                        setColumns={setSelectedColumns}
-                        selectedColumns={selectedColumns}
-                    />
-                    <Tooltip title="Filter Table">
-                        <Button onClick={handleShowFilter}>
-                            <FilterListIcon />
-                        </Button>
-                    </Tooltip>
-                </Grid>
-            </Grid>
+            <Box className={classes.filterToolbarContainer}>
+                {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
+                    <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
+                    <Select
+                    labelId="annotator-filter-label"
+                    id="annotator-filter"
+                    value={selectedFilters.user_filter}
+                    label="Filter by Annotator"
+                    onChange={(e) => setsSelectedFilters({...selectedFilters, user_filter: e.target.value})}
+                    sx={{fontSize: "16px"}}
+                    >
+                    <MenuItem value={-1}>All</MenuItem>
+                    {filterData.Annotators.map((el, i) => (
+                        <MenuItem value={el.value}>{el.label}</MenuItem>
+                    ))}
+                    </Select>
+                </FormControl>}
+                <ColumnList
+                    columns={columns}
+                    setColumns={setSelectedColumns}
+                    selectedColumns={selectedColumns}
+                />
+                <Tooltip title="Filter Table">
+                    <Button onClick={handleShowFilter}>
+                        <FilterListIcon />
+                    </Button>
+                </Tooltip>
+            </Box>
         )
     }
 

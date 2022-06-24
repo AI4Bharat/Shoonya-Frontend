@@ -117,11 +117,25 @@ const DetailsViewPage = (props) => {
                     </Box>
                     <TabPanel value={value} index={0} style={{ textAlign: "center", maxWidth: "100%" }}>
                         {pageType === componentType.Type_Workspace && <>
-                            <Link to={`/create-annotation-project/${id}`} style={{ textDecoration: "none", marginRight: "200px" }}>
-                                <Button className={classes.projectButton} label={"Add New Annotation Project"} />
-                            </Link>
-                            <Link to={`/create-collection-project/${id}`} style={{ textDecoration: "none" }}>
-                                <Button className={classes.projectButton} label={"Add New Collection Project"} /></Link>
+                            <Grid
+                                container
+                                direction='row'
+                                justifyContent='center'
+                                alignItems='center'
+                                columnSpacing={4}
+                                rowSpacing={2}
+                            >
+                                <Grid item xs={12} sm={6}>
+                                    <Link to={`/create-annotation-project/${id}`}>
+                                        <Button className={classes.projectButton} label={"Add New Annotation Project"} />
+                                    </Link>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Link to={`/create-collection-project/${id}`}>
+                                        <Button className={classes.projectButton} label={"Add New Collection Project"} />
+                                    </Link>
+                                </Grid>
+                            </Grid>
                             <div className={classes.workspaceTables} >
                                 <ProjectTable />
                             </div>
