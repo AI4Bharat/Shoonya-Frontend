@@ -159,7 +159,7 @@ function MobileNavbar(props) {
             }}
         > 
             <Grid item>
-                <Link to="/">
+                <Link to="/projects">
                     <img src={Logo} alt="logo" className={classes.headerLogo} style={{marginTop: "5%"}} />
                 </Link>
             </Grid>

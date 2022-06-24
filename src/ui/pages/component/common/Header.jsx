@@ -202,7 +202,7 @@ const Header = () => {
                 sm={12}
                 md={3}
               >
-                <Link to="/">
+                <Link to="/projects">
                   <img src={Logo} alt="logo" className={classes.headerLogo} />
                 </Link>
               </Grid>
