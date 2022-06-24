@@ -241,9 +241,11 @@ const TaskTable = () => {
                         setColumns={setSelectedColumns}
                         selectedColumns={selectedColumns}
                     />
-                    <Button onClick={handleShowFilter}>
-                        <FilterListIcon />
-                    </Button>
+                    <Tooltip title="Filter Table">
+                        <Button onClick={handleShowFilter}>
+                            <FilterListIcon />
+                        </Button>
+                    </Tooltip>
                 </Grid>
             </Grid>
         )
