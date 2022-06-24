@@ -283,6 +283,8 @@ const Header = () => {
                         <FormControlLabel
                           control={setting.control}
                           label={setting.name}
+                          labelPlacement="start"
+                          sx={{ ml: 0 }}
                         />
                       ) : (
                         <Typography variant="body2" textAlign="center">
