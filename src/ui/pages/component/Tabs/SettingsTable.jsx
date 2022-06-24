@@ -9,7 +9,7 @@ export default function SettingsTable() {
     <div className={classes.settingsdiv}  >
       <Card>
       <CardContent>
-      <Button className={classes.settingsButton}  label={"Archive Workspace"} />
+      <Button className={classes.settingsButton}  label={"Archive Workspace"} buttonVariant="outlined" color="error" />
       </CardContent>
     </Card>
        
