@@ -18,7 +18,7 @@ import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
 
-const initColumns = ["id", "context", "input_text", "input_language", "output_language", "machine_translation", "status", "actions"];
+const initColumns = ["id", "input_text", "machine_translation", "status", "actions"];
 const excludeSearch = ["status", "actions"];
 
 
