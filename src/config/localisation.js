@@ -11,7 +11,7 @@ const localisation = {
     "button.Apply" : "Apply",
     "label.filter.status" : "Status",
     "label.filter.byAnnotator" : "Filter by Annotators",
-    "label.filter.column": "Filter by Columns",
+    "label.filter.column": "Select Columns",
     "button.cancel" : "Cancel",
     "button.addNewWorkspace" : "Add New Workspace",
     "button.inviteNewMEmbersToOrganization":"Invite new members to organization",

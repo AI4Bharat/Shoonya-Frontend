@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Radio,
   Autocomplete,
+  Box
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
@@ -72,12 +73,11 @@ const FilterList = (props) => {
           horizontal: "right",
         }}
       >
-        <Grid container direction="column" className={classes.filterContainer}>
-          <Grid item xs={6} sm={6} md={6} lg={6} xl={6} sx={{p:2}} className={classes.statusFilterContainer}>
+        <Box className={classes.filterContainer}>
             <Typography variant="body2" sx={{ mr: 5, fontWeight: "700" }} className={classes.filterTypo}>
               {translate("label.filter.status")} :
             </Typography>
-            <FormGroup sx={{ display: "inline" }}>
+            <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
               {filterStatusData.Status.map((type) => {
                 return (
                   <FormControlLabel
@@ -91,21 +91,23 @@ const FilterList = (props) => {
                     onChange={(e) => setSelectedStatus(e.target.value)}
                     value={type}
                     label={type}
+                    sx={{
+                      fontSize: "1rem",
+                    }}
                   />
                 );
               })}
             </FormGroup>
-          </Grid>
-          <Divider />
-          {/* <Grid item xs={6} sm={6} md={6} lg={6} xl={6} sx={{p:2}} className={classes.statusFilterContainer}>
-            <Typography variant="body2" sx={{ mr: 5, fontWeight: "700" }} className={classes.filterTypo}>
-              {translate("label.filter.byAnnotator")} :
-            </Typography>
-                  
-          </Grid>
-          <Divider /> */}
-          <Grid container direction="row" justifyContent={"flex-end"} spacing={2} sx={{p:2}}>
-            <Grid item>
+            <Divider />
+            <Box 
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                columnGap: "10px",
+              }}
+            >
               <Button
                 onClick={props.handleClose}
                 variant="outlined"
@@ -116,8 +118,6 @@ const FilterList = (props) => {
                 {" "}
                 {translate("button.cancel")}
               </Button>
-            </Grid>
-            <Grid item>
               <Button
                 onClick={handleStatusChange}
                 variant="contained"
@@ -128,9 +128,8 @@ const FilterList = (props) => {
                 {" "}
                 {translate("button.Apply")}
               </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+            </Box>
+        </Box>
       </Popover>
     </div>
   );
