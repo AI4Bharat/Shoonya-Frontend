@@ -21,6 +21,7 @@ import OrganizationSettings from "../Tabs/OrganizationSettings";
 import WorkspaceReports from "./WorkspaceReports";
 import AddUsersDialog from "./AddUsersDialog";
 import addUserTypes from "../../../../constants/addUserTypes";
+import AddWorkspaceDialog from "../Workspace/AddWorkspaceDialog";
 
 function TabPanel(props) {
 
@@ -46,11 +47,12 @@ function TabPanel(props) {
 
 const DetailsViewPage = (props) => {
     const { pageType, title, createdBy } = props;
-    const { id } = useParams();
+    const { id, orgId } = useParams();
     const classes = DatasetStyle();
     const [value, setValue] = React.useState(0);
     const [addAnnotatorsDialogOpen, setAddAnnotatorsDialogOpen] = React.useState(false);
     const [addManagersDialogOpen, setAddManagersDialogOpen] = React.useState(false);
+    const [addWorkspacesDialogOpen, setAddWorkspacesDialogOpen] = React.useState(false);
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -80,6 +82,14 @@ const DetailsViewPage = (props) => {
 
     const handleManagerDialogOpen = () => {
         setAddManagersDialogOpen(true);
+    };
+
+    const handleWorkspaceDialogClose = () => {
+        setAddWorkspacesDialogOpen(false);
+    };
+
+    const handleWorkspaceDialogOpen = () => {
+        setAddWorkspacesDialogOpen(true);
     };
 
     return (
@@ -142,8 +152,13 @@ const DetailsViewPage = (props) => {
                         </>}
                         {pageType === componentType.Type_Organization &&
                             <>
-                                <CustomButton label={translate("button.addNewWorkspace")} sx={{ width: "100%", mb: 2 }} />
+                                <CustomButton label={translate("button.addNewWorkspace")} sx={{ width: "100%", mb: 2 }} onClick={handleWorkspaceDialogOpen} />
                                 <Workspaces />
+                                <AddWorkspaceDialog
+                                    dialogCloseHandler={handleWorkspaceDialogClose}
+                                    isOpen={addWorkspacesDialogOpen}
+                                    orgId={orgId}
+                                />
                             </>
                         }
 
