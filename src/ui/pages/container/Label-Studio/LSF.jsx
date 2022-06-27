@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, { useContext, useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
 import "@heartexlabs/label-studio/build/static/css/main.css";
-import { Button, Tooltip, Alert, TextField } from "@mui/material";
+import { Input, message, Button, Tooltip, Alert } from "antd";
 
 import {
   getProjectsandTasks,
@@ -13,9 +13,10 @@ import {
   deleteAnnotation,
   fetchAnnotation
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
-// import UserContext from "../../context/User/UserContext";
+
+
 import { useParams } from "react-router-dom";
-// import useFullPageLoader from "../../hooks/useFullPageLoader";
+import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from './lsf.module.css'
 import { useSelector } from 'react-redux';
@@ -30,17 +31,12 @@ const LabelStudioWrapper = ({notesRef}) => {
   const lsfRef = useRef();
   const [labelConfig, setLabelConfig] = useState();
   const [taskData, setTaskData] = useState(undefined);
-  // const userContext = useContext(UserContext);
-  const userData = useSelector(state=>state.fetchLoggedInUserData.data)
   const { projectId, taskId } = useParams();
-  const [message, setMessage] = useState({
-    message : "",
-    variant : "success",
-    show : false
-  })
-  // const [loader, showLoader, hideLoader] = useFullPageLoader();
+  const [loader, showLoader, hideLoader] = useFullPageLoader();
+  const userData = useSelector(state=>state.fetchLoggedInUserData.data)
 
-  console.log("userData", userData);
+  console.log("projectId, taskId", projectId, taskId);
+  // debugger
 
   function LSFRoot(
     rootRef,
@@ -133,7 +129,7 @@ const LabelStudioWrapper = ({notesRef}) => {
           load_time = new Date();
         },
         onSubmitAnnotation: function (ls, annotation) {
-          // showLoader();
+          showLoader();
           if (taskData.task_status != "freezed") {
             postAnnotation(
               annotation.serializeAnnotation(),
@@ -145,26 +141,25 @@ const LabelStudioWrapper = ({notesRef}) => {
               notesRef.current
             )
           }
-          else setMessage({message : "Task is freezed", variant : "error", show : false})
+          else message.error("Task is freezed");
 
           if (localStorage.getItem("labelAll"))
             getNextProject(projectId, taskData.id).then((res) => {
-              // hideLoader();
+              hideLoader();
               window.location.href = `/projects/${projectId}/task/${res.id}`;
             })
           else {
-            // hideLoader();
+            hideLoader();
             window.location.reload();
           }
         },
 
         onSkipTask: function () {
-          // message.warning('');
-          setMessage({message : "Notes will not be saved for skipped tasks!", variant : "warning", show : false})
-          // showLoader();
+          message.warning('Notes will not be saved for skipped tasks!');
+          showLoader();
           updateTask(taskData.id).then(() => {
             getNextProject(projectId, taskData.id).then((res) => {
-              // hideLoader();
+              hideLoader();
               window.location.href = `/projects/${projectId}/task/${res.id}`;
             });
           })
@@ -172,7 +167,7 @@ const LabelStudioWrapper = ({notesRef}) => {
 
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.task_status != "freezed") {
-            // showLoader();
+            showLoader();
             for (let i = 0; i < annotations.length; i++) {
               if (annotation.serializeAnnotation().id == annotations[i].result.id) {
                 let temp = annotation.serializeAnnotation()
@@ -192,17 +187,17 @@ const LabelStudioWrapper = ({notesRef}) => {
                   ).then(() => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
-                        // hideLoader();
+                        hideLoader();
                         window.location.href = `/projects/${projectId}/task/${res.id}`;
                       })
                     else{
-                      // hideLoader();
+                      hideLoader();
                       window.location.reload();
                     }
                   });
               }
             }
-          } else setMessage({message : "Task is freezed", variant : "error", show : false});
+          } else message.error("Task is freezed");
         },
 
         onDeleteAnnotation: function (ls, annotation) {
@@ -219,7 +214,7 @@ const LabelStudioWrapper = ({notesRef}) => {
 
   // we're running an effect on component mount and rendering LSF inside rootRef node
   useEffect(() => {
-    // showLoader();
+    showLoader();
     if (localStorage.getItem('rtl') === "true") {
       var style = document.createElement('style');
       style.innerHTML = 'input, textarea { direction: RTL; }'
@@ -247,7 +242,7 @@ const LabelStudioWrapper = ({notesRef}) => {
             predictions,
             notesRef
           );
-          // hideLoader();
+          hideLoader();
         }
       );
     }
@@ -259,16 +254,16 @@ const LabelStudioWrapper = ({notesRef}) => {
   }
 
   const onNextAnnotation = async () => {
-    // showLoader();
+    showLoader();
     getNextProject(projectId, taskId).then((res) => {
-      // hideLoader();
+      hideLoader();
       window.location.href = `/projects/${projectId}/task/${res.id}`;
     });
   }
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      {!loader && <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div/>
         <div>
           <Tooltip title="Save task for later">
@@ -296,9 +291,9 @@ const LabelStudioWrapper = ({notesRef}) => {
             <div style={{minWidth: "160px"}}/>
           )}
         </div>
-      </div>
+      </div>}
       <div className="label-studio-root" ref={rootRef}></div>
-      {/* {loader} */}
+      {loader}
     </div>
   );
 };
@@ -350,7 +345,7 @@ export default function LSF() {
       </div>
       <div className={styles.collapse} style={{height:collapseHeight}}>
         <Alert message="Please do not add notes if you are going to skip the task!" type="warning" showIcon style={{marginBottom: '1%'}} />
-        <TextField placeholder="Place your remarks here ..." value={notesValue} onChange={event=>setNotesValue(event.target.value)} />
+        <Input.TextArea placeholder="Place your remarks here ..." value={notesValue} onChange={event=>setNotesValue(event.target.value)} />
       </div>
       <LabelStudioWrapper notesRef={notesRef}/>
     </div>
