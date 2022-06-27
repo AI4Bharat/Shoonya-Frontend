@@ -8,7 +8,8 @@ import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRol
 import MembersTable from "../Project/MembersTable";
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
 
-const Invites = () => {
+const Invites = (props) => {
+    const {hideButton} = props;
     const dispatch = useDispatch();
     const { orgId } = useParams();
     const OrganizationUserData = useSelector(state => state.getOrganizationUsers.data);
@@ -26,7 +27,7 @@ const Invites = () => {
 
     return (
         <MembersTable
-            hideButton={true}
+            hideButton = {hideButton ? hideButton : false}
             dataSource={OrganizationUserData && OrganizationUserData.length > 0 && OrganizationUserData.filter((el, i) => { return !el.has_accepted_invite })}
         />
     )
