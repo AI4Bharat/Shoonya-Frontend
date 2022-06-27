@@ -1,0 +1,5 @@
+.collapse {
+    margin: 1%;
+    overflow: hidden;
+    transition: height 0.2s ease-in-out;
+}

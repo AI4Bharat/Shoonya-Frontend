@@ -27,6 +27,7 @@ import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
+import LSF from "./ui/pages/container/Label-Studio/LSF";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -140,7 +141,8 @@ const App = () => {
         <Route
           path="projects/:projectId/task/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<AnnotateTask />} />
+            <Layout component={<LSF />} />
+            // <Layout component={<AnnotateTask />} />
           )}
         />
         <Route
