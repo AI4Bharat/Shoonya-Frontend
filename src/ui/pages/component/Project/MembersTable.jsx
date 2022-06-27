@@ -101,7 +101,7 @@ const MembersTable = (props) => {
 
     return (
         <React.Fragment>
-            {userRole !== 1 || hideButton === true && <CustomButton
+            {userRole !== 1 && <CustomButton
                 sx={{ borderRadius: 2, mb: 3, whiteSpace: "nowrap" }}
                 startIcon={<PersonAddAlt />}
                 label="Add Users to Project"
