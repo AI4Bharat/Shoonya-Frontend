@@ -64,7 +64,7 @@ const MembersTable = (props) => {
     const projectDetails = useSelector((state) => state.getProjectDetails?.data);
     const [userRole, setUserRole] = useState();
 
-    const { dataSource } = props;
+    const { dataSource, hideButton } = props;
 
     const userDetails = useSelector(state=>state.fetchLoggedInUserData.data);
 
@@ -101,7 +101,7 @@ const MembersTable = (props) => {
 
     return (
         <React.Fragment>
-            {userRole !== 1 && <CustomButton
+            {userRole !== 1 || hideButton === true && <CustomButton
                 sx={{ borderRadius: 2, mb: 3, whiteSpace: "nowrap" }}
                 startIcon={<PersonAddAlt />}
                 label="Add Users to Project"
