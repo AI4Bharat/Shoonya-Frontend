@@ -2,7 +2,7 @@
 
 import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
@@ -12,6 +12,7 @@ import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
 import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
+import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
@@ -25,6 +26,7 @@ const TaskTable = () => {
     const classes = DatasetStyle();
     const { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
@@ -35,6 +37,7 @@ const TaskTable = () => {
     const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled", user_filter: -1});
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+    const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState();
     const [pullDisabled, setPullDisabled] = useState("");
@@ -50,6 +53,7 @@ const TaskTable = () => {
     const [pullClicked, setPullClicked] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [columns, setColumns] = useState([]);
+    const [labellingStarted, setLabellingStarted] = useState(false);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
@@ -71,6 +75,13 @@ const TaskTable = () => {
         const batchObj = new PullNewBatchAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
         dispatch(APITransport(batchObj));
     }
+
+    const labelAllTasks = () => {
+        localStorage.setItem("labellingMode", selectedFilters.task_status);
+        const getNextTaskObj = new GetNextTaskAPI(id);
+        dispatch(APITransport(getNextTaskObj));
+        setLabellingStarted(true);
+    };
 
     const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
 
@@ -198,6 +209,14 @@ const TaskTable = () => {
             setPullDisabled("You have too many unlabeled tasks")
         }
     }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters.task_status])
+
+    useEffect(() => {
+        if(labellingStarted && Object.keys(NextTask).length > 0) {
+          localStorage.setItem("labelAll", true);
+          navigate(`/projects/${id}/task/${NextTask.id}`);
+        }
+        //TODO: display no more tasks message
+      }, [NextTask]);
 
     const handleShowFilter = (event) => {
         setAnchorEl(event.currentTarget);
@@ -344,7 +363,11 @@ const TaskTable = () => {
                         />
                     </Box>
                 </Tooltip>
-                <CustomButton sx={{ p: 1, width: '38%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} label={"Start Labelling Now"} />
+                <CustomButton 
+                    sx={{ p: 1, width: '38%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} 
+                    label={"Start Labelling Now"}
+                    onClick={labelAllTasks}
+                />
                 </Box>
             ) : (
                 <Button

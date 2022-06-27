@@ -54,6 +54,7 @@ const Projects = () => {
 
     const dispatch = useDispatch();
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
 
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
@@ -158,7 +159,7 @@ const Projects = () => {
                         <Typography variant="body2" fontWeight='700' pr={1}>Status :</Typography>
                         <Typography variant="body2">{ProjectDetails.is_published ? "Published" : ProjectDetails.is_archived ? "Archived" : "Draft"}</Typography>
                     </Grid>
-                    <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
+                    {userDetails?.role !== 1 && <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
                         <Button
                             sx={{
                                 marginTop: 2,
@@ -171,7 +172,7 @@ const Projects = () => {
                         >
                             <Typography variant="body2" sx={{color : "#FFFFFF"}}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
-                    </Link>
+                    </Link>}
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
                             <Tab label={translate("label.tasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
