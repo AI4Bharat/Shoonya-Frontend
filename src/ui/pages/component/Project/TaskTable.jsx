@@ -18,9 +18,8 @@ import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
 
-const initColumns = ["id", "input_text", "machine_translation", "status", "actions"];
-const excludeSearch = ["status", "actions"];
-
+const excludeSearch = ["status", "actions", "output_text"];
+const excludeCols = ["context", "input_language", "output_language"];
 
 const TaskTable = () => {
     const classes = DatasetStyle();
@@ -49,7 +48,8 @@ const TaskTable = () => {
         variant: "success",
       });
     const [pullClicked, setPullClicked] = useState(false);
-    const [selectedColumns, setSelectedColumns] = useState(initColumns);
+    const [selectedColumns, setSelectedColumns] = useState([]);
+    const [columns, setColumns] = useState([]);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
@@ -60,6 +60,19 @@ const TaskTable = () => {
             }
         }) : []
     }
+
+    const getTaskListData = () => {
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+        dispatch(APITransport(taskObj));
+    }
+
+    const fetchNewTasks = () => {
+        setPullClicked(true);
+        const batchObj = new PullNewBatchAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+        dispatch(APITransport(batchObj));
+    }
+
+    const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
 
     const handleShowSearch = (col, event) => {
         setSearchAnchor(event.currentTarget);
@@ -85,42 +98,6 @@ const TaskTable = () => {
             </Box>
         );
     }
-    
-    const initColList = initColumns.map((col) => {
-        return {
-            name: col,
-            label: snakeToTitleCase(col),
-            options: {
-                filter: false,
-                sort: false,
-                align: "center",
-                customHeadLabelRender: customColumnHead,
-            }
-        }
-    })
-    
-    const [columns, setColumns] = useState(initColList);
-
-    const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
-        dispatch(APITransport(taskObj));
-    }
-
-    const fetchNewTasks = () => {
-        setPullClicked(true);
-        const batchObj = new PullNewBatchAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
-        dispatch(APITransport(batchObj));
-    }
-
-    const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
-
-    useEffect(() => {
-        const newCols = initColList.map(col => {
-            col.options.display = selectedColumns.includes(col.name) ? "true" : "false";
-            return col;
-        });
-        setColumns(newCols);
-    }, [selectedColumns]);
 
     useEffect(() => {
         getTaskListData();
@@ -152,24 +129,57 @@ const TaskTable = () => {
     }, [PullBatchRes]);
 
     useEffect(() => {
-        const data = taskList && taskList.length > 0 ? taskList.map((el, i) => {
-            return [
-                el.id,
-                el.data.input_text,
-                el.data.machine_translation,
-                el.task_status,
-                <Link to={`task/${el.id}`} className={classes.link}>
-                    <CustomButton
-                        onClick={() => console.log("task id === ", el.id)}
-                        sx={{ p: 1, borderRadius: 2 }}
-                        label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
-                            {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
-                        </Typography>} />
-                </Link>
+        if (taskList?.length > 0) {
+            const data = taskList.map((el, i) => {
+                let row = [
+                    el.id,
+                    ...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key])
                 ]
-        }) : []
-        setTasks(data);
+                taskList[0].task_status && row.push(el.task_status);
+                return [
+                    ...row,
+                    <Link to={`task/${el.id}`} className={classes.link}>
+                        <CustomButton
+                            onClick={() => console.log("task id === ", el.id)}
+                            sx={{ p: 1, borderRadius: 2 }}
+                            label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
+                                {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
+                            </Typography>} />
+                    </Link>
+                    ]
+            })
+            let colList = ["id"];
+            colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
+            taskList[0].task_status && colList.push("status");
+            colList.push("actions");
+            const cols = colList.map((col) => {
+                return {
+                    name: col,
+                    label: snakeToTitleCase(col),
+                    options: {
+                        filter: false,
+                        sort: false,
+                        align: "center",
+                        customHeadLabelRender: customColumnHead,
+                    }
+                }
+            });
+            setColumns(cols);
+            setSelectedColumns(colList);
+            setTasks(data);
+        } else {
+            setTasks([]);
+        }
     }, [taskList, ProjectDetails.project_mode]);
+
+
+    useEffect(() => {
+        const newCols = columns.map(col => {
+            col.options.display = selectedColumns.includes(col.name) ? "true" : "false";
+            return col;
+        });
+        setColumns(newCols);
+    }, [selectedColumns]);
 
     useEffect(() => {
         if (ProjectDetails) {
