@@ -64,7 +64,7 @@ const MembersTable = (props) => {
     const projectDetails = useSelector((state) => state.getProjectDetails?.data);
     const [userRole, setUserRole] = useState();
 
-    const { dataSource } = props;
+    const { dataSource, hideButton } = props;
 
     const userDetails = useSelector(state=>state.fetchLoggedInUserData.data);
 
