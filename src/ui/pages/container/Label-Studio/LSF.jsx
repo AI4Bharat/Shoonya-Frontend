@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux';
 
 //used just in postAnnotation to support draft status update.
 let task_status = "accepted";
+let loaded = false;
 
 const LabelStudioWrapper = ({notesRef}) => {
   // we need a reference to a DOM node here so LSF knows where to render
@@ -214,7 +215,6 @@ const LabelStudioWrapper = ({notesRef}) => {
 
   // we're running an effect on component mount and rendering LSF inside rootRef node
   useEffect(() => {
-    showLoader();
     if (localStorage.getItem('rtl') === "true") {
       var style = document.createElement('style');
       style.innerHTML = 'input, textarea { direction: RTL; }'
@@ -223,11 +223,13 @@ const LabelStudioWrapper = ({notesRef}) => {
     if (
       typeof labelConfig === "undefined" &&
       typeof taskData === "undefined" &&
-      userData
+      userData && !loaded
     ) {
+      loaded = true;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
+          showLoader();
           console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
           setLabelConfig(labelConfig.label_config);
           setTaskData(taskData.data);
