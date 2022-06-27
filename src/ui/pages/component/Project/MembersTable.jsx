@@ -101,13 +101,15 @@ const MembersTable = (props) => {
 
     return (
         <React.Fragment>
-            {userRole !== 1 && <CustomButton
+            {userRole !== 1 && !hideButton ?
+            <CustomButton
                 sx={{ borderRadius: 2, mb: 3, whiteSpace: "nowrap" }}
                 startIcon={<PersonAddAlt />}
                 label="Add Users to Project"
                 fullWidth
                 onClick={handleUserDialogOpen}
-            />}
+            /> : null
+            }
             <AddUsersDialog
                 handleDialogClose={handleUserDialogClose}
                 isOpen={addUserDialogOpen}
