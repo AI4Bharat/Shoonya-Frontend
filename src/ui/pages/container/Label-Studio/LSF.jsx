@@ -18,6 +18,7 @@ import { useParams } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from './lsf.module.css'
+import "./lsf.css"
 import { useSelector } from 'react-redux';
 
 //used just in postAnnotation to support draft status update.
