@@ -130,26 +130,24 @@ const TaskTable = () => {
 
     useEffect(() => {
         if (taskList?.length > 0) {
-            const data = taskList.map((el, i) => {
+            const data = taskList.map((el) => {
                 let row = [
-                    el.id,
-                    ...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key])
+                    el.id
                 ]
+                taskList[0].data && row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
                 taskList[0].task_status && row.push(el.task_status);
-                return [
-                    ...row,
-                    <Link to={`task/${el.id}`} className={classes.link}>
-                        <CustomButton
-                            onClick={() => console.log("task id === ", el.id)}
-                            sx={{ p: 1, borderRadius: 2 }}
-                            label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
-                                {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
-                            </Typography>} />
-                    </Link>
-                    ]
+                row.push(<Link to={`task/${el.id}`} className={classes.link}>
+                            <CustomButton
+                                onClick={() => console.log("task id === ", el.id)}
+                                sx={{ p: 1, borderRadius: 2 }}
+                                label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
+                                    {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
+                                </Typography>} />
+                        </Link>);
+                return row;
             })
             let colList = ["id"];
-            colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
+            taskList[0].data && colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
             colList.push("actions");
             const cols = colList.map((col) => {
