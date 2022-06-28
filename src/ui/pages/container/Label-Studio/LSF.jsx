@@ -20,6 +20,7 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 import styles from './lsf.module.css'
 import "./lsf.css"
 import { useSelector } from 'react-redux';
+import { translate } from '../../../../config/localisation';
 
 //used just in postAnnotation to support draft status update.
 let task_status = "accepted";
@@ -348,8 +349,15 @@ export default function LSF() {
         </div>
       </div>
       <div className={styles.collapse} style={{height:collapseHeight}}>
-        <Alert message="Please do not add notes if you are going to skip the task!" severity="warning" showIcon style={{marginBottom: '1%'}} />
-        <TextareaAutosize placeholder="Place your remarks here ..." value={notesValue} onChange={event=>setNotesValue(event.target.value)} />
+        <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+            {translate("alert.notes")}
+        </Alert>
+        <TextareaAutosize 
+          placeholder="Place your remarks here ..." 
+          value={notesValue} 
+          onChange={event=>setNotesValue(event.target.value)} 
+          style={{width: '99%', minHeight: '80px'}}
+        />
       </div>
       <LabelStudioWrapper notesRef={notesRef}/>
     </div>
