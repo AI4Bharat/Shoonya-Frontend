@@ -23,7 +23,6 @@ import { useSelector } from 'react-redux';
 
 //used just in postAnnotation to support draft status update.
 let task_status = "accepted";
-let loaded = false;
 
 const LabelStudioWrapper = ({notesRef}) => {
   // we need a reference to a DOM node here so LSF knows where to render
@@ -35,6 +34,7 @@ const LabelStudioWrapper = ({notesRef}) => {
   const { projectId, taskId } = useParams();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
+  let loaded = false;
 
   console.log("projectId, taskId", projectId, taskId);
   // debugger
