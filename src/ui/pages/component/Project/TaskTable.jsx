@@ -85,7 +85,7 @@ const TaskTable = () => {
                 sx={{
                     display: "flex",
                     flexDirection: "row",
-                    justifyContent: "space-around",
+                    justifyContent: "flex-start",
                     columnGap: "10px",
                     flexGrow: "1",
                     alignItems: "center",
@@ -177,6 +177,7 @@ const TaskTable = () => {
             return col;
         });
         setColumns(newCols);
+        console.log("columns", newCols)
     }, [selectedColumns]);
 
     useEffect(() => {
