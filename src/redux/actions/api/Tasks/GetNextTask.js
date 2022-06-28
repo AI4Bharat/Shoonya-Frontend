@@ -11,7 +11,7 @@ export default class GetNextTaskAPI extends API {
     this.projectId = projectId;
     this.labellingMode = localStorage.getItem("labellingMode");
     this.type = constants.GET_NEXT_TASK;
-    this.endpoint = this.labellingMode ? `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/next/?current_task_id=${taskId}&task_status=${this.labellingMode}` : `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/next/?current_task_id=${taskId}`;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/next/?${taskId ? 'current_task_id=' + taskId : ''}${this.labellingMode ? '&task_status=' + this.labellingMode : ''}`;
   }
 
   processResponse(res) {

@@ -196,14 +196,14 @@ const DetailsViewPage = (props) => {
                                 />
                             </>
                         }
-                        {pageType === componentType.Type_Organization && <Invites />}
+                        {pageType === componentType.Type_Organization && <Invites hideButton={true} />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
                         {pageType === componentType.Type_Organization && <OrganizationSettings />}
                         {pageType === componentType.Type_Workspace && <WorkspaceReports />}
                     </TabPanel>
                     <TabPanel value={value} index={4}>
-                        {pageType === componentType.Type_Workspace && <Button className={classes.settingsButton} label={"Archive Workspace"} buttonVariant="outlined" color="error" />}
+                        {pageType === componentType.Type_Workspace && <CustomButton className={classes.settingsButton} label={"Archive Workspace"} buttonVariant="contained" sx={{backgroundColor : "#cf5959", "&:hover" : {backgroundColor : "#cf5959",}}} />}
                     </TabPanel>
                 </Card>
             </Grid>
