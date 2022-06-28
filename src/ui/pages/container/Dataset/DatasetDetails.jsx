@@ -8,6 +8,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useEffect } from "react";
 import DataitemsTable from "../../component/common/DataitemsTable";
 import { translate } from "../../../../config/localisation";
+import TabPanel from '../../component/common/TabPanel';
 
 const DatasetDetails = () => {
 
@@ -89,7 +90,15 @@ const DatasetDetails = () => {
                             <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
-                    <DataitemsTable />
+                    <TabPanel value={selectedTab} index={0}>
+                        <DataitemsTable />
+                    </TabPanel>
+                    <TabPanel value={selectedTab} index={1}>
+
+                    </TabPanel>
+                    <TabPanel value={selectedTab} index={2}>
+                        
+                    </TabPanel>
                 </Card>
             </Grid>
         </ThemeProvider>
