@@ -28,7 +28,11 @@ import constants from "../../../constants";
    }
  
    getBody() {
-    return {
+    return this.language === "all" ? {
+      project_type: this.projectType,
+      from_date: this.fromDate,
+      to_date: this.toDate,
+    } : {
         project_type: this.projectType,
         from_date: this.fromDate,
         to_date: this.toDate,

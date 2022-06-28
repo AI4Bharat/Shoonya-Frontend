@@ -41,7 +41,7 @@ const WorkspaceReports = () => {
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [reportType, setReportType] = useState("project");
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState("all");
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [reportData, setReportData] = useState([]);
@@ -130,10 +130,6 @@ const WorkspaceReports = () => {
       setSelectedColumns([]);
     }
   }, [ProjectReports]);
-
-  useEffect(() => {
-    LanguageChoices.language && setLanguage(LanguageChoices.language[0]);
-  }, [LanguageChoices]);
 
   const renderToolBar = () => {
     const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -308,6 +304,7 @@ const options = {
               label="Target Language"
               onChange={(e) => setLanguage(e.target.value)}
             >
+              <MenuItem value={"all"}>All languages</MenuItem>
               {LanguageChoices.language?.map((lang) => (
                 <MenuItem value={lang} key={lang}>
                   {lang}
