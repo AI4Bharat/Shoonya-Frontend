@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import DataitemsTable from "../../component/common/DataitemsTable";
 import { translate } from "../../../../config/localisation";
 import TabPanel from '../../component/common/TabPanel';
+import DatasetProjectsTable from '../../component/Tabs/DatasetProjectsTable';
 
 const DatasetDetails = () => {
 
@@ -94,10 +95,9 @@ const DatasetDetails = () => {
                         <DataitemsTable />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={1}>
-
                     </TabPanel>
                     <TabPanel value={selectedTab} index={2}>
-                        
+                        <DatasetProjectsTable datasetId={datasetId} />
                     </TabPanel>
                 </Card>
             </Grid>
