@@ -79,7 +79,7 @@ const Header = () => {
   const handleOpenHelpMenu = (event) => {
     setAnchorElHelp(event.currentTarget);
   };
-  const handleCloseHelpMenu = (event) => {
+  const handleCloseHelpMenu = () => {
     setAnchorElHelp(null);
   };
 
@@ -242,7 +242,6 @@ const Header = () => {
                 xs={12}
                 sm={12}
                 md={7}
-               
               >
                 {tabs.map((tab) => tab)}
               </Grid>
@@ -255,7 +254,7 @@ const Header = () => {
                   spacing={2}
                   sx={{ textAlign: "center", alignItems: "center" }}
                 >
-                   <Grid item xs={3} sm={3} md={3}>
+                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="help">
                       <IconButton onClick={handleOpenHelpMenu}>
                         <HelpOutlineIcon
@@ -275,7 +274,7 @@ const Header = () => {
                       </IconButton>
                     </Tooltip>
                   </Grid>
-                  <Grid item xs={6} sm={6} md={6}>
+                  <Grid item xs={6} sm={6} md={7}>
                     <Tooltip title="User Options">
                       <IconButton onClick={handleOpenUserMenu}>
                         <Avatar
