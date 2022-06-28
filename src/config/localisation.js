@@ -30,7 +30,8 @@ const localisation = {
     "label.annotators":"Annotators",
     "label.managers":"Managers",
     "label.backToPreviousPage":"Back To Previous Page",
-    "label.showProjectSettings":"Show Project Settings"
+    "label.showProjectSettings":"Show Project Settings",
+    "label.backToProject": "Back To Project",
 };
 
 export const translate = (prop) => localisation[prop];

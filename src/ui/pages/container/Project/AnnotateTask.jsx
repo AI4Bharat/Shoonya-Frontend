@@ -17,6 +17,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const AnnotateTask = () => {
   const urlParams = useParams();
@@ -110,166 +111,177 @@ const AnnotateTask = () => {
   };
 
   return (
-    <Card
-      elevation={2}
-      sx={{
-        minHeight: 600,
-        padding: 5,
-        mb: 5
-      }}
-    >
-      <Grid
-        container
-        direction={"row"}
-        justifyContent={"space-between"}
+    <>
+      <Button 
+        variant="contained" 
+        color="primary" 
+        startIcon={<  ArrowBackIcon />} 
+        sx={{ color:"white" ,   mb:2  }} 
+        onClick={() => navigate(`/projects/${urlParams?.projectId}`)}
+      >
+        {translate("label.backToProject")}
+      </Button>
+      <Card
+        elevation={2}
         sx={{
-          mb : 2
+          minHeight: 600,
+          padding: 5,
+          mb: 5
         }}
       >
-        <Typography variant="body1"><b>Annotate Task - #{urlParams && urlParams.taskId}</b></Typography>
-        <CustomButton
-          label={translate("button.notes")}
-          onClick={() => setShowNotes(!showNotes)}
-          endIcon={showNotes ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        <Grid
+          container
+          direction={"row"}
+          justifyContent={"space-between"}
           sx={{
-            borderRadius: 2,
+            mb : 2
           }}
-        />
-      </Grid>
+        >
+          <Typography variant="body1"><b>Annotate Task - #{urlParams && urlParams.taskId}</b></Typography>
+          <CustomButton
+            label={translate("button.notes")}
+            onClick={() => setShowNotes(!showNotes)}
+            endIcon={showNotes ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            sx={{
+              borderRadius: 2,
+            }}
+          />
+        </Grid>
 
-      {showNotes && <Grid
-        // container
-        // direction={"row"}
-        // justifyContent={"space-between"}
-        sx={{
-          mt: 2,
-          mb: 2,
-          alignItems: "center",
-        }}
-      >
-        <Alert severity="warning" sx={{ width: "auto" }}>Please do not add notes if you are going to skip the task!</Alert>
-        <TextField
-          value={notes}
-          onChange={(e)=>setNotes(e.target.value)}
-          placeholder="Place your remarks here..."
-          multiline
-          rows={3}
-          sx={{ border: "none", width: "100%", mt: 2 }}
-        />
-      </Grid>}
-      <Divider />
-      <Grid
-        container
-        direction={"row"}
-        justifyContent={"space-between"}
-        sx={{
-          mt: 5,
-          mb: 2,
-          alignItems: "center",
-        }}
-      >
-        {/* <Typography variant="body2">Task : #<b>{urlParams && urlParams.taskId}</b></Typography> */}
-        <Typography variant="body2">Task Status : <b>{TaskDetails && TaskDetails.task_status}</b></Typography>
+        {showNotes && <Grid
+          // container
+          // direction={"row"}
+          // justifyContent={"space-between"}
+          sx={{
+            mt: 2,
+            mb: 2,
+            alignItems: "center",
+          }}
+        >
+          <Alert severity="warning" sx={{ width: "auto" }}>Please do not add notes if you are going to skip the task!</Alert>
+          <TextField
+            value={notes}
+            onChange={(e)=>setNotes(e.target.value)}
+            placeholder="Place your remarks here..."
+            multiline
+            rows={3}
+            sx={{ border: "none", width: "100%", mt: 2 }}
+          />
+        </Grid>}
+        <Divider />
+        <Grid
+          container
+          direction={"row"}
+          justifyContent={"space-between"}
+          sx={{
+            mt: 5,
+            mb: 2,
+            alignItems: "center",
+          }}
+        >
+          {/* <Typography variant="body2">Task : #<b>{urlParams && urlParams.taskId}</b></Typography> */}
+          <Typography variant="body2">Task Status : <b>{TaskDetails && TaskDetails.task_status}</b></Typography>
+          <Grid
+            direction={"row"}
+            justifyContent={"space-around"}
+            columnSpacing={5}
+            sx={{
+            }}
+          >
+            <CustomButton label={translate("button.draft")} onClick={onDraftTask} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
+            <CustomButton label={translate("button.next")} onClick={onNextTask} endIcon={<NavigateNextIcon />} sx={{ borderRadius: 2 }} />
+          </Grid>
+        </Grid>
+        <Divider />
+        <Grid
+          container
+          direction={"row"}
+          justifyContent={"space-between"}
+          columnGap={1}
+          sx={{ mb: 3 }}
+        >
+          <Grid
+            item
+            xs={12}
+            md={3.5}
+            lg={3.5}
+            xl={3.5}
+            sm={12}
+            sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
+          >
+            <Typography variant="body1">Source sentence</Typography>
+            <Typography variant="body2" sx={{ mt: 4 }}>{TaskDetails && TaskDetails.data && TaskDetails.data.input_text}</Typography>
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={3.5}
+            lg={3.5}
+            xl={3.5}
+            sm={12}
+            sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
+          >
+            <Typography variant="body1">{TaskDetails && TaskDetails.data && TaskDetails.data.output_language} translation</Typography>
+            <TextField
+              value={translatedText}
+              onChange={(e) => setTranslatedText(e.target.value)}
+              multiline
+              rows={6}
+              sx={{ border: "none", width: "100%", mt: 4, background : "#ffffff" }}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={3.5}
+            lg={3.5}
+            xl={3.5}
+            sm={12}
+            sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
+          >
+            <Typography variant="body1">Machine translation</Typography>
+            <Typography variant="body2" sx={{ mt: 4 }}>{TaskDetails && TaskDetails.data && TaskDetails.data.machine_translation}</Typography>
+          </Grid>
+
+        </Grid>
         <Grid
           direction={"row"}
           justifyContent={"space-around"}
           columnSpacing={5}
           sx={{
+            mt: 3,
+            mb: 3,
+            textAlign: "end"
           }}
         >
-          <CustomButton label={translate("button.draft")} onClick={onDraftTask} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
-          <CustomButton label={translate("button.next")} onClick={onNextTask} endIcon={<NavigateNextIcon />} sx={{ borderRadius: 2 }} />
+          <CustomButton label={translate("button.skip")} onClick={onSkipTask} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
+          <CustomButton label={translate("button.submit")} sx={{ borderRadius: 2 }} onClick={onSubmitAnnotation}/>
         </Grid>
-      </Grid>
-      <Divider />
-      <Grid
-        container
-        direction={"row"}
-        justifyContent={"space-between"}
-        columnGap={1}
-        sx={{ mb: 3 }}
-      >
+        <Divider />
         <Grid
-          item
-          xs={12}
-          md={3.5}
-          lg={3.5}
-          xl={3.5}
-          sm={12}
-          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
+          container
+          direction={"row"}
+          justifyContent={"space-between"}
+          sx={{
+            mt: 2,
+            mb: 2,
+            alignItems: "center",
+          }}
         >
-          <Typography variant="body1">Source sentence</Typography>
-          <Typography variant="body2" sx={{ mt: 4 }}>{TaskDetails && TaskDetails.data && TaskDetails.data.input_text}</Typography>
+          <Typography variant="body1">Context</Typography>
+          <Typography variant="body2" sx={{ mt: 4 }}>{TaskDetails && TaskDetails.data && TaskDetails.data.context}</Typography>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          md={3.5}
-          lg={3.5}
-          xl={3.5}
-          sm={12}
-          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
-        >
-          <Typography variant="body1">{TaskDetails && TaskDetails.data && TaskDetails.data.output_language} translation</Typography>
-          <TextField
-            value={translatedText}
-            onChange={(e) => setTranslatedText(e.target.value)}
-            multiline
-            rows={6}
-            sx={{ border: "none", width: "100%", mt: 4, background : "#ffffff" }}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          md={3.5}
-          lg={3.5}
-          xl={3.5}
-          sm={12}
-          sx={{ minHeight: 200, mt: 3, p: 2, backgroundColor: "#f5f5f5" }}
-        >
-          <Typography variant="body1">Machine translation</Typography>
-          <Typography variant="body2" sx={{ mt: 4 }}>{TaskDetails && TaskDetails.data && TaskDetails.data.machine_translation}</Typography>
-        </Grid>
-
-      </Grid>
-      <Grid
-        direction={"row"}
-        justifyContent={"space-around"}
-        columnSpacing={5}
-        sx={{
-          mt: 3,
-          mb: 3,
-          textAlign: "end"
-        }}
-      >
-        <CustomButton label={translate("button.skip")} onClick={onSkipTask} buttonVariant="outlined" sx={{ borderRadius: 2, mr: 2 }} />
-        <CustomButton label={translate("button.submit")} sx={{ borderRadius: 2 }} onClick={onSubmitAnnotation}/>
-      </Grid>
-      <Divider />
-      <Grid
-        container
-        direction={"row"}
-        justifyContent={"space-between"}
-        sx={{
-          mt: 2,
-          mb: 2,
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="body1">Context</Typography>
-        <Typography variant="body2" sx={{ mt: 4 }}>{TaskDetails && TaskDetails.data && TaskDetails.data.context}</Typography>
-      </Grid>
-      <CustomizedSnackbars
-        open={snackbar.open}
-        handleClose={() =>
-          setSnackbarInfo({ open: false, message: "", variant: "" })
-        }
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        variant={snackbar.variant}
-        message={snackbar.message}
-      />
-    </Card>
+        <CustomizedSnackbars
+          open={snackbar.open}
+          handleClose={() =>
+            setSnackbarInfo({ open: false, message: "", variant: "" })
+          }
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          variant={snackbar.variant}
+          message={snackbar.message}
+        />
+      </Card>
+    </>
   )
 }
 
