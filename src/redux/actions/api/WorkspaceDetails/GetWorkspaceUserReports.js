@@ -6,12 +6,13 @@
 import constants from "../../../constants";
  
  export default class GetWorkspaceUserReportsAPI extends API {
-   constructor(workspaceId, projectType, fromDate, toDate, timeout = 2000) {
+   constructor(workspaceId, projectType, fromDate, toDate, language, timeout = 2000) {
      super("POST", timeout, false);
      this.type = constants. GET_WORKSPACE_USER_REPORTS;
      this.projectType = projectType;
      this.fromDate = fromDate;
      this.toDate = toDate;
+      this.language = language;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${workspaceId}/user_analytics/`;
    }
  
@@ -30,7 +31,8 @@ import constants from "../../../constants";
     return {
         project_type: this.projectType,
         from_date: this.fromDate,
-        to_date: this.toDate
+        to_date: this.toDate,
+        tgt_language: this.language
     }
    }
  
