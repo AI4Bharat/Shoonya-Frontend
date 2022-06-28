@@ -129,12 +129,12 @@ const TaskTable = () => {
     }, [PullBatchRes]);
 
     useEffect(() => {
-        if (taskList?.length > 0) {
+        if (taskList?.length > 0 && taskList[0]?.data) {
             const data = taskList.map((el) => {
                 let row = [
                     el.id
                 ]
-                taskList[0].data && row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
+                row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
                 taskList[0].task_status && row.push(el.task_status);
                 row.push(<Link to={`task/${el.id}`} className={classes.link}>
                             <CustomButton
@@ -147,7 +147,7 @@ const TaskTable = () => {
                 return row;
             })
             let colList = ["id"];
-            taskList[0].data && colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
+            colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
             colList.push("actions");
             const cols = colList.map((col) => {
