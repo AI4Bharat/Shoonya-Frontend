@@ -14,7 +14,7 @@ import {
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from './lsf.module.css'
@@ -306,6 +306,8 @@ export default function LSF() {
   const notesRef = useRef('');
   const {taskId} = useParams()
   const [notesValue, setNotesValue] = useState('');
+  const { projectId } = useParams();
+  const navigate = useNavigate();
   
   const handleCollapseClick = () => {
     if(collapseHeight === '0') {
@@ -335,8 +337,7 @@ export default function LSF() {
             value="Back to Project"
             onClick={() => {
               localStorage.removeItem("labelAll");
-              var id = window.location.href.split("/")[4];
-              window.location.href = `/projects/${id}`;
+              navigate(`/projects/${projectId}`);
             }}
           >
             Back to Project
