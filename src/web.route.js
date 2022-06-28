@@ -140,7 +140,7 @@ const App = () => {
         <Route
           path="projects/:projectId/task/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<AnnotateTask />} />
+            <Layout component={<AnnotateTask />} Backbutton={true} />
           )}
         />
         <Route
