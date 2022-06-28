@@ -1,6 +1,6 @@
 // MembersTable
 
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MUIDataTable from "mui-datatables";
 import CustomButton from "../common/Button";
@@ -14,108 +14,117 @@ import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import addUserTypes from "../../../../constants/addUserTypes";
 
 const columns = [
-  {
-    name: "Name",
-    label: "Name",
-    options: {
-      filter: false,
-      sort: false,
-      align: "center",
+    {
+        name: "Name",
+        label: "Name",
+        options: {
+            filter: false,
+            sort: false,
+            align: "center",
+        },
     },
-  },
-  {
-    name: "Email",
-    label: "Email",
-    options: {
-      filter: false,
-      sort: false,
+    {
+        name: "Email",
+        label: "Email",
+        options: {
+            filter: false,
+            sort: false,
+        },
     },
-  },
-  {
-    name: "Role",
-    label: "Role",
-    options: {
-      filter: false,
-      sort: false,
+    {
+        name: "Role",
+        label: "Role",
+        options: {
+            filter: false,
+            sort: false,
+        },
     },
-  },
-  {
-    name: "Actions",
-    label: "Actions",
-    options: {
-      filter: false,
-      sort: false,
+    {
+        name: "Actions",
+        label: "Actions",
+        options: {
+            filter: false,
+            sort: false,
+        },
     },
-  },
 ];
 
 const options = {
-  filterType: "checkbox",
-  selectableRows: "none",
-  download: false,
-  filter: false,
-  print: false,
-  search: false,
-  viewColumns: false,
+    filterType: "checkbox",
+    selectableRows: "none",
+    download: false,
+    filter: false,
+    print: false,
+    search: false,
+    viewColumns: false,
 };
 
 const MembersTable = (props) => {
-  const [addUserDialogOpen, setAddUserDialogOpen] = React.useState(false);
-  const projectDetails = useSelector((state) => state.getProjectDetails?.data);
+    const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+    const projectDetails = useSelector((state) => state.getProjectDetails?.data);
+    const [userRole, setUserRole] = useState();
 
-  const { dataSource } = props;
+    const { dataSource, hideButton } = props;
 
-  const handleUserDialogClose = () => {
-    setAddUserDialogOpen(false);
-  };
+    const userDetails = useSelector(state=>state.fetchLoggedInUserData.data);
 
-  const handleUserDialogOpen = () => {
-    setAddUserDialogOpen(true);
-  };
+    useEffect(() => {
+        userDetails && setUserRole(userDetails.role);
+    }, [])
 
-  const data =
-    dataSource && dataSource.length > 0
-      ? dataSource.map((el, i) => {
-          const userRole = el.role && UserMappedByRole(el.role).element;
-          return [
-            el.username,
-            el.email,
-            userRole ? userRole : el.role,
+    const handleUserDialogClose = () => {
+        setAddUserDialogOpen(false);
+    };
+
+    const handleUserDialogOpen = () => {
+        setAddUserDialogOpen(true);
+    };
+
+    const data =
+        dataSource && dataSource.length > 0
+            ? dataSource.map((el, i) => {
+                const userRole = el.role && UserMappedByRole(el.role).element;
+                return [
+                    el.username,
+                    el.email,
+                    userRole ? userRole : el.role,
+                    <CustomButton
+                        sx={{ p: 1, borderRadius: 2 }}
+                        onClick={() => {
+                            console.log(el.id);
+                        }}
+                        label={"View"}
+                    />,
+                ];
+            })
+            : [];
+
+    return (
+        <React.Fragment>
+            {userRole !== 1 && !hideButton ?
             <CustomButton
-              sx={{ p: 1, borderRadius: 2 }}
-              onClick={() => {
-                console.log(el.id);
-              }}
-              label={"View"}
-            />,
-          ];
-        })
-      : [];
-
-  return (
-    <React.Fragment>
-      <CustomButton
-        sx={{ borderRadius: 2, mb: 3, whiteSpace: "nowrap" }}
-        startIcon={<PersonAddAlt />}
-        label="Add Users to Project"
-        fullWidth
-        onClick={handleUserDialogOpen}
-      />
-      <AddUsersDialog
-        handleDialogClose={handleUserDialogClose}
-        isOpen={addUserDialogOpen}
-        userType={addUserTypes.PROJECT_MEMBER}
-        id={projectDetails?.id}
-      />
-      <MUIDataTable
-        title={""}
-        data={data}
-        columns={columns}
-        options={options}
-        // filter={false}
-      />
-    </React.Fragment>
-  );
+                sx={{ borderRadius: 2, mb: 3, whiteSpace: "nowrap" }}
+                startIcon={<PersonAddAlt />}
+                label="Add Users to Project"
+                fullWidth
+                onClick={handleUserDialogOpen}
+            /> : null
+            }
+            <AddUsersDialog
+                handleDialogClose={handleUserDialogClose}
+                isOpen={addUserDialogOpen}
+                userType={addUserTypes.PROJECT_MEMBER}
+                id={projectDetails?.id}
+            />
+            <MUIDataTable
+                title={""}
+                data={data}
+                columns={columns}
+                options={options}
+            // filter={false}
+            />
+        </React.Fragment>
+    );
 };
 
 export default MembersTable;
