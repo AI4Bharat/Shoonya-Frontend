@@ -26,10 +26,12 @@ import CustomButton from "../common/Button";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@material-ui/core";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElSettings, setAnchorElSettings] = useState(null);
+  const [anchorElHelp, setAnchorElHelp] = useState(null);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
 
@@ -72,6 +74,13 @@ const Header = () => {
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
+  };
+
+  const handleOpenHelpMenu = (event) => {
+    setAnchorElHelp(event.currentTarget);
+  };
+  const handleCloseHelpMenu = () => {
+    setAnchorElHelp(null);
   };
 
   const handleOpenSettingsMenu = (event) => {
@@ -178,10 +187,26 @@ const Header = () => {
         />
       ),
     },
+    // {
+    //   name: "Help",
+    //   onclick: () => {},
+    // },
+  ];
+  const helpMenu = [
     {
       name: "Help",
-      onclick: () => {},
+      onclick: () => {
+       
+        const url = 'https://github.com/AI4Bharat/Shoonya/wiki/Shoonya-FAQ'
+        window.open(url, '_blank');
+       
+      },
     },
+   
+    // {
+    //   name: "Feedback",
+    //   onclick: () => {},
+    // },
   ];
 
   return (
@@ -216,7 +241,7 @@ const Header = () => {
                 rowGap={2}
                 xs={12}
                 sm={12}
-                md={8}
+                md={7}
               >
                 {tabs.map((tab) => tab)}
               </Grid>
@@ -229,7 +254,17 @@ const Header = () => {
                   spacing={2}
                   sx={{ textAlign: "center", alignItems: "center" }}
                 >
-                  <Grid item xs={6} sm={6} md={3}>
+                   <Grid item xs={3} sm={3} md={2}>
+                    <Tooltip title="help">
+                      <IconButton onClick={handleOpenHelpMenu}>
+                        <HelpOutlineIcon
+                          color="primary.dark"
+                          fontSize="large"
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={3} sm={3} md={3}>
                     <Tooltip title="Settings">
                       <IconButton onClick={handleOpenSettingsMenu}>
                         <SettingsOutlinedIcon
@@ -239,7 +274,7 @@ const Header = () => {
                       </IconButton>
                     </Tooltip>
                   </Grid>
-                  <Grid item xs={6} sm={6} md={9}>
+                  <Grid item xs={6} sm={6} md={7}>
                     <Tooltip title="User Options">
                       <IconButton onClick={handleOpenUserMenu}>
                         <Avatar
@@ -323,6 +358,40 @@ const Header = () => {
                     </MenuItem>
                   ))}
                 </Menu>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElHelp}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  open={Boolean(anchorElHelp)}
+                  onClose={handleCloseHelpMenu}
+                >
+                  {helpMenu.map((help) => (
+                    <MenuItem key={help} onClick={help.onclick}>
+                      {help.control ? (
+                        <FormControlLabel
+                          control={help.control}
+                          label={help.name}
+                          labelPlacement="start"
+                          sx={{ ml: 0 }}
+                        />
+                      ) : (
+                        <Typography variant="body2" textAlign="center">
+                          {help.name}
+                        </Typography>
+                      )}
+                    </MenuItem>
+                  ))}
+                </Menu>
+             
               </Box>
             </Toolbar>
           </AppBar>
