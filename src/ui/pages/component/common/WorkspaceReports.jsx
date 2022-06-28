@@ -22,6 +22,7 @@ import { useParams } from "react-router-dom";
 import GetWorkspaceUserReportsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceUserReports";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetWorkspaceProjectReportAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProjectReports";
+import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from '../common/ColumnList';
@@ -40,6 +41,7 @@ const WorkspaceReports = () => {
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [reportType, setReportType] = useState("project");
+  const [language, setLanguage] = useState("");
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [reportData, setReportData] = useState([]);
@@ -54,10 +56,15 @@ const WorkspaceReports = () => {
   const ProjectReports = useSelector(
     (state) => state.getWorkspaceProjectReports.data
   );
+  const LanguageChoices = useSelector(
+    (state) => state.fetchLanguages.data
+  );
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
+    const langObj = new FetchLanguagesAPI();
     dispatch(APITransport(typesObj));
+    dispatch(APITransport(langObj));
   }, []);
 
   useEffect(() => {
@@ -123,6 +130,10 @@ const WorkspaceReports = () => {
       setSelectedColumns([]);
     }
   }, [ProjectReports]);
+
+  useEffect(() => {
+    LanguageChoices.language && setLanguage(LanguageChoices.language[0]);
+  }, [LanguageChoices]);
 
   const renderToolBar = () => {
     const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -190,7 +201,8 @@ const options = {
         id,
         selectedType,
         startDate,
-        endDate
+        endDate,
+        language,
       );
       dispatch(APITransport(userReportObj));
     } else if (reportType === "project") {
@@ -198,7 +210,8 @@ const options = {
         id,
         selectedType,
         startDate,
-        endDate
+        endDate,
+        language,
       );
       dispatch(APITransport(projectReportObj));
     }
@@ -214,7 +227,7 @@ const options = {
           marginBottom: "24px",
         }}
       >
-        <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
+        <Grid item xs={12} sm={12} md={showPicker ? 4 : 2} lg={showPicker ? 4 : 2} xl={showPicker ? 4 : 2}>
           <FormControl fullWidth>
             <InputLabel id="date-range-select-label"sx={{fontSize:"16px"}}>Date Range</InputLabel>
             <Select
@@ -252,7 +265,7 @@ const options = {
             />
           </LocalizationProvider>
         </Grid>}
-        <Grid item xs={12} sm={12} md={showPicker ? 5 : 3} lg={showPicker ? 5 : 3} xl={showPicker ? 5 : 3}>
+        <Grid item xs={12} sm={12} md={showPicker ? 4 : 3} lg={showPicker ? 4 : 3} xl={showPicker ? 4 : 3}>
           <FormControl fullWidth>
             <InputLabel id="project-type-label" sx={{fontSize:"16px"}}>Project Type</InputLabel>
             <Select
@@ -270,7 +283,7 @@ const options = {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12} md={showPicker ? 5 : 3} lg={showPicker ? 5 : 3} xl={showPicker ? 5 : 3}>
+        <Grid item xs={12} sm={12} md={showPicker ? 4 : 3} lg={showPicker ? 4 : 3} xl={showPicker ? 4 : 3}>
           <FormControl fullWidth>
             <InputLabel id="report-type-label" sx={{fontSize:"16px"}}>Report Type</InputLabel>
             <Select
@@ -285,7 +298,24 @@ const options = {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth>
+            <InputLabel id="language-label" sx={{fontSize:"16px"}}>Target Language</InputLabel>
+            <Select
+              labelId="language-label"
+              id="language-select"
+              value={language}
+              label="Target Language"
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              {LanguageChoices.language?.map((lang) => (
+                <MenuItem value={lang} key={lang}>
+                  {lang}
+                </MenuItem>))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
             <Button
                 variant="contained"
                 onClick={handleDateSubmit}
