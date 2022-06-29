@@ -19,6 +19,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
+import Spinner from "../../component/common/Spinner"
 
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = ["context", "input_language", "output_language"];
@@ -44,6 +45,7 @@ const TaskTable = () => {
     const [pullDisabled, setPullDisabled] = useState("");
     const PullBatchRes = useSelector(state => state.pullNewBatch);
     const DeallocateRes = useSelector(state => state.deallocateTasks);
+    const apiLoading = useSelector(state => state.apiStatus.loading);
     const [searchAnchor, setSearchAnchor] = useState(null);
     const searchOpen = Boolean(searchAnchor);
     const [searchedCol, setSearchedCol] = useState();
@@ -58,6 +60,7 @@ const TaskTable = () => {
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [columns, setColumns] = useState([]);
     const [labellingStarted, setLabellingStarted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
@@ -120,6 +123,10 @@ const TaskTable = () => {
             </Box>
         );
     }
+
+    useEffect(() => {
+        setLoading(apiLoading);
+    }, [apiLoading]);
 
     useEffect(() => {
         getTaskListData();
@@ -465,6 +472,7 @@ const TaskTable = () => {
                 />
             )}
             {renderSnackBar()}
+            {loading && <Spinner /> }
         </Fragment>
     )
 }
