@@ -364,7 +364,7 @@ const TaskTable = () => {
                 }}
                 >
                 <CustomButton 
-                    sx={{ p: 1, width: '24%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} 
+                    sx={{ p: 1, width: '24%', borderRadius: 2, mb: 3, mr:"1%" }} 
                     label={"De-allocate Tasks"}
                     onClick={() => setDeallocateDialog(true)}
                     color={"warning"}
@@ -408,7 +408,7 @@ const TaskTable = () => {
                     </Select>
                 </FormControl>
                 <Tooltip title={pullDisabled}>
-                    <Box sx={{width: '24%', ml: "1%", mr:"1%", mb: 3}}>
+                    <Box sx={{width: '26%', ml: "1%", mr:"1%", mb: 3}}>
                         <CustomButton 
                             sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
                             label={"Pull New Batch"} 
@@ -418,7 +418,7 @@ const TaskTable = () => {
                     </Box>
                 </Tooltip>
                 <CustomButton 
-                    sx={{ p: 1, width: '24%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} 
+                    sx={{ p: 1, width: '26%', borderRadius: 2, mb: 3, ml: "1%" }} 
                     label={"Start Labelling Now"}
                     onClick={labelAllTasks}
                 />
