@@ -332,7 +332,7 @@ export default function LSF() {
   }, [notesValue])
   
   return (
-    <div style={{ maxHeight: "100%", maxWidth: "90%" }}>
+    <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
       <Button
         value="Back to Project"
         startIcon={<  ArrowBackIcon />}
@@ -347,7 +347,6 @@ export default function LSF() {
       </Button>
       <Card
         sx={{
-            width: "100%",
             minHeight: 500,
             padding: 5,
             mt: 3,
