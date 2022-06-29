@@ -7,12 +7,13 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
 import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
 import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
+import DeallocateTasksAPI from "../../../../redux/actions/api/Tasks/DeallocateTasks";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
@@ -42,6 +43,7 @@ const TaskTable = () => {
     const [pullSize, setPullSize] = useState();
     const [pullDisabled, setPullDisabled] = useState("");
     const PullBatchRes = useSelector(state => state.pullNewBatch);
+    const DeallocateRes = useSelector(state => state.deallocateTasks);
     const [searchAnchor, setSearchAnchor] = useState(null);
     const searchOpen = Boolean(searchAnchor);
     const [searchedCol, setSearchedCol] = useState();
@@ -51,6 +53,8 @@ const TaskTable = () => {
         variant: "success",
       });
     const [pullClicked, setPullClicked] = useState(false);
+    const [deallocateClicked, setDeallocateClicked] = useState(false);
+    const [deallocateDialog, setDeallocateDialog] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [columns, setColumns] = useState([]);
     const [labellingStarted, setLabellingStarted] = useState(false);
@@ -72,8 +76,15 @@ const TaskTable = () => {
 
     const fetchNewTasks = () => {
         setPullClicked(true);
-        const batchObj = new PullNewBatchAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+        const batchObj = new PullNewBatchAPI(id, pullSize);
         dispatch(APITransport(batchObj));
+    }
+
+    const unassignTasks = () => {
+        setDeallocateDialog(false);
+        setDeallocateClicked(true);
+        const deallocateObj = new DeallocateTasksAPI(id);
+        dispatch(APITransport(deallocateObj));
     }
 
     const labelAllTasks = () => {
@@ -124,7 +135,6 @@ const TaskTable = () => {
 
     useEffect(() => {
         if(pullClicked && PullBatchRes.status === 200) {
-            getTaskListData();
             setSnackbarInfo({
                 open: true,
                 message: PullBatchRes.data.message,
@@ -138,6 +148,22 @@ const TaskTable = () => {
             }
         }
     }, [PullBatchRes]);
+
+    useEffect(() => {
+        if(deallocateClicked && DeallocateRes.status === 200) {
+            setSnackbarInfo({
+                open: true,
+                message: DeallocateRes.data.message,
+                variant: "success",
+            })
+            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+                getTaskListData();
+            } else {
+                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setCurrentPageNumber(1);
+            }
+        }
+    }, [DeallocateRes]);
 
     useEffect(() => {
         if (taskList?.length > 0) {
@@ -337,6 +363,34 @@ const TaskTable = () => {
                     alignItems: "flex-end",
                 }}
                 >
+                <CustomButton 
+                    sx={{ p: 1, width: '24%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} 
+                    label={"De-allocate Tasks"}
+                    onClick={() => setDeallocateDialog(true)}
+                    color={"warning"}
+                />
+                <Dialog
+                    open={deallocateDialog}
+                    onClose={() => setDeallocateDialog(false)}
+                    aria-labelledby="deallocate-dialog-title"
+                    aria-describedby="deallocate-dialog-description"
+                >
+                    <DialogTitle id="deallocate-dialog-title">
+                    {"De-allocate Tasks?"}
+                    </DialogTitle>
+                    <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        All unlabeled tasks will be de-allocated from this project.
+                        Please be careful as this action cannot be undone.
+                    </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                    <Button onClick={() => setDeallocateDialog(false)} variant="outlined" color="error">Cancel</Button>
+                    <Button onClick={unassignTasks} variant="contained" color="error" autoFocus>
+                        Confirm
+                    </Button>
+                    </DialogActions>
+                </Dialog>
                 <FormControl size="small" sx={{width: "18%", ml: "1%", mr:"1%", mb: 3}}>
                     <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
                     <Select
@@ -354,7 +408,7 @@ const TaskTable = () => {
                     </Select>
                 </FormControl>
                 <Tooltip title={pullDisabled}>
-                    <Box sx={{width: '38%', ml: "1%", mr:"1%", mb: 3}}>
+                    <Box sx={{width: '24%', ml: "1%", mr:"1%", mb: 3}}>
                         <CustomButton 
                             sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
                             label={"Pull New Batch"} 
@@ -364,7 +418,7 @@ const TaskTable = () => {
                     </Box>
                 </Tooltip>
                 <CustomButton 
-                    sx={{ p: 1, width: '38%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} 
+                    sx={{ p: 1, width: '24%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} 
                     label={"Start Labelling Now"}
                     onClick={labelAllTasks}
                 />
