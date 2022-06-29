@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types'
 import React, { useContext, useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, TextareaAutosize } from "@mui/material";
+import { Tooltip, Button, Alert, TextareaAutosize, Card } from "@mui/material";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 import {
   getProjectsandTasks,
@@ -267,7 +270,7 @@ const LabelStudioWrapper = ({notesRef}) => {
 
   return (
     <div>
-      {!loader && <div style={{ display: "flex", justifyContent: "space-between" }}>
+      {!loader && <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
         <div/>
         <div>
           <Tooltip title="Save task for later">
@@ -275,18 +278,20 @@ const LabelStudioWrapper = ({notesRef}) => {
               value="Draft"
               type="default"
               onClick={handleDraftAnnotationClick}
-              style={{minWidth: "160px", borderColor:"#e5e5e5", color: "#e80", fontWeight: "500"}}
+              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None", borderRight: "None"}}
+              className="lsf-button"
             >
               Draft
             </Button>
           </Tooltip>
-          {localStorage.getItem("labelAll") != "true" ? (
+          {localStorage.getItem("labelAll") !== "true" ? (
             <Tooltip title="Go to next task">
               <Button
                 value="Next"
                 type="default"
                 onClick={onNextAnnotation}
-                style={{minWidth: "160px", borderColor:"#e5e5e5", color: "#09f", fontWeight: "500"}}
+                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None"}}
+                className="lsf-button"
               >
                 Next
               </Button>
@@ -303,7 +308,7 @@ const LabelStudioWrapper = ({notesRef}) => {
 };
 
 export default function LSF() {
-  const [collapseHeight, setCollapseHeight] = useState('0');
+  const [showNotes, setShowNotes] = useState(false);
   const notesRef = useRef('');
   const {taskId} = useParams()
   const [notesValue, setNotesValue] = useState('');
@@ -311,11 +316,7 @@ export default function LSF() {
   const navigate = useNavigate();
   
   const handleCollapseClick = () => {
-    if(collapseHeight === '0') {
-      setCollapseHeight('auto')
-    } else {
-      setCollapseHeight('0');
-    }
+    setShowNotes(!showNotes);
   }
 
   useEffect(()=>{
@@ -332,34 +333,48 @@ export default function LSF() {
   
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%" }}>
-      <div style={{ maxWidth: "100%", display: "flex", justifyContent: "space-between" }}>
-        <div style={{ display: "flex" }}>
-          <Button
-            value="Back to Project"
-            onClick={() => {
-              localStorage.removeItem("labelAll");
-              navigate(`/projects/${projectId}`);
-            }}
-          >
-            Back to Project
-          </Button>
-          <Button style={{marginLeft:'20%'}} onClick={handleCollapseClick}>
-            Notes
-          </Button>
+      <Button
+        value="Back to Project"
+        startIcon={<  ArrowBackIcon />}
+        variant="contained" 
+        color="primary"
+        onClick={() => {
+          localStorage.removeItem("labelAll");
+          navigate(`/projects/${projectId}`);
+        }}
+      >
+        Back to Project
+      </Button>
+      <Card
+        sx={{
+            width: "100%",
+            minHeight: 500,
+            padding: 5,
+            mt: 3,
+            pt: 3,
+        }}
+      >
+        <Button 
+          endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+          variant="contained"
+          color="primary"
+          onClick={handleCollapseClick}
+        >
+          Notes
+        </Button>
+        <div className={styles.collapse} style={{display: showNotes? "block" : "none",paddingBottom: "16px"}}>
+          <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+              {translate("alert.notes")}
+          </Alert>
+          <TextareaAutosize 
+            placeholder="Place your remarks here ..." 
+            value={notesValue} 
+            onChange={event=>setNotesValue(event.target.value)} 
+            style={{width: '99%', minHeight: '80px'}}
+          />
         </div>
-      </div>
-      <div className={styles.collapse} style={{height:collapseHeight}}>
-        <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
-            {translate("alert.notes")}
-        </Alert>
-        <TextareaAutosize 
-          placeholder="Place your remarks here ..." 
-          value={notesValue} 
-          onChange={event=>setNotesValue(event.target.value)} 
-          style={{width: '99%', minHeight: '80px'}}
-        />
-      </div>
-      <LabelStudioWrapper notesRef={notesRef}/>
+        <LabelStudioWrapper notesRef={notesRef}/>
+      </Card>
     </div>
   );
 }

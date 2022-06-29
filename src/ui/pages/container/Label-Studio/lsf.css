@@ -1,3 +1,7 @@
+.ls-editor {
+    border: 1px solid #e6e6e6;
+}
+
 .ant-scroll-number {
     overflow: hidden
 }
@@ -29039,11 +29043,11 @@ div.ant-typography-edit-content.ant-typography-rtl {
 }
 
 .common--1n20d {
-    align-items: stretch;
+    /* align-items: stretch;
     display: grid;
     flex: 1;
     grid-template-columns: calc(100% - 320px) 320px;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr; */
     max-width: 100%
 }
 
