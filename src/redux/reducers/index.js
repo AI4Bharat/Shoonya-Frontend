@@ -38,6 +38,7 @@ import getTaskAnnotations from './Tasks/GetTaskAnnotations';
 import updateTask from './Tasks/UpdateTask';
 import pullNewBatch from "./Tasks/PullNewBatch";
 import getDatasetProjects from './Dataset/GetDatasetProjects';
+import getDatasetMembers from './Dataset/GetDatasetMembers';
 
 const index = {
     apiStatus,
@@ -83,6 +84,7 @@ const index = {
     updateTask,
     pullNewBatch,
     getDatasetProjects,
+    getDatasetMembers,
 };
 
 export default index;

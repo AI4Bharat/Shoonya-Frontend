@@ -3,13 +3,16 @@ import { Box, Card, Grid, ThemeProvider, Typography, Tabs, Tab } from "@mui/mate
 import themeDefault from '../../../theme/theme'
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useEffect } from "react";
 import DataitemsTable from "../../component/common/DataitemsTable";
 import { translate } from "../../../../config/localisation";
 import TabPanel from '../../component/common/TabPanel';
 import DatasetProjectsTable from '../../component/Tabs/DatasetProjectsTable';
+import CustomButton from '../../component/common/Button';
+import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
+import GetDatasetMembersAPI from "../../../../redux/actions/api/Dataset/GetDatasetMembers";
+import MembersTable from '../../component/Project/MembersTable';
 
 const DatasetDetails = () => {
 
@@ -18,16 +21,12 @@ const DatasetDetails = () => {
 
     const dispatch = useDispatch();
     const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
-
-    const getDatasetDetails = () => {
-        const datasetObj = new GetDatasetDetailsAPI(datasetId);
-
-        dispatch(APITransport(datasetObj));
-    }
-
+    const DatasetMembers = useSelector((state) => state.getDatasetMembers.data);
+    
     useEffect(() => {
-        getDatasetDetails();
-    }, []);
+		dispatch(APITransport(new GetDatasetDetailsAPI(datasetId)));
+		dispatch(APITransport(new GetDatasetMembersAPI(datasetId)));
+	}, [dispatch, datasetId]);
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -89,15 +88,20 @@ const DatasetDetails = () => {
                             <Tab label={translate("label.datasets")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.downloadDataset")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={selectedTab} index={0}>
                         <DataitemsTable />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={1}>
+                        <MembersTable dataSource={DatasetMembers} />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={2}>
                         <DatasetProjectsTable datasetId={datasetId} />
+                    </TabPanel>
+                    <TabPanel value={selectedTab} index={3}>
+                        <CustomButton />
                     </TabPanel>
                 </Card>
             </Grid>

@@ -11,7 +11,7 @@ export default class GetDatasetProjects extends API {
 		this.type = constants.GET_DATASET_PROJECTS;
 		this.endpoint = `${super.apiEndPointAuto()}${
 			ENDPOINTS.getDatasets
-		}/instances/${datasetId}/projects/`;
+		}instances/${datasetId}/projects/`;
 	}
 
 	processResponse(res) {
