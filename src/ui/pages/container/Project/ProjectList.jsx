@@ -63,7 +63,7 @@ const Dashboard = () => {
             <Search />
 
 
-            <Box sx={{ margin: "0 auto", pb: 5 }}>
+            {/* <Box sx={{ margin: "0 auto", pb: 5 }}> */}
             {loading && <Spinner /> }
             {projectData.length > 0 && <Box sx={{ margin: "0 auto", pb: 5 }}>
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
@@ -104,7 +104,8 @@ const Dashboard = () => {
                     onRowsPerPageChange={rowChange}
                     ActionsComponent={TablePaginationActions}
                 />
-            </Box>}
+            </Box>
+            }
         </React.Fragment>
     )
 }
