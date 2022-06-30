@@ -33,7 +33,7 @@ const localisation = {
     "label.showProjectSettings":"Show Project Settings",
     "label.backToProject": "Back To Project",
     "label.datasets": "Datasets",
-    "label.downloadDataset": "Download Dataset",
+    "button.downloadDataset": "Download Dataset"
 };
 
 export const translate = (prop) => localisation[prop];

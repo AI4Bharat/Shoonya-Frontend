@@ -9,10 +9,10 @@ import DataitemsTable from "../../component/common/DataitemsTable";
 import { translate } from "../../../../config/localisation";
 import TabPanel from '../../component/common/TabPanel';
 import DatasetProjectsTable from '../../component/Tabs/DatasetProjectsTable';
-import CustomButton from '../../component/common/Button';
 import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
 import GetDatasetMembersAPI from "../../../../redux/actions/api/Dataset/GetDatasetMembers";
 import MembersTable from '../../component/Project/MembersTable';
+import DatasetSettings from './DatasetSettings';
 
 const DatasetDetails = () => {
 
@@ -88,7 +88,7 @@ const DatasetDetails = () => {
                             <Tab label={translate("label.datasets")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            <Tab label={translate("label.downloadDataset")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={selectedTab} index={0}>
@@ -101,7 +101,7 @@ const DatasetDetails = () => {
                         <DatasetProjectsTable datasetId={datasetId} />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={3}>
-                        <CustomButton />
+                        <DatasetSettings datasetId={datasetId} />
                     </TabPanel>
                 </Card>
             </Grid>
