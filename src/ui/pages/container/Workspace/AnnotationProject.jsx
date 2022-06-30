@@ -56,7 +56,7 @@ const AnnotationProject = (props) => {
   const [sourceLanguage, setSourceLanguage] = useState("");
   const [targetLanguage, setTargetLanguage] = useState("");
   const [samplingMode, setSamplingMode] = useState(null);
-  const [random, setRandom] = useState(5);
+  const [random, setRandom] = useState(null);
   const [batchSize, setBatchSize] = useState(null);
   const [batchNumber, setBatchNumber] = useState(null);
   const [samplingParameters, setSamplingParameters] = useState(null);
@@ -329,6 +329,8 @@ const AnnotationProject = (props) => {
         batch_size: batchSize,
         batch_number: batchNumber,
       });
+    } else {
+      setSamplingParameters(null);
     }
   }, [batchSize, batchNumber]);
 
@@ -374,19 +376,11 @@ const AnnotationProject = (props) => {
     }
   };
 
-  const handleRandomChange = (value) => {
-    setRandom(value);
+  const handleRandomChange = (e) => {
+    setRandom(e.target.value);
     setSamplingParameters({
-      fraction: parseFloat(value / 100),
+      fraction: parseFloat(e.target.value / 100),
     });
-  };
-
-  const handleBatchSizeChange = (value) => {
-    setBatchSize(value);
-  };
-
-  const handleBatchNumberChange = (value) => {
-    setBatchNumber(value);
   };
 
   const onConfirmSelections = () => {
@@ -875,7 +869,7 @@ const AnnotationProject = (props) => {
               <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
                 <OutlinedTextField
                   fullWidth
-                  value={random}
+                  value={random || ''}
                   onChange={handleRandomChange}
                 />
               </Grid>
@@ -898,8 +892,8 @@ const AnnotationProject = (props) => {
               <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
                 <OutlinedTextField
                   fullWidth
-                  value={batchSize}
-                  onChange={handleBatchSizeChange}
+                  value={batchSize || ''}
+                  onChange={(e) => setBatchSize(e.target.value)}
                 />
               </Grid>
 
@@ -918,8 +912,8 @@ const AnnotationProject = (props) => {
               <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
                 <OutlinedTextField
                   fullWidth
-                  value={batchNumber}
-                  onChange={handleBatchNumberChange}
+                  value={batchNumber || ''}
+                  onChange={(e) => setBatchNumber(e.target.value)}
                 />
               </Grid>
             </>
@@ -942,9 +936,7 @@ const AnnotationProject = (props) => {
                 <OutlinedTextField
                   fullWidth
                   value={selectedAnnotatorsNum}
-                  onChange={(e) => {
-                    setSelectedAnnotatorsNum(e.target.value);
-                  }}
+                  onChange={(e) => setSelectedAnnotatorsNum(e.target.value)}
                 />
               </Grid>
             </>
