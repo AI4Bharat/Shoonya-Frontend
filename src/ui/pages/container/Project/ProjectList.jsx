@@ -16,19 +16,23 @@ import { InputBase, ThemeProvider } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import themeDefault from '../../../theme/theme'
 
+import Spinner from "../../component/common/Spinner"
 
 const Dashboard = () => {
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const projectData = useSelector(state => state.getProjects.data);
+
+    const apiLoading = useSelector(state => state.apiStatus.loading);
+
     const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(9);
 
 
     const getDashboardprojectData = () => {
         const projectObj = new GetProjectsAPI();
-        dispatch(APITransport(projectObj));
-
+        dispatch(APITransport(projectObj));   
     }
 
     const handleChangePage = (e, newPage) => {
@@ -41,11 +45,16 @@ const Dashboard = () => {
         setPage(0);
     }
 
+    useEffect(()=>{
+        setLoading(apiLoading);
+    },[apiLoading])
+
     useEffect(() => {
         getDashboardprojectData();
     }, []);
 
     const SearchProject = useSelector((state) => state.SearchProjectCards.data);
+    console.log("loading", apiLoading);
 
 
     return (
@@ -55,6 +64,8 @@ const Dashboard = () => {
 
 
             <Box sx={{ margin: "0 auto", pb: 5 }}>
+            {loading && <Spinner /> }
+            {projectData.length > 0 && <Box sx={{ margin: "0 auto", pb: 5 }}>
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
                 <Grid container rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{ mb: 3 }}>
                     {
@@ -93,7 +104,7 @@ const Dashboard = () => {
                     onRowsPerPageChange={rowChange}
                     ActionsComponent={TablePaginationActions}
                 />
-            </Box>
+            </Box>}
         </React.Fragment>
     )
 }
