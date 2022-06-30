@@ -95,7 +95,7 @@ const DatasetDetails = () => {
                         <DataitemsTable />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={1}>
-                        <MembersTable dataSource={DatasetMembers} />
+                        <MembersTable dataSource={DatasetMembers} hideButton />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={2}>
                         <DatasetProjectsTable datasetId={datasetId} />
