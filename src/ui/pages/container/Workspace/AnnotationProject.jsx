@@ -161,6 +161,7 @@ const AnnotationProject = (props) => {
   useEffect(() => {
     if (NewProject.id) {
       navigate(`/projects/${NewProject.id}`, { replace: true });
+      window.location.reload();
     }
   }, [NewProject]);
 
