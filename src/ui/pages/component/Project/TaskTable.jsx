@@ -14,6 +14,7 @@ import FilterList from "./FilterList";
 import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
 import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
 import DeallocateTasksAPI from "../../../../redux/actions/api/Tasks/DeallocateTasks";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
@@ -54,7 +55,7 @@ const TaskTable = () => {
         message: "",
         variant: "success",
       });
-    const [pullClicked, setPullClicked] = useState(false);
+    // const [pullClicked, setPullClicked] = useState(false);
     const [deallocateClicked, setDeallocateClicked] = useState(false);
     const [deallocateDialog, setDeallocateDialog] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -77,10 +78,36 @@ const TaskTable = () => {
         dispatch(APITransport(taskObj));
     }
 
-    const fetchNewTasks = () => {
-        setPullClicked(true);
+    const fetchNewTasks = async() => {
         const batchObj = new PullNewBatchAPI(id, pullSize);
-        dispatch(APITransport(batchObj));
+        const res = await fetch(batchObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(batchObj.getBody()),
+            headers: batchObj.getHeaders().headers,
+          });
+        const resp = await res.json();
+        console.log(resp, res);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+                getTaskListData();
+            } else {
+                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setCurrentPageNumber(1);
+            }
+            const projectObj = new GetProjectDetailsAPI(id);
+            dispatch(APITransport(projectObj));
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
     }
 
     const unassignTasks = () => {
@@ -139,22 +166,6 @@ const TaskTable = () => {
             getTaskListData();
         }
     }, [selectedFilters]);
-
-    useEffect(() => {
-        if(pullClicked && PullBatchRes.status === 200) {
-            setSnackbarInfo({
-                open: true,
-                message: PullBatchRes.data.message,
-                variant: "success",
-            })
-            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
-                getTaskListData();
-            } else {
-                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
-                setCurrentPageNumber(1);
-            }
-        }
-    }, [PullBatchRes]);
 
     useEffect(() => {
         if(deallocateClicked && DeallocateRes.status === 200) {

@@ -56,9 +56,9 @@ const AnnotationProject = (props) => {
   const [sourceLanguage, setSourceLanguage] = useState("");
   const [targetLanguage, setTargetLanguage] = useState("");
   const [samplingMode, setSamplingMode] = useState(null);
-  const [random, setRandom] = useState(5);
-  const [batchSize, setBatchSize] = useState(null);
-  const [batchNumber, setBatchNumber] = useState(null);
+  const [random, setRandom] = useState("");
+  const [batchSize, setBatchSize] = useState("");
+  const [batchNumber, setBatchNumber] = useState("");
   const [samplingParameters, setSamplingParameters] = useState(null);
   const [selectedInstances, setSelectedInstances] = useState([]);
   const [confirmed, setConfirmed] = useState(false);
@@ -161,6 +161,7 @@ const AnnotationProject = (props) => {
   useEffect(() => {
     if (NewProject.id) {
       navigate(`/projects/${NewProject.id}`, { replace: true });
+      window.location.reload();
     }
   }, [NewProject]);
 
@@ -329,6 +330,8 @@ const AnnotationProject = (props) => {
         batch_size: batchSize,
         batch_number: batchNumber,
       });
+    } else {
+      setSamplingParameters(null);
     }
   }, [batchSize, batchNumber]);
 
@@ -374,19 +377,9 @@ const AnnotationProject = (props) => {
     }
   };
 
-  const handleRandomChange = (value) => {
-    setRandom(value);
-    setSamplingParameters({
-      fraction: parseFloat(value / 100),
-    });
-  };
-
-  const handleBatchSizeChange = (value) => {
-    setBatchSize(value);
-  };
-
-  const handleBatchNumberChange = (value) => {
-    setBatchNumber(value);
+  const handleRandomChange = (e) => {
+    setRandom(e.target.value);
+    setSamplingParameters(e.target.value ? { fraction: parseFloat(e.target.value / 100)} : null);
   };
 
   const onConfirmSelections = () => {
@@ -473,6 +466,7 @@ const AnnotationProject = (props) => {
 
           <Grid container direction="row">
             <Grid
+              item
               xs={12}
               sm={12}
               md={12}
@@ -899,7 +893,7 @@ const AnnotationProject = (props) => {
                 <OutlinedTextField
                   fullWidth
                   value={batchSize}
-                  onChange={handleBatchSizeChange}
+                  onChange={(e) => setBatchSize(e.target.value)}
                 />
               </Grid>
 
@@ -919,7 +913,7 @@ const AnnotationProject = (props) => {
                 <OutlinedTextField
                   fullWidth
                   value={batchNumber}
-                  onChange={handleBatchNumberChange}
+                  onChange={(e) => setBatchNumber(e.target.value)}
                 />
               </Grid>
             </>
@@ -942,9 +936,7 @@ const AnnotationProject = (props) => {
                 <OutlinedTextField
                   fullWidth
                   value={selectedAnnotatorsNum}
-                  onChange={(e) => {
-                    setSelectedAnnotatorsNum(e.target.value);
-                  }}
+                  onChange={(e) => setSelectedAnnotatorsNum(e.target.value)}
                 />
               </Grid>
             </>
