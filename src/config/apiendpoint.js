@@ -8,4 +8,5 @@ export default {
   getLanguages:"/users/languages/",
   getDatasets:"/data/",
   annotations:"/annotation/",
+  getUsers:"/users/",
 };
