@@ -7,10 +7,11 @@
 import constants from "../../../constants";
  
  export default class GetDataitemsByIdAPI extends API {
-   constructor(datasetId, pageNo, countPerPage, timeout = 2000) {
+   constructor(instanceIds, pageNo, countPerPage, datasetType, timeout = 2000) {
      super("POST", timeout, false);
      this.type = constants.GET_DATAITEMS_BY_ID;
-     this.datasetId = datasetId;
+     this.instanceIds = instanceIds;
+     this.datasetType = datasetType;
      const queryString = `?${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}`
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}dataitems/get_data_items/${queryString}`;
    }
@@ -28,7 +29,8 @@ import constants from "../../../constants";
  
    getBody() {
     return {
-      instance_ids: this.datasetId
+      instance_ids: this.instanceIds,
+      dataset_type: this.datasetType
     }
    }
  

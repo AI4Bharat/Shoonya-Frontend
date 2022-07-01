@@ -4,11 +4,13 @@ import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Button from "../../component/common/Button";
+import ColumnList from "../../component/common/ColumnList";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import MUIDataTable from "mui-datatables";
 import StandardTextField from "../../component/common/StandardTextField";
 import NativeSelect from "@mui/material/NativeSelect";
 import MenuItems from "../../component/common/MenuItems";
@@ -18,7 +20,9 @@ import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetsByType";
 import GetDatasetFieldsAPI from "../../../../redux/actions/api/Dataset/GetDatasetFields";
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
+import GetDataitemsByIdAPI from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import { snakeToTitleCase } from "../../../../utils/utils";
 
 const AnnotationProject = (props) => {
   const { id } = useParams();
@@ -34,6 +38,7 @@ const AnnotationProject = (props) => {
   );
   const DatasetFields = useSelector((state) => state.getDatasetFields.data);
   const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
+  const DataItems = useSelector((state) => state.getDataitemsById.data);
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -51,9 +56,9 @@ const AnnotationProject = (props) => {
   const [sourceLanguage, setSourceLanguage] = useState("");
   const [targetLanguage, setTargetLanguage] = useState("");
   const [samplingMode, setSamplingMode] = useState(null);
-  const [random, setRandom] = useState(5);
-  const [batchSize, setBatchSize] = useState(null);
-  const [batchNumber, setBatchNumber] = useState(null);
+  const [random, setRandom] = useState("");
+  const [batchSize, setBatchSize] = useState("");
+  const [batchNumber, setBatchNumber] = useState("");
   const [samplingParameters, setSamplingParameters] = useState(null);
   const [selectedInstances, setSelectedInstances] = useState([]);
   const [confirmed, setConfirmed] = useState(false);
@@ -63,6 +68,91 @@ const AnnotationProject = (props) => {
     []
   );
 
+  //Table related state variables
+  const [columns, setColumns] = useState(null);
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [currentPageNumber, setCurrentPageNumber] = useState(1);
+  const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
+  const [totalDataitems, setTotalDataitems] = useState(10);
+  const [tableData, setTableData] = useState([]);
+  const excludeKeys = [
+    "parent_data_id",
+    "metadata_json",
+    "instance_id_id",
+    "datasetbase_ptr_id",
+    "key",
+    "instance_id",
+    "labse_score",
+    "parent_data",
+    "id",
+    "rating"
+  ];
+  const renderToolBar = () => {
+    return (
+      <Grid container spacing={0} md={12}>
+        <Grid
+          item
+          xs={8}
+          sm={8}
+          md={12}
+          lg={12}
+          xl={12}
+          className={classes.filterToolbarContainer}
+        >
+          <Grid container direction="row" justifyContent={"flex-end"}>
+            <ColumnList
+              columns={columns}
+              setColumns={setSelectedColumns}
+              selectedColumns={selectedColumns}
+            />
+          </Grid>
+        </Grid>
+      </Grid>
+    );
+  };
+  const options = {
+    count: totalDataitems,
+    rowsPerPage: currentRowPerPage,
+    page: currentPageNumber - 1,
+    rowsPerPageOptions: [10, 25, 50, 100],
+    textLabels: {
+      pagination: {
+        next: "Next >",
+        previous: "< Previous",
+        rowsPerPage: "currentRowPerPage",
+        displayRows: "OF",
+      },
+    },
+    onChangePage: (currentPage) => {
+      currentPage + 1 > currentPageNumber &&
+        setCurrentPageNumber(currentPage + 1);
+    },
+    onChangeRowsPerPage: (rowPerPageCount) => {
+      setCurrentRowPerPage(rowPerPageCount);
+    },
+    filterType: "checkbox",
+    selectableRows: "none",
+    download: false,
+    filter: false,
+    print: false,
+    search: false,
+    viewColumns: false,
+    textLabels: {
+      body: {
+        noMatch: "No records ",
+      },
+      toolbar: {
+        search: "Search",
+        viewColumns: "View Column",
+      },
+      pagination: {
+        rowsPerPage: "Rows per page",
+      },
+      options: { sortDirection: "desc" },
+    },
+    customToolbar: renderToolBar,
+  };
+  
   useEffect(() => {
     const domainObj = new GetProjectDomainsAPI();
     dispatch(APITransport(domainObj));
@@ -71,6 +161,7 @@ const AnnotationProject = (props) => {
   useEffect(() => {
     if (NewProject.id) {
       navigate(`/projects/${NewProject.id}`, { replace: true });
+      window.location.reload();
     }
   }, [NewProject]);
 
@@ -176,6 +267,32 @@ const AnnotationProject = (props) => {
   }, [LanguageChoices]);
 
   useEffect(() => {
+    setTotalDataitems(DataItems.count);
+    let fetchedItems = DataItems.results;
+    setTableData(fetchedItems);
+    let tempColumns = [];
+    let tempSelected = [];
+    if (fetchedItems?.length) {
+      Object.keys(fetchedItems[0]).forEach((key) => {
+        if (!excludeKeys.includes(key)) {
+          tempColumns.push({
+            name: key,
+            label: snakeToTitleCase(key),
+            options: {
+              filter: false,
+              sort: false,
+              align: "center",
+            },
+          });
+          tempSelected.push(key);
+        }
+      });
+    }
+    setColumns(tempColumns);
+    setSelectedColumns(tempSelected);
+  }, [DataItems]);
+
+  useEffect(() => {
     setSelectedType("");
     setSamplingParameters(null);
     setConfirmed(false);
@@ -183,14 +300,18 @@ const AnnotationProject = (props) => {
       const langChoicesObj = new GetLanguageChoicesAPI();
       dispatch(APITransport(langChoicesObj));
     }
-    //setTableData(null);
+    setTableData([]);
+    setCurrentPageNumber(1);
+    setCurrentRowPerPage(10);
   }, [selectedDomain]);
 
   useEffect(() => {
     setSelectedInstances([]);
     setSamplingParameters(null);
     setConfirmed(false);
-    //setTableData(false);
+    setTableData([]);
+    setCurrentPageNumber(1);
+    setCurrentRowPerPage(10);
     if (selectedType) {
       if (variableParameters[selectedType]) {
         const fieldsObj = new GetDatasetFieldsAPI(
@@ -209,6 +330,8 @@ const AnnotationProject = (props) => {
         batch_size: batchSize,
         batch_number: batchNumber,
       });
+    } else {
+      setSamplingParameters(null);
     }
   }, [batchSize, batchNumber]);
 
@@ -218,16 +341,6 @@ const AnnotationProject = (props) => {
 
   const onSelectProjectType = (value) => {
     setSelectedType(value);
-    /* let tempColumns = [];
-        for (const column in columnFields[value]) {
-        tempColumns.push({
-            title: columnFields[value][column],
-            dataIndex: columnFields[value][column],
-            key: columnFields[value][column],
-            ellipsis: true,
-        });
-        }
-        setColumns(tempColumns); */
     const instancesObj = new GetDatasetsByTypeAPI(datasetTypes[value]);
     dispatch(APITransport(instancesObj));
   };
@@ -240,7 +353,9 @@ const AnnotationProject = (props) => {
 
   const handleChangeInstances = () => {
     setConfirmed(false);
-    //setTableData(null);
+    setTableData([]);
+    setCurrentPageNumber(1);
+    setCurrentRowPerPage(10);
     setSamplingMode(null);
     setSamplingParameters(null);
   };
@@ -262,23 +377,25 @@ const AnnotationProject = (props) => {
     }
   };
 
-  const handleRandomChange = (value) => {
-    setRandom(value);
-    setSamplingParameters({
-      fraction: parseFloat(value / 100),
-    });
-  };
-
-  const handleBatchSizeChange = (value) => {
-    setBatchSize(value);
-  };
-
-  const handleBatchNumberChange = (value) => {
-    setBatchNumber(value);
+  const handleRandomChange = (e) => {
+    setRandom(e.target.value);
+    setSamplingParameters(e.target.value ? { fraction: parseFloat(e.target.value / 100)} : null);
   };
 
   const onConfirmSelections = () => {
     setConfirmed(true);
+    getDataItems();
+  };
+
+  useEffect(() => {
+    if(selectedInstances && datasetTypes) {
+      getDataItems();
+    }
+  }, [currentPageNumber, currentRowPerPage]);
+
+  const getDataItems = () => {
+    const dataObj = new GetDataitemsByIdAPI(selectedInstances, currentPageNumber, currentRowPerPage, datasetTypes[selectedType]);
+    dispatch(APITransport(dataObj));
   };
 
   const processNameString = (string) => {
@@ -294,7 +411,6 @@ const AnnotationProject = (props) => {
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
-    //showLoader();
     const newProject = {
       title: title,
       description: description,
@@ -341,8 +457,7 @@ const AnnotationProject = (props) => {
                 > */}
       <Grid container direction="row">
       <Card className={classes.workspaceCard}>
-        <Grid item xs={2} sm={2} md={2} lg={2} xl={2}></Grid>
-        <Grid item xs={8} sm={8} md={8} lg={8} xl={8} sx={{ pb: "6rem" }}>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ pb: "6rem" }}>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography variant="h2" gutterBottom component="div">
               Create a Project
@@ -351,6 +466,7 @@ const AnnotationProject = (props) => {
 
           <Grid container direction="row">
             <Grid
+              item
               xs={12}
               sm={12}
               md={12}
@@ -669,6 +785,33 @@ const AnnotationProject = (props) => {
                 xl={12}
               >
                 <Typography gutterBottom component="div">
+                  Dataset Rows:
+                </Typography>
+              </Grid>
+              <Grid
+                className={classes.projectsettingGrid}
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+              >
+                <MUIDataTable
+                  title={""}
+                  data={tableData}
+                  columns={columns.filter((column) => selectedColumns.includes(column.name))}
+                  options={options}
+                />
+              </Grid>
+              <Grid
+                className={classes.projectsettingGrid}
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+              >
+                <Typography gutterBottom component="div">
                   Select Sampling Type:
                 </Typography>
               </Grid>
@@ -750,7 +893,7 @@ const AnnotationProject = (props) => {
                 <OutlinedTextField
                   fullWidth
                   value={batchSize}
-                  onChange={handleBatchSizeChange}
+                  onChange={(e) => setBatchSize(e.target.value)}
                 />
               </Grid>
 
@@ -770,7 +913,7 @@ const AnnotationProject = (props) => {
                 <OutlinedTextField
                   fullWidth
                   value={batchNumber}
-                  onChange={handleBatchNumberChange}
+                  onChange={(e) => setBatchNumber(e.target.value)}
                 />
               </Grid>
             </>
@@ -793,9 +936,7 @@ const AnnotationProject = (props) => {
                 <OutlinedTextField
                   fullWidth
                   value={selectedAnnotatorsNum}
-                  onChange={(e) => {
-                    setSelectedAnnotatorsNum(e.target.value);
-                  }}
+                  onChange={(e) => setSelectedAnnotatorsNum(e.target.value)}
                 />
               </Grid>
             </>
