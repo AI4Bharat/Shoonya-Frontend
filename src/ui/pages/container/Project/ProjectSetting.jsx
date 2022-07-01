@@ -23,6 +23,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DownloadProjectButton from './DownloadProjectButton';
 import MenuItems from "../../component/common/MenuItems";
+import CircularProgress from "../../component/common/Spinner"
+import Backdrop from '@mui/material/Backdrop';
+import CustomizedSnackbars from "../../component/common/Snackbar"
 
 
 const ProjectSetting = (props) => {
@@ -32,12 +35,18 @@ const ProjectSetting = (props) => {
         { name: "Project Type", value: null },
         { name: "Status", value: null },
     ])
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState();
     const [showLanguage, setShowLanguage] = useState(false);
     const [sourceLanguage, setSourceLanguage] = useState("");
     const [targetLanguage, setTargetLanguage] = useState("");
     const [languageOptions, setLanguageOptions] = useState([]);
+    const [spinner, setSpinner] = React.useState(false);
     const { id } = useParams();
 
     const classes = DatasetStyle();
@@ -82,13 +91,38 @@ const ProjectSetting = (props) => {
 
 
 
+    const PublishProject = useSelector(state => state.getPublishProject.data);
+
+    
 
     const getPublishProjectButton = () => {
         const projectObj = new GetPublishProjectButtonAPI(id);
-
+       
+        console.log(projectObj,"projectObj")
+        console.log(projectObj.publishProjectButton,"projectObj.message1")
         dispatch(APITransport(projectObj));
+        if(projectObj.message===null){
+            // console.log(projectObj.publishProjectButton.message,"projectObj.message2")
+            setSnackbarInfo({
+                open: true,
+                variant: "error",
+                message: "unable to project published",
+              });
+              setSpinner(false);
+        }
+        if(projectObj.message!==null) {
+            // console.log(projectObj.publishProjectButton.message,"projectObj.message3")
+            setSnackbarInfo({
+                open: true,
+             
+                message: "project published",
+              });
+              setSpinner(false);
+        }
+        
     }
 
+    console.log(PublishProject,"PublishProject")
 
     const getPullNewDataAPI = () => {
         const projectObj = new GetPullNewDataAPI(id);
@@ -135,8 +169,10 @@ const ProjectSetting = (props) => {
     }
     const handlePublishProject = () => {
         getPublishProjectButton()
+        setSpinner(!open);
+        setSpinner(false);
     }
-
+  
     const handlePullNewData = () => {
         getPullNewDataAPI()
 
@@ -149,6 +185,11 @@ const ProjectSetting = (props) => {
     const handleClose = () => {
         setOpen(false);
     };
+  
+
+    const handleSpinnerClose = () => {
+        setSpinner(false);
+    };
 
     const handleok = () => {
         getArchiveProjectAPI()
@@ -160,11 +201,29 @@ const ProjectSetting = (props) => {
             return word.charAt(0).toUpperCase() + word.slice(1);
         }).join(" ");
     }
+    const renderSnackBar = () => {
+        return (
+          <CustomizedSnackbars
+            open={snackbar.open}
+            handleClose={() =>
+              setSnackbarInfo({ open: false, message: "", variant: "" })
+            }
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            variant={snackbar.variant}
+            message={snackbar.message}
+          />
+        );
+      };
 
     return (
         <ThemeProvider theme={themeDefault}>
 
             {/* <Header /> */}
+            <Grid>
+        {renderSnackBar()}
+
+      </Grid>
+      projectObj
             <Grid
                 container
                 direction='row'
@@ -488,6 +547,16 @@ const ProjectSetting = (props) => {
                     <Button onClick={handleok} label="Ok" autoFocus />
                 </DialogActions>
             </Dialog>
+            <Backdrop
+      
+        open={spinner}
+        onClick={handleSpinnerClose}
+      >
+      <CircularProgress/>
+      </Backdrop>
+
+
+            
         </ThemeProvider>
     )
 }

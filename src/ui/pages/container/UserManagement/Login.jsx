@@ -61,7 +61,7 @@ const Login = () => {
         if (!res.ok) {
           // return Promise.reject('');
           // let errorObj =
-          console.log("res -", res);
+          console.log("res -", rsp_data);
           setSnackbarInfo({
             open: true,
             variant: "error",
