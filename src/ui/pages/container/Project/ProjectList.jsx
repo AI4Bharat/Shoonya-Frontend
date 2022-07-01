@@ -73,7 +73,7 @@ const Dashboard = () => {
                             if (SearchProject == "") {
                                 return el;
                             } else if (
-                                el.project_type
+                                el.project_type,el.title
                                     ?.toLowerCase()
                                     .includes(SearchProject?.toLowerCase())
                             ) {
