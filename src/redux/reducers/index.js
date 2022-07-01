@@ -2,6 +2,7 @@ import apiStatus from './apistatus/apistatus';
 import getProjects from './Dashboard/GetProjects';
 import getWorkspaces from './Dashboard/GetWorkspaces';
 import fetchLoggedInUserData from './UserManagement/FetchLoggedInUserData';
+import getUserAnalytics from "./UserManagement/GetUserAnalytics";
 import getProjectDetails from './ProjectDetails/GetProjectDetails';
 import getProjectReport from './ProjectDetails/GetProjectReport';
 import getTasksByProjectId from './Tasks/GetTasksByProjectId';
@@ -39,11 +40,13 @@ import updateTask from './Tasks/UpdateTask';
 import pullNewBatch from "./Tasks/PullNewBatch";
 import deallocateTasks from "./Tasks/DeallocateTasks";
 
+
 const index = {
     apiStatus,
     getProjects,
     getWorkspaces,
     fetchLoggedInUserData,
+    getUserAnalytics,
     getProjectDetails,
     getProjectReport,
     getTasksByProjectId,

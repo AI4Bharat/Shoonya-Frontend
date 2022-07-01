@@ -22,11 +22,11 @@ import Layout from "./ui/Layout";
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
 import CollectionProject from "./ui/pages/container/Workspace/CollectionProject";
 import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
-import MyProfile from "./ui/pages/container/UserManagement/MyProfile";
 import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
+import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -119,7 +119,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/profile"
-          element={ProtectedRouteWrapper(<Layout component={<MyProfile />} />)}
+          element={ProtectedRouteWrapper(<Layout component={<UserProfilePage />} />)}
         />
         <Route
           path="/projects"

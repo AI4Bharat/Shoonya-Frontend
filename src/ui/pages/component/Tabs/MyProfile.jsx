@@ -1,12 +1,12 @@
 import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel } from "@mui/material";
-import OutlinedTextField from "../../component/common/OutlinedTextField";
+import OutlinedTextField from "../common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import Snackbar from "../../component/common/Snackbar";
+import Snackbar from "../common/Snackbar";
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 
 const MyProfile = () => {
@@ -89,7 +89,8 @@ const MyProfile = () => {
             // width: window.innerWidth * 0.8,
             width: "100%",
             minHeight: 500,
-            padding: 5,
+            // padding: 5,
+            border: 0,
           }}
         >
           <Grid container spacing={4}>
