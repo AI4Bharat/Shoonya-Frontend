@@ -1,23 +1,22 @@
 import constants from "../../constants";
 
 let initialState = {
-    data: ""
+    data: []
 }
-
 const reducer = (state = initialState, action) => {
-    
     switch (action.type) {
-        case constants.SEARCH_PROJECT_CARDS:
+        case constants.GET_USER_ANALYTICS:
             return {
                 ...state,
                 data: action.payload
-            } 
+            }
 
         default:
             return {
                 ...state
             }
     }
+
 };
 
 export default reducer;
