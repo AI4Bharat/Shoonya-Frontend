@@ -81,7 +81,7 @@ const OrganizationReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: true,
+            sort: key === "Word Count Of Annotated Tasks",
             align: "center",
           },
         });
@@ -108,7 +108,7 @@ const OrganizationReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: true,
+            sort: key === "Word Count Of Annotated Tasks",
             align: "center",
           },
         });
