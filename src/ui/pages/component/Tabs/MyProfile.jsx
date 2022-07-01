@@ -16,6 +16,7 @@ const MyProfile = () => {
   const [initLangs, setInitLangs] = useState([]);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
   const [email, setEmail] = useState("");
+  const [originalEmail, setOriginalEmail] = useState("");
   const [enableVerifyEmail, setEnableVerifyEmail] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
@@ -49,6 +50,7 @@ const MyProfile = () => {
       phone: userDetails.phone,
     });
     setEmail(userDetails.email);
+    setOriginalEmail(userDetails.email);
   }, [userDetails]);
 
   const handleFieldChange = (event) => {
@@ -62,7 +64,7 @@ const MyProfile = () => {
   const handleEmailChange = (event) => {
     event.preventDefault();
     setEmail(event.target.value);
-    event.target.value !== userDetails.email ? setEnableVerifyEmail(true) : setEnableVerifyEmail(false);
+    event.target.value !== originalEmail ? setEnableVerifyEmail(true) : setEnableVerifyEmail(false);
   };
 
   const handleUpdateEmail = () => {
@@ -90,6 +92,7 @@ const MyProfile = () => {
   
   const handleVerificationSuccess = () => {
     setEnableVerifyEmail(false);
+    setOriginalEmail(email);
     setSnackbarState({ open: true, message: "Email successfully updated", variant: "success" });
   }
   
