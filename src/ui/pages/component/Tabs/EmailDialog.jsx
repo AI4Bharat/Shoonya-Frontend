@@ -11,27 +11,31 @@ import React, { useState } from "react";
 import VerifyEmailAPI from "../../../../redux/actions/api/UserManagement/VerifyEmail";
 import CustomButton from "../common/Button";
 import OutlinedTextField from "../common/OutlinedTextField";
+import Snackbar from "../common/Snackbar";
 
-const EmailDialog = ({isOpen, handleClose, oldEmail, newEmail}) => {
+const EmailDialog = ({isOpen, handleClose, oldEmail, newEmail, onSuccess}) => {
   const [oldEmailCode, setOldEmailCode] = useState("");
   const [newEmailCode, setNewEmailCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
 
   const verifyEmail = async () => {
+    setLoading(true);
     const apiObj = new VerifyEmailAPI(oldEmailCode, newEmailCode);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
       headers: apiObj.getHeaders().headers,
     }).then(async (res) => {
-      const response = await res.json();
-      if (response.status === 200) {
-        setSnackbarState({ open: true, message: response.message, variant: "success" });
-        handleClose();
-      } else {
-        setSnackbarState({ open: true, message: response.message, variant: "error" });
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    }).then((res) => {
+      setSnackbarState({ open: true, message: res.message, variant: "success" });
+      onSuccess();
+      handleClose();
+    }).catch((err) => {
+        setSnackbarState({ open: true, message: err.message, variant: "error" });
         setLoading(false);
-      }
     });
   };
 
@@ -81,6 +85,12 @@ const EmailDialog = ({isOpen, handleClose, oldEmail, newEmail}) => {
           disabled={!(oldEmailCode && newEmailCode)}
         />
       </DialogActions>
+      <Snackbar 
+        {...snackbarState} 
+        handleClose={()=> setSnackbarState({...snackbarState, open: false})} 
+        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+        hide={2000}
+      />
     </Dialog>
   );
 };

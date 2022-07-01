@@ -1,4 +1,4 @@
-import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel, InputAdornment } from "@mui/material";
+import { Button, Card, CircularProgress, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel, InputAdornment } from "@mui/material";
 import OutlinedTextField from "../common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ const MyProfile = () => {
   const [email, setEmail] = useState("");
   const [enableVerifyEmail, setEnableVerifyEmail] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
 
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const dispatch = useDispatch();
@@ -61,29 +62,36 @@ const MyProfile = () => {
   const handleEmailChange = (event) => {
     event.preventDefault();
     setEmail(event.target.value);
-    setEnableVerifyEmail(true);
+    event.target.value !== userDetails.email ? setEnableVerifyEmail(true) : setEnableVerifyEmail(false);
   };
 
   const handleUpdateEmail = () => {
+    setEmailVerifyLoading(true);
     const apiObj = new UpdateEmailAPI(email);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
       headers: apiObj.getHeaders().headers,
     }).then(async (res) => {
-      const response = await res.json();
-      if (response.status === 200) {
-        setSnackbarState({ open: true, message: response.message, variant: "success" });
-        setShowEmailDialog(true);
-      } else {
-        setSnackbarState({ open: true, message: response.message, variant: "error" });
-      }
+      setEmailVerifyLoading(false);
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    }).then((res) => {
+      setSnackbarState({ open: true, message: res.message, variant: "success" });
+      setShowEmailDialog(true);
+    }).catch((err) => {
+      setSnackbarState({ open: true, message: err.message, variant: "error" });
     });
   };
 
   const handleEmailDialogClose = () => {
     setShowEmailDialog(false);
   };
+  
+  const handleVerificationSuccess = () => {
+    setEnableVerifyEmail(false);
+    setSnackbarState({ open: true, message: "Email successfully updated", variant: "success" });
+  }
   
   const handleSubmit = () => {
     const apiObj = new UpdateProfileAPI(
@@ -160,9 +168,9 @@ const MyProfile = () => {
                 onChange={handleEmailChange}
                 InputLabelProps={{ shrink: true }}
                 InputProps={{
-                  endAdornment: (<InputAdornment position="end">
-                    <Button disabled={!enableVerifyEmail} variant="text" color="primary" onClick={handleUpdateEmail}>
-                      VERIFY EMAIL
+                  endAdornment: (enableVerifyEmail && <InputAdornment position="end">
+                    <Button variant="text" color="primary" onClick={handleUpdateEmail} sx={{gap:"4px"}}>
+                      {emailVerifyLoading && <CircularProgress size="1rem" color="primary"/>}VERIFY EMAIL
                     </Button>
                   </InputAdornment>)
                 }}
@@ -172,6 +180,7 @@ const MyProfile = () => {
                 handleClose={handleEmailDialogClose}
                 oldEmail={userDetails.email}
                 newEmail={email}
+                onSuccess={handleVerificationSuccess}
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
