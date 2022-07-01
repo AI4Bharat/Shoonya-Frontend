@@ -1,5 +1,5 @@
 import { Box, Divider, Grid, Typography } from "@mui/material";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import ProjectCard from "../../component/common/ProjectCard";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
@@ -10,12 +10,6 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 import TablePagination from '@mui/material/TablePagination';
 import TablePaginationActions from "../../component/common/TablePaginationActions";
-import Search from "../../component/common/Search";
-import SearchProjectCards from "../../../../redux/actions/api/ProjectDetails/SearchProjectCards"
-import { InputBase, ThemeProvider } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
-import themeDefault from '../../../theme/theme'
-
 import Spinner from "../../component/common/Spinner"
 
 const Dashboard = () => {
@@ -53,21 +47,16 @@ const Dashboard = () => {
         getDashboardprojectData();
     }, []);
 
-    const SearchProject = useSelector((state) => state.SearchProjectCards.data);
     console.log("loading", apiLoading);
 
 
     return (
         <React.Fragment>
             {/* <Header /> */}
-            <Search />
-
-
-            {/* <Box sx={{ margin: "0 auto", pb: 5 }}> */}
             {loading && <Spinner /> }
             {projectData.length > 0 && <Box sx={{ margin: "0 auto", pb: 5 }}>
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
-                <Grid container rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{ mb: 3 }}>
+                <Grid container rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{mb : 3}}>
                     {
                         (rowsPerPage > 0 ? projectData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage ) : projectData).filter((el) => {
                             if (SearchProject == "") {
@@ -82,6 +71,7 @@ const Dashboard = () => {
                             }
                         }).map((el, i) => {
                             console.log(el, "el")
+                        (rowsPerPage > 0 ? projectData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : projectData ).map((el, i) => {
                             return (
                                 <Grid key={el.id} item xs={12} sm={6} md={4} lg={4} xl={4}>
                                     <ProjectCard
@@ -104,8 +94,7 @@ const Dashboard = () => {
                     onRowsPerPageChange={rowChange}
                     ActionsComponent={TablePaginationActions}
                 />
-            </Box>
-            }
+            </Box>}
         </React.Fragment>
     )
 }
