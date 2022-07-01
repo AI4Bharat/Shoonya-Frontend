@@ -8,10 +8,12 @@ import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRol
 import { PersonAddAlt } from "@mui/icons-material";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import AddUsersDialog from "../common/AddUsersDialog";
+import InviteUsersDialog from "../common/InviteUsersDialog";
 import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
 import AddMembersToProjectAPI from "../../../../redux/actions/api/ProjectDetails/AddMembersToProject";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import addUserTypes from "../../../../constants/addUserTypes";
+import { useParams } from "react-router-dom";
 
 const columns = [
     {
@@ -59,9 +61,14 @@ const options = {
     viewColumns: false,
 };
 
+const addLabel = {
+    organization: "Invite Users to Organization",
+    project: "Add Users to Project",
+}
+
 const MembersTable = (props) => {
     const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
-    const projectDetails = useSelector((state) => state.getProjectDetails?.data);
+    const { orgId, id } = useParams();
     const [userRole, setUserRole] = useState();
 
     const { dataSource, hideButton } = props;
@@ -105,17 +112,25 @@ const MembersTable = (props) => {
             <CustomButton
                 sx={{ borderRadius: 2, mb: 3, whiteSpace: "nowrap" }}
                 startIcon={<PersonAddAlt />}
-                label="Add Users to Project"
+                label={props.type ? addLabel[props.type] : "Add Users"}
                 fullWidth
                 onClick={handleUserDialogOpen}
             /> : null
             }
-            <AddUsersDialog
-                handleDialogClose={handleUserDialogClose}
-                isOpen={addUserDialogOpen}
-                userType={addUserTypes.PROJECT_MEMBER}
-                id={projectDetails?.id}
-            />
+            {props.type === "organization" ?  
+                <InviteUsersDialog
+                    handleDialogClose={handleUserDialogClose}
+                    isOpen={addUserDialogOpen}
+                    id={orgId}
+                />
+                : 
+                <AddUsersDialog
+                    handleDialogClose={handleUserDialogClose}
+                    isOpen={addUserDialogOpen}
+                    userType={addUserTypes.PROJECT_MEMBER}
+                    id={id}
+                />
+            }
             <MUIDataTable
                 title={""}
                 data={data}
