@@ -8,7 +8,7 @@ import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/Updat
 import UpdateEmailAPI from "../../../../redux/actions/api/UserManagement/UpdateEmail";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import Snackbar from "../common/Snackbar";
-import EmailDialog from "./EmailDialog"
+import UpdateEmailDialog from "../common/UpdateEmailDialog"
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 
 const MyProfile = () => {
@@ -175,7 +175,7 @@ const MyProfile = () => {
                   </InputAdornment>)
                 }}
               ></OutlinedTextField>
-              <EmailDialog 
+              <UpdateEmailDialog 
                 isOpen={showEmailDialog}
                 handleClose={handleEmailDialogClose}
                 oldEmail={userDetails.email}

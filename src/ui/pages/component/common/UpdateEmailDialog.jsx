@@ -13,7 +13,7 @@ import CustomButton from "../common/Button";
 import OutlinedTextField from "../common/OutlinedTextField";
 import Snackbar from "../common/Snackbar";
 
-const EmailDialog = ({isOpen, handleClose, oldEmail, newEmail, onSuccess}) => {
+const UpdateEmailDialog = ({isOpen, handleClose, oldEmail, newEmail, onSuccess}) => {
   const [oldEmailCode, setOldEmailCode] = useState("");
   const [newEmailCode, setNewEmailCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -95,4 +95,4 @@ const EmailDialog = ({isOpen, handleClose, oldEmail, newEmail, onSuccess}) => {
   );
 };
 
-export default EmailDialog;
+export default UpdateEmailDialog;
