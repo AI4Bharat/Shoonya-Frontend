@@ -223,7 +223,7 @@ const ProjectSetting = (props) => {
         {renderSnackBar()}
 
       </Grid>
-      projectObj
+    
             <Grid
                 container
                 direction='row'

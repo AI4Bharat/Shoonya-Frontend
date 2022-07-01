@@ -69,11 +69,11 @@ const Dashboard = () => {
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
                 <Grid container rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{ mb: 3 }}>
                     {
-                        (rowsPerPage > 0 ? projectData.slice(page ) : projectData).filter((el) => {
+                        (rowsPerPage > 0 ? projectData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage ) : projectData).filter((el) => {
                             if (SearchProject == "") {
                                 return el;
                             } else if (
-                                el.project_type
+                                el.project_type , el.title
                                     ?.toLowerCase()
                                     .includes(SearchProject?.toLowerCase())
                             ) {
