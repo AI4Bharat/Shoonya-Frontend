@@ -44,8 +44,7 @@ const TaskTable = () => {
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState();
     const [pullDisabled, setPullDisabled] = useState("");
-    const PullBatchRes = useSelector(state => state.pullNewBatch);
-    const DeallocateRes = useSelector(state => state.deallocateTasks);
+    const [deallocateDisabled, setDeallocateDisabled] = useState("");
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const [searchAnchor, setSearchAnchor] = useState(null);
     const searchOpen = Boolean(searchAnchor);
@@ -55,8 +54,6 @@ const TaskTable = () => {
         message: "",
         variant: "success",
       });
-    // const [pullClicked, setPullClicked] = useState(false);
-    const [deallocateClicked, setDeallocateClicked] = useState(false);
     const [deallocateDialog, setDeallocateDialog] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [columns, setColumns] = useState([]);
@@ -86,7 +83,6 @@ const TaskTable = () => {
             headers: batchObj.getHeaders().headers,
           });
         const resp = await res.json();
-        console.log(resp, res);
         if (res.ok) {
             setSnackbarInfo({
                 open: true,
@@ -110,11 +106,36 @@ const TaskTable = () => {
         }
     }
 
-    const unassignTasks = () => {
+    const unassignTasks = async () => {
         setDeallocateDialog(false);
-        setDeallocateClicked(true);
         const deallocateObj = new DeallocateTasksAPI(id);
-        dispatch(APITransport(deallocateObj));
+        const res = await fetch(deallocateObj.apiEndPoint(), {
+            method: "GET",
+            body: JSON.stringify(deallocateObj.getBody()),
+            headers: deallocateObj.getHeaders().headers,
+          });
+        const resp = await res.json();
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+                getTaskListData();
+            } else {
+                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setCurrentPageNumber(1);
+            }
+            const projectObj = new GetProjectDetailsAPI(id);
+            dispatch(APITransport(projectObj));
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
     }
 
     const labelAllTasks = () => {
@@ -166,22 +187,6 @@ const TaskTable = () => {
             getTaskListData();
         }
     }, [selectedFilters]);
-
-    useEffect(() => {
-        if(deallocateClicked && DeallocateRes.status === 200) {
-            setSnackbarInfo({
-                open: true,
-                message: DeallocateRes.data.message,
-                variant: "success",
-            })
-            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
-                getTaskListData();
-            } else {
-                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
-                setCurrentPageNumber(1);
-            }
-        }
-    }, [DeallocateRes]);
 
     useEffect(() => {
         if (taskList?.length > 0) {
@@ -240,19 +245,33 @@ const TaskTable = () => {
         if (ProjectDetails) {
             if (ProjectDetails.unassigned_task_count === 0)
                 setPullDisabled("No more unassigned tasks in this project")
+            else if (pullDisabled === "No more unassigned tasks in this project")
+                setPullDisabled("")
             ProjectDetails.frozen_users?.forEach((user) => {
                 if (user.id === userDetails?.id) 
                     setPullDisabled("You're no more a part of this project");
+                else if (pullDisabled === "You're no more a part of this project")
+                    setPullDisabled("");
             })
             setPullSize(ProjectDetails.tasks_pull_count_per_batch*0.5);
         }
-    }, [ProjectDetails, userDetails])
+    }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, userDetails])
 
     useEffect(() => {
         if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user) {
             setPullDisabled("You have too many unlabeled tasks")
+        } else if (pullDisabled === "You have too many unlabeled tasks") {
+            setPullDisabled("")
         }
     }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters.task_status])
+
+    useEffect(() => {
+        if (selectedFilters.task_status === "unlabeled" && totalTaskCount === 0) {
+            setDeallocateDisabled("No more tasks to deallocate")
+        } else if (deallocateDisabled === "No more tasks to deallocate") {
+            setDeallocateDisabled("")
+        }
+    }, [totalTaskCount, selectedFilters.task_status])
 
     useEffect(() => {
         if(labellingStarted && Object.keys(NextTask).length > 0) {
@@ -381,12 +400,17 @@ const TaskTable = () => {
                     alignItems: "flex-end",
                 }}
                 >
-                <CustomButton 
-                    sx={{ p: 1, width: '24%', borderRadius: 2, mb: 3, mr:"1%" }} 
-                    label={"De-allocate Tasks"}
-                    onClick={() => setDeallocateDialog(true)}
-                    color={"warning"}
-                />
+                <Tooltip title={deallocateDisabled}>
+                    <Box sx={{width: '24%', mr:"1%", mb: 3}}>
+                        <CustomButton 
+                            sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
+                            label={"De-allocate Tasks"}
+                            onClick={() => setDeallocateDialog(true)}
+                            disabled={deallocateDisabled}
+                            color={"warning"}
+                        />
+                    </Box>
+                </Tooltip>
                 <Dialog
                     open={deallocateDialog}
                     onClose={() => setDeallocateDialog(false)}
