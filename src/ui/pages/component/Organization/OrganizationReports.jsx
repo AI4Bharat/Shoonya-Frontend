@@ -26,6 +26,7 @@ import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/Fetc
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from '../common/ColumnList';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const OrganizationReports = () => {
   const [startDate, setStartDate] = useState(format(startOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
@@ -37,11 +38,11 @@ const OrganizationReports = () => {
   const [selectedType, setSelectedType] = useState("");
   const [reportType, setReportType] = useState("project");
   const [targetLanguage, setTargetLanguage] = useState("all");
-  const [sortByColumn, setSortByColumn] = useState(null);
-  const [descOrder, setDescOrder] = useState(null);
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [reportData, setReportData] = useState([]);
+  const [showSpinner, setShowSpinner] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   
   const classes = DatasetStyle();
   const { orgId } = useParams();
@@ -80,7 +81,7 @@ const OrganizationReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: key === "Word Count Of Annotated Tasks",
+            sort: true,
             align: "center",
           },
         });
@@ -94,6 +95,7 @@ const OrganizationReports = () => {
       setReportData([]);
       setSelectedColumns([]);
     }
+    setShowSpinner(false);
   }, [UserReports]);
 
   useEffect(() => {
@@ -106,7 +108,7 @@ const OrganizationReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: key === "Word Count Of Annotated Tasks",
+            sort: true,
             align: "center",
           },
         });
@@ -120,6 +122,7 @@ const OrganizationReports = () => {
       setReportData([]);
       setSelectedColumns([]);
     }
+    setShowSpinner(false);
   }, [ProjectReports]);
 
   const renderToolBar = () => {
@@ -181,7 +184,12 @@ const options = {
     setEndDate(format(end, "yyyy-MM-dd"));
   };
 
-  const handleDateSubmit = () => {
+  const handleSubmit = () => {
+    setSubmitted(true);
+    setShowSpinner(true);
+    setColumns([]);
+    setReportData([]);
+    setSelectedColumns([]);
     if (reportType === "user") {
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,
@@ -189,8 +197,6 @@ const options = {
         startDate,
         endDate,
         targetLanguage,
-        sortByColumn,
-        descOrder,
       );
       dispatch(APITransport(userReportObj));
     } else if (reportType === "project") {
@@ -200,8 +206,6 @@ const options = {
         startDate,
         endDate,
         targetLanguage,
-        sortByColumn,
-        descOrder,
       );
       dispatch(APITransport(projectReportObj));
     }
@@ -309,21 +313,30 @@ const options = {
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
             <Button
               variant="contained"
-              onClick={handleDateSubmit}
+              onClick={handleSubmit}
               sx={{width: "100%", mt:2}}
             >
               Submit
             </Button>
         </Grid>
       </Grid>
-      {reportData?.length > 0 && (
+      {reportData?.length > 0 ? 
         <MUIDataTable
           title={""}
           data={reportData}
           columns={columns.filter((col) => selectedColumns.includes(col.name))}
           options={options}
-        />
-      )}
+        /> : <Grid
+          container
+          justifyContent="center"
+        >
+          <Grid item sx={{mt:"10%"}}>
+            {showSpinner ? (<CircularProgress color="primary" size={50} />) : (
+              !reportData?.length && submitted && <>No results</>
+            )}
+          </Grid>
+        </Grid>
+      }
     </React.Fragment>
   );
 };
