@@ -166,7 +166,7 @@ const ProjectSetting = (props) => {
 
             {/* <Header /> */}
             <Grid>
-        {renderSnackBar()}
+        {/* {renderSnackBar()} */}
 
       </Grid>
     

@@ -1,3 +1,5 @@
+
+
 import { Box, Divider, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
@@ -58,19 +60,6 @@ const Dashboard = () => {
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
                 <Grid container rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{mb : 3}}>
                     {
-                        (rowsPerPage > 0 ? projectData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage ) : projectData).filter((el) => {
-                            if (SearchProject == "") {
-                                return el;
-                            } else if (
-                                el.project_type , el.title
-                                    ?.toLowerCase()
-                                    .includes(SearchProject?.toLowerCase())
-                            ) {
-
-                                return el;
-                            }
-                        }).map((el, i) => {
-                            console.log(el, "el")
                         (rowsPerPage > 0 ? projectData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : projectData ).map((el, i) => {
                             return (
                                 <Grid key={el.id} item xs={12} sm={6} md={4} lg={4} xl={4}>
