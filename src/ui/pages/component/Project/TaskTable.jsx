@@ -139,7 +139,12 @@ const TaskTable = () => {
     }
 
     const labelAllTasks = () => {
+        let search_filters = Object.keys(selectedFilters).filter(key => key.startsWith("search_")).reduce((acc, curr) => {
+            acc[curr] = selectedFilters[curr];
+            return acc;
+        }, {});
         localStorage.setItem("labellingMode", selectedFilters.task_status);
+        localStorage.setItem("searchFilters", JSON.stringify(search_filters));
         const getNextTaskObj = new GetNextTaskAPI(id);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
@@ -257,12 +262,12 @@ const TaskTable = () => {
     }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, userDetails])
 
     useEffect(() => {
-        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user) {
+        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
             setPullDisabled("You have too many unlabeled tasks")
         } else if (pullDisabled === "You have too many unlabeled tasks") {
             setPullDisabled("")
         }
-    }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters.task_status])
+    }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters])
 
     useEffect(() => {
         if (selectedFilters.task_status === "unlabeled" && totalTaskCount === 0) {
