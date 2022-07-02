@@ -230,6 +230,7 @@ const LabelStudioWrapper = ({notesRef}) => {
       typeof taskData === "undefined" &&
       userData && !loaded
     ) {
+      showLoader();
       loaded = true;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {

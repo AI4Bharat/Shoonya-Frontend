@@ -23,6 +23,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DownloadProjectButton from './DownloadProjectButton';
 import MenuItems from "../../component/common/MenuItems";
+import CircularProgress from "../../component/common/Spinner"
+import Backdrop from '@mui/material/Backdrop';
+import CustomizedSnackbars from "../../component/common/Snackbar"
 
 
 const ProjectSetting = (props) => {
@@ -32,23 +35,29 @@ const ProjectSetting = (props) => {
         { name: "Project Type", value: null },
         { name: "Status", value: null },
     ])
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState();
     const [showLanguage, setShowLanguage] = useState(false);
     const [sourceLanguage, setSourceLanguage] = useState("");
     const [targetLanguage, setTargetLanguage] = useState("");
     const [languageOptions, setLanguageOptions] = useState([]);
+    const [spinner, setSpinner] = React.useState(false);
     const { id } = useParams();
 
     const classes = DatasetStyle();
     const dispatch = useDispatch();
-
+    const apiMessage = useSelector(state => state.apiStatus.message);
+    console.log(apiMessage,"apiMessage")
 
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
 
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
-
         dispatch(APITransport(projectObj));
     }
 
@@ -85,8 +94,27 @@ const ProjectSetting = (props) => {
 
     const getPublishProjectButton = () => {
         const projectObj = new GetPublishProjectButtonAPI(id);
-
+ 
         dispatch(APITransport(projectObj));
+        if(apiMessage==""){
+            console.log(apiMessage,"apiMessage1")
+            setSnackbarInfo({
+                open: true,
+               
+                message: " project published"
+               ,
+              });
+              setSpinner(false);
+        }
+       else {
+          console.log(apiMessage,"apiMessage1")
+            setSnackbarInfo({
+                open: true,
+                variant: "error",
+                message: "unable to  publish project",
+              });
+              setSpinner(false);
+        }
     }
 
 
@@ -135,6 +163,8 @@ const ProjectSetting = (props) => {
     }
     const handlePublishProject = () => {
         getPublishProjectButton()
+        setSpinner(!open);
+        setSpinner(false);
     }
 
     const handlePullNewData = () => {
@@ -160,11 +190,29 @@ const ProjectSetting = (props) => {
             return word.charAt(0).toUpperCase() + word.slice(1);
         }).join(" ");
     }
+    const renderSnackBar = () => {
+        return (
+          <CustomizedSnackbars
+            open={snackbar.open}
+            handleClose={() =>
+              setSnackbarInfo({ open: false, message: "", variant: "" })
+            }
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            variant={snackbar.variant}
+            message={snackbar.message}
+          />
+        );
+      };
 
     return (
         <ThemeProvider theme={themeDefault}>
 
             {/* <Header /> */}
+            <Grid>
+        {renderSnackBar()}
+
+      </Grid>
+    
             <Grid
                 container
                 direction='row'
