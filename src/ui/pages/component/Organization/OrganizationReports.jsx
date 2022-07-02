@@ -29,10 +29,11 @@ import ColumnList from '../common/ColumnList';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 const OrganizationReports = () => {
-  const [startDate, setStartDate] = useState(format(startOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
-  const [endDate, setEndDate] = useState(format(lastDayOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
-  const [selectRange, setSelectRange] = useState("Last Week");
-  const [rangeValue, setRangeValue] = useState([startOfMonth(Date.now()), Date.now()]);
+  const OrganizationDetails = useSelector(state=>state.fetchLoggedInUserData.data.organization);
+  const [startDate, setStartDate] = useState(format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
+  const [endDate, setEndDate] = useState(format(Date.now(), "yyyy-MM-dd"));
+  const [selectRange, setSelectRange] = useState("Till Date");
+  const [rangeValue, setRangeValue] = useState([format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
@@ -159,20 +160,24 @@ const options = {
       setStartDate(format(Date.now(), "yyyy-MM-dd"));
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
     }
-    if (e.target.value === "Yesterday") {
+    else if (e.target.value === "Yesterday") {
       setStartDate(format(addDays(Date.now(), -1), "yyyy-MM-dd"));
       setEndDate(format(addDays(Date.now(), -1), "yyyy-MM-dd"));
     }
-    if (e.target.value === "This Week") {
+    else if (e.target.value === "This Week") {
       setStartDate(format(startOfWeek(Date.now()), "yyyy-MM-dd"));
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
     }
-    if (e.target.value === "Last Week") {
+    else if (e.target.value === "Last Week") {
       setStartDate(format(startOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
       setEndDate(format(lastDayOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
     }
-    if (e.target.value === "This Month") {
+    else if (e.target.value === "This Month") {
       setStartDate(format(startOfMonth(Date.now()), "yyyy-MM-dd"));
+      setEndDate(format(Date.now(), "yyyy-MM-dd"));
+    }
+    else if (e.target.value === "Till Date") {
+      setStartDate(format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
     }
   };
@@ -237,6 +242,7 @@ const options = {
               <MenuItem value={"This Week"}>This Week</MenuItem>
               <MenuItem value={"Last Week"}>Last Week</MenuItem>
               <MenuItem value={"This Month"}>This Month</MenuItem>
+              {OrganizationDetails?.created_at && <MenuItem value={"Till Date"}>Till Date</MenuItem>}
               <MenuItem value={"Custom Range"}>Custom Range</MenuItem>
             </Select>
           </FormControl>
