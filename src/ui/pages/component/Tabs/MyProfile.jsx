@@ -1,18 +1,25 @@
-import { Button, Card, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel } from "@mui/material";
+import { Button, Card, CircularProgress, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel, InputAdornment } from "@mui/material";
 import OutlinedTextField from "../common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
+import UpdateEmailAPI from "../../../../redux/actions/api/UserManagement/UpdateEmail";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import Snackbar from "../common/Snackbar";
+import UpdateEmailDialog from "../common/UpdateEmailDialog"
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
   const [initLangs, setInitLangs] = useState([]);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
+  const [email, setEmail] = useState("");
+  const [originalEmail, setOriginalEmail] = useState("");
+  const [enableVerifyEmail, setEnableVerifyEmail] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
 
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const dispatch = useDispatch();
@@ -42,6 +49,8 @@ const MyProfile = () => {
       languages: userDetails.languages,
       phone: userDetails.phone,
     });
+    setEmail(userDetails.email);
+    setOriginalEmail(userDetails.email);
   }, [userDetails]);
 
   const handleFieldChange = (event) => {
@@ -52,6 +61,41 @@ const MyProfile = () => {
     }));
   };
 
+  const handleEmailChange = (event) => {
+    event.preventDefault();
+    setEmail(event.target.value);
+    event.target.value !== originalEmail ? setEnableVerifyEmail(true) : setEnableVerifyEmail(false);
+  };
+
+  const handleUpdateEmail = () => {
+    setEmailVerifyLoading(true);
+    const apiObj = new UpdateEmailAPI(email);
+    fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    }).then(async (res) => {
+      setEmailVerifyLoading(false);
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    }).then((res) => {
+      setSnackbarState({ open: true, message: res.message, variant: "success" });
+      setShowEmailDialog(true);
+    }).catch((err) => {
+      setSnackbarState({ open: true, message: err.message, variant: "error" });
+    });
+  };
+
+  const handleEmailDialogClose = () => {
+    setShowEmailDialog(false);
+  };
+  
+  const handleVerificationSuccess = () => {
+    setEnableVerifyEmail(false);
+    setOriginalEmail(email);
+    setSnackbarState({ open: true, message: "Email successfully updated", variant: "success" });
+  }
+  
   const handleSubmit = () => {
     const apiObj = new UpdateProfileAPI(
       newDetails.username,
@@ -121,12 +165,26 @@ const MyProfile = () => {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
               <OutlinedTextField
-                disabled
                 fullWidth
                 label="Email"
-                value={userDetails.email}
+                value={email}
+                onChange={handleEmailChange}
                 InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  endAdornment: (enableVerifyEmail && <InputAdornment position="end">
+                    <Button variant="text" color="primary" onClick={handleUpdateEmail} sx={{gap:"4px"}}>
+                      {emailVerifyLoading && <CircularProgress size="1rem" color="primary"/>}VERIFY EMAIL
+                    </Button>
+                  </InputAdornment>)
+                }}
               ></OutlinedTextField>
+              <UpdateEmailDialog 
+                isOpen={showEmailDialog}
+                handleClose={handleEmailDialogClose}
+                oldEmail={userDetails.email}
+                newEmail={email}
+                onSuccess={handleVerificationSuccess}
+              />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
               <OutlinedTextField
