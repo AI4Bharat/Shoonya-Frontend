@@ -39,6 +39,8 @@ import getTaskAnnotations from './Tasks/GetTaskAnnotations';
 import updateTask from './Tasks/UpdateTask';
 import pullNewBatch from "./Tasks/PullNewBatch";
 import deallocateTasks from "./Tasks/DeallocateTasks";
+import getOrganizationUserReports from './Organization/GetOrganizationUserReports';
+import getOrganizationProjectReports from './Organization/GetOrganizationProjectReports';
 
 
 const index = {
@@ -86,6 +88,9 @@ const index = {
     updateTask,
     pullNewBatch,
     deallocateTasks,
+    getOrganizationUserReports,
+    getOrganizationProjectReports,
+    
 };
 
 export default index;

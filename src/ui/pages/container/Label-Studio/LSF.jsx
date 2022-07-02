@@ -28,7 +28,7 @@ import { translate } from '../../../../config/localisation';
 //used just in postAnnotation to support draft status update.
 let task_status = "accepted";
 
-const LabelStudioWrapper = ({notesRef}) => {
+const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
@@ -36,7 +36,6 @@ const LabelStudioWrapper = ({notesRef}) => {
   const [labelConfig, setLabelConfig] = useState();
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
-  const [loader, showLoader, hideLoader] = useFullPageLoader();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
   let loaded = false;
 
@@ -230,6 +229,7 @@ const LabelStudioWrapper = ({notesRef}) => {
       typeof taskData === "undefined" &&
       userData && !loaded
     ) {
+      showLoader();
       loaded = true;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
@@ -314,6 +314,7 @@ export default function LSF() {
   const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const [loader, showLoader, hideLoader] = useFullPageLoader();
   
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -333,7 +334,7 @@ export default function LSF() {
   
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
-      <Button
+      {!loader && <Button
         value="Back to Project"
         startIcon={<  ArrowBackIcon />}
         variant="contained" 
@@ -344,7 +345,7 @@ export default function LSF() {
         }}
       >
         Back to Project
-      </Button>
+      </Button>}
       <Card
         sx={{
             minHeight: 500,
@@ -353,14 +354,14 @@ export default function LSF() {
             pt: 3,
         }}
       >
-        <Button 
+        {!loader && <Button 
           endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
           variant="contained"
           color="primary"
           onClick={handleCollapseClick}
         >
           Notes
-        </Button>
+        </Button>}
         <div className={styles.collapse} style={{display: showNotes? "block" : "none",paddingBottom: "16px"}}>
           <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
@@ -372,7 +373,7 @@ export default function LSF() {
             style={{width: '99%', minHeight: '80px'}}
           />
         </div>
-        <LabelStudioWrapper notesRef={notesRef}/>
+        <LabelStudioWrapper notesRef={notesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
       </Card>
     </div>
   );

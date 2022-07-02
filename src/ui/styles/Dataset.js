@@ -170,7 +170,27 @@ progressDiv:{
     top:0,
   left:0,
   opacity: 0.4
-}  
+} ,
+search: {
+  position: "relative",
+  borderRadius: "24px",
+  backgroundColor: "#F3F3F3",
+  marginLeft: "0px",
+  width: "220px",
+  textAlign: "left",
+  float: "right",
+},
+searchIcon: {
+  // padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "#00000029",
+  marginLeft: "10px",
+}, 
   
 })
 
