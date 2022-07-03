@@ -145,6 +145,7 @@ const TaskTable = () => {
         }, {});
         localStorage.setItem("labellingMode", selectedFilters.task_status);
         localStorage.setItem("searchFilters", JSON.stringify(search_filters));
+        localStorage.setItem("labelAll", true);
         const getNextTaskObj = new GetNextTaskAPI(id);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
@@ -203,7 +204,7 @@ const TaskTable = () => {
                 taskList[0].task_status && row.push(el.task_status);
                 row.push(<Link to={`task/${el.id}`} className={classes.link}>
                             <CustomButton
-                                onClick={() => console.log("task id === ", el.id)}
+                                onClick={() => {console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
                                 sx={{ p: 1, borderRadius: 2 }}
                                 label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
                                     {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
@@ -279,7 +280,6 @@ const TaskTable = () => {
 
     useEffect(() => {
         if(labellingStarted && Object.keys(NextTask).length > 0) {
-          localStorage.setItem("labelAll", true);
           navigate(`/projects/${id}/task/${NextTask.id}`);
         }
         //TODO: display no more tasks message
