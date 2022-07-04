@@ -26,6 +26,7 @@ import MenuItems from "../../component/common/MenuItems";
 import CircularProgress from "../../component/common/Spinner"
 import Backdrop from '@mui/material/Backdrop';
 import CustomizedSnackbars from "../../component/common/Snackbar"
+import Spinner from "../../component/common/Spinner";
 
 
 const ProjectSetting = (props) => {
@@ -39,7 +40,7 @@ const ProjectSetting = (props) => {
         open: false,
         message: "",
         variant: "success",
-      });
+    });
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState();
     const [showLanguage, setShowLanguage] = useState(false);
@@ -47,13 +48,15 @@ const ProjectSetting = (props) => {
     const [targetLanguage, setTargetLanguage] = useState("");
     const [languageOptions, setLanguageOptions] = useState([]);
     const [spinner, setSpinner] = React.useState(false);
+    const [loading, setLoading] = useState(false);
     const { id } = useParams();
 
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiMessage = useSelector(state => state.apiStatus.message);
-    console.log(apiMessage,"apiMessage")
-
+    const apiError = useSelector(state => state.apiStatus.error);
+    console.log(apiMessage, "apiMessage")
+    const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
 
     const getProjectDetails = () => {
@@ -68,7 +71,7 @@ const ProjectSetting = (props) => {
     console.log(ProjectDetails, "ProjectDetails")
 
     useEffect(() => {
-        if(ProjectDetails.project_type === "MonolingualTranslation" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
+        if (ProjectDetails.project_type === "MonolingualTranslation" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
             getLanguageChoices();
             setShowLanguage(true);
         }
@@ -94,28 +97,35 @@ const ProjectSetting = (props) => {
 
     const getPublishProjectButton = () => {
         const projectObj = new GetPublishProjectButtonAPI(id);
- 
         dispatch(APITransport(projectObj));
-        if(apiMessage==""){
-            console.log(apiMessage,"apiMessage1")
-            setSnackbarInfo({
-                open: true,
-               
-                message: " project published"
-               ,
-              });
-              setSpinner(false);
-        }
-       else {
-          console.log(apiMessage,"apiMessage1")
-            setSnackbarInfo({
-                open: true,
-                variant: "error",
-                message: "unable to  publish project",
-              });
-              setSpinner(false);
-        }
+        // if(apiMessage === undefined ){
+
+        //     console.log(apiMessage,"apiMessage1")
+        //     setSnackbarInfo({
+        //         open: true,
+        //         message: " project published",
+        //       });
+        //       setSpinner(false);
+        // }
+        // if( apiMessage === "") {
+        //   console.log(apiMessage,"apiMessage2")
+        //     setSnackbarInfo({
+        //         open: true,
+        //         variant: "error",
+        //         message: "unable to  publish project",
+        //       });
+        //       setSpinner(false);
+        // }
     }
+
+    useEffect(() => {
+        setSnackbarInfo({
+            open: apiMessage ? true : false,
+            variant: apiError ? "error" : "success",
+            message: apiMessage,
+        });
+        setSpinner(false);
+    }, [apiMessage, apiError])
 
 
     const getPullNewDataAPI = () => {
@@ -144,16 +154,16 @@ const ProjectSetting = (props) => {
 
     useEffect(() => {
         if (LanguageChoices && LanguageChoices.length > 0) {
-          let temp = [];
-          LanguageChoices.forEach((element) => {
-            temp.push({
-              name: element[0],
-              value: element[0],
+            let temp = [];
+            LanguageChoices.forEach((element) => {
+                temp.push({
+                    name: element[0],
+                    value: element[0],
+                });
             });
-          });
-          setLanguageOptions(temp);
+            setLanguageOptions(temp);
         }
-      }, [LanguageChoices]);
+    }, [LanguageChoices]);
 
     const handleSave = () => {
         getSaveButtonAPI()
@@ -164,7 +174,7 @@ const ProjectSetting = (props) => {
     const handlePublishProject = () => {
         getPublishProjectButton()
         setSpinner(!open);
-        setSpinner(false);
+       
     }
 
     const handlePullNewData = () => {
@@ -185,34 +195,40 @@ const ProjectSetting = (props) => {
         setIsArchived(!isArchived)
         setOpen(false);
     }
+    
     function snakeToTitleCase(str) {
         return str.split("_").map((word) => {
             return word.charAt(0).toUpperCase() + word.slice(1);
         }).join(" ");
     }
+    useEffect(()=>{
+        setLoading(apiLoading);
+    },[apiLoading])
+
     const renderSnackBar = () => {
         return (
-          <CustomizedSnackbars
-            open={snackbar.open}
-            handleClose={() =>
-              setSnackbarInfo({ open: false, message: "", variant: "" })
-            }
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            variant={snackbar.variant}
-            message={snackbar.message}
-          />
+            <CustomizedSnackbars
+                open={snackbar.open}
+                handleClose={() =>
+                    setSnackbarInfo({ open: false, message: "", variant: "" })
+                }
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                variant={snackbar.variant}
+                message={snackbar.message}
+            />
         );
-      };
+    };
 
     return (
         <ThemeProvider theme={themeDefault}>
 
             {/* <Header /> */}
+            {loading && <Spinner /> }
             <Grid>
-        {renderSnackBar()}
+                {renderSnackBar()}
 
-      </Grid>
-    
+            </Grid>
+
             <Grid
                 container
                 direction='row'
@@ -325,80 +341,80 @@ const ProjectSetting = (props) => {
                         </Grid>
                     </Grid>
                     {showLanguage && (
-                    <>
-                        <Grid
-                            container
-                            direction='row'
-                            sx={{
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                mt: 2
-                            }}
-                        >
+                        <>
                             <Grid
-                                items
-                                xs={12}
-                                sm={12}
-                                md={12}
-                                lg={2}
-                                xl={2}
+                                container
+                                direction='row'
+                                sx={{
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    mt: 2
+                                }}
                             >
-                                <Typography gutterBottom component="div" label="Required">
-                                    Source Language:
-                                </Typography>
+                                <Grid
+                                    items
+                                    xs={12}
+                                    sm={12}
+                                    md={12}
+                                    lg={2}
+                                    xl={2}
+                                >
+                                    <Typography gutterBottom component="div" label="Required">
+                                        Source Language:
+                                    </Typography>
+                                </Grid>
+                                <Grid
+                                    item
+                                    xs={12}
+                                    md={12}
+                                    lg={9}
+                                    xl={9}
+                                    sm={12}
+                                >
+                                    <MenuItems
+                                        menuOptions={languageOptions}
+                                        handleChange={(value) => setSourceLanguage(value)}
+                                        value={ProjectDetails.src_language}
+                                    />
+                                </Grid>
                             </Grid>
                             <Grid
-                                item
-                                xs={12}
-                                md={12}
-                                lg={9}
-                                xl={9}
-                                sm={12}
+                                container
+                                direction='row'
+                                sx={{
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    mt: 2
+                                }}
                             >
-                                <MenuItems
-                                    menuOptions={languageOptions}
-                                    handleChange={(value) => setSourceLanguage(value)}
-                                    value={ProjectDetails.src_language}
-                                />
+                                <Grid
+                                    items
+                                    xs={12}
+                                    sm={12}
+                                    md={12}
+                                    lg={2}
+                                    xl={2}
+                                >
+                                    <Typography gutterBottom component="div" label="Required">
+                                        Target Language:
+                                    </Typography>
+                                </Grid>
+                                <Grid
+                                    item
+                                    xs={12}
+                                    md={12}
+                                    lg={9}
+                                    xl={9}
+                                    sm={12}
+                                >
+                                    <MenuItems
+                                        menuOptions={languageOptions}
+                                        handleChange={(value) => setTargetLanguage(value)}
+                                        value={ProjectDetails.tgt_language}
+                                    />
+                                </Grid>
                             </Grid>
-                        </Grid>
-                        <Grid
-                            container
-                            direction='row'
-                            sx={{
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                mt: 2
-                            }}
-                        >
-                            <Grid
-                                items
-                                xs={12}
-                                sm={12}
-                                md={12}
-                                lg={2}
-                                xl={2}
-                            >
-                                <Typography gutterBottom component="div" label="Required">
-                                    Target Language:
-                                </Typography>
-                            </Grid>
-                            <Grid
-                                item
-                                xs={12}
-                                md={12}
-                                lg={9}
-                                xl={9}
-                                sm={12}
-                            >
-                                <MenuItems
-                                    menuOptions={languageOptions}
-                                    handleChange={(value) => setTargetLanguage(value)}
-                                    value={ProjectDetails.tgt_language}
-                                />
-                            </Grid>
-                        </Grid>
-                    </>)}
+                        </>)}
                     <Grid
                         container
                         xs={12}
@@ -536,6 +552,7 @@ const ProjectSetting = (props) => {
                     <Button onClick={handleok} label="Ok" autoFocus />
                 </DialogActions>
             </Dialog>
+           
         </ThemeProvider>
     )
 }
