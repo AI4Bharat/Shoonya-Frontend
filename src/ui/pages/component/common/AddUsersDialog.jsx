@@ -68,7 +68,7 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
               (annotator) => annotator?.id === orgUser?.id
             ) === -1
         )
-        .map((user) => ({ email: user.email, username: user.username }));
+        .map((user) => ({ email: user.email, username: user.username, id: user.id }));
       break;
     case addUserTypes.MANAGER:
       return orgUsers
@@ -110,7 +110,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
     case addUserTypes.ANNOTATOR:
       const addAnnotatorsObj = new AddAnnotatorsToWorkspaceAPI(
         id,
-        users.map((user) => user.email).join(','),
+        users.map((user) => user.id).join(','),
       );
       const addAnnotatorsRes = await fetch(addAnnotatorsObj.apiEndPoint(), {
         method: "POST",

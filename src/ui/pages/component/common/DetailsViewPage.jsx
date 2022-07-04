@@ -114,7 +114,7 @@ const DetailsViewPage = (props) => {
                             {pageType === componentType.Type_Workspace && <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {pageType === componentType.Type_Organization && <Tab label={translate("label.workspaces")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Workspace && <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {pageType === componentType.Type_Organization && <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
 
@@ -170,7 +170,7 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Workspace &&
                             <>
                                 
-                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"}sx={{ width: "100%", mb: 2 }} onClick={handleAnnotatorDialogOpen} />
+                                <Button className={classes.annotatorsButton} label={"Add Members to Workspace"}sx={{ width: "100%", mb: 2 }} onClick={handleAnnotatorDialogOpen} />
                                 <AnnotatorsTable />
                                 <AddUsersDialog
                                     handleDialogClose={handleAnnotatorDialogClose}

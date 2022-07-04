@@ -12,7 +12,7 @@ export default class AddAnnotatorsToWorkspaceAPI extends API {
     this.emails = userEmails;
     this.endpoint = `${super.apiEndPointAuto()}${
       ENDPOINTS.getWorkspaces
-    }${workspaceId}/addannotators/`;
+    }${workspaceId}/addmembers/`;
   }
 
   processResponse(res) {
