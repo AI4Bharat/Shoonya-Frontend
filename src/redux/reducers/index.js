@@ -41,6 +41,9 @@ import pullNewBatch from "./Tasks/PullNewBatch";
 import deallocateTasks from "./Tasks/DeallocateTasks";
 import getOrganizationUserReports from './Organization/GetOrganizationUserReports';
 import getOrganizationProjectReports from './Organization/GetOrganizationProjectReports';
+import getDatasetProjects from './Dataset/GetDatasetProjects';
+import getDatasetMembers from './Dataset/GetDatasetMembers';
+import getDatasetDownload from './Dataset/GetDatasetDownload';
 
 
 const index = {
@@ -90,7 +93,9 @@ const index = {
     deallocateTasks,
     getOrganizationUserReports,
     getOrganizationProjectReports,
-    
+    getDatasetProjects,
+    getDatasetMembers,
+    getDatasetDownload,
 };
 
 export default index;
