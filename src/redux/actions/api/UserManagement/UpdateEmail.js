@@ -1,24 +1,22 @@
 /**
- * API to add members to a project
+ * Update Email API
  */
 import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
-export default class AddAnnotatorsToWorkspaceAPI extends API {
-  constructor(workspaceId, userEmails, timeout = 2000) {
+export default class UpdateEmailAPI extends API {
+  constructor(email, timeout = 2000) {
     super("POST", timeout, false);
-    this.type = constants.ADD_ANNOTATORS_TO_WORKSPACE;
-    this.emails = userEmails;
-    this.endpoint = `${super.apiEndPointAuto()}${
-      ENDPOINTS.getWorkspaces
-    }${workspaceId}/addmembers/`;
+    this.email = email;
+    this.type = constants.UPDATE_EMAIL;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.fetch}update_email/`;
   }
 
   processResponse(res) {
     super.processResponse(res);
     if (res) {
-      this.msg = res;
+      this.updateEmail = res;
     }
   }
 
@@ -28,7 +26,7 @@ export default class AddAnnotatorsToWorkspaceAPI extends API {
 
   getBody() {
     return {
-      user_id: this.emails,
+      email: this.email
     };
   }
 
@@ -36,13 +34,13 @@ export default class AddAnnotatorsToWorkspaceAPI extends API {
     this.headers = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `JWT ${localStorage.getItem("shoonya_access_token")}`,
+        "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
       },
     };
     return this.headers;
   }
 
   getPayload() {
-    return this.msg;
+    return this.updateEmail;
   }
 }

@@ -22,7 +22,6 @@ const DatasetList = () => {
     const getDatasetList = ()=>{
         const datasetObj = new GetDatasetsAPI();
         dispatch(APITransport(datasetObj));
-        
     }
 
     const handleChangePage = (e, newPage) => {

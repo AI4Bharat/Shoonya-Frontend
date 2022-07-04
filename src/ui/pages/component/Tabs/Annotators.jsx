@@ -27,8 +27,6 @@ const AnnotatorsTable = (props) => {
         getWorkspaceAnnotatorsData();
     },[]);
     // const orgId = workspaceAnnotators &&  workspaceAnnotators
-    console.log("workspaceAnnotators", workspaceAnnotators);
-
 // getWorkspacesProjectData
    
 

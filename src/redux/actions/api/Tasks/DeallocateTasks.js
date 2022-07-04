@@ -1,23 +1,24 @@
 /**
- * Login API
+ * Get Next Task API
  */
  import API from "../../../api";
  import ENDPOINTS from "../../../../config/apiendpoint";
-import constants from "../../../constants";
+ import constants from "../../../constants";
  
- export default class GetWorkspacesAnnotatorsDataAPI extends API {
-   constructor(workspaceId, timeout = 2000) {
+ export default class DeallocateTasksAPI extends API {
+   constructor(projectId, timeout = 2000) {
      super("GET", timeout, false);
-     this.type = constants. GET_WORKSPACE_ANNOTATORS_DATA;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${workspaceId}/members/`;
+     this.projectId = projectId;
+     this.type = constants.DE_ALLOCATE_TASKS;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_tasks/`;
    }
  
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-         this.workspaceAnnotatorsData = res;
+         this.unassignRes = res;
      }
- }
+   }
  
    apiEndPoint() {
      return this.endpoint;
@@ -36,7 +37,7 @@ import constants from "../../../constants";
    }
  
    getPayload() {
-     return this.workspaceAnnotatorsData
+     return this.unassignRes;
    }
  }
- 
+  

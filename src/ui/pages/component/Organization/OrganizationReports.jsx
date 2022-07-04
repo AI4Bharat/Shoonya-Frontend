@@ -1,8 +1,8 @@
-// WorkspaceReports
+// OrganizationReports
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { TextField, Box, Stack, Button, Grid } from "@mui/material";
+import { TextField, Box, Button, Grid } from "@mui/material";
 import { DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import InputLabel from "@mui/material/InputLabel";
@@ -19,47 +19,39 @@ import {
 } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import GetWorkspaceUserReportsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceUserReports";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
-import GetWorkspaceProjectReportAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProjectReports";
+import GetOrganizationUserReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationUserReports";
+import GetOrganizationProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationProjectReports";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from '../common/ColumnList';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-const WorkspaceReports = () => {
-  const WorkspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
-  const [startDate, setStartDate] = useState(
-    format(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd')
-  );
+const OrganizationReports = () => {
+  const OrganizationDetails = useSelector(state=>state.fetchLoggedInUserData.data.organization);
+  const [startDate, setStartDate] = useState(format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(format(Date.now(), "yyyy-MM-dd"));
   const [selectRange, setSelectRange] = useState("Till Date");
-  const [rangeValue, setRangeValue] = useState([
-    format(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'),
-    Date.now(),
-  ]);
+  const [rangeValue, setRangeValue] = useState([format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [reportType, setReportType] = useState("project");
-  const [language, setLanguage] = useState("all");
+  const [targetLanguage, setTargetLanguage] = useState("all");
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [reportData, setReportData] = useState([]);
+  const [showSpinner, setShowSpinner] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  
   const classes = DatasetStyle();
-
-  const { id } = useParams();
+  const { orgId } = useParams();
   const dispatch = useDispatch();
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
-  const UserReports = useSelector(
-    (state) => state.getWorkspaceUserReports.data
-  );
-  const ProjectReports = useSelector(
-    (state) => state.getWorkspaceProjectReports.data
-  );
-  const LanguageChoices = useSelector(
-    (state) => state.fetchLanguages.data
-  );
+  const UserReports = useSelector((state) => state.getOrganizationUserReports.data);
+  const ProjectReports = useSelector((state) => state.getOrganizationProjectReports.data);
+  const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -90,7 +82,7 @@ const WorkspaceReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: false,
+            sort: key === "Word Count Of Annotated Tasks",
             align: "center",
           },
         });
@@ -104,6 +96,7 @@ const WorkspaceReports = () => {
       setReportData([]);
       setSelectedColumns([]);
     }
+    setShowSpinner(false);
   }, [UserReports]);
 
   useEffect(() => {
@@ -116,7 +109,7 @@ const WorkspaceReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: false,
+            sort: key === "Word Count Of Annotated Tasks",
             align: "center",
           },
         });
@@ -130,10 +123,10 @@ const WorkspaceReports = () => {
       setReportData([]);
       setSelectedColumns([]);
     }
+    setShowSpinner(false);
   }, [ProjectReports]);
 
   const renderToolBar = () => {
-    const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
       <Box className={classes.filterToolbarContainer}>
         <ColumnList
@@ -184,7 +177,7 @@ const options = {
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
     }
     else if (e.target.value === "Till Date") {
-      setStartDate(format(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
+      setStartDate(format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
     }
   };
@@ -196,23 +189,28 @@ const options = {
     setEndDate(format(end, "yyyy-MM-dd"));
   };
 
-  const handleDateSubmit = () => {
+  const handleSubmit = () => {
+    setSubmitted(true);
+    setShowSpinner(true);
+    setColumns([]);
+    setReportData([]);
+    setSelectedColumns([]);
     if (reportType === "user") {
-      const userReportObj = new GetWorkspaceUserReportsAPI(
-        id,
+      const userReportObj = new GetOrganizationUserReportsAPI(
+        orgId,
         selectedType,
         startDate,
         endDate,
-        language,
+        targetLanguage,
       );
       dispatch(APITransport(userReportObj));
     } else if (reportType === "project") {
-      const projectReportObj = new GetWorkspaceProjectReportAPI(
-        id,
+      const projectReportObj = new GetOrganizationProjectReportsAPI(
+        orgId,
         selectedType,
         startDate,
         endDate,
-        language,
+        targetLanguage,
       );
       dispatch(APITransport(projectReportObj));
     }
@@ -235,7 +233,7 @@ const options = {
               labelId="date-range-select-label"
               id="date-range-select"
               value={selectRange}
-              defaultValue={"Till Date"}
+              defaultValue={"Last Week"}
               label="Date Range"
               onChange={handleOptionChange}
             >
@@ -244,7 +242,7 @@ const options = {
               <MenuItem value={"This Week"}>This Week</MenuItem>
               <MenuItem value={"Last Week"}>Last Week</MenuItem>
               <MenuItem value={"This Month"}>This Month</MenuItem>
-              {WorkspaceDetails?.created_at && <MenuItem value={"Till Date"}>Till Date</MenuItem>}
+              {OrganizationDetails?.created_at && <MenuItem value={"Till Date"}>Till Date</MenuItem>}
               <MenuItem value={"Custom Range"}>Custom Range</MenuItem>
             </Select>
           </FormControl>
@@ -306,9 +304,9 @@ const options = {
             <Select
               labelId="language-label"
               id="language-select"
-              value={language}
+              value={targetLanguage}
               label="Target Language"
-              onChange={(e) => setLanguage(e.target.value)}
+              onChange={(e) => setTargetLanguage(e.target.value)}
             >
               <MenuItem value={"all"}>All languages</MenuItem>
               {LanguageChoices.language?.map((lang) => (
@@ -320,27 +318,33 @@ const options = {
         </Grid>
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
             <Button
-                variant="contained"
-                onClick={handleDateSubmit}
-                sx={{
-                    width: "100%",
-                   mt:2,
-                }}
+              variant="contained"
+              onClick={handleSubmit}
+              sx={{width: "100%", mt:2}}
             >
-                Submit
+              Submit
             </Button>
         </Grid>
       </Grid>
-      {reportData?.length > 0 && (
+      {reportData?.length > 0 ? 
         <MUIDataTable
           title={""}
           data={reportData}
           columns={columns.filter((col) => selectedColumns.includes(col.name))}
           options={options}
-        />
-      )}
+        /> : <Grid
+          container
+          justifyContent="center"
+        >
+          <Grid item sx={{mt:"10%"}}>
+            {showSpinner ? (<CircularProgress color="primary" size={50} />) : (
+              !reportData?.length && submitted && <>No results</>
+            )}
+          </Grid>
+        </Grid>
+      }
     </React.Fragment>
   );
 };
 
-export default WorkspaceReports;
+export default OrganizationReports;
