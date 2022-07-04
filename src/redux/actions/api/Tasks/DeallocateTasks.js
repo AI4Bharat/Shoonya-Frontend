@@ -1,23 +1,24 @@
 /**
- * Login API
+ * Get Next Task API
  */
  import API from "../../../api";
  import ENDPOINTS from "../../../../config/apiendpoint";
- import constant from '../../../constants';
-
- export default class GetWorkspacesAPI extends API {
-   constructor(pageNo, records, timeout = 2000) {
+ import constants from "../../../constants";
+ 
+ export default class DeallocateTasksAPI extends API {
+   constructor(projectId, timeout = 2000) {
      super("GET", timeout, false);
-     this.type = constant.GET_WORKSPACES_DATA
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}?page=${pageNo}&records=${records}`;
+     this.projectId = projectId;
+     this.type = constants.DE_ALLOCATE_TASKS;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_tasks/`;
    }
-
+ 
    processResponse(res) {
-    super.processResponse(res);
-    if (res) {
-        this.workspaceData = res;
-    }
-}
+     super.processResponse(res);
+     if (res) {
+         this.unassignRes = res;
+     }
+   }
  
    apiEndPoint() {
      return this.endpoint;
@@ -36,7 +37,7 @@
    }
  
    getPayload() {
-     return this.workspaceData;
+     return this.unassignRes;
    }
  }
- 
+  

@@ -18,6 +18,7 @@ import MembersTable from "../Project/MembersTable";
 import Members from "../Tabs/Members";
 import Invites from "../Tabs/Invites";
 import OrganizationSettings from "../Tabs/OrganizationSettings";
+import OrganizationReports from "../Organization/OrganizationReports"
 import WorkspaceReports from "./WorkspaceReports";
 import AddUsersDialog from "./AddUsersDialog";
 import addUserTypes from "../../../../constants/addUserTypes";
@@ -121,6 +122,8 @@ const DetailsViewPage = (props) => {
                             {pageType === componentType.Type_Organization && <Tab label={translate("label.invites")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
                             {pageType === componentType.Type_Workspace && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {pageType === componentType.Type_Organization && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+
 
                             <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
@@ -199,10 +202,11 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Organization && <Invites hideButton={true} />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                        {pageType === componentType.Type_Organization && <OrganizationSettings />}
+                        {pageType === componentType.Type_Organization && <OrganizationReports />}
                         {pageType === componentType.Type_Workspace && <WorkspaceReports />}
                     </TabPanel>
                     <TabPanel value={value} index={4}>
+                        {pageType === componentType.Type_Organization && <OrganizationSettings />}
                         {pageType === componentType.Type_Workspace && <CustomButton className={classes.settingsButton} label={"Archive Workspace"} buttonVariant="contained" sx={{backgroundColor : "#cf5959", "&:hover" : {backgroundColor : "#cf5959",}}} />}
                     </TabPanel>
                 </Card>

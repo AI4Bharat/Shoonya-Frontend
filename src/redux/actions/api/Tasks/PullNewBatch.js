@@ -11,7 +11,7 @@
      this.projectId = projectId;
      this.numsTasks = numsTasks;
      this.type = constants.PULL_NEW_BATCH;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/assign_new_task/`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/assign_new_tasks/`;
    }
  
    processResponse(res) {

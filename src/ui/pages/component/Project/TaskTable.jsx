@@ -7,17 +7,20 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from "@mui/material";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
 import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
 import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
+import DeallocateTasksAPI from "../../../../redux/actions/api/Tasks/DeallocateTasks";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
+import Spinner from "../../component/common/Spinner"
 
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = ["context", "input_language", "output_language"];
@@ -41,7 +44,8 @@ const TaskTable = () => {
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState();
     const [pullDisabled, setPullDisabled] = useState("");
-    const PullBatchRes = useSelector(state => state.pullNewBatch);
+    const [deallocateDisabled, setDeallocateDisabled] = useState("");
+    const apiLoading = useSelector(state => state.apiStatus.loading);
     const [searchAnchor, setSearchAnchor] = useState(null);
     const searchOpen = Boolean(searchAnchor);
     const [searchedCol, setSearchedCol] = useState();
@@ -50,10 +54,11 @@ const TaskTable = () => {
         message: "",
         variant: "success",
       });
-    const [pullClicked, setPullClicked] = useState(false);
+    const [deallocateDialog, setDeallocateDialog] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [columns, setColumns] = useState([]);
     const [labellingStarted, setLabellingStarted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const filterData = {
         Status : ["unlabeled", "skipped", "accepted", "draft"],
@@ -70,14 +75,77 @@ const TaskTable = () => {
         dispatch(APITransport(taskObj));
     }
 
-    const fetchNewTasks = () => {
-        setPullClicked(true);
-        const batchObj = new PullNewBatchAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
-        dispatch(APITransport(batchObj));
+    const fetchNewTasks = async() => {
+        const batchObj = new PullNewBatchAPI(id, pullSize);
+        const res = await fetch(batchObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(batchObj.getBody()),
+            headers: batchObj.getHeaders().headers,
+          });
+        const resp = await res.json();
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+                getTaskListData();
+            } else {
+                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setCurrentPageNumber(1);
+            }
+            const projectObj = new GetProjectDetailsAPI(id);
+            dispatch(APITransport(projectObj));
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+    }
+
+    const unassignTasks = async () => {
+        setDeallocateDialog(false);
+        const deallocateObj = new DeallocateTasksAPI(id);
+        const res = await fetch(deallocateObj.apiEndPoint(), {
+            method: "GET",
+            body: JSON.stringify(deallocateObj.getBody()),
+            headers: deallocateObj.getHeaders().headers,
+          });
+        const resp = await res.json();
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+                getTaskListData();
+            } else {
+                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setCurrentPageNumber(1);
+            }
+            const projectObj = new GetProjectDetailsAPI(id);
+            dispatch(APITransport(projectObj));
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
     }
 
     const labelAllTasks = () => {
+        let search_filters = Object.keys(selectedFilters).filter(key => key.startsWith("search_")).reduce((acc, curr) => {
+            acc[curr] = selectedFilters[curr];
+            return acc;
+        }, {});
         localStorage.setItem("labellingMode", selectedFilters.task_status);
+        localStorage.setItem("searchFilters", JSON.stringify(search_filters));
+        localStorage.setItem("labelAll", true);
         const getNextTaskObj = new GetNextTaskAPI(id);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
@@ -96,7 +164,7 @@ const TaskTable = () => {
                 sx={{
                     display: "flex",
                     flexDirection: "row",
-                    justifyContent: "space-around",
+                    justifyContent: "flex-start",
                     columnGap: "10px",
                     flexGrow: "1",
                     alignItems: "center",
@@ -111,6 +179,10 @@ const TaskTable = () => {
     }
 
     useEffect(() => {
+        setLoading(apiLoading);
+    }, [apiLoading]);
+
+    useEffect(() => {
         getTaskListData();
     }, [currentPageNumber, currentRowPerPage]);
 
@@ -123,41 +195,22 @@ const TaskTable = () => {
     }, [selectedFilters]);
 
     useEffect(() => {
-        if(pullClicked && PullBatchRes.status === 200) {
-            getTaskListData();
-            setSnackbarInfo({
-                open: true,
-                message: PullBatchRes.data.message,
-                variant: "success",
-            })
-            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
-                getTaskListData();
-            } else {
-                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
-                setCurrentPageNumber(1);
-            }
-        }
-    }, [PullBatchRes]);
-
-    useEffect(() => {
-        if (taskList?.length > 0) {
-            const data = taskList.map((el, i) => {
+        if (taskList?.length > 0 && taskList[0]?.data) {
+            const data = taskList.map((el) => {
                 let row = [
-                    el.id,
-                    ...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key])
+                    el.id
                 ]
+                row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
                 taskList[0].task_status && row.push(el.task_status);
-                return [
-                    ...row,
-                    <Link to={`task/${el.id}`} className={classes.link}>
-                        <CustomButton
-                            onClick={() => console.log("task id === ", el.id)}
-                            sx={{ p: 1, borderRadius: 2 }}
-                            label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
-                                {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
-                            </Typography>} />
-                    </Link>
-                    ]
+                row.push(<Link to={`task/${el.id}`} className={classes.link}>
+                            <CustomButton
+                                onClick={() => {console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
+                                sx={{ p: 1, borderRadius: 2 }}
+                                label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
+                                    {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
+                                </Typography>} />
+                        </Link>);
+                return row;
             })
             let colList = ["id"];
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
@@ -190,29 +243,43 @@ const TaskTable = () => {
             return col;
         });
         setColumns(newCols);
+        console.log("columns", newCols)
     }, [selectedColumns]);
 
     useEffect(() => {
         if (ProjectDetails) {
             if (ProjectDetails.unassigned_task_count === 0)
                 setPullDisabled("No more unassigned tasks in this project")
+            else if (pullDisabled === "No more unassigned tasks in this project")
+                setPullDisabled("")
             ProjectDetails.frozen_users?.forEach((user) => {
                 if (user.id === userDetails?.id) 
                     setPullDisabled("You're no more a part of this project");
+                else if (pullDisabled === "You're no more a part of this project")
+                    setPullDisabled("");
             })
             setPullSize(ProjectDetails.tasks_pull_count_per_batch*0.5);
         }
-    }, [ProjectDetails, userDetails])
+    }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, userDetails])
 
     useEffect(() => {
-        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user) {
+        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
             setPullDisabled("You have too many unlabeled tasks")
+        } else if (pullDisabled === "You have too many unlabeled tasks") {
+            setPullDisabled("")
         }
-    }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters.task_status])
+    }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters])
+
+    useEffect(() => {
+        if (selectedFilters.task_status === "unlabeled" && totalTaskCount === 0) {
+            setDeallocateDisabled("No more tasks to deallocate")
+        } else if (deallocateDisabled === "No more tasks to deallocate") {
+            setDeallocateDisabled("")
+        }
+    }, [totalTaskCount, selectedFilters.task_status])
 
     useEffect(() => {
         if(labellingStarted && Object.keys(NextTask).length > 0) {
-          localStorage.setItem("labelAll", true);
           navigate(`/projects/${id}/task/${NextTask.id}`);
         }
         //TODO: display no more tasks message
@@ -337,6 +404,39 @@ const TaskTable = () => {
                     alignItems: "flex-end",
                 }}
                 >
+                <Tooltip title={deallocateDisabled}>
+                    <Box sx={{width: '24%', mr:"1%", mb: 3}}>
+                        <CustomButton 
+                            sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
+                            label={"De-allocate Tasks"}
+                            onClick={() => setDeallocateDialog(true)}
+                            disabled={deallocateDisabled}
+                            color={"warning"}
+                        />
+                    </Box>
+                </Tooltip>
+                <Dialog
+                    open={deallocateDialog}
+                    onClose={() => setDeallocateDialog(false)}
+                    aria-labelledby="deallocate-dialog-title"
+                    aria-describedby="deallocate-dialog-description"
+                >
+                    <DialogTitle id="deallocate-dialog-title">
+                    {"De-allocate Tasks?"}
+                    </DialogTitle>
+                    <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        All unlabeled tasks will be de-allocated from this project.
+                        Please be careful as this action cannot be undone.
+                    </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                    <Button onClick={() => setDeallocateDialog(false)} variant="outlined" color="error">Cancel</Button>
+                    <Button onClick={unassignTasks} variant="contained" color="error" autoFocus>
+                        Confirm
+                    </Button>
+                    </DialogActions>
+                </Dialog>
                 <FormControl size="small" sx={{width: "18%", ml: "1%", mr:"1%", mb: 3}}>
                     <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
                     <Select
@@ -354,7 +454,7 @@ const TaskTable = () => {
                     </Select>
                 </FormControl>
                 <Tooltip title={pullDisabled}>
-                    <Box sx={{width: '38%', ml: "1%", mr:"1%", mb: 3}}>
+                    <Box sx={{width: '26%', ml: "1%", mr:"1%", mb: 3}}>
                         <CustomButton 
                             sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
                             label={"Pull New Batch"} 
@@ -364,7 +464,7 @@ const TaskTable = () => {
                     </Box>
                 </Tooltip>
                 <CustomButton 
-                    sx={{ p: 1, width: '38%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} 
+                    sx={{ p: 1, width: '26%', borderRadius: 2, mb: 3, ml: "1%" }} 
                     label={"Start Labelling Now"}
                     onClick={labelAllTasks}
                 />
@@ -411,6 +511,7 @@ const TaskTable = () => {
                 />
             )}
             {renderSnackBar()}
+            {loading && <Spinner /> }
         </Fragment>
     )
 }
