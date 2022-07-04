@@ -41,6 +41,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
 
   console.log("projectId, taskId", projectId, taskId);
   // debugger
+  console.log("notesRef", notesRef);
 
   function LSFRoot(
     rootRef,
@@ -309,7 +310,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
 
 export default function LSF() {
   const [showNotes, setShowNotes] = useState(false);
-  const notesRef = useRef('');
+  const notesRef = useRef(null);
   const {taskId} = useParams()
   const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
