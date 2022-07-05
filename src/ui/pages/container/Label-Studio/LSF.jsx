@@ -33,6 +33,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
@@ -58,7 +59,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     let interfaces = [];
     if (predictions == null) predictions = [];
 
-    if (taskData.task_status == "freezed") {
+    if (taskData.task_status === "freezed") {
       interfaces = [
         "panel",
         // "update",
@@ -151,11 +152,12 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
           if (localStorage.getItem("labelAll"))
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
-              window.location.href = `/projects/${projectId}/task/${res.id}`;
+              // window.location.href = `/projects/${projectId}/task/${res.id}`;
+              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
             })
           else {
             hideLoader();
-            window.location.reload();
+            // window.location.reload();
           }
         },
 
@@ -165,7 +167,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
           updateTask(taskData.id).then(() => {
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
-              window.location.href = `/projects/${projectId}/task/${res.id}`;
+              // window.location.href = `/projects/${projectId}/task/${res.id}`;
+              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
             });
           })
         },
@@ -193,7 +196,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
                         hideLoader();
-                        window.location.href = `/projects/${projectId}/task/${res.id}`;
+                        // window.location.href = `/projects/${projectId}/task/${res.id}`;
+                        navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
                       })
                     else{
                       hideLoader();
@@ -267,7 +271,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     showLoader();
     getNextProject(projectId, taskId).then((res) => {
       hideLoader();
-      window.location.href = `/projects/${projectId}/task/${res.id}`;
+      // window.location.href = `/projects/${projectId}/task/${res.id}`;
+      navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
     });
   }
 
@@ -344,7 +349,7 @@ export default function LSF() {
         color="primary"
         onClick={() => {
           localStorage.removeItem("labelAll");
-          navigate(`/projects/${projectId}`);
+          navigate(-1);
         }}
       >
         Back to Project
