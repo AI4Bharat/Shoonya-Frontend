@@ -37,7 +37,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
-  let loaded = false;
+  let loaded = useRef(false);
 
   console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -135,7 +135,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
         },
         onSubmitAnnotation: function (ls, annotation) {
           showLoader();
-          if (taskData.task_status != "freezed") {
+          if (taskData.task_status !== "freezed") {
             postAnnotation(
               annotation.serializeAnnotation(),
               taskData.id,
@@ -171,10 +171,10 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
         },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.task_status != "freezed") {
+          if (taskData.task_status !== "freezed") {
             showLoader();
             for (let i = 0; i < annotations.length; i++) {
-              if (annotation.serializeAnnotation().id == annotations[i].result.id) {
+              if (annotation.serializeAnnotation().id === annotations[i].result.id) {
                 let temp = annotation.serializeAnnotation()
 
                 for (let i = 0; i < temp.length; i++) {
@@ -208,7 +208,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id == annotations[i].result.id)
+            if (annotation.serializeAnnotation().id === annotations[i].result.id)
               deleteAnnotation(
                 annotations[i].id
               );
@@ -228,14 +228,12 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     if (
       typeof labelConfig === "undefined" &&
       typeof taskData === "undefined" &&
-      userData && !loaded
+      userData?.id && !loaded.current
     ) {
-      showLoader();
-      loaded = true;
+      loaded.current = true;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
-          showLoader();
           console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
           setLabelConfig(labelConfig.label_config);
           setTaskData(taskData.data);
@@ -255,6 +253,10 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
       );
     }
   }, [labelConfig, userData, notesRef]);
+
+  useEffect(() => {
+    showLoader();
+  }, []);
 
   const handleDraftAnnotationClick = async () => {
     task_status = "draft";
