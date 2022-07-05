@@ -154,7 +154,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
             })
           else {
             hideLoader();
-            window.location.reload();
+            // window.location.reload();
           }
         },
 
