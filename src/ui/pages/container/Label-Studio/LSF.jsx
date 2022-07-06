@@ -108,6 +108,9 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     }
 
     if (rootRef.current) {
+      if (lsfRef.current) {
+        lsfRef.current.destroy();
+      }
       lsfRef.current = new LabelStudio(rootRef.current, {
         /* all the options according to the docs */
         config: labelConfig,
@@ -258,7 +261,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
 
   useEffect(() => {
     showLoader();
-  }, []);
+  }, [taskId]);
 
   const handleDraftAnnotationClick = async () => {
     task_status = "draft";
