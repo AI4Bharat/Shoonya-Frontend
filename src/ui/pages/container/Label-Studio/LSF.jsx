@@ -28,6 +28,7 @@ import { translate } from '../../../../config/localisation';
 //used just in postAnnotation to support draft status update.
 let task_status = "accepted";
 
+
 const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
@@ -38,7 +39,9 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
   let loaded = false;
-
+  
+  let navigate = useNavigate();
+  
   console.log("projectId, taskId", projectId, taskId);
   // debugger
   console.log("notesRef", notesRef);
@@ -151,7 +154,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
           if (localStorage.getItem("labelAll"))
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
-              window.location.href = `/projects/${projectId}/task/${res.id}`;
+              // window.location.href = `/projects/${projectId}/task/${res.id}`;
+              navigate(`/projects/${projectId}/task/${res.id}`);
             })
           else {
             hideLoader();
@@ -165,7 +169,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
           updateTask(taskData.id).then(() => {
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
-              window.location.href = `/projects/${projectId}/task/${res.id}`;
+              // window.location.href = `/projects/${projectId}/task/${res.id}`;
+              navigate(`/projects/${projectId}/task/${res.id}`);
             });
           })
         },
@@ -189,16 +194,24 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                   annotations[i].lead_time,
                   task_status,
                   notesRef.current
-                  ).then(() => {
+                  )
+                  .then(() => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
                         hideLoader();
-                        window.location.href = `/projects/${projectId}/task/${res.id}`;
+                        // window.location.href = `/projects/${projectId}/task/${res.id}`;
+                        navigate(`/projects/${projectId}/task/${res.id}`);
                       })
                     else{
                       hideLoader();
+                      console.log("in else part and reloading page");
+                      debugger
                       window.location.reload();
                     }
+                  })
+                  .catch(err=>{
+                    hideLoader();
+                    console.log("on update error : ", err);
                   });
               }
             }
@@ -265,7 +278,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     showLoader();
     getNextProject(projectId, taskId).then((res) => {
       hideLoader();
-      window.location.href = `/projects/${projectId}/task/${res.id}`;
+      // window.location.href = ;
+      navigate(`/projects/${projectId}/task/${res.id}`);
     });
   }
 
