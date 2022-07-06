@@ -139,7 +139,13 @@ const TaskTable = () => {
     }
 
     const labelAllTasks = () => {
+        let search_filters = Object.keys(selectedFilters).filter(key => key.startsWith("search_")).reduce((acc, curr) => {
+            acc[curr] = selectedFilters[curr];
+            return acc;
+        }, {});
         localStorage.setItem("labellingMode", selectedFilters.task_status);
+        localStorage.setItem("searchFilters", JSON.stringify(search_filters));
+        localStorage.setItem("labelAll", true);
         const getNextTaskObj = new GetNextTaskAPI(id);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
@@ -198,7 +204,7 @@ const TaskTable = () => {
                 taskList[0].task_status && row.push(el.task_status);
                 row.push(<Link to={`task/${el.id}`} className={classes.link}>
                             <CustomButton
-                                onClick={() => console.log("task id === ", el.id)}
+                                onClick={() => {console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
                                 sx={{ p: 1, borderRadius: 2 }}
                                 label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
                                     {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
@@ -257,12 +263,12 @@ const TaskTable = () => {
     }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, userDetails])
 
     useEffect(() => {
-        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user) {
+        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
             setPullDisabled("You have too many unlabeled tasks")
         } else if (pullDisabled === "You have too many unlabeled tasks") {
             setPullDisabled("")
         }
-    }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters.task_status])
+    }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters])
 
     useEffect(() => {
         if (selectedFilters.task_status === "unlabeled" && totalTaskCount === 0) {
@@ -270,11 +276,10 @@ const TaskTable = () => {
         } else if (deallocateDisabled === "No more tasks to deallocate") {
             setDeallocateDisabled("")
         }
-    }, [totalTaskCount, selectedFilters.task_status])
+    }, [totalTaskCount, selectedFilters])
 
     useEffect(() => {
         if(labellingStarted && Object.keys(NextTask).length > 0) {
-          localStorage.setItem("labelAll", true);
           navigate(`/projects/${id}/task/${NextTask.id}`);
         }
         //TODO: display no more tasks message

@@ -38,9 +38,13 @@ import getNextTask from './Tasks/GetNextTask';
 import getTaskAnnotations from './Tasks/GetTaskAnnotations';
 import updateTask from './Tasks/UpdateTask';
 import pullNewBatch from "./Tasks/PullNewBatch";
+import  SearchProjectCards from "./ProjectDetails/SearchProjectCards"
 import deallocateTasks from "./Tasks/DeallocateTasks";
 import getOrganizationUserReports from './Organization/GetOrganizationUserReports';
 import getOrganizationProjectReports from './Organization/GetOrganizationProjectReports';
+import getDatasetProjects from './Dataset/GetDatasetProjects';
+import getDatasetMembers from './Dataset/GetDatasetMembers';
+import getDatasetDownload from './Dataset/GetDatasetDownload';
 
 
 const index = {
@@ -87,10 +91,13 @@ const index = {
     getTaskAnnotations,
     updateTask,
     pullNewBatch,
+    SearchProjectCards,
     deallocateTasks,
     getOrganizationUserReports,
     getOrganizationProjectReports,
-    
+    getDatasetProjects,
+    getDatasetMembers,
+    getDatasetDownload,
 };
 
 export default index;
