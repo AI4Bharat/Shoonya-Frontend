@@ -276,7 +276,7 @@ const TaskTable = () => {
         } else if (deallocateDisabled === "No more tasks to deallocate") {
             setDeallocateDisabled("")
         }
-    }, [totalTaskCount, selectedFilters.task_status])
+    }, [totalTaskCount, selectedFilters])
 
     useEffect(() => {
         if(labellingStarted && Object.keys(NextTask).length > 0) {
