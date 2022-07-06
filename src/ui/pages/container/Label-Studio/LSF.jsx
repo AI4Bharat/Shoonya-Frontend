@@ -34,14 +34,13 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
-  let loaded = false;
-  
-  let navigate = useNavigate();
-  
+  let loaded = useRef(false);
+
   console.log("projectId, taskId", projectId, taskId);
   // debugger
   console.log("notesRef", notesRef);
@@ -61,7 +60,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     let interfaces = [];
     if (predictions == null) predictions = [];
 
-    if (taskData.task_status == "freezed") {
+    if (taskData.task_status === "freezed") {
       interfaces = [
         "panel",
         // "update",
@@ -138,7 +137,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
         },
         onSubmitAnnotation: function (ls, annotation) {
           showLoader();
-          if (taskData.task_status != "freezed") {
+          if (taskData.task_status !== "freezed") {
             postAnnotation(
               annotation.serializeAnnotation(),
               taskData.id,
@@ -155,11 +154,11 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
               // window.location.href = `/projects/${projectId}/task/${res.id}`;
-              navigate(`/projects/${projectId}/task/${res.id}`);
+              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
             })
           else {
             hideLoader();
-            window.location.reload();
+            // window.location.reload();
           }
         },
 
@@ -170,16 +169,16 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
               // window.location.href = `/projects/${projectId}/task/${res.id}`;
-              navigate(`/projects/${projectId}/task/${res.id}`);
+              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
             });
           })
         },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.task_status != "freezed") {
+          if (taskData.task_status !== "freezed") {
             showLoader();
             for (let i = 0; i < annotations.length; i++) {
-              if (annotation.serializeAnnotation().id == annotations[i].result.id) {
+              if (annotation.serializeAnnotation().id === annotations[i].result.id) {
                 let temp = annotation.serializeAnnotation()
 
                 for (let i = 0; i < temp.length; i++) {
@@ -200,7 +199,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                       getNextProject(projectId, taskData.id).then((res) => {
                         hideLoader();
                         // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                        navigate(`/projects/${projectId}/task/${res.id}`);
+                        navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
                       })
                     else{
                       hideLoader();
@@ -221,7 +220,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id == annotations[i].result.id)
+            if (annotation.serializeAnnotation().id === annotations[i].result.id)
               deleteAnnotation(
                 annotations[i].id
               );
@@ -241,14 +240,12 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     if (
       typeof labelConfig === "undefined" &&
       typeof taskData === "undefined" &&
-      userData && !loaded
+      userData?.id && !loaded.current
     ) {
-      showLoader();
-      loaded = true;
+      loaded.current = true;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
-          showLoader();
           console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
           setLabelConfig(labelConfig.label_config);
           setTaskData(taskData.data);
@@ -269,6 +266,10 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     }
   }, [labelConfig, userData, notesRef]);
 
+  useEffect(() => {
+    showLoader();
+  }, []);
+
   const handleDraftAnnotationClick = async () => {
     task_status = "draft";
     lsfRef.current.store.submitAnnotation();
@@ -278,8 +279,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     showLoader();
     getNextProject(projectId, taskId).then((res) => {
       hideLoader();
-      // window.location.href = ;
-      navigate(`/projects/${projectId}/task/${res.id}`);
+      // window.location.href = `/projects/${projectId}/task/${res.id}`;
+      navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
     });
   }
 
@@ -356,7 +357,7 @@ export default function LSF() {
         color="primary"
         onClick={() => {
           localStorage.removeItem("labelAll");
-          navigate(`/projects/${projectId}`);
+          navigate(-1);
         }}
       >
         Back to Project

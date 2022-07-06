@@ -41,11 +41,11 @@ console.log(res,"res")
   api.processResponse(res.data);
   if (api.type) {
     dispatch(dispatchAPIAsync(api));
-    dispatch(apiStatusAsync(false, false, api.successMsg, res.data, null, false));
+    dispatch(apiStatusAsync(false, false, res.data.message ? res.data.message : api.successMsg, res.data, null, false));
   }
   if (typeof api.processNextSuccessStep === "function" && res.status && (res.status === 200 || res.status === 201))
     api.processNextSuccessStep(res.data);
-    dispatch(apiStatusAsync(false, false, api.successMsg, res.data, null, false));
+    dispatch(apiStatusAsync(false, false, res.data.message ? res.data.message : api.successMsg, res.data, null, false));
 }
 
 function error(err, api, dispatch) {

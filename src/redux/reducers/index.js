@@ -38,6 +38,7 @@ import getNextTask from './Tasks/GetNextTask';
 import getTaskAnnotations from './Tasks/GetTaskAnnotations';
 import updateTask from './Tasks/UpdateTask';
 import pullNewBatch from "./Tasks/PullNewBatch";
+import  SearchProjectCards from "./ProjectDetails/SearchProjectCards"
 import deallocateTasks from "./Tasks/DeallocateTasks";
 import getOrganizationUserReports from './Organization/GetOrganizationUserReports';
 import getOrganizationProjectReports from './Organization/GetOrganizationProjectReports';
@@ -90,6 +91,7 @@ const index = {
     getTaskAnnotations,
     updateTask,
     pullNewBatch,
+    SearchProjectCards,
     deallocateTasks,
     getOrganizationUserReports,
     getOrganizationProjectReports,
