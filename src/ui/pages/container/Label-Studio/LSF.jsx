@@ -38,7 +38,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
-  let loaded = useRef(false);
+  let loaded = useRef();
 
   console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -229,11 +229,9 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
       document.head.appendChild(style);
     }
     if (
-      typeof labelConfig === "undefined" &&
-      typeof taskData === "undefined" &&
-      userData?.id && !loaded.current
+      userData?.id && loaded.current !== taskId
     ) {
-      loaded.current = true;
+      loaded.current = taskId;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
@@ -255,7 +253,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
         }
       );
     }
-  }, [labelConfig, userData, notesRef]);
+  }, [labelConfig, userData, notesRef, taskId]);
 
   useEffect(() => {
     showLoader();
@@ -285,7 +283,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
               value="Draft"
               type="default"
               onClick={handleDraftAnnotationClick}
-              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None", borderRight: "None"}}
+              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None"}}
               className="lsf-button"
             >
               Draft
@@ -297,7 +295,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                 value="Next"
                 type="default"
                 onClick={onNextAnnotation}
-                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None"}}
+                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None", borderLeft: "None"}}
                 className="lsf-button"
               >
                 Next
