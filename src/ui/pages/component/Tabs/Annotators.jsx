@@ -16,7 +16,7 @@ const AnnotatorsTable = (props) => {
 
     const getWorkspaceAnnotatorsData = ()=>{
         
-        const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(orgId);
+        const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(id);
        
         dispatch(APITransport(workspaceObjs));
     }
@@ -28,7 +28,6 @@ const AnnotatorsTable = (props) => {
     },[]);
     // const orgId = workspaceAnnotators &&  workspaceAnnotators
 // getWorkspacesProjectData
-   
 
     const columns = [
         {

@@ -175,9 +175,9 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
 
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.task_status !== "freezed") {
-            showLoader();
             for (let i = 0; i < annotations.length; i++) {
               if (annotation.serializeAnnotation().id === annotations[i].result.id) {
+                showLoader();
                 let temp = annotation.serializeAnnotation()
 
                 for (let i = 0; i < temp.length; i++) {
