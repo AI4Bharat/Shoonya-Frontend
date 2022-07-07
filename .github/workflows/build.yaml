@@ -1,15 +1,15 @@
 name: Build React App
 
 on:
-  push:
-    branches:
-      - stage
+  workflow_dispatch:
+  workflow_call:
   pull_request:
-    branches:
-      - stage
+    branches: [stage]
+
 env: 
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
+  
 jobs:
   build:
     name: Build

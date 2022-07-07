@@ -1,16 +1,24 @@
 name: Deploy React App
 
 on:
-  workflow_run:
-    workflows: ["Build React App"]
+  push: [stage]
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
     branches: [stage]
-    types: [completed]
+
+env: 
+  CI: false
+  NODE_OPTIONS: "--max_old_space_size=4096"
 
 jobs:
-  deploy:
-    name: Deploy
+  build-stage:
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+  release-stage:
+    name: Deploy React App
+    needs: [build-stage]
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     steps:
     - name: Download artifact
