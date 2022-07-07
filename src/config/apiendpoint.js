@@ -1,4 +1,4 @@
-export default {
+const apiendpoint =  {
   login: "/users/auth/jwt/create",
   getProjects:"/projects/",
   getWorkspaces:"/workspaces/",
@@ -10,3 +10,5 @@ export default {
   annotations:"/annotation/",
   getUsers:"/users/",
 };
+
+export default apiendpoint;
