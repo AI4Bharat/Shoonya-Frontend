@@ -121,14 +121,9 @@ const TaskTable = () => {
                 message: resp?.message,
                 variant: "success",
             })
-            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
-                getTaskListData();
-            } else {
-                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
-                setCurrentPageNumber(1);
-            }
-            const projectObj = new GetProjectDetailsAPI(id);
-            dispatch(APITransport(projectObj));
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
             setSnackbarInfo({
                 open: true,
@@ -394,81 +389,85 @@ const TaskTable = () => {
         <Fragment>
         {userDetails?.role === 1 && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
-                <Box
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    width: "100%",
-                    marginBottom: "1%",
-                    flexWrap: "wrap",
-                    alignItems: "flex-end",
-                }}
+                <Grid
+                    container
+                    direction="row"
+                    spacing={2}
+                    sx={{ mb: 2, mt: 2 }}
                 >
-                <Tooltip title={deallocateDisabled}>
-                    <Box sx={{width: '24%', mr:"1%", mb: 3}}>
-                        <CustomButton 
-                            sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
-                            label={"De-allocate Tasks"}
-                            onClick={() => setDeallocateDialog(true)}
-                            disabled={deallocateDisabled}
-                            color={"warning"}
-                        />
-                    </Box>
-                </Tooltip>
-                <Dialog
-                    open={deallocateDialog}
-                    onClose={() => setDeallocateDialog(false)}
-                    aria-labelledby="deallocate-dialog-title"
-                    aria-describedby="deallocate-dialog-description"
-                >
-                    <DialogTitle id="deallocate-dialog-title">
-                    {"De-allocate Tasks?"}
-                    </DialogTitle>
-                    <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        All unlabeled tasks will be de-allocated from this project.
-                        Please be careful as this action cannot be undone.
-                    </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                    <Button onClick={() => setDeallocateDialog(false)} variant="outlined" color="error">Cancel</Button>
-                    <Button onClick={unassignTasks} variant="contained" color="error" autoFocus>
-                        Confirm
-                    </Button>
-                    </DialogActions>
-                </Dialog>
-                <FormControl size="small" sx={{width: "18%", ml: "1%", mr:"1%", mb: 3}}>
-                    <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
-                    <Select
-                    labelId="pull-select-label"
-                    id="pull-select"
-                    value={pullSize}
-                    label="Pull Size"
-                    onChange={(e) => setPullSize(e.target.value)}
-                    disabled={pullDisabled}
-                    sx={{fontSize: "16px"}}
+                    {selectedFilters.task_status === "unlabeled" && <Grid item xs={12} sm={12} md={3}>
+                    <Tooltip title={deallocateDisabled}>
+                        <Box>
+                            <CustomButton 
+                                sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
+                                label={"De-allocate Tasks"}
+                                onClick={() => setDeallocateDialog(true)}
+                                disabled={deallocateDisabled}
+                                color={"warning"}
+                            />
+                        </Box>
+                    </Tooltip>
+                    </Grid>}
+                    <Dialog
+                        open={deallocateDialog}
+                        onClose={() => setDeallocateDialog(false)}
+                        aria-labelledby="deallocate-dialog-title"
+                        aria-describedby="deallocate-dialog-description"
                     >
-                    <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch*0.5}>{ProjectDetails?.tasks_pull_count_per_batch*0.5}</MenuItem>
-                    <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch}>{ProjectDetails?.tasks_pull_count_per_batch}</MenuItem>
-                    <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch*1.5}>{ProjectDetails?.tasks_pull_count_per_batch*1.5}</MenuItem>
-                    </Select>
-                </FormControl>
-                <Tooltip title={pullDisabled}>
-                    <Box sx={{width: '26%', ml: "1%", mr:"1%", mb: 3}}>
+                        <DialogTitle id="deallocate-dialog-title">
+                        {"De-allocate Tasks?"}
+                        </DialogTitle>
+                        <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            All unlabeled tasks will be de-allocated from this project.
+                            Please be careful as this action cannot be undone.
+                        </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                        <Button onClick={() => setDeallocateDialog(false)} variant="outlined" color="error">Cancel</Button>
+                        <Button onClick={unassignTasks} variant="contained" color="error" autoFocus>
+                            Confirm
+                        </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Grid item xs={4} sm={4} md={selectedFilters.task_status === "unlabeled" ? 2 : 3}>
+                        <FormControl size="small" sx={{ width: "100%" }}>
+                            <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
+                            <Select
+                            labelId="pull-select-label"
+                            id="pull-select"
+                            value={pullSize}
+                            label="Pull Size"
+                            onChange={(e) => setPullSize(e.target.value)}
+                            disabled={pullDisabled}
+                            sx={{fontSize: "16px"}}
+                            >
+                            <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch*0.5}>{ProjectDetails?.tasks_pull_count_per_batch*0.5}</MenuItem>
+                            <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch}>{ProjectDetails?.tasks_pull_count_per_batch}</MenuItem>
+                            <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch*1.5}>{ProjectDetails?.tasks_pull_count_per_batch*1.5}</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={8} sm={8} md={selectedFilters.task_status === "unlabeled" ? 3 : 4}>
+                        <Tooltip title={pullDisabled}>
+                            <Box>
+                                <CustomButton 
+                                    sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
+                                    label={"Pull New Batch"} 
+                                    disabled={pullDisabled} 
+                                    onClick={fetchNewTasks} 
+                                />
+                            </Box>
+                        </Tooltip>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={selectedFilters.task_status === "unlabeled" ? 4 : 5}>
                         <CustomButton 
-                            sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
-                            label={"Pull New Batch"} 
-                            disabled={pullDisabled} 
-                            onClick={fetchNewTasks} 
+                            sx={{ p: 1, borderRadius: 2, margin: "auto", width: '100%'}} 
+                            label={"Start Labelling Now"}
+                            onClick={labelAllTasks}
                         />
-                    </Box>
-                </Tooltip>
-                <CustomButton 
-                    sx={{ p: 1, width: '26%', borderRadius: 2, mb: 3, ml: "1%" }} 
-                    label={"Start Labelling Now"}
-                    onClick={labelAllTasks}
-                />
-                </Box>
+                    </Grid>
+                </Grid>
             ) : (
                 <Button
                 type="primary"
@@ -476,13 +475,14 @@ const TaskTable = () => {
                     width: "100%",
                     marginBottom: "1%",
                     marginRight: "1%",
+                    marginTop: "1%",
                 }}
                 >
                 Disabled
                 </Button>
             )
             ) : ( 
-                <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} label={"Add New Item"} />
+                <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%", mt:"1%" }} label={"Add New Item"} />
             ))}
             <MUIDataTable
                 title={""}
