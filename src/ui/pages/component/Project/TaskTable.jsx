@@ -433,7 +433,7 @@ const TaskTable = () => {
                     </Button>
                     </DialogActions>
                 </Dialog>
-                <FormControl size="small" sx={{width: "18%", ml: "1%", mr:"1%", mb: 3}}>
+                <FormControl size="small" sx={{width: "18%", ml: selectedFilters.task_status === "unlabeled" ? "1%" : "0", mr:"1%", mb: 3}}>
                     <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
                     <Select
                     labelId="pull-select-label"
@@ -450,7 +450,7 @@ const TaskTable = () => {
                     </Select>
                 </FormControl>
                 <Tooltip title={pullDisabled}>
-                    <Box sx={{width: '26%', ml: "1%", mr:"1%", mb: 3}}>
+                    <Box sx={{width: selectedFilters.task_status === "unlabeled" ? '26%' : '39%', ml: "1%", mr:"1%", mb: 3}}>
                         <CustomButton 
                             sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
                             label={"Pull New Batch"} 
@@ -460,7 +460,7 @@ const TaskTable = () => {
                     </Box>
                 </Tooltip>
                 <CustomButton 
-                    sx={{ p: 1, width: '26%', borderRadius: 2, mb: 3, ml: "1%" }} 
+                    sx={{ p: 1, width: selectedFilters.task_status === "unlabeled" ? '26%' : '39%', borderRadius: 2, mb: 3, ml: "1%" }} 
                     label={"Start Labelling Now"}
                     onClick={labelAllTasks}
                 />
