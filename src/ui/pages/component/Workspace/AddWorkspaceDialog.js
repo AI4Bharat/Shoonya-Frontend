@@ -1,20 +1,24 @@
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch} from 'react-redux'
 import GetWorkspacesAPI from '../../../../redux/actions/api/Dashboard/GetWorkspaces'
 import CreateWorkspaceAPI from '../../../../redux/actions/api/WorkspaceDetails/CreateWorkspace'
 import APITransport from '../../../../redux/actions/apitransport/apitransport'
 import CustomButton from '../common/Button'
 
+
 const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
     const [workspaceName, setWorkspaceName] = useState('')
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
-
-    const addBtnClickHandler = async () => {
+    
+   
+    const addBtnClickHandler = async (event) => {
+        setWorkspaceName('');
+        dialogCloseHandler();
         if (!workspaceName) return;
 
-        setLoading(true);
+        //  setLoading(true);
         const createWorkspaceObj = new CreateWorkspaceAPI(
             orgId,
             workspaceName,
@@ -33,7 +37,9 @@ const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
             return createWorkspaceRespData;
         }
 
-        setLoading(true);
+        setLoading(false)
+       
+
     }
 
     const handleUserDialogClose = () => {
@@ -41,11 +47,15 @@ const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
         dialogCloseHandler();
     }
 
+    const handleTextField=(e)=>{
+       setWorkspaceName(e.target.value)   
+    }
+    
     return (
         <Dialog open={isOpen} onClose={handleUserDialogClose} close>
             <DialogTitle>Enter workspace details</DialogTitle>
             <DialogContent style={{ paddingTop: 4 }}>
-                <TextField placeholder='Enter Workspace Name' label="Workspace Name" fullWidth size='small' value={workspaceName} onChange={(e) => setWorkspaceName(e.target.value)} />
+                <TextField placeholder='Enter Workspace Name' label="Workspace Name" fullWidth size='small' value={workspaceName} onChange={handleTextField} />
             </DialogContent>
             <DialogActions style={{ padding: '0 24px 24px 0' }}>
                 <Button onClick={handleUserDialogClose} size="small">
@@ -63,7 +73,7 @@ const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
                     size="small"
                     label="OK"
                     disabled={loading || !workspaceName}
-                />
+                />  
             </DialogActions>
         </Dialog>
     )

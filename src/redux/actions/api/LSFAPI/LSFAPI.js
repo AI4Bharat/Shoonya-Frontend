@@ -105,8 +105,8 @@ const getNextProject = async (projectID, taskID) => {
       id: projectID,
     });
     if (response.status === 204) {
-      if (localStorage.getItem("labelAll"))
-        window.location.href = `/projects/${projectID}`;
+      // if (localStorage.getItem("labelAll"))
+        // window.location.href = `/projects/${projectID}`;
       // message.info("No more tasks for this project.");
     } else {
       return response.data;

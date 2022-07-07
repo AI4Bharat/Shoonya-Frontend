@@ -5,6 +5,7 @@ import { Tooltip, Button, Alert, TextareaAutosize, Card } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 import {
   getProjectsandTasks,
@@ -35,6 +36,11 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   const lsfRef = useRef();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
@@ -43,6 +49,24 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   console.log("projectId, taskId", projectId, taskId);
   // debugger
   console.log("notesRef", notesRef);
+
+  const tasksComplete = (id) => {
+    if (id) {
+      navigate(`/projects/${projectId}/task/${id}`, {replace: true});
+    } else {
+      // navigate(-1);
+      setSnackbarInfo({
+        open: true,
+        message: "No more tasks to label",
+        variant: "info",
+      });
+      setTimeout(() => {
+        localStorage.removeItem("labelAll");
+        window.location.replace(`/#/projects/${projectId}`);
+        window.location.reload();
+      }, 1000);
+    }
+  }
 
   function LSFRoot(
     rootRef,
@@ -148,20 +172,20 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
               annotation.lead_time,
               task_status,
               notesRef.current
-            )
+            ).then((res) => {
+              if (localStorage.getItem("labelAll"))
+                getNextProject(projectId, taskData.id).then((res) => {
+                  hideLoader();
+                  // window.location.href = `/projects/${projectId}/task/${res.id}`;
+                  tasksComplete(res?.id || null);
+                })
+              else {
+                hideLoader();
+                window.location.reload();
+              }
+            })
           }
         //   else message.error("Task is freezed");
-
-          if (localStorage.getItem("labelAll"))
-            getNextProject(projectId, taskData.id).then((res) => {
-              hideLoader();
-              // window.location.href = `/projects/${projectId}/task/${res.id}`;
-              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
-            })
-          else {
-            hideLoader();
-            // window.location.reload();
-          }
         },
 
         onSkipTask: function () {
@@ -170,8 +194,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
           updateTask(taskData.id).then(() => {
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
-              // window.location.href = `/projects/${projectId}/task/${res.id}`;
-              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
+              tasksComplete(res?.id || null);
             });
           })
         },
@@ -199,8 +222,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
                         hideLoader();
-                        // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                        navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
+                        tasksComplete(res?.id || null);
                       })
                     else{
                       hideLoader();
@@ -273,9 +295,24 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     getNextProject(projectId, taskId).then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
-      navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
+     tasksComplete(res?.id || null);
     });
   }
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+        autoHideDuration={2000}
+      />
+    );
+  };
 
   return (
     <div>
@@ -312,6 +349,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
       </div>}
       <div className="label-studio-root" ref={rootRef}></div>
       {loader}
+      {renderSnackBar()}
     </div>
   );
 };
@@ -350,7 +388,8 @@ export default function LSF() {
         color="primary"
         onClick={() => {
           localStorage.removeItem("labelAll");
-          navigate(-1);
+          window.location.replace(`/#/projects/${projectId}`);
+          window.location.reload();
         }}
       >
         Back to Project
