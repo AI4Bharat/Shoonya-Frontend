@@ -26,6 +26,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: production-files
+        path: ./build
 
     - name: Display structure of downloaded files
       run: ls -R
@@ -39,7 +40,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name shoonyastorage  --auth-mode key -d '$web' -s .
+            az storage blob upload-batch --account-name shoonyastorage  --auth-mode key -d '$web' -s ./build
 
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
