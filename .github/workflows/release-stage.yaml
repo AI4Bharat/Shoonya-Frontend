@@ -1,7 +1,8 @@
 name: Deploy React App
 
 on:
-  push: [stage]
+  push:
+    branches: [stage]
   workflow_dispatch:
   workflow_call:
   pull_request:
