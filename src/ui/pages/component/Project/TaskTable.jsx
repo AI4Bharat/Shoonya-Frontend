@@ -121,14 +121,9 @@ const TaskTable = () => {
                 message: resp?.message,
                 variant: "success",
             })
-            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
-                getTaskListData();
-            } else {
-                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
-                setCurrentPageNumber(1);
-            }
-            const projectObj = new GetProjectDetailsAPI(id);
-            dispatch(APITransport(projectObj));
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
             setSnackbarInfo({
                 open: true,
@@ -402,9 +397,10 @@ const TaskTable = () => {
                     marginBottom: "1%",
                     flexWrap: "wrap",
                     alignItems: "flex-end",
+                    marginTop: "1%",
                 }}
                 >
-                <Tooltip title={deallocateDisabled}>
+                {selectedFilters.task_status === "unlabeled" && <Tooltip title={deallocateDisabled}>
                     <Box sx={{width: '24%', mr:"1%", mb: 3}}>
                         <CustomButton 
                             sx={{ p: 1, width: '100%', borderRadius: 2, margin: "auto" }} 
@@ -414,7 +410,7 @@ const TaskTable = () => {
                             color={"warning"}
                         />
                     </Box>
-                </Tooltip>
+                </Tooltip>}
                 <Dialog
                     open={deallocateDialog}
                     onClose={() => setDeallocateDialog(false)}
@@ -476,13 +472,14 @@ const TaskTable = () => {
                     width: "100%",
                     marginBottom: "1%",
                     marginRight: "1%",
+                    marginTop: "1%",
                 }}
                 >
                 Disabled
                 </Button>
             )
             ) : ( 
-                <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%" }} label={"Add New Item"} />
+                <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%", mt:"1%" }} label={"Add New Item"} />
             ))}
             <MUIDataTable
                 title={""}
