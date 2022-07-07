@@ -25,7 +25,7 @@ jobs:
     - name: Download artifact
       uses: dawidd6/action-download-artifact@v2
       with:
-        workflow: build.yml
+        workflow: ./.github/workflows/build.yaml
         workflow_conclusion: success
     
     - name: Azure login
