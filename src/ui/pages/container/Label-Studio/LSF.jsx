@@ -51,6 +51,10 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
   console.log("notesRef", notesRef);
 
   const tasksComplete = (id) => {
+<<<<<<< HEAD
+=======
+    console.log(id, "Hellooo");
+>>>>>>> 5bcda529a3f3e70a46ee3f3d2e65b4f38ea8582b
     if (id) {
       navigate(`/projects/${projectId}/task/${id}`, {replace: true});
     } else {
@@ -177,7 +181,11 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                 getNextProject(projectId, taskData.id).then((res) => {
                   hideLoader();
                   // window.location.href = `/projects/${projectId}/task/${res.id}`;
+<<<<<<< HEAD
                   tasksComplete(res?.id || null);
+=======
+                  tasksComplete(res.id);
+>>>>>>> 5bcda529a3f3e70a46ee3f3d2e65b4f38ea8582b
                 })
               else {
                 hideLoader();
@@ -222,7 +230,11 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
                         hideLoader();
+<<<<<<< HEAD
                         tasksComplete(res?.id || null);
+=======
+                        tasksComplete(res.id);
+>>>>>>> 5bcda529a3f3e70a46ee3f3d2e65b4f38ea8582b
                       })
                     else{
                       hideLoader();
@@ -295,7 +307,11 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     getNextProject(projectId, taskId).then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
+<<<<<<< HEAD
      tasksComplete(res?.id || null);
+=======
+     tasksComplete(res.id);
+>>>>>>> 5bcda529a3f3e70a46ee3f3d2e65b4f38ea8582b
     });
   }
 
