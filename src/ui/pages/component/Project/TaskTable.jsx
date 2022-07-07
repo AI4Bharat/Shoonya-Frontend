@@ -437,6 +437,7 @@ const TaskTable = () => {
                             labelId="pull-select-label"
                             id="pull-select"
                             value={pullSize}
+                            // defaultValue={5}
                             label="Pull Size"
                             onChange={(e) => setPullSize(e.target.value)}
                             disabled={pullDisabled}
