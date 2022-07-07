@@ -22,11 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Download artifact
-      uses: dawidd6/action-download-artifact@v2
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
       with:
-        workflow: ./.github/workflows/build.yaml
-        workflow_conclusion: success
+        name: production-files
     
     - name: Azure login
       uses: azure/login@v1
