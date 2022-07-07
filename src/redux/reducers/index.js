@@ -45,6 +45,9 @@ import getOrganizationProjectReports from './Organization/GetOrganizationProject
 import getDatasetProjects from './Dataset/GetDatasetProjects';
 import getDatasetMembers from './Dataset/GetDatasetMembers';
 import getDatasetDownload from './Dataset/GetDatasetDownload';
+import CreateNewDatasetInstance from './Dataset/CreateNewDatasetInstance';
+import GetDatasetType from './Dataset/GetDatasetType';
+import Uploaddata from './Dataset/Uploaddata'
 
 
 const index = {
@@ -98,6 +101,9 @@ const index = {
     getDatasetProjects,
     getDatasetMembers,
     getDatasetDownload,
+    CreateNewDatasetInstance,
+    GetDatasetType,
+    Uploaddata,
 };
 
 export default index;
