@@ -40,7 +40,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name shoonyastorage  --auth-mode key -d '$web' -s ./build
+            az storage blob upload-batch --account-name shoonyastorage --account-key ${{ secrets.AZURE_STORAGE_KEY }} -d '$web' -s ./build
 
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
