@@ -22,23 +22,30 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Download artifacts
+    - name: Download artifacts from build pipeline
       uses: actions/download-artifact@v3
       with:
         name: production-files
-    
+    - name: Display structure of downloaded files
+      run: ls -R
+
     - name: Azure login
       uses: azure/login@v1
       with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: Upload to Azure blob storage
+    - name: Upload to blob storage
       uses: azure/CLI@v1
       with:
-        azcliversion: 2.0.72
         inlineScript: |
-            az storage blob upload-batch --account-name shoonyastorage -d '$web' -s ./production-files
+            az storage blob upload-batch --account-name shoonyastorage  --auth-mode key -d '$web' -s ./production-files
+    - name: Purge CDN endpoint
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+           az cdn endpoint purge --no-wait --content-paths  "/*" --profile-name react-website --name frontend-stage-shoonya.azureedge.net --resource-group shoonya_prod
     
     - name: Azure logout
       run: |
             az logout
+      if: always()
