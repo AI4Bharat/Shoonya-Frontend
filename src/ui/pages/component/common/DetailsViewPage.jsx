@@ -170,7 +170,7 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Workspace &&
                             <>
                                 
-                                <Button className={classes.annotatorsButton} label={"Add Members to Workspace"}sx={{ width: "100%", mb: 2 }} onClick={handleAnnotatorDialogOpen} />
+                                <Button className={classes.annotatorsButton} label={"Add Annotators to Workspace"}sx={{ width: "100%", mb: 2 }} onClick={handleAnnotatorDialogOpen} />
                                 <AnnotatorsTable />
                                 <AddUsersDialog
                                     handleDialogClose={handleAnnotatorDialogClose}
