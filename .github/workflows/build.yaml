@@ -18,12 +18,12 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Install Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: 14
+        node-version: 18
 
     - name: Install NPM packages
-      run: npm ci
+      run: npm ci --legacy-peer-deps
     
     - name: Build project
       run: npm run build --if-present
