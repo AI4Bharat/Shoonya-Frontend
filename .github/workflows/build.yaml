@@ -20,10 +20,10 @@ jobs:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 18.5
+        node-version: 16.15
 
     - name: Install NPM packages
-      run: npm ci --legacy-peer-deps
+      run: npm ci
     
     - name: Build project
       run: NODE_OPTIONS="--max_old_space_size=4096" npm run build
