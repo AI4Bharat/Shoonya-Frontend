@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-node@v2
 
     - name: Install NPM packages
-      run: npm ci
+      run: npm ci --legacy-peer-deps
     
     - name: Build project
       run: NODE_OPTIONS="--max_old_space_size=4096" npm run build
