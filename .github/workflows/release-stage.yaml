@@ -26,6 +26,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: production-files
+
     - name: Display structure of downloaded files
       run: ls -R
 
@@ -33,12 +34,13 @@ jobs:
       uses: azure/login@v1
       with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
+
     - name: Upload to blob storage
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name shoonyastorage  --auth-mode key -d '$web' -s ${{ github.workspace }}/production-files
+            az storage blob upload-batch --account-name shoonyastorage  --auth-mode key -d '$web' -s ${{ github.workspace }}/Shoonya-Frontend-New/production-files
+
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
       with:
