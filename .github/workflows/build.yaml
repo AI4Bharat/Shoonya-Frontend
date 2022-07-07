@@ -21,17 +21,12 @@ jobs:
     
     - name: Install Node.js
       uses: actions/setup-node@v2
-      with:
-          node-version: 16
 
     - name: Install NPM packages
-      run: npm ci
+      run: npm ci --legacy-peer-deps
     
     - name: Build project
       run: npm run build
-    
-    - name: Run unit tests
-      run: npm test
 
     - name: Upload production-ready build files
       uses: actions/upload-artifact@v2
