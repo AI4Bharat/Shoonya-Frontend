@@ -151,7 +151,7 @@ const Projects = () => {
                             <Typography variant="body2" sx={{color : "#FFFFFF"}}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
                     </Link>}
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
                             <Tab label={translate("label.tasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
