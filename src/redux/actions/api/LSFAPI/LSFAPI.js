@@ -52,7 +52,7 @@ const postAnnotation = async (result, task, completed_by, load_time, lead_time, 
     },
     )
     .then((res)=> {
-    if(res.status != 201){
+    if(res.status !== 201){
       // message.error(res.data.message)
     }
   })

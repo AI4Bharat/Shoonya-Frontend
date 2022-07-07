@@ -8,7 +8,7 @@ import constants from "../../../constants";
  export default class  GetWorkspacesManagersDataAPI extends API {
    constructor(workspaceId, timeout = 2000) {
      super("GET", timeout, false);
-     this.type = constants. GET_WORKSPACE_MANAGERS_DATA;
+     this.type = constants.GET_WORKSPACE_MANAGERS_DATA;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}${workspaceId}/users/`;
    }
  
