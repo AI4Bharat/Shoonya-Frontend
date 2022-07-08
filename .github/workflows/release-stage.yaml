@@ -26,7 +26,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: production-files-stage
-        path: ./build
+        path: ./build-stage
 
     - name: Display structure of downloaded files
       run: ls -R
