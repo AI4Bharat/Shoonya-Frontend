@@ -31,7 +31,7 @@ const UserProfilePage = () => {
     }
     return (
         <Box sx={{ p: 2 }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Box >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="My Profile" sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="My Progress" sx={{ fontSize: 16, fontWeight: '700' }} />

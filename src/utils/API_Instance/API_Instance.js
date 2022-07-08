@@ -11,7 +11,7 @@ const REFRESH_URL = "users/auth/jwt/refresh";
 const VERIFY_URL = "users/auth/jwt/verify";
 
 const axiosInstance = axios.create({
-  baseURL: configs.BASE_URL,
+  baseURL: configs.BASE_URL_AUTO,
   timeout: 500000,
   headers: {
     Authorization: `JWT ${localStorage.getItem(ACCESS_TOKEN)}`,
