@@ -24,7 +24,7 @@ jobs:
       uses: actions/setup-node@v2
 
     - name: Install NPM packages
-      run: npm ci --legacy-peer-deps
+      run: npm install --legacy-peer-deps
     
     - name: Build project
       run: npm run build
@@ -33,4 +33,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: production-files-stage
-        path: ./build-stage
+        path: ./build
