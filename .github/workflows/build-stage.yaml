@@ -9,6 +9,7 @@ on:
 env: 
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
+  REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_STAGE }}
 
 jobs:
   build:
@@ -31,5 +32,5 @@ jobs:
     - name: Upload production-ready build files
       uses: actions/upload-artifact@v3
       with:
-        name: production-files
-        path: ./build
+        name: production-files-stage
+        path: ./build-stage
