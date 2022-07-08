@@ -385,6 +385,10 @@ export default function LSF() {
     setShowNotes(false);
     setNotesValue("");
   }
+
+  useEffect(()=>{
+    resetNotes();
+  }, [taskId]);
   
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
