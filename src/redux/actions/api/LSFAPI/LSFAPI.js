@@ -52,7 +52,7 @@ const postAnnotation = async (result, task, completed_by, load_time, lead_time, 
     },
     )
     .then((res)=> {
-    if(res.status != 201){
+    if(res.status !== 201){
       // message.error(res.data.message)
     }
   })
@@ -105,8 +105,8 @@ const getNextProject = async (projectID, taskID) => {
       id: projectID,
     });
     if (response.status === 204) {
-      if (localStorage.getItem("labelAll"))
-        window.location.href = `/projects/${projectID}`;
+      // if (localStorage.getItem("labelAll"))
+        // window.location.href = `/projects/${projectID}`;
       // message.info("No more tasks for this project.");
     } else {
       return response.data;

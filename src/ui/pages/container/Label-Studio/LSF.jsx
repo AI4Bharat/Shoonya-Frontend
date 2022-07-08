@@ -5,6 +5,7 @@ import { Tooltip, Button, Alert, TextareaAutosize, Card } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 import {
   getProjectsandTasks,
@@ -29,21 +30,45 @@ import { translate } from '../../../../config/localisation';
 let task_status = "accepted";
 
 
-const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
+const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
-  let loaded = useRef(false);
+  let loaded = useRef();
 
   console.log("projectId, taskId", projectId, taskId);
   // debugger
   console.log("notesRef", notesRef);
+
+  const tasksComplete = (id) => {
+    if (id) {
+      resetNotes()
+      navigate(`/projects/${projectId}/task/${id}`, {replace: true});
+    } else {
+      // navigate(-1);
+      setSnackbarInfo({
+        open: true,
+        message: "No more tasks to label",
+        variant: "info",
+      });
+      setTimeout(() => {
+        localStorage.removeItem("labelAll");
+        window.location.replace(`/#/projects/${projectId}`);
+        window.location.reload();
+      }, 1000);
+    }
+  }
 
   function LSFRoot(
     rootRef,
@@ -109,6 +134,9 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     }
 
     if (rootRef.current) {
+      if (lsfRef.current) {
+        lsfRef.current.destroy();
+      }
       lsfRef.current = new LabelStudio(rootRef.current, {
         /* all the options according to the docs */
         config: labelConfig,
@@ -146,20 +174,24 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
               annotation.lead_time,
               task_status,
               notesRef.current
-            )
+            ).then((res) => {
+              if (localStorage.getItem("labelAll"))
+                getNextProject(projectId, taskData.id).then((res) => {
+                  hideLoader();
+                  resetNotes()
+                  // window.location.href = `/projects/${projectId}/task/${res.id}`;
+                  console.log("res.id", res?.id);
+                  // tasksComplete(res?.id || null);
+                })
+              else {
+                hideLoader();
+                console.log("in else part");
+                debugger
+                window.location.reload();
+              }
+            })
           }
         //   else message.error("Task is freezed");
-
-          if (localStorage.getItem("labelAll"))
-            getNextProject(projectId, taskData.id).then((res) => {
-              hideLoader();
-              // window.location.href = `/projects/${projectId}/task/${res.id}`;
-              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
-            })
-          else {
-            hideLoader();
-            // window.location.reload();
-          }
         },
 
         onSkipTask: function () {
@@ -168,8 +200,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
           updateTask(taskData.id).then(() => {
             getNextProject(projectId, taskData.id).then((res) => {
               hideLoader();
-              // window.location.href = `/projects/${projectId}/task/${res.id}`;
-              navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
+              tasksComplete(res?.id || null);
             });
           })
         },
@@ -198,8 +229,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
                         hideLoader();
-                        // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                        navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
+                        tasksComplete(res?.id || null);
                       })
                     else{
                       hideLoader();
@@ -238,11 +268,9 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
       document.head.appendChild(style);
     }
     if (
-      typeof labelConfig === "undefined" &&
-      typeof taskData === "undefined" &&
-      userData?.id && !loaded.current
+      userData?.id && loaded.current !== taskId
     ) {
-      loaded.current = true;
+      loaded.current = taskId;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
@@ -264,11 +292,11 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
         }
       );
     }
-  }, [labelConfig, userData, notesRef]);
+  }, [labelConfig, userData, notesRef, taskId]);
 
   useEffect(() => {
     showLoader();
-  }, []);
+  }, [taskId]);
 
   const handleDraftAnnotationClick = async () => {
     task_status = "draft";
@@ -280,9 +308,24 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
     getNextProject(projectId, taskId).then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
-      navigate(`/projects/${projectId}/task/${res.id}`, {replace: true});
+     tasksComplete(res?.id || null);
     });
   }
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+        autoHideDuration={2000}
+      />
+    );
+  };
 
   return (
     <div>
@@ -294,7 +337,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
               value="Draft"
               type="default"
               onClick={handleDraftAnnotationClick}
-              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None", borderRight: "None"}}
+              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None"}}
               className="lsf-button"
             >
               Draft
@@ -306,7 +349,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
                 value="Next"
                 type="default"
                 onClick={onNextAnnotation}
-                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None"}}
+                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None", borderLeft: "None"}}
                 className="lsf-button"
               >
                 Next
@@ -319,6 +362,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
       </div>}
       <div className="label-studio-root" ref={rootRef}></div>
       {loader}
+      {renderSnackBar()}
     </div>
   );
 };
@@ -347,6 +391,12 @@ export default function LSF() {
   useEffect(()=>{
     notesRef.current = notesValue;
   }, [notesValue])
+
+  const resetNotes = () => {
+    setNotesValue("");
+    setShowNotes(false);
+
+  }
   
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
@@ -357,7 +407,8 @@ export default function LSF() {
         color="primary"
         onClick={() => {
           localStorage.removeItem("labelAll");
-          navigate(-1);
+          window.location.replace(`/#/projects/${projectId}`);
+          window.location.reload();
         }}
       >
         Back to Project
@@ -389,7 +440,7 @@ export default function LSF() {
             style={{width: '99%', minHeight: '80px'}}
           />
         </div>
-        <LabelStudioWrapper notesRef={notesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
+        <LabelStudioWrapper resetNotes={resetNotes} notesRef={notesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
       </Card>
     </div>
   );

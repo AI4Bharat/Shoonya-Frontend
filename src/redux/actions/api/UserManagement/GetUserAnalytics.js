@@ -8,7 +8,7 @@ import constants from "../../../constants";
  export default class GetUserAnalyticsAPI extends API {
    constructor(fromDate, toDate, projectType, workspaces, timeout = 2000) {
      super("POST", timeout, false);
-     this.type = constants. GET_USER_ANALYTICS;
+     this.type = constants.GET_USER_ANALYTICS;
      this.fromDate = fromDate;
      this.toDate = toDate;
      this.projectType = projectType;
