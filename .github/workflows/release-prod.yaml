@@ -14,7 +14,7 @@ env:
 
 jobs:
   build-prod:
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/build-prod.yaml
     secrets: inherit
   release-prod:
     name: Deploy React App

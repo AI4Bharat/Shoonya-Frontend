@@ -14,7 +14,7 @@ env:
 
 jobs:
   build-stage:
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/build-stage.yaml
     secrets: inherit
   release-stage:
     name: Deploy React App
