@@ -1,22 +1,21 @@
 /**
- * Upload data API
+ * Get File Types API
  */
  import API from "../../../api";
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from '../../../constants';
  
- export default class UploaddataAPI extends API {
-   constructor(datasetId,projectObj, timeout = 2000) {
-     super("POST", timeout, false);
-     this.projectObj = projectObj;
-     this.type = constants.UPLOAD_DATA;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/${datasetId}/upload/`;
+ export default class GetFileTypesAPI extends API {
+   constructor( timeout = 2000) {
+     super("GET", timeout, false);
+     this.type = constants.GET_FILE_TYPES;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/accepted_filetypes/`;
    }
      
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-       this.uploaddata = res;
+       this.filetypes = res;
      }
    }
    
@@ -24,9 +23,7 @@
      return this.endpoint;
    }
  
-   getBody() {
-    return this.projectObj;
-  }
+   getBody() {}
  
    getHeaders() {
      this.headers = {
@@ -39,6 +36,6 @@
    }
      
    getPayload() {
-     return this.uploaddata;
+     return this.filetypes;
    }
  }

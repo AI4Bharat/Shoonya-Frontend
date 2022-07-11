@@ -17,6 +17,7 @@ import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CreateNewDatasetInstanceAPI from "../../../../redux/actions/api/Dataset/CreateNewDatasetInstance";
+import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import GetDatasetTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetType"
 import MenuItems from "../../component/common/MenuItems"
 
@@ -28,20 +29,26 @@ const CollectionProject = (props) => {
   const [instance_Name, setInstance_Name] = useState("")
   const [parent_Instance_Id, setParent_Instance_Id] = useState("")
   const [instance_Description, setInstance_Description] = useState("")
-  const [dataset_Type, setDataset_Type] = useState("")
   const [organisation_Id, setOrganisation_Id] = useState("")
   const [users, setUsers] = useState("")
   const [datasettype, setDatasettype] = useState("");
   const [type, setType] = useState([]);
 
-console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
 
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
+
+  useEffect(() => {
+    setUsers([loggedInUserData.id])
+  },)
+ 
   const handleCreate = () => {
     const CreateDatasetInstance = {
       instance_name: instance_Name,
       parent_instance_id: parent_Instance_Id,
       instance_description: instance_Description,
-      datasettype: datasettype,
+      dataset_type:datasettype,
       organisation_id: organisation_Id,
       users: users,
     }
@@ -60,7 +67,7 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
     getProjectDetails();
 
   }, []);
-  console.log(datasetType, "datasetType")
+  
 
 
   useEffect(() => {
@@ -68,13 +75,16 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
       let temp = [];
       datasetType.forEach((element) => {
         temp.push({
+        
           name: element,
+          value: element,
 
         });
       });
       setType(temp);
     }
   }, [datasetType]);
+  console.log(loggedInUserData,"loggedInUserData")
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
@@ -101,7 +111,7 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
           <Grid item xs={8} sm={8} md={8} lg={8} xl={8} sx={{ pb: "6rem" }}>
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <Typography variant="h2" gutterBottom component="div">
-                Create a Project
+              Create New Dataset Instance
               </Typography>
             </Grid>
             <Grid
@@ -113,7 +123,7 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Instance_Name*:
+                Instance_Name *:
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -121,6 +131,7 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
                 fullWidth
                 value={instance_Name}
                 onChange={(e) => setInstance_Name(e.target.value)}
+                required
               />
             </Grid>
             <Grid
@@ -170,7 +181,7 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Dataset_Type*:
+                Dataset_Type *:
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -208,7 +219,7 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
               xl={12}
             >
               <Typography gutterBottom component="div">
-                User*:
+                User *:
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -232,8 +243,9 @@ console.log(datasettype,"datasettype",setDatasettype,"setDatasettype")
 
               <Button
                 style={{ margin: "0px 20px 0px 0px" }}
-                label={"Create Project"}
+                label={"Confirm"}
                 onClick={handleCreate}
+                disabled={ ( instance_Name && datasettype   ) ? false : true}
 
               />
 

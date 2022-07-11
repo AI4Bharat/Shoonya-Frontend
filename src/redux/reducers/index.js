@@ -47,8 +47,8 @@ import getDatasetMembers from './Dataset/GetDatasetMembers';
 import getDatasetDownload from './Dataset/GetDatasetDownload';
 import CreateNewDatasetInstance from './Dataset/CreateNewDatasetInstance';
 import GetDatasetType from './Dataset/GetDatasetType';
-import Uploaddata from './Dataset/Uploaddata'
-
+import Uploaddata from './Dataset/Uploaddata';
+import GetFileTypes from './Dataset/GetFileTypes';
 
 const index = {
     apiStatus,
@@ -104,6 +104,7 @@ const index = {
     CreateNewDatasetInstance,
     GetDatasetType,
     Uploaddata,
+    GetFileTypes,
 };
 
 export default index;
