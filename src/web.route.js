@@ -129,7 +129,7 @@ const App = () => {
         <Route
           path="projects/:id"
           element={ProtectedRouteWrapper(
-            <Layout component={<Projects />} Backbutton={true} />
+            <Layout component={<Projects />} Backbutton={true} backPressNavigationPath={"/projects"} />
           )}
         />
         <Route
