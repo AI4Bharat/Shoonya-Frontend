@@ -8,7 +8,7 @@ import constants from "../../../constants";
  export default class GetWorkspacesAnnotatorsDataAPI extends API {
    constructor(workspaceId, timeout = 2000) {
      super("GET", timeout, false);
-     this.type = constants. GET_WORKSPACE_ANNOTATORS_DATA;
+     this.type = constants.GET_WORKSPACE_ANNOTATORS_DATA;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${workspaceId}/users/`;
    }
  

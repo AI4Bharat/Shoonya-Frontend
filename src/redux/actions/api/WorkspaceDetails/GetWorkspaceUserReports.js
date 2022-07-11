@@ -8,7 +8,7 @@ import constants from "../../../constants";
  export default class GetWorkspaceUserReportsAPI extends API {
    constructor(workspaceId, projectType, fromDate, toDate, language, timeout = 2000) {
      super("POST", timeout, false);
-     this.type = constants. GET_WORKSPACE_USER_REPORTS;
+     this.type = constants.GET_WORKSPACE_USER_REPORTS;
      this.projectType = projectType;
      this.fromDate = fromDate;
      this.toDate = toDate;

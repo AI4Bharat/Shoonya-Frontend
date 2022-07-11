@@ -11,7 +11,7 @@ export default class GetOrganizationUserReportsAPI extends API {
     this.projectType = projectType;
     this.startDate = startDate;
     this.endDate = endDate;
-    this.targetLanguage = targetLanguage == "all" ? undefined : targetLanguage;
+    this.targetLanguage = targetLanguage === "all" ? undefined : targetLanguage;
     this.sortByColumn = sortByColumn ?? undefined;
     this.descOrder = descOrder ?? undefined;
     this.type = constants.GET_ORGANIZATION_USER_REPORTS;

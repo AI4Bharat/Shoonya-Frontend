@@ -83,7 +83,7 @@ const DatasetDetails = () => {
                         <Typography variant="body2" fontWeight='700' pr={1}>Description :</Typography>
                         <Typography variant="caption">{DatasetDetails.instance_description}</Typography>
                     </Grid>}
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Box >
                         <Tabs value={selectedTab} onChange={(_event,value)=>setSelectedTab(value)} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
                             <Tab label={translate("label.datasets")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />

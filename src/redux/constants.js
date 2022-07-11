@@ -1,4 +1,4 @@
-export default {
+const constants = {
   CHECK_LOGIN_CREDENTIALS: "CHECK_LOGIN_CREDENTIALS",
   APISTATUS: "APISTATUS",
   GET_PROJECT_DATA:"GET_PROJECT_DATA",
@@ -55,3 +55,5 @@ export default {
   GET_FILE_TYPES:"GET_FILE_TYPES"
 
 };
+
+export default constants;

@@ -108,7 +108,7 @@ const DetailsViewPage = (props) => {
                     <Typography variant="body1" gutterBottom component="div">
                         Created by : {createdBy}
                     </Typography>
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
                             {pageType === componentType.Type_Workspace && <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />}

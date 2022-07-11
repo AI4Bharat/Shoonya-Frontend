@@ -29,7 +29,7 @@ import { translate } from '../../../../config/localisation';
 //used just in postAnnotation to support draft status update.
 let task_status = "accepted";
 
-const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
+const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
@@ -52,9 +52,11 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader}) => {
 
   const tasksComplete = (id) => {
     if (id) {
+      resetNotes()
       navigate(`/projects/${projectId}/task/${id}`, {replace: true});
     } else {
       // navigate(-1);
+      resetNotes()
       setSnackbarInfo({
         open: true,
         message: "No more tasks to label",
@@ -378,6 +380,15 @@ export default function LSF() {
   useEffect(()=>{
     notesRef.current = notesValue;
   }, [notesValue])
+
+  const resetNotes = () => {
+    setShowNotes(false);
+    setNotesValue("");
+  }
+
+  useEffect(()=>{
+    resetNotes();
+  }, [taskId]);
   
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
@@ -421,7 +432,7 @@ export default function LSF() {
             style={{width: '99%', minHeight: '80px'}}
           />
         </div>
-        <LabelStudioWrapper notesRef={notesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
+        <LabelStudioWrapper resetNotes={()=>resetNotes()} notesRef={notesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
       </Card>
     </div>
   );
