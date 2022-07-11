@@ -168,6 +168,13 @@ const Header = () => {
         navigate("/profile");
       },
     },
+    {
+      name: "My Progress",
+      onclick: () => {
+        handleCloseUserMenu();
+        navigate("/profile?tab=progress");
+      },
+    },
     { name: "Logout", onclick: () => onLogoutClick() },
   ];
 
