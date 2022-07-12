@@ -63,6 +63,7 @@ const ProjectSetting = (props) => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
     }
+    
 
     useEffect(() => {
         getProjectDetails();
@@ -151,6 +152,19 @@ const ProjectSetting = (props) => {
         const langObj = new GetLanguageChoicesAPI();
         dispatch(APITransport(langObj));
     };
+
+    useEffect(() => {
+        if (LanguageChoices && LanguageChoices.length > 0) {
+            let temp = [];
+            LanguageChoices.forEach((element) => {
+                temp.push({
+                    name: element[0],
+                    value: element[0],
+                });
+            });
+            setLanguageOptions(temp);
+        }
+    }, [LanguageChoices]);
 
     useEffect(() => {
         if (LanguageChoices && LanguageChoices.length > 0) {
@@ -300,7 +314,11 @@ const ProjectSetting = (props) => {
                             xl={9}
                             sm={12}
                         >
-                            <OutlinedTextField fullWidth value={ProjectDetails.title} onChange={(e) => setValue(e.target.value)} />
+                            <OutlinedTextField 
+                            fullWidth 
+                            InputProps={{ style: { fontSize: "16px" } }}
+                            value={ProjectDetails.title}
+                             onChange={(e) => setValue(e.target.value)} />
                         </Grid>
                     </Grid>
                     <Grid
@@ -332,9 +350,11 @@ const ProjectSetting = (props) => {
                             lg={9}
                             xl={9}
                             sm={12}
+                          
                         >
                             <OutlinedTextField
                                 fullWidth
+                                InputProps={{ style: { fontSize: "16px" } }}
                                 value={ProjectDetails.description}
                                 onChange={(e) => setValue(e.target.value)}
                             />
@@ -372,9 +392,10 @@ const ProjectSetting = (props) => {
                                     sm={12}
                                 >
                                     <MenuItems
+                                 
                                         menuOptions={languageOptions}
                                         handleChange={(value) => setSourceLanguage(value)}
-                                        value={ProjectDetails.src_language}
+                                        value={sourceLanguage}
                                     />
                                 </Grid>
                             </Grid>
@@ -410,7 +431,7 @@ const ProjectSetting = (props) => {
                                     <MenuItems
                                         menuOptions={languageOptions}
                                         handleChange={(value) => setTargetLanguage(value)}
-                                        value={ProjectDetails.tgt_language}
+                                        value={targetLanguage}
                                     />
                                 </Grid>
                             </Grid>
