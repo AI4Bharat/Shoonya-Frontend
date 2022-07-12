@@ -166,18 +166,7 @@ const ProjectSetting = (props) => {
         }
     }, [LanguageChoices]);
 
-    useEffect(() => {
-        if (LanguageChoices && LanguageChoices.length > 0) {
-            let temp = [];
-            LanguageChoices.forEach((element) => {
-                temp.push({
-                    name: element[0],
-                    value: element[0],
-                });
-            });
-            setLanguageOptions(temp);
-        }
-    }, [LanguageChoices]);
+   
 
     const handleSave = () => {
         getSaveButtonAPI()

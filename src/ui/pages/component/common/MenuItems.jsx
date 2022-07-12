@@ -13,7 +13,7 @@ export default function MenuItems(props) {
   };
   return (
     <div>
-      <FormControl fullWidth sx={{minWidth: 120, }}>
+      <FormControl fullWidth sx={{minWidth: 120}}>
         
         <Select
           labelId="demo-simple-select-standard-label"
@@ -25,7 +25,7 @@ export default function MenuItems(props) {
         >
            { 
             props.menuOptions.map(menu  => {
-                    return  <MenuItem  key={menu.name} value={menu.value} > {menu.name}</MenuItem>
+                    return  <MenuItem  key={menu.name} value={menu.value}> {menu.name}</MenuItem>
                 })
             }
         </Select>
