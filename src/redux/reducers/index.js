@@ -50,6 +50,7 @@ import GetDatasetType from './Dataset/GetDatasetType';
 import Uploaddata from './Dataset/Uploaddata';
 import GetFileTypes from './Dataset/GetFileTypes';
 import fetchUserById from './UserManagement/FetchUserById';
+import setTaskFilter from './Tasks/SetTaskFilter';
 
 const index = {
     apiStatus,
@@ -107,6 +108,7 @@ const index = {
     Uploaddata,
     GetFileTypes,
     fetchUserById,
+    setTaskFilter,
 };
 
 export default index;
