@@ -21,7 +21,7 @@ const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 const Layout= (props) => {
   // const Component = props.component;
-  const { type, index, userRoles, component,Backbutton } = props;
+  const { type, index, userRoles, component,Backbutton, backPressNavigationPath } = props;
   const [show, setShow] = useState(false);
   const [popUp, setPopup] = useState(true);
   const apiStatus = useSelector((state) => state.apiStatus);
@@ -97,7 +97,7 @@ const Layout= (props) => {
           {/* {renderSpinner()}
           {renderError()} */}
           { Backbutton  && 
-           < BackButton startIcon={<  ArrowBackIcon />} sx={{ color:"white" ,   mb:2  }} label={translate("label.backToPreviousPage")}/>
+           < BackButton startIcon={<  ArrowBackIcon />} sx={{ color:"white" ,   mb:2  }} backPressNavigationPath={backPressNavigationPath ? backPressNavigationPath : ""} label={translate("label.backToPreviousPage")}/>
            }
           <Suspense fallback={<div>Loading....</div>}>
             {component}
