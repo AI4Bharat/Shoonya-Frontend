@@ -70,7 +70,7 @@ const ManagersTable = (props) => {
                 el.username, 
                 el.email,
                
-                <Link to={`/workspace/${el.id}`} style={{ textDecoration: "none" }}>
+                <Link to={`/profile/${el.id}`} style={{ textDecoration: "none" }}>
                     <CustomButton
                         sx={{borderRadius : 2,marginRight: 2}}
                         label = "View"
