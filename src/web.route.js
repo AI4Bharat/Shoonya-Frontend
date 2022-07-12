@@ -28,6 +28,7 @@ import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
 import LSF from "./ui/pages/container/Label-Studio/LSF";
 import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage";
+import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance"
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -189,6 +190,12 @@ const App = () => {
           path="transliteration/"
           element={ProtectedRouteWrapper(
             <Layout component={<Transliteration />} Backbutton={true} />
+          )}
+        />
+         <Route
+          path="create-Dataset-Instance-Button"
+          element={ProtectedRouteWrapper(
+            <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
           )}
         />
       </Routes>
