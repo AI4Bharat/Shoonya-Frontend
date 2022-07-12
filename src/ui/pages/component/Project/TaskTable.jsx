@@ -15,6 +15,7 @@ import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
 import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
 import DeallocateTasksAPI from "../../../../redux/actions/api/Tasks/DeallocateTasks";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+import SetTaskFilter from "../../../../redux/actions/Tasks/SetTaskFilter";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
@@ -37,7 +38,9 @@ const TaskTable = () => {
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
-    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled", user_filter: -1});
+    const TaskFilter = useSelector(state => state.setTaskFilter.data);
+    const [selectedFilters, setsSelectedFilters] = useState(
+        (TaskFilter && TaskFilter.id === id) ? TaskFilter.filters : {task_status: "unlabeled", user_filter: -1});
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const NextTask = useSelector(state => state.getNextTask.data);
@@ -182,6 +185,7 @@ const TaskTable = () => {
     }, [currentPageNumber, currentRowPerPage]);
 
     useEffect(() => {
+        dispatch(SetTaskFilter(id, selectedFilters));
         if (currentPageNumber !== 1) {
             setCurrentPageNumber(1);
         } else {

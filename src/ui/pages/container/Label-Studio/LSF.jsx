@@ -399,8 +399,9 @@ export default function LSF() {
         color="primary"
         onClick={() => {
           localStorage.removeItem("labelAll");
-          window.location.replace(`/#/projects/${projectId}`);
-          window.location.reload();
+          navigate(`/projects/${projectId}`);
+          //window.location.replace(`/#/projects/${projectId}`);
+          //window.location.reload();
         }}
       >
         Back to Project
