@@ -126,7 +126,7 @@ const App = () => {
         />
          <Route
           path="/Change-Password"
-          element={ProtectedRouteWrapper(<Layout component={<ChangePassword />} />)}
+          element={ProtectedRouteWrapper(<Layout component={<ChangePassword />} Backbutton={true} />)}
         />
         <Route
           path="/projects"

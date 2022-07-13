@@ -17,7 +17,6 @@ import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CreateNewDatasetInstanceAPI from "../../../../redux/actions/api/Dataset/CreateNewDatasetInstance";
-import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import GetDatasetTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetType"
 import MenuItems from "../../component/common/MenuItems"
 
