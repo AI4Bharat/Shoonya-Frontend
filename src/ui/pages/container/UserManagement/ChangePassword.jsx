@@ -41,7 +41,7 @@ const ChangePassword = (props) => {
     setSnackbarInfo({
         open: apiMessage ? true : false,
         variant: apiError ? "error" : "success",
-        message: apiMessage,
+        message: apiMessage ,
     });
 }, [apiMessage, apiError])
 
