@@ -26,7 +26,7 @@ import Spinner from "../../component/common/Spinner"
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = ["context", "input_language", "output_language"];
 
-const TaskTable = () => {
+const TaskTable = (props) => {
     const classes = DatasetStyle();
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -39,8 +39,17 @@ const TaskTable = () => {
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
+    const filterData = {
+        Status : props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"],
+        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
+            return {
+                label: el.username,
+                value: el.id
+            }
+        }) : []
+    }
     const [selectedFilters, setsSelectedFilters] = useState(
-        (TaskFilter && TaskFilter.id === id) ? TaskFilter.filters : {task_status: "unlabeled", user_filter: -1});
+        (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {task_status: filterData.Status[0], user_filter: -1});
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const NextTask = useSelector(state => state.getNextTask.data);
@@ -63,18 +72,8 @@ const TaskTable = () => {
     const [labellingStarted, setLabellingStarted] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const filterData = {
-        Status : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
-            return {
-                label: el.username,
-                value: el.id
-            }
-        }) : []
-    }
-
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters, props.type);
         dispatch(APITransport(taskObj));
     }
 
@@ -185,7 +184,7 @@ const TaskTable = () => {
     }, [currentPageNumber, currentRowPerPage]);
 
     useEffect(() => {
-        dispatch(SetTaskFilter(id, selectedFilters));
+        dispatch(SetTaskFilter(id, selectedFilters, props.type));
         if (currentPageNumber !== 1) {
             setCurrentPageNumber(1);
         } else {
@@ -201,12 +200,20 @@ const TaskTable = () => {
                 ]
                 row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
                 taskList[0].task_status && row.push(el.task_status);
-                row.push(<Link to={`task/${el.id}`} className={classes.link}>
+                props.type === "annotation" && row.push(<Link to={`task/${el.id}`} className={classes.link}>
                             <CustomButton
                                 onClick={() => {console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
                                 sx={{ p: 1, borderRadius: 2 }}
                                 label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
                                     {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
+                                </Typography>} />
+                        </Link>);
+                props.type === "review" && row.push(<Link to={`review/${el.id}`} className={classes.link}>
+                            <CustomButton
+                                onClick={() => {console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
+                                sx={{ p: 1, borderRadius: 2 }}
+                                label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
+                                    Review
                                 </Typography>} />
                         </Link>);
                 return row;
@@ -279,7 +286,7 @@ const TaskTable = () => {
 
     useEffect(() => {
         if(labellingStarted && Object.keys(NextTask).length > 0) {
-          navigate(`/projects/${id}/task/${NextTask.id}`);
+          navigate(`/projects/${id}/${props.type === "annotation" ? "task" : "review"}/${NextTask.id}`);
         }
         //TODO: display no more tasks message
       }, [NextTask]);

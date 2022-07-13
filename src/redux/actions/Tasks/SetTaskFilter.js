@@ -1,11 +1,12 @@
 import constants from "../../constants"
 
-export default function SetTaskFilter(id, filters) {
+export default function SetTaskFilter(id, filters, type = "annotation") {
     return {
         type: constants.SET_TASK_FILTER,
         payload: {
             id,
-            filters
+            filters,
+            type
         }
     }
 }

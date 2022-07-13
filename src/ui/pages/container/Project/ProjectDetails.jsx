@@ -171,22 +171,26 @@ const Projects = () => {
                     </Link>}
                     <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
-                            <Tab label={translate("label.tasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
-                        <TaskTable />
+                        <TaskTable type="annotation"/>
                     </TabPanel>
-                    <TabPanel value={value} index={1}>
+                    {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <TabPanel value={value} index={1}>
+                        <TaskTable type="review"/>
+                    </TabPanel>}
+                    <TabPanel value={value} index={userDetails?.role !== 1 && ProjectDetails.enable_task_reviews ? 2: 1}>
                         <MembersTable dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
-                    <TabPanel value={value} index={2}>
+                    {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <TabPanel value={value} index={3}>
                         <MembersTable dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
-                    </TabPanel>
-                    <TabPanel value={value} index={3}>
+                    </TabPanel>}
+                    <TabPanel value={value} index={userDetails?.role !== 1 && ProjectDetails.enable_task_reviews ? 4 : 2}>
                         <ReportsTable />
                     </TabPanel>
                 </Card>
