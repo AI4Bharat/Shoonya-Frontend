@@ -22,6 +22,7 @@ const localisation = {
     "button.submit":"Submit",
     "label.workspaces":"Workspaces",
     "label.members":"Members",
+    "label.reviewers":"Reviewers",
     "label.invites":"Invites",
     "label.settings":"Settings",
     "label.tasks":"Tasks",

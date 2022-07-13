@@ -11,6 +11,7 @@ import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { translate } from "../../../../config/localisation";
 import TabPanel from "../../component/common/TabPanel";
+import addUserTypes from "../../../../constants/addUserTypes";
 
 
 
@@ -172,6 +173,7 @@ const Projects = () => {
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
                             <Tab label={translate("label.tasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
@@ -179,9 +181,12 @@ const Projects = () => {
                         <TaskTable />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        <MembersTable dataSource={ProjectDetails.users} type="project" />
+                        <MembersTable dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
+                        <MembersTable dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
+                    </TabPanel>
+                    <TabPanel value={value} index={3}>
                         <ReportsTable />
                     </TabPanel>
                 </Card>
