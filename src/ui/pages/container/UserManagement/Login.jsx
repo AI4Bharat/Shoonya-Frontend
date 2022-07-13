@@ -39,14 +39,29 @@ const Login = () => {
     variant: "success",
   });
 
-  useEffect(() => {
-    // localStorage.clear();
-    window.addEventListener("keypress", (key) => {
-      if (key.code === "Enter") {
+  const [isPressed, setIsPressed] = useState(false);
+  
+  const keyPress = (e) => {
+    if (e.code === "Enter") {
+      if (!isPressed) {
+        setIsPressed(true);
         createToken();
       }
-    });
-  });
+    }
+  };
+
+  const keyRelease = () => {
+    setIsPressed(false);
+  };
+  
+  useEffect(() => {
+    window.addEventListener("keydown", keyPress);
+    window.addEventListener("keyup", keyRelease);
+    return () => {
+      window.removeEventListener("keydown", keyPress);
+      window.removeEventListener("keyup", keyRelease);
+    }
+  }, [keyPress, keyRelease]);
 
   const createToken = () => {
     const apiObj = new LoginAPI(credentials.email, credentials.password);
