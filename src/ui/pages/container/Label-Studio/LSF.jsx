@@ -53,7 +53,8 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
   const tasksComplete = (id) => {
     if (id) {
       resetNotes()
-      navigate(`/projects/${projectId}/task/${id}`, {replace: true});
+      // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
+      navigate(`/projects/${projectId}/task/${id}`);
     } else {
       // navigate(-1);
       resetNotes()
@@ -399,8 +400,9 @@ export default function LSF() {
         color="primary"
         onClick={() => {
           localStorage.removeItem("labelAll");
-          window.location.replace(`/#/projects/${projectId}`);
-          window.location.reload();
+          navigate(`/projects/${projectId}`);
+          //window.location.replace(`/#/projects/${projectId}`);
+          //window.location.reload();
         }}
       >
         Back to Project

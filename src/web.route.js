@@ -28,6 +28,8 @@ import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
 import LSF from "./ui/pages/container/Label-Studio/LSF";
 import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage";
+import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
+import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance"
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -123,13 +125,17 @@ const App = () => {
           element={ProtectedRouteWrapper(<Layout component={<UserProfilePage />} />)}
         />
         <Route
+          path="/profile/:id"
+          element={ProtectedRouteWrapper(<Layout component={<ProfilePage />} Backbutton={true}/>)}
+        />
+        <Route
           path="/projects"
           element={ProtectedRouteWrapper(<Layout component={<Dashboard />} />)}
         />
         <Route
           path="projects/:id"
           element={ProtectedRouteWrapper(
-            <Layout component={<Projects />} Backbutton={true} />
+            <Layout component={<Projects />} Backbutton={true} backPressNavigationPath={"/projects"} />
           )}
         />
         <Route
@@ -189,6 +195,12 @@ const App = () => {
           path="transliteration/"
           element={ProtectedRouteWrapper(
             <Layout component={<Transliteration />} Backbutton={true} />
+          )}
+        />
+         <Route
+          path="create-Dataset-Instance-Button"
+          element={ProtectedRouteWrapper(
+            <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
           )}
         />
       </Routes>

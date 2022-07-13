@@ -35,6 +35,7 @@ const localisation = {
     "alert.notes": "Please do not add notes if you are going to skip the task!",
     "label.datasets": "Datasets",
     "button.downloadDataset": "Download Dataset",
+    "button.uploadData":"Upload Data",
 };
 
 export const translate = (prop) => localisation[prop];
