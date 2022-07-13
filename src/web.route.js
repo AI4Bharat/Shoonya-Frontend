@@ -30,6 +30,8 @@ import LSF from "./ui/pages/container/Label-Studio/LSF";
 import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage";
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
+import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
+import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance"
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -127,6 +129,10 @@ const App = () => {
          <Route
           path="/Change-Password"
           element={ProtectedRouteWrapper(<Layout component={<ChangePassword />} Backbutton={true} />)}
+        />
+        <Route
+          path="/profile/:id"
+          element={ProtectedRouteWrapper(<Layout component={<ProfilePage />} Backbutton={true}/>)}
         />
         <Route
           path="/projects"
