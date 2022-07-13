@@ -80,7 +80,9 @@ const Login = () => {
           setSnackbarInfo({
             open: true,
             variant: "error",
-            message: "Username or Password incorrect.",
+            // message: "Username or Password incorrect.",
+            message: rsp_data.detail
+
           });
         } else {
           localStorage.setItem("shoonya_access_token", rsp_data.access);
