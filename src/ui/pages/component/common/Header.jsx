@@ -27,6 +27,7 @@ import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@material-ui/core";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import Logout from "../../../../redux/actions/UserManagement/Logout";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -61,6 +62,7 @@ const Header = () => {
 
   const onLogoutClick = () => {
     handleCloseUserMenu();
+    dispatch(Logout());
     // ExpireSession();
     localStorage.clear();
     navigate("/");
