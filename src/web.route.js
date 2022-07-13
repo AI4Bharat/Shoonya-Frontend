@@ -28,7 +28,8 @@ import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
 import LSF from "./ui/pages/container/Label-Studio/LSF";
 import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage";
-import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance"
+import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
+import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -122,6 +123,10 @@ const App = () => {
         <Route
           path="/profile"
           element={ProtectedRouteWrapper(<Layout component={<UserProfilePage />} />)}
+        />
+         <Route
+          path="/Change-Password"
+          element={ProtectedRouteWrapper(<Layout component={<ChangePassword />} />)}
         />
         <Route
           path="/projects"
