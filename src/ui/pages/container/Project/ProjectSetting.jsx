@@ -89,11 +89,11 @@ const ProjectSetting = (props) => {
        
       }, [ProjectDetails]);
 
-    const getSaveButtonAPI = () => {
-        const projectObj = new GetSaveButtonAPI(id, ProjectDetails);
+    // const getSaveButtonAPI = () => {
+    //     const projectObj = new GetSaveButtonAPI(id, ProjectDetails);
 
-        dispatch(APITransport(projectObj));
-    }
+    //     dispatch(APITransport(projectObj));
+    // }
 
 
 
@@ -180,7 +180,18 @@ const ProjectSetting = (props) => {
    
 
     const handleSave = () => {
-        getSaveButtonAPI()
+       
+        const sendData ={
+            title:newDetails.title,
+            description:ProjectDetails.description,
+            tgt_language: targetLanguage,
+            src_language: sourceLanguage,
+            project_type: ProjectDetails.project_type,
+            project_mode:ProjectDetails.project_mode,
+        }
+        console.log(sendData,"sendData")
+        const projectObj = new GetSaveButtonAPI(id, sendData);
+        dispatch(APITransport(projectObj));
     }
     const handleExportProject = () => {
         getExportProjectButton();

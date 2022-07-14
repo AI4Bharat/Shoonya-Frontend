@@ -6,14 +6,10 @@
 import constants from "../../../constants";
  
  export default class GetSaveButtonAPI extends API {
-   constructor(projectId,ProjectDetails,description,title, timeout = 2000) {
-    console.log(projectId,"projectId",ProjectDetails,"ProjectDetails")
+   constructor(projectId,projectObj, timeout = 2000) {
      super("PUT", timeout, false);
-     this.title = ProjectDetails.title;
-     this.description = ProjectDetails.description;
-     this.project_mode = ProjectDetails.project_mode;
-     this.project_type = ProjectDetails.project_type;
-     this.type = constants.GET_SAVE_BUTTON;
+     this.projectObj = projectObj;
+    //  this.type = constants.GET_SAVE_BUTTON;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}`;
    }
  
@@ -27,14 +23,8 @@ import constants from "../../../constants";
    apiEndPoint() {
      return this.endpoint;
    }
- 
    getBody() {
-    return {
-      title:this.title,
-      description: this.description, 
-      project_mode:this.project_mode,
-      project_type:this.project_type,
-    };
+    return this.projectObj;
   }
  
    getHeaders() {
