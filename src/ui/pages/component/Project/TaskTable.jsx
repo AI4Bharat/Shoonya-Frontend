@@ -39,8 +39,10 @@ const TaskTable = (props) => {
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
+    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const filterData = {
-        Status : props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"],
+        Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
             return {
                 label: el.username,
@@ -50,8 +52,6 @@ const TaskTable = (props) => {
     }
     const [selectedFilters, setsSelectedFilters] = useState(
         (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {task_status: filterData.Status[0], user_filter: -1});
-    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState();
@@ -269,15 +269,15 @@ const TaskTable = (props) => {
     }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, userDetails])
 
     useEffect(() => {
-        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
-            setPullDisabled("You have too many unlabeled tasks")
-        } else if (pullDisabled === "You have too many unlabeled tasks") {
+        if (totalTaskCount && ((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
+            setPullDisabled(`You have too many ${selectedFilters.task_status} tasks`)
+        } else if (pullDisabled === "You have too many unlabeled tasks" || pullDisabled === "You have too many labeled tasks") {
             setPullDisabled("")
         }
     }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters])
 
     useEffect(() => {
-        if (selectedFilters.task_status === "unlabeled" && totalTaskCount === 0) {
+        if (((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && totalTaskCount === 0) {
             setDeallocateDisabled("No more tasks to deallocate")
         } else if (deallocateDisabled === "No more tasks to deallocate") {
             setDeallocateDisabled("")
@@ -406,7 +406,7 @@ const TaskTable = (props) => {
                     spacing={2}
                     sx={{ mb: 2, mt: 2 }}
                 >
-                    {selectedFilters.task_status === "unlabeled" && <Grid item xs={12} sm={12} md={3}>
+                    {((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && <Grid item xs={12} sm={12} md={3}>
                     <Tooltip title={deallocateDisabled}>
                         <Box>
                             <CustomButton 

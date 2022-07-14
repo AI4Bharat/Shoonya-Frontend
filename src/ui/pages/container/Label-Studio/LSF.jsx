@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useContext, useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, TextareaAutosize, Card } from "@mui/material";
+import { Tooltip, Button, Alert, TextareaAutosize, Card, TextField } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -29,7 +29,7 @@ import { translate } from '../../../../config/localisation';
 //used just in postAnnotation to support draft status update.
 let task_status = "accepted";
 
-const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNotes}) => {
+const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
@@ -48,7 +48,6 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
 
   console.log("projectId, taskId", projectId, taskId);
   // debugger
-  console.log("notesRef", notesRef);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -79,7 +78,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
     labelConfig,
     annotations,
     predictions,
-    notesRef
+    annotationNotesRef,
   ) {
     let load_time;
     let interfaces = [];
@@ -173,7 +172,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
               load_time,
               annotation.lead_time,
               task_status,
-              notesRef.current
+              annotationNotesRef.current.value
             ).then((res) => {
               if (localStorage.getItem("labelAll"))
                 getNextProject(projectId, taskData.id).then((res) => {
@@ -219,7 +218,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
                   load_time,
                   annotations[i].lead_time,
                   task_status,
-                  notesRef.current
+                  annotationNotesRef.current.value
                   ).then(() => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
@@ -275,13 +274,13 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
             labelConfig.label_config,
             annotations,
             predictions,
-            notesRef
+            annotationNotesRef
           );
           hideLoader();
         }
       );
     }
-  }, [labelConfig, userData, notesRef, taskId]);
+  }, [labelConfig, userData, annotationNotesRef, taskId]);
 
   useEffect(() => {
     showLoader();
@@ -358,9 +357,10 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
 
 export default function LSF() {
   const [showNotes, setShowNotes] = useState(false);
-  const notesRef = useRef(null);
+  const annotationNotesRef = useRef(null);
+  const reviewNotesRef = useRef(null);
   const {taskId} = useParams()
-  const [notesValue, setNotesValue] = useState('');
+  // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
@@ -370,20 +370,18 @@ export default function LSF() {
   }
 
   useEffect(()=>{
+    console.log("useeffect", taskId)
     fetchAnnotation(taskId).then((data)=>{
       if(data && Array.isArray(data) && data.length > 0) {
-        setNotesValue(data[0].notes);
+        annotationNotesRef.current.value = data[0].annotation_notes?? '';
+        reviewNotesRef.current.value = data[0].review_notes?? '';
       }
     })
-  }, [setNotesValue, taskId]);
-
-  useEffect(()=>{
-    notesRef.current = notesValue;
-  }, [notesValue])
+  }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);
-    setNotesValue("");
+    annotationNotesRef.current.value = "";
   }
 
   useEffect(()=>{
@@ -426,14 +424,37 @@ export default function LSF() {
           <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert>
-          <TextareaAutosize 
+          <TextField
+            multiline 
             placeholder="Place your remarks here ..." 
-            value={notesValue} 
-            onChange={event=>setNotesValue(event.target.value)} 
-            style={{width: '99%', minHeight: '80px'}}
+            label="Annotation Notes"
+            // value={notesValue} 
+            // onChange={event=>setNotesValue(event.target.value)} 
+            inputRef={annotationNotesRef}
+            rows={2}
+            maxRows={4}
+            inputProps={{
+              style: {fontSize: "1rem",},
+            }}
+            style={{width: '99%'}}
+          />
+          <TextField
+            multiline 
+            placeholder="Place your remarks here ..." 
+            label="Review Notes"
+            // value={notesValue} 
+            // onChange={event=>setNotesValue(event.target.value)} 
+            inputRef={reviewNotesRef}
+            rows={2}
+            maxRows={4}
+            inputProps={{
+              style: {fontSize: "1rem",},
+              readOnly: true,
+            }}
+            style={{width: '99%', marginTop: '1%'}}
           />
         </div>
-        <LabelStudioWrapper resetNotes={()=>resetNotes()} notesRef={notesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
+        <LabelStudioWrapper resetNotes={()=>resetNotes()} annotationNotesRef={annotationNotesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
       </Card>
     </div>
   );

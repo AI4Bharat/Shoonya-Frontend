@@ -48,7 +48,7 @@ const postAnnotation = async (result, task, completed_by, load_time, lead_time, 
       completed_by: completed_by,
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       task_status: task_status,
-      notes: notes
+      annotation_notes: notes
     },
     )
     .then((res)=> {
@@ -68,7 +68,7 @@ const patchAnnotation = async (result, annotationID, load_time, lead_time, task_
       result: result,
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       task_status: task_status,
-      notes: notes
+      annotation_notes: notes
     });
   } catch (err) {
     return err;
