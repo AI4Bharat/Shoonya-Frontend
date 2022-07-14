@@ -2,7 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { TextField, Box, Stack, Button, Grid } from "@mui/material";
+import {
+  TextField,
+  Box,
+  Stack,
+  Button,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
 import { DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import InputLabel from "@mui/material/InputLabel";
@@ -25,17 +32,25 @@ import GetWorkspaceProjectReportAPI from "../../../../redux/actions/api/Workspac
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
-import ColumnList from '../common/ColumnList';
+import ColumnList from "../common/ColumnList";
 
 const WorkspaceReports = () => {
-  const WorkspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
+  const WorkspaceDetails = useSelector(
+    (state) => state.getWorkspaceDetails.data
+  );
   const [startDate, setStartDate] = useState(
-    format(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd')
+    format(
+      Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
+      "yyyy-MM-dd"
+    )
   );
   const [endDate, setEndDate] = useState(format(Date.now(), "yyyy-MM-dd"));
   const [selectRange, setSelectRange] = useState("Till Date");
   const [rangeValue, setRangeValue] = useState([
-    format(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'),
+    format(
+      Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
+      "yyyy-MM-dd"
+    ),
     Date.now(),
   ]);
   const [showPicker, setShowPicker] = useState(false);
@@ -45,6 +60,7 @@ const WorkspaceReports = () => {
   const [language, setLanguage] = useState("all");
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
+  const [showSpinner, setShowSpinner] = useState(false);
   const [reportData, setReportData] = useState([]);
   const classes = DatasetStyle();
 
@@ -57,9 +73,7 @@ const WorkspaceReports = () => {
   const ProjectReports = useSelector(
     (state) => state.getWorkspaceProjectReports.data
   );
-  const LanguageChoices = useSelector(
-    (state) => state.fetchLanguages.data
-  );
+  const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -130,23 +144,24 @@ const WorkspaceReports = () => {
       setReportData([]);
       setSelectedColumns([]);
     }
+    setShowSpinner(false);
   }, [ProjectReports]);
 
   const renderToolBar = () => {
-    const buttonSXStyle = { borderRadius: 2, margin: 2 }
+    const buttonSXStyle = { borderRadius: 2, margin: 2 };
     return (
       <Box className={classes.filterToolbarContainer}>
         <ColumnList
-            columns={columns}
-            setColumns={setSelectedColumns}
-            selectedColumns={selectedColumns}
+          columns={columns}
+          setColumns={setSelectedColumns}
+          selectedColumns={selectedColumns}
         />
       </Box>
-    )
-}
+    );
+  };
 
-const options = {
-    filterType: 'checkbox',
+  const options = {
+    filterType: "checkbox",
     selectableRows: "none",
     download: false,
     filter: false,
@@ -154,7 +169,12 @@ const options = {
     search: false,
     viewColumns: false,
     customToolbar: renderToolBar,
-};
+    textLabels: {
+      body: {
+        noMatch: "No Record Found!",
+      },
+    },
+  };
 
   const handleOptionChange = (e) => {
     setSelectRange(e.target.value);
@@ -166,25 +186,25 @@ const options = {
     if (e.target.value === "Today") {
       setStartDate(format(Date.now(), "yyyy-MM-dd"));
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
-    }
-    else if (e.target.value === "Yesterday") {
+    } else if (e.target.value === "Yesterday") {
       setStartDate(format(addDays(Date.now(), -1), "yyyy-MM-dd"));
       setEndDate(format(addDays(Date.now(), -1), "yyyy-MM-dd"));
-    }
-    else if (e.target.value === "This Week") {
+    } else if (e.target.value === "This Week") {
       setStartDate(format(startOfWeek(Date.now()), "yyyy-MM-dd"));
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
-    }
-    else if (e.target.value === "Last Week") {
+    } else if (e.target.value === "Last Week") {
       setStartDate(format(startOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
       setEndDate(format(lastDayOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
-    }
-    else if (e.target.value === "This Month") {
+    } else if (e.target.value === "This Month") {
       setStartDate(format(startOfMonth(Date.now()), "yyyy-MM-dd"));
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
-    }
-    else if (e.target.value === "Till Date") {
-      setStartDate(format(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
+    } else if (e.target.value === "Till Date") {
+      setStartDate(
+        format(
+          Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
+          "yyyy-MM-dd"
+        )
+      );
       setEndDate(format(Date.now(), "yyyy-MM-dd"));
     }
   };
@@ -203,18 +223,20 @@ const options = {
         selectedType,
         startDate,
         endDate,
-        language,
+        language
       );
       dispatch(APITransport(userReportObj));
+      setShowSpinner(true);
     } else if (reportType === "project") {
       const projectReportObj = new GetWorkspaceProjectReportAPI(
         id,
         selectedType,
         startDate,
         endDate,
-        language,
+        language
       );
       dispatch(APITransport(projectReportObj));
+      setShowSpinner(true);
     }
   };
 
@@ -228,9 +250,18 @@ const options = {
           marginBottom: "24px",
         }}
       >
-        <Grid item xs={12} sm={12} md={showPicker ? 4 : 2} lg={showPicker ? 4 : 2} xl={showPicker ? 4 : 2}>
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={showPicker ? 4 : 2}
+          lg={showPicker ? 4 : 2}
+          xl={showPicker ? 4 : 2}
+        >
           <FormControl fullWidth>
-            <InputLabel id="date-range-select-label"sx={{fontSize:"16px"}}>Date Range</InputLabel>
+            <InputLabel id="date-range-select-label" sx={{ fontSize: "16px" }}>
+              Date Range
+            </InputLabel>
             <Select
               labelId="date-range-select-label"
               id="date-range-select"
@@ -244,32 +275,48 @@ const options = {
               <MenuItem value={"This Week"}>This Week</MenuItem>
               <MenuItem value={"Last Week"}>Last Week</MenuItem>
               <MenuItem value={"This Month"}>This Month</MenuItem>
-              {WorkspaceDetails?.created_at && <MenuItem value={"Till Date"}>Till Date</MenuItem>}
+              {WorkspaceDetails?.created_at && (
+                <MenuItem value={"Till Date"}>Till Date</MenuItem>
+              )}
               <MenuItem value={"Custom Range"}>Custom Range</MenuItem>
             </Select>
           </FormControl>
         </Grid>
-        {showPicker && <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
+        {showPicker && (
+          <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
             <LocalizationProvider
-            dateAdapter={AdapterDateFns}
-            localeText={{ start: "Start Date", end: "End Date" }}
-          >
-            <DateRangePicker
-              value={rangeValue}
-              onChange={handleRangeChange}
-              renderInput={(startProps, endProps) => (
-                <React.Fragment>
-                  <TextField {...startProps} sx={{width: "48%"}}/>
-                  <Box sx={{ mx: 2, width: "4%", textAlign: "center" }}> to </Box>
-                  <TextField {...endProps} sx={{width: "48%"}}/>
-                </React.Fragment>
-              )}
-            />
-          </LocalizationProvider>
-        </Grid>}
-        <Grid item xs={12} sm={12} md={showPicker ? 4 : 3} lg={showPicker ? 4 : 3} xl={showPicker ? 4 : 3}>
+              dateAdapter={AdapterDateFns}
+              localeText={{ start: "Start Date", end: "End Date" }}
+            >
+              <DateRangePicker
+                value={rangeValue}
+                onChange={handleRangeChange}
+                renderInput={(startProps, endProps) => (
+                  <React.Fragment>
+                    <TextField {...startProps} sx={{ width: "48%" }} />
+                    <Box sx={{ mx: 2, width: "4%", textAlign: "center" }}>
+                      {" "}
+                      to{" "}
+                    </Box>
+                    <TextField {...endProps} sx={{ width: "48%" }} />
+                  </React.Fragment>
+                )}
+              />
+            </LocalizationProvider>
+          </Grid>
+        )}
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={showPicker ? 4 : 3}
+          lg={showPicker ? 4 : 3}
+          xl={showPicker ? 4 : 3}
+        >
           <FormControl fullWidth>
-            <InputLabel id="project-type-label" sx={{fontSize:"16px"}}>Project Type</InputLabel>
+            <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
+              Project Type
+            </InputLabel>
             <Select
               labelId="project-type-label"
               id="project-type-select"
@@ -285,9 +332,18 @@ const options = {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12} md={showPicker ? 4 : 3} lg={showPicker ? 4 : 3} xl={showPicker ? 4 : 3}>
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={showPicker ? 4 : 3}
+          lg={showPicker ? 4 : 3}
+          xl={showPicker ? 4 : 3}
+        >
           <FormControl fullWidth>
-            <InputLabel id="report-type-label" sx={{fontSize:"16px"}}>Report Type</InputLabel>
+            <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>
+              Report Type
+            </InputLabel>
             <Select
               labelId="report-type-label"
               id="report-select"
@@ -302,7 +358,9 @@ const options = {
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth>
-            <InputLabel id="language-label" sx={{fontSize:"16px"}}>Target Language</InputLabel>
+            <InputLabel id="language-label" sx={{ fontSize: "16px" }}>
+              Target Language
+            </InputLabel>
             <Select
               labelId="language-label"
               id="language-select"
@@ -314,24 +372,27 @@ const options = {
               {LanguageChoices.language?.map((lang) => (
                 <MenuItem value={lang} key={lang}>
                   {lang}
-                </MenuItem>))}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
-            <Button
-                variant="contained"
-                onClick={handleDateSubmit}
-                sx={{
-                    width: "100%",
-                   mt:2,
-                }}
-            >
-                Submit
-            </Button>
+          <Button
+            variant="contained"
+            onClick={handleDateSubmit}
+            sx={{
+              width: "100%",
+              mt: 2,
+            }}
+          >
+            Submit
+          </Button>
         </Grid>
       </Grid>
-      {reportData?.length > 0 && (
+      {showSpinner ? (
+        <CircularProgress sx={{ mx: "auto", display: "block" }} />
+      ) : (
         <MUIDataTable
           title={""}
           data={reportData}
