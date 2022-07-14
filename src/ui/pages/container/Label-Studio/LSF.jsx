@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, Card, TextField } from "@mui/material";
+import { Tooltip, Button, Alert, Card, TextField, Box } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -53,6 +53,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const tasksComplete = (id) => {
     if (id) {
       resetNotes()
+      // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
       navigate(`/projects/${projectId}/task/${id}`);
     } else {
       // navigate(-1);
@@ -359,7 +360,12 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           )}
         </div>
       </div>}
-      <div className="label-studio-root" ref={rootRef}></div>
+      <Box
+        sx={{border : "1px solid rgb(224 224 224)"}}
+      >
+        <div className="label-studio-root" ref={rootRef}></div>
+      </Box>
+      
       {loader}
       {renderSnackBar()}
     </div>
