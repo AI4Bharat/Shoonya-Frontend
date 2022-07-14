@@ -22,6 +22,7 @@ const MyProfile = () => {
   const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
 
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+  console.log(userDetails,"userDetails")
   const dispatch = useDispatch();
   const LanguageList = useSelector(state => state.fetchLanguages.data);
 

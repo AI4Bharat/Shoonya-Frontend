@@ -49,6 +49,7 @@ const ProjectSetting = (props) => {
     const [languageOptions, setLanguageOptions] = useState([]);
     const [spinner, setSpinner] = React.useState(false);
     const [loading, setLoading] = useState(false);
+    const [newDetails, setNewDetails] = useState();
     const { id } = useParams();
 
     const classes = DatasetStyle();
@@ -58,7 +59,7 @@ const ProjectSetting = (props) => {
     console.log(apiMessage, "apiMessage")
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-
+    console.log(ProjectDetails,"ProjectDetails")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
@@ -78,6 +79,15 @@ const ProjectSetting = (props) => {
         }
     }, [ProjectDetails]);
 
+
+    useEffect(() => {
+        setNewDetails({
+            title: ProjectDetails.title,
+          description: ProjectDetails.description,
+         
+        });
+       
+      }, [ProjectDetails]);
 
     const getSaveButtonAPI = () => {
         const projectObj = new GetSaveButtonAPI(id, ProjectDetails);
@@ -137,6 +147,7 @@ const ProjectSetting = (props) => {
 
 
     const ArchiveProject = useSelector(state => state.getArchiveProject.data);
+    console.log(ArchiveProject,"ArchiveProject")
     const [isArchived, setIsArchived] = useState(ArchiveProject.is_archived);
     const getArchiveProjectAPI = () => {
         const projectObj = new GetArchiveProjectAPI(id);
@@ -207,6 +218,15 @@ const ProjectSetting = (props) => {
     useEffect(()=>{
         setLoading(apiLoading);
     },[apiLoading])
+
+    const handleProjectName =(event)=>{
+        setValue(event.target.value)
+        event.preventDefault();
+    setNewDetails((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+    }
 
     const renderSnackBar = () => {
         return (
@@ -305,9 +325,11 @@ const ProjectSetting = (props) => {
                         >
                             <OutlinedTextField 
                             fullWidth 
+                            name="title"
                             InputProps={{ style: { fontSize: "16px" } }}
-                            value={ProjectDetails.title}
-                             onChange={(e) => setValue(e.target.value)} />
+                            // value={ProjectDetails.title}
+                            value={newDetails?.title}
+                             onChange={handleProjectName} />
                         </Grid>
                     </Grid>
                     <Grid
@@ -343,9 +365,10 @@ const ProjectSetting = (props) => {
                         >
                             <OutlinedTextField
                                 fullWidth
+                                name="description"
                                 InputProps={{ style: { fontSize: "16px" } }}
-                                value={ProjectDetails.description}
-                                onChange={(e) => setValue(e.target.value)}
+                                value={newDetails?.description}
+                                onChange={handleProjectName}
                             />
                         </Grid>
                     </Grid>
