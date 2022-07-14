@@ -188,6 +188,8 @@ const ProjectSetting = (props) => {
             src_language: sourceLanguage,
             project_type: ProjectDetails.project_type,
             project_mode:ProjectDetails.project_mode,
+            users:ProjectDetails.users,
+            annotation_reviewers:ProjectDetails.annotation_reviewers,
         }
         console.log(sendData,"sendData")
         const projectObj = new GetSaveButtonAPI(id, sendData);

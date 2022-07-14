@@ -10,7 +10,7 @@ import constants from "../../../constants";
      super("PUT", timeout, false);
      this.projectObj = projectObj;
     //  this.type = constants.GET_SAVE_BUTTON;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/`;
    }
  
    processResponse(res) {
