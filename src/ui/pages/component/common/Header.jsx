@@ -108,6 +108,191 @@ const Header = () => {
     }
   };
 
+  const renderTabs = () => {
+    if (loggedInUserData?.role === 1) {
+      return(
+        <Grid
+          container
+          direction="row"
+          // justifyContent="space-evenly"
+          // spacing={0}
+          columnGap={2}
+          rowGap={2}
+          xs={12}
+          sm={12}
+          md={7}
+        >
+          {/* <Typography variant="body1">
+            <NavLink
+              hidden={loggedInUserData.role === 1}
+              to={
+                loggedInUserData && loggedInUserData.organization
+                  ? `/my-organization/${loggedInUserData.organization.id}`
+                  : `/my-organization/1`
+              }
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Organization
+            </NavLink>
+          </Typography> */}
+          {/* <Typography variant="body1">
+            <NavLink
+              hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
+              to="/workspaces"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Workspaces
+            </NavLink>
+          </Typography> */}
+          <Typography variant="body1">
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Projects
+            </NavLink>
+          </Typography>
+          {/* <Typography variant="body1">
+            <NavLink
+              hidden={loggedInUserData.role === 1}
+              to="/datasets"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Datasets
+            </NavLink>
+          </Typography> */}
+        </Grid>
+      )
+    } else if (loggedInUserData?.role === 2) {
+      return(<Grid
+          container
+          direction="row"
+          // justifyContent="space-evenly"
+          // spacing={0}
+          columnGap={2}
+          rowGap={2}
+          xs={12}
+          sm={12}
+          md={7}
+        >
+          <Typography variant="body1">
+            <NavLink
+              to={
+                loggedInUserData && loggedInUserData.organization
+                  ? `/my-organization/${loggedInUserData.organization.id}`
+                  : `/my-organization/1`
+              }
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Organization
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/workspaces"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Workspaces
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Projects
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/datasets"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Datasets
+            </NavLink>
+          </Typography>
+        </Grid>)
+    } else if (loggedInUserData?.role === 3) {
+      return(<Grid
+          container
+          direction="row"
+          // justifyContent="space-evenly"
+          // spacing={0}
+          columnGap={2}
+          rowGap={2}
+          xs={12}
+          sm={12}
+          md={7}
+        >
+          <Typography variant="body1">
+            <NavLink
+              to={
+                loggedInUserData && loggedInUserData.organization
+                  ? `/my-organization/${loggedInUserData.organization.id}`
+                  : `/my-organization/1`
+              }
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Organization
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Projects
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/datasets"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Datasets
+            </NavLink>
+          </Typography>
+        </Grid>)
+    } else {
+      return(
+        null
+      )
+    }
+  }
+
   const tabs = [
     <Typography variant="body1">
       <NavLink
@@ -127,7 +312,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1|| loggedInUserData.role === 3}
+        hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -198,13 +383,13 @@ const Header = () => {
     {
       name: "Help",
       onclick: () => {
-       
+
         const url = 'https://github.com/AI4Bharat/Shoonya/wiki/Shoonya-FAQ'
         window.open(url, '_blank');
-       
+
       },
     },
-   
+
     // {
     //   name: "Feedback",
     //   onclick: () => {},
@@ -234,7 +419,7 @@ const Header = () => {
                   <img src={Logo} alt="logo" className={classes.headerLogo} />
                 </Link>
               </Grid>
-              <Grid
+              {/* <Grid
                 container
                 direction="row"
                 // justifyContent="space-evenly"
@@ -246,7 +431,8 @@ const Header = () => {
                 md={7}
               >
                 {tabs.map((tab) => tab)}
-              </Grid>
+              </Grid> */}
+              {renderTabs()}
 
               <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
                 <Grid
@@ -256,7 +442,7 @@ const Header = () => {
                   spacing={2}
                   sx={{ textAlign: "center", alignItems: "center" }}
                 >
-                   <Grid item xs={3} sm={3} md={2}>
+                  <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="help">
                       <IconButton onClick={handleOpenHelpMenu}>
                         <HelpOutlineIcon
@@ -393,7 +579,7 @@ const Header = () => {
                     </MenuItem>
                   ))}
                 </Menu>
-             
+
               </Box>
             </Toolbar>
           </AppBar>
