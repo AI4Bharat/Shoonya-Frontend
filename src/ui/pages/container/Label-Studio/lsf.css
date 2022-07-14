@@ -66,23 +66,6 @@
      overflow: visible
  }
  
- h1,
- h2,
- h3,
- h4,
- h5,
- h6 {
-     color: rgba(0, 0, 0, .85);
-     font-weight: 500;
-     margin-bottom: .5em;
-     margin-top: 0
- }
- 
- p {
-     margin-bottom: 1em;
-     margin-top: 0
- }
- 
  abbr[data-original-title],
  abbr[title] {
      border-bottom: 0;
