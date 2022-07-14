@@ -172,25 +172,25 @@ const Projects = () => {
                     <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
                             <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {ProjectDetails?.enable_task_reviews && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id) && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {ProjectDetails?.enable_task_reviews && (ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id) || userDetails?.role !== 1) && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
                         <TaskTable type="annotation"/>
                     </TabPanel>
-                    {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <TabPanel value={value} index={1}>
+                    {ProjectDetails?.enable_task_reviews && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id) && <TabPanel value={value} index={1}>
                         <TaskTable type="review"/>
                     </TabPanel>}
-                    <TabPanel value={value} index={userDetails?.role !== 1 && ProjectDetails.enable_task_reviews ? 2: 1}>
+                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id) ? 2: 1}>
                         <MembersTable dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
-                    {userDetails?.role !== 1 && ProjectDetails.enable_task_reviews && <TabPanel value={value} index={3}>
+                    {ProjectDetails?.enable_task_reviews && (ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id) || userDetails?.role !== 1) && <TabPanel value={value} index={ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id) ? 3 : 2}>
                         <MembersTable dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
-                    <TabPanel value={value} index={userDetails?.role !== 1 && ProjectDetails.enable_task_reviews ? 4 : 2}>
+                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id) ? 4 : userDetails?.role !== 1 ? 3 : 2}>
                         <ReportsTable />
                     </TabPanel>
                 </Card>

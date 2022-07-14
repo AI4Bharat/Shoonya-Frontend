@@ -9,11 +9,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 
 import {
   getProjectsandTasks,
-  postAnnotation,
-  updateTask,
   getNextProject,
-  patchAnnotation,
-  deleteAnnotation,
   fetchAnnotation
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
@@ -28,11 +24,9 @@ import { translate } from '../../../../config/localisation';
 
 //used just in postAnnotation to support draft status update.
 
-const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
+const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
-  const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-  const task_status = useRef(ProjectDetails.enable_task_reviews ? "labeled": "accepted");
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
   const navigate = useNavigate();
@@ -114,7 +108,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "update",
         "submit",
         "skip",
-        "controls",
+        // "controls",
         "infobar",
         "topbar",
         "instruction",
@@ -163,88 +157,88 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           ls.annotationStore.selectAnnotation(c.id);
           load_time = new Date();
         },
-        onSubmitAnnotation: function (ls, annotation) {
-          showLoader();
-          if (taskData.task_status !== "freezed") {
-            postAnnotation(
-              annotation.serializeAnnotation(),
-              taskData.id,
-              userData.id,
-              load_time,
-              annotation.lead_time,
-              task_status.current,
-              annotationNotesRef.current.value
-            ).then((res) => {
-              if (localStorage.getItem("labelAll"))
-                getNextProject(projectId, taskData.id).then((res) => {
-                  hideLoader();
-                  // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                  tasksComplete(res?.id || null);
-                })
-              else {
-                hideLoader();
-                window.location.reload();
-              }
-            })
-          }
-        //   else message.error("Task is freezed");
-        },
+        // onSubmitAnnotation: function (ls, annotation) {
+        //   showLoader();
+        //   if (taskData.task_status !== "freezed") {
+        //     postAnnotation(
+        //       annotation.serializeAnnotation(),
+        //       taskData.id,
+        //       userData.id,
+        //       load_time,
+        //       annotation.lead_time,
+        //       task_status.current,
+        //       annotationNotesRef.current.value
+        //     ).then((res) => {
+        //       if (localStorage.getItem("labelAll"))
+        //         getNextProject(projectId, taskData.id).then((res) => {
+        //           hideLoader();
+        //           // window.location.href = `/projects/${projectId}/task/${res.id}`;
+        //           tasksComplete(res?.id || null);
+        //         })
+        //       else {
+        //         hideLoader();
+        //         window.location.reload();
+        //       }
+        //     })
+        //   }
+        // //   else message.error("Task is freezed");
+        // },
 
-        onSkipTask: function () {
-        //   message.warning('Notes will not be saved for skipped tasks!');
-          showLoader();
-          updateTask(taskData.id).then(() => {
-            getNextProject(projectId, taskData.id).then((res) => {
-              hideLoader();
-              tasksComplete(res?.id || null);
-            });
-          })
-        },
+        // onSkipTask: function () {
+        // //   message.warning('Notes will not be saved for skipped tasks!');
+        //   showLoader();
+        //   updateTask(taskData.id).then(() => {
+        //     getNextProject(projectId, taskData.id).then((res) => {
+        //       hideLoader();
+        //       tasksComplete(res?.id || null);
+        //     });
+        //   })
+        // },
 
-        onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.task_status !== "freezed") {
-            for (let i = 0; i < annotations.length; i++) {
-              if (annotation.serializeAnnotation().id === annotations[i].result.id) {
-                showLoader();
-                let temp = annotation.serializeAnnotation()
+        // onUpdateAnnotation: function (ls, annotation) {
+        //   if (taskData.task_status !== "freezed") {
+        //     for (let i = 0; i < annotations.length; i++) {
+        //       if (annotation.serializeAnnotation().id === annotations[i].result.id) {
+        //         showLoader();
+        //         let temp = annotation.serializeAnnotation()
 
-                for (let i = 0; i < temp.length; i++) {
-                  if (temp[i].value.text) {
-                    temp[i].value.text = [temp[i].value.text[0]]
-                  }
-                }
-                patchAnnotation(
-                  temp,
-                  annotations[i].id,
-                  load_time,
-                  annotations[i].lead_time,
-                  task_status.current,
-                  annotationNotesRef.current.value
-                  ).then(() => {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id).then((res) => {
-                        hideLoader();
-                        tasksComplete(res?.id || null);
-                      })
-                    else{
-                      hideLoader();
-                      window.location.reload();
-                    }
-                  });
-              }
-            }
-          } 
-        //   else message.error("Task is freezed");
-        },
+        //         for (let i = 0; i < temp.length; i++) {
+        //           if (temp[i].value.text) {
+        //             temp[i].value.text = [temp[i].value.text[0]]
+        //           }
+        //         }
+        //         patchAnnotation(
+        //           temp,
+        //           annotations[i].id,
+        //           load_time,
+        //           annotations[i].lead_time,
+        //           task_status.current,
+        //           annotationNotesRef.current.value
+        //           ).then(() => {
+        //             if (localStorage.getItem("labelAll"))
+        //               getNextProject(projectId, taskData.id).then((res) => {
+        //                 hideLoader();
+        //                 tasksComplete(res?.id || null);
+        //               })
+        //             else{
+        //               hideLoader();
+        //               window.location.reload();
+        //             }
+        //           });
+        //       }
+        //     }
+        //   } 
+        // //   else message.error("Task is freezed");
+        // },
 
-        onDeleteAnnotation: function (ls, annotation) {
-          for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id === annotations[i].result.id)
-              deleteAnnotation(
-                annotations[i].id
-              );
-          }
-        }
+        // onDeleteAnnotation: function (ls, annotation) {
+        //   for (let i = 0; i < annotations.length; i++) {
+        //     if (annotation.serializeAnnotation().id === annotations[i].result.id)
+        //       deleteAnnotation(
+        //         annotations[i].id
+        //       );
+        //   }
+        // }
       });
     }
   }
@@ -275,22 +269,17 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             labelConfig.label_config,
             annotations,
             predictions,
-            annotationNotesRef
+            reviewNotesRef
           );
           hideLoader();
         }
       );
     }
-  }, [labelConfig, userData, annotationNotesRef, taskId]);
+  }, [labelConfig, userData, reviewNotesRef, taskId]);
 
   useEffect(() => {
     showLoader();
   }, [taskId]);
-
-  const handleDraftAnnotationClick = async () => {
-    task_status.current = "draft";
-    lsfRef.current.store.submitAnnotation();
-  }
 
   const onNextAnnotation = async () => {
     showLoader();
@@ -299,6 +288,12 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
      tasksComplete(res?.id || null);
     });
+  }
+
+  const handleRejectClick = async () => {
+  }
+
+  const handleAcceptClick = async () => {
   }
 
   const renderSnackBar = () => {
@@ -321,27 +316,38 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       {!loader && <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
         <div/>
         <div>
-          <Tooltip title="Save task for later">
+        <Tooltip title="Go to next task">
             <Button
-              value="Draft"
+              value="Reject"
               type="default"
-              onClick={handleDraftAnnotationClick}
-              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None"}}
+              onClick={onNextAnnotation}
+              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#1890ff", pt: 3, pb: 3, borderBottom: "None", borderRight: "None"}}
               className="lsf-button"
             >
-              Draft
+              Next
+            </Button>
+          </Tooltip>
+          <Tooltip title="Reject Annotation">
+            <Button
+              value="Reject"
+              type="default"
+              onClick={handleRejectClick}
+              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#f5222d", pt: 3, pb: 3, borderBottom: "None"}}
+              className="lsf-button"
+            >
+              Reject
             </Button>
           </Tooltip>
           {localStorage.getItem("labelAll") !== "true" ? (
-            <Tooltip title="Go to next task">
+            <Tooltip title="Accept Annotation">
               <Button
-                value="Next"
+                value="Accept"
                 type="default"
-                onClick={onNextAnnotation}
-                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None", borderLeft: "None"}}
+                onClick={handleAcceptClick}
+                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#52c41a", pt: 3, pb: 3, borderBottom: "None", borderLeft: "None"}}
                 className="lsf-button"
               >
-                Next
+                Accept
               </Button>
             </Tooltip>
           ) : (
@@ -381,7 +387,7 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
   }
 
   useEffect(()=>{
@@ -435,6 +441,7 @@ export default function LSF() {
             maxRows={4}
             inputProps={{
               style: {fontSize: "1rem",},
+              readOnly: true,
             }}
             style={{width: '99%'}}
           />
@@ -449,12 +456,11 @@ export default function LSF() {
             maxRows={4}
             inputProps={{
               style: {fontSize: "1rem",},
-              readOnly: true,
             }}
             style={{width: '99%', marginTop: '1%'}}
           />
         </div>
-        <LabelStudioWrapper resetNotes={()=>resetNotes()} annotationNotesRef={annotationNotesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
+        <LabelStudioWrapper resetNotes={()=>resetNotes()} reviewNotesRef={reviewNotesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
       </Card>
     </div>
   );
