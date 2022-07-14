@@ -103,7 +103,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
     case addUserTypes.PROJECT_MEMBER:
       const addMembersObj = new AddMembersToProjectAPI(
         id,
-        users.map((user) => user.email),
+        users.map((user) => user.id),
       );
       const res = await fetch(addMembersObj.apiEndPoint(), {
         method: "POST",
