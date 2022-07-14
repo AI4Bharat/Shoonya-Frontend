@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useContext, useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import '@heartexlabs/label-studio/build/static/css/main.css';
+// import '@heartexlabs/label-studio/build/static/css/main.css';
 import { Tooltip, Button, Alert, TextareaAutosize, Card, Box } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -23,7 +23,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from './lsf.module.css'
-// import "./lsf.css"
+import "./lsf.css"
 import { useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 
