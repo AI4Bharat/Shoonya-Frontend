@@ -27,6 +27,10 @@ import CircularProgress from "../../component/common/Spinner"
 import Backdrop from '@mui/material/Backdrop';
 import CustomizedSnackbars from "../../component/common/Snackbar"
 import Spinner from "../../component/common/Spinner";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import EnableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/EnableTaskReviews";
+import DisableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/DisableTaskReviews";
 
 
 const ProjectSetting = (props) => {
@@ -103,6 +107,32 @@ const ProjectSetting = (props) => {
         dispatch(APITransport(projectObj));
     }
 
+    const handleReviewToggle = async () => {
+        setLoading(true);
+        const reviewObj = ProjectDetails.enable_task_reviews ? new DisableTaskReviewsAPI(id) : new EnableTaskReviewsAPI(id);
+        const res = await fetch(reviewObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(reviewObj.getBody()),
+            headers: reviewObj.getHeaders().headers,
+          });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            const projectObj = new GetProjectDetailsAPI(id);
+            dispatch(APITransport(projectObj));
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+    }
 
 
 
@@ -147,15 +177,19 @@ const ProjectSetting = (props) => {
 
 
     const ArchiveProject = useSelector(state => state.getArchiveProject.data);
-    console.log(ArchiveProject,"ArchiveProject")
-    const [isArchived, setIsArchived] = useState(ArchiveProject.is_archived);
+    const [isArchived, setIsArchived] = useState(false);
+    console.log(ProjectDetails.is_archived,"is_archived",isArchived)
     const getArchiveProjectAPI = () => {
         const projectObj = new GetArchiveProjectAPI(id);
 
         dispatch(APITransport(projectObj));
     }
 
-    console.log(ArchiveProject, "ArchiveProject")
+    useEffect(() => {
+        setIsArchived(ProjectDetails?.is_archived) 
+    }, [ProjectDetails])
+ 
+   
 
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
@@ -191,7 +225,6 @@ const ProjectSetting = (props) => {
             users:ProjectDetails.users,
             annotation_reviewers:ProjectDetails.annotation_reviewers,
         }
-        console.log(sendData,"sendData")
         const projectObj = new GetSaveButtonAPI(id, sendData);
         dispatch(APITransport(projectObj));
     }
@@ -527,7 +560,13 @@ const ProjectSetting = (props) => {
                         <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
 
                         <DownloadProjectButton />
-
+                        <FormControlLabel
+                            control={<Switch color="primary"/>}
+                            label="Task Reviews"
+                            labelPlacement="start"
+                            checked={ProjectDetails.enable_task_reviews}
+                            onChange={handleReviewToggle}
+                        />
                     </Grid>
                     <Divider />
                     <Grid

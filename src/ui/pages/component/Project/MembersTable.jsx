@@ -63,7 +63,8 @@ const options = {
 
 const addLabel = {
     organization: "Invite Users to Organization",
-    project: "Add Users to Project",
+    [addUserTypes.PROJECT_MEMBER]: "Add Users to Project",
+    [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
 }
 
 const MembersTable = (props) => {
@@ -128,7 +129,7 @@ const MembersTable = (props) => {
                 <AddUsersDialog
                     handleDialogClose={handleUserDialogClose}
                     isOpen={addUserDialogOpen}
-                    userType={addUserTypes.PROJECT_MEMBER}
+                    userType={props.type}
                     id={id}
                 />
             }

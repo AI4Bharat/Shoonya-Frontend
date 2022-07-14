@@ -27,6 +27,7 @@ import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
 import LSF from "./ui/pages/container/Label-Studio/LSF";
+import ReviewLSF from "./ui/pages/container/Label-Studio/ReviewLSF";
 import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage";
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
@@ -155,6 +156,12 @@ const App = () => {
           element={ProtectedRouteWrapper(
             <Layout component={<LSF />} />
             // <Layout component={<AnnotateTask />} />
+          )}
+        />
+        <Route
+          path="projects/:projectId/review/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<ReviewLSF />} />
           )}
         />
         <Route
