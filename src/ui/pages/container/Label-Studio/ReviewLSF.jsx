@@ -10,7 +10,8 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import {
   getProjectsandTasks,
   getNextProject,
-  fetchAnnotation
+  fetchAnnotation,
+  postReview,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 
@@ -26,6 +27,7 @@ import { translate } from '../../../../config/localisation';
 
 const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
+  const review_status = useRef();
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
@@ -73,7 +75,7 @@ const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, res
     labelConfig,
     annotations,
     predictions,
-    annotationNotesRef,
+    reviewNotesRef,
   ) {
     let load_time;
     let interfaces = [];
@@ -157,88 +159,48 @@ const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, res
           ls.annotationStore.selectAnnotation(c.id);
           load_time = new Date();
         },
-        // onSubmitAnnotation: function (ls, annotation) {
-        //   showLoader();
-        //   if (taskData.task_status !== "freezed") {
-        //     postAnnotation(
-        //       annotation.serializeAnnotation(),
-        //       taskData.id,
-        //       userData.id,
-        //       load_time,
-        //       annotation.lead_time,
-        //       task_status.current,
-        //       annotationNotesRef.current.value
-        //     ).then((res) => {
-        //       if (localStorage.getItem("labelAll"))
-        //         getNextProject(projectId, taskData.id).then((res) => {
-        //           hideLoader();
-        //           // window.location.href = `/projects/${projectId}/task/${res.id}`;
-        //           tasksComplete(res?.id || null);
-        //         })
-        //       else {
-        //         hideLoader();
-        //         window.location.reload();
-        //       }
-        //     })
-        //   }
-        // //   else message.error("Task is freezed");
-        // },
+        onUpdateAnnotation: function (ls, annotation) {
+          if (taskData.task_status !== "freezed") {
+            for (let i = 0; i < annotations.length; i++) {
+              if (annotation.serializeAnnotation().id === annotations[i].result.id) {
+                showLoader();
+                let temp = annotation.serializeAnnotation()
 
-        // onSkipTask: function () {
-        // //   message.warning('Notes will not be saved for skipped tasks!');
-        //   showLoader();
-        //   updateTask(taskData.id).then(() => {
-        //     getNextProject(projectId, taskData.id).then((res) => {
-        //       hideLoader();
-        //       tasksComplete(res?.id || null);
-        //     });
-        //   })
-        // },
-
-        // onUpdateAnnotation: function (ls, annotation) {
-        //   if (taskData.task_status !== "freezed") {
-        //     for (let i = 0; i < annotations.length; i++) {
-        //       if (annotation.serializeAnnotation().id === annotations[i].result.id) {
-        //         showLoader();
-        //         let temp = annotation.serializeAnnotation()
-
-        //         for (let i = 0; i < temp.length; i++) {
-        //           if (temp[i].value.text) {
-        //             temp[i].value.text = [temp[i].value.text[0]]
-        //           }
-        //         }
-        //         patchAnnotation(
-        //           temp,
-        //           annotations[i].id,
-        //           load_time,
-        //           annotations[i].lead_time,
-        //           task_status.current,
-        //           annotationNotesRef.current.value
-        //           ).then(() => {
-        //             if (localStorage.getItem("labelAll"))
-        //               getNextProject(projectId, taskData.id).then((res) => {
-        //                 hideLoader();
-        //                 tasksComplete(res?.id || null);
-        //               })
-        //             else{
-        //               hideLoader();
-        //               window.location.reload();
-        //             }
-        //           });
-        //       }
-        //     }
-        //   } 
-        // //   else message.error("Task is freezed");
-        // },
-
-        // onDeleteAnnotation: function (ls, annotation) {
-        //   for (let i = 0; i < annotations.length; i++) {
-        //     if (annotation.serializeAnnotation().id === annotations[i].result.id)
-        //       deleteAnnotation(
-        //         annotations[i].id
-        //       );
-        //   }
-        // }
+                for (let i = 0; i < temp.length; i++) {
+                  if (temp[i].value.text) {
+                    temp[i].value.text = [temp[i].value.text[0]]
+                  }
+                }
+                postReview(
+                  temp,
+                  taskData.id,
+                  userData.id,
+                  annotations[i].id,
+                  load_time,
+                  annotations[i].lead_time,
+                  review_status.current,
+                  reviewNotesRef.current.value
+                  ).then(() => {
+                    if (localStorage.getItem("labelAll"))
+                      getNextProject(projectId, taskData.id).then((res) => {
+                        hideLoader();
+                        tasksComplete(res?.id || null);
+                      })
+                    else{
+                      hideLoader();
+                      window.location.reload();
+                    }
+                  });
+              }
+            }
+          } 
+          else
+          setSnackbarInfo({
+            open: true,
+            message: "Task is frozen",
+            variant: "error",
+          });
+        },
       });
     }
   }
@@ -291,9 +253,13 @@ const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, res
   }
 
   const handleRejectClick = async () => {
+    review_status.current = "rejected";
+    lsfRef.current.store.submitAnnotation();
   }
 
   const handleAcceptClick = async () => {
+    review_status.current = "accepted";
+    lsfRef.current.store.submitAnnotation();
   }
 
   const renderSnackBar = () => {

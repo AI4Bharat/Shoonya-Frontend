@@ -187,7 +187,12 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
               }
             })
           }
-        //   else message.error("Task is freezed");
+          else
+          setSnackbarInfo({
+            open: true,
+            message: "Task is frozen",
+            variant: "error",
+          });
         },
 
         onSkipTask: function () {
@@ -234,7 +239,12 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
               }
             }
           } 
-        //   else message.error("Task is freezed");
+          else
+          setSnackbarInfo({
+            open: true,
+            message: "Task is frozen",
+            variant: "error",
+          });
         },
 
         onDeleteAnnotation: function (ls, annotation) {

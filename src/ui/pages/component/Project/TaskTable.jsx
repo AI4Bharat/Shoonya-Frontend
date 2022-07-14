@@ -93,10 +93,10 @@ const TaskTable = (props) => {
                 message: resp?.message,
                 variant: "success",
             })
-            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+            if (((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && currentPageNumber === 1) {
                 getTaskListData();
             } else {
-                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setsSelectedFilters({...selectedFilters, task_status: props.type === "annotation" ? "unlabeled" : "labeled"});
                 setCurrentPageNumber(1);
             }
             const projectObj = new GetProjectDetailsAPI(id);
