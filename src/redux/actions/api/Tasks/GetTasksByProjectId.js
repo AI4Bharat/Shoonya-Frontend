@@ -7,10 +7,10 @@
 import constants from "../../../constants";
  
  export default class GetTasksByProjectIdAPI extends API {
-   constructor(projectId, pageNo, countPerPage, selectedFilters, timeout = 2000) {
+   constructor(projectId, pageNo, countPerPage, selectedFilters, taskType, timeout = 2000) {
      super("GET", timeout, false);
      this.type = constants.GET_TASK_LIST;
-     let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}`
+     let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}${taskType === "review" ? "&mode=review" : ""}`;
      for (let key in selectedFilters) {
         if (selectedFilters[key] && selectedFilters[key] !== -1) {
           queryString += `&${key}=${selectedFilters[key]}`

@@ -11,6 +11,7 @@ import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { translate } from "../../../../config/localisation";
 import TabPanel from "../../component/common/TabPanel";
+import addUserTypes from "../../../../constants/addUserTypes";
 
 
 
@@ -170,18 +171,26 @@ const Projects = () => {
                     </Link>}
                     <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
-                            <Tab label={translate("label.tasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
-                        <TaskTable />
+                        <TaskTable type="annotation"/>
                     </TabPanel>
-                    <TabPanel value={value} index={1}>
-                        <MembersTable dataSource={ProjectDetails.users} type="project" />
+                    {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <TabPanel value={value} index={1}>
+                        <TaskTable type="review"/>
+                    </TabPanel>}
+                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) ? 2: 1}>
+                        <MembersTable dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
-                    <TabPanel value={value} index={2}>
+                    {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <TabPanel value={value} index={3}>
+                        <MembersTable dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
+                    </TabPanel>}
+                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) ? 4 : 2}>
                         <ReportsTable />
                     </TabPanel>
                 </Card>

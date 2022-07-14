@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, Card, TextField, Box } from "@mui/material";
+import { Tooltip, Button, Box, Card, TextField } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -9,12 +9,9 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 
 import {
   getProjectsandTasks,
-  postAnnotation,
-  updateTask,
   getNextProject,
-  patchAnnotation,
-  deleteAnnotation,
-  fetchAnnotation
+  fetchAnnotation,
+  postReview,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 
@@ -28,11 +25,10 @@ import { translate } from '../../../../config/localisation';
 
 //used just in postAnnotation to support draft status update.
 
-const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
+const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
+  const review_status = useRef();
   const rootRef = useRef();
-  const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-  const task_status = useRef(ProjectDetails.enable_task_reviews ? "labeled": "accepted");
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
   const navigate = useNavigate();
@@ -53,7 +49,6 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const tasksComplete = (id) => {
     if (id) {
       resetNotes()
-      // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
       navigate(`/projects/${projectId}/task/${id}`);
     } else {
       // navigate(-1);
@@ -80,7 +75,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     labelConfig,
     annotations,
     predictions,
-    annotationNotesRef,
+    reviewNotesRef,
   ) {
     let load_time;
     let interfaces = [];
@@ -115,7 +110,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "update",
         "submit",
         "skip",
-        "controls",
+        // "controls",
         "infobar",
         "topbar",
         "instruction",
@@ -164,49 +159,6 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           ls.annotationStore.selectAnnotation(c.id);
           load_time = new Date();
         },
-        onSubmitAnnotation: function (ls, annotation) {
-          showLoader();
-          if (taskData.task_status !== "freezed") {
-            postAnnotation(
-              annotation.serializeAnnotation(),
-              taskData.id,
-              userData.id,
-              load_time,
-              annotation.lead_time,
-              task_status.current,
-              annotationNotesRef.current.value
-            ).then((res) => {
-              if (localStorage.getItem("labelAll"))
-                getNextProject(projectId, taskData.id).then((res) => {
-                  hideLoader();
-                  // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                  tasksComplete(res?.id || null);
-                })
-              else {
-                hideLoader();
-                window.location.reload();
-              }
-            })
-          }
-          else
-          setSnackbarInfo({
-            open: true,
-            message: "Task is frozen",
-            variant: "error",
-          });
-        },
-
-        onSkipTask: function () {
-        //   message.warning('Notes will not be saved for skipped tasks!');
-          showLoader();
-          updateTask(taskData.id).then(() => {
-            getNextProject(projectId, taskData.id).then((res) => {
-              hideLoader();
-              tasksComplete(res?.id || null);
-            });
-          })
-        },
-
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.task_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
@@ -219,13 +171,15 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
                     temp[i].value.text = [temp[i].value.text[0]]
                   }
                 }
-                patchAnnotation(
+                postReview(
                   temp,
+                  taskData.id,
+                  userData.id,
                   annotations[i].id,
                   load_time,
                   annotations[i].lead_time,
-                  task_status.current,
-                  annotationNotesRef.current.value
+                  review_status.current,
+                  reviewNotesRef.current.value
                   ).then(() => {
                     if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
@@ -247,15 +201,6 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             variant: "error",
           });
         },
-
-        onDeleteAnnotation: function (ls, annotation) {
-          for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id === annotations[i].result.id)
-              deleteAnnotation(
-                annotations[i].id
-              );
-          }
-        }
       });
     }
   }
@@ -286,22 +231,17 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             labelConfig.label_config,
             annotations,
             predictions,
-            annotationNotesRef
+            reviewNotesRef
           );
           hideLoader();
         }
       );
     }
-  }, [labelConfig, userData, annotationNotesRef, taskId]);
+  }, [labelConfig, userData, reviewNotesRef, taskId]);
 
   useEffect(() => {
     showLoader();
   }, [taskId]);
-
-  const handleDraftAnnotationClick = async () => {
-    task_status.current = "draft";
-    lsfRef.current.store.submitAnnotation();
-  }
 
   const onNextAnnotation = async () => {
     showLoader();
@@ -310,6 +250,16 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
      tasksComplete(res?.id || null);
     });
+  }
+
+  const handleRejectClick = async () => {
+    review_status.current = "rejected";
+    lsfRef.current.store.submitAnnotation();
+  }
+
+  const handleAcceptClick = async () => {
+    review_status.current = "accepted";
+    lsfRef.current.store.submitAnnotation();
   }
 
   const renderSnackBar = () => {
@@ -332,27 +282,38 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       {!loader && <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
         <div/>
         <div>
-          <Tooltip title="Save task for later">
+        <Tooltip title="Go to next task">
             <Button
-              value="Draft"
+              value="Reject"
               type="default"
-              onClick={handleDraftAnnotationClick}
-              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None"}}
+              onClick={onNextAnnotation}
+              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#1890ff", pt: 3, pb: 3, borderBottom: "None", borderRight: "None"}}
               className="lsf-button"
             >
-              Draft
+              Next
+            </Button>
+          </Tooltip>
+          <Tooltip title="Reject Annotation">
+            <Button
+              value="Reject"
+              type="default"
+              onClick={handleRejectClick}
+              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#f5222d", pt: 3, pb: 3, borderBottom: "None"}}
+              className="lsf-button"
+            >
+              Reject
             </Button>
           </Tooltip>
           {localStorage.getItem("labelAll") !== "true" ? (
-            <Tooltip title="Go to next task">
+            <Tooltip title="Accept Annotation">
               <Button
-                value="Next"
+                value="Accept"
                 type="default"
-                onClick={onNextAnnotation}
-                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None", borderLeft: "None"}}
+                onClick={handleAcceptClick}
+                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#52c41a", pt: 3, pb: 3, borderBottom: "None", borderLeft: "None"}}
                 className="lsf-button"
               >
-                Next
+                Accept
               </Button>
             </Tooltip>
           ) : (
@@ -365,7 +326,6 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       >
         <div className="label-studio-root" ref={rootRef}></div>
       </Box>
-      
       {loader}
       {renderSnackBar()}
     </div>
@@ -397,7 +357,7 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
   }
 
   useEffect(()=>{
@@ -437,9 +397,9 @@ export default function LSF() {
           Notes
         </Button>}
         <div className={styles.collapse} style={{display: showNotes? "block" : "none",paddingBottom: "16px"}}>
-          <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+          {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
-          </Alert>
+          </Alert> */}
           <TextField
             multiline 
             placeholder="Place your remarks here ..." 
@@ -451,8 +411,9 @@ export default function LSF() {
             maxRows={4}
             inputProps={{
               style: {fontSize: "1rem",},
+              readOnly: true,
             }}
-            style={{width: '99%'}}
+            style={{width: '99%', marginTop: '1%'}}
           />
           <TextField
             multiline 
@@ -465,12 +426,11 @@ export default function LSF() {
             maxRows={4}
             inputProps={{
               style: {fontSize: "1rem",},
-              readOnly: true,
             }}
             style={{width: '99%', marginTop: '1%'}}
           />
         </div>
-        <LabelStudioWrapper resetNotes={()=>resetNotes()} annotationNotesRef={annotationNotesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
+        <LabelStudioWrapper resetNotes={()=>resetNotes()} reviewNotesRef={reviewNotesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
       </Card>
     </div>
   );

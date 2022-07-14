@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
+import { snakeToTitleCase } from "../../../../utils/utils";
 // import { translate } from "../../../../assets/localisation";
 
 const FilterList = (props) => {
@@ -90,10 +91,10 @@ const FilterList = (props) => {
                     }
                     onChange={(e) => setSelectedStatus(e.target.value)}
                     value={type}
-                    label={type}
+                    label={snakeToTitleCase(type)}
                     sx={{
                       fontSize: "1rem",
-                    }}
+                    }} 
                   />
                 );
               })}

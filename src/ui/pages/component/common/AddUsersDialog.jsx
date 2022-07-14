@@ -22,6 +22,7 @@ import AddAnnotatorsToWorkspaceAPI from "../../../../redux/actions/api/Workspace
 import AssignManagerToWorkspaceAPI from "../../../../redux/actions/api/WorkspaceDetails/AssignManagerToWorkspace";
 import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
+import AddProjectReviewersAPI from "../../../../redux/actions/api/ProjectDetails/AddProjectReviewers";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CustomButton from "./Button";
 
@@ -29,12 +30,14 @@ const DialogHeading = {
   [addUserTypes.ANNOTATOR]: 'Add Annotators',
   [addUserTypes.MANAGER]: 'Assign Manager',
   [addUserTypes.PROJECT_MEMBER]: 'Add Project Members',
+  [addUserTypes.PROJECT_REVIEWER]: 'Add Project Reviewers',
 }
 
 // fetch all users in the current organization/workspace
 const fetchAllUsers = (userType, id, dispatch) => {
   switch (userType) {
     case addUserTypes.PROJECT_MEMBER:
+    case addUserTypes.PROJECT_REVIEWER:
       const workspaceAnnotatorsObj = new GetWorkspacesAnnotatorsDataAPI(id);
       dispatch(APITransport(workspaceAnnotatorsObj));
       break;
@@ -60,6 +63,16 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
         )
         .map((user) => ({ email: user.email, username: user.username }));
       break;
+      case addUserTypes.PROJECT_REVIEWER:
+        return workspaceAnnotators
+          .filter(
+            (workspaceAnnotator) =>
+              projectDetails?.annotation_reviewers.findIndex(
+                (projectUser) => projectUser?.id === workspaceAnnotator?.id
+              ) === -1
+          )
+          .map((user) => ({ id: user.id, email: user.email, username: user.username }));
+        break;
     case addUserTypes.ANNOTATOR:
       return orgUsers
         ?.filter(
@@ -106,6 +119,27 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
         return resp_data;
       }
       break;
+
+      case addUserTypes.PROJECT_REVIEWER:
+        console.log(users, "users");
+        const addReviewersObj = new AddProjectReviewersAPI(
+          id,
+          users.map((user) => user.id),
+        );
+        const reviewerRes = await fetch(addReviewersObj.apiEndPoint(), {
+          method: "POST",
+          body: JSON.stringify(addReviewersObj.getBody()),
+          headers: addReviewersObj.getHeaders().headers,
+        });
+  
+        const reviewerRespData = await reviewerRes.json();
+  
+        if (reviewerRes.ok) {
+          const projectObj = new GetProjectDetailsAPI(id);
+          dispatch(APITransport(projectObj));
+          return reviewerRespData;
+        }
+        break;
 
     case addUserTypes.ANNOTATOR:
       const addAnnotatorsObj = new AddAnnotatorsToWorkspaceAPI(
@@ -171,6 +205,7 @@ const AddUsersDialog = ({
     let id = '';
     switch (userType) {
       case addUserTypes.PROJECT_MEMBER:
+      case addUserTypes.PROJECT_REVIEWER:
         id = projectDetails?.workspace_id;
         break;
       case addUserTypes.ANNOTATOR:
