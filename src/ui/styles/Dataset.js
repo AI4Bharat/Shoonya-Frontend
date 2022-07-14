@@ -135,7 +135,7 @@ projectCardContainer1 : {
   
 },
 projectCardContainer2 : {
-  backgroundColor : "#119DA4",
+  //backgroundColor : "#119DA4",
   height : "100%",
   width : "100%"
 },
