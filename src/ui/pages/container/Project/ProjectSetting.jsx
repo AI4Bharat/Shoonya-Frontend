@@ -137,13 +137,18 @@ const ProjectSetting = (props) => {
 
 
     const ArchiveProject = useSelector(state => state.getArchiveProject.data);
-    const [isArchived, setIsArchived] = useState(ArchiveProject.is_archived);
+    const [isArchived, setIsArchived] = useState(false);
+    console.log(ProjectDetails.is_archived,"is_archived",isArchived)
     const getArchiveProjectAPI = () => {
         const projectObj = new GetArchiveProjectAPI(id);
 
         dispatch(APITransport(projectObj));
     }
 
+    useEffect(() => {
+        setIsArchived(ProjectDetails?.is_archived) 
+    }, [ProjectDetails])
+ 
     console.log(ArchiveProject, "ArchiveProject")
 
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
