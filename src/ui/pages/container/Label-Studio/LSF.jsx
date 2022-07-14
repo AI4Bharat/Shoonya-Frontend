@@ -54,6 +54,7 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
   const tasksComplete = (id) => {
     if (id) {
       resetNotes()
+      // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
       navigate(`/projects/${projectId}/task/${id}`);
     } else {
       // navigate(-1);
