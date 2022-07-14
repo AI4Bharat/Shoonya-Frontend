@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
 import CustomButton from '../common/Button';
-import { Typography, TextField, Box, Stack, Button, Grid } from '@mui/material';
+import { Typography, TextField, Box, Stack, Button, Grid, CircularProgress } from '@mui/material';
 import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import InputLabel from '@mui/material/InputLabel';
@@ -25,6 +25,7 @@ const ReportsTable = () => {
     const [selectRange, setSelectRange] = useState("Till Date");
     const [rangeValue, setRangeValue] = useState([format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
     const [showPicker, setShowPicker] = useState(false);
+    const [showSpinner, setShowSpinner] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [columns, setColumns] = useState([]);
 
@@ -54,6 +55,7 @@ const ReportsTable = () => {
             setColumns([]);
             setSelectedColumns([]);
         }
+        setShowSpinner(false);
     }, [ProjectReport]);
 
     const renderToolBar = () => {
@@ -78,6 +80,11 @@ const ReportsTable = () => {
         search: false,
         viewColumns: false,
         customToolbar: renderToolBar,
+        textLabels: {
+            body: {
+              noMatch: 'No Record Found!'
+            }
+          }
     };
 
     const handleOptionChange = (e) => {
@@ -123,6 +130,7 @@ const ReportsTable = () => {
     const handleDateSubmit = () => {
         const projectObj = new GetProjectReportAPI(id, startDate, endDate);
         dispatch(APITransport(projectObj));
+        setShowSpinner(true);
     }
 
     return (
@@ -169,14 +177,17 @@ const ReportsTable = () => {
                     </LocalizationProvider>}
                 <Button variant="contained" onClick={handleDateSubmit}>Submit</Button>
             </Stack>
-            {ProjectReport.length > 0 &&
-                <MUIDataTable
-                    title={""}
-                    data={ProjectReport}
-                    columns={columns.filter(col => selectedColumns.includes(col.name))}
-                    options={options}
-                    // filter={false}
-                />}
+            {
+                showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : (
+                    <MUIDataTable
+                        title={""}
+                        data={ProjectReport}
+                        columns={columns.filter(col => selectedColumns.includes(col.name))}
+                        options={options}
+                        // filter={false}
+                    />
+                )
+            }
         </React.Fragment>
     )
 }
