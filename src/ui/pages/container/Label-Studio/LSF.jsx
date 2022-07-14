@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types'
 import React, { useContext, useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, TextareaAutosize, Card } from "@mui/material";
+import '@heartexlabs/label-studio/build/static/css/main.css';
+import { Tooltip, Button, Alert, TextareaAutosize, Card, Box } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -22,7 +23,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from './lsf.module.css'
-import "./lsf.css"
+// import "./lsf.css"
 import { useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 
@@ -349,7 +350,12 @@ const LabelStudioWrapper = ({notesRef, loader, showLoader, hideLoader, resetNote
           )}
         </div>
       </div>}
-      <div className="label-studio-root" ref={rootRef}></div>
+      <Box
+        sx={{border : "1px solid rgb(224 224 224)"}}
+      >
+        <div className="label-studio-root" ref={rootRef}></div>
+      </Box>
+      
       {loader}
       {renderSnackBar()}
     </div>
