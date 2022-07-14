@@ -309,7 +309,7 @@ const TaskTable = (props) => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
             <Box className={classes.filterToolbarContainer}>
-                {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
+                {props.type === "annotation" && userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
                     <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
                     <Select
                     labelId="annotator-filter-label"
