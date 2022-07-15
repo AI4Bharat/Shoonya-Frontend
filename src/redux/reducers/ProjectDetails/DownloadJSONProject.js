@@ -5,19 +5,19 @@ const initialState = {
 	data: 0,
 };
 
- function JSON(data) {
+ function jsonDownload(data) {
 	console.log("JSON data", data);
 
-	
+	// const JSONData = JSON.stringify(data);
 
-	// const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
-	// 	JSON.stringify(data)
-	//   )}`;
-	//   const link = document.createElement("a");
-	//   link.href = jsonString;
-	//   link.download = "data.json";
-  
-	//   link.click();
+	const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+		JSON.stringify(data)
+	  )}`;
+	  const link = document.createElement("a");
+	  link.href = jsonString;
+	  link.download = "data.json";
+	  link.click();
+	  
 	// 	const fileName = "my-file";
 //   const json = JSON.stringify(content, null, 2);
 //   console.log(json,"json")
@@ -87,7 +87,7 @@ const initialState = {
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
 		case constants.DOWNLOAD_PROJECT_JSON:
-			JSON(action.payload);
+			jsonDownload(action.payload);
 			return {
 				...state,
 				data: state.data + 1,
