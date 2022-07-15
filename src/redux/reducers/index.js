@@ -52,6 +52,7 @@ import GetFileTypes from './Dataset/GetFileTypes';
 import ChangePassword from './UserManagement/ChangePassword'
 import fetchUserById from './UserManagement/FetchUserById';
 import setTaskFilter from './Tasks/SetTaskFilter';
+import DownloadJSONProject from './ProjectDetails/DownloadJSONProject'
 
 const index = {
     apiStatus,
@@ -111,6 +112,7 @@ const index = {
     ChangePassword,
     fetchUserById,
     setTaskFilter,
+    DownloadJSONProject,
 };
 
 export default index;
