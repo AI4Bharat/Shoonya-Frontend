@@ -29,7 +29,7 @@ import getLanguageChoices from './ProjectDetails/GetLanguageChoices';
 import createProject from './ProjectDetails/CreateProject';
 import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
 import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
-import  downloadProjectButton from './ProjectDetails/DownloadProject'
+import  downloadProjectCSV from './ProjectDetails/DownloadCSVProject'
 import getFilteredTasks from './Tasks/GetFilteredTasks';
 import postAnnotation from './Annotation/PostAnnotation';
 import updateAnnotation from './Annotation/UpdateAnnotation';
@@ -89,7 +89,7 @@ const index = {
     createProject,
     getWorkspaceUserReports,
     getWorkspaceProjectReports,
-    downloadProjectButton,
+    downloadProjectCSV,
     getFilteredTasks,
     postAnnotation,
     updateAnnotation,

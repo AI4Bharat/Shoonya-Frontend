@@ -3,17 +3,17 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from "../../../constants";
   
- export default class DownloadProjectButtonAPI extends API {
+ export default class DownloadProjectCsvAPI extends API {
     constructor(projectId, timeout = 2000) {
       super("POST", timeout, false);
-      this.type = constants.DOWNLOAD_PROJECT_BUTTON;
+      this.type = constants.DOWNLOAD_PROJECT_CSV;
       this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=CSV`;
     }
   
     processResponse(res) {
       super.processResponse(res);
       if (res) {
-          this.downloadProjectButton = res;
+          this.downloadProjectCsv = res;
       }
   }
   
@@ -35,7 +35,7 @@
     }
   
     getPayload() {
-      return this.downloadProjectButton;
+      return this.downloadProjectCsv;
     }
   }
   

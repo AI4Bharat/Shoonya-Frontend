@@ -5,7 +5,7 @@ const initialState = {
 	data: 0,
 };
 
-function CSV(content) {
+function CsvDownload(content) {
 	const downloadLink = document.createElement("a");
 	const blob = new Blob(["\ufeff", content]);
 	const url = URL.createObjectURL(blob);
@@ -18,8 +18,8 @@ function CSV(content) {
 
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
-		case constants.DOWNLOAD_PROJECT_BUTTON:
-			CSV(action.payload);
+		case constants.DOWNLOAD_PROJECT_CSV:
+			CsvDownload(action.payload);
 			return {
 				...state,
 				data: state.data + 1,
