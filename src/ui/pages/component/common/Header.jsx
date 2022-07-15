@@ -28,6 +28,7 @@ import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@material-ui/core";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Logout from "../../../../redux/actions/UserManagement/Logout";
+import { checkUserRole } from "../../../../utils/UserMappedByRole/UserRoles";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -109,7 +110,7 @@ const Header = () => {
   };
 
   const renderTabs = () => {
-    if (loggedInUserData?.role === 1) {
+    if (checkUserRole(loggedInUserData?.role).isAnnotator()) {
       return(
         <Grid
           container
@@ -122,34 +123,6 @@ const Header = () => {
           sm={12}
           md={7}
         >
-          {/* <Typography variant="body1">
-            <NavLink
-              hidden={loggedInUserData.role === 1}
-              to={
-                loggedInUserData && loggedInUserData.organization
-                  ? `/my-organization/${loggedInUserData.organization.id}`
-                  : `/my-organization/1`
-              }
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Organization
-            </NavLink>
-          </Typography> */}
-          {/* <Typography variant="body1">
-            <NavLink
-              hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
-              to="/workspaces"
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Workspaces
-            </NavLink>
-          </Typography> */}
           <Typography variant="body1">
             <NavLink
               to="/projects"
@@ -161,21 +134,9 @@ const Header = () => {
               Projects
             </NavLink>
           </Typography>
-          {/* <Typography variant="body1">
-            <NavLink
-              hidden={loggedInUserData.role === 1}
-              to="/datasets"
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Datasets
-            </NavLink>
-          </Typography> */}
         </Grid>
       )
-    } else if (loggedInUserData?.role === 2) {
+    } else if (checkUserRole(loggedInUserData?.role).isWorkspaceManager()) {
       return(<Grid
           container
           direction="row"
@@ -236,7 +197,7 @@ const Header = () => {
             </NavLink>
           </Typography>
         </Grid>)
-    } else if (loggedInUserData?.role === 3) {
+    } else if (checkUserRole(loggedInUserData?.role).isOrganizationOwner()) {
       return(<Grid
           container
           direction="row"
@@ -296,7 +257,7 @@ const Header = () => {
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={checkUserRole(loggedInUserData.role).isAnnotator()}
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -312,7 +273,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
+        hidden={checkUserRole(loggedInUserData.role).isAnnotatorOrOrganizationOwner()}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -335,7 +296,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={checkUserRole(loggedInUserData.role).isAnnotator()}
         to="/datasets"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu

@@ -1,5 +1,7 @@
+import { UserRoles } from "./UserRoles";
+
 export default {
-    1: "Annotator",
-    2: "Manager",
-    3: "Admin",
-}
+	[UserRoles.ANNOTATOR]: "Annotator",
+	[UserRoles.WORKSPACE_MANAGER]: "Manager",
+	[UserRoles.ORGANIZATION_OWNER]: "Admin",
+};

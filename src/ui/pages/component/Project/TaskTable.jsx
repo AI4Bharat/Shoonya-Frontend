@@ -24,6 +24,7 @@ import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
 import Spinner from "../../component/common/Spinner"
+import { checkUserRole } from "../../../../utils/UserMappedByRole/UserRoles";
 
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = ["context", "input_language", "output_language"];
@@ -45,7 +46,7 @@ const TaskTable = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const filterData = {
         Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"] : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
+        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => checkUserRole(member.role).isAnnotator()).map((el,i)=>{
             return {
                 label: el.username,
                 value: el.id
@@ -309,7 +310,7 @@ const TaskTable = (props) => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
             <Box className={classes.filterToolbarContainer}>
-                {props.type === "annotation" && userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
+                {props.type === "annotation" && !checkUserRole(userDetails?.role).isAnnotator && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
                     <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
                     <Select
                     labelId="annotator-filter-label"
@@ -400,7 +401,7 @@ const TaskTable = (props) => {
 
     return (
         <Fragment>
-        {((props.type === "annotation" && userDetails?.role === 1) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
+        {((props.type === "annotation" && checkUserRole(userDetails?.role).isAnnotator()) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
                 <Grid
                     container
