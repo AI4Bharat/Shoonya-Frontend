@@ -115,21 +115,27 @@ const updateTask = async (taskID) => {
   }
 };
 
-const getNextProject = async (projectID, taskID) => {
+const getNextProject = async (projectID, taskID, mode="annotation") => {
   try {
-    let labellingMode= localStorage.getItem("labellingMode");
-    let requestUrl = labellingMode ? `/projects/${projectID}/next/?current_task_id=${taskID}&task_status=${labellingMode}` : `/projects/${projectID}/next/?current_task_id=${taskID}`;
+    let labellingMode = localStorage.getItem("labellingMode");
+    let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
+    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${labellingMode ? `&task_status=${labellingMode}` : ""}${mode === "review" ? `&mode=review` : ""}`;
+    if (localStorage.getItem("labelAll")) {
+      Object.keys(searchFilters)?.forEach(key => {
+        requestUrl += `&${key}=${this.searchFilters[key]}`;
+      });
+    }
     let response = await axiosInstance.post(requestUrl, {
       id: projectID,
     });
     if (response.status === 204) {
-      // if (localStorage.getItem("labelAll"))
-        // window.location.href = `/projects/${projectID}`;
       // message.info("No more tasks for this project.");
-    } else {
+    }
+    else {
       return response.data;
     }
-  } catch (err) {
+  }
+  catch (err) {
     // message.error("Error getting next task.");
     return err
   }

@@ -182,7 +182,7 @@ const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, res
                   reviewNotesRef.current.value
                   ).then(() => {
                     if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id).then((res) => {
+                      getNextProject(projectId, taskData.id, "review").then((res) => {
                         hideLoader();
                         tasksComplete(res?.id || null);
                       })
@@ -245,7 +245,7 @@ const LabelStudioWrapper = ({reviewNotesRef, loader, showLoader, hideLoader, res
 
   const onNextAnnotation = async () => {
     showLoader();
-    getNextProject(projectId, taskId).then((res) => {
+    getNextProject(projectId, taskId, "review").then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
      tasksComplete(res?.id || null);

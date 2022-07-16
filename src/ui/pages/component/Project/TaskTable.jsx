@@ -145,7 +145,7 @@ const TaskTable = (props) => {
         localStorage.setItem("labellingMode", selectedFilters.task_status);
         localStorage.setItem("searchFilters", JSON.stringify(search_filters));
         localStorage.setItem("labelAll", true);
-        const getNextTaskObj = new GetNextTaskAPI(id);
+        const getNextTaskObj = new GetNextTaskAPI(id, null, props.type);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
     };
