@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, Card, TextField, Box } from "@mui/material";
+import { Tooltip, Button, Alert, Card, TextField, Box, Grid } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -158,6 +158,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         },
 
         onLabelStudioLoad: function (ls) {
+          /* added */
+          task_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
           var c = ls.annotationStore.addAnnotation({
             userGenerate: true,
           });
@@ -331,7 +333,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     <div>
       {!loader && <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
         <div/>
-        <div>
+        <Grid container spacing={0}>
+          <Grid item>
           <Tooltip title="Save task for later">
             <Button
               value="Draft"
@@ -343,13 +346,15 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
               Draft
             </Button>
           </Tooltip>
+          </Grid>
+          <Grid item>
           {localStorage.getItem("labelAll") !== "true" ? (
             <Tooltip title="Go to next task">
               <Button
                 value="Next"
                 type="default"
                 onClick={onNextAnnotation}
-                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None", borderLeft: "None"}}
+                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None",}}
                 className="lsf-button"
               >
                 Next
@@ -358,7 +363,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           ) : (
             <div style={{minWidth: "160px"}}/>
           )}
-        </div>
+          </Grid>
+        </Grid>
       </div>}
       <Box
         sx={{border : "1px solid rgb(224 224 224)"}}
@@ -433,6 +439,7 @@ export default function LSF() {
           variant="contained"
           color="primary"
           onClick={handleCollapseClick}
+          style={{marginBottom:'20px'}}
         >
           Notes
         </Button>}
