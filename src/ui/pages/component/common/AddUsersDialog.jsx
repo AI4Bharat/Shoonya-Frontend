@@ -121,7 +121,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
       break;
 
       case addUserTypes.PROJECT_REVIEWER:
-        console.log(users, "users");
+        //console.log(users, "users");
         const addReviewersObj = new AddProjectReviewersAPI(
           id,
           users.map((user) => user.id),
