@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { TextField, Box, Button, Grid } from "@mui/material";
+import { TextField, Box, Button, Grid, createTheme, ThemeProvider } from "@mui/material";
+import themeDefault from "../../../theme/theme";
 import { DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import InputLabel from "@mui/material/InputLabel";
@@ -53,6 +54,35 @@ const OrganizationReports = () => {
   const ProjectReports = useSelector((state) => state.getOrganizationProjectReports.data);
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
+  const theme = createTheme({
+    ...themeDefault,
+    components: {
+      ...themeDefault.components,
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            minWidth: "25",
+            borderRadius: "none",
+            textTransform: "none",
+          },
+          label: {
+            textTransform: "none",
+            fontFamily: '"Roboto", "Segoe UI"',
+            fontSize: "16px",
+            letterSpacing: "0.16px",
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+            height: "19px",
+            "@media (max-width:640px)": {
+              fontSize: "10px",
+            },
+          },
+        },
+      },
+    },
+  });
+
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
     const langObj = new FetchLanguagesAPI();
@@ -82,7 +112,7 @@ const OrganizationReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: key === "Word Count Of Annotated Tasks",
+            sort: true,
             align: "center",
           },
         });
@@ -327,12 +357,14 @@ const options = {
         </Grid>
       </Grid>
       {reportData?.length > 0 ? 
-        <MUIDataTable
-          title={""}
-          data={reportData}
-          columns={columns.filter((col) => selectedColumns.includes(col.name))}
-          options={options}
-        /> : <Grid
+        <ThemeProvider theme={theme}>
+          <MUIDataTable
+            title={""}
+            data={reportData}
+            columns={columns.filter((col) => selectedColumns.includes(col.name))}
+            options={options}
+          />
+        </ThemeProvider> : <Grid
           container
           justifyContent="center"
         >
