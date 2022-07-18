@@ -27,6 +27,10 @@ import CircularProgress from "../../component/common/Spinner"
 import Backdrop from '@mui/material/Backdrop';
 import CustomizedSnackbars from "../../component/common/Snackbar"
 import Spinner from "../../component/common/Spinner";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import EnableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/EnableTaskReviews";
+import DisableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/DisableTaskReviews";
 
 
 const ProjectSetting = (props) => {
@@ -49,6 +53,7 @@ const ProjectSetting = (props) => {
     const [languageOptions, setLanguageOptions] = useState([]);
     const [spinner, setSpinner] = React.useState(false);
     const [loading, setLoading] = useState(false);
+    const [newDetails, setNewDetails] = useState();
     const { id } = useParams();
 
     const classes = DatasetStyle();
@@ -58,11 +63,12 @@ const ProjectSetting = (props) => {
     console.log(apiMessage, "apiMessage")
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-
+    console.log(ProjectDetails,"ProjectDetails")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
     }
+    
 
     useEffect(() => {
         getProjectDetails();
@@ -78,11 +84,20 @@ const ProjectSetting = (props) => {
     }, [ProjectDetails]);
 
 
-    const getSaveButtonAPI = () => {
-        const projectObj = new GetSaveButtonAPI(id, ProjectDetails);
+    useEffect(() => {
+        setNewDetails({
+            title: ProjectDetails.title,
+          description: ProjectDetails.description,
+         
+        });
+       
+      }, [ProjectDetails]);
 
-        dispatch(APITransport(projectObj));
-    }
+    // const getSaveButtonAPI = () => {
+    //     const projectObj = new GetSaveButtonAPI(id, ProjectDetails);
+
+    //     dispatch(APITransport(projectObj));
+    // }
 
 
 
@@ -92,6 +107,32 @@ const ProjectSetting = (props) => {
         dispatch(APITransport(projectObj));
     }
 
+    const handleReviewToggle = async () => {
+        setLoading(true);
+        const reviewObj = ProjectDetails.enable_task_reviews ? new DisableTaskReviewsAPI(id) : new EnableTaskReviewsAPI(id);
+        const res = await fetch(reviewObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(reviewObj.getBody()),
+            headers: reviewObj.getHeaders().headers,
+          });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            const projectObj = new GetProjectDetailsAPI(id);
+            dispatch(APITransport(projectObj));
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+    }
 
 
 
@@ -136,14 +177,19 @@ const ProjectSetting = (props) => {
 
 
     const ArchiveProject = useSelector(state => state.getArchiveProject.data);
-    const [isArchived, setIsArchived] = useState(ArchiveProject.is_archived);
+    const [isArchived, setIsArchived] = useState(false);
+    console.log(ProjectDetails.is_archived,"is_archived",isArchived)
     const getArchiveProjectAPI = () => {
         const projectObj = new GetArchiveProjectAPI(id);
 
         dispatch(APITransport(projectObj));
     }
 
-    console.log(ArchiveProject, "ArchiveProject")
+    useEffect(() => {
+        setIsArchived(ProjectDetails?.is_archived) 
+    }, [ProjectDetails])
+ 
+   
 
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
@@ -165,8 +211,22 @@ const ProjectSetting = (props) => {
         }
     }, [LanguageChoices]);
 
+   
+
     const handleSave = () => {
-        getSaveButtonAPI()
+       
+        const sendData ={
+            title:newDetails.title,
+            description:ProjectDetails.description,
+            tgt_language: targetLanguage,
+            src_language: sourceLanguage,
+            project_type: ProjectDetails.project_type,
+            project_mode:ProjectDetails.project_mode,
+            users:ProjectDetails.users,
+            annotation_reviewers:ProjectDetails.annotation_reviewers,
+        }
+        const projectObj = new GetSaveButtonAPI(id, sendData);
+        dispatch(APITransport(projectObj));
     }
     const handleExportProject = () => {
         getExportProjectButton();
@@ -204,6 +264,15 @@ const ProjectSetting = (props) => {
     useEffect(()=>{
         setLoading(apiLoading);
     },[apiLoading])
+
+    const handleProjectName =(event)=>{
+        setValue(event.target.value)
+        event.preventDefault();
+    setNewDetails((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+    }
 
     const renderSnackBar = () => {
         return (
@@ -300,7 +369,13 @@ const ProjectSetting = (props) => {
                             xl={9}
                             sm={12}
                         >
-                            <OutlinedTextField fullWidth value={ProjectDetails.title} onChange={(e) => setValue(e.target.value)} />
+                            <OutlinedTextField 
+                            fullWidth 
+                            name="title"
+                            InputProps={{ style: { fontSize: "16px" } }}
+                            // value={ProjectDetails.title}
+                            value={newDetails?.title}
+                             onChange={handleProjectName} />
                         </Grid>
                     </Grid>
                     <Grid
@@ -332,11 +407,14 @@ const ProjectSetting = (props) => {
                             lg={9}
                             xl={9}
                             sm={12}
+                          
                         >
                             <OutlinedTextField
                                 fullWidth
-                                value={ProjectDetails.description}
-                                onChange={(e) => setValue(e.target.value)}
+                                name="description"
+                                InputProps={{ style: { fontSize: "16px" } }}
+                                value={newDetails?.description}
+                                onChange={handleProjectName}
                             />
                         </Grid>
                     </Grid>
@@ -372,9 +450,10 @@ const ProjectSetting = (props) => {
                                     sm={12}
                                 >
                                     <MenuItems
+                                 
                                         menuOptions={languageOptions}
                                         handleChange={(value) => setSourceLanguage(value)}
-                                        value={ProjectDetails.src_language}
+                                        value={sourceLanguage}
                                     />
                                 </Grid>
                             </Grid>
@@ -410,7 +489,7 @@ const ProjectSetting = (props) => {
                                     <MenuItems
                                         menuOptions={languageOptions}
                                         handleChange={(value) => setTargetLanguage(value)}
-                                        value={ProjectDetails.tgt_language}
+                                        value={targetLanguage}
                                     />
                                 </Grid>
                             </Grid>
@@ -481,7 +560,13 @@ const ProjectSetting = (props) => {
                         <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
 
                         <DownloadProjectButton />
-
+                        <FormControlLabel
+                            control={<Switch color="primary"/>}
+                            label="Task Reviews"
+                            labelPlacement="start"
+                            checked={ProjectDetails.enable_task_reviews}
+                            onChange={handleReviewToggle}
+                        />
                     </Grid>
                     <Divider />
                     <Grid

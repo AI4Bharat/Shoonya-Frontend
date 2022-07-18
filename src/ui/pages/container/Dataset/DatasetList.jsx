@@ -8,10 +8,14 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import TablePagination from '@mui/material/TablePagination';
 import TablePaginationActions from "../../component/common/TablePaginationActions";
 import Spinner from "../../component/common/Spinner"
+import CustomButton from "../../component/common/Button"
+import { Link, useNavigate, useParams } from "react-router-dom";
+
 
 const DatasetList = () => {
     const classes = DatasetStyle();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const datasetList = useSelector(state=>state.getDatasetList.data);
     const apiLoading = useSelector(state => state.apiStatus.loading);
 
@@ -23,6 +27,8 @@ const DatasetList = () => {
         const datasetObj = new GetDatasetsAPI();
         dispatch(APITransport(datasetObj));
     }
+   
+  
 
     const handleChangePage = (e, newPage) => {
         console.log("newPage", newPage);
@@ -42,10 +48,16 @@ const DatasetList = () => {
         getDatasetList();
     },[]);
 
+    const handleCreateProject =(e)=>{
+        navigate(`/create-Dataset-Instance-Button/`)
+    }
+
     return (
         <React.Fragment>
             {/* <Header /> */}
             {loading && <Spinner /> }
+            <CustomButton  sx={{  p: 2, borderRadius: 3, mt: 5, mb: 2, justifyContent: "flex-end" }} 
+            onClick={handleCreateProject} label="Create New Dataset Instance" />
             {datasetList.length > 0 && <Box sx={{margin : "0 auto", pb : 5 }}>
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
                 <Grid container justifyContent={"center"} rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{mb : 3}}>

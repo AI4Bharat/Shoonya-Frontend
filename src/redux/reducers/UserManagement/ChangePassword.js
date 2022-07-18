@@ -5,7 +5,7 @@ let initialState = {
 }
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case constants.DOWNLOAD_PROJECT_BUTTON:
+        case constants.CHANGE_PASSWORD:
             return {
                 ...state,
                 data: action.payload

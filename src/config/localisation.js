@@ -3,6 +3,8 @@ const localisation = {
   enterEmailId: "Enter your Email ID*",
   enterPassword: "Enter your Password*",
   forgotPassword: "Forgot Password?",
+  newPassword:"Enter your New Password*",
+  currentPassword:"Enter your Current Password*",
   "label.shoonyaInfo":
     "Shoonya is an open source platform to annotate and label data at scale, built with a vision to enhance digital presence of under-represented languages in India.",
     "button.clearAll" : "Clear All",
@@ -22,9 +24,12 @@ const localisation = {
     "button.submit":"Submit",
     "label.workspaces":"Workspaces",
     "label.members":"Members",
+    "label.reviewers":"Reviewers",
     "label.invites":"Invites",
     "label.settings":"Settings",
     "label.tasks":"Tasks",
+    "label.annotationTasks":"Annotation Tasks",
+    "label.reviewTasks":"Review Tasks",
     "label.reports":"Reports",
     "label.projects":"Projects",
     "label.annotators":"Annotators",
@@ -35,6 +40,7 @@ const localisation = {
     "alert.notes": "Please do not add notes if you are going to skip the task!",
     "label.datasets": "Datasets",
     "button.downloadDataset": "Download Dataset",
+    "button.uploadData":"Upload Data",
 };
 
 export const translate = (prop) => localisation[prop];

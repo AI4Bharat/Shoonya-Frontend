@@ -13,7 +13,7 @@ import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/Worksp
 import AddMembersToProjectAPI from "../../../../redux/actions/api/ProjectDetails/AddMembersToProject";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import addUserTypes from "../../../../constants/addUserTypes";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const columns = [
     {
@@ -63,12 +63,14 @@ const options = {
 
 const addLabel = {
     organization: "Invite Users to Organization",
-    project: "Add Users to Project",
+    [addUserTypes.PROJECT_MEMBER]: "Add Users to Project",
+    [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
 }
 
 const MembersTable = (props) => {
     const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
     const { orgId, id } = useParams();
+    const navigate = useNavigate();
     const [userRole, setUserRole] = useState();
 
     const { dataSource, hideButton } = props;
@@ -98,7 +100,7 @@ const MembersTable = (props) => {
                     <CustomButton
                         sx={{ p: 1, borderRadius: 2 }}
                         onClick={() => {
-                            console.log(el.id);
+                            navigate(`/profile/${el.id}`);
                         }}
                         label={"View"}
                     />,
@@ -127,7 +129,7 @@ const MembersTable = (props) => {
                 <AddUsersDialog
                     handleDialogClose={handleUserDialogClose}
                     isOpen={addUserDialogOpen}
-                    userType={addUserTypes.PROJECT_MEMBER}
+                    userType={props.type}
                     id={id}
                 />
             }

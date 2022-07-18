@@ -6,10 +6,10 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class AddMembersToProjectAPI extends API {
-  constructor(projectId, userEmails, timeout = 2000) {
+  constructor(projectId, userIds, timeout = 2000) {
     super("POST", timeout, false);
     this.type = constants.ADD_MEMBERS_TO_PROJECT;
-    this.emails = userEmails;
+    this.ids = userIds;
     this.endpoint = `${super.apiEndPointAuto()}${
       ENDPOINTS.getProjects
     }${projectId}/add_project_users/`;
@@ -28,7 +28,7 @@ export default class AddMembersToProjectAPI extends API {
 
   getBody() {
     return {
-      emails: this.emails,
+      ids: this.ids,
     };
   }
 

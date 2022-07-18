@@ -13,13 +13,14 @@ export default function MenuItems(props) {
   };
   return (
     <div>
-      <FormControl fullWidth sx={{minWidth: 120 }}>
+      <FormControl fullWidth sx={{minWidth: 120}}>
         
         <Select
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
           value={props.value}
           onChange={handleChange}
+          sx={{fontSize:"16px" }}
        
         >
            { 

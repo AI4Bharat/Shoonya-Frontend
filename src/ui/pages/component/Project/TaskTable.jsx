@@ -12,9 +12,12 @@ import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
 import PullNewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewBatch";
+import PullNewReviewBatchAPI from "../../../../redux/actions/api/Tasks/PullNewReviewBatch";
 import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
 import DeallocateTasksAPI from "../../../../redux/actions/api/Tasks/DeallocateTasks";
+import DeallocateReviewTasksAPI from "../../../../redux/actions/api/Tasks/DeallocateReviewTasks";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+import SetTaskFilter from "../../../../redux/actions/Tasks/SetTaskFilter";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
@@ -25,7 +28,7 @@ import Spinner from "../../component/common/Spinner"
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = ["context", "input_language", "output_language"];
 
-const TaskTable = () => {
+const TaskTable = (props) => {
     const classes = DatasetStyle();
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -37,9 +40,20 @@ const TaskTable = () => {
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
     const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
-    const [selectedFilters, setsSelectedFilters] = useState({task_status: "unlabeled", user_filter: -1});
+    const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+    const filterData = {
+        Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"] : ["unlabeled", "skipped", "accepted", "draft"],
+        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
+            return {
+                label: el.username,
+                value: el.id
+            }
+        }) : []
+    }
+    const [selectedFilters, setsSelectedFilters] = useState(
+        (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {task_status: filterData.Status[0], user_filter: -1});
     const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState();
@@ -60,23 +74,13 @@ const TaskTable = () => {
     const [labellingStarted, setLabellingStarted] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const filterData = {
-        Status : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
-            return {
-                label: el.username,
-                value: el.id
-            }
-        }) : []
-    }
-
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters, props.type);
         dispatch(APITransport(taskObj));
     }
 
     const fetchNewTasks = async() => {
-        const batchObj = new PullNewBatchAPI(id, pullSize);
+        const batchObj = props.type === "annotation" ? new PullNewBatchAPI(id, pullSize) : new PullNewReviewBatchAPI(id, pullSize);
         const res = await fetch(batchObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(batchObj.getBody()),
@@ -89,10 +93,10 @@ const TaskTable = () => {
                 message: resp?.message,
                 variant: "success",
             })
-            if (selectedFilters.task_status === "unlabeled" && currentPageNumber === 1) {
+            if (((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && currentPageNumber === 1) {
                 getTaskListData();
             } else {
-                setsSelectedFilters({...selectedFilters, task_status: "unlabeled"});
+                setsSelectedFilters({...selectedFilters, task_status: props.type === "annotation" ? "unlabeled" : "labeled"});
                 setCurrentPageNumber(1);
             }
             const projectObj = new GetProjectDetailsAPI(id);
@@ -108,7 +112,7 @@ const TaskTable = () => {
 
     const unassignTasks = async () => {
         setDeallocateDialog(false);
-        const deallocateObj = new DeallocateTasksAPI(id);
+        const deallocateObj = props.type === "annotation" ? new DeallocateTasksAPI(id) : new DeallocateReviewTasksAPI(id);
         const res = await fetch(deallocateObj.apiEndPoint(), {
             method: "GET",
             body: JSON.stringify(deallocateObj.getBody()),
@@ -182,6 +186,7 @@ const TaskTable = () => {
     }, [currentPageNumber, currentRowPerPage]);
 
     useEffect(() => {
+        dispatch(SetTaskFilter(id, selectedFilters, props.type));
         if (currentPageNumber !== 1) {
             setCurrentPageNumber(1);
         } else {
@@ -197,12 +202,20 @@ const TaskTable = () => {
                 ]
                 row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
                 taskList[0].task_status && row.push(el.task_status);
-                row.push(<Link to={`task/${el.id}`} className={classes.link}>
+                props.type === "annotation" && row.push(<Link to={`task/${el.id}`} className={classes.link}>
                             <CustomButton
                                 onClick={() => {console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
                                 sx={{ p: 1, borderRadius: 2 }}
                                 label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
                                     {ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit"}
+                                </Typography>} />
+                        </Link>);
+                props.type === "review" && row.push(<Link to={`review/${el.id}`} className={classes.link}>
+                            <CustomButton
+                                onClick={() => {console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
+                                sx={{ p: 1, borderRadius: 2 }}
+                                label={<Typography sx={{color : "#FFFFFF"}} variant="body2">
+                                    Review
                                 </Typography>} />
                         </Link>);
                 return row;
@@ -255,18 +268,18 @@ const TaskTable = () => {
             })
             setPullSize(ProjectDetails.tasks_pull_count_per_batch*0.5);
         }
-    }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, userDetails])
+    }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, ProjectDetails.tasks_pull_count_per_batch, userDetails])
 
     useEffect(() => {
-        if (totalTaskCount && selectedFilters.task_status === "unlabeled" && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
-            setPullDisabled("You have too many unlabeled tasks")
-        } else if (pullDisabled === "You have too many unlabeled tasks") {
+        if (totalTaskCount && ((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && totalTaskCount >=ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
+            setPullDisabled(`You have too many ${selectedFilters.task_status} tasks`)
+        } else if (pullDisabled === "You have too many unlabeled tasks" || pullDisabled === "You have too many labeled tasks") {
             setPullDisabled("")
         }
     }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters])
 
     useEffect(() => {
-        if (selectedFilters.task_status === "unlabeled" && totalTaskCount === 0) {
+        if (((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && totalTaskCount === 0) {
             setDeallocateDisabled("No more tasks to deallocate")
         } else if (deallocateDisabled === "No more tasks to deallocate") {
             setDeallocateDisabled("")
@@ -275,7 +288,7 @@ const TaskTable = () => {
 
     useEffect(() => {
         if(labellingStarted && Object.keys(NextTask).length > 0) {
-          navigate(`/projects/${id}/task/${NextTask.id}`);
+          navigate(`/projects/${id}/${props.type === "annotation" ? "task" : "review"}/${NextTask.id}`);
         }
         //TODO: display no more tasks message
       }, [NextTask]);
@@ -296,7 +309,7 @@ const TaskTable = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
             <Box className={classes.filterToolbarContainer}>
-                {userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
+                {props.type === "annotation" && userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
                     <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
                     <Select
                     labelId="annotator-filter-label"
@@ -387,7 +400,7 @@ const TaskTable = () => {
 
     return (
         <Fragment>
-        {userDetails?.role === 1 && (ProjectDetails.project_mode === "Annotation" ? (
+        {((props.type === "annotation" && userDetails?.role === 1) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
                 <Grid
                     container
@@ -395,7 +408,7 @@ const TaskTable = () => {
                     spacing={2}
                     sx={{ mb: 2, mt: 2 }}
                 >
-                    {selectedFilters.task_status === "unlabeled" && <Grid item xs={12} sm={12} md={3}>
+                    {((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && <Grid item xs={12} sm={12} md={3}>
                     <Tooltip title={deallocateDisabled}>
                         <Box>
                             <CustomButton 
@@ -419,7 +432,7 @@ const TaskTable = () => {
                         </DialogTitle>
                         <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            All unlabeled tasks will be de-allocated from this project.
+                            All {props.type === "annotation" ? "unlabeled" : "labeled"} tasks will be de-allocated from this project.
                             Please be careful as this action cannot be undone.
                         </DialogContentText>
                         </DialogContent>
@@ -430,7 +443,7 @@ const TaskTable = () => {
                         </Button>
                         </DialogActions>
                     </Dialog>
-                    <Grid item xs={4} sm={4} md={selectedFilters.task_status === "unlabeled" ? 2 : 3}>
+                    <Grid item xs={4} sm={4} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 2 : 3}>
                         <FormControl size="small" sx={{ width: "100%" }}>
                             <InputLabel id="pull-select-label" sx={{fontSize: "16px"}}>Pull Size</InputLabel>
                             <Select
@@ -449,7 +462,7 @@ const TaskTable = () => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={8} sm={8} md={selectedFilters.task_status === "unlabeled" ? 3 : 4}>
+                    <Grid item xs={8} sm={8} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 3 : 4}>
                         <Tooltip title={pullDisabled}>
                             <Box>
                                 <CustomButton 
@@ -461,7 +474,7 @@ const TaskTable = () => {
                             </Box>
                         </Tooltip>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={selectedFilters.task_status === "unlabeled" ? 4 : 5}>
+                    <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 4 : 5}>
                         <CustomButton 
                             sx={{ p: 1, borderRadius: 2, margin: "auto", width: '100%'}} 
                             label={"Start Labelling Now"}
