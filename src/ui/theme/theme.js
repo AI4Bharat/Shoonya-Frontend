@@ -148,6 +148,13 @@ const themeDefault = createTheme({
         },
       },
     },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          maxHeight: "25%",
+        },
+      },
+    },
     MUIDataTableFilter: {
       styleOverrides: {
         root: {
