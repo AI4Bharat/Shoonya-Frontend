@@ -368,7 +368,7 @@ const TaskTable = (props) => {
             }
         },
         onChangePage: (currentPage) => { 
-            currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1);
+            setCurrentPageNumber(currentPage + 1);
         },
         onChangeRowsPerPage: (rowPerPageCount) => { 
             setCurrentPageNumber(1); 
@@ -395,6 +395,8 @@ const TaskTable = (props) => {
             },
             options: { sortDirection: "desc" },
         },
+        jumpToPage: true,
+        serverSide: true,
         customToolbar: renderToolBar,
     };
 
