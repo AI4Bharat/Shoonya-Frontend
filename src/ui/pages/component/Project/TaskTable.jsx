@@ -7,7 +7,8 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
@@ -500,13 +501,15 @@ const TaskTable = (props) => {
             ) : ( 
                 <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%", mt:"1%" }} label={"Add New Item"} />
             ))}
-            <MUIDataTable
-                title={""}
-                data={tasks}
-                columns={columns}
-                options={options}
-            // filter={false}
-            />
+            <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    title={""}
+                    data={tasks}
+                    columns={columns}
+                    options={options}
+                    // filter={false}
+                />
+            </ThemeProvider>
             {searchOpen && <SearchPopup 
                 open={searchOpen}
                 anchorEl={searchAnchor}

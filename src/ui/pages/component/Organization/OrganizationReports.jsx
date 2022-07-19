@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { TextField, Box, Button, Grid, createTheme, ThemeProvider } from "@mui/material";
-import themeDefault from "../../../theme/theme";
+import { TextField, Box, Button, Grid, ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import { DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import InputLabel from "@mui/material/InputLabel";
@@ -53,35 +53,6 @@ const OrganizationReports = () => {
   const UserReports = useSelector((state) => state.getOrganizationUserReports.data);
   const ProjectReports = useSelector((state) => state.getOrganizationProjectReports.data);
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
-
-  const theme = createTheme({
-    ...themeDefault,
-    components: {
-      ...themeDefault.components,
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            minWidth: "25",
-            borderRadius: "none",
-            textTransform: "none",
-          },
-          label: {
-            textTransform: "none",
-            fontFamily: '"Roboto", "Segoe UI"',
-            fontSize: "16px",
-            letterSpacing: "0.16px",
-            textAlign: "center",
-            display: "flex",
-            justifyContent: "center",
-            height: "19px",
-            "@media (max-width:640px)": {
-              fontSize: "10px",
-            },
-          },
-        },
-      },
-    },
-  });
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -358,7 +329,7 @@ const options = {
         </Grid>
       </Grid>
       {reportData?.length > 0 ? 
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={""}
             data={reportData}
