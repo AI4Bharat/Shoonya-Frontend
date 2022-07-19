@@ -72,6 +72,7 @@ const options = {
 	print: false,
 	search: false,
 	viewColumns: false,
+	jumpToPage: true,
 };
 
 export default function DatasetProjectsTable({ datasetId }) {

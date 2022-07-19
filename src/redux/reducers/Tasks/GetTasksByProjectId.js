@@ -8,7 +8,7 @@ let initialState = {
 const reducer = (state=initialState,action)=>{
     switch(action.type){
         case constants.GET_TASK_LIST:
-            let data = action.payload;
+            /* let data = action.payload;
             if (isValidUrl(state.endpoint) && isValidUrl(action.endpoint)) {
                 let oldURLParam = new URL(state.endpoint).searchParams;
                 let newURLParam = new URL(action.endpoint).searchParams;
@@ -32,10 +32,10 @@ const reducer = (state=initialState,action)=>{
                     const currentResult = action.payload.results;
                     data.results = getUniqueListBy([...prevResult,...currentResult],'id')
                 }
-            }
+            } */
             return {
                 ...state,
-                data:data,
+                data: action.payload,
                 endpoint:action.endpoint
             } 
 

@@ -108,7 +108,7 @@ const ManagersTable = (props) => {
             viewColumns: false,
             selectableRows: "none",
             search: false,
-           
+            jumpToPage: true,
           };
 
     return (

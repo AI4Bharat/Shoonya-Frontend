@@ -148,6 +148,13 @@ const themeDefault = createTheme({
         },
       },
     },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          maxHeight: "24%",
+        },
+      },
+    },
     MUIDataTableFilter: {
       styleOverrides: {
         root: {
@@ -449,6 +456,13 @@ const themeDefault = createTheme({
     },
     MUIDataTableBodyCell: {
       root: { padding: ".5rem .5rem .5rem .8rem", textTransform: "capitalize" },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          fontSize: "0.875rem",
+        }
+      }
     },
   },
 });

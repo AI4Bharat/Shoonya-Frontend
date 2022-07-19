@@ -28,7 +28,7 @@ export default class AddMembersToProjectAPI extends API {
 
   getBody() {
     return {
-      emails: this.ids,
+      ids: this.ids,
     };
   }
 

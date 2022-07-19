@@ -168,6 +168,7 @@ const WorkspaceReports = () => {
     print: false,
     search: false,
     viewColumns: false,
+    jumpToPage: true,
     customToolbar: renderToolBar,
     textLabels: {
       body: {
