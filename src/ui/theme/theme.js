@@ -151,7 +151,7 @@ const themeDefault = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          maxHeight: "25%",
+          maxHeight: "24%",
         },
       },
     },
