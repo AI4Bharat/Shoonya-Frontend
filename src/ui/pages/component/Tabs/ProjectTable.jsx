@@ -95,7 +95,7 @@ const ProjectTable = (props) => {
             viewColumns: false,
             selectableRows: "none",
             search: false,
-           
+            jumpToPage: true,
           };
 
     return (

@@ -79,6 +79,7 @@ const ReportsTable = () => {
         print: false,
         search: false,
         viewColumns: false,
+        jumpToPage: true,
         customToolbar: renderToolBar,
         textLabels: {
             body: {

@@ -118,7 +118,7 @@ const AnnotatorsTable = (props) => {
             viewColumns: false,
             selectableRows: "none",
             search: false,
-           
+            jumpToPage: true,
           };
 
     return (

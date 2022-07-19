@@ -124,8 +124,7 @@ const AnnotationProject = (props) => {
       },
     },
     onChangePage: (currentPage) => {
-      currentPage + 1 > currentPageNumber &&
-        setCurrentPageNumber(currentPage + 1);
+      setCurrentPageNumber(currentPage + 1);
     },
     onChangeRowsPerPage: (rowPerPageCount) => {
       setCurrentRowPerPage(rowPerPageCount);
@@ -150,6 +149,8 @@ const AnnotationProject = (props) => {
       },
       options: { sortDirection: "desc" },
     },
+    jumpToPage: true,
+    serverSide: true,
     customToolbar: renderToolBar,
   };
   

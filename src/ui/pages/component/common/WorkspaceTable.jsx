@@ -106,7 +106,7 @@ const WorkspaceTable = (props) => {
                     displayRows: "OF"
                 }
             },
-            onChangePage: (currentPage) => { currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1) },
+            onChangePage: (currentPage) => setCurrentPageNumber(currentPage + 1),
             // onChangeRowsPerPage: (rowPerPageCount) => { setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount) },
             filterType: 'checkbox',
             selectableRows: "none",
@@ -128,6 +128,8 @@ const WorkspaceTable = (props) => {
                 },
                 options: { sortDirection: "desc" },
             },
+            jumpToPage: true,
+            serverSide: true,
             // customToolbar: renderToolBar,
         };
 

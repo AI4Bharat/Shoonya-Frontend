@@ -196,6 +196,7 @@ const MyProgress = () => {
     print: false,
     search: false,
     viewColumns: false,
+    jumpToPage: true,
     customToolbar: renderToolBar,
   };
 
