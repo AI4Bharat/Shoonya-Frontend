@@ -31,7 +31,7 @@ const tableTheme = createTheme({
       styleOverrides: {
         paper: {
           maxHeight: "25%",
-          maxWidth: "96px",
+          maxWidth: "95px",
         },
       },
     },
