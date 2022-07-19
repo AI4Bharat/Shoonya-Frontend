@@ -16,14 +16,15 @@ import {
   deleteAnnotation,
   fetchAnnotation
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
-
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
 
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from './lsf.module.css'
 import "./lsf.css"
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 
 //used just in postAnnotation to support draft status update.
@@ -31,6 +32,7 @@ import { translate } from '../../../../config/localisation';
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
+  const dispatch = useDispatch();
   const ProjectDetails = useSelector(state => state.getProjectDetails.data);
   const task_status = useRef(ProjectDetails.enable_task_reviews ? "labeled": "accepted");
   // this reference will be populated when LSF initialized and can be used somewhere else
@@ -159,13 +161,14 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
         onLabelStudioLoad: function (ls) {
           task_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
+          console.log("task_status", task_status.current, "test", ProjectDetails);
           if (userData.role === 1 && annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
             });
             ls.annotationStore.selectAnnotation(c.id);
-            load_time = new Date();
           }
+          load_time = new Date();
         },
         onSubmitAnnotation: function (ls, annotation) {
           showLoader();
@@ -213,7 +216,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.task_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
-              if (annotation.serializeAnnotation().id === annotations[i].result.id) {
+              if (annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
                 showLoader();
                 let temp = annotation.serializeAnnotation()
 
@@ -237,7 +240,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
                       })
                     else{
                       hideLoader();
-                      window.location.reload();
+                      // window.location.reload();
                     }
                   });
               }
@@ -273,29 +276,34 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     if (
       userData?.id && loaded.current !== taskId
     ) {
-      loaded.current = taskId;
-      getProjectsandTasks(projectId, taskId).then(
-        ([labelConfig, taskData, annotations, predictions]) => {
-          // both have loaded!
-          console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
-          setLabelConfig(labelConfig.label_config);
-          setTaskData(taskData.data);
-          LSFRoot(
-            rootRef,
-            lsfRef,
-            userData,
-            projectId,
-            taskData,
-            labelConfig.label_config,
-            annotations,
-            predictions,
-            annotationNotesRef
-          );
-          hideLoader();
-        }
-      );
+      if (Object.keys(ProjectDetails).length === 0) {
+        const projectObj = new GetProjectDetailsAPI(projectId);
+        dispatch(APITransport(projectObj));
+      } else {
+        loaded.current = taskId;
+        getProjectsandTasks(projectId, taskId).then(
+          ([labelConfig, taskData, annotations, predictions]) => {
+            // both have loaded!
+            console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
+            setLabelConfig(labelConfig.label_config);
+            setTaskData(taskData.data);
+            LSFRoot(
+              rootRef,
+              lsfRef,
+              userData,
+              projectId,
+              taskData,
+              labelConfig.label_config,
+              annotations,
+              predictions,
+              annotationNotesRef
+            );
+            hideLoader();
+          }
+        );
+      }
     }
-  }, [labelConfig, userData, annotationNotesRef, taskId]);
+  }, [labelConfig, userData, annotationNotesRef, taskId, ProjectDetails]);
 
   useEffect(() => {
     showLoader();

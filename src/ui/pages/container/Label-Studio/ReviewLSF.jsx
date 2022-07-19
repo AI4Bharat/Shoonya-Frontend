@@ -154,7 +154,7 @@ const LabelStudioWrapper = ({
         },
 
         task: {
-          annotations: annotations.filter((annotation) => !annotation.parent_annotation),
+          annotations: annotations.filter((annotation) => !annotation.parent_annotation || annotation.id === taskData.correct_annotation),
           predictions: predictions,
           id: taskData.id,
           data: taskData.data,
@@ -193,9 +193,13 @@ const LabelStudioWrapper = ({
                 annotation.serializeAnnotation()[0].id ===
                 annotations[i].result[0].id
               ) {
-                let temp;
+                let temp, review;
                 showLoader();
-                let review = annotations.find((annotation) => annotation.parent_annotation === annotations[i].id);
+                if (annotations[i].parent_annotation) {
+                  review = annotations[i];
+                } else {
+                  review = annotations.find((annotation) => annotation.parent_annotation === annotations[i].id);
+                }
                 if (review) {
                   temp = review.result;
                   temp[0].value = annotation.serializeAnnotation()[0].value;
