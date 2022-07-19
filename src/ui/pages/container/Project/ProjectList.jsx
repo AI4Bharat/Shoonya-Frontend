@@ -23,6 +23,7 @@ const Dashboard = () => {
 
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const SearchProject = useSelector((state) => state.SearchProjectCards.data);
+    const [pagecount, setPagecount] = useState("");
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -53,6 +54,7 @@ const Dashboard = () => {
     useEffect(() => {
         getDashboardprojectData();
     }, []);
+   
 
     
 
@@ -82,6 +84,8 @@ const Dashboard = () => {
                                     ?.toLowerCase()
                                     .includes(SearchProject?.toLowerCase())
                             ) {
+                               
+
 
                                 return el;
                             }else if (
@@ -89,18 +93,21 @@ const Dashboard = () => {
                                      ?.toLowerCase()
                                      .includes(SearchProject?.toLowerCase())
                              ) {
+                               
+
  
                                  return el;
                              }else if (
                                 el.id.toString()?.toLowerCase()
                                 ?.includes(SearchProject.toLowerCase())
                             ) {
+                                
                                       return el;
                               }
+
                             
                         }).map((el, i) => {
-                            // setSearchPaginations(current => [...current, el])
-                          
+                            
                             return (
                                 <Grid key={el.id} item xs={12} sm={6} md={4} lg={4} xl={4}>
                                     <ProjectCard

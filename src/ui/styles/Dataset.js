@@ -176,7 +176,7 @@ search: {
   borderRadius: "24px",
   backgroundColor: "#F3F3F3",
   marginLeft: "0px",
-  width: "220px",
+  width: "300px",
   textAlign: "left",
   float: "right",
 },

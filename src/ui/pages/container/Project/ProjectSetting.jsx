@@ -74,7 +74,7 @@ const ProjectSetting = (props) => {
         getProjectDetails();
 
     }, []);
-    console.log(ProjectDetails, "ProjectDetails")
+
 
     useEffect(() => {
         if (ProjectDetails.project_type === "MonolingualTranslation" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
