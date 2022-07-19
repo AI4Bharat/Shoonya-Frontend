@@ -29,7 +29,7 @@ import getLanguageChoices from './ProjectDetails/GetLanguageChoices';
 import createProject from './ProjectDetails/CreateProject';
 import getWorkspaceUserReports from './WorkspaceDetails/GetWorkspaceUserReports';
 import getWorkspaceProjectReports from './WorkspaceDetails/GetWorkspaceProjectReports';
-import  downloadProjectButton from './ProjectDetails/DownloadProject'
+import  downloadProjectCSV from './ProjectDetails/DownloadCSVProject'
 import getFilteredTasks from './Tasks/GetFilteredTasks';
 import postAnnotation from './Annotation/PostAnnotation';
 import updateAnnotation from './Annotation/UpdateAnnotation';
@@ -52,6 +52,7 @@ import GetFileTypes from './Dataset/GetFileTypes';
 import ChangePassword from './UserManagement/ChangePassword'
 import fetchUserById from './UserManagement/FetchUserById';
 import setTaskFilter from './Tasks/SetTaskFilter';
+import DownloadJSONProject from './ProjectDetails/DownloadJSONProject'
 
 const index = {
     apiStatus,
@@ -88,7 +89,7 @@ const index = {
     createProject,
     getWorkspaceUserReports,
     getWorkspaceProjectReports,
-    downloadProjectButton,
+    downloadProjectCSV,
     getFilteredTasks,
     postAnnotation,
     updateAnnotation,
@@ -111,6 +112,7 @@ const index = {
     ChangePassword,
     fetchUserById,
     setTaskFilter,
+    DownloadJSONProject,
 };
 
 export default index;
