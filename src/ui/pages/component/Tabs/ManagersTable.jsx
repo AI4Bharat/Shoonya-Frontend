@@ -5,6 +5,8 @@ import GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/Workspac
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
 import CustomButton from "../common/Button";
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 
 const ManagersTable = (props) => {
 
@@ -113,12 +115,14 @@ const ManagersTable = (props) => {
 
     return (
         <div>
-            <MUIDataTable
-                // title={""}
-                data={data}
-                columns={columns}
-                options={options}
-            />
+            <ThemeProvider theme={tableTheme}>
+				<MUIDataTable
+                    // title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                />
+            </ThemeProvider>
         </div>
        
     )

@@ -6,6 +6,8 @@ import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/Worksp
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import CustomButton from "../common/Button";
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 
 const AnnotatorsTable = (props) => {
     const dispatch = useDispatch();
@@ -123,12 +125,14 @@ const AnnotatorsTable = (props) => {
 
     return (
         <div>
-            <MUIDataTable
-                // title={""}
-                data={data}
-                columns={columns}
-                options={options}
-            />
+            <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    // title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                />
+            </ThemeProvider>
         </div>
        
     )

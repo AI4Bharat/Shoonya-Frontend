@@ -1,4 +1,5 @@
-import { Box, Chip, Grid, ThemeProvider, Typography,Card } from "@mui/material";
+import { Box, Chip, Grid, ThemeProvider, Typography, Card } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
@@ -797,12 +798,14 @@ const AnnotationProject = (props) => {
                 lg={12}
                 xl={12}
               >
-                <MUIDataTable
-                  title={""}
-                  data={tableData}
-                  columns={columns.filter((column) => selectedColumns.includes(column.name))}
-                  options={options}
-                />
+                <ThemeProvider theme={tableTheme}>
+                  <MUIDataTable
+                    title={""}
+                    data={tableData}
+                    columns={columns.filter((column) => selectedColumns.includes(column.name))}
+                    options={options}
+                  />
+                </ThemeProvider>
               </Grid>
               <Grid
                 className={classes.projectsettingGrid}

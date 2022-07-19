@@ -6,6 +6,8 @@ import MUIDataTable from "mui-datatables";
 // import WorkspaceTable from "../common/WorkspaceTable";
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 
 
 const WorkspaceTable = (props) => {
@@ -135,12 +137,14 @@ const WorkspaceTable = (props) => {
 
     return (
         <div>
-            {workspaceData && <MUIDataTable
-                // title={""}
-                data={data}
-                columns={columns}
-                options={options}
-            />}
+            {workspaceData && <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    // title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                />
+            </ThemeProvider>}
         </div>
     )
 }
