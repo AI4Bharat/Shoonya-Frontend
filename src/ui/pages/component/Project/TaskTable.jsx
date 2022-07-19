@@ -56,7 +56,7 @@ const TaskTable = (props) => {
         (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {task_status: filterData.Status[0], user_filter: -1});
     const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
-    const [pullSize, setPullSize] = useState();
+    const [pullSize, setPullSize] = useState(ProjectDetails.tasks_pull_count_per_batch*0.5);
     const [pullDisabled, setPullDisabled] = useState("");
     const [deallocateDisabled, setDeallocateDisabled] = useState("");
     const apiLoading = useSelector(state => state.apiStatus.loading);
@@ -145,7 +145,7 @@ const TaskTable = (props) => {
         localStorage.setItem("labellingMode", selectedFilters.task_status);
         localStorage.setItem("searchFilters", JSON.stringify(search_filters));
         localStorage.setItem("labelAll", true);
-        const getNextTaskObj = new GetNextTaskAPI(id);
+        const getNextTaskObj = new GetNextTaskAPI(id, null, props.type);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
     };

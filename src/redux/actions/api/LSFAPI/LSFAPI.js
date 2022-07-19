@@ -62,7 +62,7 @@ const postAnnotation = async (result, task, completed_by, load_time, lead_time, 
   }
 };
 
-const postReview = async (result, task, completed_by, parentAnnotation, load_time, lead_time, review_status, notes) => {
+const postReview = async (result, task, completed_by, parentAnnotation, load_time, lead_time, review_status, annotation_notes, review_notes) => {
   try {
     await axiosInstance.post(`/annotation/`, {
       result: result,
@@ -71,7 +71,8 @@ const postReview = async (result, task, completed_by, parentAnnotation, load_tim
       parent_annotation: parentAnnotation,
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       review_status: review_status,
-      review_notes: notes,
+      annotation_notes: annotation_notes,
+      review_notes: review_notes,
       mode: "review"
     });
   } catch (err) {
@@ -94,6 +95,23 @@ const patchAnnotation = async (result, annotationID, load_time, lead_time, task_
   }
 };
 
+const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, annotation_notes, review_notes) => {
+  try {
+    await axiosInstance.patch(`/annotation/${annotationID}/`, {
+      result: result,
+      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      parent_annotation: parentAnnotation,
+      review_status: review_status,
+      // annotation_notes: annotation_notes,
+      review_notes: review_notes,
+      mode: "review"
+    });
+  } catch (err) {
+    return err;
+    // message.error("Error updating annotations");
+  }
+}
+
 const deleteAnnotation = async (annotationID) => {
   try {
     await axiosInstance.delete(`/annotation/${annotationID}/`);
@@ -115,21 +133,27 @@ const updateTask = async (taskID) => {
   }
 };
 
-const getNextProject = async (projectID, taskID) => {
+const getNextProject = async (projectID, taskID, mode="annotation") => {
   try {
-    let labellingMode= localStorage.getItem("labellingMode");
-    let requestUrl = labellingMode ? `/projects/${projectID}/next/?current_task_id=${taskID}&task_status=${labellingMode}` : `/projects/${projectID}/next/?current_task_id=${taskID}`;
+    let labellingMode = localStorage.getItem("labellingMode");
+    let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
+    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${labellingMode ? `&task_status=${labellingMode}` : ""}${mode === "review" ? `&mode=review` : ""}`;
+    if (localStorage.getItem("labelAll")) {
+      Object.keys(searchFilters)?.forEach(key => {
+        requestUrl += `&${key}=${this.searchFilters[key]}`;
+      });
+    }
     let response = await axiosInstance.post(requestUrl, {
       id: projectID,
     });
     if (response.status === 204) {
-      // if (localStorage.getItem("labelAll"))
-        // window.location.href = `/projects/${projectID}`;
       // message.info("No more tasks for this project.");
-    } else {
+    }
+    else {
       return response.data;
     }
-  } catch (err) {
+  }
+  catch (err) {
     // message.error("Error getting next task.");
     return err
   }
@@ -153,4 +177,5 @@ export {
   deleteAnnotation,
   fetchAnnotation,
   postReview,
+  patchReview,
 };
