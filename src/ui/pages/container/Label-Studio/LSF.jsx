@@ -158,11 +158,13 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         },
 
         onLabelStudioLoad: function (ls) {
-          var c = ls.annotationStore.addAnnotation({
-            userGenerate: true,
-          });
-          ls.annotationStore.selectAnnotation(c.id);
-          load_time = new Date();
+          if (userData.role === 1 && annotations.length === 0) {
+            var c = ls.annotationStore.addAnnotation({
+              userGenerate: true,
+            });
+            ls.annotationStore.selectAnnotation(c.id);
+            load_time = new Date();
+          }
         },
         onSubmitAnnotation: function (ls, annotation) {
           showLoader();
