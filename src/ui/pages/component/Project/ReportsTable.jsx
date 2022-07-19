@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
 import CustomButton from '../common/Button';
-import { Typography, TextField, Box, Stack, Button, Grid, CircularProgress } from '@mui/material';
+import { Typography, TextField, Box, Stack, Button, Grid, CircularProgress, ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import InputLabel from '@mui/material/InputLabel';
@@ -79,6 +80,7 @@ const ReportsTable = () => {
         print: false,
         search: false,
         viewColumns: false,
+        jumpToPage: true,
         customToolbar: renderToolBar,
         textLabels: {
             body: {
@@ -179,13 +181,15 @@ const ReportsTable = () => {
             </Stack>
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : (
-                    <MUIDataTable
-                        title={""}
-                        data={ProjectReport}
-                        columns={columns.filter(col => selectedColumns.includes(col.name))}
-                        options={options}
-                        // filter={false}
-                    />
+                    <ThemeProvider theme={tableTheme}>
+                        <MUIDataTable
+                            title={""}
+                            data={ProjectReport}
+                            columns={columns.filter(col => selectedColumns.includes(col.name))}
+                            options={options}
+                            // filter={false}
+                        />
+                    </ThemeProvider>
                 )
             }
         </React.Fragment>

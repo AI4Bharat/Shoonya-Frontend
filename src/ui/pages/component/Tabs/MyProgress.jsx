@@ -1,4 +1,5 @@
 import { Button, Grid, ThemeProvider, Typography, Select, Box, MenuItem, InputLabel, FormControl, TextField } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -196,6 +197,7 @@ const MyProgress = () => {
     print: false,
     search: false,
     viewColumns: false,
+    jumpToPage: true,
     customToolbar: renderToolBar,
   };
 
@@ -310,12 +312,14 @@ const MyProgress = () => {
           </Grid>
         </Grid>
         {UserAnalytics?.length > 0 && (
-          <MUIDataTable
-            title={""}
-            data={reportData}
-            columns={columns.filter((col) => selectedColumns.includes(col.name))}
-            options={tableOptions}
-          />
+          <ThemeProvider theme={tableTheme}>
+            <MUIDataTable
+              title={""}
+              data={reportData}
+              columns={columns.filter((col) => selectedColumns.includes(col.name))}
+              options={tableOptions}
+            />
+          </ThemeProvider>
         )}
       </Grid>
       <CustomizedSnackbars message={snackbarText} open={snackbarOpen} hide={2000} handleClose={closeSnackbar} anchorOrigin={{
