@@ -240,7 +240,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
                       })
                     else{
                       hideLoader();
-                      // window.location.reload();
+                      window.location.reload();
                     }
                   });
               }
