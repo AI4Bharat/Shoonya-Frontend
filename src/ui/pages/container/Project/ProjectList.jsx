@@ -14,7 +14,8 @@ import TablePagination from '@mui/material/TablePagination';
 import TablePaginationActions from "../../component/common/TablePaginationActions";
 import Spinner from "../../component/common/Spinner";
 import Search from "../../component/common/Search";
-import SearchProjectCards from "../../../../redux/actions/api/ProjectDetails/SearchProjectCards"
+import SearchProjectCards from "../../../../redux/actions/api/ProjectDetails/SearchProjectCards";
+import Record from "../../../../assets/no-record.svg";
 
 const Dashboard = () => {
     const classes = DatasetStyle();
@@ -107,7 +108,7 @@ const Dashboard = () => {
             {/* <Header /> */}
             <Search />
             {loading && <Spinner />}
-            {projectData.length > 0 && <Box sx={{ margin: "0 auto", pb: 5 }}>
+            {pageSearch().length > 0 ? <Box sx={{ margin: "0 auto", pb: 5 }}>
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
                 <Grid container rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{ mb: 3 }}>
                     {
@@ -138,7 +139,8 @@ const Dashboard = () => {
                     ActionsComponent={TablePaginationActions}
                 />
 
-            </Box>}
+            </Box>: <div style={{ background: `url(${Record}) no-repeat center center`, height: '287px', marginTop: '20vh' }}>
+                    </div>}
         </React.Fragment>
     )
 }
