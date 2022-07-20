@@ -61,7 +61,7 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
               (projectUser) => projectUser?.id === workspaceAnnotator?.id
             ) === -1
         )
-        .map((user) => ({ email: user.email, username: user.username }));
+        .map((user) => ({ id: user.id, email: user.email, username: user.username }));
       break;
       case addUserTypes.PROJECT_REVIEWER:
         return workspaceAnnotators
@@ -91,7 +91,7 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
               (manager) => manager?.id === orgUser?.id
             ) === -1
         )
-        .map((user) => ({ email: user.email, username: user.username }));
+        .map((user) => ({ id: user.id, email: user.email, username: user.username }));
       break;
     default:
       break;
@@ -121,7 +121,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
       break;
 
       case addUserTypes.PROJECT_REVIEWER:
-        console.log(users, "users");
+        //console.log(users, "users");
         const addReviewersObj = new AddProjectReviewersAPI(
           id,
           users.map((user) => user.id),

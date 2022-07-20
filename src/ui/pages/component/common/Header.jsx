@@ -355,6 +355,13 @@ const Header = () => {
         navigate("/profile");
       },
     },
+    {
+      name: "Change Password",
+      onclick: () => {
+        handleCloseUserMenu();
+        navigate("/Change-Password");
+      },
+    },
     { name: "Logout", onclick: () => onLogoutClick() },
   ];
 

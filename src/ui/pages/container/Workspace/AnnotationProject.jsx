@@ -1,4 +1,5 @@
-import { Box, Chip, Grid, ThemeProvider, Typography,Card } from "@mui/material";
+import { Box, Chip, Grid, ThemeProvider, Typography, Card } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
@@ -124,8 +125,7 @@ const AnnotationProject = (props) => {
       },
     },
     onChangePage: (currentPage) => {
-      currentPage + 1 > currentPageNumber &&
-        setCurrentPageNumber(currentPage + 1);
+      setCurrentPageNumber(currentPage + 1);
     },
     onChangeRowsPerPage: (rowPerPageCount) => {
       setCurrentRowPerPage(rowPerPageCount);
@@ -150,6 +150,8 @@ const AnnotationProject = (props) => {
       },
       options: { sortDirection: "desc" },
     },
+    jumpToPage: true,
+    serverSide: true,
     customToolbar: renderToolBar,
   };
   
@@ -518,7 +520,7 @@ const AnnotationProject = (props) => {
                 xl={12}
               >
                 <Typography gutterBottom component="div">
-                  Select a domain to work in:
+                Select a Category to Work in:
                 </Typography>
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -796,12 +798,14 @@ const AnnotationProject = (props) => {
                 lg={12}
                 xl={12}
               >
-                <MUIDataTable
-                  title={""}
-                  data={tableData}
-                  columns={columns.filter((column) => selectedColumns.includes(column.name))}
-                  options={options}
-                />
+                <ThemeProvider theme={tableTheme}>
+                  <MUIDataTable
+                    title={""}
+                    data={tableData}
+                    columns={columns.filter((column) => selectedColumns.includes(column.name))}
+                    options={options}
+                  />
+                </ThemeProvider>
               </Grid>
               <Grid
                 className={classes.projectsettingGrid}

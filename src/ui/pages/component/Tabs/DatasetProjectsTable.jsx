@@ -7,6 +7,9 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetDatasetProjects from "../../../../redux/actions/api/Dataset/GetDatasetProjects";
 import MUIDataTable from "mui-datatables";
 
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
+
 const columns = [
 	{
 		name: "id",
@@ -72,6 +75,7 @@ const options = {
 	print: false,
 	search: false,
 	viewColumns: false,
+	jumpToPage: true,
 };
 
 export default function DatasetProjectsTable({ datasetId }) {
@@ -97,11 +101,13 @@ export default function DatasetProjectsTable({ datasetId }) {
 
 	return (
 		<>
-			<MUIDataTable
-				columns={columns}
-				options={options}
-				data={datasetProjects}
-			/>
+			<ThemeProvider theme={tableTheme}>
+				<MUIDataTable
+					columns={columns}
+					options={options}
+					data={datasetProjects}
+				/>
+			</ThemeProvider>
 		</>
 	);
 }
