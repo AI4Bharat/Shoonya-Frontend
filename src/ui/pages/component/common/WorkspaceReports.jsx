@@ -9,7 +9,9 @@ import {
   Button,
   Grid,
   CircularProgress,
+  ThemeProvider,
 } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import { DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import InputLabel from "@mui/material/InputLabel";
@@ -168,6 +170,7 @@ const WorkspaceReports = () => {
     print: false,
     search: false,
     viewColumns: false,
+    jumpToPage: true,
     customToolbar: renderToolBar,
     textLabels: {
       body: {
@@ -393,12 +396,14 @@ const WorkspaceReports = () => {
       {showSpinner ? (
         <CircularProgress sx={{ mx: "auto", display: "block" }} />
       ) : (
-        <MUIDataTable
-          title={""}
-          data={reportData}
-          columns={columns.filter((col) => selectedColumns.includes(col.name))}
-          options={options}
-        />
+        <ThemeProvider theme={tableTheme}>
+          <MUIDataTable
+            title={""}
+            data={reportData}
+            columns={columns.filter((col) => selectedColumns.includes(col.name))}
+            options={options}
+          />
+        </ThemeProvider>
       )}
     </React.Fragment>
   );
