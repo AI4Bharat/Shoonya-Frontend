@@ -13,10 +13,10 @@ env:
   NODE_OPTIONS: "--max_old_space_size=4096"
 
 jobs:
-  build-stage:
+  build-demo:
     uses: ./.github/workflows/build-demo.yaml
     secrets: inherit
-  release-stage:
+  release-demo:
     name: Deploy React App
     needs: [build-demo]
     runs-on: ubuntu-latest
