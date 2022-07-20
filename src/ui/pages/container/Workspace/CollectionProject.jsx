@@ -219,7 +219,7 @@ import {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a domain to work in:
+                  Select a Category to Work in:
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>

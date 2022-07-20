@@ -5,6 +5,8 @@ import MUIDataTable from "mui-datatables";
 import GetWorkspacesProjectDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 
 const ProjectTable = (props) => {
    
@@ -100,12 +102,14 @@ const ProjectTable = (props) => {
 
     return (
         <div>
-            <MUIDataTable
-                // title={""}
-                data={data}
-                columns={columns}
-                options={options}
-            />
+            <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    // title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                />
+            </ThemeProvider>
         </div>
        
     )

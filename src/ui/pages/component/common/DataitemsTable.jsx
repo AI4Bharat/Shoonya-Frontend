@@ -4,7 +4,8 @@ import { Link, useParams } from "react-router-dom";
 import GetDataitemsById from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography, ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "./ColumnList";
@@ -152,12 +153,14 @@ const DataitemsTable = () => {
 
   return (
     <Fragment>
-      <MUIDataTable
-        title={""}
-        data={dataitems}
-        columns={columns.filter((column) => selectedColumns.includes(column.name))}
-        options={options}
-      />
+      <ThemeProvider theme={tableTheme}>
+        <MUIDataTable
+          title={""}
+          data={dataitems}
+          columns={columns.filter((column) => selectedColumns.includes(column.name))}
+          options={options}
+        />
+      </ThemeProvider>
     </Fragment>
   );
 };
