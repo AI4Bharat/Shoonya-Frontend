@@ -555,7 +555,7 @@ const ProjectSetting = (props) => {
                         <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePublishProject} label="Publish Project" />
                         {ProjectDetails.sampling_mode == "f" ? <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleExportProject} label="Export Project into Dataset" /> : " "}
 
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleClickOpen} label={isArchived ? "unArchived" : "Archived"} />
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleClickOpen} label={isArchived ? "Archived" : "Archive"} />
 
                         <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
 
@@ -629,11 +629,11 @@ const ProjectSetting = (props) => {
                 <DialogContent>
 
                     <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to {!isArchived ? "unarchive" : "archive"} this project?
+                        Are you sure you want to {!isArchived ? "archive" : "unarchive"} this project?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} label="Cancle" />
+                    <Button onClick={handleClose} label="Cancel" />
                     <Button onClick={handleok} label="Ok" autoFocus />
                 </DialogActions>
             </Dialog>
