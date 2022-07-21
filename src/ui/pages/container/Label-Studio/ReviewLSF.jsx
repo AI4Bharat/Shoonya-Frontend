@@ -154,7 +154,8 @@ const LabelStudioWrapper = ({
         },
 
         task: {
-          annotations: annotations.filter((annotation) => !annotation.parent_annotation || annotation.id === taskData.correct_annotation),
+          // annotations: annotations.filter((annotation) => !annotation.parent_annotation).concat(annotations.filter((annotation) => annotation.id === taskData.correct_annotation)),
+          annotations: annotations.filter((annotation) => annotation.id === taskData.correct_annotation).length > 0 ? annotations.filter((annotation) => annotation.id === taskData.correct_annotation) : annotations.filter((annotation) => !annotation.parent_annotation),
           predictions: predictions,
           id: taskData.id,
           data: taskData.data,
