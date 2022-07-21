@@ -413,6 +413,7 @@ export default function LSF() {
   const resetNotes = () => {
     setShowNotes(false);
     annotationNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
   }
 
   useEffect(()=>{
