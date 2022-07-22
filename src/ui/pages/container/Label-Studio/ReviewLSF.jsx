@@ -469,7 +469,6 @@ export default function LSF() {
   // useEffect(() => {
   //   fetchAnnotation(taskId).then((data) => {
   //     if (data && Array.isArray(data) && data.length > 0) {
-  //       console.log("[data]", data);
   //       let correctAnnotation = data.find((item) => item.status === "correct");
   //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
   //       reviewNotesRef.current.value = data[0].review_notes ?? "";
