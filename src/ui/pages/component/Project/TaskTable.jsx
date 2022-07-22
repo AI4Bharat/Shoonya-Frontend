@@ -403,7 +403,7 @@ const TaskTable = (props) => {
         {((props.type === "annotation" && userDetails?.role === 1) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
                 <Grid
-                    container
+                    // container
                     direction="row"
                     spacing={2}
                     sx={{ mb: 2, mt: 2 }}
