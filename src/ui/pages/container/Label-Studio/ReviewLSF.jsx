@@ -281,6 +281,19 @@ const LabelStudioWrapper = ({
     }
   }
 
+  const setNotes = (taskData, annotations) => {
+    if (annotations && Array.isArray(annotations) && annotations.length > 0) {
+      let correctAnnotation = annotations.find((annotation) => annotation.id === taskData.correct_annotation);
+      if (correctAnnotation) {
+        reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
+        annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === correctAnnotation.parent_annotation)?.annotation_notes ?? "";
+      } else {
+        annotationNotesRef.current.value = annotations[0].annotation_notes ?? "";
+        reviewNotesRef.current.value = annotations[0].review_notes ?? "";
+      }
+    }
+  }
+
   // we're running an effect on component mount and rendering LSF inside rootRef node
   useEffect(() => {
     if (localStorage.getItem("rtl") === "true") {
@@ -299,6 +312,7 @@ const LabelStudioWrapper = ({
             annotations,
             predictions,
           ]);
+          setNotes(taskData, annotations);
           setLabelConfig(labelConfig.label_config);
           setTaskData(taskData.data);
           LSFRoot(
@@ -452,14 +466,16 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
-  useEffect(() => {
-    fetchAnnotation(taskId).then((data) => {
-      if (data && Array.isArray(data) && data.length > 0) {
-        annotationNotesRef.current.value = data[0].annotation_notes ?? "";
-        reviewNotesRef.current.value = data[0].review_notes ?? "";
-      }
-    });
-  }, [taskId]);
+  // useEffect(() => {
+  //   fetchAnnotation(taskId).then((data) => {
+  //     if (data && Array.isArray(data) && data.length > 0) {
+  //       console.log("[data]", data);
+  //       let correctAnnotation = data.find((item) => item.status === "correct");
+  //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
+  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
+  //     }
+  //   });
+  // }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);
