@@ -14,6 +14,8 @@ import AddMembersToProjectAPI from "../../../../redux/actions/api/ProjectDetails
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import addUserTypes from "../../../../constants/addUserTypes";
 import { useNavigate, useParams } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 
 const columns = [
     {
@@ -59,6 +61,7 @@ const options = {
     print: false,
     search: false,
     viewColumns: false,
+    jumpToPage: true,
 };
 
 const addLabel = {
@@ -133,13 +136,15 @@ const MembersTable = (props) => {
                     id={id}
                 />
             }
-            <MUIDataTable
-                title={""}
-                data={data}
-                columns={columns}
-                options={options}
-            // filter={false}
-            />
+            <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                    // filter={false}
+                />
+            </ThemeProvider>
         </React.Fragment>
     );
 };
