@@ -95,7 +95,7 @@ const patchAnnotation = async (result, annotationID, load_time, lead_time, task_
   }
 };
 
-const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, annotation_notes, review_notes) => {
+const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, review_notes) => {
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       result: result,
