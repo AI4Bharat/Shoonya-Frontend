@@ -402,11 +402,11 @@ const TaskTable = (props) => {
     };
 
     return (
-        <Fragment>
+        <div>
         {((props.type === "annotation" && userDetails?.role === 1) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
                 <Grid
-                    // container
+                    container
                     direction="row"
                     spacing={2}
                     sx={{ mb: 2, mt: 2 }}
@@ -531,7 +531,7 @@ const TaskTable = (props) => {
             )}
             {renderSnackBar()}
             {loading && <Spinner /> }
-        </Fragment>
+        </div>
     )
 }
 
