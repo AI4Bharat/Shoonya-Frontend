@@ -48,8 +48,8 @@ const ProjectSetting = (props) => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState();
     const [showLanguage, setShowLanguage] = useState(false);
-    const [sourceLanguage, setSourceLanguage] = useState("");
-    const [targetLanguage, setTargetLanguage] = useState("");
+    const [sourceLanguage, setSourceLanguage] = useState();
+    const [targetLanguage, setTargetLanguage] = useState();
     const [languageOptions, setLanguageOptions] = useState([]);
     const [spinner, setSpinner] = React.useState(false);
     const [loading, setLoading] = useState(false);
@@ -68,11 +68,14 @@ const ProjectSetting = (props) => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
     }
-
+ 
+    useEffect(() => {
+        setSourceLanguage(ProjectDetails.src_language);
+        setTargetLanguage(ProjectDetails.tgt_language);
+    }, [ProjectDetails])
 
     useEffect(() => {
         getProjectDetails();
-
     }, []);
 
 
@@ -257,7 +260,7 @@ const ProjectSetting = (props) => {
 
 
 
-    const handleSave = () => {
+    const handleSave = async () => {
 
         const sendData = {
             title: newDetails.title,
@@ -271,6 +274,28 @@ const ProjectSetting = (props) => {
         }
         const projectObj = new GetSaveButtonAPI(id, sendData);
         dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "PUT",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: "success",
+                variant: "success",
+            })
+
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+       
     }
     const handleExportProject = () => {
         getExportProjectButton();
