@@ -96,7 +96,7 @@ const Projects = () => {
                   
                     <Typography variant="h3">{ProjectDetails.title}</Typography>
                     <Grid
-                        container
+                        
                         alignItems="center"
                         direction="row"
                         justifyContent="flex-start"
@@ -108,7 +108,7 @@ const Projects = () => {
                         <Typography variant="body2">{ProjectDetails.id}</Typography>
                     </Grid>
                     <Grid
-                        container
+                        
                         alignItems="center"
                         direction="row"
                         justifyContent="flex-start"
@@ -120,7 +120,7 @@ const Projects = () => {
                         <Typography variant="body2">{ProjectDetails.description}</Typography>
                     </Grid>
                     <Grid
-                        container
+                        
                         alignItems="center"
                         direction="row"
                         justifyContent="flex-start"
@@ -132,7 +132,7 @@ const Projects = () => {
                         <Typography variant="body2">{ProjectDetails.project_type}</Typography>
                     </Grid>
                     <Grid
-                        container
+                        
                         alignItems="center"
                         direction="row"
                         justifyContent="flex-start"
@@ -144,7 +144,7 @@ const Projects = () => {
                         <Typography variant="body2">{ProjectDetails.is_published ? "Published" : ProjectDetails.is_archived ? "Archived" : "Draft"}</Typography>
                     </Grid>
                     <Grid
-                        container
+                        
                         alignItems="center"
                         direction="row"
                         justifyContent="flex-start"
