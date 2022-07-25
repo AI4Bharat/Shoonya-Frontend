@@ -283,13 +283,20 @@ const LabelStudioWrapper = ({
 
   const setNotes = (taskData, annotations) => {
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
-      let correctAnnotation = annotations.find((annotation) => annotation.id === taskData.correct_annotation);
-      if (correctAnnotation) {
-        reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
-        annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === correctAnnotation.parent_annotation)?.annotation_notes ?? "";
+      let reviewerAnnotations = annotations.filter((annotation) => !!annotation.parent_annotation);
+      if (reviewerAnnotations.length > 0) {
+        let correctAnnotation = reviewerAnnotations.find((annotation) => annotation.id === taskData.correct_annotation);
+        if (correctAnnotation) {
+          reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
+          annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === correctAnnotation.parent_annotation)?.annotation_notes ?? "";
+        } else {
+          reviewNotesRef.current.value = reviewerAnnotations[0].review_notes ?? "";
+          annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === reviewerAnnotations[0].parent_annotation)?.annotation_notes ?? "";
+        }
       } else {
-        annotationNotesRef.current.value = annotations[0].annotation_notes ?? "";
-        reviewNotesRef.current.value = annotations[0].review_notes ?? "";
+        let normalAnnotation = annotations.find((annotation) => !annotation.parent_annotation);
+        annotationNotesRef.current.value = normalAnnotation.annotation_notes ?? "";
+        reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
       }
     }
   }
@@ -469,7 +476,6 @@ export default function LSF() {
   // useEffect(() => {
   //   fetchAnnotation(taskId).then((data) => {
   //     if (data && Array.isArray(data) && data.length > 0) {
-  //       console.log("[data]", data);
   //       let correctAnnotation = data.find((item) => item.status === "correct");
   //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
   //       reviewNotesRef.current.value = data[0].review_notes ?? "";
