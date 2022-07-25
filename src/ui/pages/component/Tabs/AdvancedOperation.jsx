@@ -1,4 +1,4 @@
-import { Card, Grid, ThemeProvider, Typography } from "@mui/material";
+import { Card, Grid, ThemeProvider, Typography, Divider } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -50,14 +50,14 @@ const AdvancedOperation = (props) => {
         dispatch(APITransport(projectObj));
     }
 
-    
+
 
     useEffect(() => {
         getProjectDetails();
     }, []);
 
 
-    
+
 
 
     useEffect(() => {
@@ -253,119 +253,167 @@ const AdvancedOperation = (props) => {
 
             </Grid>
 
+       <div className={classes.rootdiv} >
             <Grid
                 container
-                direction='row'
-            
+                // direction="row"
+                xs={4}
+                md={4}
+                lg={4}
+                xl={4}
+                sm={4}
+                spacing={1}
+                rowGap={2}
+                sx={{ float: "left" }}
+                columnSpacing={2}
 
             >
-                    <Grid
-                        container
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        sm={12}
-                        style={{ margin: "38px 0px 30px 0px", }}
-                    >
-                        <Typography variant="h5" gutterBottom component="div"  sx={{  pl:2 , ml: 2 }}>
-                            Advanced Operation
-                        </Typography>
-                    </Grid>
-
-                    <Grid
-                        container
-                        direction="row"
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        sm={12}
-                        spacing={1}
-                        rowGap={2}
-                        // columnSpacing={2}
+                <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                >
+                    <CustomButton
                         sx={{
-                            // direction : "row",
-                            mb: 2,
-                            justifyContent: "flex-start",
-
+                            inlineSize: "max-content",
+                            pl: 2,
+                            borderRadius: 3,
+                            ml: 2,
+                            width: "300px"
                         }}
-                    >
-                         <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                    >
-                  <CustomButton sx={{ inlineSize: "max-content", pl:2 , borderRadius: 3, ml: 2,width:"300px" }} onClick={handlePublishProject} label="Publish Project" />
+                        onClick={handlePublishProject}
+                        label="Publish Project" />
 
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        
-                    >
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2,width:"300px"  }} onClick={handleExportProject} label="Export Project into Dataset" />
-                        </Grid>
-                       
-                        <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                       
-                    >
-                        {ProjectDetails.sampling_mode == "f" ? <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 ,width:"300px" }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" /> : " "}
-                        </Grid>
-                        <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        
-                    >
-                        <DownloadProjectButton />
-                        </Grid>
-                        <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                       
-                    >
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2,width:"300px"  }} color="error" onClick={handleClickOpen} label={isArchived ? "Archived" : "Archive"} />
-                        </Grid>
-                        <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                       
-                    >
-                        <FormControlLabel
-                            control={<Switch color="primary" />}
-                            label="Task Reviews"
-                            labelPlacement="start"
-                            checked={ProjectDetails.enable_task_reviews}
-                            onChange={handleReviewToggle}
-                        />
-                         </Grid>
-                    </Grid>
+                </Grid>
+                <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+
+                >
+                    <CustomButton
+                        sx={{
+                            inlineSize: "max-content",
+                            p: 2,
+                            borderRadius: 3,
+                            ml: 2,
+                            width: "300px"
+                        }}
+                        color="error"
+                        onClick={handleClickOpen}
+                        label={isArchived ? "Archived" : "Archive"} />
+                </Grid>
+
             </Grid>
+
+            <Grid
+                container
+                // direction="row"
+                xs={4}
+                md={4}
+                lg={4}
+                xl={4}
+                sm={4}
+                spacing={1}
+                rowGap={2}
+                sx={{ float: "left" }}
+                columnSpacing={2}
+
+            >
+                <div className={classes.divider} ></div>
+                <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+
+                >
+                    <CustomButton
+                        sx={{
+                            inlineSize: "max-content",
+                            p: 2,
+                            borderRadius: 3,
+                            ml: 2,
+                            width: "300px"
+                        }}
+                        onClick={handleExportProject}
+                        label="Export Project into Dataset" />
+                </Grid>
+
+                <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+
+                >
+                    {ProjectDetails.sampling_mode == "f" ? <CustomButton
+                        sx={{
+                            inlineSize: "max-content",
+                            p: 2,
+                            borderRadius: 3,
+                            ml: 2,
+                            width: "300px"
+                        }}
+                        onClick={handlePullNewData}
+                        label="Pull New Data Items from Source Dataset" /> : " "}
+                </Grid>
+                <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+
+                >
+                    <DownloadProjectButton />
+                </Grid>
+            </Grid>
+
+            <Grid
+                container
+                // direction="row"
+                xs={4}
+                md={4}
+                lg={4}
+                xl={4}
+                sm={4}
+                spacing={1}
+                rowGap={2}
+                columnSpacing={2}
+
+            >
+                <div className={classes.divider} ></div>
+                <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+
+                >
+                    <FormControlLabel
+                        control={<Switch color="primary" />}
+                        label="Task Reviews"
+                        labelPlacement="start"
+                        checked={ProjectDetails.enable_task_reviews}
+                        onChange={handleReviewToggle}
+                    />
+                </Grid>
+            </Grid>
+
             <Dialog
                 open={open}
                 onClose={handleClose}
@@ -383,7 +431,7 @@ const AdvancedOperation = (props) => {
                     <Button onClick={handleok} label="Ok" autoFocus />
                 </DialogActions>
             </Dialog>
-
+            </div>
         </ThemeProvider>
     )
 }

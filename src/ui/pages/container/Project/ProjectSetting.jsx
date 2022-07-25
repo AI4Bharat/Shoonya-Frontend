@@ -5,6 +5,7 @@ import BasicSettings from '../../component/Tabs/BasicSettings';
 import ReadonlyConfigurations from '../../component/Tabs/ReadonlyConfigurations'
 import AdvancedOperation from '../../component/Tabs/AdvancedOperation';
 
+
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -48,17 +49,17 @@ const UserProfilePage = () => {
                         md={12}
                         lg={12}
                         xl={12}
-                        sx={{mb:6}}
+                        sx={{mb:3,}}
                     >
-                        <Typography variant="h3" gutterBottom component="div">
+                        <Typography variant="h3" gutterBottom component="div"sx={{fontWeight: '1.6875rem'}}>
                             Project Settings
                         </Typography>
                     </Grid>
-            <Box >
+            <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
-                    <Tab label="Basic Settings" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label=" Advanced Operation" sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Read-only Configurations" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    <Tab label="Basic " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label=" Advanced " sx={{ fontSize: 17, fontWeight: '700' }} />
+                    <Tab label=" Read-only " sx={{ fontSize: 17, fontWeight: '700' }} />
                 </Tabs>
             </Box>
             <Divider/>

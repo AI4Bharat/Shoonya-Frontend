@@ -11,8 +11,9 @@ import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditU
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import CustomButton from "../common/Button";
 import MenuItems from "../common/MenuItems";
-import CustomizedSnackbars from "../common/Snackbar"
+import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../common/Spinner";
+import Autocomplete from "../common/Autocomplete"
 
 
 
@@ -30,12 +31,13 @@ const BasicSettings = (props) => {
     const [loading, setLoading] = useState(false);
     const [newDetails, setNewDetails] = useState();
     const { id } = useParams();
-
+    const navigate = useNavigate();
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     console.log(ProjectDetails, "ProjectDetails")
+    console.log(targetLanguage,"targetLanguage")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
@@ -53,18 +55,21 @@ const BasicSettings = (props) => {
             getLanguageChoices();
             setShowLanguage(true);
         }
+       
     }, [ProjectDetails]);
+
 
 
     useEffect(() => {
         setNewDetails({
             title: ProjectDetails.title,
             description: ProjectDetails.description,
+           
 
         });
-
+        setTargetLanguage(ProjectDetails?.tgt_language)
     }, [ProjectDetails]);
-
+    console.log(targetLanguage,"cccccccccccccc")
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
     const getLanguageChoices = () => {
@@ -91,7 +96,7 @@ const BasicSettings = (props) => {
 
         const sendData = {
             title: newDetails.title,
-            description: ProjectDetails.description,
+            description: newDetails.description,
             tgt_language: targetLanguage,
             src_language: sourceLanguage,
             project_type: ProjectDetails.project_type,
@@ -135,13 +140,25 @@ const BasicSettings = (props) => {
     }, [apiLoading])
 
     const handleProjectName = (event) => {
-        setValue(event.target.value)
+       
         event.preventDefault();
         setNewDetails((prev) => ({
             ...prev,
             [event.target.name]: event.target.value,
         }));
     }
+   
+   const handletargetLanguage = (event)=>{
+       event.preventDefault();
+       console.log(event.target.name,"event.target.name",event.target.value)
+   
+    setTargetLanguage({
+        
+        [event.target.name]: event.target.value,
+    });
+   
+   }
+    console.log(targetLanguage,"targetLanguage")
 
     const renderSnackBar = () => {
         return (
@@ -173,21 +190,6 @@ const BasicSettings = (props) => {
                 justifyContent='center'
                 alignItems='center'
             >
-               
-                  
-                    <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        style={{ margin: "38px 0px 30px 0px", }}
-                    >
-                        <Typography variant="h5" gutterBottom component="div"  >
-                            Basic 
-                        </Typography>
-                    </Grid>
                     <Grid
                         container
                         direction='row'
@@ -217,7 +219,7 @@ const BasicSettings = (props) => {
                             sm={12}
                         >
                             <OutlinedTextField
-                                fullWidth
+                            fullWidth
                                 name="title"
                                 InputProps={{ style: { fontSize: "14px" } }}
                                 // value={ProjectDetails.title}
@@ -257,7 +259,7 @@ const BasicSettings = (props) => {
 
                         >
                             <OutlinedTextField
-                                fullWidth
+                            fullWidth
                                 name="description"
                                 InputProps={{ style: { fontSize: "14px" } }}
                                 value={newDetails?.description}
@@ -296,12 +298,10 @@ const BasicSettings = (props) => {
                                     xl={9}
                                     sm={12}
                                 >
-                                    <MenuItems
-
-                                        menuOptions={languageOptions}
-                                        handleChange={(value) => setSourceLanguage(value)}
-                                        value={sourceLanguage}
-                                    />
+                                  <Autocomplete
+                                options={languageOptions}
+                               
+                                />
                                 </Grid>
                             </Grid>
                             <Grid
@@ -333,12 +333,14 @@ const BasicSettings = (props) => {
                                     xl={9}
                                     sm={12}
                                 >
-                                    <MenuItems
-                                        menuOptions={languageOptions}
-                                        handleChange={(value) => setTargetLanguage(value)}
-                                        value={targetLanguage}
-                                    />
+                                   <Autocomplete
+                                   name="tgt_language"
+                                options={languageOptions.map(options=>options.name)}
+                               value={targetLanguage}
+                               onChange={handletargetLanguage}
+                                />
                                 </Grid>
+                                
                             </Grid>
                         </>)}
                     <Grid
@@ -354,10 +356,10 @@ const BasicSettings = (props) => {
                             
                         }}
                     >
-                        <CustomButton sx={{ inlineSize: "max-content" ,marginRight:"10px"}}
-                            // onClick={handleSave}
+                        <CustomButton sx={{ inlineSize: "max-content" ,marginRight:"10px",width:"80px"}}
+                            onClick={() => navigate(`/projects/:id/`)}
                             label="Cancel" />
-                        <CustomButton sx={{ inlineSize: "max-content" }}
+                        <CustomButton sx={{ inlineSize: "max-content",width:"80px" }}
                             onClick={handleSave}
                             label="Save" />
                     </Grid>
