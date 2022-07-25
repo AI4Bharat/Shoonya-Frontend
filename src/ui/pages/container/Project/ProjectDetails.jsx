@@ -63,6 +63,7 @@ const Projects = () => {
 
         dispatch(APITransport(projectObj));
     }
+    console.log(ProjectDetails, "test");
 
     useEffect(() => {
         getProjectDetails();
