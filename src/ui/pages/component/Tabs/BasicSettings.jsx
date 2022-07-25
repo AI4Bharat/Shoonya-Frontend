@@ -37,13 +37,13 @@ const BasicSettings = (props) => {
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     console.log(ProjectDetails, "ProjectDetails")
-    console.log(targetLanguage,"targetLanguage")
+    console.log(targetLanguage, "targetLanguage")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
     }
 
-   
+
 
     useEffect(() => {
         getProjectDetails();
@@ -55,7 +55,7 @@ const BasicSettings = (props) => {
             getLanguageChoices();
             setShowLanguage(true);
         }
-       
+
     }, [ProjectDetails]);
 
 
@@ -64,12 +64,12 @@ const BasicSettings = (props) => {
         setNewDetails({
             title: ProjectDetails.title,
             description: ProjectDetails.description,
-           
+
 
         });
         setTargetLanguage(ProjectDetails?.tgt_language)
     }, [ProjectDetails]);
-    console.log(targetLanguage,"cccccccccccccc")
+    console.log(targetLanguage, "cccccccccccccc")
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
     const getLanguageChoices = () => {
@@ -81,10 +81,12 @@ const BasicSettings = (props) => {
         if (LanguageChoices && LanguageChoices.length > 0) {
             let temp = [];
             LanguageChoices.forEach((element) => {
-                temp.push({
-                    name: element[0],
-                    value: element[0],
-                });
+                temp.push(element[0]
+                //     {
+                //     name: element[0],
+                //     value: element[0],
+                // }
+                );
             });
             setLanguageOptions(temp);
         }
@@ -140,25 +142,24 @@ const BasicSettings = (props) => {
     }, [apiLoading])
 
     const handleProjectName = (event) => {
-       
+
         event.preventDefault();
         setNewDetails((prev) => ({
             ...prev,
             [event.target.name]: event.target.value,
         }));
     }
-   
-   const handletargetLanguage = (event)=>{
-       event.preventDefault();
-       console.log(event.target.name,"event.target.name",event.target.value)
-   
-    setTargetLanguage({
-        
-        [event.target.name]: event.target.value,
-    });
-   
-   }
-    console.log(targetLanguage,"targetLanguage")
+
+    const handletargetLanguage = (event) => {
+        // event.preventDefault();
+        console.log(event.target.innerHTML, "event.target.name", event.target.innerHTML)
+
+        typeof(event.target.innerHTML) === "string" ?
+        setTargetLanguage(event.target.innerHTML)
+        : setTargetLanguage(ProjectDetails?.tgt_language)
+
+    }
+    console.log(targetLanguage, "targetLanguage")
 
     const renderSnackBar = () => {
         return (
@@ -190,179 +191,179 @@ const BasicSettings = (props) => {
                 justifyContent='center'
                 alignItems='center'
             >
+                <Grid
+                    container
+                    direction='row'
+                    sx={{
+                        alignItems: "center",
+                        // justifyContent: "space-between",
+                    }}
+                >
                     <Grid
-                        container
-                        direction='row'
-                        sx={{
-                            alignItems: "center",
-                            // justifyContent: "space-between",
-                        }}
+                        items
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={2}
+                        xl={2}
                     >
-                        <Grid
-                            items
-                            xs={12}
-                            sm={12}
-                            md={12}
-                            lg={2}
-                            xl={2}
-                        >
-                            <Typography variant="body2" fontWeight='700'  label="Required">
-                                Project Name 
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                            md={12}
-                            lg={9}
-                            xl={9}
-                            sm={12}
-                        >
-                            <OutlinedTextField
-                            fullWidth
-                                name="title"
-                                InputProps={{ style: { fontSize: "14px" } }}
-                                // value={ProjectDetails.title}
-                                value={newDetails?.title}
-                                onChange={handleProjectName} />
-                        </Grid>
+                        <Typography variant="body2" fontWeight='700' label="Required">
+                            Project Name
+                        </Typography>
                     </Grid>
                     <Grid
-                        container
-                        direction='row'
-                        sx={{
-                            alignItems: "center",
-                            // justifyContent: "space-between",
-                            mt: 2
-                        }}
-                    >
-                        <Grid
-                            items
-                            xs={12}
-                            sm={12}
-                            md={12}
-                            lg={2}
-                            xl={2}
-                        >
-
-                            <Typography variant="body2" fontWeight='700'>
-                                Project Description 
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                            md={12}
-                            lg={9}
-                            xl={9}
-                            sm={12}
-
-                        >
-                            <OutlinedTextField
-                            fullWidth
-                                name="description"
-                                InputProps={{ style: { fontSize: "14px" } }}
-                                value={newDetails?.description}
-                                onChange={handleProjectName}
-                            />
-                        </Grid>
-                    </Grid>
-                    {showLanguage && (
-                        <>
-                            <Grid
-                                container
-                                direction='row'
-                                sx={{
-                                    alignItems: "center",
-                                    // justifyContent: "space-between",
-                                    mt: 2
-                                }}
-                            >
-                                <Grid
-                                    items
-                                    xs={12}
-                                    sm={12}
-                                    md={12}
-                                    lg={2}
-                                    xl={2}
-                                >
-                                    <Typography variant="body2" fontWeight='700' label="Required">
-                                        Source Language
-                                    </Typography>
-                                </Grid>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    md={12}
-                                    lg={9}
-                                    xl={9}
-                                    sm={12}
-                                >
-                                  <Autocomplete
-                                options={languageOptions}
-                               
-                                />
-                                </Grid>
-                            </Grid>
-                            <Grid
-                                container
-                                direction='row'
-                                sx={{
-                                    alignItems: "center",
-                                    // justifyContent: "space-between",
-                                    mt: 2
-                                }}
-                            >
-                                <Grid
-                                    items
-                                    xs={12}
-                                    sm={12}
-                                    md={12}
-                                    lg={2}
-                                    xl={2}
-                                >
-                                    <Typography variant="body2" fontWeight='700' label="Required">
-                                        Target Language
-                                    </Typography>
-                                </Grid>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    md={12}
-                                    lg={9}
-                                    xl={9}
-                                    sm={12}
-                                >
-                                   <Autocomplete
-                                   name="tgt_language"
-                                options={languageOptions.map(options=>options.name)}
-                               value={targetLanguage}
-                               onChange={handletargetLanguage}
-                                />
-                                </Grid>
-                                
-                            </Grid>
-                        </>)}
-                    <Grid
-                        container
+                        item
                         xs={12}
                         md={12}
-                        lg={12}
-                        xl={12}
+                        lg={9}
+                        xl={9}
                         sm={12}
-                        sx={{ 
-                            m: 7,
-                            justifyContent: "center",
-                            
-                        }}
                     >
-                        <CustomButton sx={{ inlineSize: "max-content" ,marginRight:"10px",width:"80px"}}
-                            onClick={() => navigate(`/projects/:id/`)}
-                            label="Cancel" />
-                        <CustomButton sx={{ inlineSize: "max-content",width:"80px" }}
-                            onClick={handleSave}
-                            label="Save" />
+                        <OutlinedTextField
+                            fullWidth
+                            name="title"
+                            InputProps={{ style: { fontSize: "14px" } }}
+                            // value={ProjectDetails.title}
+                            value={newDetails?.title}
+                            onChange={handleProjectName} />
                     </Grid>
+                </Grid>
+                <Grid
+                    container
+                    direction='row'
+                    sx={{
+                        alignItems: "center",
+                        // justifyContent: "space-between",
+                        mt: 2
+                    }}
+                >
+                    <Grid
+                        items
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={2}
+                        xl={2}
+                    >
+
+                        <Typography variant="body2" fontWeight='700'>
+                            Project Description
+                        </Typography>
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        md={12}
+                        lg={9}
+                        xl={9}
+                        sm={12}
+
+                    >
+                        <OutlinedTextField
+                            fullWidth
+                            name="description"
+                            InputProps={{ style: { fontSize: "14px" } }}
+                            value={newDetails?.description}
+                            onChange={handleProjectName}
+                        />
+                    </Grid>
+                </Grid>
+                {showLanguage && (
+                    <>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                // justifyContent: "space-between",
+                                mt: 2
+                            }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={2}
+                                xl={2}
+                            >
+                                <Typography variant="body2" fontWeight='700' label="Required">
+                                    Source Language
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={9}
+                                xl={9}
+                                sm={12}
+                            >
+                                <Autocomplete
+                                    options={languageOptions}
+
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                // justifyContent: "space-between",
+                                mt: 2
+                            }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={2}
+                                xl={2}
+                            >
+                                <Typography variant="body2" fontWeight='700' label="Required">
+                                    Target Language
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={9}
+                                xl={9}
+                                sm={12}
+                            >
+                                <Autocomplete
+                                    name="tgt_language"
+                                    options={languageOptions.map((el,i)=>{return el})}
+                                    value={targetLanguage}
+                                    onChange={handletargetLanguage}
+                                />
+                            </Grid>
+
+                        </Grid>
+                    </>)}
+                <Grid
+                    container
+                    xs={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                    sm={12}
+                    sx={{
+                        m: 7,
+                        justifyContent: "center",
+
+                    }}
+                >
+                    <CustomButton sx={{ inlineSize: "max-content", marginRight: "10px", width: "80px" }}
+                        onClick={() => navigate(`/projects/:id/`)}
+                        label="Cancel" />
+                    <CustomButton sx={{ inlineSize: "max-content", width: "80px" }}
+                        onClick={handleSave}
+                        label="Save" />
+                </Grid>
             </Grid>
         </ThemeProvider>
     )

@@ -12,11 +12,12 @@ export default function Autocompletes(props) {
   
   return (
     <Autocomplete
+      freeSolo
       disablePortal
       id="combo-box-demo"
       value={selectAutocomplete}
       options={props.options}
-      getOptionLabel={(option) => (option ? option.name : "")}
+      getOptionLabel={(option) => (option ? option : "")}
       onChange={props.onChange}
       name={props.name}
       sx={{ width: 500 }}
