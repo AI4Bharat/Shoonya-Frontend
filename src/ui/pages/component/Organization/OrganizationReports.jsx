@@ -69,7 +69,7 @@ const OrganizationReports = () => {
         types.push(...subTypes);
       });
       setProjectTypes(types);
-      setSelectedType(types[0]);
+      setSelectedType(types[2]);
     }
   }, [ProjectTypes]);
 
