@@ -421,7 +421,7 @@ export default function LSF() {
   }, [taskId]);
   
   return (
-    <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
+    <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" }}>
       {!loader && <Button
         value="Back to Project"
         startIcon={<  ArrowBackIcon />}

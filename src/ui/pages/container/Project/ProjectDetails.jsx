@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { translate } from "../../../../config/localisation";
-import TabPanel from "../../component/common/TabPanel";
+// import TabPanel from "../../component/common/TabPanel";
 import addUserTypes from "../../../../constants/addUserTypes";
 
 
@@ -20,6 +20,28 @@ const menuOptions = [
     { name: "Members", isChecked: false, component: () => null },
     { name: "Reports", isChecked: true, component: () => null }
 ]
+
+function TabPanel(props) {
+
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box sx={{ p: 3 }}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
+}
+
 
 const Projects = () => {
     // console.log("props", props)
@@ -169,7 +191,7 @@ const Projects = () => {
                             <Typography variant="body2" sx={{color : "#FFFFFF"}}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
                     </Link>}
-                    <Box >
+                    <Box>
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
                             <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
