@@ -187,7 +187,7 @@ const Header = () => {
           sm={12}
           md={7}
         >
-          <Typography variant="body1">
+          {/* <Typography variant="body1">
             <NavLink
               to={
                 loggedInUserData && loggedInUserData.organization
@@ -201,7 +201,7 @@ const Header = () => {
             >
               Organization
             </NavLink>
-          </Typography>
+          </Typography> */}
           <Typography variant="body1">
             <NavLink
               to="/workspaces"
@@ -296,7 +296,7 @@ const Header = () => {
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={loggedInUserData.role === 1 || loggedInUserData.role === 2}
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
