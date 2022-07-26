@@ -3,27 +3,35 @@
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
 import CustomButton from '../common/Button';
-import { Typography, TextField, Box, Stack, Button, Grid, CircularProgress, ThemeProvider } from "@mui/material";
-import tableTheme from "../../../theme/tableTheme";
-import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
+import { Typography, TextField, Box, Stack, Button, Grid, CircularProgress } from '@mui/material';
+// import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { format, addDays, addWeeks, startOfWeek, startOfMonth, lastDayOfWeek } from 'date-fns';
+import { format, addDays, addWeeks, startOfWeek, startOfMonth, lastDayOfWeek, compareAsc } from 'date-fns';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetProjectReportAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectReport";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from '../common/ColumnList';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import { DateRangePicker } from 'react-date-range';
 
 const ReportsTable = () => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const [startDate, setStartDate] = useState(format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
     const [endDate, setEndDate] = useState(format(Date.now(), 'yyyy-MM-dd'));
-    const [selectRange, setSelectRange] = useState("Till Date");
+    const [selectRange, setSelectRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: addDays(new Date(), 7),
+            key: 'selection'
+        }
+    ]);
     const [rangeValue, setRangeValue] = useState([format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
     const [showPicker, setShowPicker] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
@@ -84,13 +92,19 @@ const ReportsTable = () => {
         customToolbar: renderToolBar,
         textLabels: {
             body: {
-              noMatch: 'No Record Found!'
+                noMatch: 'No Record Found!'
             }
-          }
+        }
     };
 
     const handleOptionChange = (e) => {
-        setSelectRange(e.target.value);
+        setSelectRange([
+            {
+                startDate: new Date(),
+                endDate: addDays(new Date(), 7),
+                key: 'selection'
+            }
+        ]);
         if (e.target.value === "Custom Range") {
             setStartDate(format(startOfMonth(Date.now()), 'yyyy-MM-dd'));
             setEndDate(format(Date.now(), 'yyyy-MM-dd'));
@@ -123,73 +137,68 @@ const ReportsTable = () => {
     };
 
     const handleRangeChange = (dates) => {
-        setRangeValue(dates);
-        const [start, end] = dates;
-        setStartDate(format(start, 'yyyy-MM-dd'));
-        setEndDate(format(end, 'yyyy-MM-dd'));
+        // console.log("dates", dates.selection);
+        // console.log("parsed start date", format(Date.parse(dates.selection.startDate), 'yyyy-MM-dd'));
+        // console.log("parsed end date", format(Date.parse(dates.selection.endDate), 'yyyy-MM-dd'));
+        // setRangeValue(dates);
+        // const [start, end] = dates;
+        let currentDateSplittedArr = format(Date.parse(new Date()), 'yyyy-MM-dd').split("-");
+        let startDateSplittedArr = format(Date.parse(dates.selection.startDate), 'yyyy-MM-dd').split("-");
+        let endDateSplittedArr = format(Date.parse(dates.selection.endDate), 'yyyy-MM-dd').split("-");
+
+        let finalStartDate = compareAsc(new Date(startDateSplittedArr[0], startDateSplittedArr[1], startDateSplittedArr[2]), new Date(currentDateSplittedArr[0], currentDateSplittedArr[1], currentDateSplittedArr[2]));
+        let finalEndDate = compareAsc(new Date(endDateSplittedArr[0], endDateSplittedArr[1], endDateSplittedArr[2]), new Date(currentDateSplittedArr[0], currentDateSplittedArr[1], currentDateSplittedArr[2]));
+
+        // console.log("finalStartDate", finalStartDate);
+        // console.log("finalEndDate", finalEndDate);
+
+        // console.log("startDateSplittedArr", startDateSplittedArr);
+        // console.log("endDateSplittedArr", endDateSplittedArr);
+
+
+        setSelectRange([dates.selection]);
+        setStartDate(finalStartDate == 1 ? currentDateSplittedArr.join("-") : startDateSplittedArr.join("-"));
+        setEndDate(finalEndDate == 1 ? currentDateSplittedArr.join("-") : endDateSplittedArr.join("-"));
     };
 
     const handleDateSubmit = () => {
         const projectObj = new GetProjectReportAPI(id, startDate, endDate);
         dispatch(APITransport(projectObj));
+        setShowPicker(false)
         setShowSpinner(true);
     }
 
     return (
         <React.Fragment>
-            <Stack direction="row" spacing={2} sx={{ marginBottom: "12px", alignItems: "center" }}>
-                <Box sx={{ width: "200px" }}>
-                    <FormControl variant="standard" fullWidth>
-                        <InputLabel id="date-range-select-label" sx={{fontSize:"16px"}}>Date Range</InputLabel>
-                            <Select
-                                labelId="date-range-select-label"
-                                id="date-range-select"
-                                value={selectRange}
-                                defaultValue={"This Month"}
-                                label="Date Range"
-                                onChange={handleOptionChange}
-                                sx={{fontSize : "0.875rem", lineHeight : 3}}
-                            >
-                                <MenuItem value={"Today"}>Today</MenuItem>
-                                <MenuItem value={"Yesterday"}>Yesterday</MenuItem>
-                                <MenuItem value={"This Week"}>This Week</MenuItem>
-                                <MenuItem value={"Last Week"}>Last Week</MenuItem>
-                                <MenuItem value={"This Month"}>This Month</MenuItem>
-                                {ProjectDetails?.created_at && <MenuItem value={"Till Date"}>Till Date</MenuItem>}
-                                <MenuItem value={"Custom Range"}>Custom Range</MenuItem>
-                            </Select>
-                    </FormControl>
-                </Box>
+            <Stack direction="row" spacing={2} sx={{ marginBottom: "12px", alignItems: "center", marginTop : "1rem" }}>
+                
+
                 {showPicker &&
-                    <LocalizationProvider
-                        dateAdapter={AdapterDateFns}
-                        localeText={{ start: 'Start Date', end: 'End Date' }}
-                    >
-                        <DateRangePicker
-                            value={rangeValue}
-                            onChange={handleRangeChange}
-                            renderInput={(startProps, endProps) => (
-                                <React.Fragment>
-                                    <TextField {...startProps} />
-                                        <Box sx={{ mx: 2 }}> to </Box>
-                                    <TextField {...endProps} />
-                                </React.Fragment>
-                            )}
-                        />
-                    </LocalizationProvider>}
-                <Button variant="contained" onClick={handleDateSubmit}>Submit</Button>
+                    <DateRangePicker
+                        onChange={handleRangeChange}
+                        // onChange={item => setSelectRange([item.selection])}
+                        showSelectionPreview={true}
+                        moveRangeOnFirstSelection={false}
+                        months={2}
+                        ranges={selectRange}
+                        direction="horizontal"
+                        maxDate={new Date()}
+                    />
+                }
+                {showPicker ?
+                    <Button variant="contained" onClick={handleDateSubmit}>Submit</Button>
+                    : <Button variant="contained" onClick={() => setShowPicker(true)}>Select a Date Range</Button>
+                }
             </Stack>
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : (
-                    <ThemeProvider theme={tableTheme}>
-                        <MUIDataTable
-                            title={""}
-                            data={ProjectReport}
-                            columns={columns.filter(col => selectedColumns.includes(col.name))}
-                            options={options}
-                            // filter={false}
-                        />
-                    </ThemeProvider>
+                    !showPicker && <MUIDataTable
+                        title={""}
+                        data={ProjectReport}
+                        columns={columns.filter(col => selectedColumns.includes(col.name))}
+                        options={options}
+                    // filter={false}
+                    />
                 )
             }
         </React.Fragment>

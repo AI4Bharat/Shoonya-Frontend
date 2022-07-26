@@ -48,8 +48,8 @@ const ProjectSetting = (props) => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState();
     const [showLanguage, setShowLanguage] = useState(false);
-    const [sourceLanguage, setSourceLanguage] = useState("");
-    const [targetLanguage, setTargetLanguage] = useState("");
+    const [sourceLanguage, setSourceLanguage] = useState();
+    const [targetLanguage, setTargetLanguage] = useState();
     const [languageOptions, setLanguageOptions] = useState([]);
     const [spinner, setSpinner] = React.useState(false);
     const [loading, setLoading] = useState(false);
@@ -63,16 +63,19 @@ const ProjectSetting = (props) => {
     console.log(apiMessage, "apiMessage")
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-    console.log(ProjectDetails,"ProjectDetails")
+    console.log(ProjectDetails, "ProjectDetails")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
     }
-    
+ 
+    useEffect(() => {
+        setSourceLanguage(ProjectDetails.src_language);
+        setTargetLanguage(ProjectDetails.tgt_language);
+    }, [ProjectDetails])
 
     useEffect(() => {
         getProjectDetails();
-
     }, []);
 
 
@@ -87,11 +90,11 @@ const ProjectSetting = (props) => {
     useEffect(() => {
         setNewDetails({
             title: ProjectDetails.title,
-          description: ProjectDetails.description,
-         
+            description: ProjectDetails.description,
+
         });
-       
-      }, [ProjectDetails]);
+
+    }, [ProjectDetails]);
 
     // const getSaveButtonAPI = () => {
     //     const projectObj = new GetSaveButtonAPI(id, ProjectDetails);
@@ -101,10 +104,30 @@ const ProjectSetting = (props) => {
 
 
 
-    const getExportProjectButton = () => {
+    const getExportProjectButton = async () => {
         const projectObj = new GetExportProjectButtonAPI(id);
-
         dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
     }
 
     const handleReviewToggle = async () => {
@@ -114,7 +137,7 @@ const ProjectSetting = (props) => {
             method: "POST",
             body: JSON.stringify(reviewObj.getBody()),
             headers: reviewObj.getHeaders().headers,
-          });
+        });
         const resp = await res.json();
         setLoading(false);
         if (res.ok) {
@@ -136,60 +159,84 @@ const ProjectSetting = (props) => {
 
 
 
-    const getPublishProjectButton = () => {
+    const getPublishProjectButton = async () => {
         const projectObj = new GetPublishProjectButtonAPI(id);
         dispatch(APITransport(projectObj));
-        // if(apiMessage === undefined ){
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
 
-        //     console.log(apiMessage,"apiMessage1")
-        //     setSnackbarInfo({
-        //         open: true,
-        //         message: " project published",
-        //       });
-        //       setSpinner(false);
-        // }
-        // if( apiMessage === "") {
-        //   console.log(apiMessage,"apiMessage2")
-        //     setSnackbarInfo({
-        //         open: true,
-        //         variant: "error",
-        //         message: "unable to  publish project",
-        //       });
-        //       setSpinner(false);
-        // }
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+
     }
 
-    useEffect(() => {
-        setSnackbarInfo({
-            open: apiMessage ? true : false,
-            variant: apiError ? "error" : "success",
-            message: apiMessage,
-        });
-        setSpinner(false);
-    }, [apiMessage, apiError])
+    // useEffect(() => {
+    //     setSnackbarInfo({
+    //         open: apiMessage ? true : false,
+    //         variant: apiError ? "error" : "success",
+    //         message: apiMessage,
+    //     });
+    //     setSpinner(false);
+    // }, [apiMessage, apiError])
 
 
-    const getPullNewDataAPI = () => {
+    const getPullNewDataAPI = async () => {
         const projectObj = new GetPullNewDataAPI(id);
-
         dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+
     }
 
 
     const ArchiveProject = useSelector(state => state.getArchiveProject.data);
     const [isArchived, setIsArchived] = useState(false);
-    console.log(ProjectDetails.is_archived,"is_archived",isArchived)
+    console.log(ProjectDetails.is_archived, "is_archived", isArchived)
     const getArchiveProjectAPI = () => {
         const projectObj = new GetArchiveProjectAPI(id);
-
         dispatch(APITransport(projectObj));
     }
 
     useEffect(() => {
-        setIsArchived(ProjectDetails?.is_archived) 
+        setIsArchived(ProjectDetails?.is_archived)
     }, [ProjectDetails])
- 
-   
+
+
 
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
@@ -211,22 +258,44 @@ const ProjectSetting = (props) => {
         }
     }, [LanguageChoices]);
 
-   
 
-    const handleSave = () => {
-       
-        const sendData ={
-            title:newDetails.title,
-            description:ProjectDetails.description,
+
+    const handleSave = async () => {
+
+        const sendData = {
+            title: newDetails.title,
+            description: ProjectDetails.description,
             tgt_language: targetLanguage,
             src_language: sourceLanguage,
             project_type: ProjectDetails.project_type,
-            project_mode:ProjectDetails.project_mode,
-            users:ProjectDetails.users,
-            annotation_reviewers:ProjectDetails.annotation_reviewers,
+            project_mode: ProjectDetails.project_mode,
+            users: ProjectDetails.users,
+            annotation_reviewers: ProjectDetails.annotation_reviewers,
         }
         const projectObj = new GetSaveButtonAPI(id, sendData);
         dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "PUT",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: "success",
+                variant: "success",
+            })
+
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+       
     }
     const handleExportProject = () => {
         getExportProjectButton();
@@ -234,7 +303,7 @@ const ProjectSetting = (props) => {
     const handlePublishProject = () => {
         getPublishProjectButton()
         setSpinner(!open);
-       
+
     }
 
     const handlePullNewData = () => {
@@ -255,23 +324,23 @@ const ProjectSetting = (props) => {
         setIsArchived(!isArchived)
         setOpen(false);
     }
-    
+
     function snakeToTitleCase(str) {
         return str.split("_").map((word) => {
             return word.charAt(0).toUpperCase() + word.slice(1);
         }).join(" ");
     }
-    useEffect(()=>{
+    useEffect(() => {
         setLoading(apiLoading);
-    },[apiLoading])
+    }, [apiLoading])
 
-    const handleProjectName =(event)=>{
+    const handleProjectName = (event) => {
         setValue(event.target.value)
         event.preventDefault();
-    setNewDetails((prev) => ({
-      ...prev,
-      [event.target.name]: event.target.value,
-    }));
+        setNewDetails((prev) => ({
+            ...prev,
+            [event.target.name]: event.target.value,
+        }));
     }
 
     const renderSnackBar = () => {
@@ -292,7 +361,7 @@ const ProjectSetting = (props) => {
         <ThemeProvider theme={themeDefault}>
 
             {/* <Header /> */}
-            {loading && <Spinner /> }
+            {loading && <Spinner />}
             <Grid>
                 {renderSnackBar()}
 
@@ -369,13 +438,13 @@ const ProjectSetting = (props) => {
                             xl={9}
                             sm={12}
                         >
-                            <OutlinedTextField 
-                            fullWidth 
-                            name="title"
-                            InputProps={{ style: { fontSize: "16px" } }}
-                            // value={ProjectDetails.title}
-                            value={newDetails?.title}
-                             onChange={handleProjectName} />
+                            <OutlinedTextField
+                                fullWidth
+                                name="title"
+                                InputProps={{ style: { fontSize: "16px" } }}
+                                // value={ProjectDetails.title}
+                                value={newDetails?.title}
+                                onChange={handleProjectName} />
                         </Grid>
                     </Grid>
                     <Grid
@@ -407,7 +476,7 @@ const ProjectSetting = (props) => {
                             lg={9}
                             xl={9}
                             sm={12}
-                          
+
                         >
                             <OutlinedTextField
                                 fullWidth
@@ -450,7 +519,7 @@ const ProjectSetting = (props) => {
                                     sm={12}
                                 >
                                     <MenuItems
-                                 
+
                                         menuOptions={languageOptions}
                                         handleChange={(value) => setSourceLanguage(value)}
                                         value={sourceLanguage}
@@ -553,15 +622,15 @@ const ProjectSetting = (props) => {
                         }}
                     >
                         <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePublishProject} label="Publish Project" />
-                        {ProjectDetails.sampling_mode == "f" ? <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleExportProject} label="Export Project into Dataset" /> : " "}
+                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleExportProject} label="Export Project into Dataset" />
 
                         <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handleClickOpen} label={isArchived ? "Archived" : "Archive"} />
 
-                        <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" />
+                        {ProjectDetails.sampling_mode == "f" ? <CustomButton sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 }} onClick={handlePullNewData} label="Pull New Data Items from Source Dataset" /> : " "}
 
                         <DownloadProjectButton />
                         <FormControlLabel
-                            control={<Switch color="primary"/>}
+                            control={<Switch color="primary" />}
                             label="Task Reviews"
                             labelPlacement="start"
                             checked={ProjectDetails.enable_task_reviews}
@@ -637,7 +706,7 @@ const ProjectSetting = (props) => {
                     <Button onClick={handleok} label="Ok" autoFocus />
                 </DialogActions>
             </Dialog>
-           
+
         </ThemeProvider>
     )
 }
