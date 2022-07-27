@@ -1,6 +1,8 @@
 name: Build React App
 
 on:
+  push:
+    branches: [demo]
   workflow_dispatch:
   workflow_call:
   pull_request:
@@ -12,8 +14,8 @@ env:
   REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_DEMO }}
 
 jobs:
-  build:
-    name: Build
+  cicd:
+    name: CICD
     runs-on: ubuntu-latest
     
     steps:
