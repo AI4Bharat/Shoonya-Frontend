@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@mui/styles";
+import { Grid } from "@mui/material";
 import Modal from "@mui/material/Modal";
 
 function getModalStyle() {
@@ -13,28 +13,26 @@ function getModalStyle() {
   };
 }
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    borderRadius: "20px",
-    position: "absolute",
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    // width:400,
-    // height:200,
-  },
-}));
+
 
 export default function SimpleModal(props) {
-  const classes = useStyles();
   const { handleClose, open } = props;
   const [modalStyle] = React.useState(getModalStyle);
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div style={modalStyle} className={classes.paper}>
-        {props.children}
-      </div>
+      <Grid sx={{
+        borderRadius: "5px",
+        position: "absolute",
+         backgroundColor: "#FFFFFF",
+        //  boxShadow: theme.shadows[5],
+        padding: 5,
+        // width: "auto",
+      }}
+      style={modalStyle}
+      >
+          {props.children}
+      </Grid>
     </Modal>
   );
 }

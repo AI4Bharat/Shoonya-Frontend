@@ -141,7 +141,7 @@ export default function DatasetSettings({ datasetId }) {
 									<Grid container spacing={2}sx={{
 											alignItems: "center",
 											// justifyContent: "space-between",
-											mt: 3,
+											mt: 2,
 											
 										}} >
 									<Grid item xs={12} sm={12} md={12} lg={2} xl={2} sx={{mt:6}} >
