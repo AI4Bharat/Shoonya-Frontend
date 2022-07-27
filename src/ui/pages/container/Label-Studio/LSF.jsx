@@ -256,10 +256,15 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id === annotations[i].result.id)
+            if (annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
               deleteAnnotation(
                 annotations[i].id
               );
+              var c = ls.annotationStore.addAnnotation({
+                userGenerate: true,
+              });
+              ls.annotationStore.selectAnnotation(c.id);
+            }
           }
         }
       });
@@ -413,6 +418,7 @@ export default function LSF() {
   const resetNotes = () => {
     setShowNotes(false);
     annotationNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
   }
 
   useEffect(()=>{
@@ -420,7 +426,7 @@ export default function LSF() {
   }, [taskId]);
   
   return (
-    <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
+    <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" }}>
       {!loader && <Button
         value="Back to Project"
         startIcon={<  ArrowBackIcon />}

@@ -402,7 +402,7 @@ const TaskTable = (props) => {
     };
 
     return (
-        <Fragment>
+        <div>
         {((props.type === "annotation" && userDetails?.role === 1) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
                 <Grid
@@ -480,7 +480,7 @@ const TaskTable = (props) => {
                     <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 4 : 5}>
                         <CustomButton 
                             sx={{ p: 1, borderRadius: 2, margin: "auto", width: '100%'}} 
-                            label={"Start Labelling Now"}
+                            label={props.type == "annotation"? "Start Labelling Now":"Start reviewing now"}
                             onClick={labelAllTasks}
                         />
                     </Grid>
@@ -531,7 +531,7 @@ const TaskTable = (props) => {
             )}
             {renderSnackBar()}
             {loading && <Spinner /> }
-        </Fragment>
+        </div>
     )
 }
 

@@ -2,22 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
-import CustomButton from '../common/Button';
-import { Typography, TextField, Box, Stack, Button, Grid, CircularProgress, ThemeProvider } from "@mui/material";
-import tableTheme from "../../../theme/tableTheme";
-import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
+import { TextField, Box, Button, Grid, CircularProgress } from '@mui/material';
+// import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { format, addDays, addWeeks, startOfWeek, startOfMonth, lastDayOfWeek } from 'date-fns';
+import { format, addDays, addWeeks, startOfWeek, startOfMonth, lastDayOfWeek, compareAsc } from 'date-fns';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetProjectReportAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectReport";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from '../common/ColumnList';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import { DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
 
 const ReportsTable = () => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
@@ -84,9 +85,9 @@ const ReportsTable = () => {
         customToolbar: renderToolBar,
         textLabels: {
             body: {
-              noMatch: 'No Record Found!'
+                noMatch: 'No Record Found!'
             }
-          }
+        }
     };
 
     const handleOptionChange = (e) => {
@@ -125,71 +126,78 @@ const ReportsTable = () => {
     const handleRangeChange = (dates) => {
         setRangeValue(dates);
         const [start, end] = dates;
-        setStartDate(format(start, 'yyyy-MM-dd'));
-        setEndDate(format(end, 'yyyy-MM-dd'));
+        setStartDate(format(start, "yyyy-MM-dd"));
+        setEndDate(format(end, "yyyy-MM-dd"));
     };
 
-    const handleDateSubmit = () => {
+    const handleSubmit = () => {
         const projectObj = new GetProjectReportAPI(id, startDate, endDate);
         dispatch(APITransport(projectObj));
+        setShowPicker(false)
         setShowSpinner(true);
     }
 
     return (
         <React.Fragment>
-            <Stack direction="row" spacing={2} sx={{ marginBottom: "12px", alignItems: "center" }}>
-                <Box sx={{ width: "200px" }}>
-                    <FormControl variant="standard" fullWidth>
-                        <InputLabel id="date-range-select-label" sx={{fontSize:"16px"}}>Date Range</InputLabel>
-                            <Select
-                                labelId="date-range-select-label"
-                                id="date-range-select"
-                                value={selectRange}
-                                defaultValue={"This Month"}
-                                label="Date Range"
-                                onChange={handleOptionChange}
-                                sx={{fontSize : "0.875rem", lineHeight : 3}}
-                            >
-                                <MenuItem value={"Today"}>Today</MenuItem>
-                                <MenuItem value={"Yesterday"}>Yesterday</MenuItem>
-                                <MenuItem value={"This Week"}>This Week</MenuItem>
-                                <MenuItem value={"Last Week"}>Last Week</MenuItem>
-                                <MenuItem value={"This Month"}>This Month</MenuItem>
-                                {ProjectDetails?.created_at && <MenuItem value={"Till Date"}>Till Date</MenuItem>}
-                                <MenuItem value={"Custom Range"}>Custom Range</MenuItem>
-                            </Select>
-                    </FormControl>
-                </Box>
-                {showPicker &&
-                    <LocalizationProvider
-                        dateAdapter={AdapterDateFns}
-                        localeText={{ start: 'Start Date', end: 'End Date' }}
+            <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ marginBottom: "12px", marginTop : "1rem" }}>
+                
+            <Grid item xs={12} sm={12} md={showPicker ? 4 : 8} lg={showPicker ? 4 : 8} xl={showPicker ? 4 : 8}>
+                <FormControl fullWidth size="small">
+                    <InputLabel id="date-range-select-label"sx={{fontSize:"16px"}}>Date Range</InputLabel>
+                    <Select
+                        labelId="date-range-select-label"
+                        id="date-range-select"
+                        value={selectRange}
+                        defaultValue={"Last Week"}
+                        label="Date Range"
+                        onChange={handleOptionChange}
                     >
-                        <DateRangePicker
-                            value={rangeValue}
-                            onChange={handleRangeChange}
-                            renderInput={(startProps, endProps) => (
-                                <React.Fragment>
-                                    <TextField {...startProps} />
-                                        <Box sx={{ mx: 2 }}> to </Box>
-                                    <TextField {...endProps} />
-                                </React.Fragment>
-                            )}
-                        />
-                    </LocalizationProvider>}
-                <Button variant="contained" onClick={handleDateSubmit}>Submit</Button>
-            </Stack>
+                        <MenuItem value={"Today"}>Today</MenuItem>
+                        <MenuItem value={"Yesterday"}>Yesterday</MenuItem>
+                        <MenuItem value={"This Week"}>This Week</MenuItem>
+                        <MenuItem value={"Last Week"}>Last Week</MenuItem>
+                        <MenuItem value={"This Month"}>This Month</MenuItem>
+                        {ProjectDetails?.created_at && <MenuItem value={"Till Date"}>Till Date</MenuItem>}
+                        <MenuItem value={"Custom Range"}>Custom Range</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
+                {showPicker && <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                    <LocalizationProvider
+                    dateAdapter={AdapterDateFns}
+                    localeText={{ start: "Start Date", end: "End Date" }}
+                >
+                    <DateRangePicker
+                    value={rangeValue}
+                    onChange={handleRangeChange}
+                    renderInput={(startProps, endProps) => (
+                        <React.Fragment>
+                        <TextField size="small" {...startProps} sx={{width: "48%"}} InputLabelProps={{style: {fontSize: "16px"}}}/>
+                        <Box sx={{ mx: 2, width: "4%", textAlign: "center" }}> to </Box>
+                        <TextField size="small" {...endProps} sx={{width: "48%"}} InputLabelProps={{style: {fontSize: "16px"}}}/>
+                        </React.Fragment>
+                    )}
+                    />
+                </LocalizationProvider>
+                </Grid>}
+                <Grid item xs={12} sm={12} md={showPicker ? 2 : 4} lg={showPicker ? 2 : 4} xl={showPicker ? 2 : 4}>
+                    <Button
+                    variant="contained"
+                    onClick={handleSubmit}
+                    sx={{width: "100%"}}
+                    >
+                        Submit
+                    </Button>
+                </Grid>
+            </Grid>
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : (
-                    <ThemeProvider theme={tableTheme}>
-                        <MUIDataTable
-                            title={""}
-                            data={ProjectReport}
-                            columns={columns.filter(col => selectedColumns.includes(col.name))}
-                            options={options}
-                            // filter={false}
-                        />
-                    </ThemeProvider>
+                    !showPicker && <MUIDataTable
+                        title={""}
+                        data={ProjectReport}
+                        columns={columns.filter(col => selectedColumns.includes(col.name))}
+                        options={options}
+                    />
                 )
             }
         </React.Fragment>
