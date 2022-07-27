@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CircularProgress from '@material-ui/core/CircularProgress';
+// import CircularProgress from '@material-ui/core/CircularProgress';
+import { CircularProgress } from '@mui/material';
 import DatasetStyle from '../../../styles/Dataset';
 
 // const styles = theme => ({
