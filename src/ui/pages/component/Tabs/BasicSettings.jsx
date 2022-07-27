@@ -152,8 +152,6 @@ const BasicSettings = (props) => {
 
     const handletargetLanguage = (event) => {
         // event.preventDefault();
-        // console.log(event.target.innerHTML, "event.target.name", event.target.innerHTML)
-
         typeof (event.target.innerHTML) === "string" ?
             setTargetLanguage(event.target.innerHTML)
             : setTargetLanguage(ProjectDetails?.tgt_language)
