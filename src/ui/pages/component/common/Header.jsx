@@ -28,6 +28,8 @@ import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@material-ui/core";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Logout from "../../../../redux/actions/UserManagement/Logout";
+import Modal from "./Modal";
+import Transliteration from "../../container/Transliteration/Transliteration";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -35,6 +37,7 @@ const Header = () => {
   const [anchorElHelp, setAnchorElHelp] = useState(null);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
+  const [showTransliterationModel, setShowTransliterationModel] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -369,7 +372,8 @@ const Header = () => {
     {
       name: "Transliteration",
       onclick: () => {
-        navigate("/transliteration");
+        // navigate("/transliteration");
+        setShowTransliterationModel(true);
       },
     },
     {
@@ -402,6 +406,10 @@ const Header = () => {
     //   onclick: () => {},
     // },
   ];
+
+  const handleTransliterationModelClose = () => {
+    setShowTransliterationModel(false);
+  }
 
   return (
     <Grid container direction="row">
@@ -592,6 +600,13 @@ const Header = () => {
           </AppBar>
         )}
       </Box>
+      <Modal
+        open={showTransliterationModel}
+        onClose={() => handleTransliterationModelClose}
+        // sx={{width: "400px"}}
+      >
+        <Transliteration onCancelTransliteration={()=>handleTransliterationModelClose} />
+      </Modal>
     </Grid>
   );
 };
