@@ -1,4 +1,4 @@
-// MyOrganization
+// My Organization
 
 import DetailsViewPage from "../../component/common/DetailsViewPage";
 import componentType from "../../../../config/pageType";
