@@ -25,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import CustomButton from "../common/Button";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
-import { useMediaQuery } from "@material-ui/core";
+import { useMediaQuery } from "@mui/material";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Logout from "../../../../redux/actions/UserManagement/Logout";
 import Modal from "./Modal";
