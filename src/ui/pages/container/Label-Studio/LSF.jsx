@@ -256,10 +256,15 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id === annotations[i].result.id)
+            if (annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
               deleteAnnotation(
                 annotations[i].id
               );
+              var c = ls.annotationStore.addAnnotation({
+                userGenerate: true,
+              });
+              ls.annotationStore.selectAnnotation(c.id);
+            }
           }
         }
       });
