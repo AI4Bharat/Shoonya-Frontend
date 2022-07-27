@@ -63,6 +63,7 @@ const Projects = () => {
 
         dispatch(APITransport(projectObj));
     }
+    console.log(ProjectDetails, "test");
 
     useEffect(() => {
         getProjectDetails();
@@ -97,6 +98,9 @@ const Projects = () => {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const isMember = userDetails.role!==1 || ProjectDetails?.users.some((user) => user.id === userDetails.id);
+    const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id));
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -193,26 +197,26 @@ const Projects = () => {
                     </Link>}
                     <Box>
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
-                            <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {isMember && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0}>
+                    {isMember && <TabPanel value={value} index={0}>
                         <TaskTable type="annotation"/>
-                    </TabPanel>
-                    {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <TabPanel value={value} index={1}>
+                    </TabPanel>}
+                    {isReviewer && <TabPanel value={value} index={isMember ? 1 : 0}>
                         <TaskTable type="review"/>
                     </TabPanel>}
-                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) ? 2: 1}>
+                    <TabPanel value={value} index={isMember ? isReviewer ? 2 : 1 : 1}>
                         <MembersTable dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
-                    {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <TabPanel value={value} index={3}>
+                    {isReviewer && <TabPanel value={value} index={isMember ? 3 : 2}>
                         <MembersTable dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
-                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) ? 4 : 2}>
+                    <TabPanel value={value} index={isMember ? isReviewer ? 4 : 2 : 2}>
                         <ReportsTable />
                     </TabPanel>
                 </Card>

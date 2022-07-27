@@ -78,7 +78,7 @@ const ColumnList = (props) => {
             </ListItem>
           ))}
         </List>
-        <Divider />
+        {/* <Divider />
         <Box 
           sx={{
             display: "flex",
@@ -98,7 +98,7 @@ const ColumnList = (props) => {
             {" "}
             Close
           </Button>
-        </Box>
+        </Box> */}
       </Box>
       </Popover>
     </div>
