@@ -110,6 +110,34 @@ const MembersTable = (props) => {
                 ];
             })
             : [];
+            const options = {
+                textLabels: {
+                  body: {
+                    noMatch: "No records",
+                  },
+                  toolbar: {
+                    search: "Search",
+                    viewColumns: "View Column",
+                  },
+                  pagination: { rowsPerPage: "Rows per page" },
+                  options: { sortDirection: "desc" },
+                },
+                // customToolbar: fetchHeaderButton,
+                displaySelectToolbar: false,
+                fixedHeader: false,
+                filterType: "checkbox",
+                download: false,
+                print: false,
+                rowsPerPageOptions: [10, 25, 50, 100],
+                // rowsPerPage: PageInfo.count,
+                filter: false,
+                // page: PageInfo.page,
+                viewColumns: false,
+                selectableRows: "none",
+                search: false,
+                jumpToPage: true,
+              };
+    
 
     return (
         <React.Fragment>
