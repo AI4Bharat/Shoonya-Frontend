@@ -1,0 +1,52 @@
+name: Build React App
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches: [demo]
+
+env: 
+  CI: false
+  NODE_OPTIONS: "--max_old_space_size=4096"
+  REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_DEMO }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+
+    - name: Install NPM packages
+      run: npm install --legacy-peer-deps
+    
+    - name: Build project
+      run: npm run build
+
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEMO }}
+
+    - name: Upload to blob storage
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+            az storage blob upload-batch --account-name shoonyastoragedemo --account-key ${{ secrets.AZURE_STORAGE_KEY_DEMO }} -d '$web' -s ./build --overwrite
+
+    - name: Purge CDN endpoint
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+           az cdn endpoint purge --no-wait --content-paths  "/*" --profile-name demo-react-static --name frontend-demo-shoonya --resource-group shoonya_demo
+    
+    - name: Azure logout
+      run: |
+            az logout
+      if: always()
