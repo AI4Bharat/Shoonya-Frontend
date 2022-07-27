@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import DatasetStyle from '../../../styles/Dataset';
 
 // const styles = theme => ({
@@ -28,7 +28,7 @@ function CircularIndeterminate(props) {
   const classes = DatasetStyle()
   return (
     <div className={classes.progressDiv}>
-      <CircularProgress color="secondary" size={50} className={classes.progress} />
+      <CircularProgress color="primary" size={50} className={classes.progress} />
     </div>
   );
 }

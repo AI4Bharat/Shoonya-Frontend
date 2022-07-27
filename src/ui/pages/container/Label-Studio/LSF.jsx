@@ -162,7 +162,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         onLabelStudioLoad: function (ls) {
           task_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
           console.log("task_status", task_status.current, "test", ProjectDetails);
-          if (userData.role === 1 && annotations.length === 0) {
+          if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
             });

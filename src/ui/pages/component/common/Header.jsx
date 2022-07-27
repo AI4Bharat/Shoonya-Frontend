@@ -28,8 +28,6 @@ import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@material-ui/core";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Logout from "../../../../redux/actions/UserManagement/Logout";
-import Modal from "./Modal";
-import Transliteration from "../../container/Transliteration/Transliteration";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -37,7 +35,6 @@ const Header = () => {
   const [anchorElHelp, setAnchorElHelp] = useState(null);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
-  const [showTransliterationModel, setShowTransliterationModel] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -190,7 +187,7 @@ const Header = () => {
           sm={12}
           md={7}
         >
-          {/* <Typography variant="body1">
+          <Typography variant="body1">
             <NavLink
               to={
                 loggedInUserData && loggedInUserData.organization
@@ -204,7 +201,7 @@ const Header = () => {
             >
               Organization
             </NavLink>
-          </Typography> */}
+          </Typography>
           <Typography variant="body1">
             <NavLink
               to="/workspaces"
@@ -299,7 +296,7 @@ const Header = () => {
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1 || loggedInUserData.role === 2}
+        hidden={loggedInUserData.role === 1}
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -372,8 +369,7 @@ const Header = () => {
     {
       name: "Transliteration",
       onclick: () => {
-        // navigate("/transliteration");
-        setShowTransliterationModel(true);
+        navigate("/transliteration");
       },
     },
     {
@@ -406,10 +402,6 @@ const Header = () => {
     //   onclick: () => {},
     // },
   ];
-
-  const handleTransliterationModelClose = () => {
-    setShowTransliterationModel(false);
-  }
 
   return (
     <Grid container direction="row">
@@ -600,13 +592,6 @@ const Header = () => {
           </AppBar>
         )}
       </Box>
-      <Modal
-        open={showTransliterationModel}
-        onClose={() => handleTransliterationModelClose}
-        // sx={{width: "400px"}}
-      >
-        <Transliteration onCancelTransliteration={()=>handleTransliterationModelClose} />
-      </Modal>
     </Grid>
   );
 };
