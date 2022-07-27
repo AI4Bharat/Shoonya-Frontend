@@ -23,6 +23,8 @@ import WorkspaceReports from "./WorkspaceReports";
 import AddUsersDialog from "./AddUsersDialog";
 import addUserTypes from "../../../../constants/addUserTypes";
 import AddWorkspaceDialog from "../Workspace/AddWorkspaceDialog";
+import Spinner from "../../component/common/Spinner";
+import {  useSelector } from 'react-redux';
 
 function TabPanel(props) {
 
@@ -51,13 +53,14 @@ const DetailsViewPage = (props) => {
     const { id, orgId } = useParams();
     const classes = DatasetStyle();
     const [value, setValue] = React.useState(0);
+    const [loading, setLoading] = useState(false);
     const [addAnnotatorsDialogOpen, setAddAnnotatorsDialogOpen] = React.useState(false);
     const [addManagersDialogOpen, setAddManagersDialogOpen] = React.useState(false);
     const [addWorkspacesDialogOpen, setAddWorkspacesDialogOpen] = React.useState(false);
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-
+    const apiLoading = useSelector(state => state.apiStatus.loading);
     // const workspaceData = useSelector(state=>state.getWorkspaces.data);
     // const getDashboardWorkspaceData = ()=>{
     //     const workspaceObj = new GetWorkspacesAPI(1);
@@ -92,9 +95,12 @@ const DetailsViewPage = (props) => {
     const handleWorkspaceDialogOpen = () => {
         setAddWorkspacesDialogOpen(true);
     };
-
+    useEffect(() => {
+        setLoading(apiLoading);
+    }, [apiLoading])
     return (
         <ThemeProvider theme={themeDefault}>
+             {loading && <Spinner />}
             <Grid
                 container
                 direction='row'

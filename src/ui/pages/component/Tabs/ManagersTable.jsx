@@ -13,7 +13,7 @@ const ManagersTable = (props) => {
     const dispatch = useDispatch();
     
     const {id} = useParams();
-    const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
+    const orgId = useSelector(state=>state.getWorkspacesProjectData?.data?.[0]?.organization_id);
     const getWorkspaceManagersData = ()=>{
         
         const workspaceObjs = new GetWorkspacesManagersDataAPI( orgId);
@@ -26,7 +26,7 @@ const ManagersTable = (props) => {
     },[]);
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
-
+console.log(workspaceManagers,"workspaceManagers")
     const columns = [
         {
             name: "Name",
