@@ -99,8 +99,8 @@ const Projects = () => {
         setValue(newValue);
     };
 
-    const isMember = userDetails.role!==1 || ProjectDetails?.users.some((user) => user.id === userDetails.id);
-    const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id));
+    const isMember = userDetails.role!==1 || ProjectDetails?.users?.some((user) => user.id === userDetails.id);
+    const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
 
     return (
         <ThemeProvider theme={themeDefault}>

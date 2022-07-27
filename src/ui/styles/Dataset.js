@@ -163,13 +163,13 @@ const DatasetStyle = makeStyles({
   },
   progressDiv: {
     position: 'fixed',
-    backgroundColor: 'rgba(0.5, 0, 0, 0.5)',
+    // backgroundColor: 'rgba(0.5, 0, 0, 0.5)',
     zIndex: 1000,
     width: '100%',
     height: '100%',
     top: 0,
     left: 0,
-    opacity: 0.4
+    opacity: 1
   },
   search: {
     position: "relative",
