@@ -145,7 +145,7 @@ export default function DatasetSettings({ datasetId }) {
 											
 										}} >
 									<Grid item xs={12} sm={12} md={12} lg={2} xl={2} sx={{mt:6}} >
-										<CustomButton label={"Select File"} type="file"  onClick={() => fileRef.current.click()} sx={{width:"150px"}} />
+										<CustomButton label={"Select File"} type="file"  onClick={() => fileRef.current.click()}  />
 										<input
 											ref={fileRef}
 											onChange={handleOnChange}
@@ -154,7 +154,7 @@ export default function DatasetSettings({ datasetId }) {
 										    hidden
 										/>
 									</Grid>
-									<Grid item xs={12} sm={12} md={12} lg={1} xl={1} sx={{mt:5,ml:2}} >
+									<Grid item xs={12} sm={12} md={1} lg={1} xl={1} sx={{mt:5}} >
 									<h3 >or</h3></Grid>
 									<Grid item xs={12} sm={12} md={12} lg={8} xl={8}  >
 											<h2>Hello To Drag & Drop Files</h2>
