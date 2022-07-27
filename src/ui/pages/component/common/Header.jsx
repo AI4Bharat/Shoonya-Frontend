@@ -70,7 +70,6 @@ const Header = () => {
     localStorage.clear();
     navigate("/");
   };
-
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
   const handleCloseUserMenu = () => {
