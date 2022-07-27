@@ -12,8 +12,8 @@ export default function Autocompletes(props) {
   
   return (
     <Autocomplete
-      freeSolo
-      disablePortal
+      // freeSolo
+      // disablePortal
       id="combo-box-demo"
       value={selectAutocomplete}
       options={props.options}
@@ -21,7 +21,7 @@ export default function Autocompletes(props) {
       onChange={props.onChange}
       name={props.name}
       sx={{ width: 500 }}
-      renderInput={(params) => <TextField {...params} label={props.label}/>}
+      renderInput={(params) => <TextField {...params} label={props.label} inputProps={{ ...params.inputProps, style: { fontSize: "14px" } }}  />}
     />
   );
 }

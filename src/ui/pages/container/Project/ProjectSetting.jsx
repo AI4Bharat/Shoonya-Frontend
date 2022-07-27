@@ -41,7 +41,7 @@ const UserProfilePage = () => {
         }}
     >
       
-        <Box sx={{ p: 2 }}>
+        <Box >
               <Grid
                         item
                         xs={12}

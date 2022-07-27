@@ -23,7 +23,7 @@ const ReadonlyConfigurations = (props) => {
                 // justifyContent='center'
                 // alignItems='center'
             >
-                    <Grid
+                    {/* <Grid
                         item
                         xs={12}
                         md={12}
@@ -34,7 +34,7 @@ const ReadonlyConfigurations = (props) => {
                         <Typography variant="h5"   >
                             Read-only Configurations
                         </Typography>
-                    </Grid>
+                    </Grid> */}
                     {ProjectDetails && ProjectDetails.sampling_mode && (
                         <div>
                             <Grid
@@ -44,7 +44,7 @@ const ReadonlyConfigurations = (props) => {
                                 lg={12}
                                 xl={12}
                                 sm={12}
-                                sx={{mt:2}}
+                                // sx={{mt:2}}
                             >
 
                                 <Typography variant="h6"  >

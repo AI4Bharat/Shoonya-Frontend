@@ -257,6 +257,8 @@ const AdvancedOperation = (props) => {
             <Grid
                 container
                 // direction="row"
+                direction="column"
+
                 xs={4}
                 md={4}
                 lg={4}
@@ -342,7 +344,8 @@ const AdvancedOperation = (props) => {
                             p: 2,
                             borderRadius: 3,
                             ml: 2,
-                            width: "300px"
+                            width: "300px",
+                            
                         }}
                         onClick={handleExportProject}
                         label="Export Project into Dataset" />
@@ -384,11 +387,11 @@ const AdvancedOperation = (props) => {
             <Grid
                 container
                 // direction="row"
-                xs={4}
-                md={4}
-                lg={4}
-                xl={4}
-                sm={4}
+                xs={2}
+                md={2}
+                lg={2}
+                xl={2}
+                sm={2}
                 spacing={1}
                 rowGap={2}
                 columnSpacing={2}

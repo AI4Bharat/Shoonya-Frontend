@@ -36,8 +36,7 @@ const BasicSettings = (props) => {
     const dispatch = useDispatch();
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-    console.log(ProjectDetails, "ProjectDetails")
-    console.log(targetLanguage, "targetLanguage")
+   
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
@@ -68,8 +67,9 @@ const BasicSettings = (props) => {
 
         });
         setTargetLanguage(ProjectDetails?.tgt_language)
+        setSourceLanguage(ProjectDetails?.src_language)
     }, [ProjectDetails]);
-    console.log(targetLanguage, "cccccccccccccc")
+
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
     const getLanguageChoices = () => {
@@ -82,10 +82,10 @@ const BasicSettings = (props) => {
             let temp = [];
             LanguageChoices.forEach((element) => {
                 temp.push(element[0]
-                //     {
-                //     name: element[0],
-                //     value: element[0],
-                // }
+                    //     {
+                    //     name: element[0],
+                    //     value: element[0],
+                    // }
                 );
             });
             setLanguageOptions(temp);
@@ -152,14 +152,25 @@ const BasicSettings = (props) => {
 
     const handletargetLanguage = (event) => {
         // event.preventDefault();
-        console.log(event.target.innerHTML, "event.target.name", event.target.innerHTML)
+        // console.log(event.target.innerHTML, "event.target.name", event.target.innerHTML)
 
-        typeof(event.target.innerHTML) === "string" ?
-        setTargetLanguage(event.target.innerHTML)
-        : setTargetLanguage(ProjectDetails?.tgt_language)
+        typeof (event.target.innerHTML) === "string" ?
+            setTargetLanguage(event.target.innerHTML)
+            : setTargetLanguage(ProjectDetails?.tgt_language)
 
     }
-    console.log(targetLanguage, "targetLanguage")
+    const handlesourceLanguage = (event) => {
+        typeof (event.target.innerHTML) === "string" ?
+            setSourceLanguage(event.target.innerHTML)
+            : setSourceLanguage(ProjectDetails?.src_language)
+
+    }
+
+
+    // const handleCancel = ()=>{
+    //     // setSourceLanguage(ProjectDetails?.tgt_language)
+    //     // setTargetLanguage(ProjectDetails?.src_language)
+    // }
 
     const renderSnackBar = () => {
         return (
@@ -222,7 +233,7 @@ const BasicSettings = (props) => {
                         <OutlinedTextField
                             fullWidth
                             name="title"
-                            InputProps={{ style: { fontSize: "14px" } }}
+                            InputProps={{ style: { fontSize: "14px", width: "500px" } }}
                             // value={ProjectDetails.title}
                             value={newDetails?.title}
                             onChange={handleProjectName} />
@@ -262,7 +273,7 @@ const BasicSettings = (props) => {
                         <OutlinedTextField
                             fullWidth
                             name="description"
-                            InputProps={{ style: { fontSize: "14px" } }}
+                            InputProps={{ style: { fontSize: "14px", width: "500px" } }}
                             value={newDetails?.description}
                             onChange={handleProjectName}
                         />
@@ -300,8 +311,11 @@ const BasicSettings = (props) => {
                                 sm={12}
                             >
                                 <Autocomplete
-                                    options={languageOptions}
-
+                                    name="tgt_language"
+                                    options={languageOptions.map((el, i) => { return el })}
+                                    value={sourceLanguage}
+                                    onChange={handlesourceLanguage}
+                                   
                                 />
                             </Grid>
                         </Grid>
@@ -336,7 +350,7 @@ const BasicSettings = (props) => {
                             >
                                 <Autocomplete
                                     name="tgt_language"
-                                    options={languageOptions.map((el,i)=>{return el})}
+                                    options={languageOptions.map((el, i) => { return el })}
                                     value={targetLanguage}
                                     onChange={handletargetLanguage}
                                 />
@@ -353,12 +367,13 @@ const BasicSettings = (props) => {
                     sm={12}
                     sx={{
                         m: 7,
-                        justifyContent: "center",
+                        // justifyContent: "center",
 
                     }}
                 >
                     <CustomButton sx={{ inlineSize: "max-content", marginRight: "10px", width: "80px" }}
                         onClick={() => navigate(`/projects/:id/`)}
+                        // onClick={handleCancel}
                         label="Cancel" />
                     <CustomButton sx={{ inlineSize: "max-content", width: "80px" }}
                         onClick={handleSave}
