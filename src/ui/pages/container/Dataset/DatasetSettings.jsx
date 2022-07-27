@@ -8,8 +8,8 @@ import UploaddataAPI from "../../../../redux/actions/api/Dataset/uploaddata"
 import GetFileTypesAPI from "../../../../redux/actions/api/Dataset/GetFileTypes"
 import CustomButton from "../../component/common/Button";
 import Modal from "../../component/common/Modal";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import MenuItems from "../../component/common/MenuItems";
 import { FileUploader } from "react-drag-drop-files";
 
@@ -124,7 +124,7 @@ export default function DatasetSettings({ datasetId }) {
 								sx={{width:"200px"}}
 							>
 								
-								 <Grid container spacing={2} >
+								 <Grid container spacing={2}  >
 								
 									<Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ position: "absolute", right: 20 }}>
 
@@ -144,7 +144,7 @@ export default function DatasetSettings({ datasetId }) {
 											mt: 3,
 											
 										}} >
-									<Grid item xs={12} sm={12} md={12} lg={3} xl={3} sx={{mt:6}} >
+									<Grid item xs={12} sm={12} md={12} lg={2} xl={2} sx={{mt:6}} >
 										<CustomButton label={"Select File"} type="file"  onClick={() => fileRef.current.click()} sx={{width:"150px"}} />
 										<input
 											ref={fileRef}
@@ -154,9 +154,9 @@ export default function DatasetSettings({ datasetId }) {
 										    hidden
 										/>
 									</Grid>
-									<Grid item xs={12} sm={12} md={12} lg={1} xl={1}  >
+									<Grid item xs={12} sm={12} md={12} lg={1} xl={1} sx={{mt:5,ml:2}} >
 									<h3 >or</h3></Grid>
-									<Grid item xs={12} sm={12} md={12} lg={7} xl={7}  >
+									<Grid item xs={12} sm={12} md={12} lg={8} xl={8}  >
 											<h2>Hello To Drag & Drop Files</h2>
 											<FileUploader
 												multiple={true}
@@ -182,12 +182,12 @@ export default function DatasetSettings({ datasetId }) {
 									
 									<Grid
 											item
-											xs={4}
-											sm={4}
-											md={4}
-											lg={4}
-											xl={4}
-											
+											xs={3}
+											sm={3}
+											md={3}
+											lg={3}
+											xl={3}
+											sx={{ml:2}}
 
 										>
 											<Typography variant="subtitle1" gutterBottom component="div"  >
