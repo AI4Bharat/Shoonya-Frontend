@@ -373,6 +373,7 @@ const Header = () => {
       name: "Transliteration",
       onclick: () => {
         // navigate("/transliteration");
+        handleCloseSettingsMenu()
         setShowTransliterationModel(true);
       },
     },
@@ -603,6 +604,10 @@ const Header = () => {
       <Modal
         open={showTransliterationModel}
         onClose={() => handleTransliterationModelClose}
+        top= {50}
+        left= {50}
+        topTranslate={"45"}
+        leftTranslate={"-90"}
         // sx={{width: "400px"}}
       >
         <Transliteration onCancelTransliteration={()=>handleTransliterationModelClose} />

@@ -3,6 +3,7 @@ import { Autocomplete, Box, Button, Card, Grid, Typography } from "@mui/material
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { ReactTransliterate } from "tarento-react-transliterate";
+import "tarento-react-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 
@@ -25,7 +26,7 @@ const Transliteration = (props) => {
       <textarea
         {...props}
         placeholder={"Enter text here..."}
-        style={{height : 300}}
+        rows={5}
         className={classes.textAreaTransliteration}
       />
     );
@@ -71,7 +72,7 @@ const Transliteration = (props) => {
   return (
     <Card
       sx={{
-        width: window.innerWidth * 0.5,
+        width: window.innerWidth * 0.3,
         // width: 500,
         // minHeight: 500,
         // padding: 5
@@ -84,13 +85,13 @@ const Transliteration = (props) => {
         alignItems="center"
         sx={{ backgroundColor: "#f5f5f5", padding: "1rem", marginBottom: 2 }}
       >
-        <Typography variant="h6">Select Target Language For Transliteration :</Typography>
+        <Typography variant="subtitle1">Select Language :</Typography>
         <Autocomplete
           value={selectedLang ? selectedLang : {DisplayName : "Hindi - हिंदी", LangCode : "hi"}}
           onChange={handleLanguageChange}
           options={languageList}
           getOptionLabel={el => { return el.DisplayName }}
-          sx={{ width: 300 }}
+          sx={{ width: window.innerWidth * 0.15 }}
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
         />
       </Grid>
@@ -122,7 +123,7 @@ const Transliteration = (props) => {
           sx={{}}
           onClick={onCancelTransliteration()}
         >
-          Cancel
+          Close
         </Button>
         <CustomizedSnackbars
           hide={showSnackBar.timeout}
