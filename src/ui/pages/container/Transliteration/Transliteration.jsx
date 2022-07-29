@@ -1,21 +1,32 @@
-import { Autocomplete, Box, Card, Grid, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
+import { Autocomplete, Box, Button, Card, Grid, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { ReactTransliterate } from "react-transliterate";
-import "react-transliterate/dist/index.css";
+import { ReactTransliterate } from "tarento-react-transliterate";
+import "tarento-react-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
-const Transliteration = () => {
+const Transliteration = (props) => {
   const classes = GlobalStyles();
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([]);
-  const [selectedLang, setSelectedLang] = useState();
+  const [selectedLang, setSelectedLang] = useState("");
+  const [showSnackBar, setShowSnackBar] = useState({
+    message: "",
+    variant: "",
+    timeout: 1500,
+    visible: false
+  });
+
+  const { onCancelTransliteration } = props;
 
   const renderTextarea = (props) => {
     return (
       <textarea
         {...props}
         placeholder={"Enter text here..."}
+        rows={5}
         className={classes.textAreaTransliteration}
       />
     );
@@ -33,41 +44,94 @@ const Transliteration = () => {
       })
   }, [])
 
-  const handleLanguageChange = (val) => {
-    console.log("val",val)
-    // setSelectedLang(val)
+  const handleLanguageChange = (event, val) => {
+    console.log("val", val)
+    setSelectedLang(val);
+  }
+  const onCopyButtonClick = () => {
+    navigator.clipboard.writeText(text);
+    setShowSnackBar({
+      message: "Copied to clipboard!",
+      variant: "success",
+      timeout: 1500,
+      visible: true
+    })
+  }
+  const handleSnackBarClose = () => {
+    setShowSnackBar({
+      message: "",
+      variant: "",
+      timeout: 1500,
+      visible: false
+    })
   }
 
   return (
     <Card
       sx={{
-        // width: window.innerWidth * 0.8,
-        width: "100%",
-        minHeight: 500,
+        width: window.innerWidth * 0.3,
+        // width: 500,
+        // minHeight: 500,
         // padding: 5
       }}
     >
       <Grid
-        sx={{ backgroundColor: "#f5f5f5", padding: 3 }}
+        container
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ backgroundColor: "#f5f5f5", padding: "1rem", marginBottom: 2 }}
       >
+        <Typography variant="subtitle1">Select Language :</Typography>
         <Autocomplete
-          value={selectedLang}
-          onChange={handleLanguageChange()}
+          value={selectedLang ? selectedLang : {DisplayName : "Hindi - हिंदी", LangCode : "hi"}}
+          onChange={handleLanguageChange}
           options={languageList}
-          getOptionLabel={el=>{return el.DisplayName}}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Target Language" />}
+          getOptionLabel={el => { return el.DisplayName }}
+          sx={{ width: window.innerWidth * 0.15 }}
+          renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
         />
       </Grid>
-      
+
       <ReactTransliterate
-        renderComponent={(props) => renderTextarea(props)}
+        apiURL={`https://xlit-api.ai4bharat.org/tl/${selectedLang && selectedLang.LangCode ? selectedLang.LangCode : "hi"}`}
         value={text}
         onChangeText={(text) => {
           setText(text);
         }}
-        lang="hi"
+        renderComponent={(props) => renderTextarea(props)}
       />
+      <Grid
+        container
+        direction="row"
+        justifyContent="end"
+        alignItems="center"
+        sx={{ padding: "1rem" }}
+      >
+        <Button
+          variant="contained"
+          sx={{ mr: 2 }}
+          onClick={onCopyButtonClick}
+          disabled={!text}
+        >
+          Copy Text
+        </Button>
+        <Button
+          variant="contained"
+          sx={{}}
+          onClick={onCancelTransliteration()}
+        >
+          Close
+        </Button>
+        <CustomizedSnackbars
+          hide={showSnackBar.timeout}
+          open={showSnackBar.visible}
+          handleClose={handleSnackBarClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          variant={showSnackBar.variant}
+          message={showSnackBar.message}
+        />
+      </Grid>
     </Card>
   );
 };
