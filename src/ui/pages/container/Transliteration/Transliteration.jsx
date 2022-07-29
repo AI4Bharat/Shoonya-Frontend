@@ -47,9 +47,7 @@ const Transliteration = (props) => {
   const handleLanguageChange = (event, val) => {
     console.log("val", val)
     setSelectedLang(val);
-
   }
-
   const onCopyButtonClick = () => {
     navigator.clipboard.writeText(text);
     setShowSnackBar({
@@ -59,7 +57,6 @@ const Transliteration = (props) => {
       visible: true
     })
   }
-
   const handleSnackBarClose = () => {
     setShowSnackBar({
       message: "",
@@ -95,6 +92,7 @@ const Transliteration = (props) => {
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
         />
       </Grid>
+
       <ReactTransliterate
         apiURL={`https://xlit-api.ai4bharat.org/tl/${selectedLang && selectedLang.LangCode ? selectedLang.LangCode : "hi"}`}
         value={text}

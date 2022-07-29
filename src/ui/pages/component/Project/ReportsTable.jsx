@@ -2,15 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
-import CustomButton from '../common/Button';
-import { Typography, TextField, Box, Stack, Button, Grid, CircularProgress } from '@mui/material';
-// import { DateRangePicker, LocalizationProvider   } from '@mui/x-date-pickers-pro';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { format, addDays, addWeeks, startOfWeek, startOfMonth, lastDayOfWeek, compareAsc } from 'date-fns';
+import { Box, Button, Grid, CircularProgress, Card } from '@mui/material';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetProjectReportAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectReport";
@@ -19,20 +11,19 @@ import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from '../common/ColumnList';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import { DateRangePicker } from 'react-date-range';
+import { isSameDay, format } from 'date-fns/esm';
+import { DateRangePicker, defaultStaticRanges } from "react-date-range";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 const ReportsTable = () => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-    const [startDate, setStartDate] = useState(format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
-    const [endDate, setEndDate] = useState(format(Date.now(), 'yyyy-MM-dd'));
-    const [selectRange, setSelectRange] = useState([
-        {
-            startDate: new Date(),
-            endDate: addDays(new Date(), 7),
-            key: 'selection'
-        }
-    ]);
-    const [rangeValue, setRangeValue] = useState([format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
+    const [selectRange, setSelectRange] = useState([{
+        startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+        endDate: new Date(),
+        key: "selection"
+    }]);
+    // const [rangeValue, setRangeValue] = useState([format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
     const [showPicker, setShowPicker] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -97,72 +88,15 @@ const ReportsTable = () => {
         }
     };
 
-    const handleOptionChange = (e) => {
-        setSelectRange([
-            {
-                startDate: new Date(),
-                endDate: addDays(new Date(), 7),
-                key: 'selection'
-            }
-        ]);
-        if (e.target.value === "Custom Range") {
-            setStartDate(format(startOfMonth(Date.now()), 'yyyy-MM-dd'));
-            setEndDate(format(Date.now(), 'yyyy-MM-dd'));
-            setShowPicker(true);
-        } else setShowPicker(false);
-        if (e.target.value === "Today") {
-            setStartDate(format(Date.now(), 'yyyy-MM-dd'));
-            setEndDate(format(Date.now(), 'yyyy-MM-dd'));
-        }
-        else if (e.target.value === "Yesterday") {
-            setStartDate(format(addDays(Date.now(), -1), 'yyyy-MM-dd'));
-            setEndDate(format(addDays(Date.now(), -1), 'yyyy-MM-dd'));
-        }
-        else if (e.target.value === "This Week") {
-            setStartDate(format(startOfWeek(Date.now()), 'yyyy-MM-dd'));
-            setEndDate(format(Date.now(), 'yyyy-MM-dd'));
-        }
-        else if (e.target.value === "Last Week") {
-            setStartDate(format(startOfWeek(addWeeks(Date.now(), -1)), 'yyyy-MM-dd'));
-            setEndDate(format(lastDayOfWeek(addWeeks(Date.now(), -1)), 'yyyy-MM-dd'));
-        }
-        else if (e.target.value === "This Month") {
-            setStartDate(format(startOfMonth(Date.now()), 'yyyy-MM-dd'));
-            setEndDate(format(Date.now(), 'yyyy-MM-dd'));
-        }
-        else if (e.target.value === "Till Date") {
-            setStartDate(format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'));
-            setEndDate(format(Date.now(), 'yyyy-MM-dd'));
-        }
+    const handleRangeChange = (ranges) => {
+        const { selection } = ranges;
+        if (selection.endDate > new Date()) selection.endDate = new Date();
+        setSelectRange([selection]);
+        console.log(selection, "selection"); 
     };
 
-    const handleRangeChange = (dates) => {
-        // console.log("dates", dates.selection);
-        // console.log("parsed start date", format(Date.parse(dates.selection.startDate), 'yyyy-MM-dd'));
-        // console.log("parsed end date", format(Date.parse(dates.selection.endDate), 'yyyy-MM-dd'));
-        // setRangeValue(dates);
-        // const [start, end] = dates;
-        let currentDateSplittedArr = format(Date.parse(new Date()), 'yyyy-MM-dd').split("-");
-        let startDateSplittedArr = format(Date.parse(dates.selection.startDate), 'yyyy-MM-dd').split("-");
-        let endDateSplittedArr = format(Date.parse(dates.selection.endDate), 'yyyy-MM-dd').split("-");
-
-        let finalStartDate = compareAsc(new Date(startDateSplittedArr[0], startDateSplittedArr[1], startDateSplittedArr[2]), new Date(currentDateSplittedArr[0], currentDateSplittedArr[1], currentDateSplittedArr[2]));
-        let finalEndDate = compareAsc(new Date(endDateSplittedArr[0], endDateSplittedArr[1], endDateSplittedArr[2]), new Date(currentDateSplittedArr[0], currentDateSplittedArr[1], currentDateSplittedArr[2]));
-
-        // console.log("finalStartDate", finalStartDate);
-        // console.log("finalEndDate", finalEndDate);
-
-        // console.log("startDateSplittedArr", startDateSplittedArr);
-        // console.log("endDateSplittedArr", endDateSplittedArr);
-
-
-        setSelectRange([dates.selection]);
-        setStartDate(finalStartDate == 1 ? currentDateSplittedArr.join("-") : startDateSplittedArr.join("-"));
-        setEndDate(finalEndDate == 1 ? currentDateSplittedArr.join("-") : endDateSplittedArr.join("-"));
-    };
-
-    const handleDateSubmit = () => {
-        const projectObj = new GetProjectReportAPI(id, startDate, endDate);
+    const handleSubmit = () => {
+        const projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
         dispatch(APITransport(projectObj));
         setShowPicker(false)
         setShowSpinner(true);
@@ -170,34 +104,65 @@ const ReportsTable = () => {
 
     return (
         <React.Fragment>
-            <Stack direction="row" spacing={2} sx={{ marginBottom: "12px", alignItems: "center", marginTop : "1rem" }}>
-                
-
-                {showPicker &&
+            <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt:2, mb:2 , justifyContent: "space-between" }}>
+                <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+                    <Button 
+                        endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={() => setShowPicker(!showPicker)}
+                    >
+                        Pick dates
+                    </Button>
+                </Grid>
+                <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={handleSubmit}
+                    >
+                        Submit
+                    </Button>
+                </Grid>
+            </Grid>
+            {showPicker && <Box sx={{mt: 2, mb:2, display: "flex", justifyContent: "center", width: "100%"}}>
+                <Card>
                     <DateRangePicker
                         onChange={handleRangeChange}
-                        // onChange={item => setSelectRange([item.selection])}
+                        staticRanges={[
+                            ...defaultStaticRanges,
+                            {
+                                label: "Till Date",
+                                range: () => ({
+                                startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+                                endDate: new Date(),
+                                }),
+                                isSelected(range) {
+                                const definedRange = this.range();
+                                return (
+                                    isSameDay(range.startDate, definedRange.startDate) &&
+                                    isSameDay(range.endDate, definedRange.endDate)
+                                );
+                                }
+                            },
+                        ]}
                         showSelectionPreview={true}
                         moveRangeOnFirstSelection={false}
                         months={2}
                         ranges={selectRange}
-                        direction="horizontal"
+                        minDate={new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
                         maxDate={new Date()}
+                        direction="horizontal"
                     />
-                }
-                {showPicker ?
-                    <Button variant="contained" onClick={handleDateSubmit}>Submit</Button>
-                    : <Button variant="contained" onClick={() => setShowPicker(true)}>Select a Date Range</Button>
-                }
-            </Stack>
+                </Card>
+            </Box>}
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : (
-                    !showPicker && <MUIDataTable
+                     <MUIDataTable
                         title={""}
                         data={ProjectReport}
                         columns={columns.filter(col => selectedColumns.includes(col.name))}
                         options={options}
-                    // filter={false}
                     />
                 )
             }

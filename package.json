@@ -31,6 +31,7 @@
     "react-router-dom": "^6.3.0",
     "react-scoped-css": "^0.0.23",
     "react-scripts": "5.0.1",
+    "react-transliterate": "^1.1.9",
     "redux": "^4.2.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "^3.0.6",

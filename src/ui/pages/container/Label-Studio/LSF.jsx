@@ -162,7 +162,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         onLabelStudioLoad: function (ls) {
           task_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
           console.log("task_status", task_status.current, "test", ProjectDetails);
-          if (userData.role === 1 && annotations.length === 0) {
+          if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
             });
@@ -256,10 +256,15 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id === annotations[i].result.id)
+            if (annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
               deleteAnnotation(
                 annotations[i].id
               );
+              var c = ls.annotationStore.addAnnotation({
+                userGenerate: true,
+              });
+              ls.annotationStore.selectAnnotation(c.id);
+            }
           }
         }
       });
