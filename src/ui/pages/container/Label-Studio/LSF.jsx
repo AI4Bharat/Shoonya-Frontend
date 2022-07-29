@@ -52,6 +52,26 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
+  useEffect(() => {
+    localStorage.setItem("labelStudio:settings", JSON.stringify({
+      bottomSidePanel: true,
+      continuousLabeling: false,
+      enableAutoSave: false,
+      enableHotkeys: true,
+      enableLabelTooltips: true,
+      enablePanelHotkeys: true,
+      enableTooltips: false,
+      fullscreen: false,
+      imageFullSize: false,
+      selectAfterCreate: false,
+      showAnnotationsPanel: true,
+      showLabels: false,
+      showLineNumbers: false,
+      showPredictionsPanel: true,
+      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
+    }))
+  }, [])
+
   const tasksComplete = (id) => {
     if (id) {
       resetNotes()
