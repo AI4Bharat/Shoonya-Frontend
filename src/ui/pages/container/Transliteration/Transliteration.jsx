@@ -6,6 +6,7 @@ import { ReactTransliterate } from "tarento-react-transliterate";
 import "tarento-react-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const Transliteration = (props) => {
   const classes = GlobalStyles();
@@ -18,6 +19,8 @@ const Transliteration = (props) => {
     timeout: 1500,
     visible: false
   });
+
+  const matches = useMediaQuery('(max-width:768px)');
 
   const { onCancelTransliteration } = props;
 
@@ -69,7 +72,7 @@ const Transliteration = (props) => {
   return (
     <Card
       sx={{
-        width: window.innerWidth * 0.3,
+        width: matches ? window.innerWidth * 0.7 : window.innerWidth * 0.3,
         // width: 500,
         // minHeight: 500,
         // padding: 5
@@ -80,13 +83,14 @@ const Transliteration = (props) => {
         direction="row"
         justifyContent="space-between"
         alignItems="center"
-        sx={{ backgroundColor: "#f5f5f5", padding: "1rem", marginBottom: 2 }}
+        sx={{ backgroundColor: "#f5f5f5", padding: "0.4rem 1rem 0.4rem 1rem", marginBottom: 2 }}
       >
         <Typography variant="subtitle1">Select Language :</Typography>
         <Autocomplete
           value={selectedLang ? selectedLang : {DisplayName : "Hindi - हिंदी", LangCode : "hi"}}
           onChange={handleLanguageChange}
           options={languageList}
+          size={"small"}
           getOptionLabel={el => { return el.DisplayName }}
           sx={{ width: window.innerWidth * 0.15 }}
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
