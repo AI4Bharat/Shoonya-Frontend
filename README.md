@@ -1,5 +1,5 @@
 # Shoonya Frontend
-An open source platform to annotate and label data at scale
+An open source platform to annotate and label data at scale.
 You can watch a demo of our tool - [Video](https://www.youtube.com/watch?v=N4PBSB2fQto)
 
 ## Pre-requisites
