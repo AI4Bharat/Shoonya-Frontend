@@ -10,17 +10,25 @@ const Search = (props) => {
   const ref = useRef(null);
   const classes = DatasetStyle();
   const dispatch = useDispatch();
+  
+  const SearchProject = useSelector((state) => state.SearchProjectCards.data);
   const [searchValue, setSearchValue] = useState("");
+
 
   useEffect(() => {
     if (ref) ref.current.focus();
   }, [ref]);
 
+  useEffect(() => {
+   
+    dispatch(SearchProjectCards(""));
+}, [])
+
   const handleChangeName = (value) => {
     setSearchValue(value);
     dispatch(SearchProjectCards(value));
-
   };
+ 
 
   return (
     <ThemeProvider theme={themeDefault}>

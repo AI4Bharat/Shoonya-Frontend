@@ -14,6 +14,8 @@ import AddMembersToProjectAPI from "../../../../redux/actions/api/ProjectDetails
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import addUserTypes from "../../../../constants/addUserTypes";
 import { useNavigate, useParams } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 
 const columns = [
     {
@@ -59,6 +61,7 @@ const options = {
     print: false,
     search: false,
     viewColumns: false,
+    jumpToPage: true,
 };
 
 const addLabel = {
@@ -107,6 +110,34 @@ const MembersTable = (props) => {
                 ];
             })
             : [];
+            const options = {
+                textLabels: {
+                  body: {
+                    noMatch: "No records",
+                  },
+                  toolbar: {
+                    search: "Search",
+                    viewColumns: "View Column",
+                  },
+                  pagination: { rowsPerPage: "Rows per page" },
+                  options: { sortDirection: "desc" },
+                },
+                // customToolbar: fetchHeaderButton,
+                displaySelectToolbar: false,
+                fixedHeader: false,
+                filterType: "checkbox",
+                download: false,
+                print: false,
+                rowsPerPageOptions: [10, 25, 50, 100],
+                // rowsPerPage: PageInfo.count,
+                filter: false,
+                // page: PageInfo.page,
+                viewColumns: false,
+                selectableRows: "none",
+                search: false,
+                jumpToPage: true,
+              };
+    
 
     return (
         <React.Fragment>
@@ -133,13 +164,15 @@ const MembersTable = (props) => {
                     id={id}
                 />
             }
-            <MUIDataTable
-                title={""}
-                data={data}
-                columns={columns}
-                options={options}
-            // filter={false}
-            />
+            <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                    // filter={false}
+                />
+            </ThemeProvider>
         </React.Fragment>
     );
 };

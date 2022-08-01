@@ -20,7 +20,7 @@ export default function MenuItems(props) {
           id="demo-simple-select-standard"
           value={props.value}
           onChange={handleChange}
-          sx={{fontSize:"16px" }}
+          sx={{fontSize:"14px" }}
        
         >
            { 

@@ -7,7 +7,8 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from '../common/Button';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from "@mui/material";
+import { Button, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box, Tooltip, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterList from "./FilterList";
@@ -56,7 +57,7 @@ const TaskTable = (props) => {
         (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {task_status: filterData.Status[0], user_filter: -1});
     const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
-    const [pullSize, setPullSize] = useState();
+    const [pullSize, setPullSize] = useState(ProjectDetails.tasks_pull_count_per_batch*0.5);
     const [pullDisabled, setPullDisabled] = useState("");
     const [deallocateDisabled, setDeallocateDisabled] = useState("");
     const apiLoading = useSelector(state => state.apiStatus.loading);
@@ -145,7 +146,7 @@ const TaskTable = (props) => {
         localStorage.setItem("labellingMode", selectedFilters.task_status);
         localStorage.setItem("searchFilters", JSON.stringify(search_filters));
         localStorage.setItem("labelAll", true);
-        const getNextTaskObj = new GetNextTaskAPI(id);
+        const getNextTaskObj = new GetNextTaskAPI(id, null, props.type);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
     };
@@ -368,7 +369,7 @@ const TaskTable = (props) => {
             }
         },
         onChangePage: (currentPage) => { 
-            currentPage + 1 > currentPageNumber && setCurrentPageNumber(currentPage + 1);
+            setCurrentPageNumber(currentPage + 1);
         },
         onChangeRowsPerPage: (rowPerPageCount) => { 
             setCurrentPageNumber(1); 
@@ -395,11 +396,13 @@ const TaskTable = (props) => {
             },
             options: { sortDirection: "desc" },
         },
+        jumpToPage: true,
+        serverSide: true,
         customToolbar: renderToolBar,
     };
 
     return (
-        <Fragment>
+        <div>
         {((props.type === "annotation" && userDetails?.role === 1) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
             ProjectDetails.is_published ? (
                 <Grid
@@ -477,7 +480,7 @@ const TaskTable = (props) => {
                     <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 4 : 5}>
                         <CustomButton 
                             sx={{ p: 1, borderRadius: 2, margin: "auto", width: '100%'}} 
-                            label={"Start Labelling Now"}
+                            label={props.type == "annotation"? "Start Labelling Now":"Start reviewing now"}
                             onClick={labelAllTasks}
                         />
                     </Grid>
@@ -498,13 +501,15 @@ const TaskTable = (props) => {
             ) : ( 
                 <CustomButton sx={{ p: 1, width: '98%', borderRadius: 2, mb: 3, ml: "1%", mr:"1%", mt:"1%" }} label={"Add New Item"} />
             ))}
-            <MUIDataTable
-                title={""}
-                data={tasks}
-                columns={columns}
-                options={options}
-            // filter={false}
-            />
+            <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    title={""}
+                    data={tasks}
+                    columns={columns}
+                    options={options}
+                    // filter={false}
+                />
+            </ThemeProvider>
             {searchOpen && <SearchPopup 
                 open={searchOpen}
                 anchorEl={searchAnchor}
@@ -526,7 +531,7 @@ const TaskTable = (props) => {
             )}
             {renderSnackBar()}
             {loading && <Spinner /> }
-        </Fragment>
+        </div>
     )
 }
 
