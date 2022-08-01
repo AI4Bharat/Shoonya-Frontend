@@ -18,4 +18,6 @@ The project was created using [React 18.1.0](https://reactjs.org/docs/getting-st
 4.  Open http://localhost:3000 to view it in your browser
 5.  Build the app locally to the `build` folder - ``` npm run build ```
 
+### For more information please check https://github.com/AI4Bharat/Shoonya
+
 > Note: The page will reload when you make changes. You may also see any lint errors in the console.
