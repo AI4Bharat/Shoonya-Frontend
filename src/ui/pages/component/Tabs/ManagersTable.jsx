@@ -16,7 +16,7 @@ const ManagersTable = (props) => {
     // const orgId = useSelector(state=>state.getWorkspacesProjectData?.data?.[0]?.organization_id);
     const getWorkspaceManagersData = ()=>{
         
-        const workspaceObjs = new GetWorkspacesManagersDataAPI( id);
+        const workspaceObjs = new GetWorkspacesManagersDataAPI(id);
        
         dispatch(APITransport(workspaceObjs));
     }
