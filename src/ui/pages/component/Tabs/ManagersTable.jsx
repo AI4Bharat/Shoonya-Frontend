@@ -61,11 +61,6 @@ console.log(workspaceManagers,"workspaceManagers")
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
 
-        // const data = workspacesproject && workspacesproject.length > 0 ? workspacesproject.map((el,i)=>{
-        //     return [
-        //                 el.title, 
-        //                 el.created_by && el.created_by.username,
-
         const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.map((el,i)=>{
             return [
                 el.username, 
