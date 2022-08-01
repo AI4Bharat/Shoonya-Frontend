@@ -608,6 +608,7 @@ const Header = () => {
         left= {50}
         topTranslate={"45"}
         leftTranslate={"-90"}
+        isTransliteration={true}
         // sx={{width: "400px"}}
       >
         <Transliteration onCancelTransliteration={()=>handleTransliterationModelClose} />
