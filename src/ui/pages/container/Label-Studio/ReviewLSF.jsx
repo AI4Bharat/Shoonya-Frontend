@@ -76,7 +76,7 @@ const LabelStudioWrapper = ({
   const tasksComplete = (id) => {
     if (id) {
       resetNotes();
-      navigate(`/projects/${projectId}/task/${id}`);
+      navigate(`/projects/${projectId}/review/${id}`);
     } else {
       // navigate(-1);
       resetNotes();
