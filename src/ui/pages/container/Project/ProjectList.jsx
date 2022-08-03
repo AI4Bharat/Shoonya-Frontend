@@ -34,6 +34,7 @@ const Dashboard = () => {
 
 
     const getDashboardprojectData = () => {
+        setLoading(true);
         const projectObj = new GetProjectsAPI();
         dispatch(APITransport(projectObj));
     }
@@ -49,8 +50,8 @@ const Dashboard = () => {
     }
 
     useEffect(() => {
-        setLoading(apiLoading);
-    }, [apiLoading])
+        setLoading(false);
+    }, [projectData])
 
     useEffect(() => {
         getDashboardprojectData();

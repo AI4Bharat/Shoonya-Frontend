@@ -89,7 +89,8 @@ const GlobalStyles = makeStyles({
     lineHeight: "32px",
     color: "black",
     fontFamily: "Roboto",
-    height : "14rem"
+    height : "14rem",
+    padding : "1rem"
   },
 });
 

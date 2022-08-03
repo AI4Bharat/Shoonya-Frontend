@@ -13,10 +13,10 @@ const ManagersTable = (props) => {
     const dispatch = useDispatch();
     
     const {id} = useParams();
-    const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
+    // const orgId = useSelector(state=>state.getWorkspacesProjectData?.data?.[0]?.organization_id);
     const getWorkspaceManagersData = ()=>{
         
-        const workspaceObjs = new GetWorkspacesManagersDataAPI( orgId);
+        const workspaceObjs = new GetWorkspacesManagersDataAPI(id);
        
         dispatch(APITransport(workspaceObjs));
     }
@@ -26,7 +26,7 @@ const ManagersTable = (props) => {
     },[]);
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
-
+console.log(workspaceManagers,"workspaceManagers")
     const columns = [
         {
             name: "Name",
@@ -60,14 +60,8 @@ const ManagersTable = (props) => {
         // const data = [
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
-        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.filter((item) => {
-            if (
-                  item.role===2
-                    
-                ) {
-                  return item;
-                }
-              }).map((el,i)=>{
+
+        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.map((el,i)=>{
             return [
                 el.username, 
                 el.email,

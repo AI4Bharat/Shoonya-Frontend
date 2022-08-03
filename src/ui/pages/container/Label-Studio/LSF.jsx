@@ -52,6 +52,26 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
+  useEffect(() => {
+    localStorage.setItem("labelStudio:settings", JSON.stringify({
+      bottomSidePanel: true,
+      continuousLabeling: false,
+      enableAutoSave: false,
+      enableHotkeys: true,
+      enableLabelTooltips: true,
+      enablePanelHotkeys: true,
+      enableTooltips: false,
+      fullscreen: false,
+      imageFullSize: false,
+      selectAfterCreate: false,
+      showAnnotationsPanel: true,
+      showLabels: false,
+      showLineNumbers: false,
+      showPredictionsPanel: true,
+      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
+    }))
+  }, [])
+
   const tasksComplete = (id) => {
     if (id) {
       resetNotes()
@@ -162,7 +182,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         onLabelStudioLoad: function (ls) {
           task_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
           console.log("task_status", task_status.current, "test", ProjectDetails);
-          if (userData.role === 1 && annotations.length === 0) {
+          if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
             });
@@ -256,10 +276,15 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
-            if (annotation.serializeAnnotation().id === annotations[i].result.id)
+            if (annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
               deleteAnnotation(
                 annotations[i].id
               );
+              var c = ls.annotationStore.addAnnotation({
+                userGenerate: true,
+              });
+              ls.annotationStore.selectAnnotation(c.id);
+            }
           }
         }
       });

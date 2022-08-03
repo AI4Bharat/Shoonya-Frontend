@@ -53,10 +53,30 @@ const LabelStudioWrapper = ({
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
+  useEffect(() => {
+    localStorage.setItem("labelStudio:settings", JSON.stringify({
+      bottomSidePanel: true,
+      continuousLabeling: false,
+      enableAutoSave: false,
+      enableHotkeys: true,
+      enableLabelTooltips: true,
+      enablePanelHotkeys: true,
+      enableTooltips: false,
+      fullscreen: false,
+      imageFullSize: false,
+      selectAfterCreate: false,
+      showAnnotationsPanel: true,
+      showLabels: false,
+      showLineNumbers: false,
+      showPredictionsPanel: true,
+      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
+    }))
+  }, [])
+
   const tasksComplete = (id) => {
     if (id) {
       resetNotes();
-      navigate(`/projects/${projectId}/task/${id}`);
+      navigate(`/projects/${projectId}/review/${id}`);
     } else {
       // navigate(-1);
       resetNotes();
@@ -128,7 +148,7 @@ const LabelStudioWrapper = ({
         "annotations:menu",
         "annotations:current",
         // "annotations:add-new",
-        "annotations:delete",
+        // "annotations:delete",
         // "annotations:view-all",
         "predictions:tabs",
         "predictions:menu",
@@ -424,29 +444,25 @@ const LabelStudioWrapper = ({
                 Reject
               </Button>
             </Tooltip>
-            {localStorage.getItem("labelAll") !== "true" ? (
-              <Tooltip title="Accept Annotation">
-                <Button
-                  value="Accept"
-                  type="default"
-                  onClick={handleAcceptClick}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#52c41a",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                    borderLeft: "None",
-                  }}
-                  className="lsf-button"
-                >
-                  Accept
-                </Button>
-              </Tooltip>
-            ) : (
-              <div style={{ minWidth: "160px" }} />
-            )}
+            <Tooltip title="Accept Annotation">
+              <Button
+                value="Accept"
+                type="default"
+                onClick={handleAcceptClick}
+                style={{
+                  minWidth: "160px",
+                  border: "1px solid #e6e6e6",
+                  color: "#52c41a",
+                  pt: 3,
+                  pb: 3,
+                  borderBottom: "None",
+                  borderLeft: "None",
+                }}
+                className="lsf-button"
+              >
+                Accept
+              </Button>
+            </Tooltip>
           </div>
         </div>
       )}

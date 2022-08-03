@@ -14,7 +14,7 @@ const AnnotatorsTable = (props) => {
     
     const {id} = useParams();
     
-    const orgId = useSelector(state=>state.getWorkspacesProjectData.data[0].organization_id);
+    const orgId = useSelector(state=>state.getWorkspacesProjectData?.data?.[0]?.organization_id);
 
     const getWorkspaceAnnotatorsData = ()=>{
         
