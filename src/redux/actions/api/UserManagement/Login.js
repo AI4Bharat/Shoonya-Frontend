@@ -12,6 +12,13 @@ export default class LoginAPI extends API {
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.login}`;
   }
 
+  processResponse(res) {
+    super.processResponse(res);
+    if (res) {
+        this.report = res;
+    }
+}
+
   apiEndPoint() {
     return this.endpoint;
   }
@@ -33,9 +40,6 @@ export default class LoginAPI extends API {
   }
 
   getPayload() {
-    return {
-      email: this.email,
-      password: this.password,
-    };
+    return this.report
   }
 }

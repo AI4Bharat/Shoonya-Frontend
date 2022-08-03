@@ -1,0 +1,36 @@
+name: Build React App
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches: [stage]
+
+env: 
+  CI: false
+  NODE_OPTIONS: "--max_old_space_size=4096"
+  REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_STAGE }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+
+    - name: Install NPM packages
+      run: npm install --legacy-peer-deps
+    
+    - name: Build project
+      run: npm run build
+
+    - name: Upload production-ready build files
+      uses: actions/upload-artifact@v3
+      with:
+        name: production-files-stage
+        path: ./build

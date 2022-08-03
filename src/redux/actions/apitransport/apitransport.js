@@ -5,6 +5,7 @@ import Strings from "../../string";
 function dispatchAPIAsync(api) {
   return {
     type: api.type,
+    endpoint: api.apiEndPoint(),
     payload: api.getPayload()
   };
 }
@@ -36,14 +37,15 @@ function apiStatusAsync(progress, errors, message, res = null, unauthrized = fal
 }
 
 function success(res, api, dispatch) {
-
+console.log(res,"res")
   api.processResponse(res.data);
-  dispatch(apiStatusAsync(false, false, api.successMsg, res.data, null, false));
   if (api.type) {
     dispatch(dispatchAPIAsync(api));
+    dispatch(apiStatusAsync(false, false, res.data.message ? res.data.message : api.successMsg, res.data, null, false));
   }
   if (typeof api.processNextSuccessStep === "function" && res.status && (res.status === 200 || res.status === 201))
     api.processNextSuccessStep(res.data);
+    dispatch(apiStatusAsync(false, false, res.data.message ? res.data.message : api.successMsg, res.data, null, false));
 }
 
 function error(err, api, dispatch) {
@@ -65,6 +67,18 @@ export default function dispatchAPI(api) {
       dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, ""));
       axios
         .post(api.apiEndPoint(), api.getFormData(), api.getHeaders())
+        .then(res => {
+          success(res, api, dispatch);
+        })
+        .catch(err => {
+          error(err, api, dispatch);
+        });
+    };
+  } else if (api.method === "PATCH") {
+    return dispatch => {
+      dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, ""));
+      axios
+        .patch(api.apiEndPoint(), api.getBody(), api.getHeaders())
         .then(res => {
           success(res, api, dispatch);
         })
@@ -110,7 +124,7 @@ export default function dispatchAPI(api) {
     };
   }
   return dispatch => {
-    dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, ""));
+    dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, "",null, null, true));
     axios
       .get(api.apiEndPoint(), api.getHeaders())
       .then(res => {
