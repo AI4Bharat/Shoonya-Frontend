@@ -124,7 +124,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="invite/:inviteCode" element={<SignUp />} />
+        <Route path="/invite/:inviteCode" element={<SignUp />} />
         <Route
           path="/profile"
           element={ProtectedRouteWrapper(<Layout component={<UserProfilePage />} />)}
