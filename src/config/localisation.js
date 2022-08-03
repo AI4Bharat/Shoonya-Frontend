@@ -41,6 +41,7 @@ const localisation = {
     "label.datasets": "Datasets",
     "button.downloadDataset": "Download Dataset",
     "button.uploadData":"Upload Data",
+    "link.Createanaccount":"Create an account"
 };
 
 export const translate = (prop) => localisation[prop];
