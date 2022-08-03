@@ -359,6 +359,13 @@ const Header = () => {
       },
     },
     {
+      name: "My Progress",
+      onclick: () => {
+        handleCloseUserMenu();
+        navigate("/profile?tab=progress");
+      },
+    },
+    {
       name: "Change Password",
       onclick: () => {
         handleCloseUserMenu();

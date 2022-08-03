@@ -1,15 +1,40 @@
-import { Button, Grid, ThemeProvider, Typography, Select, Box, MenuItem, InputLabel, FormControl, Card, CircularProgress } from "@mui/material";
+import {
+  Button,
+  Grid,
+  ThemeProvider,
+  Typography,
+  Select,
+  Box,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Card,
+  CircularProgress 
+} from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+// import Snackbar from "../common/Snackbar";
+// import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
+// import { LocalizationProvider } from "@mui/x-date-pickers";
+// import { DateRangePicker } from "@mui/x-date-pickers-pro";
+// import {
+//   addDays,
+//   addWeeks,
+//   format,
+//   lastDayOfWeek,
+//   startOfMonth,
+//   startOfWeek,
+// } from "date-fns";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetUserAnalyticsAPI from "../../../../redux/actions/api/UserManagement/GetUserAnalytics";
 import MUIDataTable from "mui-datatables";
 import DatasetStyle from "../../../styles/Dataset";
-import ColumnList from '../common/ColumnList';
+import ColumnList from "../common/ColumnList";
 import CustomizedSnackbars from "../common/Snackbar";
 import { isSameDay, format } from 'date-fns/esm';
 import { DateRangePicker, defaultStaticRanges } from "react-date-range";
@@ -17,14 +42,17 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 const MyProgress = () => {
-  const UserDetails = useSelector(state => state.fetchLoggedInUserData.data);
+  const UserDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const [selectRange, setSelectRange] = useState([{
-    startDate: new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
-    endDate: new Date(),
-    key: "selection"
-}]);
+      startDate: new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+      endDate: new Date(),
+      key: "selection"
+  }]);
   // const [rangeValue, setRangeValue] = useState([
-  //   format(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'),
+  //   format(
+  //     Date.parse(UserDetails?.date_joined, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
+  //     "yyyy-MM-dd"
+  //   ),
   //   Date.now(),
   // ]);
   const [showPicker, setShowPicker] = useState(false);
@@ -56,6 +84,29 @@ const MyProgress = () => {
   }, []);
 
   useEffect(() => {
+    if (UserDetails && Workspaces?.results) {
+      const filteredWorkspaces = Workspaces.results.filter((ws) => {
+        let userAdded = false;
+        for (let user of ws.users) {
+          if (user.id === UserDetails.id) {
+            userAdded = true;
+            break;
+          }
+        }
+        return userAdded;
+      });
+      let workspacesList = [];
+      filteredWorkspaces?.forEach((item) => {
+        workspacesList.push({ id: item.id, name: item.workspace_name });
+      });
+      setWorkspaces(workspacesList);
+      setSelectedWorkspaces(workspacesList.map(item => item.id))
+      setSelectedType("ContextualTranslationEditing")
+      // console.log("wid--->>", Workspaces.results[0]);
+    }
+  }, [UserDetails, Workspaces]);
+
+  useEffect(() => {
     if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -66,16 +117,6 @@ const MyProgress = () => {
       types?.length && setSelectedType(types[0]);
     }
   }, [ProjectTypes]);
-
-  useEffect(() => {
-    if (Workspaces) {
-      let workspacesList = [];
-      Workspaces?.results?.forEach((item) => {
-        workspacesList.push({ id: item.id, name: item.workspace_name })
-      })
-      setWorkspaces(workspacesList)
-    }
-  }, [Workspaces]);
 
   useEffect(() => {
     if (UserAnalytics?.message) {
@@ -107,7 +148,7 @@ const MyProgress = () => {
       setSelectedColumns([]);
     }
     setShowSpinner(false);
-  }, [UserAnalytics])
+  }, [UserAnalytics]);
 
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
@@ -128,7 +169,7 @@ const MyProgress = () => {
       format(selectRange[0].startDate, 'yyyy-MM-dd'),
       format(selectRange[0].endDate, 'yyyy-MM-dd'),
       selectedType,
-      selectedWorkspaces,
+      selectedWorkspaces
     );
     dispatch(APITransport(progressObj));
     setShowSpinner(true);
@@ -139,7 +180,7 @@ const MyProgress = () => {
   };
 
   const closeSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
 
@@ -155,11 +196,11 @@ const MyProgress = () => {
           selectedColumns={selectedColumns}
         />
       </Box>
-    )
-  }
+    );
+  };
 
   const tableOptions = {
-    filterType: 'checkbox',
+    filterType: "checkbox",
     selectableRows: "none",
     download: false,
     filter: false,
@@ -185,7 +226,6 @@ const MyProgress = () => {
               My Progress
             </Typography>
           </Grid>
-
         </Grid>
         <Grid container columnSpacing={4} rowSpacing={2} mt={1} mb={1}>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
@@ -195,12 +235,14 @@ const MyProgress = () => {
                   color="primary" 
                   onClick={() => setShowPicker(!showPicker)}
               >
-                  Pick dates
+                Pick dates
               </Button>
           </Grid>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <FormControl fullWidth size="small">
-              <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
+              <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
+                Project Type
+              </InputLabel>
               <Select
                 labelId="project-type-label"
                 id="project-type-select"
@@ -218,7 +260,9 @@ const MyProgress = () => {
           </Grid>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <FormControl fullWidth size="small">
-              <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>Workspace</InputLabel>
+              <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>
+                Workspace
+              </InputLabel>
               <Select
                 labelId="workspace-label"
                 id="workspace-select"
