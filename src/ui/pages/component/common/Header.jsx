@@ -359,6 +359,13 @@ const Header = () => {
       },
     },
     {
+      name: "My Progress",
+      onclick: () => {
+        handleCloseUserMenu();
+        navigate("/profile?tab=progress");
+      },
+    },
+    {
       name: "Change Password",
       onclick: () => {
         handleCloseUserMenu();
@@ -608,6 +615,7 @@ const Header = () => {
         left= {50}
         topTranslate={"45"}
         leftTranslate={"-90"}
+        isTransliteration={true}
         // sx={{width: "400px"}}
       >
         <Transliteration onCancelTransliteration={()=>handleTransliterationModelClose} />

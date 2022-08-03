@@ -9,8 +9,9 @@ import constants from "../../../constants";
    constructor(workspaceId, timeout = 2000) {
      super("GET", timeout, false);
      this.type = constants.GET_WORKSPACE_MANAGERS_DATA;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}${workspaceId}/users/`;
-   }
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${workspaceId}/list-managers/`;
+   }   
+  
  
    processResponse(res) {
      super.processResponse(res);
