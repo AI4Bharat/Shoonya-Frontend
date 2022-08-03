@@ -53,7 +53,7 @@ const WorkspaceReports = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportData, setReportData] = useState([]);
-  const [submitted, setSubmitted] = useState(false);
+  const [reportRequested, setReportRequested] = useState(false);
   const classes = DatasetStyle();
 
   const { id } = useParams();
@@ -87,7 +87,7 @@ const WorkspaceReports = () => {
   }, [ProjectTypes]);
 
   useEffect(() => {
-    if (UserReports?.length) {
+    if (reportRequested && UserReports?.length) {
       let tempColumns = [];
       let tempSelected = [];
       Object.keys(UserReports[0]).forEach((key) => {
@@ -113,7 +113,7 @@ const WorkspaceReports = () => {
   }, [UserReports]);
 
   useEffect(() => {
-    if (ProjectReports?.length) {
+    if (reportRequested && ProjectReports?.length) {
       let tempColumns = [];
       let tempSelected = [];
       Object.keys(ProjectReports[0]).forEach((key) => {
@@ -178,7 +178,7 @@ const WorkspaceReports = () => {
 
   const handleDateSubmit = () => {
     setShowPicker(false);
-    setSubmitted(true);
+    setReportRequested(true);
     if (reportType === "user") {
       const userReportObj = new GetWorkspaceUserReportsAPI(
         id,
@@ -335,7 +335,7 @@ const WorkspaceReports = () => {
               />
           </Card>
       </Box>}
-      {reportData?.length > 0 ? (
+      {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={""}
@@ -343,8 +343,9 @@ const WorkspaceReports = () => {
             columns={columns.filter((col) => selectedColumns.includes(col.name))}
             options={options}
           />
-        </ThemeProvider>
-      ) : <Grid
+        </ThemeProvider>)
+      }
+      {/* <Grid
           container
           justifyContent="center"
         >
@@ -353,8 +354,7 @@ const WorkspaceReports = () => {
               !reportData?.length && submitted && <>No results</>
             )}
           </Grid>
-        </Grid>
-      }
+        </Grid> */}
     </React.Fragment>
   );
 };
