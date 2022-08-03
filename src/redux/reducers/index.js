@@ -52,7 +52,8 @@ import GetFileTypes from './Dataset/GetFileTypes';
 import ChangePassword from './UserManagement/ChangePassword'
 import fetchUserById from './UserManagement/FetchUserById';
 import setTaskFilter from './Tasks/SetTaskFilter';
-import DownloadJSONProject from './ProjectDetails/DownloadJSONProject'
+import DownloadJSONProject from './ProjectDetails/DownloadJSONProject';
+import getReviewDetails from './ProjectDetails/GetReviewDetails';
 
 const index = {
     apiStatus,
@@ -113,6 +114,7 @@ const index = {
     fetchUserById,
     setTaskFilter,
     DownloadJSONProject,
+    getReviewDetails,
 };
 
 export default index;

@@ -24,7 +24,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
-import Spinner from "../../component/common/Spinner"
+import Spinner from "../../component/common/Spinner";
+import GetReviewDetailsAPI from '../../../../redux/actions/api/ProjectDetails/GetReviewDetails';
 
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = ["context", "input_language", "output_language"];
@@ -44,6 +45,8 @@ const TaskTable = (props) => {
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+    const ReviewDetails= useSelector(state => state.getReviewDetails.data);
+    console.log(ReviewDetails.count,"ReviewDetails")
     const filterData = {
         Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
@@ -79,6 +82,13 @@ const TaskTable = (props) => {
         const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters, props.type);
         dispatch(APITransport(taskObj));
     }
+    const getReviewProjectAPI = () => {
+        const projectObj = new GetReviewDetailsAPI(id);
+        dispatch(APITransport(projectObj));
+    }
+    useEffect(() => {
+        getReviewProjectAPI()
+    }, [])
 
     const fetchNewTasks = async() => {
         const batchObj = props.type === "annotation" ? new PullNewBatchAPI(id, pullSize) : new PullNewReviewBatchAPI(id, pullSize);
@@ -254,9 +264,19 @@ const TaskTable = (props) => {
         setColumns(newCols);
         console.log("columns", newCols)
     }, [selectedColumns]);
+    
+
+useEffect(() => {
+    if (props.type === "review" && ReviewDetails) {
+        if (ReviewDetails.count === 0)
+            setPullDisabled("No more unassigned tasks in this project")
+        else if (pullDisabled === "No more unassigned tasks in this project")
+            setPullDisabled("")
+}}, [ReviewDetails.count])
 
     useEffect(() => {
-        if (ProjectDetails) {
+        
+        if (props.type === "annotation" && ProjectDetails) {
             if (ProjectDetails.unassigned_task_count === 0)
                 setPullDisabled("No more unassigned tasks in this project")
             else if (pullDisabled === "No more unassigned tasks in this project")
