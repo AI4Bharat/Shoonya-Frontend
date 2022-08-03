@@ -1,7 +1,7 @@
-import { Card, Grid, ThemeProvider, Typography } from "@mui/material";
+import { Grid, ThemeProvider, Typography, Autocomplete, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import OutlinedTextField from "../common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,10 +10,8 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import CustomButton from "../common/Button";
-import MenuItems from "../common/MenuItems";
 import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../common/Spinner";
-import Autocomplete from "../common/Autocomplete"
 
 
 
@@ -80,6 +78,7 @@ const BasicSettings = (props) => {
     useEffect(() => {
         if (LanguageChoices && LanguageChoices.length > 0) {
             let temp = [];
+            console.log(LanguageChoices);
             LanguageChoices.forEach((element) => {
                 temp.push(element[0]
                     //     {
@@ -149,21 +148,6 @@ const BasicSettings = (props) => {
             [event.target.name]: event.target.value,
         }));
     }
-
-    const handletargetLanguage = (event) => {
-        // event.preventDefault();
-        typeof (event.target.innerHTML) === "string" ?
-            setTargetLanguage(event.target.innerHTML)
-            : setTargetLanguage(ProjectDetails?.tgt_language)
-
-    }
-    const handlesourceLanguage = (event) => {
-        typeof (event.target.innerHTML) === "string" ?
-            setSourceLanguage(event.target.innerHTML)
-            : setSourceLanguage(ProjectDetails?.src_language)
-
-    }
-
 
     // const handleCancel = ()=>{
     //     // setSourceLanguage(ProjectDetails?.tgt_language)
@@ -309,11 +293,17 @@ const BasicSettings = (props) => {
                                 sm={12}
                             >
                                 <Autocomplete
-                                    name="tgt_language"
-                                    options={languageOptions.map((el, i) => { return el })}
+                                    onChange={(e, newVal) => setSourceLanguage(newVal)}
+                                    options={languageOptions}
                                     value={sourceLanguage}
-                                    onChange={handlesourceLanguage}
-                                   
+                                    style={{ fontSize: "14px", width: "500px" }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            inputProps={{ ...params.inputProps, style: { fontSize: "14px" } }}
+                                            placeholder="Enter source language"
+                                        />
+                                    )}
                                 />
                             </Grid>
                         </Grid>
@@ -347,10 +337,17 @@ const BasicSettings = (props) => {
                                 sm={12}
                             >
                                 <Autocomplete
-                                    name="tgt_language"
-                                    options={languageOptions.map((el, i) => { return el })}
+                                    onChange={(e, newVal) => setTargetLanguage(newVal)}
+                                    options={languageOptions}
                                     value={targetLanguage}
-                                    onChange={handletargetLanguage}
+                                    style={{ fontSize: "14px", width: "500px" }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            inputProps={{ ...params.inputProps, style: { fontSize: "14px" } }}
+                                            placeholder="Enter source language"
+                                        />
+                                    )}
                                 />
                             </Grid>
 
