@@ -13,6 +13,7 @@ const Transliteration = (props) => {
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([]);
   const [selectedLang, setSelectedLang] = useState("");
+  const [direction, setDirection] = useState("ltr");
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -31,6 +32,7 @@ const Transliteration = (props) => {
         placeholder={"Enter text here..."}
         rows={5}
         className={classes.textAreaTransliteration}
+        style={{ direction: direction }}
       />
     );
   };
@@ -49,6 +51,7 @@ const Transliteration = (props) => {
 
   const handleLanguageChange = (event, val) => {
     console.log("val", val)
+    val.Direction === "rtl" ? setDirection("rtl") : setDirection("ltr");
     setSelectedLang(val);
   }
   const onCopyButtonClick = () => {
