@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import CustomCard from "../../component/common/Card";
 import { Grid ,Typography, Link,ThemeProvider,} from "@mui/material";
 import Button from "../../component/common/Button";
@@ -7,9 +8,23 @@ import LoginStyle from "../../../styles/loginStyle";
 import themeDefault from '../../../theme/theme'
 import { useNavigate } from "react-router-dom";
 import AppInfo from "./AppInfo";
+import ForgotPasswordAPI from "../../../../redux/actions/api/UserManagement/ForgotPassword";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import { useDispatch } from "react-redux";
 
-const forgotPassword = () => {
+const ForgotPassword = () => {
   const classes = LoginStyle();
+   const dispatch = useDispatch();
+   const [sendemail, setSendemail] = useState("")
+
+  const handleforgotPassword = () => {
+    setSendemail("")
+    const ChangePassword = {
+      email:sendemail
+    }
+    const projectObj = new ForgotPasswordAPI(ChangePassword);
+    dispatch(APITransport(projectObj));
+  }
 
  
   const TextFields = () => {
@@ -24,6 +39,8 @@ const forgotPassword = () => {
           <OutlinedTextField
             fullWidth
             placeholder={translate("enterEmailId")}
+            value={sendemail}
+            onChange={(e) => setSendemail(e.target.value)}
           />
         </Grid>
       </Grid>
@@ -42,7 +59,7 @@ const forgotPassword = () => {
           </Typography>
           </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
-          <Button fullWidth label={"Send link"} />
+          <Button fullWidth label={"Send link"} onClick={handleforgotPassword}/>
         </Grid>
       </Grid>
     </CustomCard>
@@ -66,4 +83,4 @@ const forgotPassword = () => {
   );
 };
 
-export default forgotPassword;
+export default ForgotPassword;
