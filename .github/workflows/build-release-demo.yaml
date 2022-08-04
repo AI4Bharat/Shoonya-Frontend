@@ -1,35 +1,35 @@
-name: Deploy React App
+name: Build React App
 
 on:
   push:
-    branches: [demo]
+    branches: [master]
   workflow_dispatch:
   workflow_call:
   pull_request:
-    branches: [demo]
+    branches: [master]
 
 env: 
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
+  REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_DEMO }}
 
 jobs:
-  build-demo:
-    uses: ./.github/workflows/build-demo.yaml
-    secrets: inherit
-  release-demo:
-    name: Deploy React App
-    needs: [build-demo]
+  cicd:
+    name: CICD_DEMO
     runs-on: ubuntu-latest
     
     steps:
-    - name: Download artifacts from build pipeline
-      uses: actions/download-artifact@v3
-      with:
-        name: production-files-demo
-        path: ./build
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v2
 
-    - name: Display structure of downloaded files
-      run: ls -R
+    - name: Install NPM packages
+      run: npm install --legacy-peer-deps
+    
+    - name: Build project
+      run: npm run build
 
     - name: Azure login
       uses: azure/login@v1

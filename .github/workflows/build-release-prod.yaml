@@ -1,35 +1,35 @@
-name: Deploy React App
+name: Build React App
 
 on:
   push:
-    branches: [prod]
+    branches: [master]
   workflow_dispatch:
   workflow_call:
   pull_request:
-    branches: [prod]
+    branches: [master]
 
 env: 
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
+  REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_PROD }}
 
 jobs:
-  build-prod:
-    uses: ./.github/workflows/build-prod.yaml
-    secrets: inherit
-  release-prod:
-    name: Deploy React App
-    needs: [build-prod]
+  cicd:
+    name: CICD_PROD
     runs-on: ubuntu-latest
     
     steps:
-    - name: Download artifacts from build pipeline
-      uses: actions/download-artifact@v3
-      with:
-        name: production-files-prod
-        path: ./build
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v2
 
-    - name: Display structure of downloaded files
-      run: ls -R
+    - name: Install NPM packages
+      run: npm install --legacy-peer-deps
+    
+    - name: Build project
+      run: npm run build
 
     - name: Azure login
       uses: azure/login@v1
@@ -47,7 +47,7 @@ jobs:
       with:
         inlineScript: |
            az cdn endpoint purge --no-wait --content-paths  "/*" --profile-name prod-react-static --name frontend-prod-shoonya --resource-group shoonya
-    
+   
     - name: Azure logout
       run: |
             az logout
