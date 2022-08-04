@@ -104,6 +104,7 @@ const MyProgress = () => {
       setSelectedType("ContextualTranslationEditing")
       // console.log("wid--->>", Workspaces.results[0]);
        // console.log("here");
+       //console.log("test");
     }
   }, [UserDetails, Workspaces]);
 
