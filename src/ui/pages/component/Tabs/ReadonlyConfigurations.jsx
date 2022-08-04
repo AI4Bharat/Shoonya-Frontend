@@ -69,9 +69,29 @@ const ReadonlyConfigurations = (props) => {
                                     {ProjectDetails.sampling_mode == "f" && "Full"}
                                     {ProjectDetails.sampling_mode == "b" && "Batch"}
                                     {ProjectDetails.sampling_mode == "r" && "Random"}
-
                                 </Typography>
+                            </Grid>
+
+                            {ProjectDetails.datasets.map(dataset=>
+                                    <Grid
+                                    item
+                                    xs={12}
+                                    md={12}
+                                    lg={12}
+                                    xl={12}
+                                    sm={12}
+                                    sx={{mt:2,display: "flex"}}
+                                >
+                                    <Typography  variant="subtitle1"  style={{ flexDirection: "column" }} >
+                                        Dataset Instance :
+                                    </Typography >
+                                
+                                    <Typography variant="subtitle1"  style={{marginLeft: 25 }} >
+                                        {dataset?.instance_name}
+                                    </Typography>
                                 </Grid>
+                            )}
+                            
                             
                         </div>
                     )}
