@@ -1,4 +1,4 @@
-name: Build React App
+name: Build and Release React App for Demo
 
 on:
   push:
