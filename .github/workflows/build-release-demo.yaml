@@ -2,11 +2,11 @@ name: Build and Release React App for Demo
 
 on:
   push:
-    branches: [develop]
+    branches: [master]
   workflow_dispatch:
   workflow_call:
   pull_request:
-    branches: [develop]
+    branches: [master]
 
 env: 
   CI: false

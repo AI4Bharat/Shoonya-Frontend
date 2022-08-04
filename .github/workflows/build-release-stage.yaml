@@ -12,6 +12,8 @@ env:
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
   REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_STAGE }}
+  AZURE_CREDS: ${{ secrets.SHOONYA_AZURE_CREDS }}
+  AZURE_STORAGEKEY: ${{ secrets.SHOONYA_AZURE_STORAGEKEY_STAGE }}
 
 jobs:
   cicd:
@@ -34,13 +36,13 @@ jobs:
     - name: Azure login
       uses: azure/login@v1
       with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ env.AZURE_CREDS }}
 
     - name: Upload to blob storage
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name shoonyastoragestage --account-key ${{ secrets.AZURE_STORAGE_KEY_STAGE }} -d '$web' -s ./build --overwrite
+            az storage blob upload-batch --account-name shoonyastoragestage --account-key ${{ env.AZURE_STORAGEKEY }} -d '$web' -s ./build --overwrite
 
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
