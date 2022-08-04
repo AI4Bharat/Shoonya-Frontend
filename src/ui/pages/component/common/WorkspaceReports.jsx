@@ -3,29 +3,17 @@
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import {
-  TextField,
+  Card,
   Box,
-  Stack,
   Button,
   Grid,
-  CircularProgress,
   ThemeProvider,
 } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
-import { DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import {
-  format,
-  addDays,
-  addWeeks,
-  startOfWeek,
-  startOfMonth,
-  lastDayOfWeek,
-} from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetWorkspaceUserReportsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceUserReports";
@@ -35,26 +23,27 @@ import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/Fetc
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../common/ColumnList";
+import { isSameDay, format } from 'date-fns/esm';
+import { DateRangePicker, defaultStaticRanges } from "react-date-range";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 const WorkspaceReports = () => {
   const WorkspaceDetails = useSelector(
     (state) => state.getWorkspaceDetails.data
   );
-  const [startDate, setStartDate] = useState(
-    format(
-      Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
-      "yyyy-MM-dd"
-    )
-  );
-  const [endDate, setEndDate] = useState(format(Date.now(), "yyyy-MM-dd"));
-  const [selectRange, setSelectRange] = useState("Till Date");
-  const [rangeValue, setRangeValue] = useState([
-    format(
-      Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
-      "yyyy-MM-dd"
-    ),
-    Date.now(),
-  ]);
+  const [selectRange, setSelectRange] = useState([{
+    startDate: new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+    endDate: new Date(),
+    key: "selection"
+}]);
+  // const [rangeValue, setRangeValue] = useState([
+  //   format(
+  //     Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
+  //     "yyyy-MM-dd"
+  //   ),
+  //   Date.now(),
+  // ]);
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
@@ -64,6 +53,7 @@ const WorkspaceReports = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportData, setReportData] = useState([]);
+  const [reportRequested, setReportRequested] = useState(false);
   const classes = DatasetStyle();
 
   const { id } = useParams();
@@ -97,7 +87,7 @@ const WorkspaceReports = () => {
   }, [ProjectTypes]);
 
   useEffect(() => {
-    if (UserReports?.length) {
+    if (reportRequested && UserReports?.length) {
       let tempColumns = [];
       let tempSelected = [];
       Object.keys(UserReports[0]).forEach((key) => {
@@ -123,7 +113,7 @@ const WorkspaceReports = () => {
   }, [UserReports]);
 
   useEffect(() => {
-    if (ProjectReports?.length) {
+    if (reportRequested && ProjectReports?.length) {
       let tempColumns = [];
       let tempSelected = [];
       Object.keys(ProjectReports[0]).forEach((key) => {
@@ -179,53 +169,22 @@ const WorkspaceReports = () => {
     },
   };
 
-  const handleOptionChange = (e) => {
-    setSelectRange(e.target.value);
-    if (e.target.value === "Custom Range") {
-      setStartDate(format(startOfMonth(Date.now()), "yyyy-MM-dd"));
-      setEndDate(format(Date.now(), "yyyy-MM-dd"));
-      setShowPicker(true);
-    } else setShowPicker(false);
-    if (e.target.value === "Today") {
-      setStartDate(format(Date.now(), "yyyy-MM-dd"));
-      setEndDate(format(Date.now(), "yyyy-MM-dd"));
-    } else if (e.target.value === "Yesterday") {
-      setStartDate(format(addDays(Date.now(), -1), "yyyy-MM-dd"));
-      setEndDate(format(addDays(Date.now(), -1), "yyyy-MM-dd"));
-    } else if (e.target.value === "This Week") {
-      setStartDate(format(startOfWeek(Date.now()), "yyyy-MM-dd"));
-      setEndDate(format(Date.now(), "yyyy-MM-dd"));
-    } else if (e.target.value === "Last Week") {
-      setStartDate(format(startOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
-      setEndDate(format(lastDayOfWeek(addWeeks(Date.now(), -1)), "yyyy-MM-dd"));
-    } else if (e.target.value === "This Month") {
-      setStartDate(format(startOfMonth(Date.now()), "yyyy-MM-dd"));
-      setEndDate(format(Date.now(), "yyyy-MM-dd"));
-    } else if (e.target.value === "Till Date") {
-      setStartDate(
-        format(
-          Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
-          "yyyy-MM-dd"
-        )
-      );
-      setEndDate(format(Date.now(), "yyyy-MM-dd"));
-    }
-  };
-
-  const handleRangeChange = (dates) => {
-    setRangeValue(dates);
-    const [start, end] = dates;
-    setStartDate(format(start, "yyyy-MM-dd"));
-    setEndDate(format(end, "yyyy-MM-dd"));
+  const handleRangeChange = (ranges) => {
+    const { selection } = ranges;
+    if (selection.endDate > new Date()) selection.endDate = new Date();
+    setSelectRange([selection]);
+    console.log(selection, "selection"); 
   };
 
   const handleDateSubmit = () => {
+    setShowPicker(false);
+    setReportRequested(true);
     if (reportType === "user") {
       const userReportObj = new GetWorkspaceUserReportsAPI(
         id,
         selectedType,
-        startDate,
-        endDate,
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
+        format(selectRange[0].endDate, 'yyyy-MM-dd'),
         language
       );
       dispatch(APITransport(userReportObj));
@@ -234,8 +193,8 @@ const WorkspaceReports = () => {
       const projectReportObj = new GetWorkspaceProjectReportAPI(
         id,
         selectedType,
-        startDate,
-        endDate,
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
+        format(selectRange[0].endDate, 'yyyy-MM-dd'),
         language
       );
       dispatch(APITransport(projectReportObj));
@@ -253,70 +212,25 @@ const WorkspaceReports = () => {
           marginBottom: "24px",
         }}
       >
-        <Grid
-          item
-          xs={12}
-          sm={12}
-          md={showPicker ? 4 : 2}
-          lg={showPicker ? 4 : 2}
-          xl={showPicker ? 4 : 2}
-        >
-          <FormControl fullWidth>
-            <InputLabel id="date-range-select-label" sx={{ fontSize: "16px" }}>
-              Date Range
-            </InputLabel>
-            <Select
-              labelId="date-range-select-label"
-              id="date-range-select"
-              value={selectRange}
-              defaultValue={"Till Date"}
-              label="Date Range"
-              onChange={handleOptionChange}
+        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+            <Button 
+                endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
+                variant="contained" 
+                color="primary" 
+                onClick={() => setShowPicker(!showPicker)}
             >
-              <MenuItem value={"Today"}>Today</MenuItem>
-              <MenuItem value={"Yesterday"}>Yesterday</MenuItem>
-              <MenuItem value={"This Week"}>This Week</MenuItem>
-              <MenuItem value={"Last Week"}>Last Week</MenuItem>
-              <MenuItem value={"This Month"}>This Month</MenuItem>
-              {WorkspaceDetails?.created_at && (
-                <MenuItem value={"Till Date"}>Till Date</MenuItem>
-              )}
-              <MenuItem value={"Custom Range"}>Custom Range</MenuItem>
-            </Select>
-          </FormControl>
+                Pick dates
+            </Button>
         </Grid>
-        {showPicker && (
-          <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
-            <LocalizationProvider
-              dateAdapter={AdapterDateFns}
-              localeText={{ start: "Start Date", end: "End Date" }}
-            >
-              <DateRangePicker
-                value={rangeValue}
-                onChange={handleRangeChange}
-                renderInput={(startProps, endProps) => (
-                  <React.Fragment>
-                    <TextField {...startProps} sx={{ width: "48%" }} />
-                    <Box sx={{ mx: 2, width: "4%", textAlign: "center" }}>
-                      {" "}
-                      to{" "}
-                    </Box>
-                    <TextField {...endProps} sx={{ width: "48%" }} />
-                  </React.Fragment>
-                )}
-              />
-            </LocalizationProvider>
-          </Grid>
-        )}
         <Grid
           item
           xs={12}
           sm={12}
-          md={showPicker ? 4 : 3}
-          lg={showPicker ? 4 : 3}
-          xl={showPicker ? 4 : 3}
+          md={3}
+          lg={3}
+          xl={3}
         >
-          <FormControl fullWidth>
+          <FormControl fullWidth size="small">
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
               Project Type
             </InputLabel>
@@ -339,11 +253,11 @@ const WorkspaceReports = () => {
           item
           xs={12}
           sm={12}
-          md={showPicker ? 4 : 3}
-          lg={showPicker ? 4 : 3}
-          xl={showPicker ? 4 : 3}
+          md={3}
+          lg={3}
+          xl={3}
         >
-          <FormControl fullWidth>
+          <FormControl fullWidth size="small">
             <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>
               Report Type
             </InputLabel>
@@ -360,7 +274,7 @@ const WorkspaceReports = () => {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth>
+          <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>
               Target Language
             </InputLabel>
@@ -382,20 +296,46 @@ const WorkspaceReports = () => {
         </Grid>
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
           <Button
+            fullWidth
             variant="contained"
             onClick={handleDateSubmit}
-            sx={{
-              width: "100%",
-              mt: 2,
-            }}
           >
             Submit
           </Button>
         </Grid>
       </Grid>
-      {showSpinner ? (
-        <CircularProgress sx={{ mx: "auto", display: "block" }} />
-      ) : (
+      {showPicker && <Box sx={{mt: 2, mb:2, display: "flex", justifyContent: "center", width: "100%"}}>
+          <Card>
+              <DateRangePicker
+                  onChange={handleRangeChange}
+                  staticRanges={[
+                      ...defaultStaticRanges,
+                      {
+                          label: "Till Date",
+                          range: () => ({
+                          startDate: new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+                          endDate: new Date(),
+                          }),
+                          isSelected(range) {
+                          const definedRange = this.range();
+                          return (
+                              isSameDay(range.startDate, definedRange.startDate) &&
+                              isSameDay(range.endDate, definedRange.endDate)
+                          );
+                          }
+                      },
+                  ]}
+                  showSelectionPreview={true}
+                  moveRangeOnFirstSelection={false}
+                  months={2}
+                  ranges={selectRange}
+                  minDate={new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
+                  maxDate={new Date()}
+                  direction="horizontal"
+              />
+          </Card>
+      </Box>}
+      {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={""}
@@ -403,8 +343,18 @@ const WorkspaceReports = () => {
             columns={columns.filter((col) => selectedColumns.includes(col.name))}
             options={options}
           />
-        </ThemeProvider>
-      )}
+        </ThemeProvider>)
+      }
+      {/* <Grid
+          container
+          justifyContent="center"
+        >
+          <Grid item sx={{mt:"10%"}}>
+            {showSpinner ? <div></div> : (
+              !reportData?.length && submitted && <>No results</>
+            )}
+          </Grid>
+        </Grid> */}
     </React.Fragment>
   );
 };

@@ -95,7 +95,7 @@ const patchAnnotation = async (result, annotationID, load_time, lead_time, task_
   }
 };
 
-const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, annotation_notes, review_notes) => {
+const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, review_notes) => {
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       result: result,
@@ -137,8 +137,9 @@ const getNextProject = async (projectID, taskID, mode="annotation") => {
   try {
     let labellingMode = localStorage.getItem("labellingMode");
     let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
-    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${labellingMode ? `&task_status=${labellingMode}` : ""}${mode === "review" ? `&mode=review` : ""}`;
+    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${mode === "review" ? `&mode=review` : ""}`;
     if (localStorage.getItem("labelAll")) {
+      requestUrl += labellingMode ? `&task_status=${labellingMode}` : ""
       Object.keys(searchFilters)?.forEach(key => {
         requestUrl += `&${key}=${this.searchFilters[key]}`;
       });

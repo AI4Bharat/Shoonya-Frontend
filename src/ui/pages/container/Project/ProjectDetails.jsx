@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { translate } from "../../../../config/localisation";
-import TabPanel from "../../component/common/TabPanel";
+// import TabPanel from "../../component/common/TabPanel";
 import addUserTypes from "../../../../constants/addUserTypes";
 
 
@@ -21,6 +21,28 @@ const menuOptions = [
     { name: "Reports", isChecked: true, component: () => null }
 ]
 
+function TabPanel(props) {
+
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box sx={{ p: 3 }}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
+}
+
+
 const Projects = () => {
     // console.log("props", props)
     const { id } = useParams();
@@ -30,6 +52,7 @@ const Projects = () => {
         { name: "Project Type", value: null },
         { name: "Status", value: null },
         { name: "Unassigned Task", value: null },
+        { name: "Total Labeled Task", value: null },
     ])
 
     const dispatch = useDispatch();
@@ -41,6 +64,7 @@ const Projects = () => {
 
         dispatch(APITransport(projectObj));
     }
+    console.log(ProjectDetails, "test");
 
     useEffect(() => {
         getProjectDetails();
@@ -66,6 +90,10 @@ const Projects = () => {
                 name: "Unassigned Task",
                 value: ProjectDetails.unassigned_task_count
             },
+            {
+                name: "Total Labeled Task",
+                value: ProjectDetails.labeled_task_count
+            },
         ])
     }, []);
 
@@ -75,6 +103,9 @@ const Projects = () => {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const isMember = userDetails.role!==1 || ProjectDetails?.users?.some((user) => user.id === userDetails.id);
+    const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -155,6 +186,18 @@ const Projects = () => {
                         <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Task :</Typography>
                         <Typography variant="body2">{ProjectDetails.unassigned_task_count}</Typography>
                     </Grid>
+                    <Grid
+                        container
+                        alignItems="center"
+                        direction="row"
+                        justifyContent="flex-start"
+                        sx={{
+                            paddingTop: 2
+                        }}
+                    >
+                        <Typography variant="body2" fontWeight='700' pr={1}>Total Labeled Task :</Typography>
+                        <Typography variant="body2">{ProjectDetails.labeled_task_count}</Typography>
+                    </Grid>
                     {userDetails?.role !== 1 && <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
                         <Button
                             sx={{
@@ -169,28 +212,28 @@ const Projects = () => {
                             <Typography variant="body2" sx={{color : "#FFFFFF"}}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
                     </Link>}
-                    <Box >
+                    <Box>
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
-                            <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {isMember && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0}>
+                    {isMember && <TabPanel value={value} index={0}>
                         <TaskTable type="annotation"/>
-                    </TabPanel>
-                    {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <TabPanel value={value} index={1}>
+                    </TabPanel>}
+                    {isReviewer && <TabPanel value={value} index={isMember ? 1 : 0}>
                         <TaskTable type="review"/>
                     </TabPanel>}
-                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) ? 2: 1}>
+                    <TabPanel value={value} index={isMember ? isReviewer ? 2 : 1 : 1}>
                         <MembersTable dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
-                    {ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) && <TabPanel value={value} index={3}>
+                    {isReviewer && <TabPanel value={value} index={isMember ? 3 : 2}>
                         <MembersTable dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
-                    <TabPanel value={value} index={ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id)) ? 4 : 2}>
+                    <TabPanel value={value} index={isMember ? isReviewer ? 4 : 2 : 2}>
                         <ReportsTable />
                     </TabPanel>
                 </Card>

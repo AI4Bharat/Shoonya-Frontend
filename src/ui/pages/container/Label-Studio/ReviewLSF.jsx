@@ -53,10 +53,30 @@ const LabelStudioWrapper = ({
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
+  useEffect(() => {
+    localStorage.setItem("labelStudio:settings", JSON.stringify({
+      bottomSidePanel: true,
+      continuousLabeling: false,
+      enableAutoSave: false,
+      enableHotkeys: true,
+      enableLabelTooltips: true,
+      enablePanelHotkeys: true,
+      enableTooltips: false,
+      fullscreen: false,
+      imageFullSize: false,
+      selectAfterCreate: false,
+      showAnnotationsPanel: true,
+      showLabels: false,
+      showLineNumbers: false,
+      showPredictionsPanel: true,
+      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
+    }))
+  }, [])
+
   const tasksComplete = (id) => {
     if (id) {
       resetNotes();
-      navigate(`/projects/${projectId}/task/${id}`);
+      navigate(`/projects/${projectId}/review/${id}`);
     } else {
       // navigate(-1);
       resetNotes();
@@ -128,7 +148,7 @@ const LabelStudioWrapper = ({
         "annotations:menu",
         "annotations:current",
         // "annotations:add-new",
-        "annotations:delete",
+        // "annotations:delete",
         // "annotations:view-all",
         "predictions:tabs",
         "predictions:menu",
@@ -154,7 +174,8 @@ const LabelStudioWrapper = ({
         },
 
         task: {
-          annotations: annotations.filter((annotation) => !annotation.parent_annotation || annotation.id === taskData.correct_annotation),
+          // annotations: annotations.filter((annotation) => !annotation.parent_annotation).concat(annotations.filter((annotation) => annotation.id === taskData.correct_annotation)),
+          annotations: annotations.filter((annotation) => annotation.id === taskData.correct_annotation).length > 0 ? annotations.filter((annotation) => annotation.id === taskData.correct_annotation) : annotations.filter((annotation) => !annotation.parent_annotation),
           predictions: predictions,
           id: taskData.id,
           data: taskData.data,
@@ -280,6 +301,26 @@ const LabelStudioWrapper = ({
     }
   }
 
+  const setNotes = (taskData, annotations) => {
+    if (annotations && Array.isArray(annotations) && annotations.length > 0) {
+      let reviewerAnnotations = annotations.filter((annotation) => !!annotation.parent_annotation);
+      if (reviewerAnnotations.length > 0) {
+        let correctAnnotation = reviewerAnnotations.find((annotation) => annotation.id === taskData.correct_annotation);
+        if (correctAnnotation) {
+          reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
+          annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === correctAnnotation.parent_annotation)?.annotation_notes ?? "";
+        } else {
+          reviewNotesRef.current.value = reviewerAnnotations[0].review_notes ?? "";
+          annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === reviewerAnnotations[0].parent_annotation)?.annotation_notes ?? "";
+        }
+      } else {
+        let normalAnnotation = annotations.find((annotation) => !annotation.parent_annotation);
+        annotationNotesRef.current.value = normalAnnotation.annotation_notes ?? "";
+        reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
+      }
+    }
+  }
+
   // we're running an effect on component mount and rendering LSF inside rootRef node
   useEffect(() => {
     if (localStorage.getItem("rtl") === "true") {
@@ -298,6 +339,7 @@ const LabelStudioWrapper = ({
             annotations,
             predictions,
           ]);
+          setNotes(taskData, annotations);
           setLabelConfig(labelConfig.label_config);
           setTaskData(taskData.data);
           LSFRoot(
@@ -402,29 +444,25 @@ const LabelStudioWrapper = ({
                 Reject
               </Button>
             </Tooltip>
-            {localStorage.getItem("labelAll") !== "true" ? (
-              <Tooltip title="Accept Annotation">
-                <Button
-                  value="Accept"
-                  type="default"
-                  onClick={handleAcceptClick}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#52c41a",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                    borderLeft: "None",
-                  }}
-                  className="lsf-button"
-                >
-                  Accept
-                </Button>
-              </Tooltip>
-            ) : (
-              <div style={{ minWidth: "160px" }} />
-            )}
+            <Tooltip title="Accept Annotation">
+              <Button
+                value="Accept"
+                type="default"
+                onClick={handleAcceptClick}
+                style={{
+                  minWidth: "160px",
+                  border: "1px solid #e6e6e6",
+                  color: "#52c41a",
+                  pt: 3,
+                  pb: 3,
+                  borderBottom: "None",
+                  borderLeft: "None",
+                }}
+                className="lsf-button"
+              >
+                Accept
+              </Button>
+            </Tooltip>
           </div>
         </div>
       )}
@@ -451,14 +489,15 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
-  useEffect(() => {
-    fetchAnnotation(taskId).then((data) => {
-      if (data && Array.isArray(data) && data.length > 0) {
-        annotationNotesRef.current.value = data[0].annotation_notes ?? "";
-        reviewNotesRef.current.value = data[0].review_notes ?? "";
-      }
-    });
-  }, [taskId]);
+  // useEffect(() => {
+  //   fetchAnnotation(taskId).then((data) => {
+  //     if (data && Array.isArray(data) && data.length > 0) {
+  //       let correctAnnotation = data.find((item) => item.status === "correct");
+  //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
+  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
+  //     }
+  //   });
+  // }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);

@@ -30,8 +30,7 @@ const tableTheme = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          maxHeight: "25%",
-          maxWidth: "95px",
+          maxHeight: "30%",
         },
       },
     },

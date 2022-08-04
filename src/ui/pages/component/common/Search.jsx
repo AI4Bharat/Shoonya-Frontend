@@ -12,13 +12,17 @@ const Search = (props) => {
   const dispatch = useDispatch();
   
   const SearchProject = useSelector((state) => state.SearchProjectCards.data);
-  const [searchValue, setSearchValue] = useState(SearchProject);
+  const [searchValue, setSearchValue] = useState("");
 
-  
 
   useEffect(() => {
     if (ref) ref.current.focus();
   }, [ref]);
+
+  useEffect(() => {
+   
+    dispatch(SearchProjectCards(""));
+}, [])
 
   const handleChangeName = (value) => {
     setSearchValue(value);
