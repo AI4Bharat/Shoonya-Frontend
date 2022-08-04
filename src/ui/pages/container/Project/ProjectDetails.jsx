@@ -52,6 +52,7 @@ const Projects = () => {
         { name: "Project Type", value: null },
         { name: "Status", value: null },
         { name: "Unassigned Task", value: null },
+        { name: "Total Labeled Task", value: null },
     ])
 
     const dispatch = useDispatch();
@@ -88,6 +89,10 @@ const Projects = () => {
             {
                 name: "Unassigned Task",
                 value: ProjectDetails.unassigned_task_count
+            },
+            {
+                name: "Total Labeled Task",
+                value: ProjectDetails.labeled_task_count
             },
         ])
     }, []);
@@ -180,6 +185,18 @@ const Projects = () => {
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Task :</Typography>
                         <Typography variant="body2">{ProjectDetails.unassigned_task_count}</Typography>
+                    </Grid>
+                    <Grid
+                        container
+                        alignItems="center"
+                        direction="row"
+                        justifyContent="flex-start"
+                        sx={{
+                            paddingTop: 2
+                        }}
+                    >
+                        <Typography variant="body2" fontWeight='700' pr={1}>Total Labeled Task :</Typography>
+                        <Typography variant="body2">{ProjectDetails.labeled_task_count}</Typography>
                     </Grid>
                     {userDetails?.role !== 1 && <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
                         <Button

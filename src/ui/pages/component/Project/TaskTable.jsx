@@ -255,12 +255,21 @@ const TaskTable = (props) => {
         console.log("columns", newCols)
     }, [selectedColumns]);
 
+useEffect(() => {
+    if ( ProjectDetails) {
+    if (props.type === "review" && ProjectDetails.labeled_task_count === 0)
+    setPullDisabled("No more unassigned tasks in this project")
+else if (pullDisabled === "No more unassigned tasks in this project")
+    setPullDisabled("")
+}}, [ProjectDetails.labeled_task_count])
+
     useEffect(() => {
-        if (ProjectDetails) {
-            if (ProjectDetails.unassigned_task_count === 0)
+        if ( ProjectDetails) {
+            if (props.type === "annotation" && ProjectDetails.unassigned_task_count === 0)
                 setPullDisabled("No more unassigned tasks in this project")
             else if (pullDisabled === "No more unassigned tasks in this project")
                 setPullDisabled("")
+                
             ProjectDetails.frozen_users?.forEach((user) => {
                 if (user.id === userDetails?.id) 
                     setPullDisabled("You're no more a part of this project");
