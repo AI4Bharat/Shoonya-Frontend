@@ -24,6 +24,7 @@ import Logo from "../../../../assets/logo.svg";
 import AppInfo from "./AppInfo";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 
+
 const Login = () => {
   const classes = LoginStyle();
   const [credentials, setCredentials] = useState({
@@ -167,6 +168,11 @@ const Login = () => {
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <Button fullWidth onClick={createToken} label={"Login"} />
+        </Grid>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} textAlign={"right"}>
+          <Link onClick={() => navigate("/confirm-forget-Password")}>
+           confirm-forget-Password
+          </Link>
         </Grid>
       </Grid>
     </CustomCard>
