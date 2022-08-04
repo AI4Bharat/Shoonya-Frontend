@@ -44,6 +44,7 @@ const TaskTable = (props) => {
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+    console.log(ProjectDetails,"ProjectDetails")
     const filterData = {
         Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
@@ -255,9 +256,15 @@ const TaskTable = (props) => {
         console.log("columns", newCols)
     }, [selectedColumns]);
 
+
+
     useEffect(() => {
-        if (ProjectDetails) {
-            if (ProjectDetails.unassigned_task_count === 0)
+        if ( ProjectDetails) {
+            if (props.type === "annotation" && ProjectDetails.unassigned_task_count === 0)
+                setPullDisabled("No more unassigned tasks in this project")
+            else if (pullDisabled === "No more unassigned tasks in this project")
+                setPullDisabled("")
+                if (props.type === "review" && ProjectDetails.labeled_task_count === 0)
                 setPullDisabled("No more unassigned tasks in this project")
             else if (pullDisabled === "No more unassigned tasks in this project")
                 setPullDisabled("")
