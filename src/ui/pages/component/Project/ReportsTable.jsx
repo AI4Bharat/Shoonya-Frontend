@@ -27,6 +27,7 @@ const ReportsTable = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState([]);
+    const [reportRequested, setReportRequested] = useState(false);
     const [columns, setColumns] = useState([]);
 
     const { id } = useParams();
@@ -35,7 +36,7 @@ const ReportsTable = () => {
     const classes = DatasetStyle();
 
     useEffect(() => {
-        if (ProjectReport?.length > 0) {
+        if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
             let selected = [];
             Object.keys(ProjectReport[0]).forEach((key) => {
@@ -92,10 +93,10 @@ const ReportsTable = () => {
         const { selection } = ranges;
         if (selection.endDate > new Date()) selection.endDate = new Date();
         setSelectRange([selection]);
-        console.log(selection, "selection"); 
     };
 
     const handleSubmit = () => {
+        setReportRequested(true);
         const projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
         dispatch(APITransport(projectObj));
         setShowPicker(false)
@@ -157,7 +158,7 @@ const ReportsTable = () => {
                 </Card>
             </Box>}
             {
-                showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : (
+                showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
                      <MUIDataTable
                         title={""}
                         data={ProjectReport}

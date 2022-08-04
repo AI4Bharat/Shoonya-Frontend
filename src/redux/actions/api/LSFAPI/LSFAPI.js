@@ -137,8 +137,9 @@ const getNextProject = async (projectID, taskID, mode="annotation") => {
   try {
     let labellingMode = localStorage.getItem("labellingMode");
     let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
-    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${labellingMode ? `&task_status=${labellingMode}` : ""}${mode === "review" ? `&mode=review` : ""}`;
+    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${mode === "review" ? `&mode=review` : ""}`;
     if (localStorage.getItem("labelAll")) {
+      requestUrl += labellingMode ? `&task_status=${labellingMode}` : ""
       Object.keys(searchFilters)?.forEach(key => {
         requestUrl += `&${key}=${this.searchFilters[key]}`;
       });

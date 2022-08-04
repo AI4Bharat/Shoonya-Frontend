@@ -40,7 +40,7 @@ const OrganizationReports = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [reportRequested, setReportRequested] = useState(false);
   
   const classes = DatasetStyle();
   const { orgId } = useParams();
@@ -70,7 +70,7 @@ const OrganizationReports = () => {
   }, [ProjectTypes]);
 
   useEffect(() => {
-    if (UserReports?.length) {
+    if (reportRequested && UserReports?.length) {
       let tempColumns = [];
       let tempSelected = [];
       Object.keys(UserReports[0]).forEach((key) => {
@@ -97,7 +97,7 @@ const OrganizationReports = () => {
   }, [UserReports]);
 
   useEffect(() => {
-    if (ProjectReports?.length) {
+    if (reportRequested && ProjectReports?.length) {
       let tempColumns = [];
       let tempSelected = [];
       Object.keys(ProjectReports[0]).forEach((key) => {
@@ -156,7 +156,7 @@ const options = {
   };
 
   const handleSubmit = () => {
-    setSubmitted(true);
+    setReportRequested(true);
     setShowSpinner(true);
     setShowPicker(false);
     setColumns([]);
@@ -295,7 +295,7 @@ const options = {
               />
           </Card>
       </Box>}
-      {reportData?.length > 0 ? 
+      { showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={""}
@@ -303,7 +303,9 @@ const options = {
             columns={columns.filter((col) => selectedColumns.includes(col.name))}
             options={options}
           />
-        </ThemeProvider> : <Grid
+        </ThemeProvider>)
+      }
+       {/*<Grid
           container
           justifyContent="center"
         >
@@ -312,8 +314,7 @@ const options = {
               !reportData?.length && submitted && <>No results</>
             )}
           </Grid>
-        </Grid>
-      }
+        </Grid> */}
     </React.Fragment>
   );
 };
