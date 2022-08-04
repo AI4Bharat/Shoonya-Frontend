@@ -1,4 +1,4 @@
-name: Deploy React App
+name: Build React App
 
 on:
   push:
@@ -11,25 +11,25 @@ on:
 env: 
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
+  REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_STAGE }}
 
 jobs:
-  build-stage:
-    uses: ./.github/workflows/build-stage.yaml
-    secrets: inherit
-  release-stage:
-    name: Deploy React App
-    needs: [build-stage]
+  cicd:
+    name: CICD_STAGE
     runs-on: ubuntu-latest
     
     steps:
-    - name: Download artifacts from build pipeline
-      uses: actions/download-artifact@v3
-      with:
-        name: production-files-stage
-        path: ./build
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v2
 
-    - name: Display structure of downloaded files
-      run: ls -R
+    - name: Install NPM packages
+      run: npm install --legacy-peer-deps
+    
+    - name: Build project
+      run: npm run build
 
     - name: Azure login
       uses: azure/login@v1

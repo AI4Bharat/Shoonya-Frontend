@@ -2,11 +2,11 @@ name: Build React App
 
 on:
   push:
-    branches: [demo]
+    branches: [master]
   workflow_dispatch:
   workflow_call:
   pull_request:
-    branches: [demo]
+    branches: [master]
 
 env: 
   CI: false
@@ -15,7 +15,7 @@ env:
 
 jobs:
   cicd:
-    name: CICD
+    name: CICD_DEMO
     runs-on: ubuntu-latest
     
     steps:
