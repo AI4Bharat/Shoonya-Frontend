@@ -1,4 +1,4 @@
-name: Deploy React App
+name: Build and Release React App for Stage
 
 on:
   push:
@@ -11,36 +11,38 @@ on:
 env: 
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
+  REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_STAGE }}
+  AZURE_CREDS: ${{ secrets.SHOONYA_AZURE_CREDS }}
+  AZURE_STORAGEKEY: ${{ secrets.SHOONYA_AZURE_STORAGEKEY_STAGE }}
 
 jobs:
-  build-stage:
-    uses: ./.github/workflows/build-stage.yaml
-    secrets: inherit
-  release-stage:
-    name: Deploy React App
-    needs: [build-stage]
+  cicd:
+    name: CICD_STAGE
     runs-on: ubuntu-latest
     
     steps:
-    - name: Download artifacts from build pipeline
-      uses: actions/download-artifact@v3
-      with:
-        name: production-files-stage
-        path: ./build
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v2
 
-    - name: Display structure of downloaded files
-      run: ls -R
+    - name: Install NPM packages
+      run: npm install --legacy-peer-deps
+    
+    - name: Build project
+      run: npm run build
 
     - name: Azure login
       uses: azure/login@v1
       with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ env.AZURE_CREDS }}
 
     - name: Upload to blob storage
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name shoonyastoragestage --account-key ${{ secrets.AZURE_STORAGE_KEY_STAGE }} -d '$web' -s ./build --overwrite
+            az storage blob upload-batch --account-name shoonyastoragestage --account-key ${{ env.AZURE_STORAGEKEY }} -d '$web' -s ./build --overwrite
 
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
