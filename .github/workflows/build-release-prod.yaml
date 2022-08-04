@@ -42,11 +42,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-<<<<<<< HEAD:.github/workflows/release-prod.yaml
-            az storage blob upload-batch --account-name shoonyastorageprod --account-key ${{ secrets.AZURE_STORAGE_KEY_PROD }} -d '$web' -s ./build --overwrite
-=======
             az storage blob upload-batch --account-name shoonyastorageprod --account-key ${{ env.AZURE_STORAGEKEY }} -d '$web' -s ./build --overwrite
->>>>>>> develop:.github/workflows/build-release-prod.yaml
 
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
