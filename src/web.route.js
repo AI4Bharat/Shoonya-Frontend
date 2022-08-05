@@ -123,7 +123,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/confirm-forget-Password" element={<ConfirmForgetPassword />} />
+        <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
         <Route
           path="/profile"
           element={ProtectedRouteWrapper(<Layout component={<UserProfilePage />} />)}
