@@ -52,6 +52,9 @@ import GetFileTypes from './Dataset/GetFileTypes';
 import ChangePassword from './UserManagement/ChangePassword'
 import fetchUserById from './UserManagement/FetchUserById';
 import setTaskFilter from './Tasks/SetTaskFilter';
+import DownloadJSONProject from './ProjectDetails/DownloadJSONProject';
+import forgotPassword from './UserManagement/ForgotPassword';
+import confirmForgetPassword from "./UserManagement/ConfirmForgetPassword";
 import DownloadJSONProject from './ProjectDetails/DownloadJSONProject'
 import SignUp from './UserManagement/SignUp'
 
@@ -114,6 +117,8 @@ const index = {
     fetchUserById,
     setTaskFilter,
     DownloadJSONProject,
+    forgotPassword,
+    confirmForgetPassword,
     SignUp,
 };
 

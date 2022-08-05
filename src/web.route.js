@@ -32,6 +32,7 @@ import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
 import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
+import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
 
 
@@ -124,6 +125,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
         <Route path="/invite/:inviteCode" element={<SignUp />} />
         <Route
           path="/profile"
