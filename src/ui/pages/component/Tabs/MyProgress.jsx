@@ -103,6 +103,7 @@ const MyProgress = () => {
       setSelectedWorkspaces(workspacesList.map(item => item.id))
       setSelectedType("ContextualTranslationEditing")
       // console.log("wid--->>", Workspaces.results[0]);
+      // console.log("here");
     }
   }, [UserDetails, Workspaces]);
 

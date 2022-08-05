@@ -1,6 +1,6 @@
 import { TextField } from "@mui/material";
 
-const OutlinedTextField = ({...rest }) => (
+const OutlinedTextField = (rest) => (
   <TextField
  
     {...rest}

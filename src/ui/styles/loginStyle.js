@@ -80,7 +80,27 @@ const LoginStyle = makeStyles({
          
          
         },
-      }
+      },
+      link: {
+        cursor: "pointer",
+        width: "100%",
+        color: "#2C2799",
+        float: "right",
+        fontSize: "0.875rem",
+        fontFamily: '"lato" ,sans-serif',
+        fontWeight: "600",
+      },
+      Typo: {
+        marginRight: "6px",
+      },
+      createLogin: {
+        marginTop: "2%",
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        width: "100%",
+      },
      
 })
 

@@ -33,6 +33,8 @@ import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewD
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
 import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
 import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
+import SignUp from "./ui/pages/container/UserManagement/SignUp";
+
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -124,6 +126,7 @@ const App = () => {
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
+        <Route path="/invite/:inviteCode" element={<SignUp />} />
         <Route
           path="/profile"
           element={ProtectedRouteWrapper(<Layout component={<UserProfilePage />} />)}
@@ -217,6 +220,8 @@ const App = () => {
             <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
           )}
         />
+        
+         
       </Routes>
     </HashRouter>
   );

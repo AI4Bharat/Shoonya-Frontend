@@ -55,6 +55,8 @@ import setTaskFilter from './Tasks/SetTaskFilter';
 import DownloadJSONProject from './ProjectDetails/DownloadJSONProject';
 import forgotPassword from './UserManagement/ForgotPassword';
 import confirmForgetPassword from "./UserManagement/ConfirmForgetPassword";
+import DownloadJSONProject from './ProjectDetails/DownloadJSONProject'
+import SignUp from './UserManagement/SignUp'
 
 const index = {
     apiStatus,
@@ -117,6 +119,7 @@ const index = {
     DownloadJSONProject,
     forgotPassword,
     confirmForgetPassword,
+    SignUp,
 };
 
 export default index;
