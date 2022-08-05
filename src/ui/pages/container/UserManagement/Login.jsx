@@ -169,11 +169,6 @@ const Login = () => {
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <Button fullWidth onClick={createToken} label={"Login"} />
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} textAlign={"right"}>
-          <Link onClick={() => navigate("/forget-password/confirm/:key/:token")}>
-           confirm-forget-Password
-          </Link>
-        </Grid>
       </Grid>
     </CustomCard>
   );

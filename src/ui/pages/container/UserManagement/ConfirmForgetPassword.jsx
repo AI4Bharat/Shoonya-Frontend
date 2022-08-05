@@ -14,10 +14,12 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import { useNavigate } from "react-router-dom";
 
 const ConfirmForgetPassword = () => {
     const classes = LoginStyle();
     const { key, token } = useParams();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [values, setValues] = useState({
@@ -66,15 +68,16 @@ const ConfirmForgetPassword = () => {
                 setSnackbarInfo({
                     ...snackbar,
                     open: true,
-                    message: "Email has been sent with a new password.",
+                    message: "success",
                     variant: 'success'
                 })
+                navigate(`/`)
             }
             else {
                 setSnackbarInfo({
                     ...snackbar,
                     open: true,
-                    message: "Invalid email",
+                    message: "Invalid password / user id or user doesn't exis ",
                     variant: 'error'
                 })
 
@@ -98,6 +101,10 @@ const ConfirmForgetPassword = () => {
         }
         else {
             handleSubmit()
+            setValues({
+                password: "",
+                confirmPassword: "",
+            })
             setLoading(true);
         }
 

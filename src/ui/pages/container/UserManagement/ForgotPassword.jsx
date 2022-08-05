@@ -19,10 +19,10 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState({
     email: "",
-});
+  });
   const [error, setError] = useState({
     email: false,
-});
+  });
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -32,10 +32,10 @@ const ForgotPassword = () => {
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
     setError({ ...error, [prop]: false });
-};
-const ForgotPassword = {
-  email:values.email
-}
+  };
+  const ForgotPassword = {
+    email: values.email
+  }
   const handleSubmit = () => {
     let obj = new ForgotPasswordAPI(ForgotPassword)
     fetch(obj.apiEndPoint(), {
@@ -43,8 +43,8 @@ const ForgotPassword = {
       headers: obj.getHeaders().headers,
       body: JSON.stringify(obj.getBody())
     })
-      .then( (response) => {
-      
+      .then((response) => {
+
         setLoading(false)
         if (response.status === 204) {
           setSnackbarInfo({
@@ -58,43 +58,43 @@ const ForgotPassword = {
           setSnackbarInfo({
             ...snackbar,
             open: true,
-            message: "error",
+            message: "Invalid email",
             variant: 'error'
           })
-         
+
         }
-       
+
       })
       .catch(error => {
         setLoading(false)
-       
+
       })
-     
-    
+
+
   }
   const ValidateEmail = (mail) => {
     if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail)) {
-        return (true)
+      return (true)
     }
     else {
-        return false;
+      return false;
     }
-}
-const handleforgotPassword = () => {
-  if (!ValidateEmail(values.email)) {
-      setError({ ...error, email: true })
   }
-  else {
+  const handleforgotPassword = () => {
+    if (!ValidateEmail(values.email)) {
+      setError({ ...error, email: true })
+    }
+    else {
       handleSubmit()
       setValues({
         email: "",
       })
       setLoading(true);
-      
+
+    }
+
+
   }
-
-
-}
 
   const renderSnackBar = () => {
     return (
