@@ -45,6 +45,7 @@ function TabPanel(props) {
 
 const Projects = () => {
     // console.log("props", props)
+    // console.log("props", props)
     const { id } = useParams();
     const [projectData, setProjectData] = useState([
         { name: "Project ID", value: null },
