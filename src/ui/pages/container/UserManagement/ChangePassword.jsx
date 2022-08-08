@@ -79,8 +79,40 @@ const handleMouseDownPassword = (event) => {
       current_password: currentPassword,
 
     }
-    const projectObj = new ChangePasswordAPI(ChangePassword);
-    dispatch(APITransport(projectObj));
+    let apiObj = new ChangePasswordAPI(ChangePassword)
+
+    fetch(apiObj.apiEndPoint(), {
+        method: 'POST',
+        body: JSON.stringify(apiObj.getBody()),
+        headers: apiObj.getHeaders().headers
+    }).then((response) => {
+
+        setLoading(false)
+        if (response.status === 204) {
+            setSnackbarInfo({
+                ...snackbar,
+                open: true,
+                message: "success",
+                variant: 'success'
+            })
+           
+        }
+        else {
+            setSnackbarInfo({
+                ...snackbar,
+                open: true,
+                message: "Invalid password  ",
+                variant: 'error'
+            })
+
+        }
+
+    })
+        .catch(error => {
+            setLoading(false)
+
+        })
+
   }
 
 
