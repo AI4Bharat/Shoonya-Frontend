@@ -57,7 +57,7 @@ const DatasetDetails = () => {
                         }}
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Instance ID :</Typography>
-                        <Typography variant="caption">{DatasetDetails.instance_id}</Typography>
+                        <Typography variant="body2" >{DatasetDetails.instance_id}</Typography>
                     </Grid>
                     <Grid
                         container
@@ -69,19 +69,19 @@ const DatasetDetails = () => {
                         }}
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Dataset Type :</Typography>
-                        <Typography variant="caption">{DatasetDetails.dataset_type}</Typography>
+                        <Typography variant="body2" >{DatasetDetails.dataset_type}</Typography>
                     </Grid>
                     {DatasetDetails.instance_description && <Grid
                         container
                         alignItems="center"
                         direction="row"
                         justifyContent="flex-start"
-                        sx={{
-                            paddingTop: 2
-                        }}
+                        // sx={{
+                        //     paddingTop: 2
+                        // }}
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Description :</Typography>
-                        <Typography variant="caption">{DatasetDetails.instance_description}</Typography>
+                        <Typography variant="body2" >{DatasetDetails.instance_description}</Typography>
                     </Grid>}
                     <Box >
                         <Tabs value={selectedTab} onChange={(_event,value)=>setSelectedTab(value)} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>

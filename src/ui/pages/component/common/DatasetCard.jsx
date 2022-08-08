@@ -20,7 +20,7 @@ const DatasetCard = (props) => {
             >
                 <Typography
                     variant="h5"
-                    sx={{ mt: 4, textAlign: "center", color: "secondary.contrastText", backgroundColor: "primary.contrastText", borderRadius: 3, pt: 1, pb: 1 }}
+                    sx={{ mt: 4, textAlign: "center", color: "secondary.contrastText", backgroundColor: "primary.contrastText", borderRadius: 3, pt: 1, pb: 1, fontSize:"1.125rem"}}
                 >{datasetObj.instance_name}
                 </Typography>
                 <Grid
