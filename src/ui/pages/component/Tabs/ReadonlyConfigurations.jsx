@@ -74,7 +74,7 @@ const ReadonlyConfigurations = (props) => {
 							</Typography>
 						</Grid>
 
-						{ProjectDetails.datasets.map((dataset) => (
+						{/* {ProjectDetails.datasets.map((dataset) => (
 							<Grid
 								item
 								xs={12}
@@ -98,7 +98,7 @@ const ReadonlyConfigurations = (props) => {
 									{dataset?.instance_name}
 								</Typography>
 							</Grid>
-						))}
+						))} */}
 
 						{ProjectDetails.filter_string && (
 							<Grid
