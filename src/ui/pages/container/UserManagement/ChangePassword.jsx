@@ -3,6 +3,7 @@ import {
   Grid,
   ThemeProvider,
   Typography,
+  InputAdornment,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
@@ -15,7 +16,12 @@ import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import ChangePasswordAPI from "../../../../redux/actions/api/UserManagement/ChangePassword"
 import Spinner from "../../component/common/Spinner";
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import IconButton from "@material-ui/core/IconButton";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+
 
 const ChangePassword = (props) => {
   const navigate = useNavigate();
@@ -27,6 +33,10 @@ const ChangePassword = (props) => {
   const [values, setValues] = useState({
     password: "",
     showPassword: false,
+  });
+  const [newvalues, setNewValues] = useState({
+    newpassword: "",
+    showNewPassword: false,
   });
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -48,6 +58,17 @@ const ChangePassword = (props) => {
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading])
+
+  const handleClickShowPassword = () => {
+    setValues({ ...values, showPassword: !values.showPassword });
+};
+const handleClickShowNewPassword = () => {
+  setNewValues({ ...newvalues, showNewPassword: !newvalues.showNewPassword });
+};
+
+const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+};
 
  
   const handleChangePassword = () => {
@@ -110,10 +131,22 @@ const ChangePassword = (props) => {
                 <OutlinedTextField
                   fullWidth
                   placeholder={translate("newPassword")}
-                  type={values.showPassword ? "text" : "password"}
+                  type={newvalues.showNewPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                
+                 InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowNewPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {newvalues.showNewPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
                 />
               </Grid>
             </Grid>
@@ -139,6 +172,20 @@ const ChangePassword = (props) => {
                 type={values.showPassword ? "text" : "password"}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {values.showPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
+                
               />
             </Grid>
             <Grid
