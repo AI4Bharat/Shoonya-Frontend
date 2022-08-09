@@ -20,7 +20,6 @@ const MyProfile = () => {
   const [enableVerifyEmail, setEnableVerifyEmail] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
-  const [availabilityStatus, setAvailabilityStatus] = useState("");
 
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   console.log(userDetails,"userDetails")
