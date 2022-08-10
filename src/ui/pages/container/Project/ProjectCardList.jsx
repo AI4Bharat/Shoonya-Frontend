@@ -1,34 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
+import GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from "../../component/common/Button";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
-import GetDatasetsAPI from "../../../../redux/actions/api/Dataset/GetDatasetList";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
+import Spinner from "../../component/common/Spinner";
 
-const DatasetList = (props) => {
-
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { id } = useParams();
-
-    const datasetList = useSelector(state=>state.getDatasetList.data);
-    console.log(datasetList,"datasetList")
-    const getDashboardprojectData = () => {
-
-        const projectObj = new GetDatasetsAPI();
-        dispatch(APITransport(projectObj));
-       
-    }
+const ProjectCardList = (props) => {
+const{projectData}= props
+    
+    const [loading, setLoading] = useState(false);
+    const apiLoading = useSelector(state => state.apiStatus.loading);
+    //  const projectData = useSelector(state => state.getProjects.data);
+    // const getDashboardprojectData = () => {
+    //      setLoading(true);
+    //     const projectObj = new GetProjectsAPI();
+    //     dispatch(APITransport(projectObj));
+    // }
 
 
+    // useEffect(() => {
+    //     getDashboardprojectData();
+
+    // }, []);
     useEffect(() => {
-        getDashboardprojectData();
-
-    }, []);
-
+        setLoading(false);
+    }, [projectData])
     
     const columns = [
         {
@@ -59,7 +61,15 @@ const DatasetList = (props) => {
                 sort: false,
             }
         },
-       
+        {
+            name: "Project_mode",
+            label: "Project mode",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center"
+            }
+        },
         {
             name: "Action",
             label: "Action",
@@ -74,19 +84,22 @@ const DatasetList = (props) => {
 
 
 
-    const data = datasetList && datasetList.length > 0 ? datasetList.map((el, i) => {
+    const data = projectData && projectData.length > 0 ? projectData.map((el, i) => {
         return [
-            el.instance_id,
-            el.instance_name,
-            el.dataset_type,
+            el.id,
+            el.title,
+            el.project_type,
+            el.project_mode,
             <Link to={`/projects/${el.id}`} style={{ textDecoration: "none" }}>
             <CustomButton
                 sx={{ borderRadius: 2, marginRight: 2 }}
                 label="View"
             />
        </Link>
+       
         ]
-    }) : [];
+    }) 
+    : [];
 
     const options = {
         textLabels: {
@@ -119,8 +132,6 @@ const DatasetList = (props) => {
     return (
         <div>
             <ThemeProvider theme={tableTheme}>
-                
-
                 <MUIDataTable
                     title={""}
                     data={data}
@@ -134,4 +145,4 @@ const DatasetList = (props) => {
     )
 }
 
-export default DatasetList;
+export default ProjectCardList;
