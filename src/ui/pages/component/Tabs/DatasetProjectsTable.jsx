@@ -1,13 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import CustomButton from "../common/Button";
+import CustomizedSnackbars from "../../component/common/Snackbar"
+import Spinner from "../../component/common/Spinner";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetDatasetProjects from "../../../../redux/actions/api/Dataset/GetDatasetProjects";
+import GetExportProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetExportProject';
 import MUIDataTable from "mui-datatables";
 
-import { ThemeProvider } from "@mui/material";
+import { Grid, Stack, ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 
 const columns = [
@@ -57,8 +60,8 @@ const columns = [
 		},
 	},
 	{
-		name: "link",
-		label: "Link",
+		name: "actions",
+		label: "Actions",
 		options: {
 			sort: false,
 			filter: false,
@@ -80,21 +83,71 @@ const options = {
 
 export default function DatasetProjectsTable({ datasetId }) {
 	const dispatch = useDispatch();
+	const [snackbar, setSnackbarInfo] = useState({
+		open: false,
+		message: "",
+		variant: "success",
+	});	
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		dispatch(APITransport(new GetDatasetProjects(datasetId)));
 	}, [dispatch, datasetId]);
 
+	const getExportProjectButton = async (projectId) => {
+		setLoading(true);
+		const projectObj = new GetExportProjectButtonAPI(projectId);
+		dispatch(APITransport(projectObj));
+		const res = await fetch(projectObj.apiEndPoint(), {
+				method: "POST",
+				body: JSON.stringify(projectObj.getBody()),
+				headers: projectObj.getHeaders().headers,
+		});
+		const resp = await res.json();
+		setLoading(false);
+		if (res.ok) {
+				setSnackbarInfo({
+						open: true,
+						message: resp?.message,
+						variant: "success",
+				})
+
+		} else {
+				setSnackbarInfo({
+						open: true,
+						message: resp?.message,
+						variant: "error",
+				})
+		}
+	}
+
+	const renderSnackBar = () => {
+		return (
+				<CustomizedSnackbars
+						open={snackbar.open}
+						handleClose={() =>
+								setSnackbarInfo({ open: false, message: "", variant: "" })
+						}
+						anchorOrigin={{ vertical: "top", horizontal: "right" }}
+						variant={snackbar.variant}
+						message={snackbar.message}
+				/>
+		);
+	};
+
 	const datasetProjects = useSelector((state) =>
 		state.getDatasetProjects.data.map((project) => ({
 			...project,
-			link: () => (
-				<Link
-					to={`/projects/${project.id}`}
-					style={{ textDecoration: "none" }}
-				>
-					<CustomButton sx={{ borderRadius: 2 }} label="View" />
-				</Link>
+			actions: () => (
+				<Stack direction="row" spacing={2}>
+					<Link
+						to={`/projects/${project.id}`}
+						style={{ textDecoration: "none" }}
+					>
+						<CustomButton sx={{ borderRadius: 2 }} label="View" />
+					</Link>
+					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getExportProjectButton(project.id)} label="Export" />
+				</Stack>
 			),
 		}))
 	);
@@ -102,6 +155,10 @@ export default function DatasetProjectsTable({ datasetId }) {
 	return (
 		<>
 			<ThemeProvider theme={tableTheme}>
+				{loading && <Spinner />}
+				<Grid>
+						{renderSnackBar()}
+				</Grid>
 				<MUIDataTable
 					columns={columns}
 					options={options}

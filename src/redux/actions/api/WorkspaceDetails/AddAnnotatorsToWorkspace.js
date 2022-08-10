@@ -8,11 +8,11 @@ import constants from "../../../constants";
 export default class AddAnnotatorsToWorkspaceAPI extends API {
   constructor(workspaceId, userEmails, timeout = 2000) {
     super("POST", timeout, false);
-    this.type = constants.ADD_ANNOTATORS_TO_WORKSPACE;
+    this.type = constants.ADD_MEMBERS_TO_WORKSPACE;
     this.emails = userEmails;
     this.endpoint = `${super.apiEndPointAuto()}${
       ENDPOINTS.getWorkspaces
-    }${workspaceId}/addannotators/`;
+    }${workspaceId}/addmembers/`;
   }
 
   processResponse(res) {
