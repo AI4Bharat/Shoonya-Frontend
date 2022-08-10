@@ -252,7 +252,7 @@ const TaskTable = (props) => {
             return col;
         });
         setColumns(newCols);
-        console.log("columns", newCols)
+        console.log("columnss", newCols)
     }, [selectedColumns]);
 
 useEffect(() => {
