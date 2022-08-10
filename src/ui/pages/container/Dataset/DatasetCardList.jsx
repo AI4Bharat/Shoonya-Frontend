@@ -5,7 +5,7 @@ import CustomButton from "../../component/common/Button";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 
-const DatasetList = (props) => {
+const DatasetCardList = (props) => {
     const { datasetList } = props
 
    const columns = [
@@ -110,4 +110,4 @@ const DatasetList = (props) => {
     )
 }
 
-export default DatasetList;
+export default DatasetCardList;
