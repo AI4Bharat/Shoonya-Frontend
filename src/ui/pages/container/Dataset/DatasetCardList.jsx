@@ -1,45 +1,113 @@
+import React, { useState} from "react";
+import { Link } from 'react-router-dom';
+import MUIDataTable from "mui-datatables";
+import CustomButton from "../../component/common/Button";
+import { ThemeProvider } from "@mui/material";
+import tableTheme from "../../../theme/tableTheme";
 
-import { useState } from 'react'
-import {Radio,Box} from '@mui/material';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import DatasetList from "../Dataset/DatasetList";
-import DatasetCard from "../Dataset/DatasetCard";
+const DatasetList = (props) => {
+    const { datasetList } = props
+
+   const columns = [
+        {
+            name: "Project_id",
+            label: "Project Id",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center"
+            }
+        },
+        {
+            name: "Project_Title",
+            label: "Project Title",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center"
+            }
+        },
 
 
-export default function DatasetCardList() {
-    const [radiobutton, setRadiobutton] = useState(true)
-   
-    
-   const  handleProjectlist =()=>{
-    setRadiobutton(true)
-    
-   }
-    const handleProjectcard = () =>{
-        setRadiobutton(false)
-    }
-  return (
-    <>
-    <FormControl>
-    
-      <RadioGroup
-        row
-        aria-labelledby="demo-row-radio-buttons-group-label"
-        name="row-radio-buttons-group"
-        defaultValue="DatasetList"
-      >
-        <FormControlLabel value = "DatasetList" control={<Radio />} label="DatasetList" onClick={handleProjectlist} />
-        <FormControlLabel value = "DatasetCard" control={<Radio />} label="DatasetCard" onClick={handleProjectcard} />
-       
-      </RadioGroup>
-    </FormControl>
-    <Box >
-              
-                 <Box sx={{ p: 1 }}>
-                 {radiobutton ? <DatasetList /> : <DatasetCard />}    
-               </Box>
-            </Box>
-            </>
-  );
+        {
+            name: "project_Type",
+            label: "project Type",
+            options: {
+                filter: false,
+                sort: false,
+            }
+        },
+
+        {
+            name: "Action",
+            label: "Action",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center"
+            }
+        },
+
+    ];
+
+
+
+    const data = datasetList && datasetList.length > 0 ? datasetList.map((el, i) => {
+        return [
+            el.instance_id,
+            el.instance_name,
+            el.dataset_type,
+            <Link to={`/datasets/${el.instance_id}`} style={{ textDecoration: "none" }}>
+                <CustomButton
+                    sx={{ borderRadius: 2, marginRight: 2 }}
+                    label="View"
+                />
+            </Link>
+        ]
+    }) : [];
+
+    const options = {
+        textLabels: {
+            body: {
+                noMatch: "No records",
+            },
+            toolbar: {
+                search: "Search",
+                viewColumns: "View Column",
+            },
+            pagination: { rowsPerPage: "Rows per page" },
+            options: { sortDirection: "desc" },
+        },
+        // customToolbar: fetchHeaderButton,
+        displaySelectToolbar: false,
+        fixedHeader: false,
+        filterType: "checkbox",
+        download: false,
+        print: false,
+        rowsPerPageOptions: [10, 25, 50, 100],
+        // rowsPerPage: PageInfo.count,
+        filter: false,
+        // page: PageInfo.page,
+        viewColumns: false,
+        selectableRows: "none",
+        search: false,
+        jumpToPage: true,
+    };
+
+    return (
+        <div>
+            <ThemeProvider theme={tableTheme}>
+                <MUIDataTable
+                    title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                />
+            </ThemeProvider>
+
+        </div>
+
+    )
 }
+
+export default DatasetList;

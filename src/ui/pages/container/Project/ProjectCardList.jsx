@@ -1,37 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
-import GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from "../../component/common/Button";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
-import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
-import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
-import Spinner from "../../component/common/Spinner";
+
 
 const ProjectCardList = (props) => {
-const{projectData}= props
-    
-    const [loading, setLoading] = useState(false);
-    const apiLoading = useSelector(state => state.apiStatus.loading);
-    //  const projectData = useSelector(state => state.getProjects.data);
-    // const getDashboardprojectData = () => {
-    //      setLoading(true);
-    //     const projectObj = new GetProjectsAPI();
-    //     dispatch(APITransport(projectObj));
-    // }
+    const { projectData } = props
 
-
-    // useEffect(() => {
-    //     getDashboardprojectData();
-
-    // }, []);
-    useEffect(() => {
-        setLoading(false);
-    }, [projectData])
-    
     const columns = [
         {
             name: "Project_id",
@@ -91,15 +68,15 @@ const{projectData}= props
             el.project_type,
             el.project_mode,
             <Link to={`/projects/${el.id}`} style={{ textDecoration: "none" }}>
-            <CustomButton
-                sx={{ borderRadius: 2, marginRight: 2 }}
-                label="View"
-            />
-       </Link>
-       
+                <CustomButton
+                    sx={{ borderRadius: 2, marginRight: 2 }}
+                    label="View"
+                />
+            </Link>
+
         ]
-    }) 
-    : [];
+    })
+        : [];
 
     const options = {
         textLabels: {
