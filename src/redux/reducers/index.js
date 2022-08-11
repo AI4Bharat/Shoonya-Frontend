@@ -57,6 +57,8 @@ import forgotPassword from './UserManagement/ForgotPassword';
 import confirmForgetPassword from "./UserManagement/ConfirmForgetPassword";
 import SignUp from './UserManagement/SignUp';
 import RemoveProjectMember from './ProjectDetails/RemoveProjectMember';
+import RemoveProjectReviewer from './ProjectDetails/RemoveProjectReviewer';
+    
 
 const index = {
     apiStatus,
@@ -121,6 +123,7 @@ const index = {
     confirmForgetPassword,
     SignUp,
     RemoveProjectMember,
+    RemoveProjectReviewer,
 };
 
 export default index;

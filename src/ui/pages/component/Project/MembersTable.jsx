@@ -17,6 +17,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveProjectMemberAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectMember';
+import RemoveProjectReviewerAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer';
 
 const columns = [
     {
@@ -85,7 +86,8 @@ const MembersTable = (props) => {
         variant: "success",
       });
     const userDetails = useSelector(state=>state.fetchLoggedInUserData.data);
-
+    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+    
     useEffect(() => {
         userDetails && setUserRole(userDetails.role);
     }, [])
@@ -97,41 +99,87 @@ const MembersTable = (props) => {
     const handleUserDialogOpen = () => {
         setAddUserDialogOpen(true);
     };
-
-    const handleProjectMember = async() =>{
-        const projectObj = new RemoveProjectMemberAPI(id);
+    // const Projectdata = ProjectDetails && ProjectDetails.filter((el,i)=>{
+    //     return [
+    //                 el.email, 
+                  
+    //             ]
+    // });
+    const handleProjectMember = async(email) =>{
+        const projectObj = new RemoveProjectMemberAPI(id,{email:email});
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
-          method: "POST",
-          body: JSON.stringify(projectObj.getBody()),
-          headers: projectObj.getHeaders().headers,
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
         });
         const resp = await res.json();
         setLoading(false);
         if (res.ok) {
-          setSnackbarInfo({
-            open: true,
-            message: "success",
-            variant: "success",
-          })
-    
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+
         } else {
-          setSnackbarInfo({
-            open: true,
-            message: resp?.message,
-            variant: "error",
-          })
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
         }
+      
+    }
+    const handleProjectReviewer=async(Projectid)=>{
+      const projectReviewer={
+        id:Projectid,
+      }
+        const projectObj = new RemoveProjectReviewerAPI(id,projectReviewer);
+        dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+    }
+    const projectlist=(el)=>{
+        let temp=false;
+        ProjectDetails?.frozen_users.forEach((em)=>{
+        if(el==em.id){
+           temp=true
+        }
+      })
+         return temp;
     }
     const data =
         dataSource && dataSource.length > 0
             ? dataSource.map((el, i) => {
                 const userRole = el.role && UserMappedByRole(el.role).element;
+                
+            
+                
                 return [
                     el.username,
                     el.email,
                     userRole ? userRole : el.role,
-                    <>
+                    <> 
                     <CustomButton
                         sx={{ p: 1, borderRadius: 2 }}
                         onClick={() => {
@@ -139,24 +187,21 @@ const MembersTable = (props) => {
                         }}
                         label={"View"}
                     />
-                    {props.type === "organization" &&
-                    <CustomButton
-                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
-                                label = "Remove1"
-                            
-                            />}
+                   
                             {props.type === addUserTypes.PROJECT_MEMBER &&
                              <CustomButton
                                 sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
                                 label = "Remove"
-                                onClick={handleProjectMember}
+                                onClick={()=>handleProjectMember(el.email)}
+                                disabled={projectlist(el.id)}
                             
                             />}
                              {props.type === addUserTypes.PROJECT_REVIEWER &&
                              <CustomButton
                                 sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
-                                label = "Remove3"
-                            
+                                label = "Remove"
+                                onClick={()=>handleProjectReviewer(el.id)}
+                                disabled={projectlist(el.id)}
                             />}
                             </>
 

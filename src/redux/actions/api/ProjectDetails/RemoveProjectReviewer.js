@@ -3,18 +3,18 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from "../../../constants";
   
- export default class RemoveProjectMemberAPI extends API {
+ export default class RemoveProjectReviewerAPI extends API {
     constructor(projectId,projectObj, timeout = 2000) {
       super("POST", timeout, false);
       this.projectObj = projectObj;
-      this.type = constants.REMOVE_PROJECT_MEMBER;
-      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/remove_user/`;
+      this.type = constants.REMOVE_PROJECT_REVIEWER;
+      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/remove_reviewer/`;
     }
   
     processResponse(res) {
       super.processResponse(res);
       if (res) {
-          this.removeProjectMember = res;
+          this.removeProjectReviewer = res;
       }
   }
   
@@ -38,7 +38,7 @@
     }
   
     getPayload() {
-      return this.removeProjectMember;
+      return this.removeProjectReviewer;
     }
   }
   
