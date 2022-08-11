@@ -45,7 +45,6 @@ function TabPanel(props) {
 
 const Projects = () => {
     // console.log("props", props)
-    // console.log("props", props)
     const { id } = useParams();
     const [projectData, setProjectData] = useState([
         { name: "Project ID", value: null },
@@ -184,7 +183,7 @@ const Projects = () => {
                             paddingTop: 2
                         }}
                     >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Task :</Typography>
+                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Annotation Tasks :</Typography>
                         <Typography variant="body2">{ProjectDetails.unassigned_task_count}</Typography>
                     </Grid>
                     <Grid
@@ -196,7 +195,7 @@ const Projects = () => {
                             paddingTop: 2
                         }}
                     >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Total Labeled Task :</Typography>
+                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Review Tasks :</Typography>
                         <Typography variant="body2">{ProjectDetails.labeled_task_count}</Typography>
                     </Grid>
                     {userDetails?.role !== 1 && <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
