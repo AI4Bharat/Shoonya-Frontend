@@ -16,6 +16,7 @@ import addUserTypes from "../../../../constants/addUserTypes";
 import { useNavigate, useParams } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import RemoveProjectMemberAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectMember';
 
 const columns = [
     {
@@ -74,10 +75,15 @@ const MembersTable = (props) => {
     const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
     const { orgId, id } = useParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [userRole, setUserRole] = useState();
-
+    const [loading, setLoading] = useState(false);
     const { dataSource, hideButton } = props;
-
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
     const userDetails = useSelector(state=>state.fetchLoggedInUserData.data);
 
     useEffect(() => {
@@ -92,6 +98,31 @@ const MembersTable = (props) => {
         setAddUserDialogOpen(true);
     };
 
+    const handleProjectMember = async() =>{
+        const projectObj = new RemoveProjectMemberAPI(id);
+        dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+          method: "POST",
+          body: JSON.stringify(projectObj.getBody()),
+          headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: "success",
+            variant: "success",
+          })
+    
+        } else {
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "error",
+          })
+        }
+    }
     const data =
         dataSource && dataSource.length > 0
             ? dataSource.map((el, i) => {
@@ -100,13 +131,35 @@ const MembersTable = (props) => {
                     el.username,
                     el.email,
                     userRole ? userRole : el.role,
+                    <>
                     <CustomButton
                         sx={{ p: 1, borderRadius: 2 }}
                         onClick={() => {
                             navigate(`/profile/${el.id}`);
                         }}
                         label={"View"}
-                    />,
+                    />
+                    {props.type === "organization" &&
+                    <CustomButton
+                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
+                                label = "Remove1"
+                            
+                            />}
+                            {props.type === addUserTypes.PROJECT_MEMBER &&
+                             <CustomButton
+                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
+                                label = "Remove"
+                                onClick={handleProjectMember}
+                            
+                            />}
+                             {props.type === addUserTypes.PROJECT_REVIEWER &&
+                             <CustomButton
+                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
+                                label = "Remove3"
+                            
+                            />}
+                            </>
+
                 ];
             })
             : [];
