@@ -18,6 +18,7 @@ import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveProjectMemberAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectMember';
 import RemoveProjectReviewerAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer';
+import CustomizedSnackbars from "../../component/common/Snackbar"
 
 const columns = [
     {
@@ -235,7 +236,19 @@ const MembersTable = (props) => {
                 search: false,
                 jumpToPage: true,
               };
-    
+              const renderSnackBar = () => {
+                return (
+                    <CustomizedSnackbars
+                        open={snackbar.open}
+                        handleClose={() =>
+                            setSnackbarInfo({ open: false, message: "", variant: "" })
+                        }
+                        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                        variant={snackbar.variant}
+                        message={snackbar.message}
+                    />
+                );
+            };
 
     return (
         <React.Fragment>
@@ -262,6 +275,7 @@ const MembersTable = (props) => {
                     id={id}
                 />
             }
+            {renderSnackBar()}
             <ThemeProvider theme={tableTheme}>
                 <MUIDataTable
                     title={""}
