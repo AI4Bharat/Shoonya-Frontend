@@ -21,7 +21,7 @@ import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspa
   });
   
   const workspaceDtails = useSelector(state=>state.getWorkspaceDetails.data); 
-  console.log(workspaceDtails.is_archived,"workspaceDtailssssssssssss",workspaceDtails)
+  
     const handleArchiveWorkspace = async() =>{
       const projectObj = new ArchiveWorkspaceAPI(id,id);
     dispatch(APITransport(projectObj));
