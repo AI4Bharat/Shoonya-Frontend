@@ -18,7 +18,8 @@ import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveProjectMemberAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectMember';
 import RemoveProjectReviewerAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer';
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
+
 
 const columns = [
     {
@@ -80,7 +81,7 @@ const MembersTable = (props) => {
     const dispatch = useDispatch();
     const [userRole, setUserRole] = useState();
     const [loading, setLoading] = useState(false);
-    const { dataSource, hideButton } = props;
+    const { dataSource, hideButton, onRemoveSuccessGetUpdatedMembers } = props;
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -88,6 +89,7 @@ const MembersTable = (props) => {
       });
     const userDetails = useSelector(state=>state.fetchLoggedInUserData.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+    const apiLoading = useSelector(state => state.apiStatus.loading);
     
     useEffect(() => {
         userDetails && setUserRole(userDetails.role);
@@ -122,7 +124,7 @@ const MembersTable = (props) => {
                 message: resp?.message,
                 variant: "success",
             })
-
+            onRemoveSuccessGetUpdatedMembers()
         } else {
             setSnackbarInfo({
                 open: true,
@@ -151,7 +153,7 @@ const MembersTable = (props) => {
                 message: resp?.message,
                 variant: "success",
             })
-
+            onRemoveSuccessGetUpdatedMembers()
         } else {
             setSnackbarInfo({
                 open: true,
@@ -160,6 +162,10 @@ const MembersTable = (props) => {
             })
         }
     }
+    useEffect(() => {
+        setLoading(apiLoading);
+      }, [apiLoading])
+
     const projectlist=(el)=>{
         let temp=false;
         ProjectDetails?.frozen_users.forEach((em)=>{
