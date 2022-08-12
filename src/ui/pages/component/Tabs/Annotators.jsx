@@ -8,11 +8,17 @@ import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRol
 import CustomButton from "../common/Button";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import RemoveWorkspaceMemberAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceMember";
 
 const AnnotatorsTable = (props) => {
     const dispatch = useDispatch();
-    
+    const [loading, setLoading] = useState(false);
     const {id} = useParams();
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
     
     const orgId = useSelector(state=>state.getWorkspacesProjectData?.data?.[0]?.organization_id);
 
@@ -30,7 +36,35 @@ const AnnotatorsTable = (props) => {
     },[]);
     // const orgId = workspaceAnnotators &&  workspaceAnnotators
 // getWorkspacesProjectData
+const handleRemoveWorkspaceMember = async(Projectid)=>{
+    const workspacedata={
+        user_id:Projectid,
+      }
+        const projectObj = new RemoveWorkspaceMemberAPI(id,workspacedata);
+        dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
 
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+
+}
     const columns = [
         {
             name: "Name",
@@ -82,16 +116,20 @@ const AnnotatorsTable = (props) => {
                         userRole ? userRole : el.role,
                         // userRole ? userRole : el.role,
                         // el.role,
+                        <>
                         <Link to={`/profile/${el.id}`} style={{ textDecoration: "none" }}>
                             <CustomButton
                                 sx={{borderRadius : 2,marginRight: 2}}
                                 label = "View"
                             />
-                            <CustomButton
-                                sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
-                                label = "Remove"
-                            />
+                           
                         </Link>
+                         <CustomButton
+                         sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
+                         label = "Remove"
+                         onClick={()=>handleRemoveWorkspaceMember(el.id)}
+                     />
+                     </>
                     ]
         }) :[];
 
