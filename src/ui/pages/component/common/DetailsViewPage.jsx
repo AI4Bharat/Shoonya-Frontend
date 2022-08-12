@@ -50,7 +50,7 @@ function TabPanel(props) {
 
 
 const DetailsViewPage = (props) => {
-    const { pageType, title, createdBy } = props;
+    const { pageType, title, createdBy ,onArchiveWorkspace} = props;
     const { id,orgId } = useParams();
     const classes = DatasetStyle();
     const dispatch = useDispatch();
@@ -215,7 +215,7 @@ const DetailsViewPage = (props) => {
                     </TabPanel>
                     <TabPanel value={value} index={4}>
                         {pageType === componentType.Type_Organization && <OrganizationSettings />}
-                        {pageType === componentType.Type_Workspace && <WorkspaceSetting /> }
+                        {pageType === componentType.Type_Workspace && <WorkspaceSetting  onArchiveWorkspace={onArchiveWorkspace}/> }
                     </TabPanel>
                 </Card>
             </Grid>

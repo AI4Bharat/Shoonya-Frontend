@@ -8,7 +8,9 @@ import DatasetStyle from "../../../styles/Dataset";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
- function WorkspaceSetting() {
+ function WorkspaceSetting(props) {
+  const{onArchiveWorkspace}=props
+  console.log(props,"props")
     const { id } = useParams();
     const classes = DatasetStyle();
     const dispatch = useDispatch();
@@ -38,7 +40,8 @@ import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspa
         message: "success",
         variant: "success",
       })
-      window.location.reload();
+       onArchiveWorkspace()
+      // window.location.reload();
     } else {
       setSnackbarInfo({
         open: true,
