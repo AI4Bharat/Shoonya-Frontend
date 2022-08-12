@@ -56,9 +56,9 @@ import DownloadJSONProject from './ProjectDetails/DownloadJSONProject';
 import forgotPassword from './UserManagement/ForgotPassword';
 import confirmForgetPassword from "./UserManagement/ConfirmForgetPassword";
 import SignUp from './UserManagement/SignUp';
+import archiveWorkspace from './WorkspaceDetails/ArchiveWorkspace';
 import RemoveProjectMember from './ProjectDetails/RemoveProjectMember';
 import RemoveProjectReviewer from './ProjectDetails/RemoveProjectReviewer';
-    
 
 const index = {
     apiStatus,
@@ -124,6 +124,7 @@ const index = {
     SignUp,
     RemoveProjectMember,
     RemoveProjectReviewer,
+    archiveWorkspace,
 };
 
 export default index;
