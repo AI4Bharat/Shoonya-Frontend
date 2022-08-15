@@ -13,6 +13,8 @@ import themeDefault from "../../../theme/theme";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
+import Spinner from "../../component/common/Spinner";
+import CustomizedSnackbars  from "../../component/common/Snackbar";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -32,6 +34,9 @@ const CollectionProject = (props) => {
   const [users, setUsers] = useState("")
   const [datasettype, setDatasettype] = useState("");
   const [type, setType] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [snackbarState, setSnackbarState] = useState({ open: false, message: "", variant: ""});
+  const [errors, setErrors] = useState({});
 
 
   const loggedInUserData = useSelector(
@@ -43,16 +48,32 @@ const CollectionProject = (props) => {
   },)
  
   const handleCreate = () => {
+    setLoading(true);
+    setErrors({});
     const CreateDatasetInstance = {
       instance_name: instance_Name,
       parent_instance_id: parent_Instance_Id,
       instance_description: instance_Description,
-      dataset_type:datasettype,
+      dataset_type: datasettype,
       organisation_id: organisation_Id,
       users: users,
     }
-    const projectObj = new CreateNewDatasetInstanceAPI(CreateDatasetInstance);
-    dispatch(APITransport(projectObj));
+    const apiObj = new CreateNewDatasetInstanceAPI(CreateDatasetInstance);
+    fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    }).then(async (res) => {
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    }).then((res) => {
+      setLoading(false);
+      navigate(`/datasets/${res.instance_id}`);
+    }).catch((err) => {
+      setErrors(err);
+      setSnackbarState({ open: true, message: "Failed to create dataset instance", variant: "error" });
+      setLoading(false);
+    });
   }
 
   const datasetType = useSelector(state => state.GetDatasetType.data);
@@ -66,8 +87,6 @@ const CollectionProject = (props) => {
     getProjectDetails();
 
   }, []);
-  
-
 
   useEffect(() => {
     if (datasetType && datasetType.length > 0) {
@@ -83,6 +102,19 @@ const CollectionProject = (props) => {
       setType(temp);
     }
   }, [datasetType]);
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+          open={snackbarState.open}
+          handleClose={() => setSnackbarState({ open: false, message: "", variant: "" })}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          variant={snackbarState.variant}
+          message={snackbarState.message}
+      />
+    );
+};
+
   console.log(loggedInUserData,"loggedInUserData")
   return (
     <ThemeProvider theme={themeDefault}>
@@ -105,6 +137,7 @@ const CollectionProject = (props) => {
                   > */}
 
       <Grid container direction="row"  >
+        {loading && <Spinner /> }
         <Card className={classes.workspaceCard}>
           <Grid item xs={2} sm={2} md={2} lg={2} xl={2}></Grid>
           <Grid item xs={8} sm={8} md={8} lg={8} xl={8} sx={{ pb: "6rem" }}>
@@ -131,6 +164,8 @@ const CollectionProject = (props) => {
                 value={instance_Name}
                 onChange={(e) => setInstance_Name(e.target.value)}
                 required
+                helperText={errors.instance_name ? errors.instance_name : ""}
+                error={errors.instance_name ? true : false}
               />
             </Grid>
             <Grid
@@ -150,6 +185,8 @@ const CollectionProject = (props) => {
                 fullWidth
                 value={parent_Instance_Id}
                 onChange={(e) => setParent_Instance_Id(e.target.value)}
+                helperText={errors.parent_instance_id ? errors.parent_instance_id : ""}
+                error={errors.parent_instance_id ? true : false}
               />
             </Grid>
             <Grid
@@ -169,6 +206,8 @@ const CollectionProject = (props) => {
                 fullWidth
                 value={instance_Description}
                 onChange={(e) => setInstance_Description(e.target.value)}
+                helperText={errors.instance_description ? errors.instance_description : ""}
+                error={errors.instance_description ? true : false}
               />
             </Grid>
             <Grid
@@ -188,6 +227,8 @@ const CollectionProject = (props) => {
                 menuOptions={type}
                 handleChange={(value) => setDatasettype(value)}
                 value={datasettype}
+                helperText={errors.dataset_type ? errors.dataset_type : ""}
+                error={errors.dataset_type ? true : false}
               />
             </Grid>
             <Grid
@@ -207,6 +248,8 @@ const CollectionProject = (props) => {
                 fullWidth
                 value={organisation_Id}
                 onChange={(e) => setOrganisation_Id(e.target.value)}
+                helperText={errors.organisation_id ? errors.organisation_id : ""}
+                error={errors.organisation_id ? true : false}
               />
             </Grid>
             <Grid
@@ -226,6 +269,8 @@ const CollectionProject = (props) => {
                 fullWidth
                 value={users}
                 onChange={(e) => setUsers(e.target.value)}
+                helperText={errors.users ? errors.users : ""}
+                error={errors.users ? true : false}
               />
             </Grid>
             <Grid
@@ -253,8 +298,7 @@ const CollectionProject = (props) => {
                 onClick={() => navigate(`/datasets/`)}
               />
             </Grid>
-
-
+            {renderSnackBar()}
           </Grid>
         </Card>
       </Grid>
