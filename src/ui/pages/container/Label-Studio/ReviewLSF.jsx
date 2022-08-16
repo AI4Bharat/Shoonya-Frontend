@@ -373,8 +373,8 @@ const LabelStudioWrapper = ({
     });
   };
 
-  const handleRejectClick = async () => {
-    review_status.current = "rejected";
+  const handleReviseClick = async () => {
+    review_status.current = "to_be_revised";
     lsfRef.current.store.submitAnnotation();
   };
 
@@ -409,7 +409,7 @@ const LabelStudioWrapper = ({
           <div>
             <Tooltip title="Go to next task">
               <Button
-                value="Reject"
+                value="to_be_revised"
                 type="default"
                 onClick={onNextAnnotation}
                 style={{
@@ -426,11 +426,11 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            <Tooltip title="Reject Annotation">
+            <Tooltip title="Revise Annotation">
               <Button
-                value="Reject"
+                value="to_be_revised"
                 type="default"
-                onClick={handleRejectClick}
+                onClick={handleReviseClick}
                 style={{
                   minWidth: "160px",
                   border: "1px solid #e6e6e6",
@@ -441,7 +441,7 @@ const LabelStudioWrapper = ({
                 }}
                 className="lsf-button"
               >
-                Reject
+               Revise
               </Button>
             </Tooltip>
             <Tooltip title="Accept Annotation">
