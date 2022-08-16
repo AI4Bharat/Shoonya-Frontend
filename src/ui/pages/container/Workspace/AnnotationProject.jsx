@@ -423,6 +423,8 @@ const AnnotationProject = (props) => {
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
+
+    
     const newProject = {
       title: title,
       description: description,
@@ -884,8 +886,7 @@ const AnnotationProject = (props) => {
                     label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
                     labelPlacement="start"
                    checked={taskReviews}
-                  // value={}
-                  onChange={(e) => setTaskReviews(true)}
+                  onChange={(event)=> setTaskReviews(event.target.checked)}
                   />
                 </Grid>
               </>
