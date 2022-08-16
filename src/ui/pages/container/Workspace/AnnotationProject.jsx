@@ -24,6 +24,10 @@ import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/
 import GetDataitemsByIdAPI from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { snakeToTitleCase } from "../../../../utils/utils";
+import CustomizedSnackbars from "../../component/common/Snackbar"
+import Spinner from "../../component/common/Spinner";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
 const isNum = (str) => {
   var reg = new RegExp('^[0-9]*$');
@@ -53,7 +57,7 @@ const AnnotationProject = (props) => {
   const [columnFields, setColumnFields] = useState(null);
   const [variableParameters, setVariableParameters] = useState(null);
   const [languageOptions, setLanguageOptions] = useState([]);
-
+  
   //Form related state variables
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -73,6 +77,7 @@ const AnnotationProject = (props) => {
   const [selectedVariableParameters, setSelectedVariableParameters] = useState(
     []
   );
+  const [taskReviews, setTaskReviews] = useState(false)
 
   //Table related state variables
   const [columns, setColumns] = useState(null);
@@ -159,7 +164,7 @@ const AnnotationProject = (props) => {
     serverSide: true,
     customToolbar: renderToolBar,
   };
-  
+
   useEffect(() => {
     const domainObj = new GetProjectDomainsAPI();
     dispatch(APITransport(domainObj));
@@ -192,28 +197,28 @@ const AnnotationProject = (props) => {
 
           if (
             ProjectDomains[domain]["project_types"][project_type][
-              "input_dataset"
+            "input_dataset"
             ]
           ) {
             tempDatasetTypes[project_type] =
               ProjectDomains[domain]["project_types"][project_type][
-                "input_dataset"
+              "input_dataset"
               ]["class"];
             tempColumnFields[project_type] =
               ProjectDomains[domain]["project_types"][project_type][
-                "input_dataset"
+              "input_dataset"
               ]["fields"];
           }
           let temp =
             ProjectDomains[domain]["project_types"][project_type][
-              "output_dataset"
+            "output_dataset"
             ]["fields"]["variable_parameters"];
           if (temp) {
             tempVariableParameters[project_type] = {
               variable_parameters: temp,
               output_dataset:
                 ProjectDomains[domain]["project_types"][project_type][
-                  "output_dataset"
+                "output_dataset"
                 ]["class"],
             };
           }
@@ -303,7 +308,7 @@ const AnnotationProject = (props) => {
     setSelectedType("");
     setSamplingParameters(null);
     setConfirmed(false);
-    if(selectedDomain === "Translation") {
+    if (selectedDomain === "Translation") {
       const langChoicesObj = new GetLanguageChoicesAPI();
       dispatch(APITransport(langChoicesObj));
     }
@@ -386,7 +391,7 @@ const AnnotationProject = (props) => {
 
   const handleRandomChange = (e) => {
     setRandom(e.target.value);
-    setSamplingParameters(e.target.value ? { fraction: parseFloat(e.target.value / 100)} : null);
+    setSamplingParameters(e.target.value ? { fraction: parseFloat(e.target.value / 100) } : null);
   };
 
   const onConfirmSelections = () => {
@@ -395,7 +400,7 @@ const AnnotationProject = (props) => {
   };
 
   useEffect(() => {
-    if(selectedInstances && datasetTypes) {
+    if (selectedInstances && datasetTypes) {
       getDataItems();
     }
   }, [currentPageNumber, currentRowPerPage]);
@@ -436,6 +441,7 @@ const AnnotationProject = (props) => {
       variable_parameters: temp,
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
+      enable_task_reviews:taskReviews,
     };
 
     if (sourceLanguage) newProject['src_language'] = sourceLanguage;
@@ -445,8 +451,10 @@ const AnnotationProject = (props) => {
     dispatch(APITransport(projectObj));
   };
 
+ 
   return (
     <ThemeProvider theme={themeDefault}>
+      
       {/* <Header /> */}
       {/* <Grid
                 container
@@ -465,537 +473,558 @@ const AnnotationProject = (props) => {
                     xl={5}
                 > */}
       <Grid container direction="row">
-      <Card className={classes.workspaceCard}>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ pb: "6rem" }}>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="h2" gutterBottom component="div">
-              Create a Project
-            </Typography>
-          </Grid>
+        <Card className={classes.workspaceCard}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ pb: "6rem" }}>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <Typography variant="h2" gutterBottom component="div">
+                Create a Project
+              </Typography>
+            </Grid>
 
-          <Grid container direction="row">
+            <Grid container direction="row">
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+                className={classes.projectsettingGrid}
+              >
+                <Typography gutterBottom component="div" label="Required">
+                  Title:
+                </Typography>
+              </Grid>
+              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                <OutlinedTextField
+                  fullWidth
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+
             <Grid
-              item
+              className={classes.projectsettingGrid}
               xs={12}
               sm={12}
               md={12}
               lg={12}
               xl={12}
-              className={classes.projectsettingGrid}
             >
-              <Typography gutterBottom component="div" label="Required">
-                Title:
+              <Typography gutterBottom component="div">
+                Description:
               </Typography>
             </Grid>
-            <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+            <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
               <OutlinedTextField
                 fullWidth
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </Grid>
-          </Grid>
 
-          <Grid
-            className={classes.projectsettingGrid}
-            xs={12}
-            sm={12}
-            md={12}
-            lg={12}
-            xl={12}
-          >
-            <Typography gutterBottom component="div">
-              Description:
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-            <OutlinedTextField
-              fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </Grid>
+            {domains && (
+              <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Select a Category to Work in:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                  <MenuItems
+                    menuOptions={domains}
+                    handleChange={onSelectDomain}
+                    value={selectedDomain}
+                  />
+                </Grid>
+              </>
+            )}
 
-          {domains && (
-            <>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                Select a Category to Work in:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <MenuItems
-                  menuOptions={domains}
-                  handleChange={onSelectDomain}
-                  value={selectedDomain}
-                />
-              </Grid>
-            </>
-          )}
+            {selectedDomain && (
+              <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Select a Project Type:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                  <MenuItems
+                    menuOptions={projectTypes[selectedDomain].map((key) => {
+                      return {
+                        name: key,
+                        value: key,
+                      };
+                    })}
+                    handleChange={onSelectProjectType}
+                    value={selectedType}
+                  />
+                </Grid>
+              </>
+            )}
 
-          {selectedDomain && (
-            <>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Select a Project Type:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <MenuItems
-                  menuOptions={projectTypes[selectedDomain].map((key) => {
-                    return {
-                      name: key,
-                      value: key,
-                    };
-                  })}
-                  handleChange={onSelectProjectType}
-                  value={selectedType}
-                />
-              </Grid>
-            </>
-          )}
+            {selectedDomain === "Translation" && (
+              <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Source Language:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                  <MenuItems
+                    menuOptions={languageOptions}
+                    handleChange={(value) => setSourceLanguage(value)}
+                    value={sourceLanguage}
+                  />
+                </Grid>
 
-          {selectedDomain === "Translation" && (
-            <>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Source Language:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <MenuItems
-                  menuOptions={languageOptions}
-                  handleChange={(value) => setSourceLanguage(value)}
-                  value={sourceLanguage}
-                />
-              </Grid>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Target Language:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                  <MenuItems
+                    menuOptions={languageOptions}
+                    handleChange={(value) => setTargetLanguage(value)}
+                    value={targetLanguage}
+                  />
+                </Grid>
+              </>
+            )}
 
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Target Language:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <MenuItems
-                  menuOptions={languageOptions}
-                  handleChange={(value) => setTargetLanguage(value)}
-                  value={targetLanguage}
-                />
-              </Grid>
-            </>
-          )}
-
-          {instanceIds && (
-            <>
-              {selectedVariableParameters.map((parameter, index) => (
-                <>
-                  <Grid
-                    className={classes.projectsettingGrid}
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                  >
-                    <Typography gutterBottom component="div">
-                      {processNameString(parameter["name"])}:
-                    </Typography>
-                  </Grid>
-                  <Grid
-                    className={classes.projectsettingGrid}
-                    item
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                  >
-                    {parameter.data["choices"] !== undefined ? (
-                      <MenuItems
-                        menuOptions={parameter.data["choices"].map(
-                          (element) => {
-                            return {
-                              name: element[0],
-                              value: element[0],
-                            };
-                          }
-                        )}
-                        value={selectedVariableParameters[index]["value"]}
-                        handleChange={(e) =>
-                          handleVariableParametersChange(parameter["name"], e)
-                        }
-                      ></MenuItems>
-                    ) : (
-                      <>
-                        {parameter.data["name"] === "DecimalField" ||
-                        parameter.data["name"] === "IntegerField" ? (
-                          <OutlinedTextField
-                            fullWidth
-                            defaultValue={
-                              selectedVariableParameters[index]["value"]
-                            }
-                            handleChange={(e) =>
-                              handleVariableParametersChange(
-                                parameter["name"],
-                                e
-                              )
-                            }
-                            inputProps={{
-                              step: 1,
-                              min: 0,
-                              max: 99999,
-                              type: "number",
-                            }}
-                          />
-                        ) : (
-                          <OutlinedTextField
-                            fullWidth
-                            value={selectedVariableParameters[index]["value"]}
-                            onChange={(e) =>
-                              handleVariableParametersChange(
-                                parameter["name"],
-                                e
-                              )
-                            }
-                          />
-                        )}
-                      </>
-                    )}
-                  </Grid>
-                </>
-              ))}
-              {selectedType && Object.keys(instanceIds).length > 0 && (
-                <>
-                  <Grid
-                    className={classes.projectsettingGrid}
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                  >
-                    <Typography gutterBottom component="div">
-                      Select sources to fetch data from:
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                    <FormControl
-                      fullWidth
-                      sx={{ minWidth: 120 }}
-                      disabled={confirmed}
+            {instanceIds && (
+              <>
+                {selectedVariableParameters.map((parameter, index) => (
+                  <>
+                    <Grid
+                      className={classes.projectsettingGrid}
+                      xs={12}
+                      sm={12}
+                      md={12}
+                      lg={12}
+                      xl={12}
                     >
-                      <Select
-                        labelId="demo-simple-select-standard-label"
-                        id="demo-simple-select-standard"
-                        onChange={onSelectInstances}
-                        value={selectedInstances}
-                        multiple={true}
-                        renderValue={(selected) => (
-                          <Box
-                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                          >
-                            {selected.map((key) => (
-                              <Chip
-                                key={key}
-                                label={instanceIds[key]}
-                                deleteIcon={
-                                  <CancelIcon
-                                    onMouseDown={(event) =>
-                                      event.stopPropagation()
-                                    }
-                                  />
-                                }
-                                onDelete={confirmed ? undefined : () => {
-                                  setSelectedInstances(
+                      <Typography gutterBottom component="div">
+                        {processNameString(parameter["name"])}:
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      className={classes.projectsettingGrid}
+                      item
+                      xs={12}
+                      sm={12}
+                      md={12}
+                      lg={12}
+                      xl={12}
+                    >
+                      {parameter.data["choices"] !== undefined ? (
+                        <MenuItems
+                          menuOptions={parameter.data["choices"].map(
+                            (element) => {
+                              return {
+                                name: element[0],
+                                value: element[0],
+                              };
+                            }
+                          )}
+                          value={selectedVariableParameters[index]["value"]}
+                          handleChange={(e) =>
+                            handleVariableParametersChange(parameter["name"], e)
+                          }
+                        ></MenuItems>
+                      ) : (
+                        <>
+                          {parameter.data["name"] === "DecimalField" ||
+                            parameter.data["name"] === "IntegerField" ? (
+                            <OutlinedTextField
+                              fullWidth
+                              defaultValue={
+                                selectedVariableParameters[index]["value"]
+                              }
+                              handleChange={(e) =>
+                                handleVariableParametersChange(
+                                  parameter["name"],
+                                  e
+                                )
+                              }
+                              inputProps={{
+                                step: 1,
+                                min: 0,
+                                max: 99999,
+                                type: "number",
+                              }}
+                            />
+                          ) : (
+                            <OutlinedTextField
+                              fullWidth
+                              value={selectedVariableParameters[index]["value"]}
+                              onChange={(e) =>
+                                handleVariableParametersChange(
+                                  parameter["name"],
+                                  e
+                                )
+                              }
+                            />
+                          )}
+                        </>
+                      )}
+                    </Grid>
+                  </>
+                ))}
+                {selectedType && Object.keys(instanceIds).length > 0 && (
+                  <>
+                    <Grid
+                      className={classes.projectsettingGrid}
+                      xs={12}
+                      sm={12}
+                      md={12}
+                      lg={12}
+                      xl={12}
+                    >
+                      <Typography gutterBottom component="div">
+                        Select sources to fetch data from:
+                      </Typography>
+                    </Grid>
+
+                    <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                      <FormControl
+                        fullWidth
+                        sx={{ minWidth: 120 }}
+                        disabled={confirmed}
+                      >
+                        <Select
+                          labelId="demo-simple-select-standard-label"
+                          id="demo-simple-select-standard"
+                          onChange={onSelectInstances}
+                          value={selectedInstances}
+                          multiple={true}
+                          renderValue={(selected) => (
+                            <Box
+                              sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                            >
+                              {selected.map((key) => (
+                                <Chip
+                                  key={key}
+                                  label={instanceIds[key]}
+                                  deleteIcon={
+                                    <CancelIcon
+                                      onMouseDown={(event) =>
+                                        event.stopPropagation()
+                                      }
+                                    />
+                                  }
+                                  onDelete={confirmed ? undefined : () => {
+                                    setSelectedInstances(
                                       selectedInstances.filter(
                                         (instance) => instance !== key
                                       )
                                     );
-                                }}
-                              />
-                            ))}
-                          </Box>
-                        )}
-                      >
-                        {Object.keys(instanceIds).map((key) => (
-                          <MenuItem key={instanceIds[key]} value={key}>
-                            {instanceIds[key]}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                    sm={12}
-                    sx={{ margin: "20px 0px 10px 0px" }}
-                  >
-                    {selectedInstances.length > 0 && (
-                      <>
-                        <Button
-                          onClick={onConfirmSelections}
-                          style={{ margin: "0px 20px 0px 0px" }}
-                          label={"Confirm Selections"}
-                          disabled={confirmed}
-                        />
-                        <Button
-                          onClick={handleChangeInstances}
-                          label={"Change Sources"}
-                          disabled={!confirmed}
-                        />
-                      </>
-                    )}
-                  </Grid>
-                </>
-              )}
-            </>
-          )}
-          {selectedType && selectedInstances.length > 0 && confirmed && (
-            <>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Dataset Rows:
-                </Typography>
-              </Grid>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <ThemeProvider theme={tableTheme}>
-                  <MUIDataTable
-                    title={""}
-                    data={tableData}
-                    columns={columns.filter((column) => selectedColumns.includes(column.name))}
-                    options={options}
+                                  }}
+                                />
+                              ))}
+                            </Box>
+                          )}
+                        >
+                          {Object.keys(instanceIds).map((key) => (
+                            <MenuItem key={instanceIds[key]} value={key}>
+                              {instanceIds[key]}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      md={12}
+                      lg={12}
+                      xl={12}
+                      sm={12}
+                      sx={{ margin: "20px 0px 10px 0px" }}
+                    >
+                      {selectedInstances.length > 0 && (
+                        <>
+                          <Button
+                            onClick={onConfirmSelections}
+                            style={{ margin: "0px 20px 0px 0px" }}
+                            label={"Confirm Selections"}
+                            disabled={confirmed}
+                          />
+                          <Button
+                            onClick={handleChangeInstances}
+                            label={"Change Sources"}
+                            disabled={!confirmed}
+                          />
+                        </>
+                      )}
+                    </Grid>
+                  </>
+                )}
+              </>
+            )}
+            {selectedType && selectedInstances.length > 0 && confirmed && (
+              <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Dataset Rows:
+                  </Typography>
+                </Grid>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <ThemeProvider theme={tableTheme}>
+                    <MUIDataTable
+                      title={""}
+                      data={tableData}
+                      columns={columns.filter((column) => selectedColumns.includes(column.name))}
+                      options={options}
+                    />
+                  </ThemeProvider>
+                </Grid>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Select Sampling Type:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                  <MenuItems
+                    menuOptions={["Random", "Full", "Batch"].map((mode) => {
+                      return {
+                        name: mode,
+                        value: mode[0].toLowerCase(),
+                      };
+                    })}
+                    handleChange={onSelectSamplingMode}
+                    defaultValue=""
                   />
-                </ThemeProvider>
-              </Grid>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Select Sampling Type:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <MenuItems
-                  menuOptions={["Random", "Full", "Batch"].map((mode) => {
-                    return {
-                      name: mode,
-                      value: mode[0].toLowerCase(),
-                    };
-                  })}
-                  handleChange={onSelectSamplingMode}
-                  defaultValue=""
-                />
-              </Grid>
+                </Grid>
 
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Filter String:
-                </Typography>
-              </Grid>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Filter String:
+                  </Typography>
+                </Grid>
 
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <OutlinedTextField
-                  fullWidth
-                  value={filterString}
-                  onChange={(e) => {
-                    setFilterString(e.target.value);
-                  }}
-                />
-              </Grid>
-            </>
-          )}
-          {samplingMode === "r" && (
-            <>
-              <Grid
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-                className={classes.projectsettingGrid}
-              >
-                <Typography gutterBottom component="div" label="Required">
-                  Sampling Percentage:
-                </Typography>
-              </Grid>
-              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                <OutlinedTextField
-                  fullWidth
-                  value={random}
-                  onChange={handleRandomChange}
-                />
-              </Grid>
-            </>
-          )}
-          {samplingMode === "b" && (
-            <>
-              <Grid
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-                className={classes.projectsettingGrid}
-              >
-                <Typography gutterBottom component="div" label="Required">
-                  Enter Batch size:
-                </Typography>
-              </Grid>
-              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                <OutlinedTextField
-                  fullWidth
-                  type="number"
-                  inputProps={{ type: "number" }}
-                  value={batchSize}
-                  onChange={(e) => isNum(e.target.value) && setBatchSize(Number(e.target.value) || e.target.value)}
-                />
-              </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                  <OutlinedTextField
+                    fullWidth
+                    value={filterString}
+                    onChange={(e) => {
+                      setFilterString(e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  sx={{ mt: 3 }}
 
-              <Grid
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-                className={classes.projectsettingGrid}
-              >
-                <Typography gutterBottom component="div" label="Required">
-                  Enter Batch Number:
-                </Typography>
-              </Grid>
-              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                <OutlinedTextField
-                  fullWidth
-                  type="number"
-                  inputProps={{ type: "number" }}
-                  value={batchNumber}
-                  onChange={(e) => isNum(e.target.value) && setBatchNumber(Number(e.target.value))}
-                />
-              </Grid>
-            </>
-          )}
-          {samplingParameters && (
-            <>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div" label="Required">
-                  Annotators Per Task:
-                </Typography>
-              </Grid>
-              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                <OutlinedTextField
-                  fullWidth
-                  value={selectedAnnotatorsNum}
-                  onChange={(e) => setSelectedAnnotatorsNum(e.target.value)}
-                />
-              </Grid>
-            </>
-          )}
+                >
+                  <FormControlLabel
+                    control={<Switch color="primary" />}
+                    label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
+                    labelPlacement="start"
+                   checked={taskReviews}
+                  // value={}
+                  onChange={(e) => setTaskReviews(true)}
+                  />
+                </Grid>
+              </>
+            )}
+            {samplingMode === "r" && (
+              <>
+                <Grid
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  className={classes.projectsettingGrid}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                    Sampling Percentage:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <OutlinedTextField
+                    fullWidth
+                    value={random}
+                    onChange={handleRandomChange}
+                  />
+                </Grid>
+              </>
+            )}
+            {samplingMode === "b" && (
+              <>
+                <Grid
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  className={classes.projectsettingGrid}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                    Enter Batch size:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <OutlinedTextField
+                    fullWidth
+                    type="number"
+                    inputProps={{ type: "number" }}
+                    value={batchSize}
+                    onChange={(e) => isNum(e.target.value) && setBatchSize(Number(e.target.value) || e.target.value)}
+                  />
+                </Grid>
 
-          <Grid
-            className={classes.projectsettingGrid}
-            xs={12}
-            sm={12}
-            md={12}
-            lg={12}
-            xl={12}
-          >
-            <Typography gutterBottom component="div">
-              Finalize Project
-            </Typography>
-          </Grid>
+                <Grid
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  className={classes.projectsettingGrid}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                    Enter Batch Number:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <OutlinedTextField
+                    fullWidth
+                    type="number"
+                    inputProps={{ type: "number" }}
+                    value={batchNumber}
+                    onChange={(e) => isNum(e.target.value) && setBatchNumber(Number(e.target.value))}
+                  />
+                </Grid>
+              </>
+            )}
+            {samplingParameters && (
+              <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                    Annotators Per Task:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <OutlinedTextField
+                    fullWidth
+                    value={selectedAnnotatorsNum}
+                    onChange={(e) => setSelectedAnnotatorsNum(e.target.value)}
+                  />
+                </Grid>
+              </>
+            )}
 
-          <Grid
-            className={classes.projectsettingGrid}
-            style={{}}
-            item
-            xs={12}
-            md={12}
-            lg={12}
-            xl={12}
-            sm={12}
-          >
-            {/* {title !== "" && selectedType !== "" && ( */}
+            <Grid
+              className={classes.projectsettingGrid}
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+            >
+              <Typography gutterBottom component="div">
+                Finalize Project
+              </Typography>
+            </Grid>
+
+
+
+            <Grid
+              className={classes.projectsettingGrid}
+              style={{}}
+              item
+              xs={12}
+              md={12}
+              lg={12}
+              xl={12}
+              sm={12}
+            >
+              {/* {title !== "" && selectedType !== "" && ( */}
               <Button
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Create Project"}
                 onClick={handleCreateProject}
-                disabled={ ( title && description && selectedDomain && selectedType && selectedInstances && domains && samplingMode && selectedVariableParameters ) ? false : true}
+                disabled={(title && description && selectedDomain && selectedType && selectedInstances && domains && samplingMode && selectedVariableParameters) ? false : true}
               />
-             {/* )}  */}
-            <Button
-              label={"Cancel"}
-              onClick={() => navigate(`/workspaces/${id}`)}
-            />
+              {/* )}  */}
+              <Button
+                label={"Cancel"}
+                onClick={() => navigate(`/workspaces/${id}`)}
+              />
+            </Grid>
+            <Grid item xs={12} md={12} lg={12} xl={12} sm={12} />
           </Grid>
-          <Grid item xs={12} md={12} lg={12} xl={12} sm={12} />
-        </Grid>
-     
+
         </Card> </Grid>
       {/* </Grid>
             </Grid> */}
