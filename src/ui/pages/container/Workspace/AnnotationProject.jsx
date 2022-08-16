@@ -871,24 +871,6 @@ const AnnotationProject = (props) => {
                     }}
                   />
                 </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  lg={12}
-                  xl={12}
-                  sx={{ mt: 3 }}
-
-                >
-                  <FormControlLabel
-                    control={<Switch color="primary" />}
-                    label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
-                    labelPlacement="start"
-                   checked={taskReviews}
-                  onChange={(event)=> setTaskReviews(event.target.checked)}
-                  />
-                </Grid>
               </>
             )}
             {samplingMode === "r" && (
@@ -984,7 +966,26 @@ const AnnotationProject = (props) => {
                 </Grid>
               </>
             )}
+            {confirmed &&(<Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  sx={{ mt: 3 }}
 
+                >
+                  <FormControlLabel
+                  sx={{marginLeft: "1px"}}
+                    control={<Switch color="primary" />}
+                    label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
+                    labelPlacement="start"
+                   checked={taskReviews}
+                  onChange={(event)=> setTaskReviews(event.target.checked)}
+                  />
+                </Grid> )} 
+          
             <Grid
               className={classes.projectsettingGrid}
               xs={12}
