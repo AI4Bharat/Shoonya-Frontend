@@ -12,7 +12,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { translate } from "../../../../config/localisation";
 // import TabPanel from "../../component/common/TabPanel";
 import addUserTypes from "../../../../constants/addUserTypes";
-
+import Spinner from "../../component/common/Spinner";
 
 
 const menuOptions = [
@@ -44,7 +44,6 @@ function TabPanel(props) {
 
 
 const Projects = () => {
-    // console.log("props", props)
     // console.log("props", props)
     const { id } = useParams();
     const [projectData, setProjectData] = useState([
@@ -97,20 +96,21 @@ const Projects = () => {
             },
         ])
     }, []);
-
-
+    const [loading, setLoading] = useState(false);
     const [value, setValue] = React.useState(0);
-
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-
+    const apiLoading = useSelector(state => state.apiStatus.loading);
     const isMember = userDetails.role!==1 || ProjectDetails?.users?.some((user) => user.id === userDetails.id);
     const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
-
+    useEffect(() => {
+        setLoading(apiLoading);
+    }, [apiLoading])
     return (
         <ThemeProvider theme={themeDefault}>
             {/* <Header /> */}
+            {loading && <Spinner />}
             <Grid
                 container
                 direction='row'
@@ -184,7 +184,7 @@ const Projects = () => {
                             paddingTop: 2
                         }}
                     >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Task :</Typography>
+                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Annotation Tasks :</Typography>
                         <Typography variant="body2">{ProjectDetails.unassigned_task_count}</Typography>
                     </Grid>
                     <Grid
@@ -196,7 +196,7 @@ const Projects = () => {
                             paddingTop: 2
                         }}
                     >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Total Labeled Task :</Typography>
+                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Review Tasks :</Typography>
                         <Typography variant="body2">{ProjectDetails.labeled_task_count}</Typography>
                     </Grid>
                     {userDetails?.role !== 1 && <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
@@ -229,10 +229,10 @@ const Projects = () => {
                         <TaskTable type="review"/>
                     </TabPanel>}
                     <TabPanel value={value} index={isMember ? isReviewer ? 2 : 1 : 1}>
-                        <MembersTable dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
+                        <MembersTable onRemoveSuccessGetUpdatedMembers={()=>getProjectDetails()} dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
                     {isReviewer && <TabPanel value={value} index={isMember ? 3 : 2}>
-                        <MembersTable dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
+                        <MembersTable onRemoveSuccessGetUpdatedMembers={()=>getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
                     <TabPanel value={value} index={isMember ? isReviewer ? 4 : 2 : 2}>
                         <ReportsTable />

@@ -49,6 +49,7 @@ const MyProfile = () => {
       last_name: userDetails.last_name,
       languages: userDetails.languages,
       phone: userDetails.phone,
+      availability_status:userDetails.availability_status,
     });
     setEmail(userDetails.email);
     setOriginalEmail(userDetails.email);
@@ -103,7 +104,8 @@ const MyProfile = () => {
       newDetails.first_name,
       newDetails.last_name,
       newDetails.languages,
-      newDetails.phone
+      newDetails.phone,
+      newDetails.availability_status,
     );
     fetch(apiObj.apiEndPoint(), {
       method: "PATCH",
@@ -226,6 +228,7 @@ const MyProfile = () => {
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
+            
             {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
             <InputLabel id="availability-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Availability Status</InputLabel>
               <Select
@@ -269,6 +272,16 @@ const MyProfile = () => {
                 ))}
               </Select>
             </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <OutlinedTextField
+                fullWidth
+                label="Availability Status"
+                name="availability_status"
+                value={newDetails?.availability_status}
+                onChange={handleFieldChange}
+                InputLabelProps={{ shrink: true }}
+              ></OutlinedTextField>
+              </Grid>
             <Grid 
                 container 
                 direction="row"
