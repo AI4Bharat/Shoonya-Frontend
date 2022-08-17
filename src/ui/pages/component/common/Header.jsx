@@ -613,8 +613,8 @@ const Header = () => {
         onClose={() => handleTransliterationModelClose}
         top= {50}
         left= {50}
-        topTranslate={"45"}
-        leftTranslate={"-90"}
+        topTranslate={"40"}
+        leftTranslate={"-50"}
         isTransliteration={true}
         // sx={{width: "400px"}}
       >
