@@ -199,7 +199,7 @@ const CollectionProject = (props) => {
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Organisation_Id:
+                Organisation_Id *:
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -244,7 +244,7 @@ const CollectionProject = (props) => {
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Confirm"}
                 onClick={handleCreate}
-                disabled={ ( instance_Name && datasettype   ) ? false : true}
+                disabled={ ( instance_Name && datasettype && organisation_Id  ) ? false : true}
 
               />
 
