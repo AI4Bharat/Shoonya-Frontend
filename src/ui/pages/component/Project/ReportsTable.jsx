@@ -17,7 +17,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 const ReportsTable = (props) => {
-    const{annotationreviewertype}=props
+    const { annotationreviewertype } = props
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const [selectRange, setSelectRange] = useState([{
         startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
@@ -98,14 +98,14 @@ const ReportsTable = (props) => {
 
     const handleSubmit = () => {
         let projectObj;
-        let reports_type ="review_reports"
+        let reports_type = "review_reports"
         setReportRequested(true);
-        console.log(annotationreviewertype,"annotationreviewertype")
-        if(annotationreviewertype=="Annotation Reports"  ){
-             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
+        console.log(annotationreviewertype, "annotationreviewertype")
+        if (annotationreviewertype == "Annotation Reports") {
+            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
         }
-        if(annotationreviewertype=="Reviewer Reports"){
-             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'), reports_type);
+        if (annotationreviewertype == "Reviewer Reports") {
+            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'), reports_type);
         }
         dispatch(APITransport(projectObj));
         setShowPicker(false)
@@ -114,12 +114,12 @@ const ReportsTable = (props) => {
 
     return (
         <React.Fragment>
-            <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt:2, mb:2 , justifyContent: "space-between" }}>
+            <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt: 2, mb: 2, justifyContent: "space-between" }}>
                 <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                    <Button 
-                        endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
-                        variant="contained" 
-                        color="primary" 
+                    <Button
+                        endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                        variant="contained"
+                        color="primary"
                         onClick={() => setShowPicker(!showPicker)}
                     >
                         Pick dates
@@ -135,7 +135,7 @@ const ReportsTable = (props) => {
                     </Button>
                 </Grid>
             </Grid>
-            {showPicker && <Box sx={{mt: 2, mb:2, display: "flex", justifyContent: "center", width: "100%"}}>
+            {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
                 <Card>
                     <DateRangePicker
                         onChange={handleRangeChange}
@@ -144,15 +144,15 @@ const ReportsTable = (props) => {
                             {
                                 label: "Till Date",
                                 range: () => ({
-                                startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
-                                endDate: new Date(),
+                                    startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+                                    endDate: new Date(),
                                 }),
                                 isSelected(range) {
-                                const definedRange = this.range();
-                                return (
-                                    isSameDay(range.startDate, definedRange.startDate) &&
-                                    isSameDay(range.endDate, definedRange.endDate)
-                                );
+                                    const definedRange = this.range();
+                                    return (
+                                        isSameDay(range.startDate, definedRange.startDate) &&
+                                        isSameDay(range.endDate, definedRange.endDate)
+                                    );
                                 }
                             },
                         ]}
@@ -168,7 +168,7 @@ const ReportsTable = (props) => {
             </Box>}
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
-                     <MUIDataTable
+                    <MUIDataTable
                         title={""}
                         data={ProjectReport}
                         columns={columns.filter(col => selectedColumns.includes(col.name))}

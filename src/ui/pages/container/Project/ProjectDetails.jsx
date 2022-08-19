@@ -174,7 +174,6 @@ const Projects = () => {
             setAnnotationreviewertype("Reviewer Reports")
 
         }
-
     }, [annotationdata, reviewerdata])
 
     return (
