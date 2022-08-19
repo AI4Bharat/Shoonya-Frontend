@@ -28,7 +28,7 @@ const CollectionProject = (props) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const [instance_Name, setInstance_Name] = useState("")
-  const [parent_Instance_Id, setParent_Instance_Id] = useState("")
+  const [parent_Instance_Id, setParent_Instance_Id] = useState(null)
   const [instance_Description, setInstance_Description] = useState("")
   const [organisation_Id, setOrganisation_Id] = useState("")
   const [users, setUsers] = useState("")
