@@ -16,7 +16,8 @@ import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
-const ReportsTable = () => {
+const ReportsTable = (props) => {
+    const{annotationreviewertype}=props
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const [selectRange, setSelectRange] = useState([{
         startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
@@ -96,8 +97,16 @@ const ReportsTable = () => {
     };
 
     const handleSubmit = () => {
+        let projectObj;
+        let reports_type ="review_reports"
         setReportRequested(true);
-        const projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
+        console.log(annotationreviewertype,"annotationreviewertype")
+        if(annotationreviewertype=="Annotation Reports"  ){
+             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
+        }
+        if(annotationreviewertype=="Reviewer Reports"){
+             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'), reports_type);
+        }
         dispatch(APITransport(projectObj));
         setShowPicker(false)
         setShowSpinner(true);
