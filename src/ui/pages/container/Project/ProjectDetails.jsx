@@ -13,6 +13,9 @@ import { translate } from "../../../../config/localisation";
 // import TabPanel from "../../component/common/TabPanel";
 import addUserTypes from "../../../../constants/addUserTypes";
 import Spinner from "../../component/common/Spinner";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { styled, alpha } from '@mui/material/styles';
 
 
 const menuOptions = [
@@ -42,7 +45,46 @@ function TabPanel(props) {
     );
 }
 
-
+const StyledMenu = styled((props) => (
+    <Menu
+        elevation={0}
+        anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+        }}
+        transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+        }}
+        {...props}
+    />
+))(({ theme }) => ({
+    '& .MuiPaper-root': {
+        borderRadius: 6,
+        marginTop: theme.spacing(1),
+        minWidth: 180,
+        color:
+            theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+        boxShadow:
+            'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+        '& .MuiMenu-list': {
+            padding: '4px 0',
+        },
+        '& .MuiMenuItem-root': {
+            '& .MuiSvgIcon-root': {
+                fontSize: 18,
+                color: theme.palette.text.secondary,
+                marginRight: theme.spacing(1.5),
+            },
+            '&:active': {
+                backgroundColor: alpha(
+                    theme.palette.primary.main,
+                    theme.palette.action.selectedOpacity,
+                ),
+            },
+        },
+    },
+}));
 const Projects = () => {
     // console.log("props", props)
     const { id } = useParams();
@@ -54,7 +96,14 @@ const Projects = () => {
         { name: "Unassigned Task", value: null },
         { name: "Total Labeled Task", value: null },
     ])
-
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     const dispatch = useDispatch();
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
@@ -64,8 +113,6 @@ const Projects = () => {
 
         dispatch(APITransport(projectObj));
     }
-    console.log(ProjectDetails, "test");
-
     useEffect(() => {
         getProjectDetails();
         const projectStatus = ProjectDetails.is_published ? "Published" : ProjectDetails.is_archived ? "Archived" : "Draft";
@@ -97,16 +144,38 @@ const Projects = () => {
         ])
     }, []);
     const [loading, setLoading] = useState(false);
+    const [annotationreviewertype, setAnnotationreviewertype] = useState()
     const [value, setValue] = React.useState(0);
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    const isMember = userDetails.role!==1 || ProjectDetails?.users?.some((user) => user.id === userDetails.id);
+    const isMember = userDetails.role !== 1 || ProjectDetails?.users?.some((user) => user.id === userDetails.id);
     const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
+
+    let projectdata = ProjectDetails?.users?.filter((x) => {
+        return (ProjectDetails?.annotation_reviewers?.find((choice) => choice.id === x.id));
+    });
+
+    let data = projectdata?.filter((x) => {
+        return (userDetails.id == x.id);
+    })
+
+    let annotationdata = ProjectDetails?.users?.filter((x) => x.id == userDetails.id);
+    let reviewerdata = ProjectDetails?.annotation_reviewers?.filter((x) => x.id == userDetails.id);
+    useEffect(() => {
+
+        if (annotationdata?.length && !reviewerdata?.length) {
+            setAnnotationreviewertype("Annotation Reports")
+        } else if (reviewerdata?.length && !annotationdata?.length) {
+            setAnnotationreviewertype("Reviewer Reports")
+
+        }
+    }, [annotationdata, reviewerdata])
+
     return (
         <ThemeProvider theme={themeDefault}>
             {/* <Header /> */}
@@ -125,7 +194,7 @@ const Projects = () => {
                         padding: 5
                     }}
                 >
-                  
+
                     <Typography variant="h3">{ProjectDetails.title}</Typography>
                     <Grid
                         container
@@ -210,7 +279,7 @@ const Projects = () => {
                             }}
                             variant="contained"
                         >
-                            <Typography variant="body2" sx={{color : "#FFFFFF"}}>{translate("label.showProjectSettings")}</Typography>
+                            <Typography variant="body2" sx={{ color: "#FFFFFF" }}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
                     </Link>}
                     <Box>
@@ -219,23 +288,42 @@ const Projects = () => {
                             {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} onClick={handleClick} />
+                            {data?.length &&
+
+                                <StyledMenu
+                                    id="demo-customized-menu"
+                                    MenuListProps={{
+                                        'aria-labelledby': 'demo-customized-button',
+                                    }}
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleClose}
+                                >
+                                    <MenuItem onClick={() => { setAnnotationreviewertype("Annotation Reports"); handleClose() }} disableRipple>
+                                        Annotation Reports
+                                    </MenuItem>
+                                    <MenuItem onClick={() => { setAnnotationreviewertype("Reviewer Reports"); handleClose() }} disableRipple>
+                                        Reviewer Reports
+                                    </MenuItem>
+                                </StyledMenu>}
+
                         </Tabs>
                     </Box>
                     {isMember && <TabPanel value={value} index={0}>
-                        <TaskTable type="annotation"/>
+                        <TaskTable type="annotation" />
                     </TabPanel>}
                     {isReviewer && <TabPanel value={value} index={isMember ? 1 : 0}>
-                        <TaskTable type="review"/>
+                        <TaskTable type="review" />
                     </TabPanel>}
                     <TabPanel value={value} index={isMember ? isReviewer ? 2 : 1 : 1}>
-                        <MembersTable onRemoveSuccessGetUpdatedMembers={()=>getProjectDetails()} dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
+                        <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
                     </TabPanel>
                     {isReviewer && <TabPanel value={value} index={isMember ? 3 : 2}>
-                        <MembersTable onRemoveSuccessGetUpdatedMembers={()=>getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
+                        <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
                     <TabPanel value={value} index={isMember ? isReviewer ? 4 : 2 : 2}>
-                        <ReportsTable />
+                        <ReportsTable annotationreviewertype={annotationreviewertype} />
                     </TabPanel>
                 </Card>
             </Grid>
