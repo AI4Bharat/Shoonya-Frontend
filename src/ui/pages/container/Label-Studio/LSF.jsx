@@ -137,7 +137,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "update",
         "submit",
         "skip",
-        "controls",
+        ...taskData?.annotation_users?.some((user) => user === userData.id) ? ["controls"] : [],
         "infobar",
         "topbar",
         "instruction",
@@ -311,7 +311,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             // both have loaded!
             console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             setLabelConfig(labelConfig.label_config);
-            setTaskData(taskData.data);
+            setTaskData(taskData);
             LSFRoot(
               rootRef,
               lsfRef,
@@ -369,7 +369,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         <div/>
         <Grid container spacing={0}>
           <Grid item>
-          <Tooltip title="Save task for later">
+          {taskData?.annotation_users?.some((user) => user === userData.id) && <Tooltip title="Save task for later">
             <Button
               value="Draft"
               type="default"
@@ -379,7 +379,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             >
               Draft
             </Button>
-          </Tooltip>
+          </Tooltip>}
           </Grid>
           <Grid item>
           {localStorage.getItem("labelAll") !== "true" ? (

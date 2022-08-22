@@ -341,7 +341,7 @@ const LabelStudioWrapper = ({
           ]);
           setNotes(taskData, annotations);
           setLabelConfig(labelConfig.label_config);
-          setTaskData(taskData.data);
+          setTaskData(taskData);
           LSFRoot(
             rootRef,
             lsfRef,
@@ -419,14 +419,13 @@ const LabelStudioWrapper = ({
                   pt: 3,
                   pb: 3,
                   borderBottom: "None",
-                  borderRight: "None",
                 }}
                 className="lsf-button"
               >
                 Next
               </Button>
             </Tooltip>
-            <Tooltip title="Revise Annotation">
+            {taskData?.review_user === userData?.id && <Tooltip title="Revise Annotation">
               <Button
                 value="to_be_revised"
                 type="default"
@@ -438,13 +437,14 @@ const LabelStudioWrapper = ({
                   pt: 3,
                   pb: 3,
                   borderBottom: "None",
+                  borderLeft: "None",
                 }}
                 className="lsf-button"
               >
                Revise
               </Button>
-            </Tooltip>
-            <Tooltip title="Accept Annotation">
+            </Tooltip>}
+            {taskData?.review_user === userData?.id && <Tooltip title="Accept Annotation">
               <Button
                 value="Accept"
                 type="default"
@@ -462,7 +462,7 @@ const LabelStudioWrapper = ({
               >
                 Accept
               </Button>
-            </Tooltip>
+            </Tooltip>}
           </div>
         </div>
       )}
