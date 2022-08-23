@@ -16,6 +16,7 @@ import Spinner from "../../component/common/Spinner";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled, alpha } from '@mui/material/styles';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 
 const menuOptions = [
@@ -150,13 +151,13 @@ const Projects = () => {
         setValue(newValue);
     };
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    const isMember = userDetails.role !== 1 || ProjectDetails?.users?.some((user) => user.id === userDetails.id);
+    const isAnnotators = userDetails.role !== 1 || ProjectDetails?.annotators?.some((user) => user.id === userDetails.id);
     const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
 
-    let projectdata = ProjectDetails?.users?.filter((x) => {
+    let projectdata = ProjectDetails?.annotators?.filter((x) => {
         return (ProjectDetails?.annotation_reviewers?.find((choice) => choice.id === x.id));
     });
 
@@ -164,7 +165,7 @@ const Projects = () => {
         return (userDetails.id == x.id);
     })
 
-    let annotationdata = ProjectDetails?.users?.filter((x) => x.id == userDetails.id);
+    let annotationdata = ProjectDetails?.annotators?.filter((x) => x.id == userDetails.id);
     let reviewerdata = ProjectDetails?.annotation_reviewers?.filter((x) => x.id == userDetails.id);
     useEffect(() => {
 
@@ -284,12 +285,12 @@ const Projects = () => {
                     </Link>}
                     <Box>
                         <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
-                            {isMember && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                            {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {isAnnotators &&<Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} onClick={handleClick} />
-                            {data?.length &&
+                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700',flexDirection: "row-reverse" }} onClick={handleClick} icon={(data?.length || userDetails?.role === 2 || userDetails?.role === 3) &&<ArrowDropDownIcon/>}/>
+                            {(data?.length || userDetails?.role === 2 || userDetails?.role === 3) &&
 
                                 <StyledMenu
                                     id="demo-customized-menu"
@@ -310,19 +311,19 @@ const Projects = () => {
 
                         </Tabs>
                     </Box>
-                    {isMember && <TabPanel value={value} index={0}>
+                    {isAnnotators && <TabPanel value={value} index={0}>
                         <TaskTable type="annotation" />
                     </TabPanel>}
-                    {isReviewer && <TabPanel value={value} index={isMember ? 1 : 0}>
+                    {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
                         <TaskTable type="review" />
                     </TabPanel>}
-                    <TabPanel value={value} index={isMember ? isReviewer ? 2 : 1 : 1}>
-                        <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.users} type={addUserTypes.PROJECT_MEMBER} />
-                    </TabPanel>
-                    {isReviewer && <TabPanel value={value} index={isMember ? 3 : 2}>
+                    {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 : 1}>
+                     <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS} />
+                    </TabPanel>}
+                    {isReviewer && <TabPanel value={value} index={isAnnotators ? 3 : 1}>
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
-                    <TabPanel value={value} index={isMember ? isReviewer ? 4 : 2 : 2}>
+                    <TabPanel value={value} index={isAnnotators ? isReviewer ? 4 : 2 : 2}>
                         <ReportsTable annotationreviewertype={annotationreviewertype} />
                     </TabPanel>
                 </Card>

@@ -8,7 +8,7 @@
       super("POST", timeout, false);
       this.projectObj = projectObj;
       this.type = constants.REMOVE_PROJECT_MEMBER;
-      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/remove_user/`;
+      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/remove_annotator/`;
     }
   
     processResponse(res) {
