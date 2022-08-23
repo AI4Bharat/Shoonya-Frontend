@@ -9,7 +9,7 @@
    constructor(pageNo, records, timeout = 2000) {
      super("GET", timeout, false);
      this.type = constant.GET_WORKSPACES_DATA
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}?page=${pageNo}&records=${records}`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}user-workspaces/loggedin-user-workspaces/`;
    }
 
    processResponse(res) {
