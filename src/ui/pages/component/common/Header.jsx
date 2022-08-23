@@ -355,14 +355,14 @@ const Header = () => {
       name: "My Profile",
       onclick: () => {
         handleCloseUserMenu();
-        navigate("/profile");
+        navigate(`/profile/${loggedInUserData.id}`);
       },
     },
     {
       name: "My Progress",
       onclick: () => {
         handleCloseUserMenu();
-        navigate("/profile?tab=progress");
+        navigate(`/profile/${loggedInUserData.id}`);
       },
     },
     {
