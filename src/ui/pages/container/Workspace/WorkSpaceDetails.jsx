@@ -85,6 +85,8 @@ const Workspace = (props) => {
                 title={workspaceDtails && workspaceDtails.workspace_name}
                 createdBy={workspaceDtails && workspaceDtails.created_by ?.username}
                 pageType = {componentType.Type_Workspace}
+                onArchiveWorkspace={()=>getWorkspaceDetails()}
+
             />
             {/* <Grid
                 container
