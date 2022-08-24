@@ -163,7 +163,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
     case addUserTypes.MANAGER:
       const addManagerObj = new AssignManagerToWorkspaceAPI(
         id,
-        users.username,
+        [users.id],
       );
       const assignManagerRes = await fetch(addManagerObj.apiEndPoint(), {
         method: "POST",

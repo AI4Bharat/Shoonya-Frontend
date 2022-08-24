@@ -35,11 +35,9 @@ const ManagersTable = (props) => {
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
 
-const handleRemoveWorkspaceManager = async(username)=>{
-    const workspacedata={
-        usernames:username,
- } 
-        const projectObj = new RemoveWorkspaceManagerAPI(id,workspacedata);
+const handleRemoveWorkspaceManager = async(userid)=>{
+   
+        const projectObj = new RemoveWorkspaceManagerAPI(id, {ids:[userid]},);
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
@@ -51,10 +49,10 @@ const handleRemoveWorkspaceManager = async(username)=>{
         if (res.ok) {
             setSnackbarInfo({
                 open: true,
-                message: resp?.message,
+                message: "Successfully Removed",
                 variant: "success",
             })
-
+            getWorkspaceManagersData();
         } else {
             setSnackbarInfo({
                 open: true,
@@ -112,7 +110,7 @@ const handleRemoveWorkspaceManager = async(username)=>{
                  <CustomButton
                  sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
                  label = "Remove"
-                 onClick={()=>handleRemoveWorkspaceManager(el.username)}
+                 onClick={()=>handleRemoveWorkspaceManager(el.id)}
              />
              </>
                     ]

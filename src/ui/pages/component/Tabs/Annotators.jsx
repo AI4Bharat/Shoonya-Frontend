@@ -55,7 +55,7 @@ const handleRemoveWorkspaceMember = async(Projectid)=>{
                 message: resp?.message,
                 variant: "success",
             })
-
+            getWorkspaceAnnotatorsData();
         } else {
             setSnackbarInfo({
                 open: true,
