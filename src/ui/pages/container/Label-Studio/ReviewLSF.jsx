@@ -175,7 +175,7 @@ const LabelStudioWrapper = ({
 
         task: {
           // annotations: annotations.filter((annotation) => !annotation.parent_annotation).concat(annotations.filter((annotation) => annotation.id === taskData.correct_annotation)),
-          annotations: annotations.filter((annotation) => annotation.id === taskData.correct_annotation).length > 0 ? annotations.filter((annotation) => annotation.id === taskData.correct_annotation) : annotations.filter((annotation) => !annotation.parent_annotation),
+          annotations: (taskData.task_status === "accepted" || taskData.task_status === "accepted_with_changes") && annotations.filter((annotation) => annotation.id === taskData.correct_annotation).length > 0 ? annotations.filter((annotation) => annotation.id === taskData.correct_annotation) : annotations.filter((annotation) => !annotation.parent_annotation),
           predictions: predictions,
           id: taskData.id,
           data: taskData.data,
@@ -341,7 +341,7 @@ const LabelStudioWrapper = ({
           ]);
           setNotes(taskData, annotations);
           setLabelConfig(labelConfig.label_config);
-          setTaskData(taskData.data);
+          setTaskData(taskData);
           LSFRoot(
             rootRef,
             lsfRef,
@@ -373,8 +373,8 @@ const LabelStudioWrapper = ({
     });
   };
 
-  const handleRejectClick = async () => {
-    review_status.current = "rejected";
+  const handleReviseClick = async () => {
+    review_status.current = "to_be_revised";
     lsfRef.current.store.submitAnnotation();
   };
 
@@ -409,7 +409,7 @@ const LabelStudioWrapper = ({
           <div>
             <Tooltip title="Go to next task">
               <Button
-                value="Reject"
+                value="to_be_revised"
                 type="default"
                 onClick={onNextAnnotation}
                 style={{
@@ -419,18 +419,17 @@ const LabelStudioWrapper = ({
                   pt: 3,
                   pb: 3,
                   borderBottom: "None",
-                  borderRight: "None",
                 }}
                 className="lsf-button"
               >
                 Next
               </Button>
             </Tooltip>
-            <Tooltip title="Reject Annotation">
+            {taskData?.review_user === userData?.id && <Tooltip title="Revise Annotation">
               <Button
-                value="Reject"
+                value="to_be_revised"
                 type="default"
-                onClick={handleRejectClick}
+                onClick={handleReviseClick}
                 style={{
                   minWidth: "160px",
                   border: "1px solid #e6e6e6",
@@ -438,13 +437,14 @@ const LabelStudioWrapper = ({
                   pt: 3,
                   pb: 3,
                   borderBottom: "None",
+                  borderLeft: "None",
                 }}
                 className="lsf-button"
               >
-                Reject
+               Revise
               </Button>
-            </Tooltip>
-            <Tooltip title="Accept Annotation">
+            </Tooltip>}
+            {taskData?.review_user === userData?.id && <Tooltip title="Accept Annotation">
               <Button
                 value="Accept"
                 type="default"
@@ -462,7 +462,7 @@ const LabelStudioWrapper = ({
               >
                 Accept
               </Button>
-            </Tooltip>
+            </Tooltip>}
           </div>
         </div>
       )}

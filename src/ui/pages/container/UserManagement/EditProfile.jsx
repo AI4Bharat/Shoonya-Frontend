@@ -1,5 +1,5 @@
 import { Button, Card, CircularProgress, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel, InputAdornment } from "@mui/material";
-import OutlinedTextField from "../common/OutlinedTextField";
+import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -7,8 +7,8 @@ import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/Fetc
 import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
 import UpdateEmailAPI from "../../../../redux/actions/api/UserManagement/UpdateEmail";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import Snackbar from "../common/Snackbar";
-import UpdateEmailDialog from "../common/UpdateEmailDialog"
+import Snackbar from "../../component/common/Snackbar";
+import UpdateEmailDialog from "../../component/common/UpdateEmailDialog"
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 
 const MyProfile = () => {
@@ -136,14 +136,14 @@ const MyProfile = () => {
             // width: window.innerWidth * 0.8,
             width: "100%",
             minHeight: 500,
-            // padding: 5,
+            padding: 5,
             border: 0,
           }}
         >
           <Grid container spacing={4}>
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <Typography variant="h3" align="center">
-                My Profile
+                Edit Profile
               </Typography>
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>

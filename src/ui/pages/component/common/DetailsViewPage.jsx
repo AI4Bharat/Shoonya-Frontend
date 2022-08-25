@@ -24,7 +24,8 @@ import AddUsersDialog from "./AddUsersDialog";
 import addUserTypes from "../../../../constants/addUserTypes";
 import AddWorkspaceDialog from "../Workspace/AddWorkspaceDialog";
 import Spinner from "../../component/common/Spinner";
-import {  useSelector } from 'react-redux';
+import {  useSelector,useDispatch } from 'react-redux';
+import WorkspaceSetting from "../Tabs/WorkspaceSetting";
 
 function TabPanel(props) {
 
@@ -49,9 +50,10 @@ function TabPanel(props) {
 
 
 const DetailsViewPage = (props) => {
-    const { pageType, title, createdBy } = props;
-    const { id, orgId } = useParams();
+    const { pageType, title, createdBy ,onArchiveWorkspace} = props;
+    const { id,orgId } = useParams();
     const classes = DatasetStyle();
+    const dispatch = useDispatch();
     const [value, setValue] = React.useState(0);
     const [loading, setLoading] = useState(false);
     const [addAnnotatorsDialogOpen, setAddAnnotatorsDialogOpen] = React.useState(false);
@@ -70,7 +72,6 @@ const DetailsViewPage = (props) => {
     useEffect(() => {
         // getDashboardWorkspaceData();
     }, []);
-
     
     const handleAnnotatorDialogClose = () => {
         setAddAnnotatorsDialogOpen(false);
@@ -95,6 +96,7 @@ const DetailsViewPage = (props) => {
     const handleWorkspaceDialogOpen = () => {
         setAddWorkspacesDialogOpen(true);
     };
+
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
@@ -162,7 +164,7 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Organization &&
                             <>
                                 <CustomButton label={translate("button.addNewWorkspace")} sx={{ width: "100%", mb: 2 }} onClick={handleWorkspaceDialogOpen} />
-                                <Workspaces />
+                                <Workspaces createdBy={createdBy} />
                                 <AddWorkspaceDialog
                                     dialogCloseHandler={handleWorkspaceDialogClose}
                                     isOpen={addWorkspacesDialogOpen}
@@ -213,7 +215,7 @@ const DetailsViewPage = (props) => {
                     </TabPanel>
                     <TabPanel value={value} index={4}>
                         {pageType === componentType.Type_Organization && <OrganizationSettings />}
-                        {pageType === componentType.Type_Workspace && <CustomButton className={classes.settingsButton} label={"Archive Workspace"} buttonVariant="contained" sx={{backgroundColor : "#cf5959", "&:hover" : {backgroundColor : "#cf5959",}}} />}
+                        {pageType === componentType.Type_Workspace && <WorkspaceSetting  onArchiveWorkspace={onArchiveWorkspace}/> }
                     </TabPanel>
                 </Card>
             </Grid>

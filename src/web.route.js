@@ -28,10 +28,10 @@ import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
 import LSF from "./ui/pages/container/Label-Studio/LSF";
 import ReviewLSF from "./ui/pages/container/Label-Studio/ReviewLSF";
-import UserProfilePage from "./ui/pages/container/UserManagement/UserProfilePage";
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
 import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
+import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
 import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
 
@@ -128,8 +128,8 @@ const App = () => {
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
         <Route path="/invite/:inviteCode" element={<SignUp />} />
         <Route
-          path="/profile"
-          element={ProtectedRouteWrapper(<Layout component={<UserProfilePage />} />)}
+          path="/edit-profile"
+          element={ProtectedRouteWrapper(<Layout component={<EditProfile />} Backbutton={true} />)}
         />
          <Route
           path="/Change-Password"

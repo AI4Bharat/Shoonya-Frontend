@@ -29,14 +29,14 @@ import CustomButton from "./Button";
 const DialogHeading = {
   [addUserTypes.ANNOTATOR]: 'Add Annotators',
   [addUserTypes.MANAGER]: 'Assign Manager',
-  [addUserTypes.PROJECT_MEMBER]: 'Add Project Members',
+  [addUserTypes.PROJECT_ANNOTATORS]: 'Add Project Annotators',
   [addUserTypes.PROJECT_REVIEWER]: 'Add Project Reviewers',
 }
 
 // fetch all users in the current organization/workspace
 const fetchAllUsers = (userType, id, dispatch) => {
   switch (userType) {
-    case addUserTypes.PROJECT_MEMBER:
+    case addUserTypes.PROJECT_ANNOTATORS:
     case addUserTypes.PROJECT_REVIEWER:
       const workspaceAnnotatorsObj = new GetWorkspacesAnnotatorsDataAPI(id);
       dispatch(APITransport(workspaceAnnotatorsObj));
@@ -53,11 +53,11 @@ const fetchAllUsers = (userType, id, dispatch) => {
 
 const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, workspaceManagers, orgUsers) => {
   switch (userType) {
-    case addUserTypes.PROJECT_MEMBER:
+    case addUserTypes.PROJECT_ANNOTATORS:
       return workspaceAnnotators
         .filter(
           (workspaceAnnotator) =>
-            projectDetails?.users.findIndex(
+            projectDetails?.annotators.findIndex(
               (projectUser) => projectUser?.id === workspaceAnnotator?.id
             ) === -1
         )
@@ -100,7 +100,7 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
 
 const handleAddUsers = async (userType, users, id, dispatch) => {
   switch (userType) {
-    case addUserTypes.PROJECT_MEMBER:
+    case addUserTypes.PROJECT_ANNOTATORS:
       const addMembersObj = new AddMembersToProjectAPI(
         id,
         users.map((user) => user.id),
@@ -163,7 +163,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
     case addUserTypes.MANAGER:
       const addManagerObj = new AssignManagerToWorkspaceAPI(
         id,
-        users.username,
+        [users.id],
       );
       const assignManagerRes = await fetch(addManagerObj.apiEndPoint(), {
         method: "POST",
@@ -203,7 +203,7 @@ const AddUsersDialog = ({
   useEffect(() => {
     let id = '';
     switch (userType) {
-      case addUserTypes.PROJECT_MEMBER:
+      case addUserTypes.PROJECT_ANNOTATORS:
       case addUserTypes.PROJECT_REVIEWER:
         id = projectDetails?.workspace_id;
         break;

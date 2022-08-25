@@ -16,6 +16,10 @@ import addUserTypes from "../../../../constants/addUserTypes";
 import { useNavigate, useParams } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import RemoveProjectMemberAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectMember';
+import RemoveProjectReviewerAPI from '../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer';
+import CustomizedSnackbars from "../../component/common/Snackbar";
+
 
 const columns = [
     {
@@ -66,7 +70,7 @@ const options = {
 
 const addLabel = {
     organization: "Invite Users to Organization",
-    [addUserTypes.PROJECT_MEMBER]: "Add Users to Project",
+    [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
     [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
 }
 
@@ -74,12 +78,19 @@ const MembersTable = (props) => {
     const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
     const { orgId, id } = useParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [userRole, setUserRole] = useState();
-
-    const { dataSource, hideButton } = props;
-
+    const [loading, setLoading] = useState(false);
+    const { dataSource, hideButton, onRemoveSuccessGetUpdatedMembers } = props;
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
     const userDetails = useSelector(state=>state.fetchLoggedInUserData.data);
-
+    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+    const apiLoading = useSelector(state => state.apiStatus.loading);
+    
     useEffect(() => {
         userDetails && setUserRole(userDetails.role);
     }, [])
@@ -91,22 +102,116 @@ const MembersTable = (props) => {
     const handleUserDialogOpen = () => {
         setAddUserDialogOpen(true);
     };
+    // const Projectdata = ProjectDetails && ProjectDetails.filter((el,i)=>{
+    //     return [
+    //                 el.email, 
+                  
+    //             ]
+    // });
+    const handleProjectMember = async(email) =>{
+        const projectObj = new RemoveProjectMemberAPI(id,{email:email});
+        dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            onRemoveSuccessGetUpdatedMembers()
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+      
+    }
+    const handleProjectReviewer=async(Projectid)=>{
+      const projectReviewer={
+        id:Projectid,
+      }
+        const projectObj = new RemoveProjectReviewerAPI(id,projectReviewer);
+        dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
+            })
+            onRemoveSuccessGetUpdatedMembers()
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+    }
+    useEffect(() => {
+        setLoading(apiLoading);
+      }, [apiLoading])
 
+    const projectlist=(el)=>{
+        let temp=false;
+        ProjectDetails?.frozen_users.forEach((em)=>{
+        if(el==em.id){
+           temp=true
+        }
+      })
+         return temp;
+    }
     const data =
         dataSource && dataSource.length > 0
             ? dataSource.map((el, i) => {
                 const userRole = el.role && UserMappedByRole(el.role).element;
+                
+            
+                
                 return [
                     el.username,
                     el.email,
                     userRole ? userRole : el.role,
+                    <> 
                     <CustomButton
                         sx={{ p: 1, borderRadius: 2 }}
                         onClick={() => {
                             navigate(`/profile/${el.id}`);
                         }}
                         label={"View"}
-                    />,
+                    />
+                   
+                            {props.type === addUserTypes.PROJECT_ANNOTATORS &&
+                             <CustomButton
+                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
+                                label = "Remove"
+                                onClick={()=>handleProjectMember(el.email)}
+                                disabled={projectlist(el.id)}
+                            
+                            />}
+                             {props.type === addUserTypes.PROJECT_REVIEWER &&
+                             <CustomButton
+                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
+                                label = "Remove"
+                                onClick={()=>handleProjectReviewer(el.id)}
+                                disabled={projectlist(el.id)}
+                            />}
+                            </>
+
                 ];
             })
             : [];
@@ -137,7 +242,19 @@ const MembersTable = (props) => {
                 search: false,
                 jumpToPage: true,
               };
-    
+              const renderSnackBar = () => {
+                return (
+                    <CustomizedSnackbars
+                        open={snackbar.open}
+                        handleClose={() =>
+                            setSnackbarInfo({ open: false, message: "", variant: "" })
+                        }
+                        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                        variant={snackbar.variant}
+                        message={snackbar.message}
+                    />
+                );
+            };
 
     return (
         <React.Fragment>
@@ -164,6 +281,7 @@ const MembersTable = (props) => {
                     id={id}
                 />
             }
+            {renderSnackBar()}
             <ThemeProvider theme={tableTheme}>
                 <MUIDataTable
                     title={""}

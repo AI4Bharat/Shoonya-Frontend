@@ -6,10 +6,10 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class AssignManagerToWorkspaceAPI extends API {
-  constructor(workspaceId, username, timeout = 2000) {
+  constructor(workspaceId, ids, timeout = 2000) {
     super("POST", timeout, false);
+    this.ids = ids;
     this.type = constants.ASSIGN_MANAGER_TO_WORKSPACE;
-    this.username = username;
     this.endpoint = `${super.apiEndPointAuto()}${
       ENDPOINTS.getWorkspaces
     }${workspaceId}/assign_manager/`;
@@ -28,7 +28,7 @@ export default class AssignManagerToWorkspaceAPI extends API {
 
   getBody() {
     return {
-      username: this.username,
+      ids: this.ids,
     };
   }
 
