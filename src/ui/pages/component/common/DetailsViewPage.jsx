@@ -164,7 +164,7 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Organization &&
                             <>
                                 <CustomButton label={translate("button.addNewWorkspace")} sx={{ width: "100%", mb: 2 }} onClick={handleWorkspaceDialogOpen} />
-                                <Workspaces />
+                                <Workspaces createdBy={createdBy} />
                                 <AddWorkspaceDialog
                                     dialogCloseHandler={handleWorkspaceDialogClose}
                                     isOpen={addWorkspacesDialogOpen}

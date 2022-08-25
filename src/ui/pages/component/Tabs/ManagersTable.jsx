@@ -7,10 +7,18 @@ import {useDispatch,useSelector} from 'react-redux';
 import CustomButton from "../common/Button";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import RemoveWorkspaceManagerAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceManager";
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 const ManagersTable = (props) => {
 
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
     
     const {id} = useParams();
     // const orgId = useSelector(state=>state.getWorkspacesProjectData?.data?.[0]?.organization_id);
@@ -26,7 +34,33 @@ const ManagersTable = (props) => {
     },[]);
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
-console.log(workspaceManagers,"workspaceManagers")
+
+const handleRemoveWorkspaceManager = async(userid)=>{
+   
+        const projectObj = new RemoveWorkspaceManagerAPI(id, {ids:[userid]},);
+        dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: "Successfully Removed",
+                variant: "success",
+            })
+            getWorkspaceManagersData();
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
+    }
     const columns = [
         {
             name: "Name",
@@ -65,17 +99,20 @@ console.log(workspaceManagers,"workspaceManagers")
             return [
                 el.username, 
                 el.email,
-               
+               <>
                 <Link to={`/profile/${el.id}`} style={{ textDecoration: "none" }}>
                     <CustomButton
                         sx={{borderRadius : 2,marginRight: 2}}
                         label = "View"
                     />
-                    <CustomButton
-                        sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
-                        label = "Remove"
-                    />
+                   
                 </Link>
+                 <CustomButton
+                 sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
+                 label = "Remove"
+                 onClick={()=>handleRemoveWorkspaceManager(el.id)}
+             />
+             </>
                     ]
         }) : [];
 
@@ -106,9 +143,23 @@ console.log(workspaceManagers,"workspaceManagers")
             search: false,
             jumpToPage: true,
           };
+          const renderSnackBar = () => {
+            return (
+                <CustomizedSnackbars
+                    open={snackbar.open}
+                    handleClose={() =>
+                        setSnackbarInfo({ open: false, message: "", variant: "" })
+                    }
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    variant={snackbar.variant}
+                    message={snackbar.message}
+                />
+            );
+        };
 
     return (
         <div>
+            {renderSnackBar()}
             <ThemeProvider theme={tableTheme}>
 				<MUIDataTable
                     // title={""}
