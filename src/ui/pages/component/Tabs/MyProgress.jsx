@@ -74,7 +74,6 @@ const MyProgress = () => {
   const Workspaces = useSelector((state) => state.getWorkspaces.data);
   const UserAnalytics = useSelector((state) => state.getUserAnalytics.data);
   const dispatch = useDispatch();
-console.log(Workspaces,"Workspaces")
   const classes = DatasetStyle();
 
   useEffect(() => {
@@ -88,25 +87,13 @@ console.log(Workspaces,"Workspaces")
 
   useEffect(() => {
     if (UserDetails && Workspaces?.results) {
-      const filteredWorkspaces = Workspaces.results.filter((ws) => {
-        let userAdded = false;
-        for (let user of ws.users) {
-          if (user.id === UserDetails.id) {
-            userAdded = true;
-            break;
-          }
-        }
-        return userAdded;
-      });
       let workspacesList = [];
-      filteredWorkspaces?.forEach((item) => {
+      Workspaces.results.forEach((item) => {
         workspacesList.push({ id: item.id, name: item.workspace_name });
       });
       setWorkspaces(workspacesList);
       setSelectedWorkspaces(workspacesList.map(item => item.id))
-      setSelectedType("ContextualTranslationEditing")
-      // console.log("wid--->>", Workspaces.results[0]);
-      // console.log("here");
+      setSelectedType("ContextualTranslationEditing");
     }
   }, [UserDetails, Workspaces]);
 
@@ -214,7 +201,7 @@ console.log(Workspaces,"Workspaces")
     jumpToPage: true,
     customToolbar: renderToolBar,
   };
-console.log(UserDetails?.date_joined,"UserDetails?.date_joined")
+
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
@@ -224,13 +211,6 @@ console.log(UserDetails?.date_joined,"UserDetails?.date_joined")
         justifyContent="center"
         alignItems="center"
       >
-        <Grid container spacing={4}>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="h3" align="center">
-              My Progress
-            </Typography>
-          </Grid>
-        </Grid>
         <Grid container columnSpacing={4} rowSpacing={2} mt={1} mb={1}>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
               <Button 
