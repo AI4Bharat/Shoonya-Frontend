@@ -70,7 +70,7 @@ const options = {
 
 const addLabel = {
     organization: "Invite Users to Organization",
-    [addUserTypes.PROJECT_MEMBER]: "Add Users to Project",
+    [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
     [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
 }
 
@@ -195,7 +195,7 @@ const MembersTable = (props) => {
                         label={"View"}
                     />
                    
-                            {props.type === addUserTypes.PROJECT_MEMBER &&
+                            {props.type === addUserTypes.PROJECT_ANNOTATORS &&
                              <CustomButton
                                 sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
                                 label = "Remove"

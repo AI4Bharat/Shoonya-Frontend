@@ -74,6 +74,7 @@ const MyProgress = () => {
   const Workspaces = useSelector((state) => state.getWorkspaces.data);
   const UserAnalytics = useSelector((state) => state.getUserAnalytics.data);
   const dispatch = useDispatch();
+console.log(Workspaces,"Workspaces")
   const classes = DatasetStyle();
 
   useEffect(() => {
@@ -81,7 +82,6 @@ const MyProgress = () => {
     const workspacesObj = new GetWorkspacesAPI(1, 9999);
     dispatch(APITransport(typesObj));
     dispatch(APITransport(workspacesObj));
-    console.log(new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),"date")
     
   }, []);
 
@@ -201,7 +201,7 @@ const MyProgress = () => {
     jumpToPage: true,
     customToolbar: renderToolBar,
   };
-
+console.log(UserDetails?.date_joined,"UserDetails?.date_joined")
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
@@ -276,7 +276,6 @@ const MyProgress = () => {
         </Grid>
         {showPicker && <Box sx={{mt: 2, mb:2, display: "flex", justifyContent: "center", width: "100%"}}>
             <Card sx={{overflowX: "scroll"}}>
-              {UserDetails?.date_joined !== undefined &&
                 <DateRangePicker
                     onChange={handleRangeChange}
                     staticRanges={[
@@ -303,7 +302,7 @@ const MyProgress = () => {
                     minDate={new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
                     maxDate={new Date()}
                     direction="horizontal"
-                />}
+                />
         
             </Card>
         </Box>}
