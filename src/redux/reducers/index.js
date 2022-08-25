@@ -59,6 +59,7 @@ import SignUp from './UserManagement/SignUp';
 import archiveWorkspace from './WorkspaceDetails/ArchiveWorkspace';
 import RemoveProjectMember from './ProjectDetails/RemoveProjectMember';
 import RemoveProjectReviewer from './ProjectDetails/RemoveProjectReviewer';
+import GetWorkspace from './Organization/GetWorkspace';
 
 const index = {
     apiStatus,
@@ -125,6 +126,7 @@ const index = {
     RemoveProjectMember,
     RemoveProjectReviewer,
     archiveWorkspace,
+    GetWorkspace
 };
 
 export default index;
