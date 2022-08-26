@@ -348,7 +348,7 @@ else if (pullDisabled === "No more unassigned tasks in this project")
                             sx={{fontSize: "16px"}}
                         >
                         <MenuItem value={-1}>All</MenuItem>
-                        {filterData.Reviewers.map((el, i) => (
+                        {filterData.Reviewers?.map((el, i) => (
                             <MenuItem value={el.value}>{el.label}</MenuItem>
                         ))}
                         </Select>
