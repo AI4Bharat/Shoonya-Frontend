@@ -72,18 +72,18 @@ const Header = () => {
   };
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-  useEffect(() => {
-    function handleEscapeKey(event) {
-      console.log(event,"event")
-      if (event.code === 'Escape') {
-        console.log("we are escape condition")
-        handleTransliterationModelClose()
-      }
+  const keyPress = (e) => {
+    if (e.code === "Escape" && showTransliterationModel) {
+      handleTransliterationModelClose();
     }
+  };
   
-    document.addEventListener('keydown', handleEscapeKey)
-    return () => document.removeEventListener('keydown', handleEscapeKey)
-  }, [])
+  useEffect(() => {
+    window.addEventListener("keydown", keyPress);
+    return () => {
+      window.removeEventListener("keydown", keyPress);
+    }
+  }, [keyPress]);
 
 
   const handleCloseUserMenu = () => {
