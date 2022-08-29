@@ -7,6 +7,7 @@ import "tarento-react-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useDispatch, useSelector } from "react-redux";
 
 const Transliteration = (props) => {
   const classes = GlobalStyles();
@@ -23,6 +24,8 @@ const Transliteration = (props) => {
 
   const matches = useMediaQuery('(max-width:768px)');
 
+  const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+
   const { onCancelTransliteration } = props;
 
   const renderTextarea = (props) => {
@@ -37,6 +40,13 @@ const Transliteration = (props) => {
     );
   };
   console.log('...transliteration')
+
+ 
+
+  var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
+  console.log(data,"dddddddddd")
+  
+  console.log(ProjectDetails.tgt_language,"ProjectDetails" ,languageList,"aaaa",selectedLang) 
 
   useEffect(() => {
     axios.get(`https://xlit-api.ai4bharat.org/languages`)

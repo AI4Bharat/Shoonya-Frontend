@@ -72,6 +72,19 @@ const Header = () => {
   };
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+  useEffect(() => {
+    function handleEscapeKey(event) {
+      console.log(event,"event")
+      if (event.code === 'Escape') {
+        console.log("we are escape condition")
+        handleTransliterationModelClose()
+      }
+    }
+  
+    document.addEventListener('keydown', handleEscapeKey)
+    return () => document.removeEventListener('keydown', handleEscapeKey)
+  }, [])
+
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
