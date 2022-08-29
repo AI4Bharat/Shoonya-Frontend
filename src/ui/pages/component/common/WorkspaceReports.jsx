@@ -110,6 +110,7 @@ const WorkspaceReports = () => {
       setReportData([]);
       setSelectedColumns([]);
     }
+    setShowSpinner(false);
   }, [UserReports]);
 
   useEffect(() => {
