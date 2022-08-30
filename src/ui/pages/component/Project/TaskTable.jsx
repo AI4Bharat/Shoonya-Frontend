@@ -47,7 +47,14 @@ const TaskTable = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const filterData = {
         Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["labeled", "accepted", "accepted_with_changes", "to_be_revised"] : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
+        Annotators : ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators.filter((member) => member.role === 1).map((el,i)=>{
+            return {
+                label: el.username,
+                value: el.id
+            }
+        }) : [],
+
+        Reviewers : ProjectDetails?.annotation_reviewers?.length > 0 ? ProjectDetails?.annotation_reviewers.map((el,i)=>{
             return {
                 label: el.username,
                 value: el.id
