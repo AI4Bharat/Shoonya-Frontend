@@ -38,7 +38,7 @@ export default function SimpleModal(props) {
   const [modalStyle] = React.useState(getModalStyle);
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleClose} disableEscapeKeyDown={true}>
       <Grid sx={{
         borderRadius: "5px",
         // position: "absolute",
