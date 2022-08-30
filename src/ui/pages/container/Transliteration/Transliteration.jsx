@@ -7,6 +7,7 @@ import "tarento-react-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useDispatch, useSelector } from "react-redux";
 
 const Transliteration = (props) => {
   const classes = GlobalStyles();
@@ -23,8 +24,12 @@ const Transliteration = (props) => {
 
   const matches = useMediaQuery('(max-width:768px)');
 
+  const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+
   const { onCancelTransliteration } = props;
 
+  var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
+  
   const renderTextarea = (props) => {
     return (
       <textarea
@@ -37,7 +42,7 @@ const Transliteration = (props) => {
     );
   };
   console.log('...transliteration')
-
+ 
   useEffect(() => {
     axios.get(`https://xlit-api.ai4bharat.org/languages`)
       .then(response => {
@@ -90,10 +95,10 @@ const Transliteration = (props) => {
       >
         <Typography variant="subtitle1">Select Language :</Typography>
         <Autocomplete
-          value={selectedLang ? selectedLang : {DisplayName : "Hindi - हिंदी", LangCode : "hi"}}
+          value={selectedLang ? selectedLang : (data.length > 0  ? {DisplayName:data[0]?.DisplayName ,LangCode:data[0]?.LangCode} : {DisplayName : "Hindi - हिंदी", LangCode : "hi"})}
           onChange={handleLanguageChange}
           options={languageList}
-          size={"small"}
+          size={"small"}  
           getOptionLabel={el => { return el.DisplayName }}
           sx={{ width: window.innerWidth * 0.15 }}
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
@@ -101,7 +106,7 @@ const Transliteration = (props) => {
       </Grid>
 
       <ReactTransliterate
-        apiURL={`https://xlit-api.ai4bharat.org/tl/${selectedLang && selectedLang.LangCode ? selectedLang.LangCode : "hi"}`}
+        apiURL={`https://xlit-api.ai4bharat.org/tl/${selectedLang && selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0  ?  data[0]?.LangCode : "hi" )}`}
         value={text}
         onChangeText={(text) => {
           setText(text);
@@ -142,5 +147,6 @@ const Transliteration = (props) => {
     </Card>
   );
 };
+
 
 export default Transliteration;
