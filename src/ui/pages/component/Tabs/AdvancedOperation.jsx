@@ -70,7 +70,8 @@ const AdvancedOperation = (props) => {
     }, [ProjectDetails]);
 
     const getExportProjectButton = async () => {
-        const projectObj = new GetExportProjectButtonAPI(id);
+        const projectObj = ProjectDetails?.project_type === "ConversationTranslation" ?
+            new GetExportProjectButtonAPI(id, ProjectDetails?.datasets[0].instance_id) : new GetExportProjectButtonAPI(id);
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",

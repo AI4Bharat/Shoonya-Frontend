@@ -94,9 +94,11 @@ export default function DatasetProjectsTable({ datasetId }) {
 		dispatch(APITransport(new GetDatasetProjects(datasetId)));
 	}, [dispatch, datasetId]);
 
-	const getExportProjectButton = async (projectId) => {
+	const getExportProjectButton = async (project) => {
 		setLoading(true);
-		const projectObj = new GetExportProjectButtonAPI(projectId);
+		console.log(project, "PROJECT");
+		const projectObj = project.project_type === "ConversationTranslation" ?
+			new GetExportProjectButtonAPI(project.id, project.dataset_id[0]) : new GetExportProjectButtonAPI(project.id);
 		dispatch(APITransport(projectObj));
 		const res = await fetch(projectObj.apiEndPoint(), {
 				method: "POST",
@@ -146,7 +148,7 @@ export default function DatasetProjectsTable({ datasetId }) {
 					>
 						<CustomButton sx={{ borderRadius: 2 }} label="View" />
 					</Link>
-					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getExportProjectButton(project.id)} label="Export" />
+					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getExportProjectButton(project)} label="Export" />
 				</Stack>
 			),
 		}))
