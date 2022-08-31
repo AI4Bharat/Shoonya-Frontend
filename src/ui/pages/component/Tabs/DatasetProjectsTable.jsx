@@ -96,7 +96,6 @@ export default function DatasetProjectsTable({ datasetId }) {
 
 	const getExportProjectButton = async (project) => {
 		setLoading(true);
-		console.log(project, "PROJECT");
 		const projectObj = project.project_type === "ConversationTranslation" ?
 			new GetExportProjectButtonAPI(project.id, project.dataset_id[0]) : new GetExportProjectButtonAPI(project.id);
 		dispatch(APITransport(projectObj));
