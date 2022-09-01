@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ai4bharat/indic-transliterate": "^1.2.10",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@heartexlabs/label-studio": "^1.4.0",
@@ -31,13 +32,11 @@
     "react-router-dom": "^6.3.0",
     "react-scoped-css": "^0.0.23",
     "react-scripts": "5.0.1",
-    "react-transliterate": "^1.1.9",
     "redux": "^4.2.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
-    "tarento-react-transliterate": "file:tarento-react-transliterate-2.0.2.tgz",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

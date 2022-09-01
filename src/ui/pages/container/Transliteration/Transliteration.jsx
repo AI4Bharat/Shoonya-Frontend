@@ -1,9 +1,8 @@
 import { TextField } from "@mui/material";
 import { Autocomplete, Box, Button, Card, Grid, Typography } from "@mui/material";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { ReactTransliterate } from "tarento-react-transliterate";
-import "tarento-react-transliterate/dist/index.css";
+import { IndicTransliterate, getTransliterationLanguages } from "@ai4bharat/indic-transliterate"
+import "@ai4bharat/indic-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -13,7 +12,6 @@ const Transliteration = (props) => {
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([]);
   const [selectedLang, setSelectedLang] = useState("");
-  const [direction, setDirection] = useState("ltr");
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -32,17 +30,16 @@ const Transliteration = (props) => {
         placeholder={"Enter text here..."}
         rows={5}
         className={classes.textAreaTransliteration}
-        style={{ direction: direction }}
       />
     );
   };
   console.log('...transliteration')
 
   useEffect(() => {
-    axios.get(`https://xlit-api.ai4bharat.org/languages`)
-      .then(response => {
-        console.log("response", response);
-        setLanguageList(response.data);
+
+    getTransliterationLanguages()
+      .then(langs => {
+        setLanguageList(langs);
       })
       .catch(err => {
         console.log(err);
@@ -50,8 +47,6 @@ const Transliteration = (props) => {
   }, [])
 
   const handleLanguageChange = (event, val) => {
-    console.log("val", val)
-    val.Direction === "rtl" ? setDirection("rtl") : setDirection("ltr");
     setSelectedLang(val);
   }
   const onCopyButtonClick = () => {
@@ -100,8 +95,8 @@ const Transliteration = (props) => {
         />
       </Grid>
 
-      <ReactTransliterate
-        apiURL={`https://xlit-api.ai4bharat.org/tl/${selectedLang && selectedLang.LangCode ? selectedLang.LangCode : "hi"}`}
+      <IndicTransliterate
+        lang={selectedLang.LangCode}
         value={text}
         onChangeText={(text) => {
           setText(text);
