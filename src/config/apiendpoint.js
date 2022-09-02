@@ -9,7 +9,8 @@ const apiendpoint =  {
   getDatasets:"/data/",
   annotations:"/annotation/",
   getUsers:"/users/",
-  authUsers:"/users/auth/users/"
+  authUsers:"/users/auth/users/",
+  functions:"/functions/",
 };
 
 export default apiendpoint;
