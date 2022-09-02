@@ -88,18 +88,18 @@ const Transliteration = (props) => {
       visible: false
     })
   }
-  useEffect(() => {
-    if (data.length == 0 && languageList[0].DisplayName != "data" && params.taskId) {
-      setShowSnackBar({
-        open: true,
-        message: "This language doesn't support",
-        variant: "error",
-        timeout: 2500,
-        visible: true
-      })
+  // useEffect(() => {
+  //   if (data.length == 0 && languageList[0].DisplayName != "data" && params.taskId) {
+  //     setShowSnackBar({
+  //       open: true,
+  //       message: "This language doesn't support",
+  //       variant: "error",
+  //       timeout: 2500,
+  //       visible: true
+  //     })
   
-    } 
-  }, [languageList])
+  //   } 
+  // }, [languageList])
 
   return (
     <Card
