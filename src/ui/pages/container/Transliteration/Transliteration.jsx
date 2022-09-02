@@ -6,6 +6,7 @@ import "@ai4bharat/indic-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useDispatch, useSelector } from "react-redux";
 
 const Transliteration = (props) => {
   const classes = GlobalStyles();
@@ -22,6 +23,10 @@ const Transliteration = (props) => {
   const matches = useMediaQuery('(max-width:768px)');
 
   const { onCancelTransliteration } = props;
+
+  const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+
+  var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
 
   const renderTextarea = (props) => {
     return (
@@ -85,7 +90,7 @@ const Transliteration = (props) => {
       >
         <Typography variant="subtitle1">Select Language :</Typography>
         <Autocomplete
-          value={selectedLang ? selectedLang : {DisplayName : "Hindi - हिंदी", LangCode : "hi"}}
+           value={selectedLang ? selectedLang : (data.length > 0  ? {DisplayName:data[0]?.DisplayName ,LangCode:data[0]?.LangCode} : {DisplayName : "Hindi - हिंदी", LangCode : "hi"})}
           onChange={handleLanguageChange}
           options={languageList}
           size={"small"}
@@ -96,7 +101,7 @@ const Transliteration = (props) => {
       </Grid>
 
       <IndicTransliterate
-        lang={selectedLang.LangCode}
+        lang={selectedLang.LangCode ? selectedLang.LangCode : "hi"}
         value={text}
         onChangeText={(text) => {
           setText(text);
