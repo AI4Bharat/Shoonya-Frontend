@@ -34,6 +34,7 @@ import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
 import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
 import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
+import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 
 
 const App = () => {
@@ -206,6 +207,12 @@ const App = () => {
           path="datasets/:datasetId"
           element={ProtectedRouteWrapper(
             <Layout component={<DatasetDetails />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="datasets/automate"
+          element={ProtectedRouteWrapper(
+            <Layout component={<AutomateDatasets />} Backbutton={true} />
           )}
         />
         <Route
