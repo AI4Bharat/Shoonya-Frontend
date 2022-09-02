@@ -96,7 +96,9 @@ const AnnotationProject = (props) => {
     "labse_score",
     "parent_data",
     "id",
-    "rating"
+    "rating",
+    "conversation_json",
+    "speakers_json"
   ];
   const renderToolBar = () => {
     return (
