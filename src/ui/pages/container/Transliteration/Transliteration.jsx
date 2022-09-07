@@ -6,11 +6,16 @@ import "@ai4bharat/indic-transliterate/dist/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const Transliteration = (props) => {
+  const { onCancelTransliteration } = props;
+  const params = useParams()
+  console.log(params,"params")
   const classes = GlobalStyles();
-  const [text, setText] = useState("");
-  const [languageList, setLanguageList] = useState([]);
+  const [text, setText] = useState();
+  const [languageList, setLanguageList] = useState([{DisplayName:"data"}]);
   const [selectedLang, setSelectedLang] = useState("");
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
@@ -18,10 +23,27 @@ const Transliteration = (props) => {
     timeout: 1500,
     visible: false
   });
-
+  // const [taskdata, setTaskdata] = useState(searchFilters);
   const matches = useMediaQuery('(max-width:768px)');
 
-  const { onCancelTransliteration } = props;
+ 
+
+  const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+
+  let searchFilters = JSON.parse(localStorage.getItem("TaskData"));
+
+
+  var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
+
+  useEffect(() => {
+    if(params.taskId ){
+      setText(searchFilters.data.machine_translation)
+    }else{
+      setText("")
+    }
+    
+  }, [])
+
 
   const renderTextarea = (props) => {
     return (
@@ -66,6 +88,18 @@ const Transliteration = (props) => {
       visible: false
     })
   }
+  // useEffect(() => {
+  //   if (data.length == 0 && languageList[0].DisplayName != "data" && params.taskId) {
+  //     setShowSnackBar({
+  //       open: true,
+  //       message: "This language doesn't support",
+  //       variant: "error",
+  //       timeout: 2500,
+  //       visible: true
+  //     })
+  
+  //   } 
+  // }, [languageList])
 
   return (
     <Card
@@ -85,7 +119,7 @@ const Transliteration = (props) => {
       >
         <Typography variant="subtitle1">Select Language :</Typography>
         <Autocomplete
-          value={selectedLang ? selectedLang : {DisplayName : "Hindi - हिंदी", LangCode : "hi"}}
+           value={selectedLang ? selectedLang : (data.length > 0 && params.id ? {DisplayName:data[0]?.DisplayName ,LangCode:data[0]?.LangCode} : {DisplayName : "Hindi - हिंदी", LangCode : "hi"})}
           onChange={handleLanguageChange}
           options={languageList}
           size={"small"}
@@ -96,7 +130,7 @@ const Transliteration = (props) => {
       </Grid>
 
       <IndicTransliterate
-        lang={selectedLang.LangCode}
+        lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && params.id ?  data[0]?.LangCode : "hi" )}
         value={text}
         onChangeText={(text) => {
           setText(text);
