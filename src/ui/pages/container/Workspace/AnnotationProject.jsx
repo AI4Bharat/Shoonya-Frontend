@@ -98,6 +98,7 @@ const AnnotationProject = (props) => {
     "id",
     "rating",
     "conversation_json",
+    "translated_conversation_json",
     "speakers_json"
   ];
   const renderToolBar = () => {

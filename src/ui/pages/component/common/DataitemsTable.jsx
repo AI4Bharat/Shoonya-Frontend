@@ -18,6 +18,7 @@ const excludeKeys = [
   "key",
   "instance_id",
   "conversation_json",
+  "translated_conversation_json",
   "speakers_json"
 ];
 
