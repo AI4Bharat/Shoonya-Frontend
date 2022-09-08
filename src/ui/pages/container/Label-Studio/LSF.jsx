@@ -292,6 +292,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   }
 
   // we're running an effect on component mount and rendering LSF inside rootRef node
+  localStorage.setItem("TaskData", JSON.stringify(taskData));
   useEffect(() => {
     const generateLabelConfig = (taskData) => {
       const sourceChat = taskData.conversation_json.map((item, idx) => {
