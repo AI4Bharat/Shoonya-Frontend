@@ -164,6 +164,7 @@ const ReportsTable = (props) => {
                         minDate={new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
                         maxDate={new Date()}
                         direction="horizontal"
+
                     />
                 </Card>
             </Box>}
