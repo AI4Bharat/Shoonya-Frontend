@@ -218,7 +218,7 @@ function ProgressList() {
        }
     
   } else  {
-    const labels = projectTypes === "Cumulative" ?  CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
+    const labels = progressTypes === "Cumulative" ?  CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
   : PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language)
     data = {
       labels,
