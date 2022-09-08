@@ -63,7 +63,7 @@ import GetWorkspace from './Organization/GetWorkspace';
 import automateDatasets from './Dataset/AutomateDatasets';
 import getIndicTransLanguages from './Dataset/GetIndicTransLanguages';
 import getCumulativeTasks from './Progress/CumulativeTasks';
-import getPeriodicalTasks from './Progress/CumulativeTasks';
+import getPeriodicalTasks from './Progress/PeriodicalTasks';
 
 const index = {
     apiStatus,
