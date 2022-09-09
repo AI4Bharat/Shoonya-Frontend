@@ -582,7 +582,7 @@ const AnnotationProject = (props) => {
               </>
             )}
 
-            {selectedDomain === "Translation" && (
+            {selectedDomain === "Translation" || selectedDomain === "Conversation" && (
               <>
                 <Grid
                   className={classes.projectsettingGrid}
