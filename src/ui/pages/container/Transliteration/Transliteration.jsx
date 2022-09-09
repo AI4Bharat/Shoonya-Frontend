@@ -128,7 +128,7 @@ console.log(data,"data")
       </Grid>
 
       <IndicTransliterate
-        lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0  ?  data[0]?.LangCode : "hi" )}
+        lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ?  data[0]?.LangCode : "hi" )}
         value={text}
         onChangeText={(text) => {
           setText(text);
