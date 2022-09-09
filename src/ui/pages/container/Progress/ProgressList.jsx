@@ -165,26 +165,37 @@ function ProgressList() {
 
     }
     else {
-      const Periodicaldata = {
-        project_type: selectedType,
-        periodical_type: comparisonProgressTypes,
-        start_date: format(states[0].startDate, 'yyyy-MM-dd'),
-        end_date: format(states[0].endDate, 'yyyy-MM-dd'),
-      };
+     
 
-
-      if (comparisonProgressTypes !== "Cumulative") {
-        const progressObj = new PeriodicalTasks(Periodicaldata, OrgId);
-        dispatch(APITransport(progressObj));
-      } else {
+      if (comparisonProgressTypes === "Cumulative") {
+       
+  
         const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
         dispatch(APITransport(progressObj))
+       
+      } else {
+        const Periodicaldata = {
+          project_type: selectedType,
+          periodical_type: comparisonProgressTypes,
+          start_date: format(states[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(states[0].endDate, 'yyyy-MM-dd'),
+        };
+        const progressObj = new PeriodicalTasks(Periodicaldata, OrgId);
+        dispatch(APITransport(progressObj));
       }
       if (progressTypes === "Cumulative") {
+        
         const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
         dispatch(APITransport(progressObj))
       }
       else {
+        const individualPeriodicaldata = {
+          project_type: selectedType,
+          periodical_type: progressTypes,
+          start_date: format(state[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(state[0].endDate, 'yyyy-MM-dd'),
+        };
+    
         const progressObj = new PeriodicalTasks(individualPeriodicaldata, OrgId);
         dispatch(APITransport(progressObj));
       }
@@ -207,7 +218,6 @@ function ProgressList() {
 
   if (graphTypes === avilableGraphType.Individual) {
     if (progressTypes === "Cumulative") {
-      console.log("iside if")
       const labels = CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
       data = {
         labels,
@@ -237,6 +247,7 @@ function ProgressList() {
     }
 
   } else {
+    
     const labels = progressTypes === "Cumulative" ? CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
       : PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language)
     data = {

@@ -233,6 +233,7 @@ const TaskTable = (props) => {
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
             colList.push("actions");
+            console.log("colList", colList);
             const cols = colList.map((col) => {
                 return {
                     name: col,
@@ -245,6 +246,7 @@ const TaskTable = (props) => {
                     }
                 }
             });
+            console.log("cols", cols);
             setColumns(cols);
             setSelectedColumns(colList);
             setTasks(data);
