@@ -124,6 +124,7 @@ const Header = () => {
     }
   };
 
+ 
   const renderTabs = () => {
     if (loggedInUserData?.role === 1) {
       return(
@@ -175,6 +176,17 @@ const Header = () => {
               activeClassName={classes.highlightedMenu}
             >
               Projects
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+             to="/progress"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Progress
             </NavLink>
           </Typography>
           {/* <Typography variant="body1">
@@ -251,6 +263,17 @@ const Header = () => {
               Datasets
             </NavLink>
           </Typography>
+          <Typography variant="body1">
+            <NavLink
+             to="/progress"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Progress
+            </NavLink>
+          </Typography>
         </Grid>)
     } else if (loggedInUserData?.role === 3) {
       return(<Grid
@@ -299,6 +322,17 @@ const Header = () => {
               activeClassName={classes.highlightedMenu}
             >
               Datasets
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+             to="/progress"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Progress
             </NavLink>
           </Typography>
         </Grid>)
@@ -361,6 +395,17 @@ const Header = () => {
         Datasets
       </NavLink>
     </Typography>,
+    <Typography variant="body1">
+    <NavLink
+      to="/progress"
+      className={({ isActive }) =>
+        isActive ? classes.highlightedMenu : classes.headerMenu
+      }
+      activeClassName={classes.highlightedMenu}
+    >
+      Progress
+    </NavLink>
+  </Typography>,
   ];
 
   const userSettings = [

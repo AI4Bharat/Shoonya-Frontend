@@ -27,7 +27,7 @@ import ColumnList from "../common/ColumnList";
 import Spinner from "../../component/common/Spinner"
 
 const excludeSearch = ["status", "actions", "output_text"];
-const excludeCols = ["context", "input_language", "output_language"];
+const excludeCols = ["context", "input_language", "output_language", "conversation_json", "translated_conversation_json", "speakers_json"];
 
 const TaskTable = (props) => {
     const classes = DatasetStyle();
@@ -35,6 +35,7 @@ const TaskTable = (props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
+    console.log(taskList,"taskList")
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -233,6 +234,7 @@ const TaskTable = (props) => {
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
             colList.push("actions");
+            console.log("colList", colList);
             const cols = colList.map((col) => {
                 return {
                     name: col,
@@ -245,6 +247,7 @@ const TaskTable = (props) => {
                     }
                 }
             });
+            console.log("cols", cols);
             setColumns(cols);
             setSelectedColumns(colList);
             setTasks(data);

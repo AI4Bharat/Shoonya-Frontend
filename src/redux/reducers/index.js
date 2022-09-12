@@ -60,6 +60,10 @@ import archiveWorkspace from './WorkspaceDetails/ArchiveWorkspace';
 import RemoveProjectMember from './ProjectDetails/RemoveProjectMember';
 import RemoveProjectReviewer from './ProjectDetails/RemoveProjectReviewer';
 import GetWorkspace from './Organization/GetWorkspace';
+import automateDatasets from './Dataset/AutomateDatasets';
+import getIndicTransLanguages from './Dataset/GetIndicTransLanguages';
+import getCumulativeTasks from './Progress/CumulativeTasks';
+import getPeriodicalTasks from './Progress/PeriodicalTasks';
 
 const index = {
     apiStatus,
@@ -126,7 +130,13 @@ const index = {
     RemoveProjectMember,
     RemoveProjectReviewer,
     archiveWorkspace,
-    GetWorkspace
+    GetWorkspace,
+    automateDatasets,
+    getIndicTransLanguages,
+    getCumulativeTasks,
+    getPeriodicalTasks,
+    
+    
 };
 
 export default index;

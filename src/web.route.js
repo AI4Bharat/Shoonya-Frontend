@@ -34,6 +34,8 @@ import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
 import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
 import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
+import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
+import ProgressList from "./ui/pages/container/Progress/ProgressList"
 
 
 const App = () => {
@@ -209,6 +211,12 @@ const App = () => {
           )}
         />
         <Route
+          path="datasets/automate"
+          element={ProtectedRouteWrapper(
+            <Layout component={<AutomateDatasets />} Backbutton={true} />
+          )}
+        />
+        <Route
           path="transliteration/"
           element={ProtectedRouteWrapper(
             <Layout component={<Transliteration />} Backbutton={true} />
@@ -220,7 +228,12 @@ const App = () => {
             <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
           )}
         />
-        
+         <Route
+          path="progress"
+          element={ProtectedRouteWrapper(
+            <Layout component={<ProgressList />} />
+          )}
+        />
          
       </Routes>
     </HashRouter>

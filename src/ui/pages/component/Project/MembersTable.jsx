@@ -108,8 +108,8 @@ const MembersTable = (props) => {
                   
     //             ]
     // });
-    const handleProjectMember = async(email) =>{
-        const projectObj = new RemoveProjectMemberAPI(id,{email:email});
+    const handleProjectMember = async(userid) =>{
+        const projectObj = new RemoveProjectMemberAPI(id, {ids:[userid]});
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
@@ -199,7 +199,7 @@ const MembersTable = (props) => {
                              <CustomButton
                                 sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
                                 label = "Remove"
-                                onClick={()=>handleProjectMember(el.email)}
+                                onClick={()=>handleProjectMember(el.id)}
                                 disabled={projectlist(el.id)}
                             
                             />}
