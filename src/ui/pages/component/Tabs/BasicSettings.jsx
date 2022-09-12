@@ -261,7 +261,7 @@ const BasicSettings = (props) => {
                         />
                     </Grid>
                 </Grid>
-                {showLanguage && (
+            
                     <>
                         <Grid
                             container
@@ -352,7 +352,7 @@ const BasicSettings = (props) => {
                             </Grid>
 
                         </Grid>
-                    </>)}
+                    </>
                 <Grid
                     container
                     xs={12}

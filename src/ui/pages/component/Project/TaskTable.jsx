@@ -35,6 +35,7 @@ const TaskTable = (props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
+    console.log(taskList,"taskList")
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
