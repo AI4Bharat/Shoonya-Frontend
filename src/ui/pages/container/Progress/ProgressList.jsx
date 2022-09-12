@@ -94,7 +94,6 @@ function ProgressList() {
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
   const [yearvalue, setyearvalue] = useState([])
-  console.log(progressTypes, "progressTypes", comparisonProgressTypes, "comparisonProgressTypes")
   const theme = useTheme();
   const [state, setState] = useState([
     {
@@ -115,10 +114,6 @@ function ProgressList() {
   const CumulativeTasksData = useSelector((state) => state?.getCumulativeTasks?.data)
   const PeriodicalTaskssData = useSelector((state) => state?.getPeriodicalTasks?.data)
   const apiLoading = useSelector(state => state.apiStatus.loading);
-  console.log(CumulativeTasksData, "CumulativeTasksData", PeriodicalTaskssData)
-
-
-
 
   useEffect(() => {
     if (PeriodicalTaskssData.length > 0) {
@@ -326,13 +321,10 @@ function ProgressList() {
     };
    // console.log(data, "vvvv", CumulativeTasksData?.data, weekvalue?.data?.map((e) => e.annotations_completed), monthvalue?.data?.map((e) => e.annotations_completed), yearvalue?.data?.map((e) => e.annotations_completed))
 
-
-
   }
-  console.log(data)
+
   var now = new Date()
   var currentYear = now.getFullYear()
-
 
   return (
     <ThemeProvider theme={themeDefault}>
