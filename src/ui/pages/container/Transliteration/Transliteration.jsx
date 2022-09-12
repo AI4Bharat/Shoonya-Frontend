@@ -17,6 +17,7 @@ const Transliteration = (props) => {
   const [text, setText] = useState();
   const [languageList, setLanguageList] = useState([{DisplayName:"data"}]);
   const [selectedLang, setSelectedLang] = useState("");
+  console.log(selectedLang,"selectedLang",languageList)
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -26,15 +27,12 @@ const Transliteration = (props) => {
   // const [taskdata, setTaskdata] = useState(searchFilters);
   const matches = useMediaQuery('(max-width:768px)');
 
- 
-
   const ProjectDetails = useSelector(state => state.getProjectDetails.data);
 
   let searchFilters = JSON.parse(localStorage.getItem("TaskData"));
 
-
   var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
-
+console.log(data,"data")
   useEffect(() => {
     if(params.taskId ){
       setText(searchFilters.data.machine_translation)
@@ -119,7 +117,7 @@ const Transliteration = (props) => {
       >
         <Typography variant="subtitle1">Select Language :</Typography>
         <Autocomplete
-           value={selectedLang ? selectedLang : (data.length > 0 && params.id ? {DisplayName:data[0]?.DisplayName ,LangCode:data[0]?.LangCode} : {DisplayName : "Hindi - हिंदी", LangCode : "hi"})}
+           value={selectedLang ? selectedLang : (data.length > 0 && (params.taskId || params.id) ? {DisplayName:data[0]?.DisplayName ,LangCode:data[0]?.LangCode} : {DisplayName : "Hindi - हिंदी", LangCode : "hi"})}
           onChange={handleLanguageChange}
           options={languageList}
           size={"small"}
@@ -130,7 +128,7 @@ const Transliteration = (props) => {
       </Grid>
 
       <IndicTransliterate
-        lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && params.id ?  data[0]?.LangCode : "hi" )}
+        lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ?  data[0]?.LangCode : "hi" )}
         value={text}
         onChangeText={(text) => {
           setText(text);
