@@ -74,7 +74,7 @@ export const options = {
 };
 
 const GraphType = [{ graphTypename: "Individual" }, { graphTypename: "Comparison" }]
-const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "yearly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
+const ProgressType = [{ ProgressTypename: "Cumulative" },  { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
 const avilableGraphType = {
   Individual: "Individual",
   Comparison: "Comparison"
@@ -117,34 +117,17 @@ function ProgressList() {
 
   useEffect(() => {
     if (PeriodicalTaskssData.length > 0) {
-
-      const result2 = PeriodicalTaskssData[0].month_number;
-      const result = PeriodicalTaskssData[0].week_number;
-      console.log(result2, "result2", result)
-
       if (PeriodicalTaskssData[0].month_number > 0) {
         setmonthvalue(PeriodicalTaskssData[0])
-
-
       }
       else if (PeriodicalTaskssData[0].week_number > 0) {
         setweekvalue(PeriodicalTaskssData[0])
-
-
-
       }
       else if (PeriodicalTaskssData[0].year_number > 0) {
         setyearvalue(PeriodicalTaskssData[0])
-
-
-
-
       }
     }
   }, [PeriodicalTaskssData])
-
-
-  console.log(monthvalue, "monthvalue", weekvalue)
 
 
   useEffect(() => {
@@ -164,9 +147,11 @@ function ProgressList() {
     dispatch(APITransport(typesObj));
   }, []);
 
+ 
   useEffect(() => {
-    setLoading(apiLoading);
-  }, [apiLoading])
+    setLoading(false);
+  }, [PeriodicalTaskssData,CumulativeTasksData,yearvalue])
+  
 
   const handleGraphType = (e) => {
     setGraphTypes(e.target.value)
@@ -237,7 +222,7 @@ function ProgressList() {
     }
 
     setShowBarChar(true)
-    setLoading(false);
+     //setLoading(false);
 
   }
 
@@ -418,6 +403,9 @@ function ProgressList() {
               </Grid>
             </Grid>
             <Grid container rowSpacing={2} mt={1} mb={1}>
+            <Grid item xs={3} sm={3} md={3} lg={3} xl={3} >
+               
+              </Grid>
               {!(progressTypes === "Cumulative" || graphTypes === "") && <Grid item xs={3} sm={3} md={3} lg={3} xl={3} >
                 <Button
                   endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
