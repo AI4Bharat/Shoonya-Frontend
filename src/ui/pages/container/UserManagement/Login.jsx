@@ -64,6 +64,12 @@ const Login = () => {
     }
   }, [keyPress, keyRelease]);
 
+  useEffect(() => {
+    if(localStorage.getItem("shoonya_access_token") && localStorage.getItem("shoonya_refresh_token")) {
+      navigate("/projects");
+    }
+  }, []);
+
   const createToken = () => {
     const apiObj = new LoginAPI(credentials.email, credentials.password);
     fetch(apiObj.apiEndPoint(), {
