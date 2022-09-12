@@ -52,8 +52,18 @@ import GetFileTypes from './Dataset/GetFileTypes';
 import ChangePassword from './UserManagement/ChangePassword'
 import fetchUserById from './UserManagement/FetchUserById';
 import setTaskFilter from './Tasks/SetTaskFilter';
-import DownloadJSONProject from './ProjectDetails/DownloadJSONProject'
-import SignUp from './UserManagement/SignUp'
+import DownloadJSONProject from './ProjectDetails/DownloadJSONProject';
+import forgotPassword from './UserManagement/ForgotPassword';
+import confirmForgetPassword from "./UserManagement/ConfirmForgetPassword";
+import SignUp from './UserManagement/SignUp';
+import archiveWorkspace from './WorkspaceDetails/ArchiveWorkspace';
+import RemoveProjectMember from './ProjectDetails/RemoveProjectMember';
+import RemoveProjectReviewer from './ProjectDetails/RemoveProjectReviewer';
+import GetWorkspace from './Organization/GetWorkspace';
+import automateDatasets from './Dataset/AutomateDatasets';
+import getIndicTransLanguages from './Dataset/GetIndicTransLanguages';
+import getCumulativeTasks from './Progress/CumulativeTasks';
+import getPeriodicalTasks from './Progress/PeriodicalTasks';
 
 const index = {
     apiStatus,
@@ -114,7 +124,19 @@ const index = {
     fetchUserById,
     setTaskFilter,
     DownloadJSONProject,
+    forgotPassword,
+    confirmForgetPassword,
     SignUp,
+    RemoveProjectMember,
+    RemoveProjectReviewer,
+    archiveWorkspace,
+    GetWorkspace,
+    automateDatasets,
+    getIndicTransLanguages,
+    getCumulativeTasks,
+    getPeriodicalTasks,
+    
+    
 };
 
 export default index;

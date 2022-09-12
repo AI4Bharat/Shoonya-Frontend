@@ -52,12 +52,18 @@ const DatasetList = () => {
         navigate(`/create-Dataset-Instance-Button/`)
     }
 
+    const handleAutomateButton =(e)=>{
+        navigate('/datasets/automate')
+    }
+
     return (
         <React.Fragment>
             {/* <Header /> */}
             {loading && <Spinner /> }
             <CustomButton  sx={{  p: 2, borderRadius: 3, mt: 5, mb: 2, justifyContent: "flex-end" }} 
-            onClick={handleCreateProject} label="Create New Dataset Instance" />
+                onClick={handleCreateProject} label="Create New Dataset Instance" />
+            <CustomButton  sx={{  p: 2, borderRadius: 3, mt: 5, mb: 2, ml: 2, justifyContent: "flex-end" }} 
+                onClick={handleAutomateButton} label="Automate Datasets" />
             {datasetList.length > 0 && <Box sx={{margin : "0 auto", pb : 5 }}>
                 {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
                 <Grid container justifyContent={"center"} rowSpacing={4} spacing={2} columnSpacing={{ xs: 1, sm: 1, md: 3 }} sx={{mb : 3}}>

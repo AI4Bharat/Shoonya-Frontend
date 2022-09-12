@@ -12,7 +12,7 @@ export default class AddMembersToProjectAPI extends API {
     this.ids = userIds;
     this.endpoint = `${super.apiEndPointAuto()}${
       ENDPOINTS.getProjects
-    }${projectId}/add_project_users/`;
+    }${projectId}/add_project_annotators/`;
   }
 
   processResponse(res) {

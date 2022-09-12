@@ -4,7 +4,7 @@ import CustomButton from '../../component/common/Button'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 // import WorkspaceTable from "../common/WorkspaceTable";
-import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
+import GetWorkspaceAPI from "../../../../redux/actions/api/Organization/GetWorkspace";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
@@ -14,16 +14,16 @@ const WorkspaceTable = (props) => {
 
     const dispatch = useDispatch();
     const  {showManager, showCreatedBy} = props;
-    const workspaceData = useSelector(state=>state.getWorkspaces.data.results);
+    const workspaceData = useSelector(state=>state.GetWorkspace.data.results);
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
     const [totalWorkspaces, setTotalWorkspaces] = useState(10);
 
-    const totalWorkspaceCount = useSelector(state =>state.getWorkspaces.data.count);
+    const totalWorkspaceCount = useSelector(state =>state.GetWorkspace.data.count);
    
     const getWorkspaceData = ()=>{
-        const workspaceObj = new GetWorkspacesAPI(currentPageNumber);
+        const workspaceObj = new GetWorkspaceAPI(currentPageNumber);
         dispatch(APITransport(workspaceObj));
       }
 

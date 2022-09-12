@@ -17,6 +17,9 @@ const excludeKeys = [
   "datasetbase_ptr_id",
   "key",
   "instance_id",
+  "conversation_json",
+  "translated_conversation_json",
+  "speakers_json"
 ];
 
 const DataitemsTable = () => {

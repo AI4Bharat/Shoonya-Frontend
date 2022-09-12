@@ -24,6 +24,7 @@ import Logo from "../../../../assets/logo.svg";
 import AppInfo from "./AppInfo";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 
+
 const Login = () => {
   const classes = LoginStyle();
   const [credentials, setCredentials] = useState({
@@ -62,6 +63,12 @@ const Login = () => {
       window.removeEventListener("keyup", keyRelease);
     }
   }, [keyPress, keyRelease]);
+
+  useEffect(() => {
+    if(localStorage.getItem("shoonya_access_token") && localStorage.getItem("shoonya_refresh_token")) {
+      navigate("/projects");
+    }
+  }, []);
 
   const createToken = () => {
     const apiObj = new LoginAPI(credentials.email, credentials.password);

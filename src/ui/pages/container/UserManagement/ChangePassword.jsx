@@ -3,6 +3,7 @@ import {
   Grid,
   ThemeProvider,
   Typography,
+  InputAdornment,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
@@ -15,7 +16,12 @@ import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import ChangePasswordAPI from "../../../../redux/actions/api/UserManagement/ChangePassword"
 import Spinner from "../../component/common/Spinner";
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import IconButton from "@material-ui/core/IconButton";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+
 
 const ChangePassword = (props) => {
   const navigate = useNavigate();
@@ -27,6 +33,10 @@ const ChangePassword = (props) => {
   const [values, setValues] = useState({
     password: "",
     showPassword: false,
+  });
+  const [newvalues, setNewValues] = useState({
+    newpassword: "",
+    showNewPassword: false,
   });
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -49,6 +59,17 @@ const ChangePassword = (props) => {
     setLoading(apiLoading);
   }, [apiLoading])
 
+  const handleClickShowPassword = () => {
+    setValues({ ...values, showPassword: !values.showPassword });
+};
+const handleClickShowNewPassword = () => {
+  setNewValues({ ...newvalues, showNewPassword: !newvalues.showNewPassword });
+};
+
+const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+};
+
  
   const handleChangePassword = () => {
     setNewPassword("")
@@ -58,8 +79,40 @@ const ChangePassword = (props) => {
       current_password: currentPassword,
 
     }
-    const projectObj = new ChangePasswordAPI(ChangePassword);
-    dispatch(APITransport(projectObj));
+    let apiObj = new ChangePasswordAPI(ChangePassword)
+
+    fetch(apiObj.apiEndPoint(), {
+        method: 'POST',
+        body: JSON.stringify(apiObj.getBody()),
+        headers: apiObj.getHeaders().headers
+    }).then((response) => {
+
+        setLoading(false)
+        if (response.status === 204) {
+            setSnackbarInfo({
+                ...snackbar,
+                open: true,
+                message: "success",
+                variant: 'success'
+            })
+           
+        }
+        else {
+            setSnackbarInfo({
+                ...snackbar,
+                open: true,
+                message: "Invalid password  ",
+                variant: 'error'
+            })
+
+        }
+
+    })
+        .catch(error => {
+            setLoading(false)
+
+        })
+
   }
 
 
@@ -110,10 +163,22 @@ const ChangePassword = (props) => {
                 <OutlinedTextField
                   fullWidth
                   placeholder={translate("newPassword")}
-                  type={values.showPassword ? "text" : "password"}
+                  type={newvalues.showNewPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                
+                 InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowNewPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {newvalues.showNewPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
                 />
               </Grid>
             </Grid>
@@ -139,6 +204,20 @@ const ChangePassword = (props) => {
                 type={values.showPassword ? "text" : "password"}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {values.showPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
+                
               />
             </Grid>
             <Grid

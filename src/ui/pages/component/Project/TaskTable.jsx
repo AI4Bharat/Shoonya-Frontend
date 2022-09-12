@@ -27,7 +27,7 @@ import ColumnList from "../common/ColumnList";
 import Spinner from "../../component/common/Spinner"
 
 const excludeSearch = ["status", "actions", "output_text"];
-const excludeCols = ["context", "input_language", "output_language"];
+const excludeCols = ["context", "input_language", "output_language", "conversation_json", "translated_conversation_json", "speakers_json"];
 
 const TaskTable = (props) => {
     const classes = DatasetStyle();
@@ -35,18 +35,27 @@ const TaskTable = (props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const taskList = useSelector(state => state.getTasksByProjectId.data.results);
+    console.log(taskList,"taskList")
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
-    const getProjectUsers = useSelector(state=>state.getProjectDetails.data.users)
+    const getProjectUsers = useSelector(state => state.getProjectDetails.data.users);
+    const getProjectReviewers = useSelector(state => state.getProjectDetails.data.annotation_reviewers);
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const filterData = {
-        Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "rejected"] : ["labeled", "accepted", "accepted_with_changes", "rejected"] : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators : getProjectUsers?.length > 0 ? getProjectUsers.filter((member) => member.role === 1).map((el,i)=>{
+        Status : ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["labeled", "accepted", "accepted_with_changes", "to_be_revised"] : ["unlabeled", "skipped", "accepted", "draft"],
+        Annotators : ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators.filter((member) => member.role === 1).map((el,i)=>{
+            return {
+                label: el.username,
+                value: el.id
+            }
+        }) : [],
+
+        Reviewers : ProjectDetails?.annotation_reviewers?.length > 0 ? ProjectDetails?.annotation_reviewers.map((el,i)=>{
             return {
                 label: el.username,
                 value: el.id
@@ -225,6 +234,7 @@ const TaskTable = (props) => {
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
             colList.push("actions");
+            console.log("colList", colList);
             const cols = colList.map((col) => {
                 return {
                     name: col,
@@ -237,6 +247,7 @@ const TaskTable = (props) => {
                     }
                 }
             });
+            console.log("cols", cols);
             setColumns(cols);
             setSelectedColumns(colList);
             setTasks(data);
@@ -335,6 +346,23 @@ else if (pullDisabled === "No more unassigned tasks in this project")
                     ))}
                     </Select>
                 </FormControl>}
+                {props.type === "review" && userDetails?.role!==1 && !getProjectReviewers?.some((reviewer) => reviewer.id === userDetails?.id) &&
+                    <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
+                        <InputLabel id="reviewer-filter-label" sx={{fontSize: "16px"}}>Filter by Reviewer</InputLabel>
+                        <Select
+                            labelId="reviewer-filter-label"
+                            id="reviewer-filter"
+                            value={selectedFilters.user_filter}
+                            label="Filter by Reviewer"
+                            onChange={(e) => setsSelectedFilters({...selectedFilters, user_filter: e.target.value})}
+                            sx={{fontSize: "16px"}}
+                        >
+                        <MenuItem value={-1}>All</MenuItem>
+                        {filterData.Reviewers?.map((el, i) => (
+                            <MenuItem value={el.value}>{el.label}</MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>}
                 <ColumnList
                     columns={columns}
                     setColumns={setSelectedColumns}
