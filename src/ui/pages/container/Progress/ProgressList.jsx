@@ -9,8 +9,10 @@ import {
   InputLabel,
   FormControl,
   Card,
-  CircularProgress
+  CircularProgress,
+  capitalize
 } from "@mui/material";
+
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import themeDefault from "../../../theme/theme";
@@ -88,8 +90,11 @@ function ProgressList() {
   const [showPicker, setShowPicker] = useState(false);
   const [showPickers, setShowPickers] = useState(false);
   const [comparisonProgressTypes, setComparisonProgressTypes] = useState("");
+  const [monthvalue, setmonthvalue] = useState([])
+  const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
-
+  const [yearvalue, setyearvalue] = useState([])
+  console.log(progressTypes, "progressTypes", comparisonProgressTypes, "comparisonProgressTypes")
   const theme = useTheme();
   const [state, setState] = useState([
     {
@@ -110,6 +115,42 @@ function ProgressList() {
   const CumulativeTasksData = useSelector((state) => state?.getCumulativeTasks?.data)
   const PeriodicalTaskssData = useSelector((state) => state?.getPeriodicalTasks?.data)
   const apiLoading = useSelector(state => state.apiStatus.loading);
+  console.log(CumulativeTasksData, "CumulativeTasksData", PeriodicalTaskssData)
+
+
+
+
+  useEffect(() => {
+    if (PeriodicalTaskssData.length > 0) {
+
+      const result2 = PeriodicalTaskssData[0].month_number;
+      const result = PeriodicalTaskssData[0].week_number;
+      console.log(result2, "result2", result)
+
+      if (PeriodicalTaskssData[0].month_number > 0) {
+        setmonthvalue(PeriodicalTaskssData[0])
+
+
+      }
+      else if (PeriodicalTaskssData[0].week_number > 0) {
+        setweekvalue(PeriodicalTaskssData[0])
+
+
+
+      }
+      else if (PeriodicalTaskssData[0].year_number > 0) {
+        setyearvalue(PeriodicalTaskssData[0])
+
+
+
+
+      }
+    }
+  }, [PeriodicalTaskssData])
+
+
+  console.log(monthvalue, "monthvalue", weekvalue)
+
 
   useEffect(() => {
     if (ProjectTypes) {
@@ -127,13 +168,13 @@ function ProgressList() {
     const typesObj = new GetProjectDomainsAPI();
     dispatch(APITransport(typesObj));
   }, []);
+
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading])
 
   const handleGraphType = (e) => {
     setGraphTypes(e.target.value)
-    console.log(e.target.value, "e.target.value")
   }
   const handleSubmit = () => {
     const OrgId = userDetails.organization.id
@@ -165,14 +206,13 @@ function ProgressList() {
 
     }
     else {
-     
+
 
       if (comparisonProgressTypes === "Cumulative") {
-       
-  
         const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
         dispatch(APITransport(progressObj))
-       
+
+
       } else {
         const Periodicaldata = {
           project_type: selectedType,
@@ -184,7 +224,7 @@ function ProgressList() {
         dispatch(APITransport(progressObj));
       }
       if (progressTypes === "Cumulative") {
-        
+
         const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
         dispatch(APITransport(progressObj))
       }
@@ -195,7 +235,7 @@ function ProgressList() {
           start_date: format(state[0].startDate, 'yyyy-MM-dd'),
           end_date: format(state[0].endDate, 'yyyy-MM-dd'),
         };
-    
+
         const progressObj = new PeriodicalTasks(individualPeriodicaldata, OrgId);
         dispatch(APITransport(progressObj));
       }
@@ -208,13 +248,28 @@ function ProgressList() {
 
   const handleProgressType = (e) => {
     setProgressTypes(e.target.value)
+
+  }
+  const handledatecomparisionprogress = () => {
+    setShowPickers(!showPickers)
+
+
+
+  }
+  const handleDateRangePicker = (item) => {
+    setStates([item.selection])
+
+
+
   }
   const handleComparisonProgressType = (e) => {
     setComparisonProgressTypes(e.target.value)
+
   }
 
 
   let data;
+
 
   if (graphTypes === avilableGraphType.Individual) {
     if (progressTypes === "Cumulative") {
@@ -247,26 +302,32 @@ function ProgressList() {
     }
 
   } else {
-    
-    const labels = progressTypes === "Cumulative" ? CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
-      : PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language)
+
+    const labels = progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.language)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.language) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.language) : yearvalue?.data?.map((e) => e.language)
+
     data = {
       labels,
       datasets: [
+
         {
 
           label: progressTypes,
-          data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+          data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
           backgroundColor: 'rgba(26, 161, 234)',
         },
         {
           label: comparisonProgressTypes,
-          data: PeriodicalTaskssData[0]?.data.map((e) => (e.annotations_completed)),
+          data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
           backgroundColor: 'rgba(216, 208, 27 )',
         },
+
       ],
 
     };
+   // console.log(data, "vvvv", CumulativeTasksData?.data, weekvalue?.data?.map((e) => e.annotations_completed), monthvalue?.data?.map((e) => e.annotations_completed), yearvalue?.data?.map((e) => e.annotations_completed))
+
+
+
   }
   console.log(data)
   var now = new Date()
@@ -321,7 +382,7 @@ function ProgressList() {
                     onChange={handleProgressType}
                   >
                     {ProgressType.map((item, index) => (
-                      <MenuItem value={item.ProgressTypename} key={index}>{item.ProgressTypename}</MenuItem>
+                      <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -338,7 +399,7 @@ function ProgressList() {
                     onChange={handleComparisonProgressType}
                   >
                     {ProgressType.map((item, index) => (
-                      <MenuItem value={item.ProgressTypename} key={index}>{item.ProgressTypename}</MenuItem>
+                      <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -382,7 +443,7 @@ function ProgressList() {
                   endIcon={showPickers ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color="primary"
-                  onClick={() => setShowPickers(!showPickers)}
+                  onClick={handledatecomparisionprogress}
                   sx={{ backgroundColor: "rgba(216, 208, 27 )", "&:hover": { backgroundColor: "rgba(216, 208, 27 )", } }}
                 >
                   Pick dates
@@ -448,7 +509,7 @@ function ProgressList() {
               {showPickers && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
-                    onChange={item => setStates([item.selection])}
+                    onChange={handleDateRangePicker} item
                     staticRanges={[
                       ...defaultStaticRanges,
                       {
@@ -498,6 +559,7 @@ function ProgressList() {
             </Grid>
           </Grid>
           {showBarChar && <Bar options={options} data={data} />}
+
         </Box>
       </Card>
     </ThemeProvider>
