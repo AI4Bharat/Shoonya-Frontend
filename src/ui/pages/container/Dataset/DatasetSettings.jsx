@@ -12,7 +12,11 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import MenuItems from "../../component/common/MenuItems";
 import { FileUploader } from "react-drag-drop-files";
+import Switch from '@mui/material/Switch';
 
+
+
+const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 export default function DatasetSettings({ datasetId }) {
 	const dispatch = useDispatch();
@@ -23,6 +27,7 @@ export default function DatasetSettings({ datasetId }) {
 	const [file, setFile] = useState([]);
 	const [filetype, setFiletype] = useState("")
 	const [type, setType] = useState([]);
+	const [switchs, setswitchs] = useState("True");
 
 
 	const GetFileTypes = useSelector((state) => state.GetFileTypes.data);
@@ -86,10 +91,16 @@ export default function DatasetSettings({ datasetId }) {
 		const UploadFile = new FormData();
 		UploadFile.append('dataset', file);
 		UploadFile.append('filetype', filetype);
-
+		UploadFile.append("deduplicate",switchs);
+		
 		const projectObj = new UploaddataAPI(datasetId, UploadFile);
 		dispatch(APITransport(projectObj));
 		handleModalClose();
+	}
+
+	const handleswitchchange =() => {
+		setswitchs("false")
+
 	}
 
 	return (
@@ -137,7 +148,7 @@ export default function DatasetSettings({ datasetId }) {
 								>
 									<Typography variant="h5">Upload Data</Typography>
 								</Grid>
-								<Grid container spacing={2} sx={{ padding: 3 }} >
+								<Grid container spacing={2} sx={{ padding: 3}} >
 									<Grid
 										container
 										direction='row'
@@ -150,11 +161,11 @@ export default function DatasetSettings({ datasetId }) {
 									>
 										<Grid
 											item
-											xs={4}
-											sm={4}
-											md={4}
-											lg={4}
-											xl={4}
+											xs={3}
+											sm={3}
+											md={3}
+											lg={3}
+											xl={3}
 										>
 											<Typography variant="subtitle1" gutterBottom component="div"  >
 												Select File :
@@ -200,12 +211,41 @@ export default function DatasetSettings({ datasetId }) {
 											/>
 										</Grid>
 									</Grid>
+									<Grid
+										container
+										direction='row'
+										alignItems= "center"
+										justifyContent={"space-between"}
+										sx={{
+											alignItems: "center",
+											mt: 3,
+
+										}}
+									>
+										<Grid
+											item
+											xs={4}
+											sm={4}
+											md={4}
+											lg={4}
+											xl={4}
+										>
+											<Typography variant="subtitle1" gutterBottom component="div"  >
+											Switch :
+											</Typography>
+										</Grid>
+										<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
+										<Switch {...label} defaultChecked value={switchs} onChange={handleswitchchange}/>
+										</Grid>
+									</Grid>
+									
 									<Grid container item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ justifyContent: "flex-end", mt: 2 }} >
 
 										<CustomButton label={"Upload"} disabled={file.length == 0 ? true : false} onClick={handleUploadFile} />
 										<CustomButton sx={{ ml: 1 }} label={"Close"} onClick={() => handleModalClose()} />
 									</Grid>
 								</Grid>
+								
 								</Grid>
 								
 							</Modal>
