@@ -231,7 +231,7 @@ export default function DatasetSettings({ datasetId }) {
 											xl={4}
 										>
 											<Typography variant="subtitle1" gutterBottom component="div"  >
-											Switch :
+											Delete Duplicate Records :
 											</Typography>
 										</Grid>
 										<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
