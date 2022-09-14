@@ -150,7 +150,7 @@ function ProgressList() {
  
   useEffect(() => {
     setLoading(false);
-  }, [PeriodicalTaskssData,CumulativeTasksData,yearvalue])
+  }, [yearvalue,PeriodicalTaskssData,CumulativeTasksData])
   
 
   const handleGraphType = (e) => {
@@ -292,14 +292,14 @@ function ProgressList() {
         {
 
           label: progressTypes,
-          //data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
-          data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
+          data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+          //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: 'rgba(26, 161, 234)',
         },
         {
           label: comparisonProgressTypes,
-          // data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
-          data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
+           data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+          //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: 'rgba(216, 208, 27 )',
         },
 
@@ -349,40 +349,8 @@ function ProgressList() {
                   </Select>
                 </FormControl>
               </Grid>
-              {(graphTypes === avilableGraphType.Individual || graphTypes === avilableGraphType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(26, 161, 234)" }}>
-                    Select Progress Type
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Select Progress Type"
-                    onChange={handleProgressType}
-                  >
-                    {ProgressType.map((item, index) => (
-                      <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>}
-              {graphTypes === avilableGraphType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(216, 208, 27 )" }}>
-                    Select Progress Type
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Select Progress Type"
-                    onChange={handleComparisonProgressType}
-                  >
-                    {ProgressType.map((item, index) => (
-                      <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>}
+             
+             
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
@@ -404,43 +372,87 @@ function ProgressList() {
                 </FormControl>
               </Grid>
             </Grid>
-            <Grid container rowSpacing={2} mt={1} mb={1}>
-            <Grid item xs={3} sm={3} md={3} lg={3} xl={3} >
-               
-              </Grid>
-              {!(progressTypes === "Cumulative" || graphTypes === "") && <Grid item xs={3} sm={3} md={3} lg={3} xl={3} >
+           
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Grid container columnSpacing={2} rowSpacing={2} mt={1} mb={1}>
+            {(graphTypes === avilableGraphType.Individual || graphTypes === avilableGraphType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(26, 161, 234)" }}>
+                    Select Progress Type
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Select Progress Type"
+                    onChange={handleProgressType}
+                  >
+                    {ProgressType.map((item, index) => (
+                      <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>}
+              {!(progressTypes === "Cumulative" || graphTypes === "") && <Grid item xs={2} sm={2} md={2} lg={2} xl={2}  >  
+                        
+                        
+                   
                 <Button
                   endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color="primary"
                   onClick={() => setShowPicker(!showPicker)}
-                  sx={{ backgroundColor: "rgba(26, 161, 234)", "&:hover": { backgroundColor: "rgba(26, 161, 234)", } }}
+                  sx={{ backgroundColor: "rgba(26, 161, 234)", "&:hover": { backgroundColor: "rgba(26, 161, 234)", } ,marginLeft:"20px"}}
 
                 >
                   Pick dates
                 </Button>
               </Grid>}
-              {!(comparisonProgressTypes === "Cumulative" || graphTypes === "" || graphTypes === avilableGraphType.Individual) && <Grid item xs={3} sm={3} md={3} lg={3} xl={3} >
+              {graphTypes === avilableGraphType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(216, 208, 27 )" }}>
+                    Select Progress Type
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Select Progress Type"
+                    onChange={handleComparisonProgressType}
+                  >
+                    {ProgressType.map((item, index) => (
+                      <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>}
+              {!(comparisonProgressTypes === "Cumulative" || graphTypes === "" || graphTypes === avilableGraphType.Individual) && <Grid item xs={2} sm={2} md={2} lg={2} xl={2} >
                 <Button
                   endIcon={showPickers ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color="primary"
                   onClick={handledatecomparisionprogress}
-                  sx={{ backgroundColor: "rgba(216, 208, 27 )", "&:hover": { backgroundColor: "rgba(216, 208, 27 )", } }}
+                  sx={{ backgroundColor: "rgba(216, 208, 27 )", "&:hover": { backgroundColor: "rgba(216, 208, 27 )", },marginLeft:"20px" }}
                 >
                   Pick dates
                 </Button>
               </Grid>}
-              <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
-                <Button
-                  variant="contained"
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </Button>
-              </Grid>
+              <Grid item xs={6} sm={6} md={2} lg={2} xl={2}
 
-              {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
+            >
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={(progressTypes ||comparisonProgressTypes ) ? false : true}
+              >
+                Submit
+              </Button>
+            </Grid>
+            {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
                     onChange={item => setState([item.selection])}
@@ -517,7 +529,6 @@ function ProgressList() {
                         }),
                         isSelected(range) {
                           const definedRange = this.range();
-                          console.log(this.range(), "ddddd")
                           return (
                             isSameDay(range.startDate, definedRange.startDate) &&
                             isSameDay(range.endDate, definedRange.endDate)
@@ -539,6 +550,7 @@ function ProgressList() {
                 </Card>
               </Box>}
             </Grid>
+           
           </Grid>
           {showBarChar && <Bar options={options} data={data} />}
 
