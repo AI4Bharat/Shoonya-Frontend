@@ -292,19 +292,21 @@ function ProgressList() {
         {
 
           label: progressTypes,
-          data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+          //data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+          data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: 'rgba(26, 161, 234)',
         },
         {
           label: comparisonProgressTypes,
-          data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+          // data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+          data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: 'rgba(216, 208, 27 )',
         },
 
       ],
 
     };
-   // console.log(data, "vvvv", CumulativeTasksData?.data, weekvalue?.data?.map((e) => e.annotations_completed), monthvalue?.data?.map((e) => e.annotations_completed), yearvalue?.data?.map((e) => e.annotations_completed))
+    console.log(data, "vvvv", )
 
   }
 
