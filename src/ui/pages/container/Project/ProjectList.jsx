@@ -53,7 +53,7 @@ export default function ProjectList() {
                     aria-labelledby="demo-row-radio-buttons-group-label"
                     name="row-radio-buttons-group"
                     defaultValue="ProjectList"
-
+                    sx={{marginTop:"20px"}}
 
                 >
                     <FormControlLabel value="ProjectList" control={<Radio />} label="ProjectList" onClick={handleProjectlist} />
@@ -63,7 +63,7 @@ export default function ProjectList() {
             </FormControl>
 
             <Box >
-                <Box sx={{ p: 1, }}>
+                <Box sx={{ p: 1,marginTop:"20px" }}>
                     {radiobutton ? <ProjectCardList projectData={projectData} /> : <ProjectCard projectData={projectData} />}
                 </Box>
             </Box>
