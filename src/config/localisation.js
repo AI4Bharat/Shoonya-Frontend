@@ -24,6 +24,7 @@ const localisation = {
     "button.submit":"Submit",
     "label.workspaces":"Workspaces",
     "label.members":"Members",
+    "label.annotators":"Annotators",
     "label.reviewers":"Reviewers",
     "label.invites":"Invites",
     "label.settings":"Settings",

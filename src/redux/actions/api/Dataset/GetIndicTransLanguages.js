@@ -1,23 +1,23 @@
 /**
- * Login API
+ * indicTrans Languages API
  */
  import API from "../../../api";
  import ENDPOINTS from "../../../../config/apiendpoint";
- import constant from '../../../constants';
-
- export default class GetWorkspacesAPI extends API {
-   constructor(pageNo, records, timeout = 2000) {
+ import constants from '../../../constants';
+ 
+ export default class GetIndicTransLanguagesAPI extends API {
+   constructor(timeout = 2000) {
      super("GET", timeout, false);
-     this.type = constant.GET_WORKSPACES_DATA
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}user-workspaces/loggedin-user-workspaces/`;
+     this.type = constants.GET_INDIC_TRANS_LANGUAGES;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}get_indic_trans_supported_languages`;
    }
-
+ 
    processResponse(res) {
-    super.processResponse(res);
-    if (res) {
-        this.workspaceData = res;
-    }
-}
+     super.processResponse(res);
+     if (res) {
+       this.langList = res;
+     }
+ }
  
    apiEndPoint() {
      return this.endpoint;
@@ -36,7 +36,7 @@
    }
  
    getPayload() {
-     return this.workspaceData;
+     return this.langList;
    }
  }
  

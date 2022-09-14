@@ -22,6 +22,8 @@ export default function DatasetList() {
   const datasetList = useSelector(state=>state.getDatasetList.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
 
+  console.log(datasetList,"datasetList")
+
   const getDashboardprojectData = () => {
       const projectObj = new GetDatasetsAPI();
       dispatch(APITransport(projectObj));  
@@ -41,10 +43,21 @@ export default function DatasetList() {
   }
   const handleCreateProject =(e)=>{
     navigate(`/create-Dataset-Instance-Button/`)
-}
-useEffect(() => {
-  setLoading(apiLoading);
-}, [apiLoading])
+   
+  }
+//   useEffect(()=>{
+//     getDatasetList();
+// },[]);
+
+  //   const handleCreateProject =(e)=>{
+  //       navigate(`/create-Dataset-Instance-Button/`)
+  //   }
+
+    const handleAutomateButton =(e)=>{
+        navigate('/datasets/automate')
+    }
+
+
   return (
     <>
      {loading && <Spinner />}
@@ -64,6 +77,8 @@ useEffect(() => {
       <Box >
       <CustomButton  sx={{  p: 2, borderRadius: 3, mt: 5, mb: 2, justifyContent: "flex-end" }} 
             onClick={handleCreateProject} label="Create New Dataset Instance" />
+             <CustomButton  sx={{  p: 2, borderRadius: 3, mt: 5, mb: 2, ml: 2, justifyContent: "flex-end" }} 
+                onClick={handleAutomateButton} label="Automate Datasets" />
         <Box sx={{ p: 1 }}>
           {radiobutton ? <DatasetCardList datasetList={datasetList}/> : <DatasetCard datasetList={datasetList}/>}
         </Box>
