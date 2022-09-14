@@ -172,13 +172,18 @@ const DatasetStyle = makeStyles({
     opacity: 1
   },
   search: {
-    position: "relative",
+   // position: "relative",
     borderRadius: "24px",
     backgroundColor: "#F3F3F3",
     marginLeft: "0px",
     width: "300px",
     textAlign: "left",
-    float: "right",
+   // float: "right",
+   marginBottom:"30px",
+   position: "absolute",
+   right: "200px",
+   top:"105px",
+  
   },
   searchIcon: {
     // padding: theme.spacing(0, 2),
