@@ -26,7 +26,7 @@ function TabPanel(props) {
     );
 }
 
-const UserProfilePage = () => {
+const ProjectSetting = () => {
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (e, v) => {
         setTabValue(v)
@@ -79,4 +79,4 @@ const UserProfilePage = () => {
     )
 }
 
-export default UserProfilePage
+export default ProjectSetting

@@ -433,7 +433,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     <div>
       {!loader && <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
         <div/>
-        <Grid container spacing={0} sx={{ justifyContent: "end" }}>
+        <Grid container spacing={0}>
+        {/* <Grid container spacing={0} sx={{ justifyContent: "end" }}> */}
           <Grid item>
           {taskData?.annotation_users?.some((user) => user === userData.id) && <Tooltip title="Save task for later">
             <Button
