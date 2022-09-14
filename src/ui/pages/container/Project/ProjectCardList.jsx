@@ -2,12 +2,60 @@ import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 import CustomButton from "../../component/common/Button";
-import { ThemeProvider } from "@mui/material";
+import { Grid, ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import Search from "../../component/common/Search";
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const ProjectCardList = (props) => {
     const { projectData } = props
+    const SearchProject = useSelector((state) => state.SearchProjectCards.data);
+
+    const pageSearch = () => {
+
+        return projectData.filter((el) => {
+
+            if (SearchProject == "") {
+
+                return el;
+            } else if (
+                el.project_type
+                    ?.toLowerCase()
+                    .includes(SearchProject?.toLowerCase())
+            ) {
+
+                return el;
+            } else if (
+                el.project_mode
+                    ?.toLowerCase()
+                    .includes(SearchProject?.toLowerCase())
+            ) {
+
+
+
+                return el;
+            } else if (
+                el.title
+                    ?.toLowerCase()
+                    .includes(SearchProject?.toLowerCase())
+            ) {
+
+
+
+                return el;
+            } else if (
+                el.id.toString()?.toLowerCase()
+                    ?.includes(SearchProject.toLowerCase())
+            ) {
+
+                return el;
+            }
+
+
+        })
+
+    }
 
     const columns = [
         {
@@ -61,7 +109,7 @@ const ProjectCardList = (props) => {
 
 
 
-    const data = projectData && projectData.length > 0 ? projectData.map((el, i) => {
+    const data = projectData && projectData.length > 0 ? pageSearch().map((el, i) => {
         return [
             el.id,
             el.title,
@@ -104,10 +152,18 @@ const ProjectCardList = (props) => {
         selectableRows: "none",
         search: false,
         jumpToPage: true,
+
+    };
+    const renderSnackBar = () => {
+        return (
+            <Search />
+        );
     };
 
     return (
-        <div>
+
+        <Grid>
+            {renderSnackBar()}
             <ThemeProvider theme={tableTheme}>
                 <MUIDataTable
                     title={""}
@@ -117,7 +173,7 @@ const ProjectCardList = (props) => {
                 />
             </ThemeProvider>
 
-        </div>
+        </Grid>
 
     )
 }

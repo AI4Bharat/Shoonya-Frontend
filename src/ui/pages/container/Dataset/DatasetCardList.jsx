@@ -10,8 +10,8 @@ const DatasetCardList = (props) => {
 
    const columns = [
         {
-            name: "Project_id",
-            label: "Project Id",
+            name: "Dataset_id",
+            label: "Dataset Id",
             options: {
                 filter: false,
                 sort: false,
@@ -19,8 +19,8 @@ const DatasetCardList = (props) => {
             }
         },
         {
-            name: "Project_Title",
-            label: "Project Title",
+            name: "Dataset_Title",
+            label: "Dataset Title",
             options: {
                 filter: false,
                 sort: false,
@@ -30,8 +30,8 @@ const DatasetCardList = (props) => {
 
 
         {
-            name: "project_Type",
-            label: "project Type",
+            name: "Dataset_Type",
+            label: "Dataset Type",
             options: {
                 filter: false,
                 sort: false,

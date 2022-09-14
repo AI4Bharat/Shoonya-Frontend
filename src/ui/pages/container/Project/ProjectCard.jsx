@@ -15,15 +15,12 @@ import { useNavigate } from 'react-router-dom';
 const Projectcard = (props) => {
     const { projectData } = props
     const classes = DatasetStyle();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const apiLoading = useSelector(state => state.apiStatus.loading);
     const SearchProject = useSelector((state) => state.SearchProjectCards.data);
     const [page, setPage] = useState(0);
-    const [loading, setLoading] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(9);
-    // const [pagecount, setPagecount] = useState(projectData);
-    let pagecount = projectData;
+  
+
+
 
     const handleChangePage = (e, newPage) => {
         setPage(newPage);
@@ -33,10 +30,6 @@ const Projectcard = (props) => {
         setRowsPerPage(parseInt(e.target.value, 10));
         setPage(0);
     }
-
-    useEffect(() => {
-        setLoading(false);
-    }, [projectData])
 
 
     const pageSearch = () => {
@@ -87,9 +80,7 @@ const Projectcard = (props) => {
 
     return (
         <React.Fragment>
-            {/* <Header /> */}
             <Search />
-            {loading && <Spinner />}
             {pageSearch().length > 0 ?
                 <Box sx={{ margin: "0 auto", pb: 5 }}>
                     {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}
