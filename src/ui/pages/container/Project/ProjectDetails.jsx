@@ -1,4 +1,4 @@
-import { Box, Button, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
+import { Box, Button, Card, Grid, Tab, Tabs, ThemeProvider, Typography,AppBar,Toolbar } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
@@ -17,6 +17,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled, alpha } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import DatasetStyle from "../../../styles/Dataset";
 
 
 const menuOptions = [
@@ -89,6 +90,7 @@ const StyledMenu = styled((props) => (
 const Projects = () => {
     // console.log("props", props)
     const { id } = useParams();
+    const classes = DatasetStyle();
     const [projectData, setProjectData] = useState([
         { name: "Project ID", value: null },
         { name: "Description", value: null },
@@ -283,35 +285,24 @@ const Projects = () => {
                             <Typography variant="body2" sx={{ color: "#FFFFFF" }}>{translate("label.showProjectSettings")}</Typography>
                         </Button>
                     </Link>}
-                    <Box>
-                        <Tabs value={value} onChange={handleChange} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
-                            {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {isAnnotators &&<Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700' }} />}
-                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700',flexDirection: "row-reverse" }} onClick={handleClick} icon={(data?.length || userDetails?.role === 2 || userDetails?.role === 3) &&<ArrowDropDownIcon/>}/>
-                            {(data?.length || userDetails?.role === 2 || userDetails?.role === 3) &&
+                    <Grid>
+                    <AppBar  position="static" color='default'sx={{marginLeft:"25px",width:"1140px",height:"57px"}}>
+            <Toolbar >
+            <Box >
+                        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                                <StyledMenu
-                                    id="demo-customized-menu"
-                                    MenuListProps={{
-                                        'aria-labelledby': 'demo-customized-button',
-                                    }}
-                                    anchorEl={anchorEl}
-                                    open={open}
-                                    onClose={handleClose}
-                                >
-                                    <MenuItem onClick={() => { setAnnotationreviewertype("Annotation Reports"); handleClose() }} disableRipple>
-                                        Annotation Reports
-                                    </MenuItem>
-                                    <MenuItem onClick={() => { setAnnotationreviewertype("Reviewer Reports"); handleClose() }} disableRipple>
-                                        Reviewer Reports
-                                    </MenuItem>
-                                </StyledMenu>}
-
+                         {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700',}} />}
+                            {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                            {isAnnotators &&<Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                            {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700',flexDirection: "row-reverse" }} onClick={handleClick} />
+                           
                         </Tabs>
                     </Box>
-                    {isAnnotators && <TabPanel value={value} index={0}>
+                    </Toolbar>
+        </AppBar>
+        </Grid>
+                    {isAnnotators && <TabPanel value={value} index={0} >
                         <TaskTable type="annotation" />
                     </TabPanel>}
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
