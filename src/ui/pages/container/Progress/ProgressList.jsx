@@ -1,18 +1,5 @@
-import {
-  Button,
-  Grid,
-  ThemeProvider,
-  Typography,
-  Select,
-  Box,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Card,
-  CircularProgress,
-  capitalize
-} from "@mui/material";
-
+import {Button,Grid,ThemeProvider,Select,Box,MenuItem,InputLabel,FormControl,Card} from "@mui/material";
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import themeDefault from "../../../theme/theme";
@@ -25,11 +12,11 @@ import {
   LinearScale,
   BarElement,
   Title,
-  Tooltip,
+ // Tooltip,
   Legend,
 
 } from 'chart.js';
-
+import { styled } from '@mui/material/styles';
 import { Bar } from 'react-chartjs-2';
 import faker from 'faker';
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
@@ -53,11 +40,23 @@ ChartJS.register(
   LinearScale,
   BarElement,
   Title,
-  Tooltip,
+  //Tooltip,
   Legend,
 
 );
+
 ChartJS.register(CategoryScale);
+
+const LightTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.white,
+    color: 'rgba(0, 0, 0, 0.87)',
+    boxShadow: theme.shadows[1],
+    fontSize: 11,
+  },
+}));
 
 
 export const options = {
@@ -106,7 +105,7 @@ export const options = {
     },
   },
 };
-
+const TooltipData=[{name:"hello"},{name:"hellopppp"}]
 const ChartType = [{ chartTypename: "Individual" }, { chartTypename: "Comparison" }]
 const ProgressType = [{ ProgressTypename: "Cumulative" },  { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
 const avilableChartType = {
@@ -128,6 +127,7 @@ function ProgressList() {
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
   const [yearvalue, setyearvalue] = useState([])
+  const [toolTipvalue,setToolTipValue] = useState([])
   const theme = useTheme();
   const [state, setState] = useState([
     {
@@ -172,7 +172,7 @@ function ProgressList() {
         types.push(...subTypes);
       });
       setProjectTypes(types);
-      types?.length && setSelectedType(types[0]);
+      types?.length && setSelectedType(types[3]);
     }
   }, [ProjectTypes]);
 
@@ -347,6 +347,13 @@ function ProgressList() {
   var now = new Date()
   var currentYear = now.getFullYear()
 
+  const handleToolTip =(e)=>{
+setToolTipValue(e.target.value)
+  }
+
+  const ToolTipdata1 =  TooltipData.map((el,i)=> el.name ) ;
+console.log(ToolTipdata1,"ToolTipdata1")
+
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
@@ -371,15 +378,23 @@ function ProgressList() {
                   <InputLabel id="Graph-Type-label" sx={{ fontSize: "16px" }}>
                     Select Chart Type
                   </InputLabel>
+                  
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Select Graph Type"
                     onChange={handleChartType}
                   >
+                   
                     {ChartType.map((item, index) => (
-                      <MenuItem value={item.chartTypename} key={index}>{item.chartTypename}</MenuItem>
+                      
+                      
+                      
+                      <LightTooltip title={item.chartTypename} onChange={handleToolTip}  key={index} value={item.chartTypename} placement="left" ><MenuItem value={item.chartTypename}>
+                      {item.chartTypename}</MenuItem>
+                      </LightTooltip>
                     ))}
+                     
                   </Select>
                 </FormControl>
               </Grid>
@@ -390,6 +405,7 @@ function ProgressList() {
                   <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
                     Project Type
                   </InputLabel>
+                  
                   <Select
                     labelId="project-type-label"
                     id="project-type-select"
@@ -478,6 +494,7 @@ function ProgressList() {
               <Grid item xs={6} sm={6} md={2} lg={2} xl={2}
 
             >
+              
               <Button
                 variant="contained"
                 onClick={handleSubmit}
