@@ -62,6 +62,40 @@ ChartJS.register(CategoryScale);
 
 export const options = {
   responsive: true,
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: 'Language',
+        color: 'black',
+        font: {
+          family: 'Roboto',
+          size: 16,
+          weight: 'bold',
+          lineHeight: 1.2,
+        },
+        padding: {top: 20, left: 0, right: 0, bottom: 0}
+      }
+    },
+    y: {
+      display: true,
+      title: {
+        display: true,
+       text: '# Annotations Completed ',
+      // text:'Count',
+       color: '#black',
+        font: {
+           family: 'Roboto',
+          size: 16,
+          style: 'normal',
+          weight: 'bold',
+          lineHeight: 1.2
+        },
+        padding: {top: 30, left: 0, right: 0, bottom: 0}
+      }
+    }
+  },
   plugins: {
     legend: {
       position: 'top',
@@ -73,9 +107,9 @@ export const options = {
   },
 };
 
-const GraphType = [{ graphTypename: "Individual" }, { graphTypename: "Comparison" }]
+const ChartType = [{ chartTypename: "Individual" }, { chartTypename: "Comparison" }]
 const ProgressType = [{ ProgressTypename: "Cumulative" },  { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
-const avilableGraphType = {
+const avilableChartType = {
   Individual: "Individual",
   Comparison: "Comparison"
 }
@@ -84,7 +118,7 @@ function ProgressList() {
   const classes = DatasetStyle();
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
-  const [graphTypes, setGraphTypes] = useState("")
+  const [chartTypes, setChartTypes] = useState("")
   const [progressTypes, setProgressTypes] = useState("")
   const [showBarChar, setShowBarChar] = useState(false)
   const [showPicker, setShowPicker] = useState(false);
@@ -153,8 +187,8 @@ function ProgressList() {
   }, [yearvalue,PeriodicalTaskssData,CumulativeTasksData])
   
 
-  const handleGraphType = (e) => {
-    setGraphTypes(e.target.value)
+  const handleChartType = (e) => {
+    setChartTypes(e.target.value)
   }
   const handleSubmit = () => {
     const OrgId = userDetails.organization.id
@@ -172,7 +206,7 @@ function ProgressList() {
       end_date: format(state[0].endDate, 'yyyy-MM-dd'),
     };
 
-    if (graphTypes === avilableGraphType.Individual) {
+    if (chartTypes === avilableChartType.Individual) {
 
       if (progressTypes === "Cumulative") {
         const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
@@ -251,7 +285,7 @@ function ProgressList() {
   let data;
 
 
-  if (graphTypes === avilableGraphType.Individual) {
+  if (chartTypes === avilableChartType.Individual) {
     if (progressTypes === "Cumulative") {
       const labels = CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
       data = {
@@ -260,7 +294,7 @@ function ProgressList() {
           {
             label: progressTypes,
             data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
-            backgroundColor: 'rgba(26, 161, 234)',
+            backgroundColor: "rgba(243, 156, 18 )",
           },
         ],
 
@@ -273,7 +307,7 @@ function ProgressList() {
           {
             label: progressTypes,
             data: PeriodicalTaskssData[0]?.data.map((e) => (e.annotations_completed)),
-            backgroundColor: 'rgba(26, 161, 234)',
+            backgroundColor: "rgba(243, 156, 18 )",
           },
         ],
 
@@ -294,13 +328,13 @@ function ProgressList() {
           label: progressTypes,
           data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
           //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
-          backgroundColor: 'rgba(26, 161, 234)',
+          backgroundColor: "rgba(243, 156, 18 )",
         },
         {
           label: comparisonProgressTypes,
            data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
           //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
-          backgroundColor: 'rgba(216, 208, 27 )',
+          backgroundColor: 'rgba(35, 155, 86 )',
         },
 
       ],
@@ -335,16 +369,16 @@ function ProgressList() {
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small" >
                   <InputLabel id="Graph-Type-label" sx={{ fontSize: "16px" }}>
-                    Select Graph Type
+                    Select Chart Type
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Select Graph Type"
-                    onChange={handleGraphType}
+                    onChange={handleChartType}
                   >
-                    {GraphType.map((item, index) => (
-                      <MenuItem value={item.graphTypename} key={index}>{item.graphTypename}</MenuItem>
+                    {ChartType.map((item, index) => (
+                      <MenuItem value={item.chartTypename} key={index}>{item.chartTypename}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -381,9 +415,9 @@ function ProgressList() {
             alignItems="center"
           >
             <Grid container columnSpacing={2} rowSpacing={2} mt={1} mb={1}>
-            {(graphTypes === avilableGraphType.Individual || graphTypes === avilableGraphType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+            {(chartTypes === avilableChartType.Individual || chartTypes === avilableChartType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(26, 161, 234)" }}>
+                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(243, 156, 18 )" }}>
                     Select Progress Type
                   </InputLabel>
                   <Select
@@ -398,7 +432,7 @@ function ProgressList() {
                   </Select>
                 </FormControl>
               </Grid>}
-              {!(progressTypes === "Cumulative" || graphTypes === "") && <Grid item xs={2} sm={2} md={2} lg={2} xl={2}  >  
+              {!(progressTypes === "Cumulative" || chartTypes === "") && <Grid item xs={2} sm={2} md={2} lg={2} xl={2}  >  
                         
                         
                    
@@ -407,15 +441,15 @@ function ProgressList() {
                   variant="contained"
                   color="primary"
                   onClick={() => setShowPicker(!showPicker)}
-                  sx={{ backgroundColor: "rgba(26, 161, 234)", "&:hover": { backgroundColor: "rgba(26, 161, 234)", } ,marginLeft:"20px"}}
+                  sx={{ backgroundColor: "rgba(243, 156, 18)", "&:hover": { backgroundColor: "rgba(243, 156, 18 )", } ,marginLeft:"20px"}}
 
                 >
                   Pick dates
                 </Button>
               </Grid>}
-              {graphTypes === avilableGraphType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+              {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(216, 208, 27 )" }}>
+                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}>
                     Select Progress Type
                   </InputLabel>
                   <Select
@@ -430,13 +464,13 @@ function ProgressList() {
                   </Select>
                 </FormControl>
               </Grid>}
-              {!(comparisonProgressTypes === "Cumulative" || graphTypes === "" || graphTypes === avilableGraphType.Individual) && <Grid item xs={2} sm={2} md={2} lg={2} xl={2} >
+              {!(comparisonProgressTypes === "Cumulative" || chartTypes === "" || chartTypes === avilableChartType.Individual) && <Grid item xs={2} sm={2} md={2} lg={2} xl={2} >
                 <Button
                   endIcon={showPickers ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color="primary"
                   onClick={handledatecomparisionprogress}
-                  sx={{ backgroundColor: "rgba(216, 208, 27 )", "&:hover": { backgroundColor: "rgba(216, 208, 27 )", },marginLeft:"20px" }}
+                  sx={{ backgroundColor: "rgba(35, 155, 86 )", "&:hover": { backgroundColor: "rgba(35, 155, 86 )", },marginLeft:"20px" }}
                 >
                   Pick dates
                 </Button>
