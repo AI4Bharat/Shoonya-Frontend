@@ -171,7 +171,7 @@ const ReportsTable = (props) => {
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
                     <MUIDataTable
-                        title={""}
+                        title={"Reports"}
                         data={ProjectReport}
                         columns={columns.filter(col => selectedColumns.includes(col.name))}
                         options={options}

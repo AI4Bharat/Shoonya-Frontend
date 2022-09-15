@@ -197,7 +197,7 @@ const MembersTable = (props) => {
                    
                             {props.type === addUserTypes.PROJECT_ANNOTATORS &&
                              <CustomButton
-                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
+                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1,height:"40px"}}
                                 label = "Remove"
                                 onClick={()=>handleProjectMember(el.id)}
                                 disabled={projectlist(el.id)}
@@ -205,7 +205,7 @@ const MembersTable = (props) => {
                             />}
                              {props.type === addUserTypes.PROJECT_REVIEWER &&
                              <CustomButton
-                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1}}
+                                sx={{borderRadius : 2,backgroundColor:"#cf5959",m:1,height:"40px"}}
                                 label = "Remove"
                                 onClick={()=>handleProjectReviewer(el.id)}
                                 disabled={projectlist(el.id)}
