@@ -4,6 +4,7 @@ import { useState } from 'react'
 import BasicSettings from '../../component/Tabs/BasicSettings';
 import ReadonlyConfigurations from '../../component/Tabs/ReadonlyConfigurations'
 import AdvancedOperation from '../../component/Tabs/AdvancedOperation';
+import ProjectLogs from './ProjectLogs';
 
 
 function TabPanel(props) {
@@ -18,7 +19,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box p={3}>
+                <Box p={4}>
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -60,6 +61,7 @@ const ProjectSetting = () => {
                     <Tab label="Basic " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label=" Advanced " sx={{ fontSize: 17, fontWeight: '700' }} />
                     <Tab label=" Read-only " sx={{ fontSize: 17, fontWeight: '700' }} />
+                    <Tab label=" Logs " sx={{ fontSize: 17, fontWeight: '700' }} />
                 </Tabs>
             </Box>
             <Divider/>
@@ -72,6 +74,9 @@ const ProjectSetting = () => {
                 </TabPanel>
                 <TabPanel value={tabValue} index={2}>
                 <ReadonlyConfigurations />
+                </TabPanel>
+                <TabPanel value={tabValue} index={3}>
+                    <ProjectLogs />
                 </TabPanel>
             </Box>
         </Box>
