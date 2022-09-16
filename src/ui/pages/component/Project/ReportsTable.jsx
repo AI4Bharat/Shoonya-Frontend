@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, CircularProgress, Card } from '@mui/material';
+import { Box, Button, Grid, CircularProgress, Card, Radio} from '@mui/material';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetProjectReportAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectReport";
@@ -17,7 +20,6 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 const ReportsTable = (props) => {
-    const { annotationreviewertype } = props
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const [selectRange, setSelectRange] = useState([{
         startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
@@ -36,6 +38,8 @@ const ReportsTable = (props) => {
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
     const classes = DatasetStyle();
+    const [radiobutton, setRadiobutton] = useState(true)
+    
 
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
@@ -60,6 +64,18 @@ const ReportsTable = (props) => {
         }
         setShowSpinner(false);
     }, [ProjectReport]);
+
+
+    const handleAnnotatationReports = () => {
+        setRadiobutton(true)
+    }
+    const handleReviewerReports = () => {
+        setRadiobutton(false)
+        
+    }
+    
+   console.log(radiobutton,"radiobutton")
+
 
     const renderToolBar = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -101,11 +117,11 @@ const ReportsTable = (props) => {
         let projectObj;
         let reports_type = "review_reports"
         setReportRequested(true);
-        console.log(annotationreviewertype, "annotationreviewertype")
-        if (annotationreviewertype == "Annotation Reports") {
+        
+        if (radiobutton === true ) {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
         }
-        if (annotationreviewertype == "Reviewer Reports") {
+       if (radiobutton === false){
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'), reports_type);
         }
         dispatch(APITransport(projectObj));
@@ -115,7 +131,27 @@ const ReportsTable = (props) => {
 
     return (
         <React.Fragment>
+           
             <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt: 2, mb: 2, justifyContent: "space-between" }}>
+            <FormControl>
+
+<RadioGroup
+    row
+    aria-labelledby="demo-row-radio-buttons-group-label"
+    name="row-radio-buttons-group"
+    defaultValue="AnnotatationReports"
+    sx={{marginTop:"20px"}}
+
+>
+    <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation Reports" onChange={handleAnnotatationReports}  />
+    <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer Reports" onChange={handleReviewerReports} />
+
+</RadioGroup>
+</FormControl>
+
+
+            
+
                 <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                     <Button
                         endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
