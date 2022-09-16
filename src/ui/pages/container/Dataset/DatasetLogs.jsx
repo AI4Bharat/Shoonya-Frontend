@@ -22,7 +22,6 @@ const DatasetLogs = (props) => {
   const DatasetLogs = useSelector((state) => state.getDatasetLogs.data);
   const [taskName, setTaskName] = useState("projects.tasks.export_project_in_place"); 
   const [columns, setColumns] = useState([]);
-  const [selectedColumns, setSelectedColumns] = useState([]);
   const [datasetLogs, setDatasetLogs] = useState([]);
   const [showPicker, setShowPicker] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
@@ -60,7 +59,6 @@ const DatasetLogs = (props) => {
   useEffect(() => {
     if (DatasetLogs?.length) {
       let tempColumns = [];
-      let tempSelected = [];
       Object.keys(DatasetLogs[0]).forEach((key) => {
         tempColumns.push({
           name: key,
@@ -71,15 +69,12 @@ const DatasetLogs = (props) => {
             align: "center"
           },
         });
-        tempSelected.push(key);
       });
       setColumns(tempColumns);
       setDatasetLogs(DatasetLogs);
-      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setDatasetLogs([]);
-      setSelectedColumns([]);
     }
     setShowSpinner(false);
   }, [DatasetLogs]);
@@ -151,7 +146,7 @@ const DatasetLogs = (props) => {
           <MUIDataTable
             title={""}
             data={datasetLogs}
-            columns={columns.filter((col) => selectedColumns.includes(col.name))}
+            columns={columns}
             options={options}
           />
         </ThemeProvider>)

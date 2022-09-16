@@ -15,7 +15,6 @@ const ProjectLogs = () => {
   const { projectId } = useParams();
   const [taskName, setTaskName] = useState("projects.tasks.export_project_in_place"); 
   const [columns, setColumns] = useState([]);
-  const [selectedColumns, setSelectedColumns] = useState([]);
   const [projectLogs, setProjectLogs] = useState([]);
   const [showPicker, setShowPicker] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,7 +66,6 @@ const ProjectLogs = () => {
   useEffect(() => {
     if (allLogs.length) {
       let tempColumns = [];
-      let tempSelected = [];
       Object.keys(allLogs[0]).forEach((key) => {
         tempColumns.push({
           name: key,
@@ -78,15 +76,12 @@ const ProjectLogs = () => {
             align: "center"
           },
         });
-        tempSelected.push(key);
       });
       setColumns(tempColumns);
       setProjectLogs(allLogs);
-      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setProjectLogs([]);
-      setSelectedColumns([]);
     }
   }, [allLogs]);
 
@@ -157,7 +152,7 @@ const ProjectLogs = () => {
           <MUIDataTable
             title={""}
             data={projectLogs}
-            columns={columns.filter((col) => selectedColumns.includes(col.name))}
+            columns={columns}
             options={options}
           />
         </ThemeProvider>
