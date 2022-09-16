@@ -286,7 +286,7 @@ const Projects = () => {
                         </Button>
                     </Link>}
                     <Grid>
-                    <AppBar  position="static" color='default'sx={{marginLeft:"25px",width:"1140px",height:"57px"}}>
+                    <AppBar  position="static" color='default'sx={{height:"57px"}}>
             <Toolbar >
             <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
