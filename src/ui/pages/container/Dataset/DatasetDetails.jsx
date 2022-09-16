@@ -13,6 +13,7 @@ import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatas
 import GetDatasetMembersAPI from "../../../../redux/actions/api/Dataset/GetDatasetMembers";
 import MembersTable from '../../component/Project/MembersTable';
 import DatasetSettings from './DatasetSettings';
+import DatasetLogs from './DatasetLogs';
 
 const DatasetDetails = () => {
 
@@ -88,6 +89,7 @@ const DatasetDetails = () => {
                             <Tab label={translate("label.datasets")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.logs")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
                         </Tabs>
                     </Box>
@@ -101,6 +103,9 @@ const DatasetDetails = () => {
                         <DatasetProjectsTable datasetId={datasetId} />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={3}>
+                        <DatasetLogs datasetId={datasetId} />
+                    </TabPanel>
+                    <TabPanel value={selectedTab} index={4}>
                         <DatasetSettings datasetId={datasetId} />
                     </TabPanel>
                 </Card>
