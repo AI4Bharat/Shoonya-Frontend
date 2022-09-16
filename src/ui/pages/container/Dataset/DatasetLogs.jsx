@@ -6,11 +6,10 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import ColumnList from "../../component/common/ColumnList";
 import Spinner from "../../component/common/Spinner";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import { addMonths } from 'date-fns/esm';
+import { addMonths, parse } from 'date-fns/esm';
 import { DateRangePicker } from "react-date-range";
 import GetDatasetLogsAPI from "../../../../redux/actions/api/Dataset/GetDatasetLogs";
 import { snakeToTitleCase } from "../../../../utils/utils";
@@ -40,7 +39,8 @@ const DatasetLogs = (props) => {
     if (DatasetLogs?.length) {
       let tempLogs = JSON.parse(JSON.stringify(DatasetLogs));
       tempLogs = tempLogs.filter((log) => {
-        return new Date(log.date) >= selection.startDate && new Date(log.date) <= selection.endDate;
+        const date = parse(log.date, 'dd-MM-yyyy', new Date());
+        return date >= selection.startDate && date <= selection.endDate;
       });
       setDatasetLogs(tempLogs);
     }
@@ -66,7 +66,7 @@ const DatasetLogs = (props) => {
           name: key,
           label: snakeToTitleCase(key),
           options: {
-            filter: ['status', 'result'].includes(key),
+            filter: key === 'status',
             sort: false,
             align: "center"
           },

@@ -1,48 +1,47 @@
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import { Box, Button, Card, FormControl, Grid, InputLabel, MenuItem, Select, ThemeProvider } from "@mui/material";
-import { addMonths } from 'date-fns/esm';
+import { addMonths, parse } from 'date-fns/esm';
 import { DateRangePicker } from "react-date-range";
-import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetProjectLogsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectLogs";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import tableTheme from "../../../theme/tableTheme";
+import Spinner from "../../component/common/Spinner";
 
 const ProjectLogs = () => {
   const { projectId } = useParams();
-  const dispatch = useDispatch();
-  const ProjectLogs = useSelector((state) => state.getProjectLogs.data);
   const [taskName, setTaskName] = useState("projects.tasks.export_project_in_place"); 
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [projectLogs, setProjectLogs] = useState([]);
   const [showPicker, setShowPicker] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectRange, setSelectRange] = useState([{
     startDate: addMonths(new Date(), -3),
     endDate: new Date(),
     key: "selection"
   }]);
+  const [allLogs, setAllLogs] = useState([]);
 
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
-    if (ProjectLogs?.length) {
-      let tempLogs = JSON.parse(JSON.stringify(ProjectLogs));
+    if (allLogs.length) {
+      let tempLogs = JSON.parse(JSON.stringify(allLogs));
       tempLogs = tempLogs.filter((log) => {
-        return new Date(log.date) >= selection.startDate && new Date(log.date) <= selection.endDate;
+        const date = parse(log.date, 'dd-MM-yyyy', new Date());
+        return date >= selection.startDate && date <= selection.endDate;
       });
       setProjectLogs(tempLogs);
     }
   };
 
   useEffect(() => {
-    const apiObj = new GetProjectLogsAPI(projectId, taskName);
-    dispatch(APITransport(apiObj));
+    getProjectLogs();
     setSelectRange([{
       startDate: addMonths(new Date(), -3),
       endDate: new Date(),
@@ -50,16 +49,31 @@ const ProjectLogs = () => {
     }]);
   }, [taskName]);
 
+  const getProjectLogs = () => {
+    setLoading(true);
+    const apiObj = new GetProjectLogsAPI(projectId, taskName);
+    fetch(apiObj.apiEndPoint(), {
+      method: "GET",
+      headers: apiObj.getHeaders().headers,
+    }).then(async (res) => {
+      setLoading(false);
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    }).then((res) => {
+      setAllLogs(res);
+    }).catch();
+  };
+
   useEffect(() => {
-    if (ProjectLogs?.length) {
+    if (allLogs.length) {
       let tempColumns = [];
       let tempSelected = [];
-      Object.keys(ProjectLogs[0]).forEach((key) => {
+      Object.keys(allLogs[0]).forEach((key) => {
         tempColumns.push({
           name: key,
           label: snakeToTitleCase(key),
           options: {
-            filter: ['status', 'result'].includes(key),
+            filter: key === 'status',
             sort: false,
             align: "center"
           },
@@ -67,14 +81,14 @@ const ProjectLogs = () => {
         tempSelected.push(key);
       });
       setColumns(tempColumns);
-      setProjectLogs(ProjectLogs);
+      setProjectLogs(allLogs);
       setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setProjectLogs([]);
       setSelectedColumns([]);
     }
-  }, [ProjectLogs]);
+  }, [allLogs]);
 
   const options = {
       filterType: 'checkbox',
@@ -138,14 +152,16 @@ const ProjectLogs = () => {
             </Card>
           </Box>}
       </Grid>
-      <ThemeProvider theme={tableTheme}>
-        <MUIDataTable
-          title={""}
-          data={projectLogs}
-          columns={columns.filter((col) => selectedColumns.includes(col.name))}
-          options={options}
-        />
-      </ThemeProvider>
+      {loading ? <Spinner /> : 
+        <ThemeProvider theme={tableTheme}>
+          <MUIDataTable
+            title={""}
+            data={projectLogs}
+            columns={columns.filter((col) => selectedColumns.includes(col.name))}
+            options={options}
+          />
+        </ThemeProvider>
+      }
     </React.Fragment>
   );
 };
