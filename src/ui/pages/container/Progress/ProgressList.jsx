@@ -13,7 +13,7 @@ import {
   LinearScale,
   BarElement,
   Title,
-   Tooltip,
+  Tooltip,
   Legend,
 
 } from 'chart.js';
@@ -92,9 +92,10 @@ export const options = {
           size: 16,
           style: 'normal',
           weight: 'bold',
-          lineHeight: 1.2
+          lineHeight: 1.2,
+          paddingBottom:"100px",
         },
-        padding: { top: 30, left: 0, right: 0, bottom: 0 }
+        padding: { top: 30, left: 0, right: 0, bottom: 20 }
       }
     }
   },
@@ -377,7 +378,7 @@ function ProgressList() {
             justifyContent="center"
             alignItems="center"
           >
-            <Grid> <Typography variant="h3" component="h2"> Bar Chart Analytics</Typography></Grid>
+            <Grid> <Typography variant="h3" component="h2" sx={{paddingBottom:"7px"}}> Bar Chart Analytics</Typography></Grid>
             <Grid container columnSpacing={3} rowSpacing={2} mt={1} mb={1}>
 
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
@@ -430,17 +431,15 @@ function ProgressList() {
                 </FormControl>
               </Grid>
               <Grid item xs={6} sm={6} md={2} lg={2} xl={2}
-
->
-
-  <Button
-    variant="contained"
-    onClick={handleSubmit}
-    disabled={(progressTypes || comparisonProgressTypes) ? false : true}
-  >
-    Submit
-  </Button>
-</Grid>
+              >
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  disabled={(progressTypes || comparisonProgressTypes) ? false : true}
+                >
+                  Submit
+                </Button>
+              </Grid>
             </Grid>
 
           </Grid>
@@ -520,7 +519,7 @@ function ProgressList() {
                   Pick dates
                 </Button>
               </Grid>}
-             
+
               {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
