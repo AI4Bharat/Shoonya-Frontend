@@ -127,7 +127,6 @@ function ProgressList() {
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
   const [yearvalue, setyearvalue] = useState([])
-  const [toolTipvalue,setToolTipValue] = useState([])
   const theme = useTheme();
   const [state, setState] = useState([
     {
@@ -295,6 +294,7 @@ function ProgressList() {
             label: progressTypes,
             data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
             backgroundColor: "rgba(243, 156, 18 )",
+            barThickness: 30, 
           },
         ],
 
@@ -308,6 +308,7 @@ function ProgressList() {
             label: progressTypes,
             data: PeriodicalTaskssData[0]?.data.map((e) => (e.annotations_completed)),
             backgroundColor: "rgba(243, 156, 18 )",
+            barThickness: 30, 
           },
         ],
 
@@ -329,12 +330,14 @@ function ProgressList() {
           data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
           //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: "rgba(243, 156, 18 )",
+          barThickness: 30, 
         },
         {
           label: comparisonProgressTypes,
            data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
           //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: 'rgba(35, 155, 86 )',
+          barThickness: 30, 
         },
 
       ],
@@ -347,9 +350,7 @@ function ProgressList() {
   var now = new Date()
   var currentYear = now.getFullYear()
 
-  const handleToolTip =(e)=>{
-setToolTipValue(e.target.value)
-  }
+  
 
   const ToolTipdata1 =  TooltipData.map((el,i)=> el.name ) ;
 console.log(ToolTipdata1,"ToolTipdata1")
@@ -383,6 +384,7 @@ console.log(ToolTipdata1,"ToolTipdata1")
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Select Graph Type"
+                    value={chartTypes}
                     onChange={handleChartType}
                   >
                    
@@ -390,8 +392,8 @@ console.log(ToolTipdata1,"ToolTipdata1")
                       
                       
                       
-                      <LightTooltip title={item.chartTypename} onChange={handleToolTip}  key={index} value={item.chartTypename} placement="left" ><MenuItem value={item.chartTypename}>
-                      {item.chartTypename}</MenuItem>
+                      <LightTooltip title={TooltipData[index].name}  key={index} value={item.chartTypename} placement="left" followCursor>
+                        <MenuItem value={item.chartTypename}>{item.chartTypename}</MenuItem>
                       </LightTooltip>
                     ))}
                      
