@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, CircularProgress, Card, Radio,Typography } from '@mui/material';
+import { Box, Button, Grid, CircularProgress, Card, Radio,Typography,ThemeProvider } from '@mui/material';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
@@ -18,6 +18,8 @@ import { isSameDay, format } from 'date-fns/esm';
 import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import tableTheme from "../../../theme/tableTheme";
+import themeDefault from "../../../theme/theme";
 
 const ReportsTable = (props) => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
@@ -39,6 +41,7 @@ const ReportsTable = (props) => {
     const ProjectReport = useSelector(state => state.getProjectReport.data);
     const classes = DatasetStyle();
     const [radiobutton, setRadiobutton] = useState(true)
+    const [submitted, setSubmitted] = useState(false);
 
 
     useEffect(() => {
@@ -74,12 +77,13 @@ const ReportsTable = (props) => {
 
     }
 
-    console.log(radiobutton, "radiobutton")
+    console.log(radiobutton, "radiobutton",ProjectReport)
 
 
     const renderToolBar = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
+            
             <Box className={classes.filterToolbarContainer}>
                 <ColumnList
                     columns={columns}
@@ -117,6 +121,7 @@ const ReportsTable = (props) => {
         let projectObj;
         let reports_type = "review_reports"
         setReportRequested(true);
+        setSubmitted(true);
 
         if (radiobutton === "AnnotatationReports") {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
@@ -125,24 +130,21 @@ const ReportsTable = (props) => {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
         }
         dispatch(APITransport(projectObj));
+        
         setShowPicker(false)
         setShowSpinner(true);
     }
 
     return (
         <React.Fragment>
-            <Grid
             
-           // sx={{ marginTop: "20px" }}
-          
-           
-          >
-            <Typography gutterBottom component="div">
-            Select Report Type :
-            </Typography>
-          </Grid>
+         
             <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt: 2, mb: 2, justifyContent: "space-between" }}>
-            
+            <Grid   sx={{ }}   >
+             <Typography gutterBottom component="div" sx={{marginTop: "25px",fontSize:"16px"}}>
+             Select Report Type :
+             </Typography>
+           </Grid>
                 <FormControl>
 
                     <RadioGroup
@@ -150,7 +152,7 @@ const ReportsTable = (props) => {
                         aria-labelledby="demo-row-radio-buttons-group-label"
                         name="row-radio-buttons-group"
                         defaultValue="AnnotatationReports"
-                        sx={{ marginTop: "20px" }}
+                        sx={{ marginTop: "20px", marginRight:"90px" }}
 
                     >
                         <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation Reports" onChange={handleAnnotatationReports} />
@@ -158,7 +160,7 @@ const ReportsTable = (props) => {
 
                     </RadioGroup>
                 </FormControl>
-                <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+                <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
                     <Button
                         endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                         variant="contained"
@@ -210,6 +212,8 @@ const ReportsTable = (props) => {
                     />
                 </Card>
             </Box>}
+            {ProjectReport?.length > 0 ? (
+            <ThemeProvider theme={tableTheme}>
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
                     <MUIDataTable
@@ -220,6 +224,20 @@ const ReportsTable = (props) => {
                     />
                 )
             }
+             </ThemeProvider>
+             ):
+
+             <Grid
+          container
+          justifyContent="center"
+        >
+          <Grid item sx={{mt:"10%"}}>
+            {showSpinner ? <CircularProgress color="primary" size={50} /> : (
+            !ProjectReport?.length && submitted && <>No results</>
+            )}
+          </Grid>
+          </Grid>
+}
         </React.Fragment>
     )
 }
