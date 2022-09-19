@@ -61,8 +61,8 @@ const BasicSettings = (props) => {
         setNewDetails({
             title: ProjectDetails.title,
             description: ProjectDetails.description,
-
-
+            max_pending_tasks_per_user: ProjectDetails.max_pending_tasks_per_user,
+            tasks_pull_count_per_batch: ProjectDetails.tasks_pull_count_per_batch,
         });
         setTargetLanguage(ProjectDetails?.tgt_language)
         setSourceLanguage(ProjectDetails?.src_language)
@@ -104,6 +104,8 @@ const BasicSettings = (props) => {
             project_mode: ProjectDetails.project_mode,
             users: ProjectDetails.users,
             annotation_reviewers: ProjectDetails.annotation_reviewers,
+            max_pending_tasks_per_user: newDetails.max_pending_tasks_per_user,
+            tasks_pull_count_per_batch: newDetails.tasks_pull_count_per_batch,
         }
         const projectObj = new GetSaveButtonAPI(id, sendData);
         dispatch(APITransport(projectObj));
@@ -351,6 +353,78 @@ const BasicSettings = (props) => {
                                 />
                             </Grid>
 
+                        </Grid>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                mt: 2
+                            }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={2}
+                                xl={2}
+                            >
+                                <Typography variant="body2" fontWeight='700' label="Required">
+                                    Max Pending Tasks Per User
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={9}
+                                xl={9}
+                                sm={12}
+                            >
+                                <OutlinedTextField
+                                    fullWidth
+                                    name="max_pending_tasks_per_user"
+                                    InputProps={{ step: 1, min: 0, max: 99999, type: 'number', style: { fontSize: "14px", width: "500px" } }}
+                                    value={newDetails?.max_pending_tasks_per_user}
+                                    onChange={handleProjectName} />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                mt: 2
+                            }}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={2}
+                                xl={2}
+                            >
+                                <Typography variant="body2" fontWeight='700' label="Required">
+                                    Tasks Pull Count Per Batch
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={9}
+                                xl={9}
+                                sm={12}
+                            >
+                                <OutlinedTextField
+                                    fullWidth
+                                    name="tasks_pull_count_per_batch"
+                                    InputProps={{ step: 1, min: 0, max: 99999, type: 'number', style: { fontSize: "14px", width: "500px" } }}
+                                    value={newDetails?.tasks_pull_count_per_batch}
+                                    onChange={handleProjectName} />
+                            </Grid>
                         </Grid>
                     </>
                 <Grid
