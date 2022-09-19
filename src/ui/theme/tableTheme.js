@@ -34,6 +34,25 @@ const tableTheme = createTheme({
         },
       },
     },
+    MUIDataTableFilter: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "white",
+          width: "80%",
+          fontFamily: '"Roboto" ,sans-serif',
+        },
+        checkboxFormControl: {
+          minWidth: "120px",
+        },
+      },
+    },
+    MuiFormControl: {
+      styleOverrides: {
+        root: {
+          padding: "24px",
+        },
+      },
+    },
   },
 });
 
