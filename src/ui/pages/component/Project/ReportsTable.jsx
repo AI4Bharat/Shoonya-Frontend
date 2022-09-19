@@ -39,9 +39,8 @@ const ReportsTable = (props) => {
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
     const classes = DatasetStyle();
-    const [radiobutton, setRadiobutton] = useState(true)
+    const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
     const [submitted, setSubmitted] = useState(false);
-
 
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
@@ -122,7 +121,7 @@ const ReportsTable = (props) => {
         if (radiobutton === "AnnotatationReports") {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
         }
-       else {
+       else if(radiobutton === "ReviewerReports") {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
         }
         dispatch(APITransport(projectObj));
@@ -147,12 +146,13 @@ const ReportsTable = (props) => {
                         row
                         aria-labelledby="demo-row-radio-buttons-group-label"
                         name="row-radio-buttons-group"
-                        defaultValue="AnnotatationReports"
                         sx={{ marginTop: "20px", marginRight:"90px" }}
+                        value={radiobutton}
+                        onChange={handleAnnotatationReports}
 
                     >
-                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation Reports" onChange={handleAnnotatationReports} />
-                        <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer Reports" onChange={handleReviewerReports} />
+                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation Reports"  />
+                        <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer Reports"  />
 
                     </RadioGroup>
                 </FormControl>
