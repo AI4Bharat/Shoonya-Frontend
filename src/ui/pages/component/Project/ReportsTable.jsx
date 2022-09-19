@@ -28,7 +28,6 @@ const ReportsTable = (props) => {
         endDate: new Date(),
         key: "selection"
     }]);
-    console.log(ProjectDetails?.created_at, "ProjectDetails?.created_at")
     // const [rangeValue, setRangeValue] = useState([format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
     const [showPicker, setShowPicker] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
@@ -76,9 +75,6 @@ const ReportsTable = (props) => {
         setRadiobutton(e.target.value)
 
     }
-
-    console.log(radiobutton, "radiobutton",ProjectReport)
-
 
     const renderToolBar = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
