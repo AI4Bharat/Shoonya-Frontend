@@ -64,6 +64,8 @@ import automateDatasets from './Dataset/AutomateDatasets';
 import getIndicTransLanguages from './Dataset/GetIndicTransLanguages';
 import getCumulativeTasks from './Progress/CumulativeTasks';
 import getPeriodicalTasks from './Progress/PeriodicalTasks';
+import getDatasetLogs from './Dataset/GetDatasetLogs';
+import getProjectLogs from './ProjectDetails/GetProjectLogs';
 
 const index = {
     apiStatus,
@@ -135,7 +137,8 @@ const index = {
     getIndicTransLanguages,
     getCumulativeTasks,
     getPeriodicalTasks,
-    
+    getDatasetLogs,
+    getProjectLogs,
     
 };
 

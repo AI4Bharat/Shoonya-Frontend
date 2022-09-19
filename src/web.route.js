@@ -231,7 +231,7 @@ const App = () => {
           )}
         />
          <Route
-          path="progress"
+          path="Analytics"
           element={ProtectedRouteWrapper(
             <Layout component={<ProgressList />} />
           )}
