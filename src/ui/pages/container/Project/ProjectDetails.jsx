@@ -286,8 +286,7 @@ const Projects = () => {
                         </Button>
                     </Link>}
                     <Grid>
-                    <AppBar  position="static" color='default'sx={{height:"57px"}}>
-            <Toolbar >
+                   
             <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
@@ -299,8 +298,7 @@ const Projects = () => {
                            
                         </Tabs>
                     </Box>
-                    </Toolbar>
-        </AppBar>
+                   
         </Grid>
                     {isAnnotators && <TabPanel value={value} index={0} >
                         <TaskTable type="annotation" />
