@@ -167,13 +167,13 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/progress"
+             to="/Analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
               activeClassName={classes.highlightedMenu}
             >
-              Progress
+              Analytics
             </NavLink>
           </Typography>
           {/* <Typography variant="body1">
@@ -252,13 +252,13 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/progress"
+             to="/Analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
               activeClassName={classes.highlightedMenu}
             >
-              Progress
+              Analytics
             </NavLink>
           </Typography>
         </Grid>)
@@ -313,13 +313,13 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/progress"
+             to="/Analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
               activeClassName={classes.highlightedMenu}
             >
-              Progress
+              Analytics
             </NavLink>
           </Typography>
         </Grid>)
@@ -384,13 +384,13 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
     <NavLink
-      to="/progress"
+      to="/Analytics"
       className={({ isActive }) =>
         isActive ? classes.highlightedMenu : classes.headerMenu
       }
       activeClassName={classes.highlightedMenu}
     >
-      Progress
+      Analytics
     </NavLink>
   </Typography>,
   ];
