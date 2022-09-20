@@ -20,6 +20,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 const ReportsTable = (props) => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
@@ -34,10 +35,17 @@ const ReportsTable = (props) => {
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [reportRequested, setReportRequested] = useState(false);
     const [columns, setColumns] = useState([]);
+    const [snackbar, setSnackbarInfo] = useState({
+        open: false,
+        message: "",
+        variant: "success",
+      });
+    
 
     const { id } = useParams();
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
+    console.log(ProjectReport,"ProjectReport")
     const classes = DatasetStyle();
     const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
     const [submitted, setSubmitted] = useState(false);
@@ -67,13 +75,10 @@ const ReportsTable = (props) => {
     }, [ProjectReport]);
 
 
-    const handleAnnotatationReports = (e) => {
+    const handleChangeReports = (e) => {
         setRadiobutton(e.target.value)
     }
-    const handleReviewerReports = (e) => {
-        setRadiobutton(e.target.value)
-
-    }
+   
 
     const renderToolBar = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -112,7 +117,7 @@ const ReportsTable = (props) => {
         setSelectRange([selection]);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async() => {
         let projectObj;
         let reports_type = "review_reports"
         setReportRequested(true);
@@ -125,15 +130,44 @@ const ReportsTable = (props) => {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
         }
         dispatch(APITransport(projectObj));
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+          });
+          const resp = await res.json();
+          console.log(resp,"resp")
+          if (resp.message ) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+              })
+            
+      
+          } 
         
         setShowPicker(false)
-        setShowSpinner(true);
+       
     }
+
+    const renderSnackBar = () => {
+        return (
+          <CustomizedSnackbars
+            open={snackbar.open}
+            handleClose={() =>
+              setSnackbarInfo({ open: false, message: "", variant: "" })
+            }
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            variant={snackbar.variant}
+            message={snackbar.message}
+          />
+        );
+      };
 
     return (
         <React.Fragment>
-            
-         
+            {renderSnackBar()}
             <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt: 2, mb: 2, justifyContent: "space-between" }}>
             <Grid   sx={{ }}   >
              <Typography gutterBottom component="div" sx={{marginTop: "25px",fontSize:"16px"}}>
@@ -148,7 +182,7 @@ const ReportsTable = (props) => {
                         name="row-radio-buttons-group"
                         sx={{ marginTop: "20px", marginRight:"90px" }}
                         value={radiobutton}
-                        onChange={handleAnnotatationReports}
+                        onChange={handleChangeReports}
 
                     >
                         <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation Reports"  />
