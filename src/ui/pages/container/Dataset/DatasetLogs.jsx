@@ -125,7 +125,7 @@ const DatasetLogs = (props) => {
             color="primary" 
             onClick={() => setShowPicker(!showPicker)}
           >
-            Pick dates
+            Pick Dates
           </Button>
         </Grid>
         {showPicker && <Box sx={{mt: 2, display: "flex", justifyContent: "center", width: "100%"}}>
