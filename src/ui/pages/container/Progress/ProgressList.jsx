@@ -1,5 +1,6 @@
 import { Button, Grid, ThemeProvider, Select, Box, MenuItem, InputLabel, FormControl, Card, Typography } from "@mui/material";
 import React, { useEffect, useState, useRef } from "react";
+import CustomButton from "../../component/common/Button";
 import { useSelector, useDispatch } from "react-redux";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
@@ -7,7 +8,7 @@ import PeriodicalTasks from "../../../../redux/actions/api/Progress/PeriodicalTa
 import CumulativeTasksAPI from "../../../../redux/actions/api/Progress/CumulativeTasks";
 import LightTooltip from '../../component/common/Tooltip';
 import { translate } from "../../../../config/localisation";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, } from 'chart.js';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Bar } from 'react-chartjs-2';
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
@@ -16,7 +17,7 @@ import Spinner from "../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { isSameDay, format } from 'date-fns/esm';
-import {DateRangePicker,defaultStaticRanges,} from "react-date-range";
+import { DateRangePicker, defaultStaticRanges, } from "react-date-range";
 import { useTheme } from "@material-ui/core/styles";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -84,7 +85,7 @@ const TooltipData = [{ name: "Progress chart based on one data selection" }, { n
 const ProgressTypedata = [{ title: "Complete progress for annotations done till date" }, { title: "Yearly stacked progress in selected span of years" }, { title: "Monthly stacked progress in selected span of months" }, { title: "Weekly stacked progress in selected span of weeks" }]
 const ChartType = [{ chartTypename: "Individual" }, { chartTypename: "Comparison" }]
 const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "yearly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
-const avilableChartType = { Individual: "Individual", Comparison: "Comparison"}
+const avilableChartType = { Individual: "Individual", Comparison: "Comparison" }
 
 function ProgressList() {
   const dispatch = useDispatch();
@@ -464,16 +465,7 @@ function ProgressList() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} sm={6} md={2} lg={2} xl={2}
-              >
-                <Button
-                  variant="contained"
-                  onClick={handleSubmit}
-                  disabled={(progressTypes || comparisonProgressTypes) ? false : true}
-                >
-                  Submit
-                </Button>
-              </Grid>
+
             </Grid>
 
           </Grid>
@@ -575,6 +567,14 @@ function ProgressList() {
                   Pick dates
                 </Button>
               </Grid>}
+              <Grid container justifyContent="center">
+            
+
+            
+            <CustomButton label="Submit" sx={{ width: "100%", mt: 4 }} onClick={handleSubmit}
+              disabled={(progressTypes || comparisonProgressTypes) ? false : true} />
+         
+        </Grid>
 
               {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
@@ -674,7 +674,7 @@ function ProgressList() {
                 </Card>
               </Box>}
             </Grid>
-
+           
           </Grid>
           {showBarChar && <Bar options={options} data={data} />}
 

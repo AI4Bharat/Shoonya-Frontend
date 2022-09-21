@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Radio, Box } from '@mui/material';
+import { Radio, Box,Grid ,Typography} from '@mui/material';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
@@ -46,21 +46,23 @@ export default function ProjectList() {
         <React.Fragment>
             {loading && <Spinner />}
             {/* <Search/> */}
+            <Grid container justifyContent="end"
+            sx={{paddingRight:"90px"}}>  
             <FormControl>
-
                 <RadioGroup
                     row
                     aria-labelledby="demo-row-radio-buttons-group-label"
                     name="row-radio-buttons-group"
                     defaultValue="ProjectList"
-                    sx={{marginTop:"20px"}}
+                    sx={{marginTop:"70px"}}
 
                 >
-                    <FormControlLabel value="ProjectList" control={<Radio />} label="List" onClick={handleProjectlist} />
-                    <FormControlLabel value="ProjectCard" control={<Radio />} label="Card" onClick={handleProjectcard} />
+                    <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
+                    <FormControlLabel value="ProjectCard" control={<Radio />} label="Card view" onClick={handleProjectcard} />
 
                 </RadioGroup>
             </FormControl>
+            </Grid>
 
             <Box >
                 <Box sx={{ p: 1,marginTop:"20px" }}>
