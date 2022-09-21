@@ -332,7 +332,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       )}).join("");
 
       const metadata = Object.keys(taskData).map((key) => {
-        if (["conversation_json", "speakers_json", "translated_conversation_json"].includes(key) || !taskData[key]) return "";
+        if (["conversation_json", "speakers_json", "machine_translated_conversation_json"].includes(key) || !taskData[key]) return "";
         return `
           <View style="display: flex; gap: 4px;" >
             <View style="font-weight: 500;"><Text name="${key}_label" value="${snakeToTitleCase(key)}:" /></View>
