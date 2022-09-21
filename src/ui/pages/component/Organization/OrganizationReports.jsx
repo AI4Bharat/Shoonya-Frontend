@@ -298,7 +298,7 @@ const options = {
       { showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
-            title={""}
+            title={ProjectReports.length > 0 ? "Reports" : ""}
             data={reportData}
             columns={columns.filter((col) => selectedColumns.includes(col.name))}
             options={options}

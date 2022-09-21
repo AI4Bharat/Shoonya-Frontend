@@ -24,8 +24,16 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import EnableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/EnableTaskReviews";
 import DisableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/DisableTaskReviews";
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
 
-
+const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  }));
 const AdvancedOperation = (props) => {
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
@@ -254,17 +262,18 @@ const AdvancedOperation = (props) => {
 
             </Grid>
 
+         
        <div className={classes.rootdiv} >
             <Grid
                 container
                 // direction="row"
                 direction="column"
 
-                xs={4}
-                md={4}
+                xs={12}
+                md={12}
                 lg={4}
                 xl={4}
-                sm={4}
+                sm={12}
                 spacing={1}
                 rowGap={2}
                 sx={{ float: "left" }}
@@ -306,6 +315,7 @@ const AdvancedOperation = (props) => {
                             p: 2,
                             borderRadius: 3,
                             ml: 2,
+                            mb:2,
                             width: "300px"
                         }}
                         color="error"
@@ -318,18 +328,18 @@ const AdvancedOperation = (props) => {
             <Grid
                 container
                 // direction="row"
-                xs={4}
-                md={4}
+                xs={12}
+                md={12}
                 lg={4}
                 xl={4}
-                sm={4}
+                sm={12}
                 spacing={1}
                 rowGap={2}
                 sx={{ float: "left" }}
                 columnSpacing={2}
 
             >
-                <div className={classes.divider} ></div>
+                {/* <div className={classes.divider} ></div> */}
                 <Grid
                     item
                     xs={12}
@@ -388,17 +398,17 @@ const AdvancedOperation = (props) => {
             <Grid
                 container
                 // direction="row"
-                xs={2}
-                md={2}
+                xs={12}
+                md={12}
                 lg={2}
                 xl={2}
-                sm={2}
+                sm={12}
                 spacing={1}
                 rowGap={2}
                 columnSpacing={2}
 
             >
-                <div className={classes.divider} ></div>
+                {/* <div className={classes.divider} ></div> */}
                 <Grid
                     item
                     xs={12}
