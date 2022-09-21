@@ -1,37 +1,22 @@
 import { Button, Grid, ThemeProvider, Select, Box, MenuItem, InputLabel, FormControl, Card, Typography } from "@mui/material";
-//import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
 import PeriodicalTasks from "../../../../redux/actions/api/Progress/PeriodicalTasks";
 import CumulativeTasksAPI from "../../../../redux/actions/api/Progress/CumulativeTasks";
-import LightTooltip from '../../component/common/Tooltip'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-
-} from 'chart.js';
-import { styled } from '@mui/material/styles';
+import LightTooltip from '../../component/common/Tooltip';
+import { translate } from "../../../../config/localisation";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,} from 'chart.js';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Bar } from 'react-chartjs-2';
-import faker from 'faker';
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-// import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { isSameDay, format } from 'date-fns/esm';
-import {
-  DateRangePicker,
-  defaultStaticRanges,
-  createStaticRanges
-} from "react-date-range";
+import {DateRangePicker,defaultStaticRanges,} from "react-date-range";
 import { useTheme } from "@material-ui/core/styles";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -43,21 +28,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-
 );
-
 ChartJS.register(CategoryScale);
-
-// const LightTooltip = styled(({ className, ...props }) => (
-//   <Tooltip {...props} classes={{ popper: className }} />
-// ))(({ theme }) => ({
-//   [`& .${tooltipClasses.tooltip}`]: {
-//     backgroundColor: theme.palette.common.white,
-//     color: 'rgba(0, 0, 0, 0.87)',
-//     boxShadow: theme.shadows[1],
-//     fontSize: 11,
-//   },
-// }));
 
 
 export const options = {
@@ -85,7 +57,6 @@ export const options = {
       title: {
         display: true,
         text: '# Annotations Completed ',
-        // text:'Count',
         color: '#black',
         font: {
           family: 'Roboto',
@@ -93,7 +64,7 @@ export const options = {
           style: 'normal',
           weight: 'bold',
           lineHeight: 1.2,
-          paddingBottom:"100px",
+          paddingBottom: "100px",
         },
         padding: { top: 30, left: 0, right: 0, bottom: 20 }
       }
@@ -110,16 +81,15 @@ export const options = {
   },
 };
 const TooltipData = [{ name: "Progress chart based on one data selection" }, { name: "Compares progress of two different data selections" }]
-const ProgressTypedata = [{ title: "Complete progress for annotations done till date" }, { title: "Monthly stacked progress in selected span of months" }, { title: "Weekly stacked progress in selected span of weeks" }]
+const ProgressTypedata = [{ title: "Complete progress for annotations done till date" }, { title: "Yearly stacked progress in selected span of years" }, { title: "Monthly stacked progress in selected span of months" }, { title: "Weekly stacked progress in selected span of weeks" }]
 const ChartType = [{ chartTypename: "Individual" }, { chartTypename: "Comparison" }]
-const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
-const avilableChartType = {
-  Individual: "Individual",
-  Comparison: "Comparison"
-}
+const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "yearly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
+const avilableChartType = { Individual: "Individual", Comparison: "Comparison"}
+
 function ProgressList() {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
+  const ref = useRef()
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [chartTypes, setChartTypes] = useState("Individual")
@@ -132,7 +102,6 @@ function ProgressList() {
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
   const [yearvalue, setyearvalue] = useState([])
-  const theme = useTheme();
   const [state, setState] = useState([
     {
       startDate: new Date(),
@@ -187,8 +156,8 @@ function ProgressList() {
 
 
   useEffect(() => {
-    setLoading(false);
-  }, [yearvalue, PeriodicalTaskssData, CumulativeTasksData])
+    setLoading(apiLoading);
+  }, [apiLoading])
 
 
   const handleChartType = (e) => {
@@ -260,7 +229,10 @@ function ProgressList() {
     }
 
     setShowBarChar(true)
-    //setLoading(false);
+    // setTimeout(() => {
+    //   setLoading(false);
+    // }, 2000);
+
 
   }
 
@@ -270,6 +242,7 @@ function ProgressList() {
   }
   const handledatecomparisionprogress = () => {
     setShowPickers(!showPickers)
+
 
 
 
@@ -284,6 +257,45 @@ function ProgressList() {
     setComparisonProgressTypes(e.target.value)
 
   }
+
+  const handleCloseDatepicker = (e) => {
+    setShowPicker(!showPicker)
+  }
+
+  const keyPress = (e) => {
+    if (e.code === "Escape" && setShowPicker(false)) {
+      handleCloseDatepicker();
+    }
+    if (e.code === "Escape" && setShowPickers(false)) {
+      handledatecomparisionprogress();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", keyPress);
+    return () => {
+      window.removeEventListener("keydown", keyPress);
+    }
+  }, [keyPress]);
+
+
+  useEffect(() => {
+    const checkIfClickedOutside = e => {
+
+      if (showPicker && ref.current && !ref.current.contains(e.target)) {
+        setShowPicker(false)
+      }
+      if (showPickers && ref.current && !ref.current.contains(e.target)) {
+        setShowPickers(false)
+      }
+
+    }
+    document.addEventListener("mousedown", checkIfClickedOutside)
+    return () => {
+
+      document.removeEventListener("mousedown", checkIfClickedOutside)
+    }
+  }, [showPicker, showPickers])
 
 
   let data;
@@ -378,13 +390,24 @@ function ProgressList() {
             justifyContent="center"
             alignItems="center"
           >
-            <Grid> <Typography variant="h3" component="h2" sx={{paddingBottom:"7px"}}> Bar Chart Analytics</Typography></Grid>
+            <Grid> <Typography variant="h3" component="h2" sx={{ paddingBottom: "7px" }}> Bar Chart Analytics</Typography></Grid>
             <Grid container columnSpacing={3} rowSpacing={2} mt={1} mb={1}>
 
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small" >
                   <InputLabel id="Graph-Type-label" sx={{ fontSize: "16px" }}>
-                    Analytics Type
+                    Analytics Type {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.AnalyticsType")}>
+                        <InfoOutlinedIcon
+                          fontSize="medium"
+                          color="disabled"
+                        />
+                      </LightTooltip>
+                    }
                   </InputLabel>
 
                   <Select
@@ -412,7 +435,18 @@ function ProgressList() {
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
-                    Project Type
+                    Project Type {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.ProjectType")}>
+                        <InfoOutlinedIcon
+                          fontSize="medium"
+                          color="disabled"
+                        />
+                      </LightTooltip>
+                    }
                   </InputLabel>
 
                   <Select
@@ -453,7 +487,18 @@ function ProgressList() {
               {(chartTypes === avilableChartType.Individual || chartTypes === avilableChartType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(243, 156, 18 )" }}>
-                    Base period
+                    Base period {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.Baseperiod")}>
+                        <InfoOutlinedIcon
+                          fontSize="medium"
+                          color="disabled"
+                        />
+                      </LightTooltip>
+                    }
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
@@ -481,7 +526,7 @@ function ProgressList() {
                   endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color="primary"
-                  onClick={() => setShowPicker(!showPicker)}
+                  onClick={handleCloseDatepicker}
                   sx={{ backgroundColor: "rgba(243, 156, 18)", "&:hover": { backgroundColor: "rgba(243, 156, 18 )", }, marginLeft: "20px" }}
 
                 >
@@ -491,7 +536,18 @@ function ProgressList() {
               {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}>
-                    Comparison Period
+                    Comparison Period {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.ComparisonPeriod")}>
+                        <InfoOutlinedIcon
+                          fontSize="medium"
+                          color="disabled"
+                        />
+                      </LightTooltip>
+                    }
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
@@ -520,7 +576,7 @@ function ProgressList() {
                 </Button>
               </Grid>}
 
-              {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
+              {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
                     onChange={item => setState([item.selection])}
@@ -568,7 +624,7 @@ function ProgressList() {
                   />
                 </Card>
               </Box>}
-              {showPickers && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
+              {showPickers && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
                     onChange={handleDateRangePicker} item
