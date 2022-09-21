@@ -220,7 +220,7 @@ const WorkspaceReports = () => {
                 color="primary" 
                 onClick={() => setShowPicker(!showPicker)}
             >
-                Pick dates
+               Pick Dates
             </Button>
         </Grid>
         <Grid

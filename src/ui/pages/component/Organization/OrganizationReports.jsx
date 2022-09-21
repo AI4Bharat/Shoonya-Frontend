@@ -200,7 +200,7 @@ const options = {
                 color="primary" 
                 onClick={() => setShowPicker(!showPicker)}
             >
-                Pick dates
+               Pick Dates
             </Button>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>

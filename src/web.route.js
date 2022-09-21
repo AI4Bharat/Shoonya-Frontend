@@ -38,6 +38,7 @@ import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 import ProgressList from "./ui/pages/container/Progress/ProgressList"
 
 
+
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
     if (!authenticateUser()) {
@@ -133,13 +134,13 @@ const App = () => {
           path="/edit-profile"
           element={ProtectedRouteWrapper(<Layout component={<EditProfile />} Backbutton={true} />)}
         />
-         <Route
+        <Route
           path="/Change-Password"
           element={ProtectedRouteWrapper(<Layout component={<ChangePassword />} Backbutton={true} />)}
         />
         <Route
           path="/profile/:id"
-          element={ProtectedRouteWrapper(<Layout component={<ProfilePage />} Backbutton={true}/>)}
+          element={ProtectedRouteWrapper(<Layout component={<ProfilePage />} Backbutton={true} />)}
         />
         <Route
           path="/projects"
@@ -170,6 +171,7 @@ const App = () => {
             <Layout component={<ReviewLSF />} />
           )}
         />
+
         <Route
           path="workspaces/:id"
           element={ProtectedRouteWrapper(
@@ -222,14 +224,14 @@ const App = () => {
             <Layout component={<Transliteration />} Backbutton={true} />
           )}
         />
-         <Route
+        <Route
           path="create-Dataset-Instance-Button"
           element={ProtectedRouteWrapper(
             <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
           )}
         />
          <Route
-          path="progress"
+          path="Analytics"
           element={ProtectedRouteWrapper(
             <Layout component={<ProgressList />} />
           )}

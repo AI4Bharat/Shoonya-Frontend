@@ -28,6 +28,7 @@ const localisation = {
     "label.reviewers":"Reviewers",
     "label.invites":"Invites",
     "label.settings":"Settings",
+    "label.logs":"Logs",
     "label.tasks":"Tasks",
     "label.annotationTasks":"Annotation Tasks",
     "label.reviewTasks":"Review Tasks",

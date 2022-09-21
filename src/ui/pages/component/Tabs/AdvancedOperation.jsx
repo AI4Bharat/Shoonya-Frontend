@@ -164,7 +164,7 @@ const AdvancedOperation = (props) => {
 
     const getPullNewDataAPI = async () => {
         const projectObj = new GetPullNewDataAPI(id);
-        dispatch(APITransport(projectObj));
+        //dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
