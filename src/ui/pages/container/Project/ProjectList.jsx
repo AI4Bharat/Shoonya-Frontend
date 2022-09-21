@@ -56,8 +56,8 @@ export default function ProjectList() {
                     sx={{marginTop:"20px"}}
 
                 >
-                    <FormControlLabel value="ProjectList" control={<Radio />} label="ProjectList" onClick={handleProjectlist} />
-                    <FormControlLabel value="ProjectCard" control={<Radio />} label="ProjectCard" onClick={handleProjectcard} />
+                    <FormControlLabel value="ProjectList" control={<Radio />} label="List" onClick={handleProjectlist} />
+                    <FormControlLabel value="ProjectCard" control={<Radio />} label="Card" onClick={handleProjectcard} />
 
                 </RadioGroup>
             </FormControl>

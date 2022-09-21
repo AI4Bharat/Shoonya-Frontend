@@ -154,7 +154,7 @@ const ProjectCardList = (props) => {
         jumpToPage: true,
 
     };
-    const renderSnackBar = () => {
+    const renderSearch = () => {
         return (
             <Search />
         );
@@ -163,7 +163,7 @@ const ProjectCardList = (props) => {
     return (
 
         <Grid>
-            {renderSnackBar()}
+            {renderSearch()}
             <ThemeProvider theme={tableTheme}>
                 <MUIDataTable
                     title={""}
