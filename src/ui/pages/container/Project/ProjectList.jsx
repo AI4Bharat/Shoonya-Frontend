@@ -48,7 +48,7 @@ export default function ProjectList() {
             {loading && <Spinner />}
             {/* <Search/> */}
             <Grid container justifyContent="end" sx={{position:"absolute", right:500,marginTop:"20px"}}  > 
-            <Typography sx={{marginRight:"10px", fontSize:"20px",fontWeight:500}} >View :</Typography>
+            <Typography sx={{marginRight:"15px", fontSize:"20px",fontWeight:500,marginTop:"3px"}} >View :</Typography>
             <FormControl>
                 <RadioGroup
                     row
