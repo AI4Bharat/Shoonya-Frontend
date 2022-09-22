@@ -63,8 +63,9 @@ const ProjectCardList = (props) => {
             label: "Project Id",
             options: {
                 filter: false,
+                setCellHeaderProps: sort  => ({ style: { height:"70px" } }),
                 sort: false,
-                align: "center"
+                align : "center",
             }
         },
         {
@@ -73,7 +74,7 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align : "center",
             }
         },
 
@@ -84,7 +85,7 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align : "center",
             }
         },
         {
@@ -93,7 +94,7 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align : "center",
             }
         },
         {
@@ -102,7 +103,7 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align : "center",
             }
         },
 
