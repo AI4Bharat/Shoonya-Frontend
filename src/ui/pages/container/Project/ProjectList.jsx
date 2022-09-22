@@ -9,6 +9,7 @@ import Spinner from "../../component/common/Spinner"
 import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from 'react-redux';
+import { fontSize } from "@mui/system";
 
 
 export default function ProjectList() {
@@ -46,15 +47,15 @@ export default function ProjectList() {
         <React.Fragment>
             {loading && <Spinner />}
             {/* <Search/> */}
-            <Grid container justifyContent="center"
-            sx={{paddingLeft:"300px"}}>  
+            <Grid container justifyContent="end" sx={{position:"absolute", right:500,marginTop:"20px"}}  > 
+            <Typography sx={{marginRight:"10px", fontSize:"20px",fontWeight:500}} >View :</Typography>
             <FormControl>
                 <RadioGroup
                     row
                     aria-labelledby="demo-row-radio-buttons-group-label"
                     name="row-radio-buttons-group"
                     defaultValue="ProjectList"
-                    sx={{marginTop:"70px"}}
+                   
 
                 >
                     <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
@@ -65,7 +66,7 @@ export default function ProjectList() {
             </Grid>
 
             <Box >
-                <Box sx={{ p: 1,marginTop:"20px" }}>
+                <Box sx={{marginTop:"20px"}}>
                     {radiobutton ? <ProjectCardList projectData={projectData} /> : <ProjectCard projectData={projectData} />}
                 </Box>
             </Box>

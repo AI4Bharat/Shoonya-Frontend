@@ -56,16 +56,15 @@ const ProjectCardList = (props) => {
         })
 
     }
-
     const columns = [
         {
             name: "Project_id",
             label: "Project Id",
             options: {
                 filter: false,
-                setCellHeaderProps: sort  => ({ style: { height:"70px" } }),
                 sort: false,
-                align : "center",
+              
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
             }
         },
         {
@@ -75,10 +74,10 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align : "center",
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+               
             }
         },
-
-
         {
             name: "project_Type",
             label: "Project Type",
@@ -86,6 +85,8 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align : "center",
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+                
             }
         },
         {
@@ -95,6 +96,8 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align : "center",
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+                
             }
         },
         {
@@ -104,10 +107,12 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align : "center",
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
             }
-        },
+        }];
 
-    ];
+
+   
 
 
 
@@ -164,9 +169,10 @@ const ProjectCardList = (props) => {
 
     return (
 
-        <Grid>
-            {renderSearch()}
+      
+            
             <ThemeProvider theme={tableTheme}>
+                   {renderSearch()}
                 <MUIDataTable
                     title={""}
                     data={data}
@@ -175,7 +181,7 @@ const ProjectCardList = (props) => {
                 />
             </ThemeProvider>
 
-        </Grid>
+        
 
     )
 }
