@@ -40,7 +40,7 @@ const AutomateDatasets = () => {
   const DatasetTypes = useSelector((state) => state.GetDatasetType.data);
   const LanguageChoicesIndicTrans = useSelector((state) => state.getIndicTransLanguages.data);
   const LanguageChoicesAll = useSelector((state) => state.getLanguageChoices.data);
-
+console.log(DatasetTypes,"DatasetTypes", srcDatasetType, srcDatasetTypes)
   useEffect(() => {
     const obj = new GetDatasetTypeAPI();
     dispatch(APITransport(obj));
@@ -57,7 +57,7 @@ const AutomateDatasets = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: element !== "SentenceText"
+          disabled: (element !== "SentenceText" && element !== "Conversation")
         });
       });
       setSrcDatasetTypes(temp);
@@ -66,7 +66,8 @@ const AutomateDatasets = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: element !== "TranslationPair"
+          disabled: (srcDatasetType == "SentenceText" ? element !=="TranslationPair" : element !== "Conversation")
+          
         });
       });
       setTgtDatasetTypes(temp);
