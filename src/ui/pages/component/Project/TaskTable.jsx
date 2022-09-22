@@ -27,7 +27,7 @@ import ColumnList from "../common/ColumnList";
 import Spinner from "../../component/common/Spinner"
 
 const excludeSearch = ["status", "actions", "output_text"];
-const excludeCols = ["context", "input_language", "output_language", "conversation_json", "machine_translated_conversation_json", "speakers_json", "language"];
+const excludeCols = ["context", "input_language", "output_language", "conversation_json","source_conversation_json", "machine_translated_conversation_json", "speakers_json", "language"];
 
 const TaskTable = (props) => {
     const classes = DatasetStyle();
