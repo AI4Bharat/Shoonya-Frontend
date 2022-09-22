@@ -84,20 +84,24 @@ const ReportsTable = (props) => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
             
-            <Box className={classes.filterToolbarContainer}>
+            <Box sx={{ position: "absolute",  bottom: "14px", right: "45px"}}>
                 <ColumnList
                     columns={columns}
                     setColumns={setSelectedColumns}
                     selectedColumns={selectedColumns}
                 />
+               
             </Box>
         )
     }
 
+
+    
+
     const options = {
         filterType: 'checkbox',
         selectableRows: "none",
-        download: false,
+        download:true,
         filter: false,
         print: false,
         search: false,
@@ -107,8 +111,10 @@ const ReportsTable = (props) => {
         textLabels: {
             body: {
                 noMatch: 'No Record Found!'
-            }
-        }
+            },
+        },
+       
+        
     };
 
     const handleRangeChange = (ranges) => {
