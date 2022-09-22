@@ -46,8 +46,8 @@ export default function ProjectList() {
         <React.Fragment>
             {loading && <Spinner />}
             {/* <Search/> */}
-            <Grid container justifyContent="end"
-            sx={{paddingRight:"90px"}}>  
+            <Grid container justifyContent="center"
+            sx={{paddingLeft:"300px"}}>  
             <FormControl>
                 <RadioGroup
                     row

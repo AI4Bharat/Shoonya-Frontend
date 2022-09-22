@@ -80,15 +80,16 @@ const ProjectCardList = (props) => {
 
         {
             name: "project_Type",
-            label: "project Type",
+            label: "Project Type",
             options: {
                 filter: false,
                 sort: false,
+                align: "center"
             }
         },
         {
             name: "Project_mode",
-            label: "Project mode",
+            label: "Project Mode",
             options: {
                 filter: false,
                 sort: false,
