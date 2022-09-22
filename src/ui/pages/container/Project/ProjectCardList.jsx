@@ -63,8 +63,8 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-              
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+                align: "center",
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
             }
         },
         {
@@ -74,7 +74,7 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align : "center",
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
                
             }
         },
@@ -85,7 +85,8 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align : "center",
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+               
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
                 
             }
         },
@@ -96,7 +97,7 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align : "center",
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
                 
             }
         },
