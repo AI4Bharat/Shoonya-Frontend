@@ -522,7 +522,7 @@ function ProgressList() {
                   sx={{ backgroundColor: "rgba(243, 156, 18)", "&:hover": { backgroundColor: "rgba(243, 156, 18 )", }, marginLeft: "20px" }}
 
                 >
-                  Pick dates
+                 Pick Dates
                 </Button>
               </Grid>}
               {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
@@ -564,7 +564,7 @@ function ProgressList() {
                   onClick={handledatecomparisionprogress}
                   sx={{ backgroundColor: "rgba(35, 155, 86 )", "&:hover": { backgroundColor: "rgba(35, 155, 86 )", }, marginLeft: "20px" }}
                 >
-                  Pick dates
+                  Pick Dates
                 </Button>
               </Grid>}
               <Grid container justifyContent="center">

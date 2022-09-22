@@ -5,7 +5,7 @@ let initialState = {
 };
 
 function PeriodicalListData (data){
-console.log(data,"data123")
+console.log(data,"data1234")
 
 
 
