@@ -296,7 +296,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   localStorage.setItem("TaskData", JSON.stringify(taskData));
   useEffect(() => {
     const generateLabelConfig = (taskData) => {
-      const sourceChat = taskData.conversation_json.map((item, idx) => {
+      console.log(taskData, "taskData");
+      const sourceChat = taskData.conversation_json??taskData.source_conversation_json?.map((item, idx) => {
         const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
         return (
           `<View style="display: flex; flex-direction: column; font-weight: 500; gap: 4px; margin: 0 0 8px;">
@@ -309,7 +310,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           </View>`
       )}).join("");
 
-      const outputChat = taskData.conversation_json.map((item, idx) => {
+      const outputChat = taskData.conversation_json??taskData.source_conversation_json?.map((item, idx) => {
         const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
         return (
           `<View style="display: flex; flex-direction: column; width: 90%; font-weight: 500;">
@@ -332,7 +333,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       )}).join("");
 
       const metadata = Object.keys(taskData).map((key) => {
-        if (["conversation_json", "speakers_json", "machine_translated_conversation_json"].includes(key) || !taskData[key]) return "";
+        if (["conversation_json", "speakers_json", "machine_translated_conversation_json"].includes(key) || ["source_conversation_json", "speakers_json", "machine_translated_conversation_json"].includes(key) || !taskData[key]) return "";
         return `
           <View style="display: flex; gap: 4px;" >
             <View style="font-weight: 500;"><Text name="${key}_label" value="${snakeToTitleCase(key)}:" /></View>
@@ -376,7 +377,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           ([labelConfig, taskData, annotations, predictions]) => {
             // both have loaded!
             console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
-            setLabelConfig(labelConfig.project_type === "ConversationTranslation" ? generateLabelConfig(taskData.data) : labelConfig.label_config);
+            let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
+            setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
             LSFRoot(
               rootRef,
@@ -384,7 +386,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
               userData,
               projectId,
               taskData,
-              labelConfig.project_type === "ConversationTranslation" ? generateLabelConfig(taskData.data) : labelConfig.label_config,
+              tempLabelConfig,
               annotations,
               predictions,
               annotationNotesRef
