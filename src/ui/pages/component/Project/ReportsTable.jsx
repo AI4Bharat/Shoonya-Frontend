@@ -84,7 +84,7 @@ const ReportsTable = (props) => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
             
-            <Box sx={{ position: "absolute",  bottom: "14px", right: "45px"}}>
+            <Box className={classes.ToolbarContainer}>
                 <ColumnList
                     columns={columns}
                     setColumns={setSelectedColumns}

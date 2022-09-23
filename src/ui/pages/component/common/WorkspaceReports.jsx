@@ -143,7 +143,10 @@ const WorkspaceReports = () => {
   const renderToolBar = () => {
     const buttonSXStyle = { borderRadius: 2, margin: 2 };
     return (
-      <Box className={classes.filterToolbarContainer}>
+      <Box 
+      // className={classes.filterToolbarContainer}
+      className={classes.ToolbarContainer}
+      >
         <ColumnList
           columns={columns}
           setColumns={setSelectedColumns}
@@ -156,7 +159,7 @@ const WorkspaceReports = () => {
   const options = {
     filterType: "checkbox",
     selectableRows: "none",
-    download: false,
+    download: true,
     filter: false,
     print: false,
     search: false,
