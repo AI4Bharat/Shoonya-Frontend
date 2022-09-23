@@ -44,10 +44,10 @@ const localisation = {
     "button.downloadDataset": "Download Dataset",
     "button.uploadData":"Upload Data",
     "link.Createanaccount":"Create an account",
-    "tooltip.AnalyticsType":" Analytics Type",
-    "tooltip.ProjectType":" Project Type",
-    "tooltip.Baseperiod":"Baseperiod ",
-    "tooltip.ComparisonPeriod":"Comparison Period",
+    "tooltip.AnalyticsType":" The variation in chart with respect to the number of selected time ranges. In 'Individual', chart for a single time range is displayed. In 'Comparison', two different charts can be compared based on the time ranges selected. Default selection is 'Individual'.",
+    "tooltip.ProjectType":" The type of the project for which the chart should be based on. Default selection is 'ContextualTranslationEditing'.",
+    "tooltip.Baseperiod":"The time range selected for the first plot of the chart. Currently it can be cumulative, monthly or weekly. The default selection is 'Cumalative'.",
+    "tooltip.ComparisonPeriod":"The time range selected for the second plot of the chart. This is applicable when the analytics type is Comparison. Currently it can be cumulative, monthly or weekly.",
   
 };
 
