@@ -9,7 +9,7 @@ import CumulativeTasksAPI from "../../../../redux/actions/api/Progress/Cumulativ
 import LightTooltip from '../../component/common/Tooltip';
 import { translate } from "../../../../config/localisation";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, } from 'chart.js';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import InfoIcon from '@mui/icons-material/Info';
 import { Bar } from 'react-chartjs-2';
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -403,9 +403,8 @@ function ProgressList() {
                         arrow
                         placement="top"
                         title={translate("tooltip.AnalyticsType")}>
-                        <InfoOutlinedIcon
+                        <InfoIcon
                           fontSize="medium"
-                          color="disabled"
                         />
                       </LightTooltip>
                     }
@@ -414,7 +413,7 @@ function ProgressList() {
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    label="Select Graph Type"
+                    label="Analytics Type"
                     value={chartTypes}
                     onChange={handleChartType}
                   >
@@ -442,9 +441,8 @@ function ProgressList() {
                         arrow
                         placement="top"
                         title={translate("tooltip.ProjectType")}>
-                        <InfoOutlinedIcon
+                        <InfoIcon
                           fontSize="medium"
-                          color="disabled"
                         />
                       </LightTooltip>
                     }
@@ -478,24 +476,24 @@ function ProgressList() {
             <Grid container columnSpacing={2} rowSpacing={2} mt={1} mb={1}>
               {(chartTypes === avilableChartType.Individual || chartTypes === avilableChartType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(243, 156, 18 )" }}>
+                  <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px", color: "rgba(243, 156, 18 )" }}>
                     Base period {" "}
                     {
                       <LightTooltip
                         arrow
                         placement="top"
                         title={translate("tooltip.Baseperiod")}>
-                        <InfoOutlinedIcon
+                        <InfoIcon
+                         sx={{color:"rgba(0, 0, 0, 0.6)"}}
                           fontSize="medium"
-                          color="disabled"
                         />
                       </LightTooltip>
                     }
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Select Progress Type"
+                    labelId="project-type-label"
+                    id="project-type-select"
+                    label="Base period"
                     value={progressTypes}
                     onChange={handleProgressType}
                   >
@@ -534,9 +532,9 @@ function ProgressList() {
                         arrow
                         placement="top"
                         title={translate("tooltip.ComparisonPeriod")}>
-                        <InfoOutlinedIcon
+                        <InfoIcon
+                        sx={{color:"rgba(0, 0, 0, 0.6)"}}
                           fontSize="medium"
-                          color="disabled"
                         />
                       </LightTooltip>
                     }
@@ -544,7 +542,7 @@ function ProgressList() {
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    label="Select Progress Type"
+                    label="Comparison Period"
                     onChange={handleComparisonProgressType}
                   >
                     {ProgressType.map((item, index) => (
