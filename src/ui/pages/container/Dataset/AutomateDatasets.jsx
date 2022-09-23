@@ -57,7 +57,7 @@ const AutomateDatasets = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: element !== "SentenceText"
+          disabled: (element !== "SentenceText" && element !== "Conversation")
         });
       });
       setSrcDatasetTypes(temp);
@@ -66,12 +66,12 @@ const AutomateDatasets = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: element !== "TranslationPair"
+          disabled: (srcDatasetType === "SentenceText" ? element !=="TranslationPair" : element !== "Conversation")
         });
       });
       setTgtDatasetTypes(temp);
     }
-  }, [DatasetTypes]);
+  }, [DatasetTypes,srcDatasetType]);
 
   useEffect(() => {
     setLoading(false);

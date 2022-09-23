@@ -12,7 +12,8 @@ import tableTheme from "../../../theme/tableTheme";
 import Spinner from "../../component/common/Spinner";
 
 const ProjectLogs = () => {
-  const { projectId } = useParams();
+  const { id } = useParams();
+  console.log(useParams(),"useParams")
   const [taskName, setTaskName] = useState("projects.tasks.export_project_in_place"); 
   const [columns, setColumns] = useState([]);
   const [projectLogs, setProjectLogs] = useState([]);
@@ -50,7 +51,7 @@ const ProjectLogs = () => {
 
   const getProjectLogs = () => {
     setLoading(true);
-    const apiObj = new GetProjectLogsAPI(projectId, taskName);
+    const apiObj = new GetProjectLogsAPI(id, taskName);
     fetch(apiObj.apiEndPoint(), {
       method: "GET",
       headers: apiObj.getHeaders().headers,

@@ -43,6 +43,8 @@ console.log(data,"data")
   }, [])
 
 
+  var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
+  
   const renderTextarea = (props) => {
     return (
       <textarea
@@ -54,7 +56,7 @@ console.log(data,"data")
     );
   };
   console.log('...transliteration')
-
+ 
   useEffect(() => {
 
     getTransliterationLanguages()
@@ -120,7 +122,7 @@ console.log(data,"data")
            value={selectedLang ? selectedLang : (data.length > 0 && (params.taskId || params.id) ? {DisplayName:data[0]?.DisplayName ,LangCode:data[0]?.LangCode} : {DisplayName : "Hindi - हिंदी", LangCode : "hi"})}
           onChange={handleLanguageChange}
           options={languageList}
-          size={"small"}
+          size={"small"}  
           getOptionLabel={el => { return el.DisplayName }}
           sx={{ width: window.innerWidth * 0.15 }}
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
@@ -169,5 +171,6 @@ console.log(data,"data")
     </Card>
   );
 };
+
 
 export default Transliteration;

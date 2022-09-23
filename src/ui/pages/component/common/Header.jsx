@@ -72,6 +72,19 @@ const Header = () => {
   };
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+  const keyPress = (e) => {
+    if (e.code === "Escape" && showTransliterationModel) {
+      handleTransliterationModelClose();
+    }
+  };
+  
+  useEffect(() => {
+    window.addEventListener("keydown", keyPress);
+    return () => {
+      window.removeEventListener("keydown", keyPress);
+    }
+  }, [keyPress]);
+
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
