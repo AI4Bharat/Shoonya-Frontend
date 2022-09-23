@@ -367,7 +367,7 @@ function ProgressAnalytics() {
         sx={{
           width: "100%",
           minHeight: 500,
-          padding: 5
+          padding: "5px 0px 0px 30px"
         }}
       >
 
