@@ -343,7 +343,7 @@ const AutomateDatasets = () => {
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Confirm"}
                 onClick={handleConfirm}
-                disabled={!srcInstance || !tgtInstance || !languages.length}
+                disabled={srcDatasetType === "SentenceText" ? !srcInstance || !tgtInstance || !languages.length :!srcInstance || !tgtInstance}
               />
               <Button
                 label={"Cancel"}
