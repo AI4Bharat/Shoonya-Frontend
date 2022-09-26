@@ -205,7 +205,13 @@ const DatasetStyle = makeStyles({
   },
   rootdiv:{
     marginTop:"25px",
-  }
+  },
+  ToolbarContainer:{
+    position: "absolute",
+      bottom: "14px",
+       right: "45px"
+
+  },
 })
 
 export default DatasetStyle

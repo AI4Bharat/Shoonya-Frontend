@@ -180,7 +180,10 @@ console.log(Workspaces,"Workspaces")
 
   const renderToolBar = () => {
     return (
-      <Box className={classes.filterToolbarContainer}>
+      <Box
+      // className={classes.filterToolbarContainer}
+      className={classes.ToolbarContainer}
+      >
         <ColumnList
           columns={columns}
           setColumns={setSelectedColumns}
@@ -193,7 +196,7 @@ console.log(Workspaces,"Workspaces")
   const tableOptions = {
     filterType: "checkbox",
     selectableRows: "none",
-    download: false,
+    download: true,
     filter: false,
     print: false,
     search: false,
@@ -309,7 +312,7 @@ console.log(UserDetails?.date_joined,"UserDetails?.date_joined")
         {UserAnalytics?.length > 0 ? (
           <ThemeProvider theme={tableTheme}>
             <MUIDataTable
-              title={""}
+              title={"Reports"}
               data={reportData}
               columns={columns.filter((col) => selectedColumns.includes(col.name))}
               options={tableOptions}

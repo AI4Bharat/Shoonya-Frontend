@@ -125,7 +125,10 @@ const OrganizationReports = () => {
 
   const renderToolBar = () => {
     return (
-      <Box className={classes.filterToolbarContainer}>
+      <Box
+       //className={classes.filterToolbarContainer}
+       className={classes.ToolbarContainer}
+       >
         <ColumnList
             columns={columns}
             setColumns={setSelectedColumns}
@@ -138,7 +141,7 @@ const OrganizationReports = () => {
 const options = {
     filterType: 'checkbox',
     selectableRows: "none",
-    download: false,
+    download: true,
     filter: false,
     print: false,
     search: false,
