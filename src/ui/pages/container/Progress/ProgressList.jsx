@@ -156,15 +156,16 @@ function ProgressList() {
   }, []);
 
 
-  useEffect(() => {
-    setLoading(apiLoading);
-  }, [apiLoading])
+  // useEffect(() => {
+  //   setLoading(apiLoading);
+  // }, [apiLoading])
 
 
   const handleChartType = (e) => {
     setChartTypes(e.target.value)
   }
   const handleSubmit = () => {
+    const loadingTimeout = (progressTypes == "yearly" || comparisonProgressTypes == "yearly") ? 20000 : 2000;
     const OrgId = userDetails.organization.id
     setShowPicker(false);
     setShowPickers(false);
@@ -230,9 +231,9 @@ function ProgressList() {
     }
 
     setShowBarChar(true)
-    // setTimeout(() => {
-    //   setLoading(false);
-    // }, 2000);
+    setTimeout(() => {
+      setLoading(false);
+    }, loadingTimeout);
 
 
   }
@@ -349,6 +350,7 @@ function ProgressList() {
           //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: "rgba(243, 156, 18 )",
           barThickness: 20,
+          stack: "stack 0"
         },
         {
           label: comparisonProgressTypes,
@@ -356,6 +358,7 @@ function ProgressList() {
           //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: 'rgba(35, 155, 86 )',
           barThickness: 20,
+          stack: "stack 0"
         },
 
       ],
