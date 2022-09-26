@@ -569,7 +569,7 @@ function ProgressList() {
             
 
             
-            <CustomButton label="Submit" sx={{ width: "100%", mt: 4 }} onClick={handleSubmit}
+            <CustomButton label="Submit" sx={{ width: "100%", mt: 2 }} onClick={handleSubmit}
               disabled={(progressTypes || comparisonProgressTypes) ? false : true} />
          
         </Grid>
