@@ -65,6 +65,7 @@ const WorkspaceReports = () => {
   const ProjectReports = useSelector(
     (state) => state.getWorkspaceProjectReports.data
   );
+  console.log(ProjectReports,"ProjectReports")
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
   useEffect(() => {
@@ -339,7 +340,7 @@ const WorkspaceReports = () => {
       {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
-            title={""}
+            title={ProjectReports.length > 0 ? "Reports" : ""}
             data={reportData}
             columns={columns.filter((col) => selectedColumns.includes(col.name))}
             options={options}

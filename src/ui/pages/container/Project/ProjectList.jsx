@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Radio, Box } from '@mui/material';
+import { Radio, Box,Grid ,Typography} from '@mui/material';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
@@ -9,6 +9,7 @@ import Spinner from "../../component/common/Spinner"
 import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from 'react-redux';
+import { fontSize } from "@mui/system";
 
 
 export default function ProjectList() {
@@ -46,24 +47,26 @@ export default function ProjectList() {
         <React.Fragment>
             {loading && <Spinner />}
             {/* <Search/> */}
+            <Grid container justifyContent="end" sx={{position:"absolute", right:500,marginTop:"20px"}}  > 
+            <Typography sx={{marginRight:"15px", fontSize:"20px",fontWeight:500,marginTop:"3px"}} >View :</Typography>
             <FormControl>
-
                 <RadioGroup
                     row
                     aria-labelledby="demo-row-radio-buttons-group-label"
                     name="row-radio-buttons-group"
                     defaultValue="ProjectList"
-                    sx={{marginTop:"20px"}}
+                   
 
                 >
-                    <FormControlLabel value="ProjectList" control={<Radio />} label="ProjectList" onClick={handleProjectlist} />
-                    <FormControlLabel value="ProjectCard" control={<Radio />} label="ProjectCard" onClick={handleProjectcard} />
+                    <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
+                    <FormControlLabel value="ProjectCard" control={<Radio />} label="Card view" onClick={handleProjectcard} />
 
                 </RadioGroup>
             </FormControl>
+            </Grid>
 
             <Box >
-                <Box sx={{ p: 1,marginTop:"20px" }}>
+                <Box sx={{marginTop:"20px"}}>
                     {radiobutton ? <ProjectCardList projectData={projectData} /> : <ProjectCard projectData={projectData} />}
                 </Box>
             </Box>
