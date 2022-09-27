@@ -331,7 +331,7 @@ else if (pullDisabled === "No more unassigned tasks in this project")
         return (
             <Box className={classes.filterToolbarContainer}>
                 {props.type === "annotation" && userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
-                    <InputLabel id="annotator-filter-label" sx={{fontSize: "16px"}}>Filter by Annotator</InputLabel>
+                    <InputLabel id="annotator-filter-label" sx={{fontSize: "16px",margin:"23px 0px 0px 25px"}}>Filter by Annotator</InputLabel>
                     <Select
                     labelId="annotator-filter-label"
                     id="annotator-filter"
