@@ -422,9 +422,6 @@ function ProgressList() {
                   >
 
                     {ChartType.map((item, index) => (
-
-
-
                       <LightTooltip title={TooltipData[index].name} key={index} value={item.chartTypename} placement="left" arrow>
                         <MenuItem value={item.chartTypename}>{item.chartTypename}</MenuItem>
                       </LightTooltip>
@@ -437,7 +434,7 @@ function ProgressList() {
 
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
+                  <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
                     Project Type {" "}
                     {
                       <LightTooltip
@@ -452,10 +449,11 @@ function ProgressList() {
                   </InputLabel>
 
                   <Select
-                    labelId="project-type-label"
-                    id="project-type-select"
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
                     value={selectedType}
                     label="Project Type"
+                    sx={{padding:"1px"}}
                     onChange={(e) => setSelectedType(e.target.value)}
                   >
                     {projectTypes.map((type, index) => (
@@ -527,8 +525,8 @@ function ProgressList() {
                 </Button>
               </Grid>}
               {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}>
+                <FormControl  fullWidth size="small" >
+                  <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }} shrink="true">
                     Comparison Period {" "}
                     {
                       <LightTooltip
@@ -541,8 +539,10 @@ function ProgressList() {
                         />
                       </LightTooltip>
                     }
+                    
                   </InputLabel>
                   <Select
+                  
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Comparison Period"
@@ -568,11 +568,8 @@ function ProgressList() {
                   Pick Dates
                 </Button>
               </Grid>}
-              <Grid container justifyContent="center">
-            
-
-            
-            <CustomButton label="Submit" sx={{ width: "100%", mt: 2 }} onClick={handleSubmit}
+              <Grid container sx={{marginLeft:"17px"}}>
+            <CustomButton label="Submit" sx={{ width: "100%", mt: 3 }} onClick={handleSubmit}
               disabled={(progressTypes || comparisonProgressTypes) ? false : true} />
          
         </Grid>
