@@ -51,27 +51,28 @@ export default function ProjectList() {
         <ThemeProvider theme={themeDefault}>
             {loading && <Spinner />}
 
-            <Grid container justifyContent="end"  >
-                <Grid className={classes.projectgrid}>
-                    <Typography sx={{ marginRight: "10px", fontSize: "20px", fontWeight: 500, marginTop: "3px" }} >View :</Typography> </Grid>
-                <Grid className={classes.projectgrid}> <FormControl>
-                    <RadioGroup
-                        row
-                        aria-labelledby="demo-row-radio-buttons-group-label"
-                        name="row-radio-buttons-group"
-                        defaultValue="ProjectList"
-                    >
-                        <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
-                        <FormControlLabel value="ProjectCard" control={<Radio />} label="Card view" onClick={handleProjectcard} />
+            <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ position: "relative", bottom: "-51px", left: "20px" }} >
+                <Typography gutterBottom component="div" sx={{ fontSize: "16px", marginTop: "5px" }} >View :</Typography>
+                <Grid  >
+                    <FormControl >
+                        <RadioGroup
+                            row
+                            aria-labelledby="demo-row-radio-buttons-group-label"
+                            name="row-radio-buttons-group"
+                            defaultValue="ProjectList"
+                            sx={{ marginLeft: "10px" }}
+                        >
 
-                    </RadioGroup>
-                </FormControl>
-                </Grid>
-                <Grid>
-                    <Search />
+                            <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
+                            <FormControlLabel value="ProjectCard" control={<Radio />} label="Card view" onClick={handleProjectcard} />
+
+                        </RadioGroup>
+                    </FormControl>
                 </Grid>
             </Grid>
-
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Search />
+            </Grid>
             <Box >
                 <Box sx={{ marginTop: "20px" }}>
                     {radiobutton ? <ProjectCardList projectData={projectData} /> : <ProjectCard projectData={projectData} />}

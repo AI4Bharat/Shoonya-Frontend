@@ -525,8 +525,8 @@ function ProgressList() {
                 </Button>
               </Grid>}
               {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                <FormControl  focused="true" fullWidth size="small" >
-                  <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}  shrink="true">
+                <FormControl   fullWidth size="small" >
+                  <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}  >
                     Comparison Period {" "}
                     {
                       <LightTooltip

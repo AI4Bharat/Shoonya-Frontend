@@ -175,7 +175,7 @@ const ReportsTable = (props) => {
         <React.Fragment>
             {renderSnackBar()}
             <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt: 2, mb: 2, justifyContent: "space-between" }}>
-            <Grid   sx={{ }}   >
+            <Grid    >
              <Typography gutterBottom component="div" sx={{marginTop: "25px",fontSize:"16px"}}>
              Select Report Type :
              </Typography>
@@ -191,8 +191,8 @@ const ReportsTable = (props) => {
                         onChange={handleChangeReports}
 
                     >
-                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation Reports"  />
-                        <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer Reports"  />
+                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation"  />
+                        <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />
 
                     </RadioGroup>
                 </FormControl>
@@ -253,7 +253,7 @@ const ReportsTable = (props) => {
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
                     <MUIDataTable
-                        title={"Reports"}
+                        title={radiobutton==="AnnotatationReports"? "Annotatation Report" :"Reviewer Report"}
                         data={ProjectReport}
                         columns={columns.filter(col => selectedColumns.includes(col.name))}
                         options={options}

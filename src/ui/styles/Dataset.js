@@ -213,7 +213,7 @@ const DatasetStyle = makeStyles({
 
   },
   projectgrid:{
-    marginTop:"20px"
+    textAlign:"start"
   }
 })
 
