@@ -503,7 +503,7 @@ function ProgressList() {
                     {ProgressType.map((item, index) => (
 
                       <LightTooltip title={ProgressTypedata[index].title} value={item.ProgressTypename} key={index} placement="left" arrow >
-                        <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
+                        <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize"}}>{item.ProgressTypename}</MenuItem>
                       </LightTooltip>
                     ))}
                   </Select>
@@ -525,8 +525,8 @@ function ProgressList() {
                 </Button>
               </Grid>}
               {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                <FormControl  fullWidth size="small" >
-                  <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }} shrink="true">
+                <FormControl  focused="true" fullWidth size="small" >
+                  <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}  shrink="true">
                     Comparison Period {" "}
                     {
                       <LightTooltip
@@ -542,7 +542,6 @@ function ProgressList() {
                     
                   </InputLabel>
                   <Select
-                  
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Comparison Period"
