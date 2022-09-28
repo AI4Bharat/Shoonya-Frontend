@@ -21,6 +21,7 @@ const columns = [
 			filter: false,
 			sort: false,
 			align: "center",
+			setCellHeaderProps: sort => ({ style: { height: "70px",  padding: "16px" } }),
 		},
 	},
 	{

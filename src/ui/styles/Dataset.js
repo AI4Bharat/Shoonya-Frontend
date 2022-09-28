@@ -214,7 +214,18 @@ const DatasetStyle = makeStyles({
   },
   TotalSummarydata:{
     padding:"4px 0px 0px 4px",
-  }
+  },
+  projectgrid:{
+    textAlign:"start"
+  },
+  // fixedWidthContainer: {
+	// 	maxWidth: "5%",
+	// },
+  root: {
+		minHeight: 40,
+		alignItems: "center",
+		//padding: theme.spacing(0, 2)
+	},
 })
 
 export default DatasetStyle

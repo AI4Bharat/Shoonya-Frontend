@@ -64,7 +64,7 @@ const ProjectCardList = (props) => {
                 filter: false,
                 sort: false,
                 align: "center",
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
             }
         },
         {
@@ -73,9 +73,9 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align : "center",
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
-               
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
+
             }
         },
         {
@@ -84,10 +84,10 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align : "center",
-               
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
-                
+                align: "center",
+
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
+
             }
         },
         {
@@ -96,9 +96,9 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align : "center",
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px",padding:"16px" } }),
-                
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
+
             }
         },
         {
@@ -107,14 +107,10 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align : "center",
-                setCellHeaderProps: sort  => ({ style: { height:"70px",fontSize:"16px" } }),
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px" } }),
             }
         }];
-
-
-   
-
 
 
     const data = projectData && projectData.length > 0 ? pageSearch().map((el, i) => {
@@ -162,28 +158,21 @@ const ProjectCardList = (props) => {
         jumpToPage: true,
 
     };
-    const renderSearch = () => {
-        return (
-            <Search />
-        );
-    };
+    // const renderSearch = () => {
+    //     return (
+    //         <Search />
+    //     );
+    // };
 
     return (
-
-      
-            
-            <ThemeProvider theme={tableTheme}>
-                   {renderSearch()}
-                <MUIDataTable
-                    title={""}
-                    data={data}
-                    columns={columns}
-                    options={options}
-                />
-            </ThemeProvider>
-
-        
-
+        <ThemeProvider theme={tableTheme}>
+            <MUIDataTable
+                title={""}
+                data={data}
+                columns={columns}
+                options={options}
+            />
+        </ThemeProvider>
     )
 }
 
