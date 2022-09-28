@@ -297,7 +297,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   useEffect(() => {
     const generateLabelConfig = (taskData) => {
       console.log(taskData, "taskData");
-      const sourceChat = taskData.conversation_json??taskData.source_conversation_json?.map((item, idx) => {
+      const sourceChat = (taskData.conversation_json??taskData.source_conversation_json)?.map((item, idx) => {
         const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
         return (
           `<View style="display: flex; flex-direction: column; font-weight: 500; gap: 4px; margin: 0 0 8px;">
@@ -310,7 +310,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           </View>`
       )}).join("");
 
-      const outputChat = taskData.conversation_json??taskData.source_conversation_json?.map((item, idx) => {
+      const outputChat = (taskData.conversation_json??taskData.source_conversation_json)?.map((item, idx) => {
         const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
         return (
           `<View style="display: flex; flex-direction: column; width: 90%; font-weight: 500;">
