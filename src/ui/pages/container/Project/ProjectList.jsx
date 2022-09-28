@@ -68,8 +68,8 @@ export default function ProjectList() {
                             
                         >
 
-                            <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
-                            <FormControlLabel value="ProjectCard" control={<Radio />} label="Card view" onClick={handleProjectcard} />
+                            <FormControlLabel value="ProjectList" control={<Radio />} label="List" onClick={handleProjectlist} />
+                            <FormControlLabel value="ProjectCard" control={<Radio />} label="Card" onClick={handleProjectcard} />
 
                         </RadioGroup>
                     </FormControl>
