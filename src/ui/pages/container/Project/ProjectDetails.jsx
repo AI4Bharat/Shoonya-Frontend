@@ -307,10 +307,9 @@ const Projects = () => {
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
                         <TaskTable type="review" />
                     </TabPanel>}
-                    <Grid sx={{pt:4}} >
                     {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 : 1} >
                      <MembersTable  onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS}   />
-                    </TabPanel>}</Grid>
+                    </TabPanel>}
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 3 : 1}>
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
