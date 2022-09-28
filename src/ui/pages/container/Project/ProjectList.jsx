@@ -51,9 +51,31 @@ export default function ProjectList() {
         <ThemeProvider theme={themeDefault}>
             {loading && <Spinner />}
 
-            <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ position: "relative", bottom: "-51px", left: "20px" }} >
-                <Typography gutterBottom component="div" sx={{ fontSize: "16px", marginTop: "5px" }} >View :</Typography>
-                <Grid  >
+           
+            {/* <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ position: "static", bottom: "-51px", left: "20px" }} > */}
+            <Grid container className={classes.root} >
+            <Grid item style={{ flexGrow: "0"}}>
+					<Typography variant="h6" sx={{paddingBottom:"9px"}}>View :  </Typography>
+                    
+				</Grid>
+                <Grid item style={{ flexGrow: "1",paddingLeft: "10px"}}>
+                <FormControl >
+                        <RadioGroup
+                            row
+                            aria-labelledby="demo-row-radio-buttons-group-label"
+                            name="row-radio-buttons-group"
+                            defaultValue="ProjectList"
+                            
+                        >
+
+                            <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
+                            <FormControlLabel value="ProjectCard" control={<Radio />} label="Card view" onClick={handleProjectcard} />
+
+                        </RadioGroup>
+                    </FormControl>
+				</Grid>
+                
+                {/* <Grid  >
                     <FormControl >
                         <RadioGroup
                             row
@@ -69,10 +91,14 @@ export default function ProjectList() {
                         </RadioGroup>
                     </FormControl>
                 </Grid>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            </Grid> */}
+            <Grid xs={3} item className={classes.fixedWidthContainer}>
+            <Search />
+				</Grid>
+                </Grid>
+            {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Search />
-            </Grid>
+            </Grid> */}
             <Box >
                 <Box sx={{ marginTop: "20px" }}>
                     {radiobutton ? <ProjectCardList projectData={projectData} /> : <ProjectCard projectData={projectData} />}

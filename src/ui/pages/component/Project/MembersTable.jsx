@@ -29,6 +29,7 @@ const columns = [
             filter: false,
             sort: false,
             align: "center",
+            setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
         },
     },
     {
@@ -257,7 +258,7 @@ const MembersTable = (props) => {
             };
 
     return (
-        <React.Fragment>
+        <React.Fragment  >
             {userRole !== 1 && !hideButton ?
             <CustomButton
                 sx={{ borderRadius: 2, mb: 3, whiteSpace: "nowrap" }}
@@ -282,7 +283,7 @@ const MembersTable = (props) => {
                 />
             }
             {renderSnackBar()}
-            <ThemeProvider theme={tableTheme}>
+            <ThemeProvider theme={tableTheme} sx={{marginTop:"20px"}} >
                 <MUIDataTable
                     title={""}
                     data={data}
