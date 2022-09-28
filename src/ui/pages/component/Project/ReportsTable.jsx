@@ -174,19 +174,20 @@ const ReportsTable = (props) => {
     return (
         <React.Fragment>
             {renderSnackBar()}
-            <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ mt: 2, mb: 2, justifyContent: "space-between" }}>
-            <Grid    >
-             <Typography gutterBottom component="div" sx={{marginTop: "25px",fontSize:"16px"}}>
+            <Grid container direction="row" rowSpacing={2} sx={{ mt: 2, mb: 2 ,}}>
+            <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
+             <Typography gutterBottom component="div" sx={{marginTop: "10px",fontSize:"16px",}}>
              Select Report Type :
              </Typography>
-           </Grid>
-                <FormControl>
+           </Grid >
+           <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
+                <FormControl >
 
                     <RadioGroup
                         row
                         aria-labelledby="demo-row-radio-buttons-group-label"
                         name="row-radio-buttons-group"
-                        sx={{ marginTop: "20px", marginRight:"90px" }}
+                        sx={{ marginTop: "5px"}}
                         value={radiobutton}
                         onChange={handleChangeReports}
 
@@ -196,6 +197,7 @@ const ReportsTable = (props) => {
 
                     </RadioGroup>
                 </FormControl>
+                </Grid >
                 <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
                     <Button
                         endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
