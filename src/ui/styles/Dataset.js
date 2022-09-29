@@ -212,6 +212,9 @@ const DatasetStyle = makeStyles({
        right: "45px"
 
   },
+  TotalSummarydata:{
+    padding:"4px 0px 0px 4px",
+  },
   projectgrid:{
     textAlign:"start"
   },

@@ -174,7 +174,7 @@ const ReportsTable = (props) => {
     return (
         <React.Fragment>
             {renderSnackBar()}
-            <Grid container direction="row" rowSpacing={2} sx={{ mt: 2, mb: 2 ,}}>
+            <Grid container direction="row" rowSpacing={2} sx={{  mb: 2 ,}}>
             <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
              <Typography gutterBottom component="div" sx={{marginTop: "10px",fontSize:"16px",}}>
              Select Report Type :
