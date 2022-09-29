@@ -58,7 +58,7 @@ export default function ProjectList() {
 					<Typography variant="h6" sx={{paddingBottom:"9px"}}>View :  </Typography>
                     
 				</Grid>
-                <Grid item style={{ flexGrow: "1",paddingLeft: "10px"}}>
+                <Grid item style={{ flexGrow: "1",paddingLeft: "5px"}}>
                 <FormControl >
                         <RadioGroup
                             row
@@ -68,8 +68,8 @@ export default function ProjectList() {
                             
                         >
 
-                            <FormControlLabel value="ProjectList" control={<Radio />} label="List view" onClick={handleProjectlist} />
-                            <FormControlLabel value="ProjectCard" control={<Radio />} label="Card view" onClick={handleProjectcard} />
+                            <FormControlLabel value="ProjectList" control={<Radio />} label="List" onClick={handleProjectlist} />
+                            <FormControlLabel value="ProjectCard" control={<Radio />} label="Card" onClick={handleProjectcard} />
 
                         </RadioGroup>
                     </FormControl>

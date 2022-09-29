@@ -300,16 +300,17 @@ const Projects = () => {
                     </Box>
                    
         </Grid>
-   
+        <Grid >
                     {isAnnotators && <TabPanel value={value} index={0} >
                         <TaskTable type="annotation" />
-                    </TabPanel>}
+                    </TabPanel>}</Grid>
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
                         <TaskTable type="review" />
                     </TabPanel>}
+                    <Grid sx={{marginTop:"30px"}}>
                     {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 : 1} >
                      <MembersTable  onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS}   />
-                    </TabPanel>}
+                    </TabPanel>}</Grid>
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 3 : 1}>
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
