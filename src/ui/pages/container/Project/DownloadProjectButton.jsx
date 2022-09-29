@@ -102,7 +102,6 @@ function DownloadProjectButton(props) {
         variant: "error",
       })
     }
-
     SetTask([])
   };
   const handleClose = () => {
@@ -133,7 +132,8 @@ function DownloadProjectButton(props) {
         variant: "error",
       })
     }
-  }
+    SetTask([])
+  };
 
   const handleDownloadTSVProject = async () => {
     const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
@@ -159,7 +159,8 @@ function DownloadProjectButton(props) {
         variant: "error",
       })
     }
-  }
+    SetTask([])
+  };
  
   const renderSnackBar = () => {
     return (
