@@ -418,7 +418,7 @@ const MyProgress = () => {
 
           >
             <Typography variant="subtitle1">Word Count : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.["Average Annotation Time (In Seconds)"]}</Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.["Word Count"]}</Typography>
           </Grid>
         </Grid>
         }
