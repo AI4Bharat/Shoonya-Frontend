@@ -446,7 +446,7 @@ else if (pullDisabled === "No more unassigned tasks in this project")
                     container
                     direction="row"
                     spacing={2}
-                    sx={{ mb: 2, mt: 2 }}
+                    sx={{ mb: 2,  }}
                 >
                     {((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && <Grid item xs={12} sm={12} md={3}>
                     <Tooltip title={deallocateDisabled}>

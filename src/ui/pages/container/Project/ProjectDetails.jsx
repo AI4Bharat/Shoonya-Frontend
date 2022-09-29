@@ -290,7 +290,7 @@ const Projects = () => {
             <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                         {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700',}} />}
+                         {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700'}} />}
                             {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                             {isAnnotators &&<Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' , }} />}
                             {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
@@ -300,17 +300,15 @@ const Projects = () => {
                     </Box>
                    
         </Grid>
-        <Grid >
                     {isAnnotators && <TabPanel value={value} index={0} >
                         <TaskTable type="annotation" />
-                    </TabPanel>}</Grid>
+                    </TabPanel>}
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
                         <TaskTable type="review" />
                     </TabPanel>}
-                    <Grid sx={{marginTop:"30px"}}>
                     {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 : 1} >
                      <MembersTable  onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS}   />
-                    </TabPanel>}</Grid>
+                    </TabPanel>}
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 3 : 1}>
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
