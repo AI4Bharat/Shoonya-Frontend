@@ -6,13 +6,10 @@
 import constants from "../../../constants";
  
  export default class GetUserAnalyticsAPI extends API {
-   constructor(fromDate, toDate, projectType, workspaces, timeout = 2000) {
+   constructor( progressObj , timeout = 2000) {
      super("POST", timeout, false);
+     this.progressObj = progressObj;
      this.type = constants.GET_USER_ANALYTICS;
-     this.fromDate = fromDate;
-     this.toDate = toDate;
-     this.projectType = projectType;
-     this.workspaces = workspaces;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}user_analytics/`;
    }
  
@@ -28,13 +25,8 @@ import constants from "../../../constants";
    }
  
    getBody() {
-    return {
-        from_date: this.fromDate,
-        to_date: this.toDate,
-        project_type: this.projectType,
-        workspace_id: this.workspaces
-    }
-   }
+    return this.progressObj;
+  }
  
    getHeaders() {
      this.headers = {
