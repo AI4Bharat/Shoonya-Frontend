@@ -444,7 +444,7 @@ const AdvancedOperation = (props) => {
                         xl={12}
 
                     >
-                        <DownloadProjectButton taskStatus={taskStatus}  />
+                        <DownloadProjectButton taskStatus={taskStatus}  SetTask={setTaskStatus}  />
                     </Grid>
                 </Grid>
 

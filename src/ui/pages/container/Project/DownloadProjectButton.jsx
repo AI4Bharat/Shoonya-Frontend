@@ -38,11 +38,11 @@ const StyledMenu = styled((props) => (
 
 
 function DownloadProjectButton(props) {
-  const { taskStatus } = props;
+  const { taskStatus,SetTask } = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const [downloadres, setdownloadres] = useState(false);
   const [loading, setLoading] = useState(false);
-
+ const[taskValue ,setTaskValue]= useState(taskStatus)
   const apiLoading = useSelector(state => state.apiStatus.loading);
   const open = Boolean(anchorEl);
   const { id } = useParams();
@@ -103,7 +103,7 @@ function DownloadProjectButton(props) {
       })
     }
 
-
+    SetTask([])
   };
   const handleClose = () => {
     setAnchorEl(null);

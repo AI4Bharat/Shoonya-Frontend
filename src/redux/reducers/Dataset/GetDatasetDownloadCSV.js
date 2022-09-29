@@ -17,7 +17,7 @@ function downloadCSV(content) {
 
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
-		case constants.GET_DATASET_DOWNLOAD:
+		case constants.GET_DATASET_DOWNLOAD_CSV:
 			downloadCSV(action.payload);
 			return {
 				...state,
