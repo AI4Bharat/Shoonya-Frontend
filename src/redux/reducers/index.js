@@ -66,6 +66,7 @@ import getCumulativeTasks from './Progress/CumulativeTasks';
 import getPeriodicalTasks from './Progress/PeriodicalTasks';
 import getDatasetLogs from './Dataset/GetDatasetLogs';
 import getProjectLogs from './ProjectDetails/GetProjectLogs';
+import DownloadTSVProject from './ProjectDetails/DownloadTSVProject';
 
 const index = {
     apiStatus,
@@ -139,6 +140,7 @@ const index = {
     getPeriodicalTasks,
     getDatasetLogs,
     getProjectLogs,
+    DownloadTSVProject,
     
 };
 
