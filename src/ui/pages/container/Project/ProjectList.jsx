@@ -58,7 +58,7 @@ export default function ProjectList() {
 					<Typography variant="h6" sx={{paddingBottom:"9px"}}>View :  </Typography>
                     
 				</Grid>
-                <Grid item style={{ flexGrow: "1",paddingLeft: "10px"}}>
+                <Grid item style={{ flexGrow: "1",paddingLeft: "5px"}}>
                 <FormControl >
                         <RadioGroup
                             row

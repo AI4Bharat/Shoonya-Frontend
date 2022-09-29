@@ -290,7 +290,7 @@ const Projects = () => {
             <Box >
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                         {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700',}} />}
+                         {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700'}} />}
                             {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                             {isAnnotators &&<Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' , }} />}
                             {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
@@ -300,7 +300,6 @@ const Projects = () => {
                     </Box>
                    
         </Grid>
-   
                     {isAnnotators && <TabPanel value={value} index={0} >
                         <TaskTable type="annotation" />
                     </TabPanel>}
