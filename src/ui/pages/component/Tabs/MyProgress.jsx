@@ -474,7 +474,7 @@ const MyProgress = () => {
         {UserAnalytics?.length > 0 ? (
           <ThemeProvider theme={tableTheme}>
             <MUIDataTable
-              title={""}
+             title={radiobutton==="AnnotatationReports"? "Annotatation Report" :"Reviewer Report"}
               data={reportData}
               columns={columns.filter((col) => selectedColumns.includes(col.name))}
               options={tableOptions}
