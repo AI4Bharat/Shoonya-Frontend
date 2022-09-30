@@ -79,6 +79,7 @@ function DownloadProjectButton(props) {
 
   };
   const handleDownloadJSONProject = async () => {
+    SetTask([])
     const projectObj = new DownloadJSONProjectAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
@@ -102,13 +103,14 @@ function DownloadProjectButton(props) {
         variant: "error",
       })
     }
-    SetTask([])
+   
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const handleDownloadCSVProject = async () => {
+    SetTask([])
     const projectObj = new DownloadProjectCsvAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
@@ -132,10 +134,11 @@ function DownloadProjectButton(props) {
         variant: "error",
       })
     }
-    SetTask([])
+   
   };
 
   const handleDownloadTSVProject = async () => {
+    SetTask([])
     const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
@@ -159,7 +162,7 @@ function DownloadProjectButton(props) {
         variant: "error",
       })
     }
-    SetTask([])
+    
   };
  
   const renderSnackBar = () => {
