@@ -225,7 +225,6 @@ const DatasetStyle = makeStyles({
   root: {
 		minHeight: 40,
 		alignItems: "center",
-		//padding: theme.spacing(0, 2)
 	},
   modelValue: {
     "&:first-letter": { textTransform: "capitalize" },
@@ -244,7 +243,10 @@ const DatasetStyle = makeStyles({
     borderRadius: "20%",
     padding: "15px",
     height: "fit-content",
-  }
+  },
+  formControl: {
+    width: 300
+  },
 })
 
 export default DatasetStyle

@@ -5,19 +5,17 @@ import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
-export default class GetDatasetDownload extends API {
+export default class GetDatasetDownloadCSV extends API {
 	constructor(datasetId, timeout = 2000) {
 		super("GET", timeout, false);
-		this.type = constants.GET_DATASET_DOWNLOAD;
-		this.endpoint = `${super.apiEndPointAuto()}${
-			ENDPOINTS.getDatasets
-		}instances/${datasetId}/download/`;
+		this.type = constants.GET_DATASET_DOWNLOAD_CSV;
+		this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/${datasetId}/download/?export_type=CSV`;
 	}
 
 	processResponse(res) {
 		super.processResponse(res);
 		if (res) {
-			this.downloadDataset = res;
+			this.downloadDatasetCsv = res;
 		}
 	}
 
@@ -40,6 +38,6 @@ export default class GetDatasetDownload extends API {
 	}
 
 	getPayload() {
-		return this.downloadDataset;
+		return this.downloadDatasetCsv;
 	}
 }

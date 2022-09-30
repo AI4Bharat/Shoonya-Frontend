@@ -3,17 +3,17 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from "../../../constants";
   
- export default class DownloadProjectJSONAPI extends API {
-    constructor(projectId, taskStatus , timeout = 2000) {
+ export default class DownloadProjectTsvAPI extends API {
+    constructor(projectId,taskStatus, timeout = 2000) {
       super("POST", timeout, false);
-      this.type = constants.DOWNLOAD_PROJECT_JSON;
-      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=JSON&task_status=${taskStatus}`;
+     this.type = constants.DOWNLOAD_PROJECT_TSV;
+      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=TSV&task_status=${taskStatus}`;
     }
   
     processResponse(res) {
       super.processResponse(res);
       if (res) {
-          this.downloadProjectJSON = res;
+          this.downloadProjectTsv= res;
       }
   }
   
@@ -35,7 +35,7 @@
     }
   
     getPayload() {
-      return this.downloadProjectJSON;
+      return this.downloadProjectTsv;
     }
   }
   

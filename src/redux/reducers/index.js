@@ -44,7 +44,7 @@ import getOrganizationUserReports from './Organization/GetOrganizationUserReport
 import getOrganizationProjectReports from './Organization/GetOrganizationProjectReports';
 import getDatasetProjects from './Dataset/GetDatasetProjects';
 import getDatasetMembers from './Dataset/GetDatasetMembers';
-import getDatasetDownload from './Dataset/GetDatasetDownload';
+import getDatasetDownloadCSV from './Dataset/GetDatasetDownloadCSV';
 import CreateNewDatasetInstance from './Dataset/CreateNewDatasetInstance';
 import GetDatasetType from './Dataset/GetDatasetType';
 import Uploaddata from './Dataset/Uploaddata';
@@ -66,6 +66,9 @@ import getCumulativeTasks from './Progress/CumulativeTasks';
 import getPeriodicalTasks from './Progress/PeriodicalTasks';
 import getDatasetLogs from './Dataset/GetDatasetLogs';
 import getProjectLogs from './ProjectDetails/GetProjectLogs';
+import DownloadTSVProject from './ProjectDetails/DownloadTSVProject';
+import getDatasetDownloadTSV from './Dataset/GetDatasetDownloadTSV';
+import getDatasetDownloadJSON from './Dataset/GetDatasetDownloadJSON';
 
 const index = {
     apiStatus,
@@ -117,7 +120,7 @@ const index = {
     getOrganizationProjectReports,
     getDatasetProjects,
     getDatasetMembers,
-    getDatasetDownload,
+    getDatasetDownloadCSV,
     CreateNewDatasetInstance,
     GetDatasetType,
     Uploaddata,
@@ -139,6 +142,9 @@ const index = {
     getPeriodicalTasks,
     getDatasetLogs,
     getProjectLogs,
+    DownloadTSVProject,
+    getDatasetDownloadTSV,
+    getDatasetDownloadJSON,
     
 };
 
