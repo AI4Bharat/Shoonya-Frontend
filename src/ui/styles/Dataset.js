@@ -224,8 +224,10 @@ const DatasetStyle = makeStyles({
   root: {
 		minHeight: 40,
 		alignItems: "center",
-		//padding: theme.spacing(0, 2)
 	},
+  formControl: {
+    width: 300
+  },
 })
 
 export default DatasetStyle
