@@ -6,6 +6,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
 
 import {
   getProjectsandTasks,
@@ -340,7 +341,8 @@ const LabelStudioWrapper = ({
             predictions,
           ]);
           setNotes(taskData, annotations);
-          setLabelConfig(labelConfig.label_config);
+          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
+          setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
           LSFRoot(
             rootRef,
@@ -348,7 +350,7 @@ const LabelStudioWrapper = ({
             userData,
             projectId,
             taskData,
-            labelConfig.label_config,
+            tempLabelConfig,
             annotations,
             predictions,
             annotationNotesRef,
