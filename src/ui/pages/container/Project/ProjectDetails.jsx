@@ -1,8 +1,8 @@
-import { Box, Button, Card, Grid, Tab, Tabs, ThemeProvider, Typography,AppBar,Toolbar } from "@mui/material";
+import { Box, Button, Card, Grid, Tab, Tabs, ThemeProvider, Typography, IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useHistory } from 'react-router-dom';
 import TaskTable from "../../component/Project/TaskTable"
 import MembersTable from "../../component/Project/MembersTable"
 import ReportsTable from "../../component/Project/ReportsTable"
@@ -14,10 +14,12 @@ import { translate } from "../../../../config/localisation";
 import addUserTypes from "../../../../constants/addUserTypes";
 import Spinner from "../../component/common/Spinner";
 import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import { styled, alpha } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DatasetStyle from "../../../styles/Dataset";
+import ProjectDescription from "./ProjectDescription";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+
 
 
 const menuOptions = [
@@ -39,7 +41,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box sx={{p:3}} >
+                <Box sx={{ p: 3 }} >
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -99,6 +101,7 @@ const Projects = () => {
         { name: "Unassigned Task", value: null },
         { name: "Total Labeled Task", value: null },
     ])
+    let navigate = useNavigate();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -110,7 +113,7 @@ const Projects = () => {
     const dispatch = useDispatch();
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-
+    console.log(ProjectDetails, "ProjectDetails")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
 
@@ -145,7 +148,7 @@ const Projects = () => {
                 value: ProjectDetails.labeled_task_count
             },
         ])
-    }, []);
+    }, [ProjectDetails.id]);
     const [loading, setLoading] = useState(false);
     const [annotationreviewertype, setAnnotationreviewertype] = useState()
     const [value, setValue] = React.useState(0);
@@ -179,6 +182,10 @@ const Projects = () => {
         }
     }, [annotationdata, reviewerdata])
 
+    const handleOpenSettings = () => {
+        navigate("/projects/${id}/projectsetting");
+    }
+
     return (
         <ThemeProvider theme={themeDefault}>
             {/* <Header /> */}
@@ -197,109 +204,58 @@ const Projects = () => {
                         padding: 5
                     }}
                 >
+                    <Grid
+                        container
+                        direction='row'
+                        justifyContent='center'
+                        alignItems='center'
+                        sx={{ mb: 3 }}
+                    >
+                        <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
+                            <Typography  variant="h3">{ProjectDetails.title}</Typography>
+                        </Grid>
 
-                    <Typography variant="h3">{ProjectDetails.title}</Typography>
-                    <Grid
-                        container
-                        alignItems="center"
-                        direction="row"
-                        justifyContent="flex-start"
-                        sx={{
-                            paddingTop: 2
-                        }}
-                    >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Project ID :</Typography>
-                        <Typography variant="body2">{ProjectDetails.id}</Typography>
+                        {userDetails?.role !== 1 && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                            <Tooltip title={translate("label.showProjectSettings")}>
+                                <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
+                                    <SettingsOutlinedIcon
+                                        color="primary.dark"
+                                        fontSize="large"
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        </Grid>}
+
                     </Grid>
-                    <Grid
-                        container
-                        alignItems="center"
-                        direction="row"
-                        justifyContent="flex-start"
-                        sx={{
-                            paddingTop: 2
-                        }}
-                    >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Description :</Typography>
-                        <Typography variant="body2">{ProjectDetails.description}</Typography>
+                    <Grid item xs={12} sm={12} md={12} lg={12} xl={12}  sx={{ mb: 2 }}>
+                        <Grid container spacing={2}>
+                            {projectData?.map((des, i) => (
+                                <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+                                    <ProjectDescription
+                                        name={des.name}
+                                        value={des.value}
+                                        index={i}
+                                    />
+                                </Grid>
+                            ))}
+                        </Grid>
                     </Grid>
-                    <Grid
-                        container
-                        alignItems="center"
-                        direction="row"
-                        justifyContent="flex-start"
-                        sx={{
-                            paddingTop: 2
-                        }}
-                    >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Project Type :</Typography>
-                        <Typography variant="body2">{ProjectDetails.project_type}</Typography>
-                    </Grid>
-                    <Grid
-                        container
-                        alignItems="center"
-                        direction="row"
-                        justifyContent="flex-start"
-                        sx={{
-                            paddingTop: 2
-                        }}
-                    >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Status :</Typography>
-                        <Typography variant="body2">{ProjectDetails.is_published ? "Published" : ProjectDetails.is_archived ? "Archived" : "Draft"}</Typography>
-                    </Grid>
-                    <Grid
-                        container
-                        alignItems="center"
-                        direction="row"
-                        justifyContent="flex-start"
-                        sx={{
-                            paddingTop: 2
-                        }}
-                    >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Annotation Tasks :</Typography>
-                        <Typography variant="body2">{ProjectDetails.unassigned_task_count}</Typography>
-                    </Grid>
-                    <Grid
-                        container
-                        alignItems="center"
-                        direction="row"
-                        justifyContent="flex-start"
-                        sx={{
-                            paddingTop: 2
-                        }}
-                    >
-                        <Typography variant="body2" fontWeight='700' pr={1}>Unassigned Review Tasks :</Typography>
-                        <Typography variant="body2">{ProjectDetails.labeled_task_count}</Typography>
-                    </Grid>
-                    {userDetails?.role !== 1 && <Link to={`/projects/${id}/projectsetting`} style={{ textDecoration: "none" }}>
-                        <Button
-                            sx={{
-                                marginTop: 2,
-                                marginBottom: 2,
-                                padding: 1,
-                                backgroundColor: "primary.main",
-                                borderRadius: 2
-                            }}
-                            variant="contained"
-                        >
-                            <Typography variant="body2" sx={{ color: "#FFFFFF" }}>{translate("label.showProjectSettings")}</Typography>
-                        </Button>
-                    </Link>}
+
                     <Grid>
-                   
-            <Box >
-                        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                         {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700'}} />}
-                            {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
-                            {isAnnotators &&<Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700' , }} />}
-                            {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
-                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700',flexDirection: "row-reverse" }} onClick={handleClick} />
-                           
-                        </Tabs>
-                    </Box>
-                   
-        </Grid>
+                        <Box >
+                            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+
+                                {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
+                                {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                                {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                                {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                                <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700', flexDirection: "row-reverse" }} onClick={handleClick} />
+
+                            </Tabs>
+                        </Box>
+
+                    </Grid>
                     {isAnnotators && <TabPanel value={value} index={0} >
                         <TaskTable type="annotation" />
                     </TabPanel>}
@@ -307,7 +263,7 @@ const Projects = () => {
                         <TaskTable type="review" />
                     </TabPanel>}
                     {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 : 1} >
-                     <MembersTable  onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS}   />
+                        <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS} />
                     </TabPanel>}
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 3 : 1}>
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />

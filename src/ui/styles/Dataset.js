@@ -46,6 +46,7 @@ const DatasetStyle = makeStyles({
     justifyContent: "flex-end",
     alignItems: "center",
     columnGap: "10px",
+
   },
   clearAllBtn: {
     float: "right",
@@ -226,6 +227,24 @@ const DatasetStyle = makeStyles({
 		alignItems: "center",
 		//padding: theme.spacing(0, 2)
 	},
+  modelValue: {
+    "&:first-letter": { textTransform: "capitalize" },
+    display: "-webkit-box",
+    "-webkit-line-clamp": "2",
+    "-webkit-box-orient": "vertical",
+    overflow: "hidden",
+    "@media (max-width:400px)": {
+      marginLeft: "-14px",
+      fontSize: "12px"
+
+    },
+  },
+  descCardIcon: {
+    display: "flex",
+    borderRadius: "20%",
+    padding: "15px",
+    height: "fit-content",
+  }
 })
 
 export default DatasetStyle
