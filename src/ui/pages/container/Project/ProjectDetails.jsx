@@ -183,7 +183,7 @@ const Projects = () => {
     }, [annotationdata, reviewerdata])
 
     const handleOpenSettings = () => {
-        navigate("/projects/${id}/projectsetting");
+        navigate(`/projects/${id}/projectsetting`);
     }
 
     return (
