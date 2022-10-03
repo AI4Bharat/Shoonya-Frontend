@@ -18,7 +18,7 @@ const Projectcard = (props) => {
     const SearchProject = useSelector((state) => state.SearchProjectCards.data);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(9);
-  
+
 
 
 
@@ -80,7 +80,6 @@ const Projectcard = (props) => {
 
     return (
         <React.Fragment>
-            <Search />
             {pageSearch().length > 0 ?
                 <Box sx={{ margin: "0 auto", pb: 5 }}>
                     {/* <Typography variant="h5" sx={{mt : 2, mb : 2}}>Projects</Typography> */}

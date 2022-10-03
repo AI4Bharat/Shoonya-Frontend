@@ -57,7 +57,7 @@ const AutomateDatasets = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: element !== "SentenceText"
+          disabled: (element !== "SentenceText" && element !== "Conversation")
         });
       });
       setSrcDatasetTypes(temp);
@@ -66,12 +66,12 @@ const AutomateDatasets = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: element !== "TranslationPair"
+          disabled: (srcDatasetType === "SentenceText" ? element !=="TranslationPair" : element !== "Conversation")
         });
       });
       setTgtDatasetTypes(temp);
     }
-  }, [DatasetTypes]);
+  }, [DatasetTypes,srcDatasetType]);
 
   useEffect(() => {
     setLoading(false);
@@ -343,7 +343,7 @@ const AutomateDatasets = () => {
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Confirm"}
                 onClick={handleConfirm}
-                disabled={!srcInstance || !tgtInstance || !languages.length}
+                disabled={srcDatasetType === "SentenceText" ? !srcInstance || !tgtInstance || !languages.length :!srcInstance || !tgtInstance}
               />
               <Button
                 label={"Cancel"}

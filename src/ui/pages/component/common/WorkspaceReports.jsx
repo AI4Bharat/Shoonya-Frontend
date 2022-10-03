@@ -65,6 +65,7 @@ const WorkspaceReports = () => {
   const ProjectReports = useSelector(
     (state) => state.getWorkspaceProjectReports.data
   );
+  console.log(ProjectReports,"ProjectReports")
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
   useEffect(() => {
@@ -143,7 +144,10 @@ const WorkspaceReports = () => {
   const renderToolBar = () => {
     const buttonSXStyle = { borderRadius: 2, margin: 2 };
     return (
-      <Box className={classes.filterToolbarContainer}>
+      <Box 
+      // className={classes.filterToolbarContainer}
+      className={classes.ToolbarContainer}
+      >
         <ColumnList
           columns={columns}
           setColumns={setSelectedColumns}
@@ -156,7 +160,7 @@ const WorkspaceReports = () => {
   const options = {
     filterType: "checkbox",
     selectableRows: "none",
-    download: false,
+    download: true,
     filter: false,
     print: false,
     search: false,
@@ -339,7 +343,7 @@ const WorkspaceReports = () => {
       {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
-            title={""}
+            title={ProjectReports.length > 0 ? "Reports" : ""}
             data={reportData}
             columns={columns.filter((col) => selectedColumns.includes(col.name))}
             options={options}

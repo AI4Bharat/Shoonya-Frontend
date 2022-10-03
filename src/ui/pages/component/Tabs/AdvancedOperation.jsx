@@ -1,4 +1,4 @@
-import { Card, Grid, ThemeProvider, Typography, Divider } from "@mui/material";
+import { Grid, ThemeProvider, Select, Box, MenuItem, InputLabel, FormControl,Checkbox,ListItemText,ListItemIcon, Card, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -24,8 +24,37 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import EnableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/EnableTaskReviews";
 import DisableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/DisableTaskReviews";
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
 
-
+const ProgressType = ["unlabeled", "draft", "skipped", "labeled", "accepted", "accepted with Changes", "to Be Revised"]
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250
+    }
+  },
+  getContentAnchorEl: null,
+  anchorOrigin: {
+    vertical: "bottom",
+    horizontal: "center"
+  },
+  transformOrigin: {
+    vertical: "top",
+    horizontal: "center"
+  },
+  variant: "menu"
+};
+const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+}));
 const AdvancedOperation = (props) => {
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
@@ -35,30 +64,23 @@ const AdvancedOperation = (props) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [newDetails, setNewDetails] = useState();
+    const [taskStatus, setTaskStatus] = useState([]);
     const { id } = useParams();
-
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiMessage = useSelector(state => state.apiStatus.message);
     const apiError = useSelector(state => state.apiStatus.error);
-    console.log(apiMessage, "apiMessage")
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-    console.log(ProjectDetails, "ProjectDetails")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
         dispatch(APITransport(projectObj));
     }
 
 
-
     useEffect(() => {
         getProjectDetails();
     }, []);
-
-
-
-
 
     useEffect(() => {
         setNewDetails({
@@ -228,6 +250,11 @@ const AdvancedOperation = (props) => {
         setOpen(false);
     }
 
+    const handleChange = (event) => {
+        const value = event.target.value;
+        setTaskStatus(value);
+      };
+
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
@@ -254,187 +281,223 @@ const AdvancedOperation = (props) => {
 
             </Grid>
 
-       <div className={classes.rootdiv} >
-            <Grid
-                container
-                // direction="row"
-                direction="column"
 
-                xs={4}
-                md={4}
-                lg={4}
-                xl={4}
-                sm={4}
-                spacing={1}
-                rowGap={2}
-                sx={{ float: "left" }}
-                columnSpacing={2}
-
-            >
+            <div className={classes.rootdiv} >
                 <Grid
-                    item
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                >
-                    <CustomButton
-                        sx={{
-                            inlineSize: "max-content",
-                            pl: 2,
-                            borderRadius: 3,
-                            ml: 2,
-                            width: "300px"
-                        }}
-                        onClick={handlePublishProject}
-                        label="Publish Project" />
+                    container
+                    // direction="row"
+                    direction="column"
 
-                </Grid>
-                <Grid
-                    item
                     xs={12}
-                    sm={12}
                     md={12}
-                    lg={12}
-                    xl={12}
+                    lg={4}
+                    xl={4}
+                    sm={12}
+                    spacing={1}
+                    rowGap={2}
+                    sx={{ float: "left" }}
+                    columnSpacing={2}
 
                 >
-                    <CustomButton
-                        sx={{
-                            inlineSize: "max-content",
-                            p: 2,
-                            borderRadius: 3,
-                            ml: 2,
-                            width: "300px"
-                        }}
-                        color="error"
-                        onClick={handleClickOpen}
-                        label={isArchived ? "Archived" : "Archive"} />
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+                    >
+                        <CustomButton
+                            sx={{
+                                inlineSize: "max-content",
+                                pl: 2,
+                                borderRadius: 3,
+                                ml: 2,
+                                width: "300px"
+                            }}
+                            onClick={handlePublishProject}
+                            label="Publish Project" />
+
+                    </Grid>
+                   
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+
+                    >
+                        <CustomButton
+                            sx={{
+                                inlineSize: "max-content",
+                                p: 2,
+                                borderRadius: 3,
+                                ml: 2,
+                                width: "300px"
+                            }}
+                            color="error"
+                            onClick={handleClickOpen}
+                            label={isArchived ? "Archived" : "Archive"} />
+                    </Grid>
+
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+                        sx={{ml:2,height:"20px",mb:2}}
+
+                    >
+                        <FormControl   size="small" className={classes.formControl}>
+                            <InputLabel id="mutiple-select-label" sx={{fontSize:"16px",padding:"3px"}}>Select Task Statuses</InputLabel>
+                            <Select
+                                labelId="mutiple-select-label"
+                                label="Multiple Select"
+                                multiple
+                                value={taskStatus}
+                                onChange={handleChange}
+                                renderValue={(taskStatus) => taskStatus.join(", ")}
+                                MenuProps={MenuProps}
+                            >
+                                {ProgressType.map((option) => (
+                                    <MenuItem  sx={{ textTransform: "capitalize"}} key={option} value={option}>
+                                        <ListItemIcon>
+                                            <Checkbox  checked={taskStatus.indexOf(option) > -1} />
+                                        </ListItemIcon>
+                                        <ListItemText primary={option} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+
+
                 </Grid>
 
-            </Grid>
-
-            <Grid
-                container
-                // direction="row"
-                xs={4}
-                md={4}
-                lg={4}
-                xl={4}
-                sm={4}
-                spacing={1}
-                rowGap={2}
-                sx={{ float: "left" }}
-                columnSpacing={2}
-
-            >
-                <div className={classes.divider} ></div>
                 <Grid
-                    item
+                    container
+                    // direction="row"
                     xs={12}
-                    sm={12}
                     md={12}
-                    lg={12}
-                    xl={12}
+                    lg={4}
+                    xl={4}
+                    sm={12}
+                    spacing={1}
+                    rowGap={2}
+                    sx={{ float: "left" }}
+                    columnSpacing={2}
 
                 >
-                    <CustomButton
-                        sx={{
-                            inlineSize: "max-content",
-                            p: 2,
-                            borderRadius: 3,
-                            ml: 2,
-                            width: "300px",
-                            
-                        }}
-                        onClick={handleExportProject}
-                        label="Export Project into Dataset" />
+                    {/* <div className={classes.divider} ></div> */}
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+
+                    >
+                        <CustomButton
+                            sx={{
+                                inlineSize: "max-content",
+                                p: 2,
+                                borderRadius: 3,
+                                ml: 2,
+                                width: "300px",
+
+                            }}
+                            onClick={handleExportProject}
+                            label="Export Project into Dataset" />
+                    </Grid>
+
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+
+                    >
+                        {ProjectDetails.sampling_mode == "f" ? <CustomButton
+                            sx={{
+                                inlineSize: "max-content",
+                                p: 2,
+                                borderRadius: 3,
+                                ml: 2,
+                                width: "300px"
+                            }}
+                            onClick={handlePullNewData}
+                            label="Pull New Data Items from Source Dataset" /> : " "}
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+
+                    >
+                        <DownloadProjectButton taskStatus={taskStatus}  SetTask={setTaskStatus}  />
+                    </Grid>
                 </Grid>
 
                 <Grid
-                    item
+                    container
+                    // direction="row"
                     xs={12}
-                    sm={12}
                     md={12}
-                    lg={12}
-                    xl={12}
+                    lg={2}
+                    xl={2}
+                    sm={12}
+                    spacing={1}
+                    rowGap={2}
+                    columnSpacing={2}
 
                 >
-                    {ProjectDetails.sampling_mode == "f" ? <CustomButton
-                        sx={{
-                            inlineSize: "max-content",
-                            p: 2,
-                            borderRadius: 3,
-                            ml: 2,
-                            width: "300px"
-                        }}
-                        onClick={handlePullNewData}
-                        label="Pull New Data Items from Source Dataset" /> : " "}
-                </Grid>
-                <Grid
-                    item
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
+                    {/* <div className={classes.divider} ></div> */}
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
 
+                    >
+                        <FormControlLabel
+                            control={<Switch color="primary" />}
+                            label="Task Reviews"
+                            labelPlacement="start"
+                            checked={ProjectDetails.enable_task_reviews}
+                            onChange={handleReviewToggle}
+                        />
+                    </Grid>
+                </Grid>
+
+                <Dialog
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
                 >
-                    <DownloadProjectButton />
-                </Grid>
-            </Grid>
+                    <DialogContent>
 
-            <Grid
-                container
-                // direction="row"
-                xs={2}
-                md={2}
-                lg={2}
-                xl={2}
-                sm={2}
-                spacing={1}
-                rowGap={2}
-                columnSpacing={2}
-
-            >
-                <div className={classes.divider} ></div>
-                <Grid
-                    item
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-
-                >
-                    <FormControlLabel
-                        control={<Switch color="primary" />}
-                        label="Task Reviews"
-                        labelPlacement="start"
-                        checked={ProjectDetails.enable_task_reviews}
-                        onChange={handleReviewToggle}
-                    />
-                </Grid>
-            </Grid>
-
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogContent>
-
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to {!isArchived ? "archive" : "unarchive"} this project?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} label="Cancel" />
-                    <Button onClick={handleok} label="Ok" autoFocus />
-                </DialogActions>
-            </Dialog>
+                        <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to {!isArchived ? "archive" : "unarchive"} this project?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} label="Cancel" />
+                        <Button onClick={handleok} label="Ok" autoFocus />
+                    </DialogActions>
+                </Dialog>
             </div>
         </ThemeProvider>
     )

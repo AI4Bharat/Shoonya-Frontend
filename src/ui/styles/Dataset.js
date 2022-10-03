@@ -172,22 +172,23 @@ const DatasetStyle = makeStyles({
     opacity: 1
   },
   search: {
-   // position: "relative",
+    //position: "relative",
     borderRadius: "24px",
     backgroundColor: "#F3F3F3",
     marginLeft: "0px",
     width: "300px",
-    textAlign: "left",
-   // float: "right",
-   marginBottom:"30px",
-   position: "absolute",
-   right: "200px",
-   top:"105px",
+    //textAlign: "left",
+    //justifyContent:"center"
+   //float: "right",
+    marginBottom:"30px",
+  //   position: "absolute",
+  //  Right: "200px",
+  //  top:"155px",
   
   },
   searchIcon: {
     // padding: theme.spacing(0, 2),
-    height: "100%",
+   // height: "100%",
     position: "absolute",
     pointerEvents: "none",
     display: "flex",
@@ -195,6 +196,7 @@ const DatasetStyle = makeStyles({
     justifyContent: "center",
     color: "#00000029",
     marginLeft: "10px",
+    marginTop:"10px",
   },
   divider: {
     borderLeft: "1px solid #E0E0E0",
@@ -203,7 +205,29 @@ const DatasetStyle = makeStyles({
   },
   rootdiv:{
     marginTop:"25px",
-  }
+  },
+  ToolbarContainer:{
+    position: "absolute",
+      bottom: "14px",
+       right: "45px"
+
+  },
+  TotalSummarydata:{
+    padding:"4px 0px 0px 4px",
+  },
+  projectgrid:{
+    textAlign:"start"
+  },
+  // fixedWidthContainer: {
+	// 	maxWidth: "5%",
+	// },
+  root: {
+		minHeight: 40,
+		alignItems: "center",
+	},
+  formControl: {
+    width: 300
+  },
 })
 
 export default DatasetStyle
