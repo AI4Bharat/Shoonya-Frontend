@@ -4,13 +4,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import FetchUserByIdAPI from '../../../../redux/actions/api/UserManagement/FetchUserById';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Card, CardContent, Chip, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip } from '@mui/material';
 import MyProgress from '../../component/Tabs/MyProgress';
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
+import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
+import CustomizedSnackbars from "../../component/common/Snackbar"
 
 const ProfilePage = () => {
 
@@ -19,9 +21,55 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
 
   const UserDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
+
+  const handleEmailToggle = async () => {
+    setLoading(true);
+    const mailObj = new ToggleMailsAPI(LoggedInUserId, !userDetails.enable_mail);
+    const res = await fetch(mailObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(mailObj.getBody()),
+        headers: mailObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    setLoading(false);
+    if (res.ok) {
+        setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "success",
+        })
+        const userObj = new FetchUserByIdAPI(id);
+        dispatch(APITransport(userObj));
+    } else {
+        setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "error",
+        })
+    }
+  }
+
+  const renderSnackBar = () => {
+    return (
+        <CustomizedSnackbars
+            open={snackbar.open}
+            handleClose={() =>
+                setSnackbarInfo({ open: false, message: "", variant: "" })
+            }
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            variant={snackbar.variant}
+            message={snackbar.message}
+        />
+    );
+  };
   
   useEffect(() => {
     setLoading(true);
@@ -36,10 +84,10 @@ const ProfilePage = () => {
     }
   }, [UserDetails]);
 
-
   return (
       <Grid container spacing={2}>
         {loading && <Spinner />}
+        {renderSnackBar()}
           {userDetails && (
             <><Grid item xs={12} sm={12} md={4} lg={4} xl={4} sx={{ p: 2 }}>
               <Card sx={{ borderRadius: "5px" }}>
@@ -71,10 +119,25 @@ const ProfilePage = () => {
                       </Typography>
                     )}
                     {LoggedInUserId === userDetails.id &&
-                      <CustomButton
-                        label="Edit Profile"
-                        sx={{ mt: 2 }}
-                        onClick={() => navigate("/edit-profile")}/>}
+                      <Grid container spacing={2} sx={{mt: 1, alignItems: "center"}}>
+                        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                          <Tooltip title={(userDetails.enable_mail ? "Disable" : "Enable") + " daily mails"}>
+                            <FormControlLabel
+                              control={<Switch color="primary" />}
+                              label="Daily Mails"
+                              labelPlacement="start"
+                              checked={userDetails.enable_mail}
+                              onChange={handleEmailToggle}
+                            />
+                          </Tooltip>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                          <CustomButton
+                            label="Edit Profile"
+                            onClick={() => navigate("/edit-profile")}
+                          />
+                        </Grid>
+                      </Grid>}
                   </CardContent>
                 </Card>
             </Grid>
