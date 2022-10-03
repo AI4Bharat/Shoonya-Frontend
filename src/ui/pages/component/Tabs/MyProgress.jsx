@@ -398,7 +398,7 @@ const MyProgress = () => {
 
           >
             <Typography variant="subtitle1">Annotated Tasks : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary[0]?.["Annotated Tasks"]}</Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.["Annotated Tasks"]}</Typography>
           </Grid>
           <Grid
             container
@@ -408,7 +408,7 @@ const MyProgress = () => {
 
           >
             <Typography variant="subtitle1">Average Annotation Time (In Seconds) : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary[0]?.["Average Annotation Time (In Seconds)"]}</Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.["Average Annotation Time (In Seconds)"]}</Typography>
           </Grid>
           <Grid
             container
@@ -418,7 +418,7 @@ const MyProgress = () => {
 
           >
             <Typography variant="subtitle1">Word Count : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary[0]?.["Word Count"]}</Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.["Word Count"]}</Typography>
           </Grid>
         </Grid>
         }
