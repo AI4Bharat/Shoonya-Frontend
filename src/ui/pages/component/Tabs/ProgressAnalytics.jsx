@@ -129,25 +129,25 @@ function ProgressList() {
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [chartTypes, setChartTypes] = useState("Individual")
-  const [progressTypes, setProgressTypes] = useState("Cumulative")
+  const [baseperiod, setBaseperiod] = useState("Cumulative")
   const [showBarChar, setShowBarChar] = useState(false)
   const [showPicker, setShowPicker] = useState(false);
   const [showPickers, setShowPickers] = useState(false);
-  const [comparisonProgressTypes, setComparisonProgressTypes] = useState("");
+  const [comparisonperiod, setComparisonperiod] = useState("");
   const [monthvalue, setmonthvalue] = useState([])
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
   const [yearvalue, setyearvalue] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [SVGChartData, setSVGChartData] = useState([]);
-  const [state, setState] = useState([
+  const [baseperiodDatepicker, setBaseperiodDatepicker] = useState([
     {
       startDate: new Date(),
       endDate: addDays(new Date(), 1),
       key: 'selection'
     }
   ]);
-  const [states, setStates] = useState([
+  const [comparisonperiodDatepicker, setComparisonperiodDatepicker] = useState([
     {
       startDate: new Date(),
       endDate: addDays(new Date(), 1),
@@ -277,14 +277,14 @@ function ProgressList() {
     };
     const individualPeriodicaldata = {
       project_type: selectedType,
-      periodical_type: progressTypes,
-      start_date: format(state[0].startDate, 'yyyy-MM-dd'),
-      end_date: format(state[0].endDate, 'yyyy-MM-dd'),
+      periodical_type: baseperiod,
+      start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
+      end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
     };
 
     if (chartTypes === avilableChartType.Individual) {
 
-      if (progressTypes === "Cumulative") {
+      if (baseperiod === "Cumulative") {
         await getCumulativeTasksData(Cumulativedata, OrgId);
         // const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
         // dispatch(APITransport(progressObj))
@@ -299,42 +299,42 @@ function ProgressList() {
     }
     else {
 
-      if (comparisonProgressTypes === "Cumulative" && progressTypes === "Cumulative") {
+      if (comparisonperiod === "Cumulative" && baseperiod === "Cumulative") {
 
         await getCumulativeTasksData(Cumulativedata, OrgId);
 
-      } else if (comparisonProgressTypes !== "Cumulative" && progressTypes === "Cumulative") {
+      } else if (comparisonperiod !== "Cumulative" && baseperiod === "Cumulative") {
 
         const Periodicaldata = {
           project_type: selectedType,
-          periodical_type: comparisonProgressTypes,
-          start_date: format(states[0].startDate, 'yyyy-MM-dd'),
-          end_date: format(states[0].endDate, 'yyyy-MM-dd'),
+          periodical_type: comparisonperiod,
+          start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
         };
         await getPeriodicalTasksData(Periodicaldata, OrgId);
         await getCumulativeTasksData(Cumulativedata, OrgId);
 
-      } else if (comparisonProgressTypes === "Cumulative" && progressTypes !== "Cumulative") {
+      } else if (comparisonperiod === "Cumulative" && baseperiod !== "Cumulative") {
         const individualPeriodicaldata = {
           project_type: selectedType,
-          periodical_type: progressTypes,
-          start_date: format(state[0].startDate, 'yyyy-MM-dd'),
-          end_date: format(state[0].endDate, 'yyyy-MM-dd'),
+          periodical_type: baseperiod,
+          start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
         };
         await getPeriodicalTasksData(individualPeriodicaldata, OrgId);
         await getCumulativeTasksData(Cumulativedata, OrgId);
       } else {
         const basePeriodicalPayload = {
           project_type: selectedType,
-          periodical_type: comparisonProgressTypes,
-          start_date: format(states[0].startDate, 'yyyy-MM-dd'),
-          end_date: format(states[0].endDate, 'yyyy-MM-dd'),
+          periodical_type: comparisonperiod,
+          start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
         };
         const comparisonPeriodicalPayload = {
           project_type: selectedType,
-          periodical_type: progressTypes,
-          start_date: format(state[0].startDate, 'yyyy-MM-dd'),
-          end_date: format(state[0].endDate, 'yyyy-MM-dd'),
+          periodical_type: baseperiod,
+          start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
         };
 
         await getPeriodicalTasksData(basePeriodicalPayload, OrgId);
@@ -354,7 +354,7 @@ function ProgressList() {
   }
 
   const handleProgressType = (e) => {
-    setProgressTypes(e.target.value)
+    setBaseperiod(e.target.value)
 
   }
   const handledatecomparisionprogress = () => {
@@ -365,13 +365,13 @@ function ProgressList() {
 
   }
   const handleDateRangePicker = (item) => {
-    setStates([item.selection])
+    setComparisonperiodDatepicker([item.selection])
 
 
 
   }
   const handleComparisonProgressType = (e) => {
-    setComparisonProgressTypes(e.target.value)
+    setComparisonperiod(e.target.value)
 
   }
 
@@ -419,7 +419,7 @@ function ProgressList() {
     let chData;
     let svgChData;
     if (chartTypes === avilableChartType.Individual) {
-      if (progressTypes === "Cumulative") {
+      if (baseperiod === "Cumulative") {
         // console.log("CumulativeTasksData - ", CumulativeTasksData);
         // debugger
         svgChData = CumulativeTasksData.map((el, i) => {
@@ -434,7 +434,7 @@ function ProgressList() {
           labels,
           datasets: [
             {
-              label: progressTypes,
+              label: baseperiod,
               data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
               stack: "stack 0",
               backgroundColor: colorsData.orange[0].color,
@@ -458,7 +458,7 @@ function ProgressList() {
           datasets:
             PeriodicalTaskssData?.map((el, i) => {
               return {
-                label: `${progressTypes} (${el.date_range})`,
+                label: `${baseperiod} (${el.date_range})`,
                 data: el.data?.map((e) => (e.annotations_completed)),
                 stack: "stack 0",
                 backgroundColor: colorsData.green[i].color,
@@ -471,11 +471,11 @@ function ProgressList() {
       }
 
     } else {
-      if (progressTypes !== "Cumulative" && progressTypes === comparisonProgressTypes) {
+      if (baseperiod !== "Cumulative" && baseperiod === comparisonperiod) {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${progressTypes} (${el.date_range})`,
+            label: `${baseperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
             backgroundColor: colorsData.green[i].color,
@@ -485,7 +485,7 @@ function ProgressList() {
 
         const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${comparisonProgressTypes} (${el.date_range})`,
+            label: `${comparisonperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
             backgroundColor: colorsData.orange[i].color,
@@ -496,11 +496,11 @@ function ProgressList() {
           labels,
           datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
         };
-      } else if (progressTypes !== "Cumulative" && progressTypes != comparisonProgressTypes) {
+      } else if (baseperiod !== "Cumulative" && baseperiod != comparisonperiod) {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${progressTypes} (${el.date_range})`,
+            label: `${baseperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
             backgroundColor: colorsData.green[i].color,
@@ -510,7 +510,7 @@ function ProgressList() {
 
         const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${comparisonProgressTypes} (${el.date_range})`,
+            label: `${comparisonperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
             backgroundColor: colorsData.orange[i].color,
@@ -523,7 +523,7 @@ function ProgressList() {
         };
       } else {
 
-        const labels = progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.language)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.language) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.language) : yearvalue?.data?.map((e) => e.language)
+        const labels = baseperiod === "Cumulative" ? CumulativeTasksData.map((e) => (e.language)) : baseperiod === "weekly" ? weekvalue?.data?.map((e) => e.language) : baseperiod === "monthly" ? monthvalue?.data?.map((e) => e.language) : yearvalue?.data?.map((e) => e.language)
 
         chData = {
           labels,
@@ -531,17 +531,17 @@ function ProgressList() {
 
             {
 
-              label: progressTypes,
-              data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
-              //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
+              label: baseperiod,
+              data: baseperiod === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : baseperiod === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : baseperiod === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+              //data :baseperiod === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
               stack: "stack 0",
               backgroundColor: "rgba(243, 156, 18 )",
               barThickness: 20,
             },
             {
-              label: comparisonProgressTypes,
-              data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
-              //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
+              label: comparisonperiod,
+              data: comparisonperiod === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonperiod === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonperiod === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+              //data :comparisonperiod === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
               stack: "stack 0",
               backgroundColor: 'rgba(35, 155, 86 )',
               barThickness: 20,
@@ -708,7 +708,7 @@ function ProgressList() {
                     labelId="project-type-label"
                     id="project-type-select"
                     label="Base period"
-                    value={progressTypes}
+                    value={baseperiod}
                     onChange={handleProgressType}
                   >
 
@@ -722,7 +722,7 @@ function ProgressList() {
                   </Select>
                 </FormControl>
               </Grid>}
-              {!(progressTypes === "Cumulative" || chartTypes === "") && <Grid item xs={2} sm={2} md={2} lg={2} xl={2}  >
+              {!(baseperiod === "Cumulative" || chartTypes === "") && <Grid item xs={2} sm={2} md={2} lg={2} xl={2}  >
 
 
 
@@ -769,7 +769,7 @@ function ProgressList() {
                   </Select>
                 </FormControl>
               </Grid>}
-              {!(comparisonProgressTypes === "Cumulative" || chartTypes === "" || chartTypes === avilableChartType.Individual) && <Grid item xs={2} sm={2} md={2} lg={2} xl={2} >
+              {!(comparisonperiod === "Cumulative" || chartTypes === "" || chartTypes === avilableChartType.Individual) && <Grid item xs={2} sm={2} md={2} lg={2} xl={2} >
                 <Button
                   endIcon={showPickers ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
@@ -782,14 +782,14 @@ function ProgressList() {
               </Grid>}
               <Grid container sx={{marginLeft:"17px"}}>
             <CustomButton label="Submit" sx={{ width: "100%", mt: 3 }} onClick={handleSubmit}
-              disabled={(progressTypes || comparisonProgressTypes) ? false : true} />
+              disabled={(baseperiod || comparisonperiod) ? false : true} />
          
         </Grid>
 
               {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
-                    onChange={item => setState([item.selection])}
+                    onChange={item => setBaseperiodDatepicker([item.selection])}
                     staticRanges={[
                       ...defaultStaticRanges,
                       {
@@ -825,7 +825,7 @@ function ProgressList() {
                     moveRangeOnFirstSelection={false}
                     showMonthAndYearPickers={true}
                     months={2}
-                    ranges={state}
+                    ranges={baseperiodDatepicker}
                     direction="horizontal"
                     preventSnapRefocus={true}
                     // calendarFocus="backwards"
@@ -874,7 +874,7 @@ function ProgressList() {
                     moveRangeOnFirstSelection={false}
                     showMonthAndYearPickers={true}
                     months={2}
-                    ranges={states}
+                    ranges={comparisonperiodDatepicker}
                     direction="horizontal"
                     preventSnapRefocus={true}
                     // calendarFocus="backwards"
@@ -888,7 +888,7 @@ function ProgressList() {
           </Grid>
           {showBarChar &&
             <>
-              <Grid container justifyContent="end">
+              <Grid container justifyContent="end" sx={{mt:2}}>
                 <Button onClick={() => downloadReportClick("pdf")}>
                   Download Report As PDF
                 </Button>
