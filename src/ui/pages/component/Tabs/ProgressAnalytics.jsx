@@ -22,6 +22,10 @@ import { useTheme } from "@material-ui/core/styles";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { addDays } from 'date-fns';
+import colorsData from '../../../../utils/Colors_JSON/Colors_JSON';
+import axios from "axios";
+import html2canvas from 'html2canvas';
+import { jsPDF } from "jspdf";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -33,7 +37,16 @@ ChartJS.register(
 ChartJS.register(CategoryScale);
 
 
-export const options = {
+const footer = (tooltipItems) => {
+  let sum = 0;
+
+  tooltipItems.forEach(function (tooltipItem) {
+    sum += tooltipItem.parsed.y;
+  });
+  return 'Sum: ' + sum;
+};
+
+const options = {
   responsive: true,
   scales: {
     x: {
@@ -58,6 +71,7 @@ export const options = {
       title: {
         display: true,
         text: '# Annotations Completed ',
+        // text:'Count',
         color: '#black',
         font: {
           family: 'Roboto',
@@ -71,14 +85,35 @@ export const options = {
       }
     }
   },
+  interaction: {
+    intersect: false,
+    mode: 'index',
+  },
   plugins: {
     legend: {
-      position: 'top',
+      position: 'bottom',
     },
     title: {
       display: true,
       // text: 'Chart.js Bar Chart',
     },
+    tooltip: {
+      callbacks: {
+        footer: footer,
+        label: function(context) {
+          let label = context.dataset.label || '';
+          let dataVal = context.parsed.y;
+
+          if(dataVal && dataVal !== 0 && dataVal !== null){
+            label += " : " + new Intl.NumberFormat('en-US').format(dataVal);
+          } else {
+             label = ""
+          }
+          return label;
+      }
+      },
+
+    }
   },
 };
 const TooltipData = [{ name: "Progress chart based on one data selection" }, { name: "Compares progress of two different data selections" }]
@@ -102,7 +137,9 @@ function ProgressList() {
   const [monthvalue, setmonthvalue] = useState([])
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
-  const [yearvalue, setyearvalue] = useState([])
+  const [yearvalue, setyearvalue] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [SVGChartData, setSVGChartData] = useState([]);
   const [state, setState] = useState([
     {
       startDate: new Date(),
@@ -119,8 +156,13 @@ function ProgressList() {
   ]);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-  const CumulativeTasksData = useSelector((state) => state?.getCumulativeTasks?.data)
-  const PeriodicalTaskssData = useSelector((state) => state?.getPeriodicalTasks?.data)
+  
+  const [CumulativeTasksData, setCumulativeTasksData] = useState([]);
+  const [PeriodicalTaskssData, setPeriodicalTaskssData] = useState([]);
+  const [SecondaryPeriodicalTaskssData, setSecondaryPeriodicalTaskssData] = useState([]);
+
+  // const CumulativeTasksData = useSelector((state) => state?.getCumulativeTasks?.data)
+  // const PeriodicalTaskssData = useSelector((state) => state?.getPeriodicalTasks?.data)
   const apiLoading = useSelector(state => state.apiStatus.loading);
 
   useEffect(() => {
@@ -161,15 +203,74 @@ function ProgressList() {
   // }, [apiLoading])
 
 
+  const getCumulativeTasksData = async (payload, OrgId) => {
+    setLoading(true);
+    console.log("payload, OrgId", payload, OrgId);
+    const cumulativeTasksAPIObj = new CumulativeTasksAPI(payload, OrgId);
+    await axios.post(cumulativeTasksAPIObj.apiEndPoint(), cumulativeTasksAPIObj.getBody(), cumulativeTasksAPIObj.getHeaders())
+      .then(response => {
+        if (response.statusText === "OK") {
+          setCumulativeTasksData(response.data);
+          setLoading(false);
+          console.log("CumulativeTasksData -----", response);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log("err - ", err);
+      })
+  }
+
+  const getPeriodicalTasksData = async (payload, OrgId) => {
+    setLoading(true);
+    console.log("payload, OrgId", payload, OrgId);
+    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId);
+    await axios.post(periodicalTasksAPIObj.apiEndPoint(), periodicalTasksAPIObj.getBody(), periodicalTasksAPIObj.getHeaders())
+      .then(response => {
+        if (response.statusText === "OK") {
+          setPeriodicalTaskssData(response.data);
+          setLoading(false);
+          console.log("PeriodicalTaskssData -----", response);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log("err - ", err);
+      })
+  }
+
+  const getSecondaryPeriodicalTasksData = async (payload, OrgId) => {
+    setLoading(true);
+    console.log("payload, OrgId", payload, OrgId);
+    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId);
+    await axios.post(periodicalTasksAPIObj.apiEndPoint(), periodicalTasksAPIObj.getBody(), periodicalTasksAPIObj.getHeaders())
+      .then(response => {
+        if (response.statusText === "OK") {
+          setSecondaryPeriodicalTaskssData(response.data);
+          setLoading(false);
+          console.log("PeriodicalTaskssData -----", response);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log("err - ", err);
+      })
+  }
+
   const handleChartType = (e) => {
     setChartTypes(e.target.value)
   }
-  const handleSubmit = () => {
-    const loadingTimeout = (progressTypes == "yearly" || comparisonProgressTypes == "yearly") ? 20000 : 2000;
+  const handleSubmit = async () => {
     const OrgId = userDetails.organization.id
     setShowPicker(false);
     setShowPickers(false);
-    setLoading(true);
+    // setLoading(true);
 
     const Cumulativedata = {
       project_type: selectedType,
@@ -184,58 +285,72 @@ function ProgressList() {
     if (chartTypes === avilableChartType.Individual) {
 
       if (progressTypes === "Cumulative") {
-        const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
-        dispatch(APITransport(progressObj))
+        await getCumulativeTasksData(Cumulativedata, OrgId);
+        // const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
+        // dispatch(APITransport(progressObj))
       }
       else {
-        const progressObj = new PeriodicalTasks(individualPeriodicaldata, OrgId);
-        dispatch(APITransport(progressObj));
+        await getPeriodicalTasksData(individualPeriodicaldata, OrgId)
+        // const progressObj = new PeriodicalTasks(individualPeriodicaldata, OrgId);
+        // dispatch(APITransport(progressObj));
       }
 
 
     }
     else {
 
+      if (comparisonProgressTypes === "Cumulative" && progressTypes === "Cumulative") {
 
-      if (comparisonProgressTypes === "Cumulative") {
-        const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
-        dispatch(APITransport(progressObj))
+        await getCumulativeTasksData(Cumulativedata, OrgId);
 
+      } else if (comparisonProgressTypes !== "Cumulative" && progressTypes === "Cumulative") {
 
-      } else {
         const Periodicaldata = {
           project_type: selectedType,
           periodical_type: comparisonProgressTypes,
           start_date: format(states[0].startDate, 'yyyy-MM-dd'),
           end_date: format(states[0].endDate, 'yyyy-MM-dd'),
         };
-        const progressObj = new PeriodicalTasks(Periodicaldata, OrgId);
-        dispatch(APITransport(progressObj));
-      }
-      if (progressTypes === "Cumulative") {
+        await getPeriodicalTasksData(Periodicaldata, OrgId);
+        await getCumulativeTasksData(Cumulativedata, OrgId);
 
-        const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
-        dispatch(APITransport(progressObj))
-      }
-      else {
+      } else if (comparisonProgressTypes === "Cumulative" && progressTypes !== "Cumulative") {
         const individualPeriodicaldata = {
           project_type: selectedType,
           periodical_type: progressTypes,
           start_date: format(state[0].startDate, 'yyyy-MM-dd'),
           end_date: format(state[0].endDate, 'yyyy-MM-dd'),
         };
+        await getPeriodicalTasksData(individualPeriodicaldata, OrgId);
+        await getCumulativeTasksData(Cumulativedata, OrgId);
+      } else {
+        const basePeriodicalPayload = {
+          project_type: selectedType,
+          periodical_type: comparisonProgressTypes,
+          start_date: format(states[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(states[0].endDate, 'yyyy-MM-dd'),
+        };
+        const comparisonPeriodicalPayload = {
+          project_type: selectedType,
+          periodical_type: progressTypes,
+          start_date: format(state[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(state[0].endDate, 'yyyy-MM-dd'),
+        };
 
-        const progressObj = new PeriodicalTasks(individualPeriodicaldata, OrgId);
-        dispatch(APITransport(progressObj));
+        await getPeriodicalTasksData(basePeriodicalPayload, OrgId);
+        await getSecondaryPeriodicalTasksData(comparisonPeriodicalPayload, OrgId);
+
       }
     }
 
-    setShowBarChar(true)
-    setTimeout(() => {
-      setLoading(false);
-    }, loadingTimeout);
+    await handleSwitchBarChartShow();
 
+    // setLoading(false);
 
+  }
+
+  const handleSwitchBarChartShow = async () => {
+    setShowBarChar(true);
   }
 
   const handleProgressType = (e) => {
@@ -300,71 +415,153 @@ function ProgressList() {
   }, [showPicker, showPickers])
 
 
-  let data;
+  useEffect(() => {
+    let chData;
+    let svgChData;
+    if (chartTypes === avilableChartType.Individual) {
+      if (progressTypes === "Cumulative") {
+        // console.log("CumulativeTasksData - ", CumulativeTasksData);
+        // debugger
+        svgChData = CumulativeTasksData.map((el, i) => {
+          return {
+            name: el.language,
+            value: el.cumulative_tasks_count,
+            // stack: el.language
+          }
+        })
+        const labels = CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
+        chData = {
+          labels,
+          datasets: [
+            {
+              label: progressTypes,
+              data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+              stack: "stack 0",
+              backgroundColor: colorsData.orange[0].color,
+              barThickness: 25,
+            },
+          ],
 
+        };
+      } else {
+        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        svgChData = PeriodicalTaskssData.map((el, i) => {
+          return {
+            name: el.date_range,
+            value: el.data,
+          }
+        })
+        console.log("PeriodicalTaskssData - ", PeriodicalTaskssData);
+        // debugger
+        chData = {
+          labels,
+          datasets:
+            PeriodicalTaskssData?.map((el, i) => {
+              return {
+                label: `${progressTypes} (${el.date_range})`,
+                data: el.data?.map((e) => (e.annotations_completed)),
+                stack: "stack 0",
+                backgroundColor: colorsData.green[i].color,
+                barThickness: 20,
+              }
+            }),
 
-  if (chartTypes === avilableChartType.Individual) {
-    if (progressTypes === "Cumulative") {
-      const labels = CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
-      data = {
-        labels,
-        datasets: [
-          {
-            label: progressTypes,
-            data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
-            backgroundColor: "rgba(243, 156, 18 )",
-            barThickness: 25,
-          },
-        ],
+        };
+        // console.log("data data - ", data);
+      }
 
-      };
     } else {
-      const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language)
-      data = {
-        labels,
-        datasets: [
-          {
-            label: progressTypes,
-            data: PeriodicalTaskssData[0]?.data.map((e) => (e.annotations_completed)),
-            backgroundColor: "rgba(243, 156, 18 )",
+      if (progressTypes !== "Cumulative" && progressTypes === comparisonProgressTypes) {
+        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
+          return {
+            label: `${progressTypes} (${el.date_range})`,
+            data: el.data?.map((e) => (e.annotations_completed)),
+            stack: "stack 0",
+            backgroundColor: colorsData.green[i].color,
             barThickness: 20,
-          },
-        ],
+          }
+        });
 
-      };
+        const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
+          return {
+            label: `${comparisonProgressTypes} (${el.date_range})`,
+            data: el.data?.map((e) => (e.annotations_completed)),
+            stack: "stack 1",
+            backgroundColor: colorsData.orange[i].color,
+            barThickness: 20,
+          }
+        });
+        chData = {
+          labels,
+          datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
+        };
+      } else if (progressTypes !== "Cumulative" && progressTypes != comparisonProgressTypes) {
+        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
+          return {
+            label: `${progressTypes} (${el.date_range})`,
+            data: el.data?.map((e) => (e.annotations_completed)),
+            stack: "stack 0",
+            backgroundColor: colorsData.green[i].color,
+            barThickness: 20,
+          }
+        });
+
+        const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
+          return {
+            label: `${comparisonProgressTypes} (${el.date_range})`,
+            data: el.data?.map((e) => (e.annotations_completed)),
+            stack: "stack 1",
+            backgroundColor: colorsData.orange[i].color,
+            barThickness: 20,
+          }
+        });
+        chData = {
+          labels,
+          datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
+        };
+      } else {
+
+        const labels = progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.language)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.language) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.language) : yearvalue?.data?.map((e) => e.language)
+
+        chData = {
+          labels,
+          datasets: [
+
+            {
+
+              label: progressTypes,
+              data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+              //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
+              stack: "stack 0",
+              backgroundColor: "rgba(243, 156, 18 )",
+              barThickness: 20,
+            },
+            {
+              label: comparisonProgressTypes,
+              data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+              //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
+              stack: "stack 0",
+              backgroundColor: 'rgba(35, 155, 86 )',
+              barThickness: 20,
+            },
+
+          ],
+
+        };
+
+      }
+
+      // console.log(data, "vvvv",)
+
+
 
     }
+    setChartData(chData);
+    setSVGChartData(svgChData);
+  }, [PeriodicalTaskssData, SecondaryPeriodicalTaskssData, CumulativeTasksData])
 
-  } else {
-
-    const labels = progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.language)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.language) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.language) : yearvalue?.data?.map((e) => e.language)
-
-    data = {
-      labels,
-      datasets: [
-
-        {
-
-          label: progressTypes,
-          data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
-          //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
-          backgroundColor: "rgba(243, 156, 18 )",
-          barThickness: 20,
-        },
-        {
-          label: comparisonProgressTypes,
-          data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
-          //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
-          backgroundColor: 'rgba(35, 155, 86 )',
-          barThickness: 20,
-        },
-
-      ],
-
-    };
-    console.log(data, "vvvv",)
-
-  }
 
   var now = new Date()
   var currentYear = now.getFullYear()
@@ -373,6 +570,25 @@ function ProgressList() {
 
   const ToolTipdata1 = TooltipData.map((el, i) => el.name);
   console.log(ToolTipdata1, "ToolTipdata1")
+
+  const downloadReportClick = (type) => {
+    const srcElement = document.getElementById('chart-container');
+    html2canvas(srcElement)
+      .then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        if (type === "img") {
+          let anchorEle = document.createElement("a");
+          anchorEle.href = imgData;
+          anchorEle.download = "Image.png";
+          anchorEle.click();
+        } else if (type === "pdf") {
+          const pdf = new jsPDF();
+          pdf.addImage(imgData, 'JPEG', 10, 10, 180, 150);
+          // pdf.output('dataurlnewwindow');
+          pdf.save("download.pdf");
+        }
+      })
+  }
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -670,7 +886,21 @@ function ProgressList() {
             </Grid>
            
           </Grid>
-          {showBarChar && <Bar options={options} data={data} />}
+          {showBarChar &&
+            <>
+              <Grid container justifyContent="end">
+                <Button onClick={() => downloadReportClick("pdf")}>
+                  Download Report As PDF
+                </Button>
+                <Button onClick={() => downloadReportClick("img")}>
+                  Download Report As Image
+                </Button>
+              </Grid>
+              <div id="chart-container">
+                <Bar options={options} data={chartData} />
+              </div>
+            </>
+          }
 
         </Box>
       </Card>
