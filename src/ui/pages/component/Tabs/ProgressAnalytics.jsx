@@ -461,7 +461,7 @@ function ProgressList() {
                 label: `${progressTypes} (${el.date_range})`,
                 data: el.data?.map((e) => (e.annotations_completed)),
                 stack: "stack 0",
-                backgroundColor: colorsData.green[i].color,
+                backgroundColor: colorsData.orange[i].color,
                 barThickness: 20,
               }
             }),
@@ -471,7 +471,7 @@ function ProgressList() {
       }
 
     } else {
-      if (progressTypes !== "Cumulative" && progressTypes === comparisonProgressTypes) {
+      if (progressTypes !== "Cumulative" && comparisonProgressTypes !== "Cumulative" && progressTypes === comparisonProgressTypes) {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
@@ -489,6 +489,31 @@ function ProgressList() {
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
             backgroundColor: colorsData.orange[i].color,
+            barThickness: 20,
+          }
+        });
+        chData = {
+          labels,
+          datasets: SecondaryPeriodicalTaskssDataset.concat(PeriodicalTaskssDataset),
+        };
+      } else if (progressTypes !== "Cumulative" && comparisonProgressTypes !== "Cumulative" && progressTypes != comparisonProgressTypes) {
+        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
+          return {
+            label: `${progressTypes} (${el.date_range})`,
+            data: el.data?.map((e) => (e.annotations_completed)),
+            stack: "stack 0",
+            backgroundColor: colorsData.orange[i].color,
+            barThickness: 20,
+          }
+        });
+
+        const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
+          return {
+            label: `${comparisonProgressTypes} (${el.date_range})`,
+            data: el.data?.map((e) => (e.annotations_completed)),
+            stack: "stack 1",
+            backgroundColor: colorsData.green[i].color,
             barThickness: 20,
           }
         });
@@ -496,34 +521,59 @@ function ProgressList() {
           labels,
           datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
         };
-      } else if (progressTypes !== "Cumulative" && progressTypes != comparisonProgressTypes) {
+      } else if(progressTypes !== "Cumulative" && comparisonProgressTypes === "Cumulative"){
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
             label: `${progressTypes} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
-            backgroundColor: colorsData.green[i].color,
+            backgroundColor: colorsData.orange[i].color,
             barThickness: 20,
           }
         });
 
-        const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
+        const cumulativeTasksDataset = {
+          label: `${comparisonProgressTypes}`,
+          data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+          stack: "stack 1",
+          backgroundColor: colorsData.green[0].color,
+          barThickness: 20,
+        }
+        // CumulativeTasksData.map((e) => (e.cumulative_tasks_count));
+
+        chData = {
+          labels,
+          datasets: PeriodicalTaskssDataset.concat(cumulativeTasksDataset),
+        };
+
+      } else if(progressTypes === "Cumulative" && comparisonProgressTypes !== "Cumulative"){
+        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        
+        const cumulativeTasksDataset = [{
+          label: `${progressTypes}`,
+          data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+          stack: "stack 0",
+          backgroundColor: colorsData.orange[0].color,
+          barThickness: 20,
+        }]
+
+        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
             label: `${comparisonProgressTypes} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
-            backgroundColor: colorsData.orange[i].color,
+            backgroundColor: colorsData.green[i].color,
             barThickness: 20,
           }
         });
         chData = {
           labels,
-          datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
+          datasets: cumulativeTasksDataset.concat(PeriodicalTaskssDataset),
         };
       } else {
-
-        const labels = progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.language)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.language) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.language) : yearvalue?.data?.map((e) => e.language)
+        const labels = CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
+        // const labels = progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.language)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.language) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.language) : yearvalue?.data?.map((e) => e.language)
 
         chData = {
           labels,
@@ -532,18 +582,18 @@ function ProgressList() {
             {
 
               label: progressTypes,
-              data: progressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : progressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+              data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
               //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
               stack: "stack 0",
-              backgroundColor: "rgba(243, 156, 18 )",
+              backgroundColor: colorsData.orange[0].color,
               barThickness: 20,
             },
             {
               label: comparisonProgressTypes,
-              data: comparisonProgressTypes === "Cumulative" ? CumulativeTasksData.map((e) => (e.cumulative_tasks_count)) : comparisonProgressTypes === "weekly" ? weekvalue?.data?.map((e) => e.annotations_completed) : comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed) : yearvalue?.data?.map((e) => e.annotations_completed),
+              data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
               //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
-              stack: "stack 0",
-              backgroundColor: 'rgba(35, 155, 86 )',
+              stack: "stack 1",
+              backgroundColor: colorsData.green[0].color,
               barThickness: 20,
             },
 
