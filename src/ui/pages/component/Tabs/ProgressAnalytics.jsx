@@ -1,37 +1,23 @@
 import { Button, Grid, ThemeProvider, Select, Box, MenuItem, InputLabel, FormControl, Card, Typography } from "@mui/material";
-//import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import CustomButton from "../../component/common/Button";
 import { useSelector, useDispatch } from "react-redux";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
 import PeriodicalTasks from "../../../../redux/actions/api/Progress/PeriodicalTasks";
 import CumulativeTasksAPI from "../../../../redux/actions/api/Progress/CumulativeTasks";
-import LightTooltip from '../../component/common/Tooltip'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-
-} from 'chart.js';
-import { styled } from '@mui/material/styles';
+import LightTooltip from '../../component/common/Tooltip';
+import { translate } from "../../../../config/localisation";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, } from 'chart.js';
+import InfoIcon from '@mui/icons-material/Info';
 import { Bar } from 'react-chartjs-2';
-import faker from 'faker';
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-// import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { isSameDay, format } from 'date-fns/esm';
-import {
-  DateRangePicker,
-  defaultStaticRanges,
-  createStaticRanges
-} from "react-date-range";
+import { DateRangePicker, defaultStaticRanges, } from "react-date-range";
 import { useTheme } from "@material-ui/core/styles";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -43,21 +29,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-
 );
-
 ChartJS.register(CategoryScale);
-
-// const LightTooltip = styled(({ className, ...props }) => (
-//   <Tooltip {...props} classes={{ popper: className }} />
-// ))(({ theme }) => ({
-//   [`& .${tooltipClasses.tooltip}`]: {
-//     backgroundColor: theme.palette.common.white,
-//     color: 'rgba(0, 0, 0, 0.87)',
-//     boxShadow: theme.shadows[1],
-//     fontSize: 11,
-//   },
-// }));
 
 
 export const options = {
@@ -85,7 +58,6 @@ export const options = {
       title: {
         display: true,
         text: '# Annotations Completed ',
-        // text:'Count',
         color: '#black',
         font: {
           family: 'Roboto',
@@ -93,7 +65,7 @@ export const options = {
           style: 'normal',
           weight: 'bold',
           lineHeight: 1.2,
-          paddingBottom:"100px",
+          paddingBottom: "100px",
         },
         padding: { top: 30, left: 0, right: 0, bottom: 20 }
       }
@@ -110,16 +82,15 @@ export const options = {
   },
 };
 const TooltipData = [{ name: "Progress chart based on one data selection" }, { name: "Compares progress of two different data selections" }]
-const ProgressTypedata = [{ title: "Complete progress for annotations done till date" }, { title: "Monthly stacked progress in selected span of months" }, { title: "Weekly stacked progress in selected span of weeks" }]
+const ProgressTypedata = [{ title: "Complete progress for annotations done till date" }, { title: "Yearly stacked progress in selected span of years" }, { title: "Monthly stacked progress in selected span of months" }, { title: "Weekly stacked progress in selected span of weeks" }]
 const ChartType = [{ chartTypename: "Individual" }, { chartTypename: "Comparison" }]
-const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
-const avilableChartType = {
-  Individual: "Individual",
-  Comparison: "Comparison"
-}
-function ProgressAnalytics() {
+const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "yearly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
+const avilableChartType = { Individual: "Individual", Comparison: "Comparison" }
+
+function ProgressList() {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
+  const ref = useRef()
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [chartTypes, setChartTypes] = useState("Individual")
@@ -132,7 +103,6 @@ function ProgressAnalytics() {
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
   const [yearvalue, setyearvalue] = useState([])
-  const theme = useTheme();
   const [state, setState] = useState([
     {
       startDate: new Date(),
@@ -186,15 +156,16 @@ function ProgressAnalytics() {
   }, []);
 
 
-  useEffect(() => {
-    setLoading(false);
-  }, [yearvalue, PeriodicalTaskssData, CumulativeTasksData])
+  // useEffect(() => {
+  //   setLoading(apiLoading);
+  // }, [apiLoading])
 
 
   const handleChartType = (e) => {
     setChartTypes(e.target.value)
   }
   const handleSubmit = () => {
+    const loadingTimeout = (progressTypes == "yearly" || comparisonProgressTypes == "yearly") ? 20000 : 2000;
     const OrgId = userDetails.organization.id
     setShowPicker(false);
     setShowPickers(false);
@@ -260,7 +231,10 @@ function ProgressAnalytics() {
     }
 
     setShowBarChar(true)
-    //setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
+    }, loadingTimeout);
+
 
   }
 
@@ -270,6 +244,7 @@ function ProgressAnalytics() {
   }
   const handledatecomparisionprogress = () => {
     setShowPickers(!showPickers)
+
 
 
 
@@ -284,6 +259,45 @@ function ProgressAnalytics() {
     setComparisonProgressTypes(e.target.value)
 
   }
+
+  const handleCloseDatepicker = (e) => {
+    setShowPicker(!showPicker)
+  }
+
+  const keyPress = (e) => {
+    if (e.code === "Escape" && setShowPicker(false)) {
+      handleCloseDatepicker();
+    }
+    if (e.code === "Escape" && setShowPickers(false)) {
+      handledatecomparisionprogress();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", keyPress);
+    return () => {
+      window.removeEventListener("keydown", keyPress);
+    }
+  }, [keyPress]);
+
+
+  useEffect(() => {
+    const checkIfClickedOutside = e => {
+
+      if (showPicker && ref.current && !ref.current.contains(e.target)) {
+        setShowPicker(false)
+      }
+      if (showPickers && ref.current && !ref.current.contains(e.target)) {
+        setShowPickers(false)
+      }
+
+    }
+    document.addEventListener("mousedown", checkIfClickedOutside)
+    return () => {
+
+      document.removeEventListener("mousedown", checkIfClickedOutside)
+    }
+  }, [showPicker, showPickers])
 
 
   let data;
@@ -367,7 +381,7 @@ function ProgressAnalytics() {
         sx={{
           width: "100%",
           minHeight: 500,
-          padding: "5px 0px 0px 30px"
+          padding: 3
         }}
       >
 
@@ -378,13 +392,22 @@ function ProgressAnalytics() {
             justifyContent="center"
             alignItems="center"
           >
-            {/* <Grid> <Typography variant="h3" component="h2" sx={{paddingBottom:"7px"}}> Bar Chart Analytics</Typography></Grid> */}
-            <Grid container columnSpacing={3} rowSpacing={2} mt={1} mb={1}>
+            <Grid container columnSpacing={3} rowSpacing={2}  mb={1}>
 
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small" >
-                  <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
-                    Analytics Type
+                  <InputLabel id="Graph-Type-label" sx={{ fontSize: "16px" }}>
+                    Analytics Type {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.AnalyticsType")}>
+                        <InfoIcon
+                          fontSize="medium"
+                        />
+                      </LightTooltip>
+                    }
                   </InputLabel>
 
                   <Select
@@ -396,9 +419,6 @@ function ProgressAnalytics() {
                   >
 
                     {ChartType.map((item, index) => (
-
-
-
                       <LightTooltip title={TooltipData[index].name} key={index} value={item.chartTypename} placement="left" arrow>
                         <MenuItem value={item.chartTypename}>{item.chartTypename}</MenuItem>
                       </LightTooltip>
@@ -411,15 +431,26 @@ function ProgressAnalytics() {
 
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
-                    Project Type
+                  <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
+                    Project Type {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.ProjectType")}>
+                        <InfoIcon
+                          fontSize="medium"
+                        />
+                      </LightTooltip>
+                    }
                   </InputLabel>
 
                   <Select
-                    labelId="project-type-label"
-                    id="project-type-select"
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
                     value={selectedType}
                     label="Project Type"
+                    sx={{padding:"1px"}}
                     onChange={(e) => setSelectedType(e.target.value)}
                   >
                     {projectTypes.map((type, index) => (
@@ -430,16 +461,7 @@ function ProgressAnalytics() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} sm={6} md={2} lg={2} xl={2}
-              >
-                <Button
-                  variant="contained"
-                  onClick={handleSubmit}
-                  disabled={(progressTypes || comparisonProgressTypes) ? false : true}
-                >
-                  Submit
-                </Button>
-              </Grid>
+
             </Grid>
 
           </Grid>
@@ -452,12 +474,23 @@ function ProgressAnalytics() {
             <Grid container columnSpacing={2} rowSpacing={2} mt={1} mb={1}>
               {(chartTypes === avilableChartType.Individual || chartTypes === avilableChartType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="demo-simple-select-label" sx={{ fontSize:"16px", color: "rgba(243, 156, 18 )" }}>
-                    Base period
+                  <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px", color: "rgba(243, 156, 18 )" }}>
+                    Base period {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.Baseperiod")}>
+                        <InfoIcon
+                         sx={{color:"rgba(0, 0, 0, 0.6)"}}
+                          fontSize="medium"
+                        />
+                      </LightTooltip>
+                    }
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
+                    labelId="project-type-label"
+                    id="project-type-select"
                     label="Base period"
                     value={progressTypes}
                     onChange={handleProgressType}
@@ -467,7 +500,7 @@ function ProgressAnalytics() {
                     {ProgressType.map((item, index) => (
 
                       <LightTooltip title={ProgressTypedata[index].title} value={item.ProgressTypename} key={index} placement="left" arrow >
-                        <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize" }}>{item.ProgressTypename}</MenuItem>
+                        <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize"}}>{item.ProgressTypename}</MenuItem>
                       </LightTooltip>
                     ))}
                   </Select>
@@ -481,7 +514,7 @@ function ProgressAnalytics() {
                   endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color="primary"
-                  onClick={() => setShowPicker(!showPicker)}
+                  onClick={handleCloseDatepicker}
                   sx={{ backgroundColor: "rgba(243, 156, 18)", "&:hover": { backgroundColor: "rgba(243, 156, 18 )", }, marginLeft: "20px" }}
 
                 >
@@ -489,9 +522,21 @@ function ProgressAnalytics() {
                 </Button>
               </Grid>}
               {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}>
-                    Comparison Period
+                <FormControl   fullWidth size="small" >
+                  <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}  >
+                    Comparison Period {" "}
+                    {
+                      <LightTooltip
+                        arrow
+                        placement="top"
+                        title={translate("tooltip.ComparisonPeriod")}>
+                        <InfoIcon
+                        sx={{color:"rgba(0, 0, 0, 0.6)"}}
+                          fontSize="medium"
+                        />
+                      </LightTooltip>
+                    }
+                    
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
@@ -519,8 +564,13 @@ function ProgressAnalytics() {
                   Pick Dates
                 </Button>
               </Grid>}
+              <Grid container sx={{marginLeft:"17px"}}>
+            <CustomButton label="Submit" sx={{ width: "100%", mt: 3 }} onClick={handleSubmit}
+              disabled={(progressTypes || comparisonProgressTypes) ? false : true} />
+         
+        </Grid>
 
-              {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
+              {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
                     onChange={item => setState([item.selection])}
@@ -568,7 +618,7 @@ function ProgressAnalytics() {
                   />
                 </Card>
               </Box>}
-              {showPickers && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
+              {showPickers && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
                     onChange={handleDateRangePicker} item
@@ -618,7 +668,7 @@ function ProgressAnalytics() {
                 </Card>
               </Box>}
             </Grid>
-
+           
           </Grid>
           {showBarChar && <Bar options={options} data={data} />}
 
@@ -627,4 +677,4 @@ function ProgressAnalytics() {
     </ThemeProvider>
   )
 }
-export default ProgressAnalytics;
+export default ProgressList;
