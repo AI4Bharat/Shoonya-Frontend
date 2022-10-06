@@ -34,7 +34,8 @@ const ProjectTable = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align : "center"
+                align : "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
             }
         },
         {

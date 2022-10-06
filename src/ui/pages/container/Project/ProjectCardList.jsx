@@ -56,7 +56,6 @@ const ProjectCardList = (props) => {
         })
 
     }
-
     const columns = [
         {
             name: "Project_id",
@@ -64,7 +63,8 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
             }
         },
         {
@@ -73,26 +73,32 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
+
             }
         },
-
-
         {
             name: "project_Type",
-            label: "project Type",
+            label: "Project Type",
             options: {
                 filter: false,
                 sort: false,
+                align: "center",
+
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
+
             }
         },
         {
             name: "Project_mode",
-            label: "Project mode",
+            label: "Project Mode",
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px", padding: "16px" } }),
+
             }
         },
         {
@@ -101,12 +107,10 @@ const ProjectCardList = (props) => {
             options: {
                 filter: false,
                 sort: false,
-                align: "center"
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", fontSize: "16px" } }),
             }
-        },
-
-    ];
-
+        }];
 
 
     const data = projectData && projectData.length > 0 ? pageSearch().map((el, i) => {
@@ -154,27 +158,21 @@ const ProjectCardList = (props) => {
         jumpToPage: true,
 
     };
-    const renderSnackBar = () => {
-        return (
-            <Search />
-        );
-    };
+    // const renderSearch = () => {
+    //     return (
+    //         <Search />
+    //     );
+    // };
 
     return (
-
-        <Grid>
-            {renderSnackBar()}
-            <ThemeProvider theme={tableTheme}>
-                <MUIDataTable
-                    title={""}
-                    data={data}
-                    columns={columns}
-                    options={options}
-                />
-            </ThemeProvider>
-
-        </Grid>
-
+        <ThemeProvider theme={tableTheme}>
+            <MUIDataTable
+                title={""}
+                data={data}
+                columns={columns}
+                options={options}
+            />
+        </ThemeProvider>
     )
 }
 

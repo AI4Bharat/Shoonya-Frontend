@@ -5,8 +5,6 @@ on:
     branches: [master]
   workflow_dispatch:
   workflow_call:
-  pull_request:
-    branches: [master]
 
 env: 
   CI: false

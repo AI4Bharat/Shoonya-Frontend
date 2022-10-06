@@ -1,4 +1,4 @@
-import { InputBase,ThemeProvider } from "@mui/material";
+import { InputBase,ThemeProvider,Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useRef, useState } from "react";
 import themeDefault from '../../../theme/theme'
@@ -31,11 +31,11 @@ const Search = (props) => {
  
 
   return (
-    <ThemeProvider theme={themeDefault}>
-                <div className={classes.search}>
-                    <div className={classes.searchIcon}>
+   <Grid container justifyContent="end" sx={{marginTop:"20px"}}>
+                <Grid   className={classes.search}>
+                    <Grid className={classes.searchIcon}>
                         <SearchIcon fontSize="small" />
-                    </div>
+                    </Grid>
                     <InputBase
                         sx={{ ml: 4 }}
                         inputRef={ref}
@@ -44,9 +44,11 @@ const Search = (props) => {
                         onChange={(e) => handleChangeName(e.target.value)}
 
                         inputProps={{ "aria-label": "search" }}
+                        
                     />
-                </div>
-            </ThemeProvider>
+                </Grid>
+                </Grid>
+          
   );
 };
 

@@ -8,6 +8,7 @@ import { CSVDownload, CSVLink } from "react-csv";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import DownloadProjectCsvAPI from '../../../../redux/actions/api/ProjectDetails/DownloadCSVProject';
 import DownloadJSONProjectAPI from '../../../../redux/actions/api/ProjectDetails/DownloadJSONProject';
+import DownloadProjectTsvAPI from '../../../../redux/actions/api/ProjectDetails/DownloadTSVProject';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
@@ -36,11 +37,12 @@ const StyledMenu = styled((props) => (
 }));
 
 
-function DownloadProjectButton() {
+function DownloadProjectButton(props) {
+  const { taskStatus,SetTask } = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const [downloadres, setdownloadres] = useState(false);
   const [loading, setLoading] = useState(false);
-
+ const[taskValue ,setTaskValue]= useState(taskStatus)
   const apiLoading = useSelector(state => state.apiStatus.loading);
   const open = Boolean(anchorEl);
   const { id } = useParams();
@@ -72,21 +74,13 @@ function DownloadProjectButton() {
   //   dispatch(APITransport(projectObj));
 
   // }
-
-
-
-
-
-
-
-
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
 
   };
   const handleDownloadJSONProject = async () => {
-    const projectObj = new DownloadJSONProjectAPI(id);
+    SetTask([])
+    const projectObj = new DownloadJSONProjectAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
@@ -109,15 +103,15 @@ function DownloadProjectButton() {
         variant: "error",
       })
     }
-
-
+   
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const handleDownloadCSVProject = async () => {
-    const projectObj = new DownloadProjectCsvAPI(id);
+    SetTask([])
+    const projectObj = new DownloadProjectCsvAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
@@ -140,7 +134,37 @@ function DownloadProjectButton() {
         variant: "error",
       })
     }
-  }
+   
+  };
+
+  const handleDownloadTSVProject = async () => {
+    SetTask([])
+    const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
+    dispatch(APITransport(projectObj));
+    const res = await fetch(projectObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(projectObj.getBody()),
+      headers: projectObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    setLoading(false);
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: "success",
+        variant: "success",
+      })
+
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      })
+    }
+    
+  };
+ 
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -158,13 +182,13 @@ function DownloadProjectButton() {
     <div>
       {renderSnackBar()}
       <Button
-        sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2 ,width:"300px" }}
+        sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2,mb:2 ,width:"300px" }}
         id="demo-customized-button"
         // aria-controls={open ? 'demo-customized-menu' : undefined}
         // aria-haspopup="true"
         // aria-expanded={open ? 'true' : undefined}
         variant="contained"
-
+        disabled= {taskStatus.length > 0 ? false: true } 
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
       >
@@ -184,8 +208,9 @@ function DownloadProjectButton() {
         <MenuItem onClick={handleDownloadCSVProject}>
           CSV
         </MenuItem>
-
-
+        <MenuItem onClick={handleDownloadTSVProject}>
+          TSV
+        </MenuItem>
         <MenuItem onClick={handleDownloadJSONProject} >
           JSON
         </MenuItem>

@@ -390,7 +390,7 @@ function ProgressAnalytics() {
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    label="Select Graph Type"
+                    label="Analytics Type"
                     value={chartTypes}
                     onChange={handleChartType}
                   >
@@ -458,7 +458,7 @@ function ProgressAnalytics() {
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    label="Select Progress Type"
+                    label="Base period"
                     value={progressTypes}
                     onChange={handleProgressType}
                   >
@@ -496,7 +496,7 @@ function ProgressAnalytics() {
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    label="Select Progress Type"
+                    label="Comparison Period"
                     onChange={handleComparisonProgressType}
                   >
                     {ProgressType.map((item, index) => (

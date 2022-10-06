@@ -180,7 +180,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/Analytics"
+             to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -265,7 +265,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/Analytics"
+             to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -326,7 +326,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/Analytics"
+             to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -397,7 +397,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
     <NavLink
-      to="/Analytics"
+      to="/analytics"
       className={({ isActive }) =>
         isActive ? classes.highlightedMenu : classes.headerMenu
       }

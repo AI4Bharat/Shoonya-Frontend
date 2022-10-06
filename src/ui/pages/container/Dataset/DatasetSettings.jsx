@@ -3,7 +3,7 @@ import { Card, CircularProgress, Grid, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import GetDatasetDownload from "../../../../redux/actions/api/Dataset/GetDatasetDownload";
+import GetDatasetDownloadCSV from "../../../../redux/actions/api/Dataset/GetDatasetDownloadCSV";
 import UploaddataAPI from "../../../../redux/actions/api/Dataset/uploaddata"
 import GetFileTypesAPI from "../../../../redux/actions/api/Dataset/GetFileTypes"
 import CustomButton from "../../component/common/Button";
@@ -13,6 +13,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import MenuItems from "../../component/common/MenuItems";
 import { FileUploader } from "react-drag-drop-files";
 import Switch from '@mui/material/Switch';
+import DownloadDatasetButton from './DownloadDataSetButton';
 
 
 
@@ -22,7 +23,6 @@ export default function DatasetSettings({ datasetId }) {
 	const dispatch = useDispatch();
 	const fileRef = useRef();
 	const [loading, setLoading] = useState(false);
-	const downloadCount = useSelector((state) => state.getDatasetDownload.data);
 	const [modal, setModal] = useState(false);
 	const [file, setFile] = useState([]);
 	const [filetype, setFiletype] = useState("")
@@ -54,13 +54,12 @@ export default function DatasetSettings({ datasetId }) {
 	const handleClick = () => {
 		console.log('called download');
 		setLoading(true);
-		dispatch(APITransport(new GetDatasetDownload(datasetId)));
+		dispatch(APITransport(new GetDatasetDownloadCSV(datasetId)));
 	};
 
 	useEffect(() => {
-		console.log("download count", downloadCount);
 		setLoading(false);
-	}, [setLoading, downloadCount]);
+	}, [setLoading ]);
 
 
 
@@ -116,21 +115,27 @@ export default function DatasetSettings({ datasetId }) {
 					padding: 4,
 				}}
 			>
-				<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+			<Grid container direction="row" columnSpacing={1} rowSpacing={2}  >
 					{loading ? (
 						<CircularProgress />
 					) : (
 						<>
-							<CustomButton
+							<Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+							{/* <CustomButton
 								label={translate("button.downloadDataset")}
 								onClick={handleClick}
-							/>
-
+							/> */}
+							
+							<DownloadDatasetButton/>
+							</Grid>
+							<Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
 							<CustomButton
 								sx={{ ml: 8 }}
 								label={translate("button.uploadData")}
 								onClick={handleUpload}
 							/>
+							</Grid>
+							
 							<Modal
 								open={modal}
 								onClose={() => handleModalClose()}
