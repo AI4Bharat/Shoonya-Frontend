@@ -461,7 +461,7 @@ function ProgressList() {
                 label: `${baseperiod} (${el.date_range})`,
                 data: el.data?.map((e) => (e.annotations_completed)),
                 stack: "stack 0",
-                backgroundColor: colorsData.orange[i].color,
+                backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
                 barThickness: 20,
               }
             }),
@@ -479,7 +479,7 @@ function ProgressList() {
             label: `${baseperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
-            backgroundColor: colorsData.green[i].color,
+            backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
             barThickness: 20,
           }
         });
@@ -489,7 +489,7 @@ function ProgressList() {
             label: `${comparisonperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
-            backgroundColor: colorsData.orange[i].color,
+            backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
             barThickness: 20,
           }
         });
@@ -504,7 +504,7 @@ function ProgressList() {
             label: `${baseperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
-            backgroundColor: colorsData.orange[i].color,
+            backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
             barThickness: 20,
           }
         });
@@ -514,7 +514,7 @@ function ProgressList() {
             label: `${comparisonperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
-            backgroundColor: colorsData.green[i].color,
+            backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
             barThickness: 20,
           }
         });
@@ -530,7 +530,7 @@ function ProgressList() {
             label: `${baseperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
-            backgroundColor: colorsData.orange[i].color,
+            backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
             barThickness: 20,
           }
         });
@@ -565,7 +565,7 @@ function ProgressList() {
             label: `${comparisonperiod} (${el.date_range})`,
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
-            backgroundColor: colorsData.green[i].color,
+            backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
             barThickness: 20,
           }
         });
