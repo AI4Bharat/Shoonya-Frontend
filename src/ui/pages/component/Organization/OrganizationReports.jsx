@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography } from "@mui/material";
+import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography, Checkbox, ListItemText, ListItemIcon, Paper } from "@mui/material";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import tableTheme from "../../../theme/tableTheme";
@@ -24,8 +24,31 @@ import { isSameDay, format } from 'date-fns/esm';
 import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import { styled } from '@mui/material/styles';
 
-const ProgressType = [{name: "only review-enabled" }, {name: "review-disabled" }, {name: "all projects" }]
+const ProgressType = ["Review Enabled", "Review disabled"]
+const ITEM_HEIGHT = 38;
+const ITEM_PADDING_TOP = 0;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 3.5 + ITEM_PADDING_TOP,
+      width: 250,
+      fontSize:"10px",
+    }
+  },
+  getContentAnchorEl: null,
+  anchorOrigin: {
+    vertical: "bottom",
+    horizontal: "center"
+  },
+  transformOrigin: {
+    vertical: "top",
+    horizontal: "center"
+  },
+  variant: "menu"
+};
+
 
 const OrganizationReports = () => {
   const OrganizationDetails = useSelector(state => state.fetchLoggedInUserData.data.organization);
@@ -46,8 +69,8 @@ const OrganizationReports = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
   const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
-  const [reports, setReports] = useState("");
-
+  const [reportfilter, setReportfilter] = useState(["Review Enabled", "Review disabled"]);
+  
   const classes = DatasetStyle();
   const { orgId } = useParams();
   const dispatch = useDispatch();
@@ -164,25 +187,43 @@ const OrganizationReports = () => {
     console.log(selection, "selection");
   };
 
+
+
   const handleSubmit = () => {
-    const report_type = radiobutton === "AnnotatationReports" ? "annotation" : "review"
     setReportRequested(true);
     setShowSpinner(true);
     setShowPicker(false);
     setColumns([]);
     setReportData([]);
     setSelectedColumns([]);
-    if (reportType === "user") {
+    let reportData =[]
+
+    if (reportType === "user" ) {
+
+      if( reportfilter.toString() == "Review disabled" ){
+        reportData.push(false)
+      }else if(reportfilter.toString() == "Review Enabled"){
+        reportData.push(true)
+      }
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,
-        selectedType,
-        format(selectRange[0].startDate, 'yyyy-MM-dd'),
-        format(selectRange[0].endDate, 'yyyy-MM-dd'),
-        radiobutton === "AnnotatationReports" ? "annotation" : "review",
-        targetLanguage,
+      selectedType,
+      format(selectRange[0].startDate, 'yyyy-MM-dd'),
+      format(selectRange[0].endDate, 'yyyy-MM-dd'),
+      radiobutton === "AnnotatationReports" ? "annotation" : "review",
+      targetLanguage,
+      ...reportData,
+      
       );
       dispatch(APITransport(userReportObj));
-    } else if (reportType === "project") {
+   
+    } else if (reportType === "project" ) {
+
+      if( reportfilter.toString() == "Review disabled" ){
+        reportData.push(false)
+      }else if(reportfilter.toString() == "Review Enabled"){
+        reportData.push(true)
+      }
       const projectReportObj = new GetOrganizationProjectReportsAPI(
         orgId,
         selectedType,
@@ -190,7 +231,8 @@ const OrganizationReports = () => {
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
         radiobutton === "AnnotatationReports" ? "annotation" : "review",
         targetLanguage,
-        
+        ...reportData,
+
       );
       dispatch(APITransport(projectReportObj));
     }
@@ -199,9 +241,10 @@ const OrganizationReports = () => {
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value)
   }
-  const handlechangereports = (e) => {
-    setReports(e.target.value)
 
+  const handleChangeprojectFilter = (event) => {
+    const value = event.target.value;
+    setReportfilter(value);
   }
 
   return (
@@ -210,40 +253,40 @@ const OrganizationReports = () => {
         container
         direction="row"
         spacing={3}
-        
+sx={{mb:3}}
       >
-         <Grid
-        container
-        direction="row"
-        spacing={3}
-       sx={{mt:1,ml:1}}
-      >
+        <Grid
+          container
+          direction="row"
+          spacing={3}
+          sx={{ mt: 1, ml: 1 }}
+        >
 
-        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
-          <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
-            Select Report Type :
-          </Typography>
-        </Grid >
-        <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
-          <FormControl >
+          <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
+            <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
+              Select Report Type :
+            </Typography>
+          </Grid >
+          <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
+            <FormControl >
 
-            <RadioGroup
-              row
-              aria-labelledby="demo-row-radio-buttons-group-label"
-              name="row-radio-buttons-group"
-              sx={{ marginTop: "5px" }}
-              value={radiobutton}
-              onChange={handleChangeReports}
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+                sx={{ marginTop: "5px" }}
+                value={radiobutton}
+                onChange={handleChangeReports}
 
-            >
-              <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation" />
-              <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
+              >
+                <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation" />
+                <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
 
-            </RadioGroup>
-          </FormControl>
-        </Grid >
+              </RadioGroup>
+            </FormControl>
+          </Grid >
         </Grid>
-       
+
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
@@ -278,6 +321,29 @@ const OrganizationReports = () => {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small"  className={classes.formControl}>
+            <InputLabel id="mutiple-select-label" sx={{ fontSize: "16px", padding: "3px" }}>Projects Filter</InputLabel>
+            <Select
+              labelId="mutiple-select-label"
+              label="Projects Filter"
+              multiple
+              value={reportfilter}
+              onChange={handleChangeprojectFilter}
+              renderValue={(reportfilter) => reportfilter.join(", ")}
+              MenuProps={MenuProps}
+            >
+              {ProgressType.map((option) => (
+                <MenuItem sx={{ textTransform: "capitalize"}} key={option} value={option}>
+                  <ListItemIcon>
+                    <Checkbox checked={reportfilter.indexOf(option) > -1} />
+                  </ListItemIcon>
+                  <ListItemText primary={option} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
             <Select
@@ -296,29 +362,6 @@ const OrganizationReports = () => {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-        <FormControl   size="small" className={classes.formControl}>
-                            <InputLabel id="mutiple-select-label" sx={{fontSize:"16px",padding:"3px"}}>Project Filter</InputLabel>
-                            <Select
-                                labelId="mutiple-select-label"
-                                label="Project Filter"
-                                multiple
-                                value={taskStatus}
-                                onChange={handleChangeprojectFilter}
-                                renderValue={(taskStatus) => taskStatus.join(", ")}
-                                MenuProps={MenuProps}
-                            >
-                                {ProgressType.map((option) => (
-                                    <MenuItem  sx={{ textTransform: "capitalize"}} key={option} value={option}>
-                                        <ListItemIcon>
-                                            <Checkbox  checked={taskStatus.indexOf(option) > -1} />
-                                        </ListItemIcon>
-                                        <ListItemText primary={option} />
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={12} md={2} lg={3} xl={3}>
           <Button
             endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
             variant="contained"
@@ -328,7 +371,7 @@ const OrganizationReports = () => {
             Pick Dates
           </Button>
         </Grid>
-        
+
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
           <Button
             fullWidth
