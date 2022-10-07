@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, ThemeProvider, Card } from "@mui/material";
+import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography } from "@mui/material";
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import tableTheme from "../../../theme/tableTheme";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -23,13 +25,15 @@ import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
+
+
 const OrganizationReports = () => {
-  const OrganizationDetails = useSelector(state=>state.fetchLoggedInUserData.data.organization);
+  const OrganizationDetails = useSelector(state => state.fetchLoggedInUserData.data.organization);
   const [selectRange, setSelectRange] = useState([{
     startDate: new Date(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
     endDate: new Date(),
     key: "selection"
-}]);
+  }]);
   // const [rangeValue, setRangeValue] = useState([format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
@@ -41,7 +45,9 @@ const OrganizationReports = () => {
   const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
-  
+  const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
+
+
   const classes = DatasetStyle();
   const { orgId } = useParams();
   const dispatch = useDispatch();
@@ -126,19 +132,19 @@ const OrganizationReports = () => {
   const renderToolBar = () => {
     return (
       <Box
-       //className={classes.filterToolbarContainer}
-       className={classes.ToolbarContainer}
-       >
+        //className={classes.filterToolbarContainer}
+        className={classes.ToolbarContainer}
+      >
         <ColumnList
-            columns={columns}
-            setColumns={setSelectedColumns}
-            selectedColumns={selectedColumns}
+          columns={columns}
+          setColumns={setSelectedColumns}
+          selectedColumns={selectedColumns}
         />
       </Box>
     )
-}
+  }
 
-const options = {
+  const options = {
     filterType: 'checkbox',
     selectableRows: "none",
     download: true,
@@ -148,17 +154,18 @@ const options = {
     viewColumns: false,
     jumpToPage: true,
     customToolbar: renderToolBar,
-};
+  };
 
 
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
-    console.log(selection, "selection"); 
+    console.log(selection, "selection");
   };
 
   const handleSubmit = () => {
+    const report_type = radiobutton === "AnnotatationReports" ? "annotation" : "review"
     setReportRequested(true);
     setShowSpinner(true);
     setShowPicker(false);
@@ -169,8 +176,9 @@ const options = {
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,
         selectedType,
-        format(selectRange[0].startDate, 'yyyy-MM-dd'), 
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
+        radiobutton === "AnnotatationReports" ? "annotation" : "review",
         targetLanguage,
       );
       dispatch(APITransport(userReportObj));
@@ -178,13 +186,20 @@ const options = {
       const projectReportObj = new GetOrganizationProjectReportsAPI(
         orgId,
         selectedType,
-        format(selectRange[0].startDate, 'yyyy-MM-dd'), 
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
+        radiobutton === "AnnotatationReports" ? "annotation" : "review",
         targetLanguage,
+        
       );
       dispatch(APITransport(projectReportObj));
     }
   };
+
+  const handleChangeReports = (e) => {
+    setRadiobutton(e.target.value)
+  }
+ 
 
   return (
     <React.Fragment>
@@ -192,23 +207,43 @@ const options = {
         container
         direction="row"
         spacing={3}
-        sx={{
-          marginBottom: "24px",
-        }}
+        
       >
-        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Button 
-                endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
-                variant="contained" 
-                color="primary" 
-                onClick={() => setShowPicker(!showPicker)}
+         <Grid
+        container
+        direction="row"
+        spacing={3}
+       sx={{mt:1,ml:1}}
+      >
+
+        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
+          <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
+            Select Report Type :
+          </Typography>
+        </Grid >
+        <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
+          <FormControl >
+
+            <RadioGroup
+              row
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="row-radio-buttons-group"
+              sx={{ marginTop: "5px" }}
+              value={radiobutton}
+              onChange={handleChangeReports}
+
             >
-               Pick Dates
-            </Button>
+              <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation" />
+              <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
+
+            </RadioGroup>
+          </FormControl>
+        </Grid >
         </Grid>
+       
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
-            <InputLabel id="project-type-label" sx={{fontSize:"16px"}}>Project Type</InputLabel>
+            <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
             <Select
               labelId="project-type-label"
               id="project-type-select"
@@ -226,7 +261,7 @@ const options = {
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
-            <InputLabel id="report-type-label" sx={{fontSize:"16px"}}>Report Type</InputLabel>
+            <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>Report Type</InputLabel>
             <Select
               labelId="report-type-label"
               id="report-select"
@@ -241,7 +276,7 @@ const options = {
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
-            <InputLabel id="language-label" sx={{fontSize:"16px"}}>Target Language</InputLabel>
+            <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
             <Select
               labelId="language-label"
               id="language-select"
@@ -257,48 +292,60 @@ const options = {
             </Select>
           </FormControl>
         </Grid>
+       
+        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+          <Button
+            endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+            variant="contained"
+            color="primary"
+            onClick={() => setShowPicker(!showPicker)}
+          >
+            Pick Dates
+          </Button>
+        </Grid>
+        
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleSubmit}
+          >
+            Submit
+          </Button>
         </Grid>
       </Grid>
-      {showPicker && <Box sx={{mt: 2, display: "flex", justifyContent: "center", width: "100%"}}>
-          <Card>
-              <DateRangePicker
-                  onChange={handleRangeChange}
-                  staticRanges={[
-                      ...defaultStaticRanges,
-                      {
-                          label: "Till Date",
-                          range: () => ({
-                          startDate: new Date(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
-                          endDate: new Date(),
-                          }),
-                          isSelected(range) {
-                          const definedRange = this.range();
-                          return (
-                              isSameDay(range.startDate, definedRange.startDate) &&
-                              isSameDay(range.endDate, definedRange.endDate)
-                          );
-                          }
-                      },
-                  ]}
-                  showSelectionPreview={true}
-                  moveRangeOnFirstSelection={false}
-                  months={2}
-                  ranges={selectRange}
-                  minDate={new Date(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
-                  maxDate={new Date()}
-                  direction="horizontal"
-              />
-          </Card>
+      {showPicker && <Box sx={{ mt: 2, display: "flex", justifyContent: "center", width: "100%" }}>
+        <Card>
+          <DateRangePicker
+            onChange={handleRangeChange}
+            staticRanges={[
+              ...defaultStaticRanges,
+              {
+                label: "Till Date",
+                range: () => ({
+                  startDate: new Date(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+                  endDate: new Date(),
+                }),
+                isSelected(range) {
+                  const definedRange = this.range();
+                  return (
+                    isSameDay(range.startDate, definedRange.startDate) &&
+                    isSameDay(range.endDate, definedRange.endDate)
+                  );
+                }
+              },
+            ]}
+            showSelectionPreview={true}
+            moveRangeOnFirstSelection={false}
+            months={2}
+            ranges={selectRange}
+            minDate={new Date(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
+            maxDate={new Date()}
+            direction="horizontal"
+          />
+        </Card>
       </Box>}
-      { showSpinner ? <div></div> : reportRequested && (
+      {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={ProjectReports.length > 0 ? "Reports" : ""}
@@ -308,7 +355,7 @@ const options = {
           />
         </ThemeProvider>)
       }
-       {/*<Grid
+      {/*<Grid
           container
           justifyContent="center"
         >

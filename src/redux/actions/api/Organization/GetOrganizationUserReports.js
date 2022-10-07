@@ -6,7 +6,7 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class GetOrganizationUserReportsAPI extends API {
-  constructor(orgId, projectType, startDate, endDate, targetLanguage, sortByColumn, descOrder, timeout = 2000) {
+  constructor(orgId, projectType, startDate, endDate,reportsType, targetLanguage, sortByColumn, descOrder, timeout = 2000) {
     super("POST", timeout, false);
     this.projectType = projectType;
     this.startDate = startDate;
@@ -14,6 +14,7 @@ export default class GetOrganizationUserReportsAPI extends API {
     this.targetLanguage = targetLanguage === "all" ? undefined : targetLanguage;
     this.sortByColumn = sortByColumn ?? undefined;
     this.descOrder = descOrder ?? undefined;
+    this.reportsType = reportsType ;
     this.type = constants.GET_ORGANIZATION_USER_REPORTS;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}${orgId}/user_analytics/`;
   }
@@ -37,6 +38,7 @@ export default class GetOrganizationUserReportsAPI extends API {
       tgt_language: this.targetLanguage,
       sort_by_column_name: this.sortByColumn,
       descending_order: this.descOrder,
+      reports_type: this.reportsType,
     };
   }
 

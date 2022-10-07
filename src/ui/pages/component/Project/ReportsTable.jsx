@@ -45,7 +45,6 @@ const ReportsTable = (props) => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
-    console.log(ProjectReport,"ProjectReport")
     const classes = DatasetStyle();
     const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
     const [submitted, setSubmitted] = useState(false);
