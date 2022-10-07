@@ -34,7 +34,6 @@ const MenuProps = {
     style: {
       maxHeight: ITEM_HEIGHT * 3.5 + ITEM_PADDING_TOP,
       width: 250,
-      fontSize:"10px",
     }
   },
   getContentAnchorEl: null,
@@ -333,11 +332,11 @@ sx={{mb:3}}
               MenuProps={MenuProps}
             >
               {ProgressType.map((option) => (
-                <MenuItem sx={{ textTransform: "capitalize"}} key={option} value={option}>
+                <MenuItem sx={{ textTransform: "capitalize",padding:"0px"}} key={option} value={option}>
                   <ListItemIcon>
                     <Checkbox checked={reportfilter.indexOf(option) > -1} />
                   </ListItemIcon>
-                  <ListItemText primary={option} />
+                  <ListItemText primary={option} primaryTypographyProps={{fontSize: '14px'}}  />
                 </MenuItem>
               ))}
             </Select>
