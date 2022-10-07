@@ -25,7 +25,7 @@ import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
-
+const ProgressType = [{name: "only review-enabled" }, {name: "review-disabled" }, {name: "all projects" }]
 
 const OrganizationReports = () => {
   const OrganizationDetails = useSelector(state => state.fetchLoggedInUserData.data.organization);
@@ -46,7 +46,7 @@ const OrganizationReports = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
   const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
-
+  const [reports, setReports] = useState("");
 
   const classes = DatasetStyle();
   const { orgId } = useParams();
@@ -199,7 +199,10 @@ const OrganizationReports = () => {
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value)
   }
- 
+  const handlechangereports = (e) => {
+    setReports(e.target.value)
+
+  }
 
   return (
     <React.Fragment>
@@ -292,8 +295,30 @@ const OrganizationReports = () => {
             </Select>
           </FormControl>
         </Grid>
-       
-        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        <FormControl   size="small" className={classes.formControl}>
+                            <InputLabel id="mutiple-select-label" sx={{fontSize:"16px",padding:"3px"}}>Project Filter</InputLabel>
+                            <Select
+                                labelId="mutiple-select-label"
+                                label="Project Filter"
+                                multiple
+                                value={taskStatus}
+                                onChange={handleChangeprojectFilter}
+                                renderValue={(taskStatus) => taskStatus.join(", ")}
+                                MenuProps={MenuProps}
+                            >
+                                {ProgressType.map((option) => (
+                                    <MenuItem  sx={{ textTransform: "capitalize"}} key={option} value={option}>
+                                        <ListItemIcon>
+                                            <Checkbox  checked={taskStatus.indexOf(option) > -1} />
+                                        </ListItemIcon>
+                                        <ListItemText primary={option} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={12} md={2} lg={3} xl={3}>
           <Button
             endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
             variant="contained"
