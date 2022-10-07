@@ -8,6 +8,7 @@ import {
   Button,
   Grid,
   ThemeProvider,
+  Radio,Typography,
 } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import InputLabel from "@mui/material/InputLabel";
@@ -16,6 +17,8 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import GetWorkspaceUserReportsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceUserReports";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetWorkspaceProjectReportAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProjectReports";
@@ -54,6 +57,7 @@ const WorkspaceReports = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportData, setReportData] = useState([]);
   const [reportRequested, setReportRequested] = useState(false);
+  const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
   const classes = DatasetStyle();
 
   const { id } = useParams();
@@ -174,6 +178,9 @@ const WorkspaceReports = () => {
     },
   };
 
+  const handleChangeReports = (e) => {
+    setRadiobutton(e.target.value)
+}
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
@@ -190,7 +197,8 @@ const WorkspaceReports = () => {
         selectedType,
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
-        language
+        language,
+        radiobutton === "AnnotatationReports" ? "annotation" : "review",
       );
       dispatch(APITransport(userReportObj));
       setShowSpinner(true);
@@ -200,7 +208,8 @@ const WorkspaceReports = () => {
         selectedType,
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
-        language
+        language,
+        radiobutton === "AnnotatationReports" ? "annotation" : "review",
       );
       dispatch(APITransport(projectReportObj));
       setShowSpinner(true);
@@ -217,6 +226,37 @@ const WorkspaceReports = () => {
           marginBottom: "24px",
         }}
       >
+         <Grid
+        container
+        direction="row"
+        spacing={3}
+       sx={{mt:1,ml:1}}
+      >
+
+        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
+          <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
+            Select Report Type :
+          </Typography>
+        </Grid >
+        <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
+          <FormControl >
+
+            <RadioGroup
+              row
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="row-radio-buttons-group"
+              sx={{ marginTop: "5px" }}
+              value={radiobutton}
+              onChange={handleChangeReports}
+
+            >
+              <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation" />
+              <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
+
+            </RadioGroup>
+          </FormControl>
+        </Grid >
+        </Grid >
         <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
             <Button 
                 endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
