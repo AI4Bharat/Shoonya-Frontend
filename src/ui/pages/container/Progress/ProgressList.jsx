@@ -350,7 +350,6 @@ function ProgressList() {
           //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: "rgba(243, 156, 18 )",
           barThickness: 20,
-          stack: "stack 0"
         },
         {
           label: comparisonProgressTypes,
@@ -358,7 +357,6 @@ function ProgressList() {
           //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
           backgroundColor: 'rgba(35, 155, 86 )',
           barThickness: 20,
-          stack: "stack 0"
         },
 
       ],
