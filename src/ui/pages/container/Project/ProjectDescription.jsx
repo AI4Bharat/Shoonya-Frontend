@@ -25,10 +25,10 @@ const ProjectDescription = (props) => {
     return (
         <ThemeProvider theme={themeDefault}>
 
-<Card sx={{ display: 'flex' }} style={{ minHeight: '100px', maxHeight: '100px', backgroundColor: ImageArray[index].color }}>
+<Card  style={{ minHeight: '100px', maxHeight: '100px', backgroundColor: ImageArray[index].color ,display: 'flex'}}>
             <Grid container >
-                <Grid item xs={3} sm={3} md={3} lg={3} xl={3} style={{ display: 'flex', marginTop: "21px", justifyContent: 'center' }}>
-                    <div className={classes.descCardIcon} style={{ color: ImageArray[index].iconColor, backgroundColor: ImageArray[index].color }}>
+                <Grid item xs={3} sm={3} md={3} lg={3} xl={3} style={{ display: 'flex', marginTop: "21px", justifyContent: 'center', }}>
+                    <div className={classes.descCardIcon} style={{  color: ImageArray[index].iconColor, backgroundColor: ImageArray[index].color }}>
                         {ImageArray[index].imageUrl}
                     </div>
                 </Grid>
@@ -37,7 +37,7 @@ const ProjectDescription = (props) => {
                         <Typography component="div" variant="subtitle2" style={{ marginBottom: '0px' ,paddingLeft:"0px" }} >
                             {name}
                         </Typography  >
-                            <Typography variant="body2" color="text.secondary" className={classes.modelValue} >
+                            <Typography variant="body2" color="black" className={classes.modelValue} >
                                  {value}
                             </Typography> 
                     </CardContent>
