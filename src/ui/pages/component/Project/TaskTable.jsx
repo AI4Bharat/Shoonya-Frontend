@@ -329,7 +329,8 @@ else if (pullDisabled === "No more unassigned tasks in this project")
     const renderToolBar = () => {
        // const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
-            <Box className={classes.filterToolbarContainer}>
+            <Box className={classes.filterToolbarContainer} 
+            sx={{height:"80px"}}>
                 {props.type === "annotation" && userDetails?.role!==1 && <FormControl size="small" sx={{width: "30%", minWidth: "100px"}}>
                     <InputLabel id="annotator-filter-label" sx={{fontSize: "16px",position: "inherit",top:"23px",left:"-20px"}}>Filter by Annotator</InputLabel>
                     <Select
@@ -374,6 +375,7 @@ else if (pullDisabled === "No more unassigned tasks in this project")
                     </Button>
                 </Tooltip>
             </Box>
+           
         )
     }
 

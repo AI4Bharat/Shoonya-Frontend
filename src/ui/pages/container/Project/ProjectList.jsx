@@ -55,7 +55,7 @@ export default function ProjectList() {
             {/* <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ position: "static", bottom: "-51px", left: "20px" }} > */}
             <Grid container className={classes.root} >
             <Grid item style={{ flexGrow: "0"}}>
-					<Typography variant="h6" sx={{paddingBottom:"9px"}}>View :  </Typography>
+					<Typography variant="h6" sx={{paddingBottom:"7px"}}>View :  </Typography>
                     
 				</Grid>
                 <Grid item style={{ flexGrow: "1",paddingLeft: "5px"}}>
