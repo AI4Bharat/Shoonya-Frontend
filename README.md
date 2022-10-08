@@ -1,7 +1,7 @@
 # Shoonya Frontend
 An open source platform to annotate and label data at scale.
 
-You can watch a demo of our tool - [Video](https://www.youtube.com/watch?v=N4PBSB2fQto)
+You can watch a demo of our platform - [Video](https://www.youtube.com/watch?v=N4PBSB2fQto)
 
 ## Pre-requisites
 The project was created using [React 18.1.0](https://reactjs.org/docs/getting-started.html). All major dependencies are listed below:
