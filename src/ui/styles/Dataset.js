@@ -227,6 +227,10 @@ const DatasetStyle = makeStyles({
 		alignItems: "center",
 	},
   modelValue: {
+    fontSize: "14px",
+    fontFamily: "Roboto",
+    fontWeight: 400,
+    lineHeight: "22px",
     "&:first-letter": { textTransform: "capitalize" },
     display: "-webkit-box",
     "-webkit-line-clamp": "2",

@@ -9,9 +9,9 @@ import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 const imageArray = [
     { imageUrl: <CardTravelOutlinedIcon/>, color: "rgba(6, 190, 108, 0.05)", iconColor: "#0fd17b" },
     { imageUrl: <DescriptionOutlinedIcon />, color: "rgba(20, 115, 252, 0.05)", iconColor: "#1473fc" },
-    { imageUrl: <TitleOutlinedIcon />, color: "rgba(20, 115, 252, 0.05)", iconColor: "#1473fc" },
-    { imageUrl: <PublishedWithChangesOutlinedIcon/>, color: "rgba(146, 45, 136, 0.05)", iconColor: "#922d88" },
-    { imageUrl: <LabelOutlinedIcon/>, color: "rgba(20, 115, 252, 0.05)", iconColor: "#1473fc" },
-    { imageUrl: <TaskOutlinedIcon/>, color: "rgba(20, 115, 252, 0.05)", iconColor: "#1473fc" }];
+    { imageUrl: <TitleOutlinedIcon />,  color: "rgba(146, 45, 136, 0.05)", iconColor: "#922d88" },
+    { imageUrl: <PublishedWithChangesOutlinedIcon/>,  color: "rgba(253, 127, 35, 0.05)", iconColor: "#1db5d8"},
+    { imageUrl: <LabelOutlinedIcon/>, color: "rgba(29, 181, 216, 0.05)", iconColor: "#443fb1" },
+    { imageUrl: <TaskOutlinedIcon/>, color: "rgba(68, 63, 177, 0.05)", iconColor: "#443fb1" }];
 
 export default imageArray;
