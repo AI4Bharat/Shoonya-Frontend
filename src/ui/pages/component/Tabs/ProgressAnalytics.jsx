@@ -133,7 +133,7 @@ function ProgressList() {
   const [showBarChar, setShowBarChar] = useState(false)
   const [showPicker, setShowPicker] = useState(false);
   const [showPickers, setShowPickers] = useState(false);
-  const [comparisonperiod, setComparisonperiod] = useState("");
+  const [comparisonperiod, setComparisonperiod] = useState("monthly");
   const [monthvalue, setmonthvalue] = useState([])
   const [weekvalue, setweekvalue] = useState([])
   const [loading, setLoading] = useState(false);
@@ -607,10 +607,6 @@ function ProgressList() {
 
       }
 
-      // console.log(data, "vvvv",)
-
-
-
     }
     setChartData(chData);
     setSVGChartData(svgChData);
@@ -623,7 +619,6 @@ function ProgressList() {
 
 
   const ToolTipdata1 = TooltipData.map((el, i) => el.name);
-  console.log(ToolTipdata1, "ToolTipdata1")
 
   const downloadReportClick = (type) => {
     const srcElement = document.getElementById('chart-container');
@@ -777,9 +772,6 @@ function ProgressList() {
                 </FormControl>
               </Grid>}
               {!(baseperiod === "Cumulative" || chartTypes === "") && <Grid item xs={2} sm={2} md={2} lg={2} xl={2}  >
-
-
-
                 <Button
                   endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
@@ -792,7 +784,7 @@ function ProgressList() {
                 </Button>
               </Grid>}
               {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                <FormControl   fullWidth size="small" >
+                <FormControl   fullWidth size="small"  >
                   <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}  >
                     Comparison Period {" "}
                     {
@@ -812,6 +804,7 @@ function ProgressList() {
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Comparison Period"
+                    value={comparisonperiod}
                     onChange={handleComparisonProgressType}
                   >
                     {ProgressType.map((item, index) => (
@@ -835,7 +828,7 @@ function ProgressList() {
                 </Button>
               </Grid>}
               <Grid container sx={{marginLeft:"17px"}}>
-            <CustomButton label="Submit" sx={{ width: "100%", mt: 3 }} onClick={handleSubmit}
+            <CustomButton label="Submit" sx={{ width:"120px", mt: 3 }} onClick={handleSubmit}
               disabled={(baseperiod || comparisonperiod) ? false : true} />
          
         </Grid>

@@ -250,23 +250,13 @@ const WorkspaceReports = () => {
               onChange={handleChangeReports}
 
             >
-              <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation" />
+              <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
               <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
 
             </RadioGroup>
           </FormControl>
         </Grid >
         </Grid >
-        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Button 
-                endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
-                variant="contained" 
-                color="primary" 
-                onClick={() => setShowPicker(!showPicker)}
-            >
-               Pick Dates
-            </Button>
-        </Grid>
         <Grid
           item
           xs={12}
@@ -339,11 +329,23 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>
+        <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+            <Button 
+                endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
+                variant="contained" 
+                color="primary"
+                sx={{width:"130px"}} 
+                onClick={() => setShowPicker(!showPicker)}
+            >
+               Pick Dates
+            </Button>
+        </Grid>
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
           <Button
             fullWidth
             variant="contained"
             onClick={handleDateSubmit}
+            sx={{width:"130px"}}
           >
             Submit
           </Button>
