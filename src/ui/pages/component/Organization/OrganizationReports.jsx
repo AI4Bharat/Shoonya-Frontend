@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetOrganizationUserReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationUserReports";
 import GetOrganizationProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationProjectReports";
+import GetOrganizationAnnotatorQualityAPI from "../../../../redux/actions/api/Organization/GetOrganizationAnnotatorQuality";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
@@ -67,7 +68,8 @@ const OrganizationReports = () => {
   const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
-  const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
+  const [reportTypes, setReportTypes] = useState("AnnotatorQuantity");
+  const [radiobutton, setRadiobutton] = useState("ProjectReports");
   const [reportfilter, setReportfilter] = useState(["Review Enabled", "Review disabled"]);
   
   const classes = DatasetStyle();
@@ -76,7 +78,10 @@ const OrganizationReports = () => {
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const UserReports = useSelector((state) => state.getOrganizationUserReports.data);
   const ProjectReports = useSelector((state) => state.getOrganizationProjectReports.data);
+  const AnnotatorQuality = useSelector((state) => state.getOrganizationAnnotatorQuality.data);
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
+
+  console.log(AnnotatorQuality,"annotatorQuality")
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -93,7 +98,7 @@ const OrganizationReports = () => {
         types.push(...subTypes);
       });
       setProjectTypes(types);
-      setSelectedType(types[2]);
+      setSelectedType(types[3]);
     }
   }, [ProjectTypes]);
 
@@ -151,6 +156,33 @@ const OrganizationReports = () => {
     setShowSpinner(false);
   }, [ProjectReports]);
 
+  useEffect(() => {
+    if (reportRequested && AnnotatorQuality?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(AnnotatorQuality[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+      setReportData(AnnotatorQuality);
+      setSelectedColumns(tempSelected);
+    } else {
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
+    }
+    setShowSpinner(false);
+  }, [AnnotatorQuality]);
+
   const renderToolBar = () => {
     return (
       <Box
@@ -195,42 +227,54 @@ const OrganizationReports = () => {
     setColumns([]);
     setReportData([]);
     setSelectedColumns([]);
-    let reportData =[]
+    let ReviewData =[]
 
-    if (reportType === "user" ) {
+    if (reportTypes === "AnnotatorQuantity" || reportTypes === "Reviewer" ) {
 
       if( reportfilter.toString() == "Review disabled" ){
-        reportData.push(false)
+        ReviewData.push(false)
       }else if(reportfilter.toString() == "Review Enabled"){
-        reportData.push(true)
+        ReviewData.push(true)
       }
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,
       selectedType,
       format(selectRange[0].startDate, 'yyyy-MM-dd'),
       format(selectRange[0].endDate, 'yyyy-MM-dd'),
-      radiobutton === "AnnotatationReports" ? "annotation" : "review",
+      reportTypes === "AnnotatorQuantity" ? "annotation" : "review",
       targetLanguage,
-      ...reportData,
+      ...ReviewData,
       
       );
       dispatch(APITransport(userReportObj));
    
-    } else if (reportType === "project" ) {
-
-      if( reportfilter.toString() == "Review disabled" ){
-        reportData.push(false)
-      }else if(reportfilter.toString() == "Review Enabled"){
-        reportData.push(true)
-      }
+    } else if (reportTypes === "AnnotatorQuality" ) {
+        if( reportfilter.toString() == "Review disabled" ){
+          ReviewData.push(false)
+        }else if(reportfilter.toString() == "Review Enabled"){
+          ReviewData.push(true)
+        }
+        const annotatorQualityObj = new GetOrganizationAnnotatorQualityAPI(
+          orgId,
+        selectedType,
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
+        format(selectRange[0].endDate, 'yyyy-MM-dd'),
+        targetLanguage,
+        ...ReviewData,
+        );
+        dispatch(APITransport(annotatorQualityObj));
+    
+    
+      } 
+      else if (radiobutton === "ProjectReports" ) {
       const projectReportObj = new GetOrganizationProjectReportsAPI(
         orgId,
         selectedType,
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
-        radiobutton === "AnnotatationReports" ? "annotation" : "review",
+        //radiobutton === "AnnotatationReports" ? "annotation" : "review",
         targetLanguage,
-        ...reportData,
+       
 
       );
       dispatch(APITransport(projectReportObj));
@@ -278,8 +322,8 @@ sx={{mb:3}}
                 onChange={handleChangeReports}
 
               >
-                <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation" />
-                <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
+                <FormControlLabel value="UsersReports" control={<Radio />} label="Users Reports" />
+                <FormControlLabel value="ProjectReports" control={<Radio />} label="Project Reports" />
 
               </RadioGroup>
             </FormControl>
@@ -287,7 +331,7 @@ sx={{mb:3}}
         </Grid>
 
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
             <Select
               labelId="project-type-label"
@@ -305,22 +349,23 @@ sx={{mb:3}}
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" disabled={ radiobutton === "ProjectReports" }>
             <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>Report Type</InputLabel>
             <Select
               labelId="report-type-label"
               id="report-select"
-              value={reportType}
+              value={reportTypes}
               label="Report Type"
-              onChange={(e) => setReportType(e.target.value)}
+              onChange={(e) => setReportTypes(e.target.value)}
             >
-              <MenuItem value={"user"}>User Reports</MenuItem>
-              <MenuItem value={"project"}>Project Reports</MenuItem>
+              <MenuItem value={"AnnotatorQuantity"}>Annotator Quantity</MenuItem>
+              <MenuItem value={"Reviewer"}>Reviewer</MenuItem>
+              <MenuItem value={"AnnotatorQuality"}>Annotator Quality</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small"  className={classes.formControl}>
+          <FormControl fullWidth size="small"  className={classes.formControl} disabled={reportTypes === "Reviewer" || reportTypes === "AnnotatorQuality" || radiobutton === "ProjectReports" }>
             <InputLabel id="mutiple-select-label" sx={{ fontSize: "16px", padding: "3px" }}>Projects Filter</InputLabel>
             <Select
               labelId="mutiple-select-label"
