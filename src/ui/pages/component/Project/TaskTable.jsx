@@ -517,11 +517,16 @@ else if (pullDisabled === "No more unassigned tasks in this project")
                         </Tooltip>
                     </Grid>
                     <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 4 : 5}>
-                        <CustomButton 
-                            sx={{ p: 1, borderRadius: 2, margin: "auto", width: '100%'}} 
-                            label={props.type == "annotation"? "Start Labelling Now":"Start reviewing now"}
-                            onClick={labelAllTasks}
-                        />
+                        <Tooltip title={totalTaskCount === 0 ? props.type === "annotation" ? "No more tasks to label" : "No more tasks to review" : ""}>
+                            <Box>
+                                <CustomButton 
+                                    sx={{ p: 1, borderRadius: 2, margin: "auto", width: '100%'}} 
+                                    label={props.type === "annotation"? "Start Labelling Now":"Start reviewing now"}
+                                    onClick={labelAllTasks}
+                                    disabled={totalTaskCount === 0}
+                                />
+                            </Box>
+                        </Tooltip>
                     </Grid>
                 </Grid>
             ) : (
