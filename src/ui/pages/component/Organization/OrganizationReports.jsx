@@ -366,6 +366,7 @@ sx={{mb:3}}
             variant="contained"
             color="primary"
             onClick={() => setShowPicker(!showPicker)}
+            sx={{width:"130px"}}
           >
             Pick Dates
           </Button>
@@ -376,6 +377,7 @@ sx={{mb:3}}
             fullWidth
             variant="contained"
             onClick={handleSubmit}
+            sx={{width:"130px"}}
           >
             Submit
           </Button>
