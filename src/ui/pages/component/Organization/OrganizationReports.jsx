@@ -233,7 +233,7 @@ const OrganizationReports = () => {
     setColumns([]);
     setReportData([]);
     setSelectedColumns([]);
-    if (reportfilter == "") {
+    if (radiobutton === "UsersReports" && reportTypes === "AnnotatorQuantity" && reportfilter == "") {
       setSnackbarInfo({
         open: true,
         message: "Please fill Report Filter",
