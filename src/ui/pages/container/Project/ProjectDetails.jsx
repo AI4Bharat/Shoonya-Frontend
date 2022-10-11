@@ -140,11 +140,11 @@ const Projects = () => {
                 value: projectStatus
             },
             {
-                name: "Unassigned Task",
+                name: "Unassigned Annotation Tasks",
                 value: ProjectDetails.unassigned_task_count
             },
             {
-                name: "Total Labeled Task",
+                name: "Unassigned Review Tasks",
                 value: ProjectDetails.labeled_task_count
             },
         ])

@@ -431,6 +431,7 @@ const OrganizationReports = () => {
             variant="contained"
             color="primary"
             onClick={() => setShowPicker(!showPicker)}
+            sx={{width:"130px"}}
           >
             Pick Dates
           </Button>
@@ -441,6 +442,7 @@ const OrganizationReports = () => {
             fullWidth
             variant="contained"
             onClick={handleSubmit}
+            sx={{width:"130px"}}
           >
             Submit
           </Button>
