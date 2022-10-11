@@ -6,13 +6,12 @@
  import constants from "../../../constants";
  
  export default class GetOrganizationAnnotatorQualityAPI extends API {
-   constructor(orgId, projectType, startDate, endDate, targetLanguage ,onlyReviewProjects,sortByColumn, descOrder, timeout = 2000) {
+   constructor(orgId, projectType, startDate, endDate, targetLanguage,sortByColumn, descOrder, timeout = 2000) {
      super("POST", timeout, false);
      this.projectType = projectType;
      this.startDate = startDate;
      this.endDate = endDate;
      this.targetLanguage = targetLanguage === "all" ? undefined : targetLanguage;
-     this.onlyReviewProjects = onlyReviewProjects;
      this.sortByColumn = sortByColumn ?? undefined;
      this.descOrder = descOrder ?? undefined;
      this.type = constants.GET_ORGANIZATION_ANNOTATOR_QUALITY;
@@ -36,7 +35,6 @@
        from_date: this.startDate,
        to_date: this.endDate,
        tgt_language: this.targetLanguage,
-       ...(  this.onlyReviewProjects == true ||this.onlyReviewProjects == false ) && {only_review_projects: this.onlyReviewProjects},
        sort_by_column_name: this.sortByColumn,
        descending_order: this.descOrder,
      };
