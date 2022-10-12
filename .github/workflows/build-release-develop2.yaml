@@ -2,7 +2,7 @@ name: Build and Release React App for Stage
 
 on:
   push:
-    branches: [stage]
+    branches: [develop2]
   workflow_dispatch:
   workflow_call:
 
