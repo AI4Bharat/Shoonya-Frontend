@@ -247,7 +247,7 @@ const TaskTable = (props) => {
                     }
                 }
             });
-            console.log("cols", cols);
+            console.log("colss", cols);
             setColumns(cols);
             setSelectedColumns(colList);
             setTasks(data);
