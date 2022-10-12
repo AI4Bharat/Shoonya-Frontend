@@ -582,7 +582,7 @@ const AnnotationProject = (props) => {
               </>
             )}
 
-            {(selectedDomain === "Translation" || selectedDomain === "Conversation") && (selectedType === "TranslationEditing" || selectedType === "SemanticTextualSimilarity" || selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation"|| selectedType === "ConversationTranslationEditing") &&
+            {(selectedDomain === "Translation" || selectedDomain === "Conversation") && (selectedType === "TranslationEditing" || selectedType === "SemanticTextualSimilarity" || selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation" || selectedType === "ConversationTranslationEditing") &&
               <>
                 <Grid
                   className={classes.projectsettingGrid}
@@ -603,7 +603,7 @@ const AnnotationProject = (props) => {
                     value={sourceLanguage}
                   />
                 </Grid>
-              
+
                 <Grid
                   className={classes.projectsettingGrid}
                   xs={12}
@@ -623,23 +623,23 @@ const AnnotationProject = (props) => {
                     value={targetLanguage}
                   />
                 </Grid>
-               
+
               </>
             }
 
-{(selectedDomain ==="Monolingual" ) && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification")  && 
-<><Grid
-                  className={classes.projectsettingGrid}
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  lg={12}
-                  xl={12}
-                >
-                  <Typography gutterBottom component="div">
-                    Target Language:
-                  </Typography>
-                </Grid>
+            {(selectedDomain === "Monolingual" || selectedDomain === "Translation") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation") &&
+              <><Grid
+                className={classes.projectsettingGrid}
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+              >
+                <Typography gutterBottom component="div">
+                  Target Language:
+                </Typography>
+              </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
                   <MenuItems
                     menuOptions={languageOptions}
@@ -647,7 +647,7 @@ const AnnotationProject = (props) => {
                     value={targetLanguage}
                   />
                 </Grid></>}
-               
+
             {instanceIds && (
               <>
 
@@ -733,7 +733,7 @@ const AnnotationProject = (props) => {
                     </Grid>
                   </>
                 ))}
-                {selectedType && Object.keys(instanceIds).length > 0 && (
+                {selectedType   && Object.keys(instanceIds).length > 0 && (
                   <>
                     <Grid
                       className={classes.projectsettingGrid}
