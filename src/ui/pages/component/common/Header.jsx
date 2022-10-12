@@ -488,7 +488,7 @@ const Header = () => {
             loggedInUserData={loggedInUserData}
           />
         ) : (
-          <AppBar  sx={{background:"rgba(253, 127, 35, 0.10)"}}>
+          <AppBar  sx={{background:"rgba(253, 127, 35, 0.05)"}}>
             <Toolbar className={classes.toolbar}>
               <Grid
                 sx={{ flexGrow: 0, display: "inline-grid" }}
