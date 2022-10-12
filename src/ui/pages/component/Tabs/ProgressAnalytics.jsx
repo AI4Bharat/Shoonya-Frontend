@@ -326,15 +326,15 @@ function ProgressList() {
       } else {
         const basePeriodicalPayload = {
           project_type: selectedType,
-          periodical_type: comparisonperiod,
-          start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
-          end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
+          periodical_type: baseperiod,
+          start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),     
         };
         const comparisonPeriodicalPayload = {
           project_type: selectedType,
-          periodical_type: baseperiod,
-          start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
-          end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
+          periodical_type: comparisonperiod,
+          start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
+          end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
         };
 
         await getPeriodicalTasksData(basePeriodicalPayload, OrgId);
@@ -394,6 +394,18 @@ function ProgressList() {
       window.removeEventListener("keydown", keyPress);
     }
   }, [keyPress]);
+
+  const formatDateRangeChartLabel = (dataRangeStr) => {
+    let dateRangeArr = dataRangeStr.split("To");
+    let newDateRangeArr = [];
+    // newDateRangeArr.join
+    dateRangeArr?.map((el,i)=> {
+      let trimmedCurrentDate = el.trim();
+      newDateRangeArr.push(trimmedCurrentDate.split("-")[2]+"/"+ trimmedCurrentDate.split("-")[1] +"/"+ trimmedCurrentDate.split("-")[0]);
+    })
+
+    return newDateRangeArr.join(" To ");
+  }
 
 
   useEffect(() => {
@@ -457,8 +469,10 @@ function ProgressList() {
           labels,
           datasets:
             PeriodicalTaskssData?.map((el, i) => {
+              console.log("el.date_range ----- ", el.date_range);
+              console.log("splitted date range --- ", el.date_range.split("To"))
               return {
-                label: `${baseperiod} (${el.date_range})`,
+                label: formatDateRangeChartLabel(el.date_range),
                 data: el.data?.map((e) => (e.annotations_completed)),
                 stack: "stack 0",
                 backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
@@ -476,7 +490,7 @@ function ProgressList() {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${baseperiod} (${el.date_range})`,
+            label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
             backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
@@ -486,7 +500,7 @@ function ProgressList() {
 
         const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${comparisonperiod} (${el.date_range})`,
+            label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
             backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
@@ -499,9 +513,11 @@ function ProgressList() {
         };
       } else if (baseperiod !== "Cumulative" && comparisonperiod !== "Cumulative" && baseperiod != comparisonperiod) {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        console.log("baseperiod ----  ", baseperiod);
+        console.log("comparisonperiod ---- ", comparisonperiod);
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${baseperiod} (${el.date_range})`,
+            label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
             backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
@@ -511,7 +527,7 @@ function ProgressList() {
 
         const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${comparisonperiod} (${el.date_range})`,
+            label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
             backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
@@ -527,7 +543,7 @@ function ProgressList() {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${baseperiod} (${el.date_range})`,
+            label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
             backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
@@ -536,7 +552,7 @@ function ProgressList() {
         });
 
         const cumulativeTasksDataset = {
-          label: `${comparisonperiod}`,
+          label: comparisonperiod,
           data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
           stack: "stack 1",
           backgroundColor: colorsData.green[0].color,
@@ -553,7 +569,7 @@ function ProgressList() {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
         
         const cumulativeTasksDataset = [{
-          label: `${baseperiod}`,
+          label: baseperiod,
           data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
           stack: "stack 0",
           backgroundColor: colorsData.orange[0].color,
@@ -562,7 +578,7 @@ function ProgressList() {
 
         const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
           return {
-            label: `${comparisonperiod} (${el.date_range})`,
+            label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
             backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
