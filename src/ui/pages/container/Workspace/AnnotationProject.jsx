@@ -57,7 +57,7 @@ const AnnotationProject = (props) => {
   const [columnFields, setColumnFields] = useState(null);
   const [variableParameters, setVariableParameters] = useState(null);
   const [languageOptions, setLanguageOptions] = useState([]);
-  
+
   //Form related state variables
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -427,7 +427,7 @@ const AnnotationProject = (props) => {
       temp[element.name] = element.value;
     });
 
-    
+
     const newProject = {
       title: title,
       description: description,
@@ -446,7 +446,7 @@ const AnnotationProject = (props) => {
       variable_parameters: temp,
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
-      enable_task_reviews:taskReviews,
+      enable_task_reviews: taskReviews,
     };
 
     if (sourceLanguage) newProject['src_language'] = sourceLanguage;
@@ -456,10 +456,10 @@ const AnnotationProject = (props) => {
     dispatch(APITransport(projectObj));
   };
 
- 
+
   return (
     <ThemeProvider theme={themeDefault}>
-      
+
       {/* <Header /> */}
       {/* <Grid
                 container
@@ -582,7 +582,7 @@ const AnnotationProject = (props) => {
               </>
             )}
 
-            {selectedDomain === "Translation" || selectedDomain === "Conversation" && (
+            {(selectedDomain === "Translation" || selectedDomain === "Conversation") && (selectedType === "TranslationEditing" || selectedType === "SemanticTextualSimilarity" || selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation"|| selectedType === "ConversationTranslationEditing") &&
               <>
                 <Grid
                   className={classes.projectsettingGrid}
@@ -603,7 +603,7 @@ const AnnotationProject = (props) => {
                     value={sourceLanguage}
                   />
                 </Grid>
-
+              
                 <Grid
                   className={classes.projectsettingGrid}
                   xs={12}
@@ -623,25 +623,50 @@ const AnnotationProject = (props) => {
                     value={targetLanguage}
                   />
                 </Grid>
+               
               </>
-            )}
+            }
 
+{(selectedDomain ==="Monolingual" ) && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification")  && 
+<><Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                    Target Language:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                  <MenuItems
+                    menuOptions={languageOptions}
+                    handleChange={(value) => setTargetLanguage(value)}
+                    value={targetLanguage}
+                  />
+                </Grid></>}
+               
             {instanceIds && (
               <>
+
                 {selectedVariableParameters.map((parameter, index) => (
+
                   <>
-                    <Grid
-                      className={classes.projectsettingGrid}
-                      xs={12}
-                      sm={12}
-                      md={12}
-                      lg={12}
-                      xl={12}
-                    >
-                      <Typography gutterBottom component="div">
-                        {processNameString(parameter["name"])}:
-                      </Typography>
-                    </Grid>
+                    {selectedType === "Conversation" && (selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation") &&
+                      <Grid
+                        className={classes.projectsettingGrid}
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+                      >
+                        <Typography gutterBottom component="div">
+                          {processNameString(parameter["name"])}:
+                        </Typography>
+                      </Grid>}
                     <Grid
                       className={classes.projectsettingGrid}
                       item
@@ -652,20 +677,22 @@ const AnnotationProject = (props) => {
                       xl={12}
                     >
                       {parameter.data["choices"] !== undefined ? (
-                        <MenuItems
-                          menuOptions={parameter.data["choices"].map(
-                            (element) => {
-                              return {
-                                name: element[0],
-                                value: element[0],
-                              };
-                            }
-                          )}
-                          value={selectedVariableParameters[index]["value"]}
-                          handleChange={(e) =>
-                            handleVariableParametersChange(parameter["name"], e)
-                          }
-                        ></MenuItems>
+                        <>
+                          {selectedType === "Conversation" && (selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation") &&
+                            <MenuItems
+                              menuOptions={parameter.data["choices"].map(
+                                (element) => {
+                                  return {
+                                    name: element[0],
+                                    value: element[0],
+                                  };
+                                }
+                              )}
+                              value={selectedVariableParameters[index]["value"]}
+                              handleChange={(e) =>
+                                handleVariableParametersChange(parameter["name"], e)
+                              }
+                            ></MenuItems>}</>
                       ) : (
                         <>
                           {parameter.data["name"] === "DecimalField" ||
@@ -689,6 +716,7 @@ const AnnotationProject = (props) => {
                               }}
                             />
                           ) : (
+
                             <OutlinedTextField
                               fullWidth
                               value={selectedVariableParameters[index]["value"]}
@@ -969,26 +997,26 @@ const AnnotationProject = (props) => {
                 </Grid>
               </>
             )}
-            {confirmed &&(<Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  lg={12}
-                  xl={12}
-                  sx={{ mt: 3 }}
+            {confirmed && (<Grid
+              item
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+              sx={{ mt: 3 }}
 
-                >
-                  <FormControlLabel
-                  sx={{marginLeft: "1px"}}
-                    control={<Switch color="primary" />}
-                    label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
-                    labelPlacement="start"
-                   checked={taskReviews}
-                  onChange={(event)=> setTaskReviews(event.target.checked)}
-                  />
-                </Grid> )} 
-          
+            >
+              <FormControlLabel
+                sx={{ marginLeft: "1px" }}
+                control={<Switch color="primary" />}
+                label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
+                labelPlacement="start"
+                checked={taskReviews}
+                onChange={(event) => setTaskReviews(event.target.checked)}
+              />
+            </Grid>)}
+
             <Grid
               className={classes.projectsettingGrid}
               xs={12}
