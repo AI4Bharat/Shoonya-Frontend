@@ -172,7 +172,7 @@ const TaskTable = (props) => {
         setSearchedCol(col);
     }
 
-    const handleSubmitFindAndReplace = () => {
+    const handleSubmitFindAndReplace = async () => {
         const ReplaceData = {
             user_id: userDetails.id,
             project_id: id,
@@ -185,6 +185,27 @@ const TaskTable = (props) => {
 
         const AnnotationObj = new FindAndReplaceWordsInAnnotationAPI(id, ReplaceData);
         dispatch(APITransport(AnnotationObj));
+        const res = await fetch(AnnotationObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(AnnotationObj.getBody()),
+            headers: AnnotationObj.getHeaders().headers,
+          });
+          const resp = await res.json();
+          setLoading(false);
+          if (res.ok && userDetails?.role !== 3) {
+            setSnackbarInfo({
+              open: true,
+              message: resp?.message,
+              variant: "success",
+            })
+      
+          } else if(userDetails?.role === 3) {
+            setSnackbarInfo({
+              open: true,
+              message: resp?.message,
+              variant: "error",
+            })
+          }
 
     }
 
@@ -353,8 +374,8 @@ const TaskTable = (props) => {
         return (
             <Box className={classes.filterToolbarContainer}
                 sx={{ height: "80px" }}>   
-                {props.type === "annotation" && (selectedFilters.task_status === "labeled" || selectedFilters.task_status === "accepted") &&
-                    <Grid container
+                {(props.type === "annotation" || props.type === "review") && ((props.type === "annotation" && selectedFilters.task_status === "labeled") || selectedFilters.task_status === "accepted" ||selectedFilters.task_status === "accepted_with_changes") &&
+                   <Grid container
                         justifyContent='start'
                         alignItems='center'>
                         <Grid >
