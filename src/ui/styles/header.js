@@ -7,7 +7,6 @@ const headerStyle = makeStyles({
         marginBottom : window.innerHeight*0.13,
         width : window.innerWidth*0.98,
       
-      
        
     },
     appBar: {
@@ -55,7 +54,6 @@ const headerStyle = makeStyles({
         fontWeight: 500,
         letterSpacing: "0.5px",
         borderRadius:12,
-        backgroundColor: "#E0E0E0",
         '&:hover': {
             backgroundColor: "#E0E0E0",
             boxShadow: "none",
