@@ -50,6 +50,7 @@ const TaskTable = (props) => {
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+   
     
     const filterData = {
         Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["labeled", "accepted", "accepted_with_changes", "to_be_revised"] : ["unlabeled", "skipped", "accepted", "draft"],
@@ -532,8 +533,7 @@ const TaskTable = (props) => {
 
     return (
         <div>
-            {((props.type === "annotation" && userDetails?.role === 1) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (
-                ProjectDetails.is_published ? (
+            {((props.type === "annotation" && ProjectDetails?.annotators?.some((annotation) => annotation.id === userDetails?.id)) || (props.type === "review" && ProjectDetails?.annotation_reviewers.some((reviewer) => reviewer.id === userDetails?.id))) && (ProjectDetails.project_mode === "Annotation" ? (ProjectDetails.is_published ? (
                     <Grid
                         container
                         direction="row"
