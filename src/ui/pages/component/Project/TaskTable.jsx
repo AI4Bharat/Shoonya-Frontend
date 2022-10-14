@@ -54,7 +54,7 @@ const TaskTable = (props) => {
     
     const filterData = {
         Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["labeled", "accepted", "accepted_with_changes", "to_be_revised"] : ["unlabeled", "skipped", "accepted", "draft"],
-        Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators.filter((member) => member.role === 1).map((el, i) => {
+        Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
             return {
                 label: el.username,
                 value: el.id
@@ -421,7 +421,7 @@ const TaskTable = (props) => {
                     
                 }
               
-                {props.type === "annotation" && userDetails?.role !== 1 && <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
+                {props.type === "annotation"   && <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
                     <InputLabel id="annotator-filter-label" sx={{ fontSize: "16px", position: "inherit", top: "23px", left: "-20px" }}>Filter by Annotator</InputLabel>
                     <Select
                         labelId="annotator-filter-label"
