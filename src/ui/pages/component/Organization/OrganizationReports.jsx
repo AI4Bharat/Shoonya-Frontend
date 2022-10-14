@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetOrganizationUserReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationUserReports";
 import GetOrganizationProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationProjectReports";
+import GetOrganizationAnnotatorQualityAPI from "../../../../redux/actions/api/Organization/GetOrganizationAnnotatorQuality";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
@@ -25,6 +26,8 @@ import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { styled } from '@mui/material/styles';
+import { addDays } from 'date-fns';
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 const ProgressType = ["Review Enabled", "Review disabled"]
 const ITEM_HEIGHT = 38;
@@ -52,9 +55,12 @@ const MenuProps = {
 const OrganizationReports = () => {
   const OrganizationDetails = useSelector(state => state.fetchLoggedInUserData.data.organization);
   const [selectRange, setSelectRange] = useState([{
-    startDate: new Date(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
-    endDate: new Date(),
-    key: "selection"
+    // startDate: new Date(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+    // endDate: new Date(),
+    // key: "selection"
+    startDate: addDays(new Date(), -9),
+    endDate: addDays(new Date(), -3),
+    key: 'selection'
   }]);
   // const [rangeValue, setRangeValue] = useState([format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
   const [showPicker, setShowPicker] = useState(false);
@@ -67,15 +73,22 @@ const OrganizationReports = () => {
   const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
-  const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
+  const [reportTypes, setReportTypes] = useState("AnnotatorQuantity");
+  const [radiobutton, setRadiobutton] = useState("ProjectReports");
   const [reportfilter, setReportfilter] = useState(["Review Enabled", "Review disabled"]);
-  
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
+
   const classes = DatasetStyle();
   const { orgId } = useParams();
   const dispatch = useDispatch();
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const UserReports = useSelector((state) => state.getOrganizationUserReports.data);
   const ProjectReports = useSelector((state) => state.getOrganizationProjectReports.data);
+  const AnnotatorQuality = useSelector((state) => state.getOrganizationAnnotatorQuality.data);
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
   useEffect(() => {
@@ -93,7 +106,7 @@ const OrganizationReports = () => {
         types.push(...subTypes);
       });
       setProjectTypes(types);
-      setSelectedType(types[2]);
+      setSelectedType(types[3]);
     }
   }, [ProjectTypes]);
 
@@ -134,7 +147,7 @@ const OrganizationReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: key === "Word Count Of Annotated Tasks",
+            sort: true,
             align: "center",
           },
         });
@@ -150,6 +163,33 @@ const OrganizationReports = () => {
     }
     setShowSpinner(false);
   }, [ProjectReports]);
+
+  useEffect(() => {
+    if (reportRequested && AnnotatorQuality?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(AnnotatorQuality[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+      setReportData(AnnotatorQuality);
+      setSelectedColumns(tempSelected);
+    } else {
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
+    }
+    setShowSpinner(false);
+  }, [AnnotatorQuality]);
 
   const renderToolBar = () => {
     return (
@@ -186,8 +226,6 @@ const OrganizationReports = () => {
     console.log(selection, "selection");
   };
 
-
-
   const handleSubmit = () => {
     setReportRequested(true);
     setShowSpinner(true);
@@ -195,43 +233,54 @@ const OrganizationReports = () => {
     setColumns([]);
     setReportData([]);
     setSelectedColumns([]);
-    let reportData =[]
+    if (radiobutton === "UsersReports" && reportTypes === "AnnotatorQuantity" && reportfilter == "") {
+      setSnackbarInfo({
+        open: true,
+        message: "Please fill Report Filter",
+        variant: "error",
+      })
 
-    if (reportType === "user" ) {
+    }
+    let ReviewData = []
 
-      if( reportfilter.toString() == "Review disabled" ){
-        reportData.push(false)
-      }else if(reportfilter.toString() == "Review Enabled"){
-        reportData.push(true)
+    if ((reportTypes === "AnnotatorQuantity" || reportTypes === "Reviewer") && reportfilter != "" && radiobutton === "UsersReports") {
+
+      if (reportfilter.toString() == "Review disabled") {
+        ReviewData.push(false)
+      } else if (reportfilter.toString() == "Review Enabled") {
+        ReviewData.push(true)
       }
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,
-      selectedType,
-      format(selectRange[0].startDate, 'yyyy-MM-dd'),
-      format(selectRange[0].endDate, 'yyyy-MM-dd'),
-      radiobutton === "AnnotatationReports" ? "annotation" : "review",
-      targetLanguage,
-      ...reportData,
-      
+        selectedType,
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
+        format(selectRange[0].endDate, 'yyyy-MM-dd'),
+        reportTypes === "AnnotatorQuantity" ? "annotation" : "review",
+        targetLanguage,
+        ...ReviewData,
+
       );
       dispatch(APITransport(userReportObj));
-   
-    } else if (reportType === "project" ) {
 
-      if( reportfilter.toString() == "Review disabled" ){
-        reportData.push(false)
-      }else if(reportfilter.toString() == "Review Enabled"){
-        reportData.push(true)
-      }
+    } else if (reportTypes === "AnnotatorQuality" && radiobutton === "UsersReports") {
+      const annotatorQualityObj = new GetOrganizationAnnotatorQualityAPI(
+        orgId,
+        selectedType,
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
+        format(selectRange[0].endDate, 'yyyy-MM-dd'),
+        targetLanguage,
+      );
+      dispatch(APITransport(annotatorQualityObj));
+
+
+    }
+    else if (radiobutton === "ProjectReports") {
       const projectReportObj = new GetOrganizationProjectReportsAPI(
         orgId,
         selectedType,
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
-        radiobutton === "AnnotatationReports" ? "annotation" : "review",
         targetLanguage,
-        ...reportData,
-
       );
       dispatch(APITransport(projectReportObj));
     }
@@ -246,13 +295,28 @@ const OrganizationReports = () => {
     setReportfilter(value);
   }
 
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
+
   return (
     <React.Fragment>
+      {renderSnackBar()}
       <Grid
         container
         direction="row"
         spacing={3}
-sx={{mb:3}}
+        sx={{ mb: 3 }}
       >
         <Grid
           container
@@ -278,8 +342,8 @@ sx={{mb:3}}
                 onChange={handleChangeReports}
 
               >
-                <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation" />
-                <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
+                <FormControlLabel value="UsersReports" control={<Radio />} label="Users Reports" />
+                <FormControlLabel value="ProjectReports" control={<Radio />} label="Project Reports" />
 
               </RadioGroup>
             </FormControl>
@@ -287,7 +351,7 @@ sx={{mb:3}}
         </Grid>
 
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
             <Select
               labelId="project-type-label"
@@ -305,22 +369,23 @@ sx={{mb:3}}
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" disabled={radiobutton === "ProjectReports"}>
             <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>Report Type</InputLabel>
             <Select
               labelId="report-type-label"
               id="report-select"
-              value={reportType}
+              value={reportTypes}
               label="Report Type"
-              onChange={(e) => setReportType(e.target.value)}
+              onChange={(e) => setReportTypes(e.target.value)}
             >
-              <MenuItem value={"user"}>User Reports</MenuItem>
-              <MenuItem value={"project"}>Project Reports</MenuItem>
+              <MenuItem value={"AnnotatorQuantity"}>Annotator Quantity</MenuItem>
+              <MenuItem value={"Reviewer"}>Reviewer</MenuItem>
+              <MenuItem value={"AnnotatorQuality"}>Annotator Quality</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small"  className={classes.formControl}>
+          <FormControl fullWidth size="small" className={classes.formControl} disabled={reportTypes === "Reviewer" || reportTypes === "AnnotatorQuality" || radiobutton === "ProjectReports"}>
             <InputLabel id="mutiple-select-label" sx={{ fontSize: "16px", padding: "3px" }}>Projects Filter</InputLabel>
             <Select
               labelId="mutiple-select-label"
@@ -332,11 +397,11 @@ sx={{mb:3}}
               MenuProps={MenuProps}
             >
               {ProgressType.map((option) => (
-                <MenuItem sx={{ textTransform: "capitalize",padding:"0px"}} key={option} value={option}>
+                <MenuItem sx={{ textTransform: "capitalize", padding: "0px" }} key={option} value={option}>
                   <ListItemIcon>
                     <Checkbox checked={reportfilter.indexOf(option) > -1} />
                   </ListItemIcon>
-                  <ListItemText primary={option} primaryTypographyProps={{fontSize: '14px'}}  />
+                  <ListItemText primary={option} primaryTypographyProps={{ fontSize: '14px' }} />
                 </MenuItem>
               ))}
             </Select>
@@ -366,6 +431,7 @@ sx={{mb:3}}
             variant="contained"
             color="primary"
             onClick={() => setShowPicker(!showPicker)}
+            sx={{width:"130px"}}
           >
             Pick Dates
           </Button>
@@ -376,6 +442,7 @@ sx={{mb:3}}
             fullWidth
             variant="contained"
             onClick={handleSubmit}
+            sx={{width:"130px"}}
           >
             Submit
           </Button>

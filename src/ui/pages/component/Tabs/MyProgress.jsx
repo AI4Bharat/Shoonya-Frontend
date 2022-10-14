@@ -246,7 +246,7 @@ const MyProgress = () => {
         direction="row"
         justifyContent="start"
         alignItems="center"
-        sx={{ marginLeft: "50px" }}
+        // sx={{ marginLeft: "50px" }}
       >
         <Grid >
           <Typography gutterBottom component="div" sx={{ marginTop: "15px", fontSize: "16px" }}>
@@ -264,8 +264,8 @@ const MyProgress = () => {
             onChange={handleChangeReports}
 
           >
-            <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation Reports" />
-            <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer Reports" />
+            <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
+            <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
 
           </RadioGroup>
         </FormControl>
@@ -277,9 +277,9 @@ const MyProgress = () => {
         alignItems="center"
       >
 
-        <Grid container columnSpacing={4} rowSpacing={2} mt={1} mb={1} justifyContent="space-evenly">
+        <Grid container columnSpacing={4} rowSpacing={2} mt={1} mb={1} justifyContent="flex-start">
 
-          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
             <FormControl fullWidth size="small">
               <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
                 Project Type
@@ -299,11 +299,12 @@ const MyProgress = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
             <Button
               endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color="primary"
+              sx={{width:"130px"}}
               onClick={() => setShowPicker(!showPicker)}
             >
               Pick Dates
@@ -336,6 +337,7 @@ const MyProgress = () => {
               fullWidth
               variant="contained"
               onClick={handleProgressSubmit}
+              sx={{width:"130px"}}
             >
               Submit
             </Button>

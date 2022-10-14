@@ -478,8 +478,8 @@ const Header = () => {
   }
 
   return (
-    <Grid container direction="row">
-      <Box className={classes.parentContainer}>
+    <Grid container direction="row" >
+      <Box className={classes.parentContainer} >
         {isMobile ? (
           <MobileNavbar
             tabs={tabs}
@@ -488,7 +488,7 @@ const Header = () => {
             loggedInUserData={loggedInUserData}
           />
         ) : (
-          <AppBar style={{ backgroundColor: "#ffffff" }}>
+          <AppBar>
             <Toolbar className={classes.toolbar}>
               <Grid
                 sx={{ flexGrow: 0, display: "inline-grid" }}

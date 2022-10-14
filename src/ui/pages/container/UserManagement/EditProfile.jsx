@@ -10,6 +10,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import Snackbar from "../../component/common/Snackbar";
 import UpdateEmailDialog from "../../component/common/UpdateEmailDialog"
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
+import {participationType} from '../../../../config/dropDownValues';
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
@@ -22,7 +23,6 @@ const MyProfile = () => {
   const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
 
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-  console.log(userDetails,"userDetails")
   const dispatch = useDispatch();
   const LanguageList = useSelector(state => state.fetchLanguages.data);
 
@@ -50,6 +50,7 @@ const MyProfile = () => {
       languages: userDetails.languages,
       phone: userDetails.phone,
       availability_status:userDetails.availability_status,
+      participation_type: userDetails.participation_type
     });
     setEmail(userDetails.email);
     setOriginalEmail(userDetails.email);
@@ -106,6 +107,7 @@ const MyProfile = () => {
       newDetails.languages,
       newDetails.phone,
       newDetails.availability_status,
+      newDetails.participation_type
     );
     fetch(apiObj.apiEndPoint(), {
       method: "PATCH",
@@ -121,7 +123,6 @@ const MyProfile = () => {
     });
   }
 
-  console.log(snackbarState)
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
@@ -282,6 +283,27 @@ const MyProfile = () => {
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
               </Grid>
+              <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <InputLabel id="lang-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Participation Type</InputLabel>
+              <Select
+                fullWidth
+                labelId="lang-label"
+                name="participation_type"
+                value={newDetails?.participation_type? newDetails.participation_type : []}
+                onChange={handleFieldChange}
+                style={{zIndex: "0"}}
+                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+              >
+                {participationType?.length && participationType.map((type,i) => (
+                  <MenuItem
+                    key={i+1}
+                    value={i+1}
+                  >
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
             <Grid 
                 container 
                 direction="row"

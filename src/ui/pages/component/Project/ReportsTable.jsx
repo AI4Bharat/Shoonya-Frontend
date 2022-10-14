@@ -191,7 +191,7 @@ const ReportsTable = (props) => {
                         onChange={handleChangeReports}
 
                     >
-                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotatation"  />
+                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />
                         <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />
 
                     </RadioGroup>
@@ -202,6 +202,7 @@ const ReportsTable = (props) => {
                         endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                         variant="contained"
                         color="primary"
+                        sx={{width:"130px"}}
                         onClick={() => setShowPicker(!showPicker)}
                     >
                         Pick Dates
@@ -212,6 +213,7 @@ const ReportsTable = (props) => {
                         fullWidth
                         variant="contained"
                         onClick={handleSubmit}
+                        sx={{width:"130px"}}
                     >
                         Submit
                     </Button>
