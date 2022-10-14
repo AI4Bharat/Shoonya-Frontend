@@ -56,13 +56,13 @@ const headerStyle = makeStyles({
         letterSpacing: "0.5px",
         borderRadius:12,
         '&:hover': {
-            backgroundColor: "rgba(253, 127, 35, 0.10)",
+            backgroundColor: "#E0E0E0",
             boxShadow: "none",
             
         },
     },
     highlightedMenu : {
-        backgroundColor: "rgba(253, 127, 35, 0.10)",
+        backgroundColor: "#E0E0E0",
         textDecoration : "none",
         borderRadius: "inherit",
         padding : "18px ",
@@ -74,7 +74,7 @@ const headerStyle = makeStyles({
         borderRadius:12,
         letterSpacing: "0.5px",
         '&:hover': {
-            backgroundColor: "rgba(253, 127, 35, 0.10)",
+            backgroundColor: "#E0E0E0",
             boxShadow: "none",
         },
     },
