@@ -275,7 +275,7 @@ const themeDefault = createTheme({
           boxSizing: "border-box",
           margin: "-1px",
           padding: "0px",
-          backgroundImage: "linear-gradient(to right, #f1f1f1, #ffffff)",
+           backgroundImage: "linear-gradient(to right, #f1f1f1, #ffffff)",
         },
       },
     },
