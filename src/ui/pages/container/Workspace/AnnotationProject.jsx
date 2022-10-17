@@ -311,7 +311,7 @@ const AnnotationProject = (props) => {
     setSelectedType("");
     setSamplingParameters(null);
     setConfirmed(false);
-    if (selectedDomain === "Translation") {
+    if (selectedDomain === "Translation" || selectedDomain === "Conversation" ||selectedDomain === "Monolingual") {
       const langChoicesObj = new GetLanguageChoicesAPI();
       dispatch(APITransport(langChoicesObj));
     }

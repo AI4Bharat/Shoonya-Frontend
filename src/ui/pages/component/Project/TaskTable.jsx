@@ -45,13 +45,12 @@ const TaskTable = (props) => {
     
     const popoverOpen = Boolean(anchorEl);
     const filterId = popoverOpen ? "simple-popover" : undefined;
-    const getProjectUsers = useSelector(state => state.getProjectDetails.data.users);
+    const getProjectUsers = useSelector(state => state.getProjectDetails.data.annotators);
     const getProjectReviewers = useSelector(state => state.getProjectDetails.data.annotation_reviewers);
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-   
-    
+  
     const filterData = {
         Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["labeled", "accepted", "accepted_with_changes", "to_be_revised"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
@@ -421,7 +420,7 @@ const TaskTable = (props) => {
                     
                 }
               
-                {props.type === "annotation"   && <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
+                {props.type === "annotation" && userDetails?.role !== 1 && !getProjectUsers?.some((annotator) => annotator.id === userDetails?.id)  && <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
                     <InputLabel id="annotator-filter-label" sx={{ fontSize: "16px", position: "inherit", top: "23px", left: "-20px" }}>Filter by Annotator</InputLabel>
                     <Select
                         labelId="annotator-filter-label"
