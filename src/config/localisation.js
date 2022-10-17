@@ -48,6 +48,8 @@ const localisation = {
     "tooltip.ProjectType":" The type of the project for which the chart should be based on. Default selection is 'ContextualTranslationEditing'.",
     "tooltip.Baseperiod":"The time range selected for the first plot of the chart. Currently it can be cumulative, monthly or weekly. The default selection is 'Cumalative'.",
     "tooltip.ComparisonPeriod":"The time range selected for the second plot of the chart. This is applicable when the analytics type is Comparison. Currently it can be cumulative, monthly or weekly.",
+    "label.recentTasks.annotation": "Annotations",
+    "label.recentTasks.review": "Reviews"
   
 };
 

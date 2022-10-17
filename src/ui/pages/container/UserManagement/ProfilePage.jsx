@@ -6,6 +6,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip } from '@mui/material';
 import MyProgress from '../../component/Tabs/MyProgress';
+import RecentTasks from '../../component/Tabs/RecentTasks';
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
@@ -90,7 +91,7 @@ const ProfilePage = () => {
         {renderSnackBar()}
           {userDetails && (
             <><Grid item xs={12} sm={12} md={4} lg={4} xl={4} sx={{ p: 2 }}>
-              <Card sx={{ borderRadius: "5px" }}>
+              <Card sx={{ borderRadius: "5px", mb:2 }}>
                   <CardContent>
                     <Avatar
                       alt="user_profile_pic"
@@ -138,6 +139,12 @@ const ProfilePage = () => {
                           />
                         </Grid>
                       </Grid>}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
+                    <RecentTasks />
                   </CardContent>
                 </Card>
             </Grid>
