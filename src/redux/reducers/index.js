@@ -71,6 +71,7 @@ import getDatasetDownloadTSV from './Dataset/GetDatasetDownloadTSV';
 import getDatasetDownloadJSON from './Dataset/GetDatasetDownloadJSON';
 import getOrganizationAnnotatorQuality from './Organization/GetOrganizationAnnotatorQuality';
 import FindAndReplaceWordsInAnnotation from './ProjectDetails/FindAndReplaceWordsInAnnotation';
+import getRecentTasks from './UserManagement/FetchRecentTasks'
 
 const index = {
     apiStatus,
@@ -149,6 +150,7 @@ const index = {
     getDatasetDownloadJSON,
     getOrganizationAnnotatorQuality,
     FindAndReplaceWordsInAnnotation,
+    getRecentTasks,
     
 };
 
