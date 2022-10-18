@@ -16,7 +16,7 @@ const DatasetCards = (props) => {
     const [loading, setLoading] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(9);
     // const apiLoading = useSelector(state => state.apiStatus.loading);
-    const SearchProject = useSelector((state) => state.SearchProjectCards.data);
+    const SearchDataset = useSelector((state) => state.SearchProjectCards.data);
 
     const handleChangePage = (e, newPage) => {
         console.log("newPage", newPage);
@@ -32,20 +32,20 @@ const DatasetCards = (props) => {
 
         return datasetList.filter((el) => {
 
-            if (SearchProject == "") {
+            if (SearchDataset == "") {
 
                 return el;
             } else if (
                 el.dataset_type
                     ?.toLowerCase()
-                    .includes(SearchProject?.toLowerCase())
+                    .includes(SearchDataset?.toLowerCase())
             ) {
 
                 return el;
             } else if (
                 el.instance_name
                     ?.toLowerCase()
-                    .includes(SearchProject?.toLowerCase())
+                    .includes(SearchDataset?.toLowerCase())
             ) {
 
 
@@ -54,7 +54,7 @@ const DatasetCards = (props) => {
             }  
              else if (
                 el.instance_id.toString()?.toLowerCase()
-                    ?.includes(SearchProject.toLowerCase())
+                    ?.includes(SearchDataset.toLowerCase())
             ) {
 
                 return el;

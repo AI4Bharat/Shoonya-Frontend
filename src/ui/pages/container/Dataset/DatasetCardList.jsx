@@ -8,26 +8,26 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const DatasetCardList = (props) => {
     const { datasetList } = props
-    const SearchProject = useSelector((state) => state.SearchProjectCards.data);
+    const SearchDataset = useSelector((state) => state.SearchProjectCards.data);
 
     const pageSearch = () => {
 
         return datasetList.filter((el) => {
 
-            if (SearchProject == "") {
+            if (SearchDataset == "") {
 
                 return el;
             } else if (
                 el.dataset_type
                     ?.toLowerCase()
-                    .includes(SearchProject?.toLowerCase())
+                    .includes(SearchDataset?.toLowerCase())
             ) {
 
                 return el;
             } else if (
                 el.instance_name
                     ?.toLowerCase()
-                    .includes(SearchProject?.toLowerCase())
+                    .includes(SearchDataset?.toLowerCase())
             ) {
 
 
@@ -36,7 +36,7 @@ const DatasetCardList = (props) => {
             }  
              else if (
                 el.instance_id.toString()?.toLowerCase()
-                    ?.includes(SearchProject.toLowerCase())
+                    ?.includes(SearchDataset.toLowerCase())
             ) {
 
                 return el;
