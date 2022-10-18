@@ -113,7 +113,7 @@ const Projects = () => {
     const dispatch = useDispatch();
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-    console.log(ProjectDetails, "ProjectDetails")
+    
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
 
