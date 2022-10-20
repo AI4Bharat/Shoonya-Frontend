@@ -6,7 +6,7 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from '../../../constants';
 
 export default class AutomateDatasetsAPI extends API {
-  constructor(srcInstanceId, tgtInstanceId, languages, organizationId, model, checks, timeout = 2000) {
+  constructor(srcInstanceId, tgtInstanceId, languages, organizationId,apitype, model, checks, timeout = 2000) {
     super("POST", timeout, false);
     this.type = constants.AUTOMATE_DATASETS;
     this.input_dataset_instance_id = srcInstanceId;
@@ -14,7 +14,8 @@ export default class AutomateDatasetsAPI extends API {
     this.output_dataset_instance_id = tgtInstanceId;
     this.organization_id = organizationId;
     this.checks_for_particular_languages = checks;
-    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}${model === 1 ? "schedule_ai4b_translate_job": "schedule_google_translate_job"}`;
+    this.apitype=apitype;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}automated_sentence_text_translation_job`;
   }
 
   processResponse(res) {
@@ -34,7 +35,8 @@ export default class AutomateDatasetsAPI extends API {
       languages: this.languages,
       output_dataset_instance_id: this.output_dataset_instance_id,
       organization_id: this.organization_id,
-      checks_for_particular_languages: this.checks_for_particular_languages
+      checks_for_particular_languages: this.checks_for_particular_languages,
+      apitype:this.apitype
     }
   }
 
