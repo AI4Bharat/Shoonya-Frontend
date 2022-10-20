@@ -4,9 +4,48 @@ import MUIDataTable from "mui-datatables";
 import CustomButton from "../../component/common/Button";
 import { ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import { useDispatch, useSelector } from 'react-redux';
 
 const DatasetCardList = (props) => {
     const { datasetList } = props
+    const SearchDataset = useSelector((state) => state.SearchProjectCards.data);
+
+    const pageSearch = () => {
+
+        return datasetList.filter((el) => {
+
+            if (SearchDataset == "") {
+
+                return el;
+            } else if (
+                el.dataset_type
+                    ?.toLowerCase()
+                    .includes(SearchDataset?.toLowerCase())
+            ) {
+
+                return el;
+            } else if (
+                el.instance_name
+                    ?.toLowerCase()
+                    .includes(SearchDataset?.toLowerCase())
+            ) {
+
+
+
+                return el;
+            }  
+             else if (
+                el.instance_id.toString()?.toLowerCase()
+                    ?.includes(SearchDataset.toLowerCase())
+            ) {
+
+                return el;
+            }
+
+
+        })
+
+    }
 
    const columns = [
         {
@@ -53,7 +92,7 @@ const DatasetCardList = (props) => {
 
 
 
-    const data = datasetList && datasetList.length > 0 ? datasetList.map((el, i) => {
+    const data = datasetList && datasetList.length > 0 ? pageSearch().map((el, i) => {
         return [
             el.instance_id,
             el.instance_name,
