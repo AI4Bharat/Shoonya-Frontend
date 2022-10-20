@@ -1,4 +1,4 @@
-import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, Typography } from "@mui/material";
+import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,7 @@ import AutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/AutomateD
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import GetIndicTransLanguagesAPI from "../../../../redux/actions/api/Dataset/GetIndicTransLanguages";
 
+const APiType = [{ ApiTypename: "indic-trans" }, { ApiTypename: "google" }, { ApiTypename: "azure" }]
 const AutomateDatasets = () => {
   const navigate = useNavigate();
   const classes = DatasetStyle();
@@ -33,7 +34,8 @@ const AutomateDatasets = () => {
   const [translationModel, setTranslationModel] = useState('');
   const [checks, setChecks] = useState('False');
   const [loading, setLoading] = useState(false);
-  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
+  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
+  const [apitype, setApitype] = useState("indic-trans");
 
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
   const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
@@ -66,12 +68,12 @@ const AutomateDatasets = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: (srcDatasetType === "SentenceText" ? element !=="TranslationPair" : element !== "Conversation")
+          disabled: (srcDatasetType === "SentenceText" ? element !== "TranslationPair" : element !== "Conversation")
         });
       });
       setTgtDatasetTypes(temp);
     }
-  }, [DatasetTypes,srcDatasetType]);
+  }, [DatasetTypes, srcDatasetType]);
 
   useEffect(() => {
     setLoading(false);
@@ -122,7 +124,7 @@ const AutomateDatasets = () => {
   };
 
   const handleConfirm = () => {
-    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages.map(s => `'${s}'`).join(', '), loggedInUserData.organization.id, translationModel, checks);
+    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages.map(s => `'${s}'`).join(', '), loggedInUserData.organization.id, translationModel, checks,apitype);
     setLoading(true);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
@@ -140,7 +142,11 @@ const AutomateDatasets = () => {
   };
 
   if (loggedInUserData?.role === 1) return navigate("/projects");
-  
+
+  const handleAPiType = (e) => {
+    setApitype(e.target.value)
+  }
+
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
@@ -232,15 +238,15 @@ const AutomateDatasets = () => {
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
                 <MenuItems
-                    menuOptions={tgtInstances.map((instance) => {
-                      return {
-                        name: instance["instance_name"],
-                        value: instance["instance_id"],
-                      }
-                    })}
-                    handleChange={(value) => setTgtInstance(value)}
-                    value={tgtInstance}
-                  />
+                  menuOptions={tgtInstances.map((instance) => {
+                    return {
+                      name: instance["instance_name"],
+                      value: instance["instance_id"],
+                    }
+                  })}
+                  handleChange={(value) => setTgtInstance(value)}
+                  value={tgtInstance}
+                />
               </Grid>
             </>}
             {tgtDatasetType === "TranslationPair" && <>
@@ -329,6 +335,39 @@ const AutomateDatasets = () => {
                 value={checks}
               />
             </Grid>
+            
+
+            <Grid
+              className={classes.projectsettingGrid}
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+            >
+              <Typography gutterBottom component="div">
+                Api Type:
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+
+            <FormControl
+                  fullWidth
+                  sx={{ minWidth: 110 }}
+                >
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="APi-simple-select"
+                    value={apitype}
+                    onChange={handleAPiType}
+                  >
+                   {APiType.map((item, index) => (
+                    <MenuItem value={item.ApiTypename}>{item.ApiTypename}</MenuItem>
+                  ))}
+                  </Select>
+                </FormControl>
+            </Grid>
+           
             <Grid
               style={{}}
               item
@@ -343,7 +382,7 @@ const AutomateDatasets = () => {
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Confirm"}
                 onClick={handleConfirm}
-                disabled={srcDatasetType === "SentenceText" ? !srcInstance || !tgtInstance || !languages.length :!srcInstance || !tgtInstance}
+                disabled={srcDatasetType === "SentenceText" ? !srcInstance || !tgtInstance || !languages.length : !srcInstance || !tgtInstance}
               />
               <Button
                 label={"Cancel"}
@@ -353,10 +392,10 @@ const AutomateDatasets = () => {
           </Grid>
         </Card>
       </Grid>
-      <Snackbar 
-        {...snackbarState} 
-        handleClose={()=> setSnackbarState({...snackbarState, open: false})} 
-        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+      <Snackbar
+        {...snackbarState}
+        handleClose={() => setSnackbarState({ ...snackbarState, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         hide={2000}
       />
     </ThemeProvider>
