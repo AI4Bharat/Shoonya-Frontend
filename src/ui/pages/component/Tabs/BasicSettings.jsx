@@ -351,7 +351,7 @@ const BasicSettings = (props) => {
                                         <TextField
                                             {...params}
                                             inputProps={{ ...params.inputProps, style: { fontSize: "14px" } }}
-                                            placeholder="Enter source language"
+                                            placeholder="Enter target language"
                                         />
                                     )}
                                 />
