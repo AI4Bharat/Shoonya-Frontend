@@ -4,11 +4,15 @@ import { Link, useParams } from "react-router-dom";
 import GetDataitemsById from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, ThemeProvider } from "@mui/material";
+import { Button, Grid, Typography, ThemeProvider,Box, IconButton, } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "./ColumnList";
+import SearchIcon from '@mui/icons-material/Search';
+import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
+import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+
 
 const excludeKeys = [
   "parent_data_id",
@@ -27,13 +31,21 @@ const DataitemsTable = () => {
   const { datasetId } = useParams();
   const dispatch = useDispatch();
   const dataitemsList = useSelector((state) => state.getDataitemsById.data);
-
+  const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
+  const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
+  
+ 
+  const [selectedFilters, setsSelectedFilters] = useState({});
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [totalDataitems, setTotalDataitems] = useState(10);
   const [dataitems, setDataitems] = useState([]);
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
+  const [searchAnchor, setSearchAnchor] = useState(null);
+  const searchOpen = Boolean(searchAnchor);
+  const [searchedCol, setSearchedCol] = useState();
+ 
 
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
@@ -44,10 +56,29 @@ const DataitemsTable = () => {
     dispatch(APITransport(dataObj));
   };
 
+  const getsearchdataitems = () =>{
+    const searchPopupdata ={
+      instance_ids:datasetId,
+      dataset_type:DatasetDetails.dataset_type,
+      search_keys:selectedFilters
+    }
+    const taskObj = new DatasetSearchPopupAPI(searchPopupdata);
+    dispatch(APITransport(taskObj)); 
+
+  }
+
+ 
+
   const setData = () => {
-    setTotalDataitems(dataitemsList.count);
-    let fetchedItems = dataitemsList.results;
-    setDataitems(fetchedItems);
+    let fetchedItems =filterdataitemsList.results;
+      // setTotalDataitems(dataitemsList.count);
+      // fetchedItems = dataitemsList.results;
+      // setDataitems(fetchedItems);
+
+      setTotalDataitems(filterdataitemsList.count);
+      setDataitems(fetchedItems)
+   
+    
     let tempColumns = [];
     let tempSelected = [];
     if (fetchedItems?.length) {
@@ -60,6 +91,7 @@ const DataitemsTable = () => {
               filter: false,
               sort: false,
               align: "center",
+              customHeadLabelRender: customColumnHead,
             },
           });
           tempSelected.push(key);
@@ -68,23 +100,55 @@ const DataitemsTable = () => {
     }
     setColumns(tempColumns);
     setSelectedColumns(tempSelected);
+   
   };
 
+ 
+
   useEffect(() => {
-    getDataitems();
-  }, []);
+    getsearchdataitems();
+  }, [currentPageNumber,currentRowPerPage,selectedFilters]);
 
   useEffect(() => {
     setData();
-  }, [dataitemsList]);
+  }, [filterdataitemsList]);
 
-  useEffect(() => {
-    getDataitems();
-  }, [currentPageNumber]);
+  // useEffect(() => {
+  //   getsearchdataitems();
+  // }, [currentPageNumber,currentRowPerPage,selectedFilters]);
 
-  useEffect(() => {
-    getDataitems();
-  }, [currentRowPerPage]);
+ 
+
+
+  const handleShowSearch = (col, event) => {
+     setSearchAnchor(event.currentTarget);
+     setSearchedCol(col);
+   
+}
+const handleSearchClose = () => {
+  setSearchAnchor(null);
+}
+
+console.log(selectedFilters,"setsSelectedFilters")
+  const customColumnHead = (col) => {
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                columnGap: "5px",
+                flexGrow: "1",
+                alignItems: "center",
+            }}
+        >
+            {col.label}
+             <IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
+                <SearchIcon id={col.name + "_btn"} />
+            </IconButton>
+        </Box>
+    );
+}
 
   const renderToolBar = () => {
     return (
@@ -155,8 +219,8 @@ const DataitemsTable = () => {
   };
 
   return (
-    <Fragment>
-      <ThemeProvider theme={tableTheme}>
+   <>  
+       <ThemeProvider theme={tableTheme}>
         <MUIDataTable
           title={""}
           data={dataitems}
@@ -164,7 +228,16 @@ const DataitemsTable = () => {
           options={options}
         />
       </ThemeProvider>
-    </Fragment>
+                  {searchOpen && <DatasetSearchPopup
+                    open={searchOpen}
+                    anchorEl={searchAnchor}
+                     handleClose={handleSearchClose}
+                    updateFilters={setsSelectedFilters}
+                    currentFilters={selectedFilters}
+                    searchedCol={searchedCol}
+                />}
+                </>
+    
   );
 };
 
