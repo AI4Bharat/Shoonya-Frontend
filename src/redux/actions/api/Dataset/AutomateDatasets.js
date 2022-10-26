@@ -10,11 +10,13 @@ export default class AutomateDatasetsAPI extends API {
     super("POST", timeout, false);
     this.type = constants.AUTOMATE_DATASETS;
     this.input_dataset_instance_id = srcInstanceId;
-    this.languages = languages;
+    this.languages = languages && languages.length > 0 && languages.map((element,index)=>{
+      return element
+    });
     this.output_dataset_instance_id = tgtInstanceId;
     this.organization_id = organizationId;
     this.checks_for_particular_languages = checks;
-    this.apitype=apitype;
+    this.apitype = apitype;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}automated_sentence_text_translation_job`;
   }
 
@@ -32,7 +34,8 @@ export default class AutomateDatasetsAPI extends API {
   getBody() {
     return {
       input_dataset_instance_id: this.input_dataset_instance_id,
-      languages: this.languages,
+     // languages:`"[`+ this.languages + `]"`,
+     languages: JSON.stringify(this.languages) ,
       output_dataset_instance_id: this.output_dataset_instance_id,
       organization_id: this.organization_id,
       checks_for_particular_languages: this.checks_for_particular_languages,

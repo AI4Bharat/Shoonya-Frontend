@@ -124,7 +124,7 @@ const AutomateDatasets = () => {
   };
 
   const handleConfirm = () => {
-    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages.map(s => `'${s}'`).join(', '), loggedInUserData.organization.id, translationModel, checks,apitype);
+    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id, translationModel, checks,apitype);
     setLoading(true);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
@@ -297,7 +297,9 @@ const AutomateDatasets = () => {
                   <Select
                     labelId="language-select-label"
                     id="language-select"
-                    onChange={(e) => setLanguages(e.target.value)}
+                    onChange={(e) => {
+                      setLanguages(e.target.value);
+                       console.log(e.target.value,"e.target.value")}}
                     value={languages}
                     multiple
                   >
