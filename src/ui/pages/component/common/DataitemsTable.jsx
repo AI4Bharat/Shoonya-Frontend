@@ -12,6 +12,8 @@ import ColumnList from "./ColumnList";
 import SearchIcon from '@mui/icons-material/Search';
 import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+import Spinner from "../../component/common/Spinner";
+
 
 
 const excludeKeys = [
@@ -33,8 +35,9 @@ const DataitemsTable = () => {
   const dataitemsList = useSelector((state) => state.getDataitemsById.data);
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
+  const apiLoading = useSelector(state => state.apiStatus.loading);
   
- 
+  const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
@@ -45,7 +48,7 @@ const DataitemsTable = () => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
- 
+
 
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
@@ -68,9 +71,13 @@ const DataitemsTable = () => {
   }
 
  
+  useEffect(() => {
+    setLoading(apiLoading);
+}, [apiLoading]);
+ 
 
-  const setData = () => {
-    let fetchedItems =filterdataitemsList.results;
+    useEffect(() => {
+      let fetchedItems =filterdataitemsList.results;
       // setTotalDataitems(dataitemsList.count);
       // fetchedItems = dataitemsList.results;
       // setDataitems(fetchedItems);
@@ -79,44 +86,68 @@ const DataitemsTable = () => {
       setDataitems(fetchedItems)
    
     
-    let tempColumns = [];
-    let tempSelected = [];
-    if (fetchedItems?.length) {
-      Object.keys(fetchedItems[0]).forEach((key) => {
-        if (!excludeKeys.includes(key)) {
-          tempColumns.push({
-            name: key,
-            label: snakeToTitleCase(key),
-            options: {
-              filter: false,
-              sort: false,
-              align: "center",
-              customHeadLabelRender: customColumnHead,
-            },
-          });
-          tempSelected.push(key);
-        }
-      });
-    }
-    setColumns(tempColumns);
-    setSelectedColumns(tempSelected);
-   
-  };
+    // let tempColumns = [];
+    // let tempSelected = [];
+    // if (fetchedItems?.length) {
+    //   Object.keys(fetchedItems[0]).forEach((key) => {
+    //     if (!excludeKeys.includes(key)) {
+    //       tempColumns.push({
+    //         name: key,
+    //         label: snakeToTitleCase(key),
+    //         options: {
+    //           filter: false,
+    //           sort: false,
+    //           align: "center",
+    //           customHeadLabelRender: customColumnHead,
+    //         },
+    //       });
+    //       tempSelected.push(key);
+    //     }
+    //   });
+    // }
+    // setColumns(tempColumns);
+    // setSelectedColumns(tempSelected);
+    // console.log(tempSelected,"tempSelected",tempColumns)
+    if (fetchedItems?.length > 0 && fetchedItems[0]) {
 
- 
+    let colList = [];
+            colList.push(...Object.keys(fetchedItems?.[0])?.filter(el => !excludeKeys.includes(el)));
+            const cols = colList.map((col) => {
+                return {
+                    name: col,
+                    label: snakeToTitleCase(col),
+                    options: {
+                        filter: false,
+                        sort: false,
+                        align: "center",
+                        customHeadLabelRender: customColumnHead,
+                    }
+                }
+            });
+            
+            setColumns(cols);
+            setSelectedColumns(colList);
+            
+          
+          }else {
+            setDataitems([]);
+        }
+     
+    }, [filterdataitemsList])
+   
 
   useEffect(() => {
     getsearchdataitems();
   }, [currentPageNumber,currentRowPerPage,selectedFilters]);
 
   useEffect(() => {
-    setData();
-  }, [filterdataitemsList]);
-
-  // useEffect(() => {
-  //   getsearchdataitems();
-  // }, [currentPageNumber,currentRowPerPage,selectedFilters]);
-
+    const newCols = columns.map(col => {
+        col.options.display = selectedColumns.includes(col.name) ? "true" : "false";
+        return col;
+    });
+    setColumns(newCols);
+    
+}, [selectedColumns]);
  
 
 
@@ -129,7 +160,6 @@ const handleSearchClose = () => {
   setSearchAnchor(null);
 }
 
-console.log(selectedFilters,"setsSelectedFilters")
   const customColumnHead = (col) => {
     return (
         <Box
@@ -202,17 +232,17 @@ console.log(selectedFilters,"setsSelectedFilters")
     viewColumns: false,
     textLabels: {
       body: {
-        noMatch: "No records ",
+          noMatch: "No records ",
       },
       toolbar: {
-        search: "Search",
-        viewColumns: "View Column",
+          search: "Search",
+          viewColumns: "View Column",
       },
       pagination: {
-        rowsPerPage: "Rows per page",
+          rowsPerPage: "Rows per page",
       },
       options: { sortDirection: "desc" },
-    },
+  },
     jumpToPage: true,
     serverSide: true,
     customToolbar: renderToolBar,
@@ -224,7 +254,7 @@ console.log(selectedFilters,"setsSelectedFilters")
         <MUIDataTable
           title={""}
           data={dataitems}
-          columns={columns.filter((column) => selectedColumns.includes(column.name))}
+          columns={columns}
           options={options}
         />
       </ThemeProvider>
@@ -236,6 +266,7 @@ console.log(selectedFilters,"setsSelectedFilters")
                     currentFilters={selectedFilters}
                     searchedCol={searchedCol}
                 />}
+                {loading && <Spinner />}
                 </>
     
   );
