@@ -25,6 +25,7 @@ import { addDays } from 'date-fns';
 import colorsData from '../../../../utils/Colors_JSON/Colors_JSON';
 import axios from "axios";
 import html2canvas from 'html2canvas';
+import locale, { modifiedStaticRanges } from "../../../../utils/Date_Range/getDateRangeFormat"
 import { jsPDF } from "jspdf";
 ChartJS.register(
   CategoryScale,
@@ -51,6 +52,9 @@ const options = {
   scales: {
     x: {
       // stacked: true,
+      grid: {
+        display: false,
+      },
       display: true,
       title: {
         display: true,
@@ -66,7 +70,7 @@ const options = {
       }
     },
     y: {
-      // stacked: true,
+      stacked: true,
       display: true,
       title: {
         display: true,
@@ -81,7 +85,7 @@ const options = {
           lineHeight: 1.2,
           paddingBottom: "100px",
         },
-        padding: { top: 30, left: 0, right: 0, bottom: 20 }
+        padding: { top: 20, left: 0, right: 0, bottom: 20 }
       }
     }
   },
@@ -449,6 +453,8 @@ function ProgressList() {
               label: baseperiod,
               data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
               stack: "stack 0",
+              borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+              borderColor: "white",
               backgroundColor: colorsData.orange[0].color,
               barThickness: 25,
             },
@@ -475,6 +481,8 @@ function ProgressList() {
                 label: formatDateRangeChartLabel(el.date_range),
                 data: el.data?.map((e) => (e.annotations_completed)),
                 stack: "stack 0",
+                borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+                borderColor: "white",
                 backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
                 barThickness: 20,
               }
@@ -493,7 +501,9 @@ function ProgressList() {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
-            backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
+            borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+            borderColor: "white",
+            backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(120, 128%, 25%, 0.05)',
             barThickness: 20,
           }
         });
@@ -503,13 +513,15 @@ function ProgressList() {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
-            backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
+            borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+            borderColor: "white",
+            backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(33, 100%, 48%, 0.05)',
             barThickness: 20,
           }
         });
         chData = {
           labels,
-          datasets: SecondaryPeriodicalTaskssDataset.concat(PeriodicalTaskssDataset),
+          datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
         };
       } else if (baseperiod !== "Cumulative" && comparisonperiod !== "Cumulative" && baseperiod != comparisonperiod) {
         const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
@@ -520,6 +532,8 @@ function ProgressList() {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
+            borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+            borderColor: "white",
             backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
             barThickness: 20,
           }
@@ -530,6 +544,8 @@ function ProgressList() {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
+            borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+            borderColor: "white",
             backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
             barThickness: 20,
           }
@@ -546,6 +562,8 @@ function ProgressList() {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 0",
+            borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+            borderColor: "white",
             backgroundColor: colorsData.orange[i] ? colorsData.orange[i].color : 'hsla(33, 100%, 48%, 0.05)',
             barThickness: 20,
           }
@@ -555,6 +573,8 @@ function ProgressList() {
           label: comparisonperiod,
           data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
           stack: "stack 1",
+          borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+          borderColor: "white",
           backgroundColor: colorsData.green[0].color,
           barThickness: 20,
         }
@@ -572,6 +592,8 @@ function ProgressList() {
           label: baseperiod,
           data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
           stack: "stack 0",
+          borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+          borderColor: "white",
           backgroundColor: colorsData.orange[0].color,
           barThickness: 20,
         }]
@@ -581,6 +603,8 @@ function ProgressList() {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => (e.annotations_completed)),
             stack: "stack 1",
+            borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+            borderColor: "white",
             backgroundColor: colorsData.green[i] ? colorsData.green[i].color : 'hsla(120, 128%, 25%, 0.05)',
             barThickness: 20,
           }
@@ -604,6 +628,8 @@ function ProgressList() {
               data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
               //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
               stack: "stack 0",
+              borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+              borderColor: "white",
               backgroundColor: colorsData.orange[0].color,
               barThickness: 20,
             },
@@ -613,6 +639,8 @@ function ProgressList() {
               data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
               //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
               stack: "stack 1",
+              borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
+              borderColor: "white",
               backgroundColor: colorsData.green[0].color,
               barThickness: 20,
             },
@@ -853,8 +881,12 @@ function ProgressList() {
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
                     onChange={item => setBaseperiodDatepicker([item.selection])}
+                    weekStartsOn={1}
+                    inputRanges={[]}
                     staticRanges={[
-                      ...defaultStaticRanges,
+                      ...modifiedStaticRanges,
+                      // ...defaultStaticRanges,
+                      // ...locale,
                       {
                         label: "This Year",
                         range: () => ({
@@ -892,7 +924,7 @@ function ProgressList() {
                     direction="horizontal"
                     preventSnapRefocus={true}
                     // calendarFocus="backwards"
-                    weekStartsOn={2}
+                    // weekStartsOn={2}
 
                   />
                 </Card>
@@ -901,8 +933,11 @@ function ProgressList() {
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
                     onChange={handleDateRangePicker} item
+                    weekStartsOn={1}
+                    inputRanges={[]}
                     staticRanges={[
-                      ...defaultStaticRanges,
+                      ...modifiedStaticRanges,
+                      // ...defaultStaticRanges,
                       {
                         label: "This Year",
                         range: () => ({
@@ -941,8 +976,6 @@ function ProgressList() {
                     direction="horizontal"
                     preventSnapRefocus={true}
                     // calendarFocus="backwards"
-                    weekStartsOn={2}
-
                   />
                 </Card>
               </Box>}
