@@ -134,7 +134,7 @@ export default function DatasetSettings({ datasetId }) {
 							</Grid>
 							<Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
 								<CustomButton
-									sx={{ ml: 8 }}
+									sx={{ ml: 9 ,width:"150px" }}
 									label={translate("button.uploadData")}
 									onClick={handleUpload}
 								/>

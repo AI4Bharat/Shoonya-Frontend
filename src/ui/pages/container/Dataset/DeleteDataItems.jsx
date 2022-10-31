@@ -27,8 +27,8 @@ export default function DeleteDataItems() {
     const [enddataid, setEndDataId] = useState("");
     const [loading, setLoading] = useState(false);
     const [radiobutton, setRadiobutton] = useState(true)
-    const [dataIds, setDataIds] = useState([])
-    console.log(radiobutton, "radiobutton",dataIds)
+    const [dataIds, setDataIds] = useState("")
+
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -39,6 +39,12 @@ export default function DeleteDataItems() {
         setAnchorEl(event.currentTarget);
     };
 
+    let datasetitem = dataIds.split(",")
+    var value = datasetitem.map(function (str) {
+        return parseInt(str);
+    });
+
+
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -46,6 +52,7 @@ export default function DeleteDataItems() {
         setAnchorEl(null);
         setStartDataId();
         setEndDataId();
+        setDataIds("");
 
     };
     const handleDeletebyids = () => {
@@ -57,19 +64,33 @@ export default function DeleteDataItems() {
     }
 
 
+    const handledataIds = (e,) => {
+        setDataIds(e.target.value);
+
+
+    }
+
     const handleSearchSubmit = async () => {
-      
+        setAnchorEl(null);
+        setStartDataId();
+        setEndDataId();
+        setDataIds("");
         let datasetObj;
         const DeleteDataItems = {
             data_item_start_id: parseInt(startdataid),
             data_item_end_id: parseInt(enddataid)
         }
-        if(radiobutton === true){
-            datasetObj = new DeleteDataItemsAPI(datasetId, DeleteDataItems)
-            
 
-        }else{
-            datasetObj = new DeleteDataItemsAPI(datasetId, [parseInt(dataIds)])
+        const dataitemids = {
+            data_item_ids: value
+        }
+
+        if (radiobutton === true) {
+            datasetObj = new DeleteDataItemsAPI(datasetId, DeleteDataItems)
+
+
+        } else {
+            datasetObj = new DeleteDataItemsAPI(datasetId, dataitemids)
         }
         // dispatch(APITransport(datasetObj));
         const res = await fetch(datasetObj.apiEndPoint(), {
@@ -118,7 +139,11 @@ export default function DeleteDataItems() {
     return (
         <div >
             {renderSnackBar()}
-            <Button aria-describedby={id} variant="contained" onClick={handleClick}>
+            <Button
+                sx={{ width: "150px" }}
+                aria-describedby={id}
+                variant="contained"
+                onClick={handleClick}>
                 Delete Data Item
             </Button>
 
@@ -133,7 +158,7 @@ export default function DeleteDataItems() {
                 }}
             >
                 <Grid container className={classes.root} >
-                    <Grid item style={{ flexGrow: "1" }}>
+                    <Grid item style={{ flexGrow: "1", padding: "10px" }}>
                         <FormControl >
                             <RadioGroup
                                 row
@@ -254,8 +279,8 @@ export default function DeleteDataItems() {
                             xs={12}
                             sm={12}
                             md={12}
-                            lg={4}
-                            xl={4}
+                            lg={3}
+                            xl={3}
                         >
                             <Typography variant="body2" fontWeight='700' label="Required">
                                 Data Ids:
@@ -269,12 +294,12 @@ export default function DeleteDataItems() {
                             xl={6}
                             sm={6}
                         >
+
                             <TextField
-                             multiple
                                 size="small"
                                 variant="outlined"
                                 value={dataIds}
-                                onChange={(e) => setDataIds(e.target.value)}
+                                onChange={handledataIds}
                                 inputProps={{
                                     style: {
                                         fontSize: "16px"
@@ -303,7 +328,7 @@ export default function DeleteDataItems() {
                         color="primary"
                         size="small"
                         className={classes.clearAllBtn}
-                       // disabled={(!startdataid  || !enddataid  ) && !dataIds}
+                    // disabled={(!startdataid  || !enddataid  ) && !dataIds}
                     >
                         {" "}
                         {translate("button.submit")}
