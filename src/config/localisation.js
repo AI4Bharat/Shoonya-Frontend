@@ -49,7 +49,8 @@ const localisation = {
     "tooltip.Baseperiod":"The time range selected for the first plot of the chart. Currently it can be cumulative, monthly or weekly. The default selection is 'Cumalative'.",
     "tooltip.ComparisonPeriod":"The time range selected for the second plot of the chart. This is applicable when the analytics type is Comparison. Currently it can be cumulative, monthly or weekly.",
     "label.recentTasks.annotation": "Annotations",
-    "label.recentTasks.review": "Reviews"
+    "label.recentTasks.review": "Reviews",
+    "button.deleteDataItems":"Delete Data Item",
   
 };
 
