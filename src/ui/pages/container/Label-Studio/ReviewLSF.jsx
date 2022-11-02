@@ -540,10 +540,10 @@ export default function LSF() {
           <Button
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
             variant="contained"
-            color="primary"
+            color={annotationNotesRef.current?.value !== "" ? "success" : "primary"}
             onClick={handleCollapseClick}
           >
-            Notes
+            Notes {annotationNotesRef.current?.value !== "" && "*"}
           </Button>
         )}
         <div
