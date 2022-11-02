@@ -26,6 +26,7 @@ import EnableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/E
 import DisableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/DisableTaskReviews";
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
+import DeleteProjectTasks from "../../container/Project/DeleteProjectTasks";
 
 const ProgressType = ["unlabeled", "draft", "skipped", "labeled", "accepted", "accepted with Changes", "to Be Revised"]
 const ITEM_HEIGHT = 48;
@@ -445,6 +446,17 @@ const AdvancedOperation = (props) => {
 
                     >
                         <DownloadProjectButton taskStatus={taskStatus}  SetTask={setTaskStatus}  />
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        xl={12}
+
+                    >
+                        <DeleteProjectTasks  />
                     </Grid>
                 </Grid>
 
