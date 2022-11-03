@@ -4,7 +4,7 @@ import {
     Popover,
     Box,
     TextField,
-    Grid, Typography, Radio,
+    Grid, Typography, Radio,Dialog, DialogActions, DialogContent, DialogContentText,
 } from "@mui/material";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -28,6 +28,7 @@ export default function DeleteDataItems() {
     const [loading, setLoading] = useState(false);
     const [radiobutton, setRadiobutton] = useState(true)
     const [dataIds, setDataIds] = useState("")
+    const [openDialog, setOpenDialog] = useState(false);
 
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
@@ -37,6 +38,9 @@ export default function DeleteDataItems() {
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
+    };
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
     };
 
     let datasetitem = dataIds.split(",")
@@ -69,8 +73,8 @@ export default function DeleteDataItems() {
 
 
     }
-
-    const handleSearchSubmit = async () => {
+    const handleok = async() => {
+        setOpenDialog(false);
         setAnchorEl(null);
         setStartDataId();
         setEndDataId();
@@ -113,8 +117,11 @@ export default function DeleteDataItems() {
                 message: resp?.message,
                 variant: "error",
             })
-        }
+        }  
+    }
 
+    const handleSearchSubmit = async () => {
+        setOpenDialog(true);
 
     }
 
@@ -164,12 +171,12 @@ export default function DeleteDataItems() {
                                 row
                                 aria-labelledby="demo-row-radio-buttons-group-label"
                                 name="row-radio-buttons-group"
-                                defaultValue="deletebyids"
+                                defaultValue="deletebyrange"
 
                             >
 
-                                <FormControlLabel value="deletebyids" control={<Radio />} label="Delete by Ids" onClick={handleDeletebyids} />
-                                <FormControlLabel value="deletebyrange" control={<Radio />} label="Delete by Range" onClick={handleDeletebyrange} />
+                                <FormControlLabel value="deletebyrange" control={<Radio />} label="Delete by Range" onClick={handleDeletebyids} />
+                                <FormControlLabel value="deletebyids" control={<Radio />} label="Delete by IDs" onClick={handleDeletebyrange} />
 
                             </RadioGroup>
                         </FormControl>
@@ -197,7 +204,7 @@ export default function DeleteDataItems() {
                                 xl={4}
                             >
                                 <Typography variant="body2" fontWeight='700' label="Required">
-                                    Start Data Id:
+                                    Start Data ID:
                                 </Typography>
                             </Grid>
                             <Grid
@@ -239,7 +246,7 @@ export default function DeleteDataItems() {
                                 xl={4}
                             >
                                 <Typography variant="body2" fontWeight='700' label="Required">
-                                    End Data Id:
+                                    End Data ID:
                                 </Typography>
                             </Grid>
                             <Grid
@@ -283,7 +290,7 @@ export default function DeleteDataItems() {
                             xl={3}
                         >
                             <Typography variant="body2" fontWeight='700' label="Required">
-                                Data Ids:
+                                Data IDs:
                             </Typography>
                         </Grid>
                         <Grid
@@ -335,6 +342,34 @@ export default function DeleteDataItems() {
                     </Button>
                 </Box>
             </Popover>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogContent>
+
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete this data items ? Please note this action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        className={classes.clearAllBtn} > {" "}
+                        {translate("button.clear")}
+                    </Button>
+                    <Button onClick={handleok}
+                        variant="contained"
+                        color="primary"
+                        size="small" className={classes.clearAllBtn} autoFocus >
+                        Ok
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
