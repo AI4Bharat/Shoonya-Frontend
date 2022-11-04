@@ -351,7 +351,7 @@ export default function DeleteDataItems() {
                 <DialogContent>
 
                     <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to delete this data items ? Please note this action cannot be undone.
+                    Are you sure you want to delete the data items? Please note this action cannot be undone. 
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
