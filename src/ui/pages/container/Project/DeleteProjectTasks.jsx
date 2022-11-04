@@ -4,7 +4,7 @@ import {
     Popover,
     Box,
     TextField,
-    Grid, Typography, Radio,
+    Grid, Typography, Dialog, DialogActions, DialogContent, DialogContentText,
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
@@ -23,6 +23,7 @@ export default function DeleteProjectTasks() {
     const [projectTaskStartId, setProjectTaskStartId] = useState("");
     const [projectTaskEndId, setProjectTaskEndId] = useState("");
     const [loading, setLoading] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -35,12 +36,17 @@ export default function DeleteProjectTasks() {
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
     const handleClearSearch = () => {
         setAnchorEl(null);
         setProjectTaskStartId();
         setProjectTaskEndId();
     };
-    const handleSearchSubmit = async () => {
+
+    const handleok = async() => {
+        setOpenDialog(false);
         setAnchorEl(null);
         setProjectTaskStartId();
         setProjectTaskEndId();
@@ -71,7 +77,10 @@ export default function DeleteProjectTasks() {
                 variant: "error",
             })
         }
+    }
 
+    const handleSearchSubmit = () => {
+        setOpenDialog(true);
 
     }
 
@@ -139,7 +148,7 @@ export default function DeleteProjectTasks() {
                         xl={5}
                     >
                         <Typography variant="body2" fontWeight='700' label="Required">
-                            Project Task Start Id:
+                            Project Task Start ID:
                         </Typography>
                     </Grid>
                     <Grid
@@ -181,7 +190,7 @@ export default function DeleteProjectTasks() {
                         xl={5}
                     >
                         <Typography variant="body2" fontWeight='700' label="Required">
-                            Project Task End Id:
+                            Project Task End ID:
                         </Typography>
                     </Grid>
                     <Grid
@@ -228,6 +237,34 @@ export default function DeleteProjectTasks() {
                     </Button>
                 </Box>
             </Popover>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogContent>
+
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete this project ? Please note this action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        className={classes.clearAllBtn} > {" "}
+                        {translate("button.clear")}
+                    </Button>
+                    <Button onClick={handleok}
+                        variant="contained"
+                        color="primary"
+                        size="small" className={classes.clearAllBtn} autoFocus >
+                        Ok
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
