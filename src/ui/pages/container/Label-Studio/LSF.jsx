@@ -477,11 +477,11 @@ export default function LSF() {
         {!loader && <Button 
           endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
           variant="contained"
-          color="primary"
+          color={reviewNotesRef.current?.value !== "" ? "success" : "primary"}
           onClick={handleCollapseClick}
           style={{marginBottom:'20px'}}
         >
-          Notes
+          Notes {reviewNotesRef.current?.value !== "" && "*"}
         </Button>}
         <div className={styles.collapse} style={{display: showNotes? "block" : "none",paddingBottom: "16px"}}>
           <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>

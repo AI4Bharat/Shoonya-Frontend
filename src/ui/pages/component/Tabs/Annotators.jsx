@@ -1,46 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
-import {useDispatch,useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import CustomButton from "../common/Button";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider,Grid } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveWorkspaceMemberAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceMember";
+import Search from "../../component/common/Search";
 
 const AnnotatorsTable = (props) => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
-    const {id} = useParams();
+    const { id } = useParams();
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
         variant: "success",
-      });
-    
-    const orgId = useSelector(state=>state.getWorkspacesProjectData?.data?.[0]?.organization_id);
+    });
 
-    const getWorkspaceAnnotatorsData = ()=>{
-        
+    const orgId = useSelector(state => state.getWorkspacesProjectData?.data?.[0]?.organization_id);
+    const SearchWorkspaceMembers = useSelector((state) => state.SearchProjectCards.data);
+    const getWorkspaceAnnotatorsData = () => {
+
         const workspaceObjs = new GetWorkspacesAnnotatorsDataAPI(id);
-       
+
         dispatch(APITransport(workspaceObjs));
     }
 
-    const workspaceAnnotators = useSelector(state=>state.getWorkspacesAnnotatorsData.data);
+    const workspaceAnnotators = useSelector(state => state.getWorkspacesAnnotatorsData.data);
 
-    useEffect(()=>{
+    useEffect(() => {
         getWorkspaceAnnotatorsData();
-    },[]);
+    }, []);
     // const orgId = workspaceAnnotators &&  workspaceAnnotators
-// getWorkspacesProjectData
-const handleRemoveWorkspaceMember = async(Projectid)=>{
-    const workspacedata={
-        user_id:Projectid,
-      }
-        const projectObj = new RemoveWorkspaceMemberAPI(id,workspacedata);
+    // getWorkspacesProjectData
+    const handleRemoveWorkspaceMember = async (Projectid) => {
+        const workspacedata = {
+            user_id: Projectid,
+        }
+        const projectObj = new RemoveWorkspaceMemberAPI(id, workspacedata);
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
@@ -64,7 +65,35 @@ const handleRemoveWorkspaceMember = async(Projectid)=>{
             })
         }
 
-}
+    }
+
+    const pageSearch = () => {
+
+        return workspaceAnnotators.filter((el) => {
+
+            if (SearchWorkspaceMembers == "") {
+
+                return el;
+            } else if (
+                el.username
+                    ?.toLowerCase()
+                    .includes(SearchWorkspaceMembers?.toLowerCase())
+            ) {
+
+                return el;
+            } else if (
+                el.email
+                    ?.toLowerCase()
+                    .includes(SearchWorkspaceMembers?.toLowerCase())
+            ) {
+
+                return el;
+            }
+
+
+        })
+
+    }
     const columns = [
         {
             name: "Name",
@@ -72,8 +101,8 @@ const handleRemoveWorkspaceMember = async(Projectid)=>{
             options: {
                 filter: false,
                 sort: false,
-                align : "center",
-                setCellHeaderProps: sort => ({ style: { height: "70px",  padding: "16px" } }),
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
             }
         },
         {
@@ -82,7 +111,7 @@ const handleRemoveWorkspaceMember = async(Projectid)=>{
             options: {
                 filter: false,
                 sort: false,
-                align : "center"
+                align: "center"
             }
         },
         {
@@ -91,11 +120,11 @@ const handleRemoveWorkspaceMember = async(Projectid)=>{
             options: {
                 filter: false,
                 sort: false,
-                align : "center"
+                align: "center"
             }
         },
-        
-        
+
+
         {
             name: "Actions",
             label: "Actions",
@@ -105,65 +134,68 @@ const handleRemoveWorkspaceMember = async(Projectid)=>{
             }
         }];
 
-        // const data = [
-        //     ["Shoonya User", "user123@tarento.com", 0, ]
-        // ];
-        const data =  workspaceAnnotators && workspaceAnnotators.length > 0 ? workspaceAnnotators.map((el,i)=>{
-            const userRole = el.role && UserMappedByRole(el.role).element;
-            console.log("userRole", userRole);
-            return [
-                        el.username, 
-                        el.email,
-                        userRole ? userRole : el.role,
-                        // userRole ? userRole : el.role,
-                        // el.role,
-                        <>
-                        <Link to={`/profile/${el.id}`} style={{ textDecoration: "none" }}>
-                            <CustomButton
-                                sx={{borderRadius : 2,marginRight: 2}}
-                                label = "View"
-                            />
-                           
-                        </Link>
-                         <CustomButton
-                         sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
-                         label = "Remove"
-                         onClick={()=>handleRemoveWorkspaceMember(el.id)}
-                     />
-                     </>
-                    ]
-        }) :[];
+    // const data = [
+    //     ["Shoonya User", "user123@tarento.com", 0, ]
+    // ];
+    const data = workspaceAnnotators && workspaceAnnotators.length > 0 ? pageSearch().map((el, i) => {
+        const userRole = el.role && UserMappedByRole(el.role).element;
+        console.log("userRole", userRole);
+        return [
+            el.username,
+            el.email,
+            userRole ? userRole : el.role,
+            // userRole ? userRole : el.role,
+            // el.role,
+            <>
+                <Link to={`/profile/${el.id}`} style={{ textDecoration: "none" }}>
+                    <CustomButton
+                        sx={{ borderRadius: 2, marginRight: 2 }}
+                        label="View"
+                    />
 
-        const options = {
-            textLabels: {
-              body: {
+                </Link>
+                <CustomButton
+                    sx={{ borderRadius: 2, backgroundColor: "#cf5959" }}
+                    label="Remove"
+                    onClick={() => handleRemoveWorkspaceMember(el.id)}
+                />
+            </>
+        ]
+    }) : [];
+
+    const options = {
+        textLabels: {
+            body: {
                 noMatch: "No records",
-              },
-              toolbar: {
+            },
+            toolbar: {
                 search: "Search",
                 viewColumns: "View Column",
-              },
-              pagination: { rowsPerPage: "Rows per page" },
-              options: { sortDirection: "desc" },
             },
-            // customToolbar: fetchHeaderButton,
-            displaySelectToolbar: false,
-            fixedHeader: false,
-            filterType: "checkbox",
-            download: false,
-            print: false,
-            rowsPerPageOptions: [10, 25, 50, 100],
-            // rowsPerPage: PageInfo.count,
-            filter: false,
-            // page: PageInfo.page,
-            viewColumns: false,
-            selectableRows: "none",
-            search: false,
-            jumpToPage: true,
-          };
+            pagination: { rowsPerPage: "Rows per page" },
+            options: { sortDirection: "desc" },
+        },
+        // customToolbar: fetchHeaderButton,
+        displaySelectToolbar: false,
+        fixedHeader: false,
+        filterType: "checkbox",
+        download: false,
+        print: false,
+        rowsPerPageOptions: [10, 25, 50, 100],
+        // rowsPerPage: PageInfo.count,
+        filter: false,
+        // page: PageInfo.page,
+        viewColumns: false,
+        selectableRows: "none",
+        search: false,
+        jumpToPage: true,
+    };
 
     return (
         <div>
+            <Grid sx={{mb:1}}>
+                <Search />
+            </Grid>
             <ThemeProvider theme={tableTheme}>
                 <MUIDataTable
                     // title={""}
@@ -173,7 +205,7 @@ const handleRemoveWorkspaceMember = async(Projectid)=>{
                 />
             </ThemeProvider>
         </div>
-       
+
     )
 }
 
