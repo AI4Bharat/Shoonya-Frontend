@@ -5,10 +5,11 @@ import GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/Workspac
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
 import CustomButton from "../common/Button";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider,Grid } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveWorkspaceManagerAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceManager";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import Search from "../../component/common/Search";
 
 const ManagersTable = (props) => {
 
@@ -34,6 +35,7 @@ const ManagersTable = (props) => {
     },[]);
 
     const workspaceManagers = useSelector(state=>state.getWorkspacesManagersData.data);
+    const SearchWorkspaceManagers = useSelector((state) => state.SearchProjectCards.data);
 
 const handleRemoveWorkspaceManager = async(userid)=>{
    
@@ -60,6 +62,30 @@ const handleRemoveWorkspaceManager = async(userid)=>{
                 variant: "error",
             })
         }
+    }
+    const pageSearch = () => {
+
+        return workspaceManagers.filter((el) => {
+
+            if (SearchWorkspaceManagers == "") {
+
+                return el;
+            } else if (
+                el.username
+                    ?.toLowerCase()
+                    .includes(SearchWorkspaceManagers?.toLowerCase())
+            ) {
+
+                return el;
+            } else if (
+                el.email
+                    ?.toLowerCase()
+                    .includes(SearchWorkspaceManagers?.toLowerCase())
+            ) {
+
+                return el;
+            }
+        })
     }
     const columns = [
         {
@@ -96,7 +122,7 @@ const handleRemoveWorkspaceManager = async(userid)=>{
         //     ["Shoonya User", "user123@tarento.com", 0, ]
         // ];
 
-        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? workspaceManagers.map((el,i)=>{
+        const data =  workspaceManagers &&  workspaceManagers.length > 0 ? pageSearch().map((el,i)=>{
             return [
                 el.username, 
                 el.email,
@@ -161,6 +187,9 @@ const handleRemoveWorkspaceManager = async(userid)=>{
     return (
         <div>
             {renderSnackBar()}
+            <Grid sx={{mb:1}}>
+                <Search />
+            </Grid>
             <ThemeProvider theme={tableTheme}>
 				<MUIDataTable
                     // title={""}

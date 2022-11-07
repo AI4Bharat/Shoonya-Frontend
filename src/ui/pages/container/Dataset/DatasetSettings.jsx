@@ -14,6 +14,7 @@ import MenuItems from "../../component/common/MenuItems";
 import { FileUploader } from "react-drag-drop-files";
 import Switch from '@mui/material/Switch';
 import DownloadDatasetButton from './DownloadDataSetButton';
+import DeleteDataItems from './DeleteDataItems';
 
 
 
@@ -59,7 +60,7 @@ export default function DatasetSettings({ datasetId }) {
 
 	useEffect(() => {
 		setLoading(false);
-	}, [setLoading ]);
+	}, [setLoading]);
 
 
 
@@ -80,6 +81,8 @@ export default function DatasetSettings({ datasetId }) {
 		FileTypes();
 	}
 
+	
+
 	const handleModalClose = () => {
 		setModal(false);
 		setFile([]);
@@ -90,14 +93,14 @@ export default function DatasetSettings({ datasetId }) {
 		const UploadFile = new FormData();
 		UploadFile.append('dataset', file);
 		UploadFile.append('filetype', filetype);
-		UploadFile.append("deduplicate",switchs);
-		
+		UploadFile.append("deduplicate", switchs);
+
 		const projectObj = new UploaddataAPI(datasetId, UploadFile);
 		dispatch(APITransport(projectObj));
 		handleModalClose();
 	}
 
-	const handleswitchchange =() => {
+	const handleswitchchange = () => {
 		setswitchs("false")
 
 	}
@@ -115,144 +118,149 @@ export default function DatasetSettings({ datasetId }) {
 					padding: 4,
 				}}
 			>
-			<Grid container direction="row" columnSpacing={1} rowSpacing={2}  >
+				<Grid container direction="row" columnSpacing={1} rowSpacing={2}  >
 					{loading ? (
 						<CircularProgress />
 					) : (
 						<>
+						
 							<Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-							{/* <CustomButton
+								{/* <CustomButton
 								label={translate("button.downloadDataset")}
 								onClick={handleClick}
 							/> */}
-							
-							<DownloadDatasetButton/>
+
+								<DownloadDatasetButton />
 							</Grid>
-							<Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-							<CustomButton
-								sx={{ ml: 8 }}
-								label={translate("button.uploadData")}
-								onClick={handleUpload}
-							/>
+							<Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+								<CustomButton
+									sx={{ ml: 9 ,width:"150px" }}
+									label={translate("button.uploadData")}
+									onClick={handleUpload}
+								/>
 							</Grid>
 							
+							<Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+								<DeleteDataItems/>
+							</Grid>
+
 							<Modal
 								open={modal}
 								onClose={() => handleModalClose()}
-								// sx={{ width: "200px" }}
+							// sx={{ width: "200px" }}
 							>
 								<Grid
-									width={window.innerWidth*0.35}
+									width={window.innerWidth * 0.35}
 								>
-<Grid
-									container
-									// direction="row"
-									justifyContent="center"
-									alignItems="center"
-									sx={{ backgroundColor: "#f5f5f5", padding: "1rem", marginBottom: 2 }}
-								>
-									<Typography variant="h5">Upload Data</Typography>
-								</Grid>
-								<Grid container spacing={2} sx={{ padding: 3}} >
 									<Grid
 										container
-										direction='row'
-										alignItems= "center"
-										justifyContent={"space-between"}
-										sx={{
-											alignItems: "center",
-											mt: 3,
-										}}
+										// direction="row"
+										justifyContent="center"
+										alignItems="center"
+										sx={{ backgroundColor: "#f5f5f5", padding: "1rem", marginBottom: 2 }}
 									>
+										<Typography variant="h5">Upload Data</Typography>
+									</Grid>
+									<Grid container spacing={2} sx={{ padding: 3 }} >
 										<Grid
-											item
-											xs={3}
-											sm={3}
-											md={3}
-											lg={3}
-											xl={3}
+											container
+											direction='row'
+											alignItems="center"
+											justifyContent={"space-between"}
+											sx={{
+												alignItems: "center",
+												mt: 3,
+											}}
 										>
-											<Typography variant="subtitle1" gutterBottom component="div"  >
-												Select File :
-											</Typography>
-										</Grid>
-										<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
-											<FileUploader
-												multiple={true}
-												handleChange={handleChange}
-												name="file"
+											<Grid
+												item
+												xs={3}
+												sm={3}
+												md={3}
+												lg={3}
+												xl={3}
+											>
+												<Typography variant="subtitle1" gutterBottom component="div"  >
+													Select File :
+												</Typography>
+											</Grid>
+											<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
+												<FileUploader
+													multiple={true}
+													handleChange={handleChange}
+													name="file"
 
-											/>
+												/>
+											</Grid>
 										</Grid>
-									</Grid>
-									<Grid
-										container
-										direction='row'
-										alignItems= "center"
-										justifyContent={"space-between"}
-										sx={{
-											alignItems: "center",
-											mt: 3,
-
-										}}
-									>
 										<Grid
-											item
-											xs={4}
-											sm={4}
-											md={4}
-											lg={4}
-											xl={4}
-										>
-											<Typography variant="subtitle1" gutterBottom component="div"  >
-												Select File Format :
-											</Typography>
-										</Grid>
-										<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
-											<MenuItems
-												menuOptions={type}
-												handleChange={(value) => setFiletype(value)}
-												value={filetype}
-											/>
-										</Grid>
-									</Grid>
-									<Grid
-										container
-										direction='row'
-										alignItems= "center"
-										justifyContent={"space-between"}
-										sx={{
-											alignItems: "center",
-											mt: 3,
+											container
+											direction='row'
+											alignItems="center"
+											justifyContent={"space-between"}
+											sx={{
+												alignItems: "center",
+												mt: 3,
 
-										}}
-									>
+											}}
+										>
+											<Grid
+												item
+												xs={4}
+												sm={4}
+												md={4}
+												lg={4}
+												xl={4}
+											>
+												<Typography variant="subtitle1" gutterBottom component="div"  >
+													Select File Format :
+												</Typography>
+											</Grid>
+											<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
+												<MenuItems
+													menuOptions={type}
+													handleChange={(value) => setFiletype(value)}
+													value={filetype}
+												/>
+											</Grid>
+										</Grid>
 										<Grid
-											item
-											xs={4}
-											sm={4}
-											md={4}
-											lg={4}
-											xl={4}
-										>
-											<Typography variant="subtitle1" gutterBottom component="div"  >
-											Delete Duplicate Records :
-											</Typography>
-										</Grid>
-										<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
-										<Switch {...label} defaultChecked value={switchs} onChange={handleswitchchange}/>
-										</Grid>
-									</Grid>
-									
-									<Grid container item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ justifyContent: "flex-end", mt: 2 }} >
+											container
+											direction='row'
+											alignItems="center"
+											justifyContent={"space-between"}
+											sx={{
+												alignItems: "center",
+												mt: 3,
 
-										<CustomButton label={"Upload"} disabled={file.length == 0 ? true : false} onClick={handleUploadFile} />
-										<CustomButton sx={{ ml: 1 }} label={"Close"} onClick={() => handleModalClose()} />
+											}}
+										>
+											<Grid
+												item
+												xs={4}
+												sm={4}
+												md={4}
+												lg={4}
+												xl={4}
+											>
+												<Typography variant="subtitle1" gutterBottom component="div"  >
+													Delete Duplicate Records :
+												</Typography>
+											</Grid>
+											<Grid item xs={6} md={6} lg={6} xl={6} sm={6}>
+												<Switch {...label} defaultChecked value={switchs} onChange={handleswitchchange} />
+											</Grid>
+										</Grid>
+
+										<Grid container item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ justifyContent: "flex-end", mt: 2 }} >
+
+											<CustomButton label={"Upload"} disabled={file.length == 0 ? true : false} onClick={handleUploadFile} />
+											<CustomButton sx={{ ml: 1 }} label={"Close"} onClick={() => handleModalClose()} />
+										</Grid>
 									</Grid>
+
 								</Grid>
-								
-								</Grid>
-								
+
 							</Modal>
 
 						</>

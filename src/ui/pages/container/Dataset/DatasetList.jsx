@@ -14,6 +14,7 @@ import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import DatasetStyle from "../../../styles/Dataset";
 import themeDefault from "../../../theme/theme";
+import Search from "../../component/common/Search";
 
 
 export default function DatasetList() {
@@ -85,6 +86,9 @@ export default function DatasetList() {
             </RadioGroup>
           </FormControl>
         </Grid>
+        <Grid xs={3} item className={classes.fixedWidthContainer}>
+            <Search />
+				</Grid>
       </Grid>
 
       <Box >

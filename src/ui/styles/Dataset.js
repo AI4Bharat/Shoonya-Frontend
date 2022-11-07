@@ -181,7 +181,7 @@ const DatasetStyle = makeStyles({
     //textAlign: "left",
     //justifyContent:"center"
    //float: "right",
-    marginBottom:"30px",
+    marginBottom:"10px",
   //   position: "absolute",
   //  Right: "200px",
   //  top:"155px",
