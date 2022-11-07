@@ -168,10 +168,7 @@ const MembersTable = (props) => {
 
     }
     const handleProjectReviewer = async (Projectid) => {
-        const projectReviewer = {
-            id: Projectid,
-        }
-        const projectObj = new RemoveProjectReviewerAPI(id, projectReviewer);
+        const projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] });
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
