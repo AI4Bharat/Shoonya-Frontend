@@ -42,8 +42,8 @@ import browserhistory from "./web.history";
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
     if (!authenticateUser()) {
-      // return <Link href="/" />;
-      return browserhistory.replace("/#/");
+      return <Navigate to="/" />;
+      // return browserhistory.replace("/#/");
     }
     return children;
   };
