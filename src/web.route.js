@@ -36,13 +36,14 @@ import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmFo
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
 import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 import ProgressList from "./ui/pages/container/Progress/ProgressList"
-
+import browserhistory from "./web.history";
 
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
     if (!authenticateUser()) {
-      return <Link href="/" />;
+      // return <Link href="/" />;
+      return browserhistory.replace("/#/");
     }
     return children;
   };
@@ -50,6 +51,8 @@ const App = () => {
   const ProtectedRouteWrapper = (component) => {
     return <ProtectedRoute>{component}</ProtectedRoute>;
   };
+
+  
 
   // let routes = useRoutes([
   //   // { path: "/", element: <Landing /> }, my-organization
