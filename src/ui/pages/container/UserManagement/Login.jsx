@@ -173,7 +173,11 @@ const Login = () => {
           </Link>
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <CustomButton className={classes.loginButtonStyle} fullWidth onClick={createToken} label={"Login"} />
+          <CustomButton style={{
+            backgroundColor: "#2C2799",
+            borderRadius: "20px",
+            color: "#FFFFFF"
+          }} fullWidth onClick={createToken} label={"Login"} />
         </Grid>
         {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
         <div className={classes.createLogin}>
