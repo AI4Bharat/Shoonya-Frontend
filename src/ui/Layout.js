@@ -66,11 +66,11 @@ const Layout= (props) => {
     }
   }, [show])
 
-  useEffect(()=>{
-    if(!authenticateUser()){
-      navigate("/");
-    }
-  },[])
+  // useEffect(()=>{
+  //   if(!authenticateUser()){
+  //     navigate("/");
+  //   }
+  // },[])
 
   window.addEventListener('scroll', e => {
     if (window.pageYOffset > 100 && !show) {

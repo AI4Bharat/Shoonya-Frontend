@@ -108,6 +108,15 @@ const themeDefault = createTheme({
     },
   },
   components: {
+    // MuiButtonBase:{
+    //   styleOverrides:{
+    //     root:{
+    //       backgroundColor: "#2C2799",
+    //       borderRadius: "20px",
+    //       color: "#FFFFFF" 
+    //     },
+    //   }
+    // },
     MuiTableRow: {
       styleOverrides: {
         root: {
