@@ -1,6 +1,8 @@
-import { Button, Grid, ThemeProvider, Select, Box, MenuItem, InputLabel, FormControl, Card, Typography } from "@mui/material";
+import { Button, Grid, ThemeProvider, Select, Box, MenuItem,Radio, InputLabel, FormControl, Card, Typography } from "@mui/material";
 import React, { useEffect, useState, useRef } from "react";
 import CustomButton from "../../component/common/Button";
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import { useSelector, useDispatch } from "react-redux";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
@@ -144,6 +146,7 @@ function ProgressList() {
   const [yearvalue, setyearvalue] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [SVGChartData, setSVGChartData] = useState([]);
+  const [radiobutton, setRadiobutton] = useState("Annotation");
   const [baseperiodDatepicker, setBaseperiodDatepicker] = useState([
     {
       startDate: new Date(),
@@ -278,12 +281,15 @@ function ProgressList() {
 
     const Cumulativedata = {
       project_type: selectedType,
+      ...(radiobutton==="Review" && {reviewer_reports:true})
+
     };
     const individualPeriodicaldata = {
       project_type: selectedType,
       periodical_type: baseperiod,
       start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
       end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
+      ...(radiobutton==="Review" && {reviewer_reports:true})
     };
 
     if (chartTypes === avilableChartType.Individual) {
@@ -314,6 +320,7 @@ function ProgressList() {
           periodical_type: comparisonperiod,
           start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
+          ...(radiobutton==="Review" && {reviewer_reports:true})
         };
         await getPeriodicalTasksData(Periodicaldata, OrgId);
         await getCumulativeTasksData(Cumulativedata, OrgId);
@@ -324,6 +331,7 @@ function ProgressList() {
           periodical_type: baseperiod,
           start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
+          ...(radiobutton==="Review" && {reviewer_reports:true})
         };
         await getPeriodicalTasksData(individualPeriodicaldata, OrgId);
         await getCumulativeTasksData(Cumulativedata, OrgId);
@@ -332,13 +340,15 @@ function ProgressList() {
           project_type: selectedType,
           periodical_type: baseperiod,
           start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
-          end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),     
+          end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'), 
+          ...(radiobutton==="Review" && {reviewer_reports:true})    
         };
         const comparisonPeriodicalPayload = {
           project_type: selectedType,
           periodical_type: comparisonperiod,
           start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
+          ...(radiobutton==="Review" && {reviewer_reports:true})
         };
 
         await getPeriodicalTasksData(basePeriodicalPayload, OrgId);
@@ -363,16 +373,13 @@ function ProgressList() {
   }
   const handledatecomparisionprogress = () => {
     setShowPickers(!showPickers)
+  }
 
-
-
-
+  const handleChangeReports = (e) => {
+    setRadiobutton(e.target.value)
   }
   const handleDateRangePicker = (item) => {
     setComparisonperiodDatepicker([item.selection])
-
-
-
   }
   const handleComparisonProgressType = (e) => {
     setComparisonperiod(e.target.value)
@@ -701,6 +708,37 @@ function ProgressList() {
             justifyContent="center"
             alignItems="center"
           >
+             <Grid
+          container
+          direction="row"
+          spacing={0}
+          sx={{ mb:3, ml: 1 }}
+        >
+
+          <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
+            <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
+              Select Report Type :
+            </Typography>
+          </Grid >
+          <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
+            <FormControl >
+
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+                sx={{ marginTop: "5px" }}
+                value={radiobutton}
+                onChange={handleChangeReports}
+
+              >
+                <FormControlLabel value="Annotation" control={<Radio />} label="Annotation" />
+                <FormControlLabel value="Review" control={<Radio />} label="Review" />
+
+              </RadioGroup>
+            </FormControl>
+          </Grid >
+        </Grid>
             <Grid container columnSpacing={3} rowSpacing={2}  mb={1}>
 
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>

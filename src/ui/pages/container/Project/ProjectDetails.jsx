@@ -113,7 +113,7 @@ const Projects = () => {
     const dispatch = useDispatch();
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-    console.log(ProjectDetails, "ProjectDetails")
+    
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
 
@@ -230,7 +230,7 @@ const Projects = () => {
                     <Grid item xs={12} sm={12} md={12} lg={12} xl={12}  sx={{ mb: 2 }}>
                         <Grid container spacing={2}>
                             {projectData?.map((des, i) => (
-                                <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+                                <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
                                     <ProjectDescription
                                         name={des.name}
                                         value={des.value}

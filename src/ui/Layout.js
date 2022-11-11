@@ -16,6 +16,7 @@ import GlobalStyles from "./styles/LayoutStyles";
 import BackButton from "./pages/component/common/BackButton";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { translate } from "../config/localisation";
+import { authenticateUser } from "../utils/utils";
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 
@@ -64,6 +65,12 @@ const Layout= (props) => {
       window.removeEventListener('scroll', (e) => { });
     }
   }, [show])
+
+  // useEffect(()=>{
+  //   if(!authenticateUser()){
+  //     navigate("/");
+  //   }
+  // },[])
 
   window.addEventListener('scroll', e => {
     if (window.pageYOffset > 100 && !show) {

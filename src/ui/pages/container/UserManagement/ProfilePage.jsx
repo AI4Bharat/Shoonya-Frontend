@@ -6,6 +6,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip } from '@mui/material';
 import MyProgress from '../../component/Tabs/MyProgress';
+import RecentTasks from '../../component/Tabs/RecentTasks';
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
@@ -29,7 +30,8 @@ const ProfilePage = () => {
 
   const UserDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
-
+  const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
+  console.log(LoggedInUserId,"LoggedInUserId",loggedInUserData)
   const handleEmailToggle = async () => {
     setLoading(true);
     const mailObj = new ToggleMailsAPI(LoggedInUserId, !userDetails.enable_mail);
@@ -90,7 +92,7 @@ const ProfilePage = () => {
         {renderSnackBar()}
           {userDetails && (
             <><Grid item xs={12} sm={12} md={4} lg={4} xl={4} sx={{ p: 2 }}>
-              <Card sx={{ borderRadius: "5px" }}>
+              <Card sx={{ borderRadius: "5px", mb:2 }}>
                   <CardContent>
                     <Avatar
                       alt="user_profile_pic"
@@ -140,6 +142,14 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
+                {(loggedInUserData?.role === 2 || loggedInUserData?.role === 3) &&
+                <Card>
+                  <CardContent>
+                    <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
+                    <RecentTasks />
+                  </CardContent>
+                </Card>
+              }
             </Grid>
             <Grid item xs={12} sm={12} md={8} lg={8} xl={8} sx={{ p: 2 }}>
               <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 }}>
@@ -148,7 +158,7 @@ const ProfilePage = () => {
                   {UserMappedByRole(userDetails.role).element}
                 </CardContent>
               </Card>
-              {LoggedInUserId === userDetails.id &&
+              {LoggedInUserId === userDetails.id &&((loggedInUserData?.role === 2 || loggedInUserData?.role === 3)) &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>

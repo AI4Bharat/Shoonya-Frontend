@@ -5,7 +5,7 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
 
  export default class UpdateProfileAPI extends API {
-    constructor(username, first_name, last_name, languages, phone,availability_status, timeout = 2000) {
+    constructor(username, first_name, last_name, languages, phone,availability_status, participation_type, timeout = 2000) {
       super("POST", timeout, false);
       this.username = username;
       this.first_name = first_name;
@@ -13,6 +13,7 @@
       this.languages = languages;
       this.phone = phone;
       this.availability_status = availability_status;
+      this.participation_type = participation_type;
       this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.fetch}update/`;
     }
   
@@ -35,6 +36,7 @@
         languages: this.languages,
         phone: this.phone,
         availability_status:this.availability_status,
+        participation_type :this.participation_type
       };
     }
   

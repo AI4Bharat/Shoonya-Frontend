@@ -12,10 +12,8 @@ export default class GetOrganizationProjectReportsAPI extends API {
     this.startDate = startDate;
     this.endDate = endDate;
     this.targetLanguage = targetLanguage === "all" ? undefined : targetLanguage;
-    this.onlyReviewProjects = onlyReviewProjects;
     this.sortByColumn = sortByColumn ?? undefined;
     this.descOrder = descOrder ?? undefined;
-    this.reportsType = reportsType ;
     this.type = constants.GET_ORGANIZATION_PROJECT_REPORTS;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}${orgId}/project_analytics/`;
   }
@@ -37,10 +35,9 @@ export default class GetOrganizationProjectReportsAPI extends API {
       from_date: this.startDate,
       to_date: this.endDate,
       tgt_language: this.targetLanguage,
-      ...(  this.onlyReviewProjects == true ||this.onlyReviewProjects == false ) && {only_review_projects: this.onlyReviewProjects},
       sort_by_column_name: this.sortByColumn,
       descending_order: this.descOrder,
-      reports_type: this.reportsType,
+     
     };
   }
 

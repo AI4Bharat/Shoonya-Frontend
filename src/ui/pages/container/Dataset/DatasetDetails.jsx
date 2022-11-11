@@ -14,11 +14,19 @@ import GetDatasetMembersAPI from "../../../../redux/actions/api/Dataset/GetDatas
 import MembersTable from '../../component/Project/MembersTable';
 import DatasetSettings from './DatasetSettings';
 import DatasetLogs from './DatasetLogs';
+import DatasetDescription from './DatasetDescription';
 
 const DatasetDetails = () => {
 
     const { datasetId } = useParams();
     const [selectedTab, setSelectedTab] = useState(0);
+    const [datasetData, setDatasetData] = useState(
+        [
+            { name: "Dataset ID", value: null },
+            { name: "Description", value: null },
+            { name: "dataset Type", value: null },    
+        ]
+    )
 
     const dispatch = useDispatch();
     const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
@@ -28,6 +36,25 @@ const DatasetDetails = () => {
 		dispatch(APITransport(new GetDatasetDetailsAPI(datasetId)));
 		dispatch(APITransport(new GetDatasetMembersAPI(datasetId)));
 	}, [dispatch, datasetId]);
+    useEffect(() => {
+       
+        setDatasetData([
+            {
+                name: "Dataset ID",
+                value: DatasetDetails.instance_id
+            },
+            {
+                name: "Description",
+                value: DatasetDetails.description
+            },
+            {
+                name: "Datset Type",
+                value: DatasetDetails.dataset_type
+            },
+          
+           
+        ])
+    }, [DatasetDetails.instance_id]);
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -47,7 +74,7 @@ const DatasetDetails = () => {
                     <Typography variant="h3">
                         {DatasetDetails.instance_name}
                     </Typography>
-                    <Grid
+                    {/* <Grid
                         container
                         alignItems="center"
                         direction="row"
@@ -83,7 +110,20 @@ const DatasetDetails = () => {
                     >
                         <Typography variant="body2" fontWeight='700' pr={1}>Description :</Typography>
                         <Typography variant="body2" >{DatasetDetails.instance_description}</Typography>
-                    </Grid>}
+                    </Grid>} */}
+                     <Grid item xs={12} sm={12} md={12} lg={12} xl={12}  sx={{ mb: 2 ,mt:3}}>
+                        <Grid container spacing={2}>
+                            {datasetData?.map((des, i) => (
+                                <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+                                    <DatasetDescription
+                                        name={des.name}
+                                        value={des.value}
+                                        index={i}
+                                    />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Grid>
                     <Box >
                         <Tabs value={selectedTab} onChange={(_event,value)=>setSelectedTab(value)} aria-label="nav tabs example" TabIndicatorProps={{ style: { backgroundColor: "#FD7F23 " } }}>
                             <Tab label={translate("label.datasets")} sx={{ fontSize: 16, fontWeight: '700' }} />
