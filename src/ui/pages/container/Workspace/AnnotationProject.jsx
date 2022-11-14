@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, ThemeProvider, Typography, Card } from "@mui/material";
+import { Box, Chip, Grid, ThemeProvider, Typography, Card ,IconButton} from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState } from "react";
@@ -28,6 +28,9 @@ import CustomizedSnackbars from "../../component/common/Snackbar"
 import Spinner from "../../component/common/Spinner";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
+import SearchIcon from '@mui/icons-material/Search';
+import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
+import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 
 const isNum = (str) => {
   var reg = new RegExp('^[0-9]*$');
@@ -49,6 +52,8 @@ const AnnotationProject = (props) => {
   const DatasetFields = useSelector((state) => state.getDatasetFields.data);
   const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
   const DataItems = useSelector((state) => state.getDataitemsById.data);
+  const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
+
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -57,6 +62,7 @@ const AnnotationProject = (props) => {
   const [columnFields, setColumnFields] = useState(null);
   const [variableParameters, setVariableParameters] = useState(null);
   const [languageOptions, setLanguageOptions] = useState([]);
+  const [searchedCol, setSearchedCol] = useState();
 
   //Form related state variables
   const [title, setTitle] = useState("");
@@ -86,6 +92,9 @@ const AnnotationProject = (props) => {
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [totalDataitems, setTotalDataitems] = useState(10);
   const [tableData, setTableData] = useState([]);
+  const [searchAnchor, setSearchAnchor] = useState(null);
+  const [selectedFilters, setsSelectedFilters] = useState({});
+  const searchOpen = Boolean(searchAnchor);
   const excludeKeys = [
     "parent_data_id",
     "metadata_json",
@@ -122,8 +131,29 @@ const AnnotationProject = (props) => {
           </Grid>
         </Grid>
       </Grid>
+
     );
   };
+  const customColumnHead = (col) => {
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                columnGap: "5px",
+                flexGrow: "1",
+                alignItems: "center",
+            }}
+        >
+            {col.label}
+             <IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
+                <SearchIcon id={col.name + "_btn"} />
+            </IconButton>
+        </Box>
+    );
+}
+
   const options = {
     count: totalDataitems,
     rowsPerPage: currentRowPerPage,
@@ -167,11 +197,18 @@ const AnnotationProject = (props) => {
     serverSide: true,
     customToolbar: renderToolBar,
   };
-
+ 
+  
+ 
   useEffect(() => {
     const domainObj = new GetProjectDomainsAPI();
     dispatch(APITransport(domainObj));
   }, []);
+
+  useEffect(() => {
+    setTotalDataitems(filterdataitemsList.count);
+    setTableData(filterdataitemsList.results)
+  }, [filterdataitemsList.results])
 
   useEffect(() => {
     if (NewProject.id) {
@@ -179,6 +216,9 @@ const AnnotationProject = (props) => {
       window.location.reload();
     }
   }, [NewProject]);
+  useEffect(() => {
+    getsearchdataitems();
+  }, [currentPageNumber,currentRowPerPage,selectedFilters]);
 
   useEffect(() => {
     if (User) {
@@ -297,6 +337,7 @@ const AnnotationProject = (props) => {
               filter: false,
               sort: false,
               align: "center",
+              customHeadLabelRender: customColumnHead,
             },
           });
           tempSelected.push(key);
@@ -401,6 +442,11 @@ const AnnotationProject = (props) => {
     setConfirmed(true);
     getDataItems();
   };
+  const handleShowSearch = (col, event) => {
+    setSearchAnchor(event.currentTarget);
+    setSearchedCol(col);
+  
+}
 
   useEffect(() => {
     if (selectedInstances && datasetTypes) {
@@ -411,7 +457,19 @@ const AnnotationProject = (props) => {
   const getDataItems = () => {
     const dataObj = new GetDataitemsByIdAPI(selectedInstances, currentPageNumber, currentRowPerPage, datasetTypes[selectedType]);
     dispatch(APITransport(dataObj));
+    
   };
+
+  const getsearchdataitems = () =>{
+    const searchPopupdata ={
+      instance_ids: selectedInstances,
+      search_keys:selectedFilters
+    }
+    const taskObj = new DatasetSearchPopupAPI(searchPopupdata);
+    dispatch(APITransport(taskObj)); 
+
+  }
+
 
   const processNameString = (string) => {
     let temp = "";
@@ -426,6 +484,8 @@ const AnnotationProject = (props) => {
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
+
+    
 
 
     const newProject = {
@@ -455,6 +515,11 @@ const AnnotationProject = (props) => {
     const projectObj = new CreateProjectAPI(newProject);
     dispatch(APITransport(projectObj));
   };
+
+  const handleSearchClose = () => {
+    setSearchAnchor(null);
+  }
+ 
 
 
   return (
@@ -1061,6 +1126,14 @@ const AnnotationProject = (props) => {
         </Card> </Grid>
       {/* </Grid>
             </Grid> */}
+             {searchOpen && <DatasetSearchPopup
+                    open={searchOpen}
+                    anchorEl={searchAnchor}
+                     handleClose={handleSearchClose}
+                    updateFilters={setsSelectedFilters}
+                    currentFilters={selectedFilters}
+                    searchedCol={searchedCol}
+                />}
     </ThemeProvider>
   );
 };
