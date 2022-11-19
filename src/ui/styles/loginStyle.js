@@ -101,7 +101,11 @@ const LoginStyle = makeStyles({
         flexWrap: "wrap",
         width: "100%",
       },
-     
+      loginButtonStyle:{
+        backgroundColor:"",
+        borderRadius: "20px",
+        color: "#FFFFFF",
+      }
 })
 
 export default  LoginStyle

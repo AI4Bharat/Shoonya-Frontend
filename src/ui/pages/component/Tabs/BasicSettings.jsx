@@ -48,7 +48,7 @@ const BasicSettings = (props) => {
 
 
     useEffect(() => {
-        if (ProjectDetails.project_type === "MonolingualTranslation" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
+        if (ProjectDetails.project_type === "MonolingualTranslation" ||ProjectDetails.project_type === "SemanticTextualSimilarity" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
             getLanguageChoices();
             setShowLanguage(true);
         }
@@ -69,7 +69,7 @@ const BasicSettings = (props) => {
     }, [ProjectDetails]);
 
     const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
-
+    
     const getLanguageChoices = () => {
         const langObj = new GetLanguageChoicesAPI();
         dispatch(APITransport(langObj));
