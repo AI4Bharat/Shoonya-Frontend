@@ -16,7 +16,7 @@ const WorkspaceTable = (props) => {
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const { showManager, showCreatedBy } = props;
-    const workspaceData = useSelector(state => state.GetWorkspace.data.results);
+    const workspaceData = useSelector(state => state.GetWorkspace.data);
     const SearchWorkspace = useSelector((state) => state.SearchProjectCards.data);
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -110,9 +110,9 @@ const WorkspaceTable = (props) => {
                 sort: false,
             }
         }];
-        console.log(workspaceData,"workspaceData")
+      
     
-    const data = workspaceData && pageSearch().length > 0 ?pageSearch().map((el, i) => {
+    const data = workspaceData && workspaceData.length > 0 ?pageSearch().map((el, i) => {
         return [
             el.workspace_name,
             el.managers.map((manager, index) => {
@@ -129,51 +129,39 @@ const WorkspaceTable = (props) => {
     })  : [];
 
     const options = {
-        count: totalWorkspaceCount,
-        rowsPerPage: currentRowPerPage,
-        page: currentPageNumber - 1,
-        rowsPerPageOptions: [],
-        textLabels: {
-            pagination: {
-                next: "Next >",
-                previous: "< Previous",
-                rowsPerPage: "currentRowPerPage",
-                displayRows: "OF"
-            }
-        },
-        onChangePage: (currentPage) => setCurrentPageNumber(currentPage + 1),
-        // onChangeRowsPerPage: (rowPerPageCount) => { setCurrentRowPerPage(rowPerPageCount); console.log("rowPerPageCount", rowPerPageCount) },
-        filterType: 'checkbox',
-        selectableRows: "none",
-        download: false,
-        filter: false,
-        print: false,
-        search: false,
-        viewColumns: false,
         textLabels: {
             body: {
-                noMatch: "No records ",
+                noMatch: "No records",
             },
             toolbar: {
                 search: "Search",
                 viewColumns: "View Column",
             },
-            pagination: {
-                rowsPerPage: "",
-            },
+            pagination: { rowsPerPage: "Rows per page" },
             options: { sortDirection: "desc" },
         },
+        // customToolbar: fetchHeaderButton,
+        displaySelectToolbar: false,
+        fixedHeader: false,
+        filterType: "checkbox",
+        download: false,
+        print: false,
+        rowsPerPageOptions: [10, 25, 50, 100],
+        // rowsPerPage: PageInfo.count,
+        filter: false,
+        // page: PageInfo.page,
+        viewColumns: false,
+        selectableRows: "none",
+        search: false,
         jumpToPage: true,
-        serverSide: true,
-        // customToolbar: renderToolBar,
     };
 
 
     return (
         <div>
-            {/* <Grid sx={{ mb: 1 }}>
+            <Grid sx={{ mb: 1 }}>
                 <Search />
-            </Grid> */}
+            </Grid>
             {workspaceData && <ThemeProvider theme={tableTheme}>
                 <MUIDataTable
                     title={""}

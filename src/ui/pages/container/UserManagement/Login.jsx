@@ -10,8 +10,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { translate } from "../../../../config/localisation";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
-import LoginStyle from "../../../styles/loginStyle";
-import Button from "../../component/common/Button";
+import CustomButton from "../../component/common/Button";
 import CustomCard from "../../component/common/Card";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
@@ -23,6 +22,7 @@ import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Logo from "../../../../assets/logo.svg";
 import AppInfo from "./AppInfo";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import LoginStyle from "../../../styles/loginStyle";
 
 
 const Login = () => {
@@ -173,7 +173,11 @@ const Login = () => {
           </Link>
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <Button fullWidth onClick={createToken} label={"Login"} />
+          <CustomButton style={{
+            backgroundColor: "#2C2799",
+            borderRadius: "20px",
+            color: "#FFFFFF"
+          }} fullWidth onClick={createToken} label={"Login"} />
         </Grid>
         {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
         <div className={classes.createLogin}>
@@ -220,7 +224,8 @@ const Login = () => {
           <AppInfo />
         </Grid>
         <Grid item xs={12} sm={9} md={9} lg={9} className={classes.parent}>
-          <form autoComplete="off">{renderCardContent()}</form>
+          <form autoComplete="off">{renderCardContent()}
+          </form>
         </Grid>
         {renderSnackBar()}
        
