@@ -31,7 +31,6 @@ const ProfilePage = () => {
   const UserDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
-  console.log(LoggedInUserId , userDetails?.id ,"LoggedInUserId !== userDetails.id",(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1)||( loggedInUserData?.role === 2 || loggedInUserData?.role === 3) && "asdfg" )
   const handleEmailToggle = async () => {
     setLoading(true);
     const mailObj = new ToggleMailsAPI(LoggedInUserId, !userDetails.enable_mail);
