@@ -141,9 +141,8 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
-               
                 {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
-                          <Card>
+                <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
                     <RecentTasks />
@@ -159,7 +158,6 @@ const ProfilePage = () => {
                 </CardContent>
               </Card>
                {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
-
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
