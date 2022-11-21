@@ -158,7 +158,7 @@ const ProfilePage = () => {
                   {UserMappedByRole(userDetails.role).element}
                 </CardContent>
               </Card>
-              {LoggedInUserId === userDetails.id &&((loggedInUserData?.role === 2 || loggedInUserData?.role === 3)) &&
+              {LoggedInUserId === userDetails.id || ((loggedInUserData?.role === 2 || loggedInUserData?.role === 3)) &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
