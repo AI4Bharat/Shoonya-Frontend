@@ -31,7 +31,7 @@ const ProfilePage = () => {
   const UserDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
-  console.log(LoggedInUserId,"LoggedInUserId",loggedInUserData)
+  console.log(LoggedInUserId , userDetails?.id ,"LoggedInUserId !== userDetails.id",(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1)||( loggedInUserData?.role === 2 || loggedInUserData?.role === 3) && "asdfg" )
   const handleEmailToggle = async () => {
     setLoading(true);
     const mailObj = new ToggleMailsAPI(LoggedInUserId, !userDetails.enable_mail);
@@ -142,14 +142,15 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
-                {(loggedInUserData?.role === 2 || loggedInUserData?.role === 3) &&
-                <Card>
+               
+                {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
+                          <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
                     <RecentTasks />
                   </CardContent>
                 </Card>
-              }
+             } 
             </Grid>
             <Grid item xs={12} sm={12} md={8} lg={8} xl={8} sx={{ p: 2 }}>
               <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 }}>
@@ -158,13 +159,15 @@ const ProfilePage = () => {
                   {UserMappedByRole(userDetails.role).element}
                 </CardContent>
               </Card>
-              {LoggedInUserId === userDetails.id &&((loggedInUserData?.role === 2 || loggedInUserData?.role === 3)) &&
+               {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
+
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
                     <MyProgress />
                   </CardContent>
-                </Card>}
+                </Card>
+                } 
             </Grid></>
           )}
       </Grid>
