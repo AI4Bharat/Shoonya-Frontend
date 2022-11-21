@@ -23,9 +23,9 @@ const excludeKeys = [
   "datasetbase_ptr_id",
   "key",
   "instance_id",
-  "conversation_json",
-  "machine_translated_conversation_json",
-  "speakers_json"
+  // "conversation_json",
+  // "machine_translated_conversation_json",
+  // "speakers_json"
 ];
 
 const DataitemsTable = () => {
@@ -111,7 +111,7 @@ const DataitemsTable = () => {
     if (fetchedItems?.length > 0 && fetchedItems[0]) {
 
     let colList = [];
-            colList.push(...Object.keys(fetchedItems?.[0])?.filter(el => !excludeKeys.includes(el)));
+            colList.push(...Object.keys(fetchedItems?.[0])?.filter(el => !excludeKeys.includes(el) && !el.includes("_json")));
             const cols = colList.map((col) => {
                 return {
                     name: col,
