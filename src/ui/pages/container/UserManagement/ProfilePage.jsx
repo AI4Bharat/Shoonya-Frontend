@@ -142,7 +142,7 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
-                {(loggedInUserData?.role === 2 || loggedInUserData?.role === 3) &&
+                {LoggedInUserId === userDetails.id || ((loggedInUserData?.role === 2 || loggedInUserData?.role === 3)) &&
                 <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
