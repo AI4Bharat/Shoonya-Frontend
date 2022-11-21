@@ -52,7 +52,7 @@ const TaskTable = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
    
     const filterData = {
-        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["labeled", "accepted", "accepted_with_changes", "to_be_revised"] : ["unlabeled", "skipped", "accepted", "draft"],
+        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes ", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
             return {
                 label: el.username,
@@ -68,8 +68,8 @@ const TaskTable = (props) => {
         }) : []
     }
     const [selectedFilters, setsSelectedFilters] = useState(
-        (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : { task_status: filterData.Status[0], user_filter: -1 });
-    const NextTask = useSelector(state => state.getNextTask.data);
+        (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {annotation_status: filterData.Status[0], user_filter: -1 });
+        const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState(ProjectDetails.tasks_pull_count_per_batch * 0.5);
     const [pullDisabled, setPullDisabled] = useState("");
@@ -93,6 +93,7 @@ const TaskTable = (props) => {
         const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters, props.type);
         dispatch(APITransport(taskObj));
     }
+    console.log(selectedFilters,"selectedFilters")
 
     const fetchNewTasks = async () => {
         const batchObj = props.type === "annotation" ? new PullNewBatchAPI(id, pullSize) : new PullNewReviewBatchAPI(id, pullSize);

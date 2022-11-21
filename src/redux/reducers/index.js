@@ -73,6 +73,8 @@ import getOrganizationAnnotatorQuality from './Organization/GetOrganizationAnnot
 import FindAndReplaceWordsInAnnotation from './ProjectDetails/FindAndReplaceWordsInAnnotation';
 import getRecentTasks from './UserManagement/FetchRecentTasks';
 import datasetSearchPopup from './Dataset/DatasetSearchPopup';
+import getAllTasksdata from './Tasks/GetAllTasks';
+import allTasksFilter from './Tasks/AllTasksFilter';
 
 const index = {
     apiStatus,
@@ -153,6 +155,8 @@ const index = {
     FindAndReplaceWordsInAnnotation,
     getRecentTasks,
     datasetSearchPopup,
+    getAllTasksdata,
+    allTasksFilter,
     
 };
 
