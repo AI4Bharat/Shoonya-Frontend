@@ -18,8 +18,6 @@ import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AllTasksFilterList from "./AllTasksFilter";
-import AllTasksFilterAPI from "../../../../redux/actions/api/Tasks/AllTasksFilter";
-
 
 const excludeCols = [
   "context",
@@ -30,6 +28,7 @@ const excludeCols = [
   "machine_translated_conversation_json",
   "speakers_json",
   "language",
+  "actions",
 ];
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
@@ -49,34 +48,22 @@ const AllTaskTable = (props) => {
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data);
-  const AllTaskFilter = useSelector((state) => state.allTasksFilter.data);
-  console.log(AllTaskData, "AllTaskData");
 
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed", "exported"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
-    task_status: [filterData.Status[0]]
-   
+    task_status: [filterData.Status[0]],
   });
-  console.log(selectedFilters,"selectedFilters")
+
   const GetAllTasksdata = () => {
-    const taskObjs = new GetAllTasksAPI(id);
-    dispatch(APITransport(taskObjs));
-  };
-  const GetAllTasksFilter = () => {
-    const taskObjs = new AllTasksFilterAPI(id,selectedFilters.task_status);
+    const taskObjs = new GetAllTasksAPI(id, selectedFilters);
     dispatch(APITransport(taskObjs));
   };
 
   useEffect(() => {
     GetAllTasksdata();
-    GetAllTasksFilter();
   }, []);
-
-useEffect(() => {
-    setTasks(AllTaskFilter)
-}, [])
 
   useEffect(() => {
     const newCols = columns.map((col) => {
@@ -195,16 +182,17 @@ useEffect(() => {
         />
       </ThemeProvider>
       {popoverOpen && (
-          <AllTasksFilterList
-            id={filterId}
-            open={popoverOpen}
-            anchorEl={anchorEl}
-            handleClose={handleClose}
-            filterStatusData={filterData}
-            updateFilters={setsSelectedFilters}
-            currentFilters={selectedFilters}
-          />
-        )}
+        <AllTasksFilterList
+          id={filterId}
+          open={popoverOpen}
+          anchorEl={anchorEl}
+          handleClose={handleClose}
+          filterStatusData={filterData}
+          updateFilters={setsSelectedFilters}
+          currentFilters={selectedFilters}
+          onchange={GetAllTasksdata}
+        />
+      )}
     </div>
   );
 };

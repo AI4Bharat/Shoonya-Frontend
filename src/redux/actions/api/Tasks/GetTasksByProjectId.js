@@ -9,11 +9,14 @@ import constants from "../../../constants";
  export default class GetTasksByProjectIdAPI extends API {
    constructor(projectId, pageNo, countPerPage, selectedFilters, taskType, timeout = 2000) {
      super("GET", timeout, false);
+     const datavalue = []
      this.type = constants.GET_TASK_LIST;
      let queryString = `?project_id=${projectId}`;
      for (let key in selectedFilters) {
         if (selectedFilters[key] && selectedFilters[key] !== -1) {
-          queryString += `&${key}=${selectedFilters[key]}`
+          datavalue.push(selectedFilters[key] )
+          queryString += `&${key}=["${selectedFilters[key]}"]`
+          
         }
       }
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks+queryString}`;

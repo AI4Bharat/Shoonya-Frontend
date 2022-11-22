@@ -74,7 +74,7 @@ import FindAndReplaceWordsInAnnotation from './ProjectDetails/FindAndReplaceWord
 import getRecentTasks from './UserManagement/FetchRecentTasks';
 import datasetSearchPopup from './Dataset/DatasetSearchPopup';
 import getAllTasksdata from './Tasks/GetAllTasks';
-import allTasksFilter from './Tasks/AllTasksFilter';
+
 
 const index = {
     apiStatus,
@@ -156,7 +156,7 @@ const index = {
     getRecentTasks,
     datasetSearchPopup,
     getAllTasksdata,
-    allTasksFilter,
+   
     
 };
 

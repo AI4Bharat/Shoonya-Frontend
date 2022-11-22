@@ -20,7 +20,7 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 const FilterList = (props) => {
   const classes = DatasetStyle();
   const { filterStatusData, currentFilters, updateFilters } = props;
-  const [selectedStatus, setSelectedStatus] = useState(currentFilters.task_status);
+  const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status? currentFilters?.annotation_status:currentFilters.review_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
 console.log(currentFilters,"currentFilters")
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
@@ -37,10 +37,13 @@ console.log(currentFilters,"currentFilters")
   //     }
   //   }
   // };
+
+
   const handleStatusChange = (e) => {
+    let statusvalue = !!currentFilters?.annotation_status? "annotation_status":"review_status"
     updateFilters({
       ...currentFilters,
-      task_status: selectedStatus,
+      [statusvalue]:selectedStatus,
     })
     props.handleClose();
   };

@@ -5,11 +5,20 @@
 import constants from "../../../constants";
  
  export default class GetAllTasksAPI extends API {
-   constructor(projectId, timeout = 2000) {
+   constructor(projectId, selectedFilters, timeout = 2000) {
      super("GET", timeout, false);
      this.type = constants.GET_ALL_TASKS;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks}?project_id=${projectId}`;
+     let queryString = `?project_id=${projectId}`;
+     for (let key in selectedFilters) {
+        if (selectedFilters[key] && selectedFilters[key] !== -1) {
+          queryString += `&${key}=["${selectedFilters[key].join('", "')}"]`
+          
+        }
+      }
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks+queryString}`;
    }
+
+   
 
  
    processResponse(res) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import {
   Button,
   Divider,
@@ -19,18 +19,23 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 
 const AllTasksFilterList = (props) => {
   const classes = DatasetStyle();        
-  const { filterStatusData, currentFilters, updateFilters} = props;
+  const { filterStatusData, currentFilters, updateFilters,onchange} = props;
   const [selectedStatus, setSelectedStatus] = useState(currentFilters.task_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
 console.log(currentFilters,"selectedStatus")
 
   const handleStatusChange = (e) => {
-    updateFilters({
-      ...currentFilters,
-      task_status: selectedStatus,
-    })
+    onchange()
     props.handleClose();
+   
   };
+  useEffect(() => {
+    updateFilters({
+        ...currentFilters,
+        task_status: selectedStatus,
+      })
+}, [selectedStatus])
+
   
 
   return (
