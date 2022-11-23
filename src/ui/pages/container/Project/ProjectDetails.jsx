@@ -19,6 +19,8 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DatasetStyle from "../../../styles/Dataset";
 import ProjectDescription from "./ProjectDescription";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import AllTaskTable from "../../component/Project/AllTaskTable";
+import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 
 
 
@@ -113,7 +115,10 @@ const Projects = () => {
     const dispatch = useDispatch();
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-    
+    const loggedInUserData = useSelector(
+        (state) => state.fetchLoggedInUserData.data
+      );
+    console.log(loggedInUserData,"loggedInUserData")
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
 
@@ -185,6 +190,7 @@ const Projects = () => {
     const handleOpenSettings = () => {
         navigate(`/projects/${id}/projectsetting`);
     }
+ 
 
     return (
         <ThemeProvider theme={themeDefault}>
@@ -251,8 +257,7 @@ const Projects = () => {
                                 {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700', flexDirection: "row-reverse" }} onClick={handleClick} />
-
-                            </Tabs>
+                                {loggedInUserData.role === 2 && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
                         </Box>
 
                     </Grid>
@@ -271,6 +276,9 @@ const Projects = () => {
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 4 : 2 : 2}>
                         <ReportsTable annotationreviewertype={annotationreviewertype} />
                     </TabPanel>
+                 {loggedInUserData.role === 2 && <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
+                        <AllTaskTable  />
+                    </TabPanel>}
                 </Card>
             </Grid>
         </ThemeProvider>

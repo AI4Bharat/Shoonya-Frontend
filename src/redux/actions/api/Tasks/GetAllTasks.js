@@ -1,31 +1,30 @@
-/**
- * GetTasksByProjectId
- */
+
 
  import API from "../../../api";
  import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
- export default class GetTasksByProjectIdAPI extends API {
-   constructor(projectId, pageNo, countPerPage, selectedFilters, taskType, timeout = 2000) {
+ export default class GetAllTasksAPI extends API {
+   constructor(projectId, selectedFilters, timeout = 2000) {
      super("GET", timeout, false);
-     const datavalue = []
-     this.type = constants.GET_TASK_LIST;
+     this.type = constants.GET_ALL_TASKS;
      let queryString = `?project_id=${projectId}`;
      for (let key in selectedFilters) {
         if (selectedFilters[key] && selectedFilters[key] !== -1) {
-          datavalue.push(selectedFilters[key] )
-          queryString += `&${key}=["${selectedFilters[key]}"]`
+          queryString += `&${key}=["${selectedFilters[key].join('", "')}"]`
           
         }
       }
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks+queryString}`;
    }
+
+   
+
  
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-         this.taskList = res;
+         this.allTasks = res;
      }
  }
  
@@ -46,7 +45,7 @@ import constants from "../../../constants";
    }
  
    getPayload() {
-     return this.taskList
+     return this.allTasks
    }
  }
  
