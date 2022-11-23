@@ -49,7 +49,7 @@ const AllTaskTable = (props) => {
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data);
-
+console.log(AllTaskData,"AllTaskData")
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed", "exported"],
   };
@@ -77,14 +77,13 @@ const AllTaskTable = (props) => {
             .map((key) => el.data[key])
         );
         AllTaskData[0].task_status && row.push(el.task_status);
-        <CustomButton
-        label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
-            View
-        </Typography>} />
+        row.push(<CustomButton  sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
+        View
+    </Typography>}  />)
         return row;
         
       });
-     
+     console.log(data,"data123")
       let colList = ["id"];
       colList.push(
         ...Object.keys(AllTaskData[0].data).filter(
