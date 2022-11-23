@@ -430,7 +430,7 @@ const TaskTable = (props) => {
                 </FormControl>}
                 {props.type === "review" && userDetails?.role !== 1 && !getProjectReviewers?.some((reviewer) => reviewer.id === userDetails?.id) &&
                     <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
-                        <InputLabel id="reviewer-filter-label" sx={{ fontSize: "16px" }}>Filter by Reviewer</InputLabel>
+                        <InputLabel id="reviewer-filter-label" sx={{ fontSize: "16px", position: "inherit", top: "23px", left: "-25px" }}>Filter by Reviewer</InputLabel>
                         <Select
                             labelId="reviewer-filter-label"
                             id="reviewer-filter"
