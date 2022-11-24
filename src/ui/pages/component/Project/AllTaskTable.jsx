@@ -11,6 +11,7 @@ import {
   Tooltip,
   Button,
   IconButton,
+  Typography,
 } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import ColumnList from "../common/ColumnList";
@@ -18,6 +19,7 @@ import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AllTasksFilterList from "./AllTasksFilter";
+import CustomButton from '../common/Button';
 
 const excludeCols = [
   "context",
@@ -28,7 +30,6 @@ const excludeCols = [
   "machine_translated_conversation_json",
   "speakers_json",
   "language",
-  "actions",
 ];
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const AllTaskTable = (props) => {
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data);
-
+console.log(AllTaskData,"AllTaskData")
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed", "exported"],
   };
@@ -65,17 +66,7 @@ const AllTaskTable = (props) => {
     GetAllTasksdata();
   }, []);
 
-  useEffect(() => {
-    const newCols = columns.map((col) => {
-      col.options.display = selectedColumns.includes(col.name)
-        ? "true"
-        : "false";
-      return col;
-    });
-    setColumns(newCols);
-    console.log("columnss", newCols);
-  }, [selectedColumns]);
-
+  
   useEffect(() => {
     if (AllTaskData?.length > 0 && AllTaskData[0]?.data) {
       const data = AllTaskData.map((el) => {
@@ -86,8 +77,13 @@ const AllTaskTable = (props) => {
             .map((key) => el.data[key])
         );
         AllTaskData[0].task_status && row.push(el.task_status);
+        row.push(<CustomButton  sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
+        View
+    </Typography>}  />)
         return row;
+        
       });
+     console.log(data,"data123")
       let colList = ["id"];
       colList.push(
         ...Object.keys(AllTaskData[0].data).filter(
@@ -117,6 +113,18 @@ const AllTaskTable = (props) => {
       setTasks([]);
     }
   }, [AllTaskData]);
+
+  useEffect(() => {
+    const newCols = columns.map((col) => {
+      col.options.display = selectedColumns.includes(col.name)
+        ? "true"
+        : "false";
+      return col;
+    });
+    setColumns(newCols);
+    console.log("columnss", newCols);
+  }, [selectedColumns]);
+
 
   const handleShowFilter = (event) => {
     setAnchorEl(event.currentTarget);

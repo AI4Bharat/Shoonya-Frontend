@@ -257,7 +257,7 @@ const Projects = () => {
                                 {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700', flexDirection: "row-reverse" }} onClick={handleClick} />
-                                {loggedInUserData.role === 2 && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
+                                {loggedInUserData.role !== 1 && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
                         </Box>
 
                     </Grid>
@@ -276,7 +276,7 @@ const Projects = () => {
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 4 : 2 : 2}>
                         <ReportsTable annotationreviewertype={annotationreviewertype} />
                     </TabPanel>
-                 {loggedInUserData.role === 2 && <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
+                 {loggedInUserData.role !== 1  && <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
                         <AllTaskTable  />
                     </TabPanel>}
                 </Card>
