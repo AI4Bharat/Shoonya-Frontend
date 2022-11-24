@@ -243,7 +243,8 @@ const TaskTable = (props) => {
                     el.id
                 ]
                 row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
-                taskList[0].task_status && row.push(el.task_status);
+                props.type === "annotation" && taskList[0].annotation_status && row.push(el.annotation_status);
+                props.type === "review" && taskList[0].review_status && row.push(el.review_status);
         
                 props.type === "annotation" && row.push(<Link to={`task/${el.id}`} className={classes.link}>
                     <CustomButton
