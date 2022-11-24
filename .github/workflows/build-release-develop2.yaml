@@ -1,4 +1,4 @@
-name: Build and Release React App for Stage
+name: Build and Release React App for Develop2
 
 on:
   push:
