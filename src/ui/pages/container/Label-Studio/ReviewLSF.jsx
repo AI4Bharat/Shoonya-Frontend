@@ -517,7 +517,7 @@ const LabelStudioWrapper = ({
                Revise
               </Button>
             </Tooltip>}
-            <Tooltip title="Accept Annotation">
+            {taskData?.review_user === userData?.id && <Tooltip title="Accept Annotation">
               <Button
                 id="accept-button"
                 value="Accept"
@@ -540,7 +540,7 @@ const LabelStudioWrapper = ({
               >
                 Accept
               </Button>
-            </Tooltip>
+            </Tooltip>}
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
