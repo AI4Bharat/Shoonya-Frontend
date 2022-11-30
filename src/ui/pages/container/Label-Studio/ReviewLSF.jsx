@@ -7,6 +7,10 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
+import { styled, alpha } from '@mui/material/styles';
+import Menu, { MenuProps } from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import {
   getProjectsandTasks,
@@ -23,6 +27,47 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
+
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'right',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: 6,
+    marginTop: theme.spacing(1),
+    minWidth: 180,
+    color:
+      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenu-list': {
+      padding: '4px 0',
+    },
+    '& .MuiMenuItem-root': {
+      '& .MuiSvgIcon-root': {
+        fontSize: 18,
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(1.5),
+      },
+      '&:active': {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          theme.palette.action.selectedOpacity,
+        ),
+      },
+    },
+  },
+}));
 
 //used just in postAnnotation to support draft status update.
 
@@ -375,14 +420,24 @@ const LabelStudioWrapper = ({
     });
   };
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const handleReviseClick = async () => {
     review_status.current = "to_be_revised";
     lsfRef.current.store.submitAnnotation();
   };
 
-  const handleAcceptClick = async () => {
-    review_status.current = "accepted";
+  const handleAcceptClick = async (status) => {
+    review_status.current = status;
     lsfRef.current.store.submitAnnotation();
+    handleClose();
   };
 
   const renderSnackBar = () => {
@@ -411,7 +466,6 @@ const LabelStudioWrapper = ({
           <div>
             <Tooltip title="Go to next task">
               <Button
-                value="to_be_revised"
                 type="default"
                 onClick={onNextAnnotation}
                 style={{
@@ -427,6 +481,23 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
+            {taskData?.review_user === userData?.id && <Tooltip title="Save task for later">
+              <Button
+                type="default"
+                onClick={() => handleAcceptClick("draft")}
+                style={{
+                  minWidth: "160px",
+                  border: "1px solid #e6e6e6",
+                  color: "#e80",
+                  pt: 3,
+                  pb: 3,
+                  borderBottom: "None",
+                }}
+                className="lsf-button"
+              >
+                Draft
+              </Button>
+            </Tooltip>}
             {taskData?.review_user === userData?.id && <Tooltip title="Revise Annotation">
               <Button
                 value="to_be_revised"
@@ -448,9 +519,12 @@ const LabelStudioWrapper = ({
             </Tooltip>}
             {taskData?.review_user === userData?.id && <Tooltip title="Accept Annotation">
               <Button
+                id="accept-button"
                 value="Accept"
                 type="default"
-                onClick={handleAcceptClick}
+                aria-controls={open ? 'accept-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
                 style={{
                   minWidth: "160px",
                   border: "1px solid #e6e6e6",
@@ -461,10 +535,31 @@ const LabelStudioWrapper = ({
                   borderLeft: "None",
                 }}
                 className="lsf-button"
+                onClick={handleClick}
+                endIcon={<KeyboardArrowDownIcon />}
               >
                 Accept
               </Button>
             </Tooltip>}
+            <StyledMenu
+              id="accept-menu"
+              MenuListProps={{
+                'aria-labelledby': 'accept-button',
+              }}
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={() => handleAcceptClick("accepted")} disableRipple>
+                with No Changes
+              </MenuItem>
+              <MenuItem onClick={() => handleAcceptClick("accepted_with_minor_changes")} disableRipple>
+                with Minor Changes
+              </MenuItem>
+              <MenuItem onClick={() => handleAcceptClick("accepted_wth_major_changes")} disableRipple>
+                with Major Changes
+              </MenuItem>
+            </StyledMenu>
           </div>
         </div>
       )}

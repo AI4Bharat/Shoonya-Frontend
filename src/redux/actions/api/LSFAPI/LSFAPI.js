@@ -99,7 +99,7 @@ const patchReview = async (result, annotationID, parentAnnotation, load_time, le
       mode: "review"
     });
     if (review_status === "to_be_revised") {
-      await axiosInstance.patch(`/annotation/${annotationID}/`, {
+      await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
         annotation_status: review_status,
       });
     }
