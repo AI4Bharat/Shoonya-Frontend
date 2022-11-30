@@ -7,7 +7,7 @@
  
  export default class UploaddataAPI extends API {
    constructor(datasetId,projectObj, timeout = 2000) {
-     super("POST", timeout, false);
+     super("POST",  false);
      this.projectObj = projectObj;
      this.type = constants.UPLOAD_DATA;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/${datasetId}/upload/`;
@@ -31,7 +31,7 @@
    getHeaders() {
      this.headers = {
        headers: {
-         "Content-Type": "application/json",
+        // "Content-Type": "application/json",
          "Authorization":`JWT ${localStorage.getItem('shoonya_access_token')}`
        },
      };

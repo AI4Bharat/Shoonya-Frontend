@@ -11,7 +11,6 @@ import generateLabelConfig from '../../../../utils/LabelConfig/ConversationTrans
 import {
   getProjectsandTasks,
   postAnnotation,
-  updateTask,
   getNextProject,
   patchAnnotation,
   deleteAnnotation,
@@ -36,7 +35,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const rootRef = useRef();
   const dispatch = useDispatch();
   const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-  const task_status = useRef(ProjectDetails.enable_task_reviews ? "labeled": "accepted");
+  const annotation_status = useRef(ProjectDetails.enable_task_reviews ? "labeled": "accepted");
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
   const navigate = useNavigate();
@@ -143,7 +142,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "infobar",
         "topbar",
         "instruction",
-        // "side-column",
+         "side-column",
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -182,8 +181,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         },
 
         onLabelStudioLoad: function (ls) {
-          task_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
-          console.log("task_status", task_status.current, "test", ProjectDetails);
+          annotation_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
+          console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
           if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
@@ -194,14 +193,14 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         },
         onSubmitAnnotation: function (ls, annotation) {
           showLoader();
-          if (taskData.task_status !== "freezed") {
+          if (taskData.annotation_status !== "freezed") {
             postAnnotation(
               annotation.serializeAnnotation(),
               taskData.id,
               userData.id,
               load_time,
               annotation.lead_time,
-              task_status.current,
+              annotation_status.current,
               annotationNotesRef.current.value
             ).then((res) => {
               if (localStorage.getItem("labelAll"))
@@ -226,19 +225,30 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
         onSkipTask: function () {
         //   message.warning('Notes will not be saved for skipped tasks!');
-          showLoader();
-          updateTask(taskData.id).then(() => {
-            getNextProject(projectId, taskData.id).then((res) => {
-              hideLoader();
-              tasksComplete(res?.id || null);
+          let annotation = annotations.find((annotation) => !annotation.parentAnnotation);
+          console.log("onSkip", annotation)
+          if (annotation) {
+            showLoader();
+            patchAnnotation(
+              null,
+              annotation.id,
+              load_time,
+              annotation.lead_time,
+              "skipped",
+              annotationNotesRef.current.value
+            ).then(() => {
+              getNextProject(projectId, taskData.id).then((res) => {
+                hideLoader();
+                tasksComplete(res?.id || null);
+              });
             });
-          })
+          }
         },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.task_status !== "freezed") {
+          if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
-              if (annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
+              if (!annotations[i].result?.length || annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
                 showLoader();
                 let temp = annotation.serializeAnnotation()
 
@@ -252,7 +262,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
                   annotations[i].id,
                   load_time,
                   annotations[i].lead_time,
-                  task_status.current,
+                  annotation_status.current,
                   annotationNotesRef.current.value
                   ).then(() => {
                     if (localStorage.getItem("labelAll"))
@@ -339,7 +349,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   }, [taskId]);
 
   const handleDraftAnnotationClick = async () => {
-    task_status.current = "draft";
+    annotation_status.current = "draft";
     lsfRef.current.store.submitAnnotation();
   }
 
