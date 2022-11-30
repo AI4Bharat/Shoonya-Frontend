@@ -11,7 +11,6 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "./ColumnList";
 import SearchIcon from '@mui/icons-material/Search';
 import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
-import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import Spinner from "../../component/common/Spinner";
 
 
@@ -36,7 +35,7 @@ const DataitemsTable = () => {
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
-  
+  console.log(DatasetDetails,"DatasetDetails",filterdataitemsList)
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -53,22 +52,13 @@ const DataitemsTable = () => {
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
       datasetId,
+      DatasetDetails.dataset_type,
+      selectedFilters,
       currentPageNumber,
       currentRowPerPage
     );
     dispatch(APITransport(dataObj));
   };
-
-  const getsearchdataitems = () =>{
-    const searchPopupdata ={
-      instance_ids:datasetId,
-      dataset_type:DatasetDetails.dataset_type,
-      search_keys:selectedFilters
-    }
-    const taskObj = new DatasetSearchPopupAPI(searchPopupdata);
-    dispatch(APITransport(taskObj)); 
-
-  }
 
  
   useEffect(() => {
@@ -77,67 +67,66 @@ const DataitemsTable = () => {
  
 
     useEffect(() => {
-      let fetchedItems =filterdataitemsList.results;
-      // setTotalDataitems(dataitemsList.count);
-      // fetchedItems = dataitemsList.results;
-      // setDataitems(fetchedItems);
+      let fetchedItems =dataitemsList.results;
+      setTotalDataitems(dataitemsList.count);
+      fetchedItems = dataitemsList.results;
+      setDataitems(fetchedItems);
 
-      setTotalDataitems(filterdataitemsList.count);
-      setDataitems(fetchedItems)
+     
    
     
-    // let tempColumns = [];
-    // let tempSelected = [];
-    // if (fetchedItems?.length) {
-    //   Object.keys(fetchedItems[0]).forEach((key) => {
-    //     if (!excludeKeys.includes(key)) {
-    //       tempColumns.push({
-    //         name: key,
-    //         label: snakeToTitleCase(key),
-    //         options: {
-    //           filter: false,
-    //           sort: false,
-    //           align: "center",
-    //           customHeadLabelRender: customColumnHead,
-    //         },
-    //       });
-    //       tempSelected.push(key);
-    //     }
-    //   });
-    // }
-    // setColumns(tempColumns);
-    // setSelectedColumns(tempSelected);
+    let tempColumns = [];
+    let tempSelected = [];
+    if (fetchedItems?.length) {
+      Object.keys(fetchedItems[0]).forEach((key) => {
+        if (!excludeKeys.includes(key)) {
+          tempColumns.push({
+            name: key,
+            label: snakeToTitleCase(key),
+            options: {
+              filter: false,
+              sort: false,
+              align: "center",
+              customHeadLabelRender: customColumnHead,
+            },
+          });
+          tempSelected.push(key);
+        }
+      });
+    }
+    setColumns(tempColumns);
+    setSelectedColumns(tempSelected);
     // console.log(tempSelected,"tempSelected",tempColumns)
-    if (fetchedItems?.length > 0 && fetchedItems[0]) {
+    // if (dataitemsList?.length > 0 && dataitemsList[0]) {
 
-    let colList = [];
-            colList.push(...Object.keys(fetchedItems?.[0])?.filter(el => !excludeKeys.includes(el)));
-            const cols = colList.map((col) => {
-                return {
-                    name: col,
-                    label: snakeToTitleCase(col),
-                    options: {
-                        filter: false,
-                        sort: false,
-                        align: "center",
-                        customHeadLabelRender: customColumnHead,
-                    }
-                }
-            });
+    // let colList = [];
+    //         colList.push(...Object.keys(dataitemsList?.[0])?.filter(el => !excludeKeys.includes(el)));
+    //         const cols = colList.map((col) => {
+    //             return {
+    //                 name: col,
+    //                 label: snakeToTitleCase(col),
+    //                 options: {
+    //                     filter: false,
+    //                     sort: false,
+    //                     align: "center",
+    //                     customHeadLabelRender: customColumnHead,
+    //                 }
+    //             }
+    //         });
             
-            setColumns(cols);
-            setSelectedColumns(colList);
+    //         setColumns(cols);
+    //         setSelectedColumns(colList);
             
           
-          }else {
-            setDataitems([]);
-        }
+    //       }else {
+    //         setDataitems([]);
+    //     }
      
-    }, [filterdataitemsList])
+     }, [dataitemsList])
    
 
   useEffect(() => {
-    getsearchdataitems();
+    getDataitems();
   }, [currentPageNumber,currentRowPerPage,selectedFilters]);
 
   useEffect(() => {

@@ -53,7 +53,7 @@ const AnnotationProject = (props) => {
   const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
   const DataItems = useSelector((state) => state.getDataitemsById.data);
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
-
+console.log(DataItems,"DataItems")
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -449,13 +449,13 @@ const AnnotationProject = (props) => {
 }
 
   useEffect(() => {
-    if (selectedInstances && datasetTypes) {
+    if (selectedInstances && datasetTypes ) {
       getDataItems();
     }
   }, [currentPageNumber, currentRowPerPage]);
 
   const getDataItems = () => {
-    const dataObj = new GetDataitemsByIdAPI(selectedInstances, currentPageNumber, currentRowPerPage, datasetTypes[selectedType]);
+    const dataObj = new GetDataitemsByIdAPI(selectedInstances,  datasetTypes[selectedType],selectedFilters,currentPageNumber,currentRowPerPage);
     dispatch(APITransport(dataObj));
     
   };
