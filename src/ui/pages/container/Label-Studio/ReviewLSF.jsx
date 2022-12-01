@@ -104,7 +104,8 @@ const LabelStudioWrapper = ({
     annotations,
     predictions,
     annotationNotesRef,
-    reviewNotesRef
+    reviewNotesRef,
+    projectType,
   ) {
     let load_time;
     let interfaces = [];
@@ -120,7 +121,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...labelConfig?.project_type === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
+        ...projectType === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -143,7 +144,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...labelConfig?.project_type === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
+        ...projectType === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -354,7 +355,8 @@ const LabelStudioWrapper = ({
             annotations,
             predictions,
             annotationNotesRef,
-            reviewNotesRef
+            reviewNotesRef,
+            labelConfig.project_type
           );
           hideLoader();
         }
