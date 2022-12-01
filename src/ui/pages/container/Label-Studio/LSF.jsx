@@ -105,10 +105,13 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     annotations,
     predictions,
     annotationNotesRef,
+    projectType
   ) {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
+
+    console.log("labelConfig", labelConfig);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -120,7 +123,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "infobar",
         "topbar",
         "instruction",
-        ...labelConfig?.project_type === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
+        ...projectType === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -143,7 +146,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "infobar",
         "topbar",
         "instruction",
-        ...labelConfig?.project_type === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
+        ...projectType === "SingleSpeakerAudioTranscriptionEditing" ? ["side-column"] : [],
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -157,7 +160,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "edit-history",
       ];
     }
-
+    
     if (rootRef.current) {
       if (lsfRef.current) {
         lsfRef.current.destroy();
@@ -325,7 +328,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
               tempLabelConfig,
               annotations,
               predictions,
-              annotationNotesRef
+              annotationNotesRef,
+              labelConfig.project_type
             );
             hideLoader();
           }
