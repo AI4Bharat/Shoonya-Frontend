@@ -29,7 +29,7 @@ import OutlinedTextField from "../common/OutlinedTextField";
 import FindAndReplaceWordsInAnnotationAPI from "../../../../redux/actions/api/ProjectDetails/FindAndReplaceWordsinAnnotation";
 
 const excludeSearch = ["status", "actions", "output_text"];
-const excludeCols = ["context", "input_language", "output_language", "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json", "language"];
+const excludeCols = ["context", "input_language", "output_language", "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json", "language","audio_url"];
 
 const TaskTable = (props) => {
     const classes = DatasetStyle();
