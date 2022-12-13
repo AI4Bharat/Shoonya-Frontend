@@ -67,7 +67,6 @@ const TaskTable = (props) => {
             }
         }) : []
     }
-    console.log(filterData.Status[2],filterData.Status[3],"ProjectDetailsProjectDetails", )
     const [selectedFilters, setsSelectedFilters] = useState(
         (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : { task_status: filterData.Status[0], user_filter: -1 });
     const NextTask = useSelector(state => state.getNextTask.data);
@@ -288,7 +287,6 @@ const TaskTable = (props) => {
             setColumns(cols);
             setSelectedColumns(colList);
             setTasks(data);
-            console.log(colList,"colListcolList")
         } else {
             setTasks([]);
         }
