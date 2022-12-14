@@ -36,7 +36,7 @@ const DataitemsTable = () => {
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
-  
+
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -51,93 +51,48 @@ const DataitemsTable = () => {
 
 
   const getDataitems = () => {
-    const dataObj = new GetDataitemsById(
-      datasetId,
-      currentPageNumber,
-      currentRowPerPage
-    );
+    const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage, DatasetDetails.dataset_type,selectedFilters);
     dispatch(APITransport(dataObj));
   };
 
-  const getsearchdataitems = () =>{
-    const searchPopupdata ={
-      instance_ids:datasetId,
-      dataset_type:DatasetDetails.dataset_type,
-      search_keys:selectedFilters
-    }
-    const taskObj = new DatasetSearchPopupAPI(searchPopupdata);
-    dispatch(APITransport(taskObj)); 
-
-  }
-
+  
  
   useEffect(() => {
     setLoading(apiLoading);
 }, [apiLoading]);
  
 
-    useEffect(() => {
-      let fetchedItems =filterdataitemsList.results;
-      // setTotalDataitems(dataitemsList.count);
-      // fetchedItems = dataitemsList.results;
-      // setDataitems(fetchedItems);
+useEffect(() => {
+  setTotalDataitems(dataitemsList.count);
+  let fetchedItems = dataitemsList.results;
+  setDataitems(fetchedItems);
+  let tempColumns = [];
+  let tempSelected = [];
+  if (fetchedItems?.length) {
+    Object.keys(fetchedItems[0]).forEach((key) => {
+      if (!excludeKeys.includes(key)) {
+        tempColumns.push({
+          name: key,
+          label: snakeToTitleCase(key),
+          options: {
+            filter: false,
+            sort: false,
+            align: "center",
+            customHeadLabelRender: customColumnHead,
+          },
+        });
+        tempSelected.push(key);
+      }
+    });
+  }
+  setColumns(tempColumns);
+  setSelectedColumns(tempSelected);
+}, [dataitemsList]);
 
-      setTotalDataitems(filterdataitemsList.count);
-      setDataitems(fetchedItems)
-   
-    
-    // let tempColumns = [];
-    // let tempSelected = [];
-    // if (fetchedItems?.length) {
-    //   Object.keys(fetchedItems[0]).forEach((key) => {
-    //     if (!excludeKeys.includes(key)) {
-    //       tempColumns.push({
-    //         name: key,
-    //         label: snakeToTitleCase(key),
-    //         options: {
-    //           filter: false,
-    //           sort: false,
-    //           align: "center",
-    //           customHeadLabelRender: customColumnHead,
-    //         },
-    //       });
-    //       tempSelected.push(key);
-    //     }
-    //   });
-    // }
-    // setColumns(tempColumns);
-    // setSelectedColumns(tempSelected);
-    // console.log(tempSelected,"tempSelected",tempColumns)
-    if (fetchedItems?.length > 0 && fetchedItems[0]) {
-
-    let colList = [];
-            colList.push(...Object.keys(fetchedItems?.[0])?.filter(el => !excludeKeys.includes(el) && !el.includes("_json")));
-            const cols = colList.map((col) => {
-                return {
-                    name: col,
-                    label: snakeToTitleCase(col),
-                    options: {
-                        filter: false,
-                        sort: false,
-                        align: "center",
-                        customHeadLabelRender: customColumnHead,
-                    }
-                }
-            });
-            
-            setColumns(cols);
-            setSelectedColumns(colList);
-            
-          
-          }else {
-            setDataitems([]);
-        }
-     
-    }, [filterdataitemsList])
-   
+ 
 
   useEffect(() => {
-    getsearchdataitems();
+    getDataitems();
   }, [currentPageNumber,currentRowPerPage,selectedFilters]);
 
   useEffect(() => {
