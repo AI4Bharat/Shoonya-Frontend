@@ -158,8 +158,12 @@ const TaskTable = (props) => {
         }, {});
         localStorage.setItem("labellingMode", selectedFilters.task_status);
         localStorage.setItem("searchFilters", JSON.stringify(search_filters));
-        localStorage.setItem("labelAll", true);
-        const getNextTaskObj = new GetNextTaskAPI(id, null, props.type);
+        JSON.parse(localStorage.setItem("labelAll", true));
+        const datavalue= {
+            annotation_status:selectedFilters?.annotation_status,
+            ...( props.type === "review" && {mode: "review", annotation_status:selectedFilters?.review_status})
+        }
+        const getNextTaskObj = new GetNextTaskAPI( id,datavalue,null, props.type);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
     };

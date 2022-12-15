@@ -120,15 +120,20 @@ const getNextProject = async (projectID, taskID, mode="annotation") => {
   try {
     let labellingMode = localStorage.getItem("labellingMode");
     let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
-    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${mode === "review" ? `&mode=review` : ""}`;
-    if (localStorage.getItem("labelAll")) {
-      requestUrl += labellingMode ? `&task_status=${labellingMode}` : ""
+    console.log(labellingMode,"searchFilters",searchFilters,localStorage.getItem("labelAll"))
+    let requestUrl = `/projects/${projectID}/next/${mode === "review" ? `&mode=review` : ""}`;
+     if (localStorage.getItem("labelAll")) {
+      // requestUrl += labellingMode ? `&task_status=${labellingMode}` : ""
       Object.keys(searchFilters)?.forEach(key => {
         requestUrl += `&${key}=${this.searchFilters[key]}`;
       });
     }
     let response = await axiosInstance.post(requestUrl, {
       id: projectID,
+      current_task_id:taskID,
+      annotation_status:labellingMode,
+      ...( mode === "review" && {mode: "review"})
+    
     });
     if (response.status === 204) {
       // message.error("Error getting next task.");
