@@ -17,7 +17,7 @@ import {
   getNextProject,
   fetchAnnotation,
   postReview,
-  patchReview,
+  patchReview
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 import { useParams, useNavigate } from "react-router-dom";
@@ -253,32 +253,6 @@ const LabelStudioWrapper = ({
           // }
           load_time = new Date();
         },
-
-        onSkipTask: function () {
-          //   message.warning('Notes will not be saved for skipped tasks!');
-          let review = annotations.find(
-            (review) => !review.parent_annotation,
-          );
-          console.log("onSkip", review);
-          if (review) {
-            showLoader();
-            patchReview(
-              null,
-              review.id,
-              load_time,
-              review.lead_time,
-              "skipped",
-              reviewNotesRef.current.value
-            ).then(() => {
-              getNextProject(projectId, taskData.id,"review").then((res) => {
-                hideLoader();
-                tasksComplete(res?.id || null);
-              });
-            });
-          }
-        },
-
-        
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.task_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
@@ -374,7 +348,6 @@ const LabelStudioWrapper = ({
   }
 
   const setNotes = (taskData, annotations) => {
-    console.log(annotations,"annotations")
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
       let reviewerAnnotations = annotations.filter((annotation) => !!annotation.parent_annotation);
       if (reviewerAnnotations.length > 0) {
@@ -440,7 +413,7 @@ const LabelStudioWrapper = ({
 
   const onNextAnnotation = async () => {
     showLoader();
-    getNextProject(projectId, taskId, "C").then((res) => {
+    getNextProject(projectId, taskId, "review").then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
       tasksComplete(res?.id || null);
@@ -467,8 +440,6 @@ const LabelStudioWrapper = ({
     handleClose();
   };
 
-  
-
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -483,8 +454,6 @@ const LabelStudioWrapper = ({
       />
     );
   };
-
-  
 
   return (
     <div>
