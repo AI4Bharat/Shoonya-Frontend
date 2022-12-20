@@ -37,6 +37,7 @@ import SignUp from "./ui/pages/container/UserManagement/SignUp";
 import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 import ProgressList from "./ui/pages/container/Progress/ProgressList"
 import browserhistory from "./web.history";
+import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
 
 
 const App = () => {
@@ -172,6 +173,13 @@ const App = () => {
           path="projects/:projectId/review/:taskId"
           element={ProtectedRouteWrapper(
             <Layout component={<ReviewLSF />} />
+          )}
+        />
+         <Route
+          path="projects/:projectId/Alltask/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<AllTaskLSF />} />
+            // <Layout component={<AnnotateTask />} />
           )}
         />
 

@@ -11,10 +11,12 @@ export default class GetNextTaskAPI extends API {
     this.projectId = projectId;
     this.labellingMode = localStorage.getItem("labellingMode");
     this.searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
+    this.searchFiltersdddddd = localStorage.getItem("labelAll")
+    console.log(this.labellingMode,"labellingMode",this.searchFilters,this.searchFiltersdddddd)
     this.projectObj = projectObj;
     this.type = constants.GET_NEXT_TASK;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/next/`;
-    if (localStorage.getItem("labelAll")) {
+    if (localStorage.getItem("labelAll") ) {
       Object.keys(this.searchFilters).forEach(key => {
         this.endpoint += `?${key}=${this.searchFilters[key]}`;
       });

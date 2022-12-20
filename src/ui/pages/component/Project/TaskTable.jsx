@@ -151,14 +151,18 @@ const TaskTable = (props) => {
         }
     }
 
+  
+
     const labelAllTasks = () => {
+
         let search_filters = Object.keys(selectedFilters).filter(key => key.startsWith("search_")).reduce((acc, curr) => {
             acc[curr] = selectedFilters[curr];
             return acc;
         }, {});
-        localStorage.setItem("labellingMode", selectedFilters.task_status);
+        localStorage.setItem("labellingMode", props.type === "annotation" ? selectedFilters.annotation_status:selectedFilters.review_status);
         localStorage.setItem("searchFilters", JSON.stringify(search_filters));
-        JSON.parse(localStorage.setItem("labelAll", true));
+        localStorage.setItem("labelAll", true);
+       
         const datavalue= {
             annotation_status:selectedFilters?.annotation_status,
             ...( props.type === "review" && {mode: "review", annotation_status:selectedFilters?.review_status})
