@@ -21,7 +21,6 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
 
-
 const excludeCols = [
   "context",
   "input_language",
@@ -35,7 +34,6 @@ const excludeCols = [
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const [snackbar, setSnackbarInfo] = useState({
@@ -51,7 +49,7 @@ const AllTaskTable = (props) => {
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data);
-  const NextTask = useSelector(state => state.getNextTask.data);
+console.log(AllTaskData,"AllTaskData")
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed", "exported"],
   };
@@ -79,18 +77,9 @@ const AllTaskTable = (props) => {
             .map((key) => el.data[key])
         );
         AllTaskData[0].task_status && row.push(el.task_status);
-        row.push(
-        <>
-          <Link to={`Alltask/${el.id}`} className={classes.link}>
-          <CustomButton
-              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
-              sx={{ p: 1, borderRadius: 2 }}
-              label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                   View
-              </Typography>} />
-      </Link>
-        
-        </>)
+        row.push(<CustomButton  sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
+        View
+    </Typography>}  />)
         return row;
         
       });
@@ -143,7 +132,6 @@ const AllTaskTable = (props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
 
   const renderToolBar = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
