@@ -17,7 +17,7 @@ import {
   getNextProject,
   fetchAnnotation,
   postReview,
-  patchReview,
+  patchReview
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 import { useParams, useNavigate } from "react-router-dom";
@@ -412,7 +412,7 @@ const LabelStudioWrapper = ({
                     });
                   else {
                     hideLoader();
-                   //window.location.reload();
+                   window.location.reload();
                   }
                 });
               }
@@ -433,7 +433,6 @@ const LabelStudioWrapper = ({
  
 
   const setNotes = (taskData, annotations) => {
-    console.log(annotations,"annotations")
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
       let reviewerAnnotations = annotations.filter((annotation) => !!annotation.parent_annotation);
       if (reviewerAnnotations.length > 0) {
@@ -499,7 +498,7 @@ const LabelStudioWrapper = ({
 
   const onNextAnnotation = async () => {
     showLoader();
-    getNextProject(projectId, taskId, "C").then((res) => {
+    getNextProject(projectId, taskId, "review").then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
       tasksComplete(res?.id || null);
@@ -526,7 +525,6 @@ const LabelStudioWrapper = ({
     handleClose();
   };
 
-
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -541,8 +539,6 @@ const LabelStudioWrapper = ({
       />
     );
   };
-
-  
 
   return (
     <div>
