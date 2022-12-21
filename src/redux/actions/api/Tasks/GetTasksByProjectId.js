@@ -15,13 +15,13 @@ import constants from "../../../constants";
       if (selectedFilters[key] && selectedFilters[key] !== -1) {
      switch (key) {
             case 'annotation_status':
-          queryString += `&${key}=["${selectedFilters[key]}"]`
+          queryString +=`&${key}=["${selectedFilters[key]}"]`
               break;
               case 'review_status':
-              queryString += `&${key}=["${selectedFilters[key]}"]`
+              queryString +=`&${key}=["${selectedFilters[key]}"]`
                   break;
               default:
-              queryString += `&${key}=${selectedFilters[key]}`
+              queryString +=`&${key}=${selectedFilters[key]}`
              
           }
       }

@@ -284,12 +284,13 @@ const LabelStudioWrapper = ({
               ) {
                 showLoader();
                 let temp = annotation.serializeAnnotation();
-
+              
                 for (let i = 0; i < temp.length; i++) {
                   if (temp[i].value.text) {
                     temp[i].value.text = [temp[i].value.text[0]];
                   }
                 }
+              
                 patchAnnotation(
                   temp,
                   annotations[i].id,

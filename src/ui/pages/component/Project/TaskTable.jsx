@@ -52,7 +52,7 @@ const TaskTable = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
    
     const filterData = {
-        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes ", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "accepted", "draft"],
+        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
             return {
                 label: el.username,
@@ -67,7 +67,7 @@ const TaskTable = (props) => {
             }
         }) : []
     }
-    const [selectedFilters, setsSelectedFilters] = useState(props.type==="annotation"? (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {annotation_status: filterData.Status[0], req_user: -1 }: (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ?TaskFilter.filters : {review_status: filterData.Status[0], req_user: -1 });
+    const [selectedFilters, setsSelectedFilters] = useState(props.type==="annotation"? (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {annotation_status:filterData.Status[0], req_user: -1 }: (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ?TaskFilter.filters : {review_status:filterData.Status[0], req_user: -1 });
     const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState(ProjectDetails.tasks_pull_count_per_batch * 0.5);

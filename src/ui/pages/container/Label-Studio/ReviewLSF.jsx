@@ -81,6 +81,7 @@ const LabelStudioWrapper = ({
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const review_status = useRef();
+  console.log(review_status,"review_statusreview_status")
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
@@ -385,21 +386,23 @@ const LabelStudioWrapper = ({
               ) {
                 showLoader();
                 let temp = annotation.serializeAnnotation();
-      
+              
                 for (let i = 0; i < temp.length; i++) {
                   if (temp[i].value.text) {
                     temp[i].value.text = [temp[i].value.text[0]];
                   }
                 }
-                console.log( annotations[i].parent_annotation
-                  ," annotations.parent_annotation")
+              
+                let review = annotations.filter((value)=> value.parent_annotation !=null)[0]
+                
                 patchReview(
-                  //temp,
-                  annotations[i].id,
+                  review.id,
                   load_time,
-                  annotations[i].lead_time,
+                  review.lead_time,
                   review_status.current,
-                  annotations[i].parent_annotation,
+                  temp,
+                  review.parent_annotation,
+                 
                   
                 ).then(() => {
                   if (localStorage.getItem("labelAll"))
@@ -409,7 +412,7 @@ const LabelStudioWrapper = ({
                     });
                   else {
                     hideLoader();
-                   // window.location.reload();
+                   //window.location.reload();
                   }
                 });
               }
@@ -518,7 +521,6 @@ const LabelStudioWrapper = ({
   };
 
   const handleAcceptClick = async (status) => {
-    console.log(status,"statusstatusstatus")
     review_status.current = status;
     lsfRef.current.store.submitAnnotation();
     handleClose();
@@ -643,7 +645,7 @@ const LabelStudioWrapper = ({
               <MenuItem onClick={() => handleAcceptClick("accepted_with_minor_changes")} disableRipple>
                 with Minor Changes
               </MenuItem>
-              <MenuItem onClick={() => handleAcceptClick("accepted_wth_major_changes")} disableRipple>
+              <MenuItem onClick={() => handleAcceptClick("accepted_with_major_changes")} disableRipple>
                 with Major Changes
               </MenuItem>
             </StyledMenu>
