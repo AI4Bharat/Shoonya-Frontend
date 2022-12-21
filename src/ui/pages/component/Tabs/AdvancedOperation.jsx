@@ -27,8 +27,9 @@ import DisableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
 import DeleteProjectTasks from "../../container/Project/DeleteProjectTasks";
+import {snakeToTitleCase} from "../../../../utils/utils"
 
-const ProgressType = ["unlabeled", "draft", "skipped", "labeled", "accepted", "accepted with Changes", "to Be Revised"]
+const ProgressType = ["unlabeled", "draft", "skipped", "labeled", "accepted", "accepted_with_changes", "to_be_revised"]
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -65,7 +66,7 @@ const AdvancedOperation = (props) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [newDetails, setNewDetails] = useState();
-    const [taskStatus, setTaskStatus] = useState([]);
+    const [taskStatus, setTaskStatus] = useState(["unlabeled", "draft", "skipped", "labeled", "accepted", "accepted_with_changes", "to_be_revised"]);
     const { id } = useParams();
     const classes = DatasetStyle();
     const dispatch = useDispatch();
@@ -354,10 +355,10 @@ const AdvancedOperation = (props) => {
 
                     >
                         <FormControl   size="small" className={classes.formControl}>
-                            <InputLabel id="mutiple-select-label" sx={{fontSize:"16px",padding:"3px"}}>Select Task Statuses</InputLabel>
+                            <InputLabel id="Select-Task-Statuses" sx={{fontSize:"16px",padding:"3px"}}>Select Task Statuses</InputLabel>
                             <Select
-                                labelId="mutiple-select-label"
-                                label="Multiple Select"
+                                labelId="Select-Task-Statuses"
+                                label="Select Task Statuses"
                                 multiple
                                 value={taskStatus}
                                 onChange={handleChange}
@@ -369,7 +370,7 @@ const AdvancedOperation = (props) => {
                                         <ListItemIcon>
                                             <Checkbox  checked={taskStatus.indexOf(option) > -1} />
                                         </ListItemIcon>
-                                        <ListItemText primary={option} />
+                                        <ListItemText primary={snakeToTitleCase(option)} />
                                     </MenuItem>
                                 ))}
                             </Select>
