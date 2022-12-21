@@ -456,9 +456,9 @@ const LabelStudioWrapper = ({
                 )}
               </Grid>
               <Grid item>
-                {/* {taskData?.annotation_users?.some(
+                {taskData?.annotation_users?.some(
                   (user) => user === userData.id
-                ) && ( */}
+                ) && (
                   <Tooltip title="Save task for later">
                     <Button
                       value="Draft"
@@ -478,7 +478,7 @@ const LabelStudioWrapper = ({
                     </Button>
                   </Tooltip>
                  
-                {/* )} */}
+                 )}
               </Grid>
                    
             </Grid>

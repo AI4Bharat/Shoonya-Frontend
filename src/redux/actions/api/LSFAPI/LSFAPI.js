@@ -88,15 +88,16 @@ const patchAnnotation = async (result, annotationID, load_time, lead_time, annot
   }
 };
 
-const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, review_notes) => {
+const patchReview = async ( annotationID, load_time, lead_time,review_status,parentAnnotation,review_notes ) => {
   try {
+    console.log(parentAnnotation,"parentAnnotation",review_notes)
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
-      result: result,
+      //result: result,
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-      parent_annotation: parentAnnotation,
-      annotation_status: review_status,
+      review_status: review_status,
+      //parent_annotation: parentAnnotation,
       review_notes: review_notes,
-      mode: "review"
+    
     });
     if (review_status === "to_be_revised") {
       await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
