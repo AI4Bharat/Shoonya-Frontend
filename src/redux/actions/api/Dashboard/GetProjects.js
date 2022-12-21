@@ -9,7 +9,7 @@
    constructor(timeout = 2000) {
      super("GET", timeout, false);
      this.type = constant.GET_PROJECT_DATA
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}projects_list/optimized/`;
    }
 
    processResponse(res) {
