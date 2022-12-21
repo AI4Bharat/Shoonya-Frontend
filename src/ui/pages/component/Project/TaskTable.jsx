@@ -29,7 +29,9 @@ import OutlinedTextField from "../common/OutlinedTextField";
 import FindAndReplaceWordsInAnnotationAPI from "../../../../redux/actions/api/ProjectDetails/FindAndReplaceWordsinAnnotation";
 
 const excludeSearch = ["status", "actions", "output_text"];
-const excludeCols = ["context", "input_language", "output_language", "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json", "language"];
+const excludeCols = ["context", "input_language", "output_language", "language",
+// "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json"
+ ];
 
 const TaskTable = (props) => {
     const classes = DatasetStyle();
@@ -244,7 +246,7 @@ const TaskTable = (props) => {
                 let row = [
                     el.id
                 ]
-                row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
+                row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key) && !key.includes("_json")).map((key) => el.data[key]));
                 taskList[0].task_status && row.push(el.task_status);
                 props.type === "annotation" && row.push(<Link to={`task/${el.id}`} className={classes.link}>
                     <CustomButton
@@ -265,7 +267,7 @@ const TaskTable = (props) => {
                 return row;
             })
             let colList = ["id"];
-            colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
+            colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el) && !el.includes("_json")));
             taskList[0].task_status && colList.push("status");
             colList.push("actions");
             console.log("colList", colList);
