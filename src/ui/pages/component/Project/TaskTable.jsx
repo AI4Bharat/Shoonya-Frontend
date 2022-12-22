@@ -131,7 +131,7 @@ const TaskTable = (props) => {
 
     const unassignTasks = async () => {
         setDeallocateDialog(false);
-        const deallocateObj = props.type === "annotation" ? new DeallocateTasksAPI(id) : new DeallocateReviewTasksAPI(id);
+        const deallocateObj = props.type === "annotation" ? new DeallocateTasksAPI(id,selectedFilters.task_status) : new DeallocateReviewTasksAPI(id,selectedFilters.task_status);
         const res = await fetch(deallocateObj.apiEndPoint(), {
             method: "GET",
             body: JSON.stringify(deallocateObj.getBody()),
@@ -145,7 +145,7 @@ const TaskTable = (props) => {
                 variant: "success",
             })
             setTimeout(() => {
-                window.location.reload();
+                //window.location.reload();
             }, 1000);
         } else {
             setSnackbarInfo({
@@ -540,7 +540,7 @@ const TaskTable = (props) => {
                     spacing={2}
                     sx={{ mb: 2, }}
                 >
-                    {((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && <Grid item xs={12} sm={12} md={3}>
+                    {((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && <Grid item xs={12} sm={12} md={3}>
                         <Tooltip title={deallocateDisabled}>
                             <Box>
                                 <CustomButton
@@ -564,7 +564,7 @@ const TaskTable = (props) => {
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
-                                All {props.type === "annotation" ? "unlabeled" : "labeled"} tasks will be de-allocated from this project.
+                                All {props.type === "annotation" ? selectedFilters.task_status : selectedFilters.task_status} tasks will be de-allocated from this project.
                                 Please be careful as this action cannot be undone.
                             </DialogContentText>
                         </DialogContent>
@@ -575,7 +575,7 @@ const TaskTable = (props) => {
                             </Button>
                         </DialogActions>
                     </Dialog>
-                    <Grid item xs={4} sm={4} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 2 : 3}>
+                    <Grid item xs={4} sm={4} md={((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 2 : 3}>
                         <FormControl size="small" sx={{ width: "100%" }}>
                             <InputLabel id="pull-select-label" sx={{ fontSize: "16px" }}>Pull Size</InputLabel>
                             <Select
@@ -594,7 +594,7 @@ const TaskTable = (props) => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={8} sm={8} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 3 : 4}>
+                    <Grid item xs={8} sm={8} md={((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 3 : 4}>
                         <Tooltip title={pullDisabled}>
                             <Box>
                                 <CustomButton
@@ -606,7 +606,7 @@ const TaskTable = (props) => {
                             </Box>
                         </Tooltip>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 4 : 5}>
+                    <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 4 : 5}>
                         <Tooltip title={totalTaskCount === 0 ? props.type === "annotation" ? "No more tasks to label" : "No more tasks to review" : ""}>
                             <Box>
                                 <CustomButton
