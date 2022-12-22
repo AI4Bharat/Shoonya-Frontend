@@ -81,7 +81,6 @@ const LabelStudioWrapper = ({
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const review_status = useRef();
-  console.log(review_status,"review_statusreview_status")
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
@@ -97,7 +96,7 @@ const LabelStudioWrapper = ({
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
 
-  console.log("projectId, taskId", projectId, taskId);
+  //console.log("projectId, taskId", projectId, taskId);
   // debugger
 
   useEffect(() => {
@@ -258,7 +257,6 @@ const LabelStudioWrapper = ({
         onSkipTask: function (annotation) {
            // message.warning('Notes will not be saved for skipped tasks!');
            let review = annotations.find((annotation) => !annotation.parentAnnotation)
-          console.log("onSkip", review);
           if (review) {
             showLoader();
             patchReview(
@@ -402,7 +400,7 @@ const LabelStudioWrapper = ({
                   review_status.current,
                   temp,
                   review.parent_annotation,
-                 
+                  reviewNotesRef.current.value
                   
                 ).then(() => {
                   if (localStorage.getItem("labelAll"))
@@ -412,7 +410,7 @@ const LabelStudioWrapper = ({
                     });
                   else {
                     hideLoader();
-                   window.location.reload();
+                  // window.location.reload();
                   }
                 });
               }
@@ -464,12 +462,12 @@ const LabelStudioWrapper = ({
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
-          console.log("[labelConfig, taskData, annotations, predictions]", [
-            labelConfig,
-            taskData,
-            annotations,
-            predictions,
-          ]);
+          // console.log("[labelConfig, taskData, annotations, predictions]", [
+          //   labelConfig,
+          //   taskData,
+          //   annotations,
+          //   predictions,
+          // ]);
           setNotes(taskData, annotations);
           let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);

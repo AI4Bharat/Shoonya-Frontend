@@ -88,20 +88,20 @@ const patchAnnotation = async (result, annotationID, load_time, lead_time, annot
   }
 };
 
-const patchReview = async ( annotationID, load_time, lead_time,review_status,result,parentAnnotation ) => {
+const patchReview = async ( annotationID, load_time, lead_time,review_status,result,parentAnnotation,reviewnotes ) => {
   try {
-    console.log(annotationID,"parentAnnotation",review_status)
+   
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status:review_status,
       result: result,
-      //review_notes: review_notes,
+      review_notes: reviewnotes,
       ...((review_status === "to_be_revised" || review_status === "accepted"|| review_status === "accepted_with_minor_changes"||review_status === "accepted_with_major_changes") &&  {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status:review_status,
       result: result,
       parent_annotation: parentAnnotation,
-      //review_notes: review_notes,
+      review_notes: reviewnotes,
     })
     
     });
@@ -157,7 +157,6 @@ const getProjectsandTasks = async (projectID, taskID) => {
     fetchPrediction(taskID),
   ]);
 };
-
 export {
   getProjectsandTasks,
   postAnnotation,
