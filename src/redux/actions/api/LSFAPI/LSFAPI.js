@@ -88,21 +88,28 @@ const patchAnnotation = async (result, annotationID, load_time, lead_time, annot
   }
 };
 
-const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, review_notes) => {
+const patchReview = async ( annotationID, load_time, lead_time,review_status,result,parentAnnotation,reviewnotes ) => {
   try {
+   
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
-      result: result,
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status:review_status,
+      result: result,
+      review_notes: reviewnotes,
+      ...((review_status === "to_be_revised" || review_status === "accepted"|| review_status === "accepted_with_minor_changes"||review_status === "accepted_with_major_changes") &&  {
+      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status:review_status,
+      result: result,
       parent_annotation: parentAnnotation,
-      annotation_status: review_status,
-      review_notes: review_notes,
-      mode: "review"
+      review_notes: reviewnotes,
+    })
+    
     });
-    if (review_status === "to_be_revised") {
-      await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
-        annotation_status: review_status,
-      });
-    }
+    // if (review_status === "to_be_revised") {
+    //   await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
+    //     annotation_status: review_status,
+    //   });
+    // }
   } catch (err) {
     return err;
   }
@@ -150,7 +157,6 @@ const getProjectsandTasks = async (projectID, taskID) => {
     fetchPrediction(taskID),
   ]);
 };
-
 export {
   getProjectsandTasks,
   postAnnotation,
