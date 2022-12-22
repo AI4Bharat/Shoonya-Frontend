@@ -106,9 +106,9 @@ console.log(DataItems,"DataItems")
     "parent_data",
     "id",
     "rating",
-    "conversation_json",
-    "machine_translated_conversation_json",
-    "speakers_json"
+    // "conversation_json",
+    // "machine_translated_conversation_json",
+    // "speakers_json"
   ];
   const renderToolBar = () => {
     return (
@@ -329,7 +329,7 @@ console.log(DataItems,"DataItems")
     let tempSelected = [];
     if (fetchedItems?.length) {
       Object.keys(fetchedItems[0]).forEach((key) => {
-        if (!excludeKeys.includes(key)) {
+        if (!excludeKeys.includes(key) && !key.includes("_json")) {
           tempColumns.push({
             name: key,
             label: snakeToTitleCase(key),

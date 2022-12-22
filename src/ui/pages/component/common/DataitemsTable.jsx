@@ -22,9 +22,9 @@ const excludeKeys = [
   "datasetbase_ptr_id",
   "key",
   "instance_id",
-  "conversation_json",
-  "machine_translated_conversation_json",
-  "speakers_json"
+  // "conversation_json",
+  // "machine_translated_conversation_json",
+  // "speakers_json"
 ];
 
 const DataitemsTable = () => {
@@ -36,6 +36,7 @@ const DataitemsTable = () => {
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
   console.log(DatasetDetails,"DatasetDetails",filterdataitemsList)
+
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -60,7 +61,10 @@ const DataitemsTable = () => {
     dispatch(APITransport(dataObj));
   };
 
- 
+//   const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage, DatasetDetails.dataset_type,selectedFilters);
+//   dispatch(APITransport(dataObj));
+// };
+
   useEffect(() => {
     setLoading(apiLoading);
 }, [apiLoading]);
