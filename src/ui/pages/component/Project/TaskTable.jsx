@@ -50,7 +50,7 @@ const TaskTable = (props) => {
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-   
+   console.log(taskList,"taskListtaskList")
     const filterData = {
         Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
@@ -364,7 +364,7 @@ const TaskTable = (props) => {
     const handleSearchClose = () => {
         setSearchAnchor(null);
     }
-
+console.log( taskList.length > 0 ,"taskList && taskList.length < 0")
     const renderToolBar = () => {
         // const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
@@ -535,7 +535,7 @@ const TaskTable = (props) => {
                     spacing={2}
                     sx={{ mb: 2, }}
                 >
-                    {((props.type === "annotation" && selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped")) && <Grid item xs={12} sm={12} md={3}>
+                    {taskList.length > 0 &&(( props.type === "annotation" && selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped")) && <Grid item xs={12} sm={12} md={3}>
                         <Tooltip title={deallocateDisabled}>
                             <Box>
                                 <CustomButton
@@ -570,7 +570,7 @@ const TaskTable = (props) => {
                             </Button>
                         </DialogActions>
                     </Dialog>
-                    <Grid item xs={4} sm={4} md={((props.type === "annotation" &&selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 2 : 3}>
+                    <Grid item xs={4} sm={4} md={taskList.length > 0 &&((props.type === "annotation" &&selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 2 : 3}>
                         <FormControl size="small" sx={{ width: "100%" }}>
                             <InputLabel id="pull-select-label" sx={{ fontSize: "16px" }}>Pull Size</InputLabel>
                             <Select
@@ -589,7 +589,7 @@ const TaskTable = (props) => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={8} sm={8} md={((props.type === "annotation" && selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 3 : 4}>
+                    <Grid item xs={8} sm={8} md={taskList.length > 0 &&((props.type === "annotation" && selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 3 : 4}>
                         <Tooltip title={pullDisabled}>
                             <Box>
                                 <CustomButton
@@ -601,7 +601,7 @@ const TaskTable = (props) => {
                             </Box>
                         </Tooltip>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 4 : 5}>
+                    <Grid item xs={12} sm={12} md={taskList.length > 0 &&((props.type === "annotation" && selectedFilters.annotation_status === "to_be_revised"||selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "to_be_revised"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 4 : 5}>
                         <Tooltip title={totalTaskCount === 0 ? props.type === "annotation" ? "No more tasks to label" : "No more tasks to review" : ""}>
                             <Box>
                                 <CustomButton
