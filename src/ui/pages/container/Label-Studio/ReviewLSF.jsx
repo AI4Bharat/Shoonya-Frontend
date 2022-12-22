@@ -96,7 +96,7 @@ const LabelStudioWrapper = ({
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
 
-  console.log("projectId, taskId", projectId, taskId);
+  //console.log("projectId, taskId", projectId, taskId);
   // debugger
 
   useEffect(() => {
@@ -158,14 +158,14 @@ const LabelStudioWrapper = ({
     if (taskData.task_status === "freezed") {
       interfaces = [
         "panel",
-        // "update",
+        //"update",
         // "submit",
         "skip",
         "controls",
         "infobar",
         "topbar",
         "instruction",
-        // "side-column",
+        "side-column",
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -181,14 +181,14 @@ const LabelStudioWrapper = ({
     } else {
       interfaces = [
         "panel",
-        "update",
-        "submit",
+        //"update",
+       "submit",
         "skip",
-        // "controls",
+        "controls",
         "infobar",
         "topbar",
         "instruction",
-        // "side-column",
+         "side-column",
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -253,87 +253,166 @@ const LabelStudioWrapper = ({
           // }
           load_time = new Date();
         },
+
+        onSkipTask: function (annotation) {
+           // message.warning('Notes will not be saved for skipped tasks!');
+           let review = annotations.find((annotation) => !annotation.parentAnnotation)
+          if (review) {
+            showLoader();
+            patchReview(
+              review.id,
+              load_time,
+              review.lead_time,
+              "skipped",
+              reviewNotesRef.current.value
+            ).then(() => {
+              getNextProject(projectId, taskData.id,"review").then((res) => {
+                hideLoader();
+                tasksComplete(res?.id || null);
+              });
+            });
+          }
+        
+        },
+      
+
+        
+        // onUpdateAnnotation: function (ls, annotation) {
+        //   console.log(  annotations," annotation.serializeAnnotation()")
+        //   if (taskData.task_status !== "freezed") {
+        //     for (let i = 0; i < annotations.length; i++) {
+        //       if (
+        //         annotation.serializeAnnotation()[0]?.id ===
+        //         annotations[i].result[0]?.id
+        //       ) {
+        //         let temp, review;
+        //         showLoader();
+        //         if (annotations[i].parent_annotation) {
+        //           review = annotations[i];
+        //         } else {
+        //           review = annotations.find((annotation) => annotation.parent_annotation === annotations[i].id);
+        //         }
+        //         if (review) {
+        //           temp = review.result;
+        //           temp[0].value = annotation.serializeAnnotation()[0].value;
+        //           for (let i = 0; i < temp.length; i++) {
+        //             if (temp[i].value.text) {
+        //               temp[i].value.text = [temp[i].value.text[0]];
+        //             }
+        //           }
+        //           patchReview(
+        //             //projectType === "SingleSpeakerAudioTranscriptionEditing" ? annotation.serializeAnnotation() : temp,
+        //             review.id,
+        //             review.parent_annotation,
+        //             load_time,
+        //             review.lead_time,
+        //             review_status.current,
+        //             // annotationNotesRef.current.value,
+        //             reviewNotesRef.current.value
+        //           ).then(() => {
+        //             if (localStorage.getItem("labelAll"))
+        //               getNextProject(projectId, taskData.id, "review").then(
+        //                 (res) => {
+        //                   hideLoader();
+        //                   tasksComplete(res?.id || null);
+        //                 }
+        //               );
+        //             else {
+        //               hideLoader();
+        //               window.location.reload();
+        //             }
+        //           });
+        //         } else {
+        //           var c = ls.annotationStore.addAnnotation({
+        //             userGenerate: true,
+        //           });
+        //           temp = c;
+        //           c = annotation.serializeAnnotation();
+        //           c[0].id = temp.id;
+        //           temp = c;
+        //           for (let i = 0; i < temp.length; i++) {
+        //             if (temp[i].value.text) {
+        //               temp[i].value.text = [temp[i].value.text[0]];
+        //             }
+        //           }
+        //           postReview(
+        //            // projectType === "SingleSpeakerAudioTranscriptionEditing" ? annotation.serializeAnnotation() : temp,
+        //             taskData.id,
+        //             userData.id,
+        //             annotations[i].id,
+        //             load_time,
+        //             annotations[i].lead_time,
+        //             review_status.current,
+        //             annotationNotesRef.current.value,
+        //             reviewNotesRef.current.value
+        //           ).then(() => {
+        //             if (localStorage.getItem("labelAll"))
+        //               getNextProject(projectId, taskData.id, "review").then(
+        //                 (res) => {
+        //                   hideLoader();
+        //                   tasksComplete(res?.id || null);
+        //                 }
+        //               );
+        //             else {
+        //               hideLoader();
+        //               window.location.reload();
+        //             }
+        //           });
+        //         }
+        //       }
+        //     }
+        //   } else
+        //     setSnackbarInfo({
+        //       open: true,
+        //       message: "Task is frozen",
+        //       variant: "error",
+        //     });
+        // },
+
+
+
+
+
         onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.task_status !== "freezed") {
+         
+          if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
               if (
+                !annotations[i].result?.length ||
                 annotation.serializeAnnotation()[0].id ===
-                annotations[i].result[0].id
+                  annotations[i].result[0].id
               ) {
-                let temp, review;
                 showLoader();
-                if (annotations[i].parent_annotation) {
-                  review = annotations[i];
-                } else {
-                  review = annotations.find((annotation) => annotation.parent_annotation === annotations[i].id);
-                }
-                if (review) {
-                  temp = review.result;
-                  temp[0].value = annotation.serializeAnnotation()[0].value;
-                  for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
-                      temp[i].value.text = [temp[i].value.text[0]];
-                    }
+                let temp = annotation.serializeAnnotation();
+              
+                for (let i = 0; i < temp.length; i++) {
+                  if (temp[i].value.text) {
+                    temp[i].value.text = [temp[i].value.text[0]];
                   }
-                  patchReview(
-                    temp,
-                    review.id,
-                    review.parent_annotation,
-                    load_time,
-                    review.lead_time,
-                    review_status.current,
-                    // annotationNotesRef.current.value,
-                    reviewNotesRef.current.value
-                  ).then(() => {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id, "review").then(
-                        (res) => {
-                          hideLoader();
-                          tasksComplete(res?.id || null);
-                        }
-                      );
-                    else {
-                      hideLoader();
-                      window.location.reload();
-                    }
-                  });
-                } else {
-                  var c = ls.annotationStore.addAnnotation({
-                    userGenerate: true,
-                  });
-                  temp = c;
-                  c = annotation.serializeAnnotation();
-                  c[0].id = temp.id;
-                  temp = c;
-                  for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
-                      temp[i].value.text = [temp[i].value.text[0]];
-                    }
-                  }
-                  postReview(
-                    temp,
-                    taskData.id,
-                    userData.id,
-                    annotations[i].id,
-                    load_time,
-                    annotations[i].lead_time,
-                    review_status.current,
-                    annotationNotesRef.current.value,
-                    reviewNotesRef.current.value
-                  ).then(() => {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id, "review").then(
-                        (res) => {
-                          hideLoader();
-                          tasksComplete(res?.id || null);
-                        }
-                      );
-                    else {
-                      hideLoader();
-                      window.location.reload();
-                    }
-                  });
                 }
+              
+                let review = annotations.filter((value)=> value.parent_annotation !=null)[0]
+                
+                patchReview(
+                  review.id,
+                  load_time,
+                  review.lead_time,
+                  review_status.current,
+                  temp,
+                  review.parent_annotation,
+                  reviewNotesRef.current.value
+                  
+                ).then(() => {
+                  if (localStorage.getItem("labelAll"))
+                    getNextProject(projectId, taskData.id,"review").then((res) => {
+                      hideLoader();
+                      tasksComplete(res?.id || null);
+                    });
+                  else {
+                    hideLoader();
+                   window.location.reload();
+                  }
+                });
               }
             }
           } else
@@ -346,6 +425,10 @@ const LabelStudioWrapper = ({
       });
     }
   }
+
+
+
+ 
 
   const setNotes = (taskData, annotations) => {
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
@@ -379,12 +462,12 @@ const LabelStudioWrapper = ({
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
-          console.log("[labelConfig, taskData, annotations, predictions]", [
-            labelConfig,
-            taskData,
-            annotations,
-            predictions,
-          ]);
+          // console.log("[labelConfig, taskData, annotations, predictions]", [
+          //   labelConfig,
+          //   taskData,
+          //   annotations,
+          //   predictions,
+          // ]);
           setNotes(taskData, annotations);
           let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
@@ -556,7 +639,7 @@ const LabelStudioWrapper = ({
               <MenuItem onClick={() => handleAcceptClick("accepted_with_minor_changes")} disableRipple>
                 with Minor Changes
               </MenuItem>
-              <MenuItem onClick={() => handleAcceptClick("accepted_wth_major_changes")} disableRipple>
+              <MenuItem onClick={() => handleAcceptClick("accepted_with_major_changes")} disableRipple>
                 with Major Changes
               </MenuItem>
             </StyledMenu>

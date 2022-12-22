@@ -50,7 +50,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
   let loaded = useRef();
 
-  console.log("projectId, taskId", projectId, taskId);
+  //console.log("projectId, taskId", projectId, taskId);
   // debugger
 
   useEffect(() => {
@@ -182,7 +182,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
         onLabelStudioLoad: function (ls) {
           annotation_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
-          console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
+          //console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
           if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
@@ -226,7 +226,6 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         onSkipTask: function () {
         //   message.warning('Notes will not be saved for skipped tasks!');
           let annotation = annotations.find((annotation) => !annotation.parentAnnotation);
-          console.log("onSkip", annotation)
           if (annotation) {
             showLoader();
             patchAnnotation(
@@ -250,13 +249,14 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             for (let i = 0; i < annotations.length; i++) {
               if (!annotations[i].result?.length || annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
                 showLoader();
-                let temp = annotation.serializeAnnotation()
-
+                let temp = annotation.serializeAnnotation();
+              
                 for (let i = 0; i < temp.length; i++) {
                   if (temp[i].value.text) {
                     temp[i].value.text = [temp[i].value.text[0]]
                   }
                 }
+              
                 patchAnnotation(
                   temp,
                   annotations[i].id,
@@ -322,7 +322,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         getProjectsandTasks(projectId, taskId).then(
           ([labelConfig, taskData, annotations, predictions]) => {
             // both have loaded!
-            console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
+           // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
@@ -397,7 +397,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           </Tooltip>}
           </Grid>
           <Grid item>
-          {localStorage.getItem("labelAll") !== "true" ? (
+          {localStorage.getItem("labelAll") === "true" ? (
             <Tooltip title="Go to next task">
               <Button
                 value="Next"
