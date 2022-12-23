@@ -77,9 +77,17 @@ console.log(AllTaskData,"AllTaskData")
             .map((key) => el.data[key])
         );
         AllTaskData[0].task_status && row.push(el.task_status);
-        row.push(<CustomButton  sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
-        View
-    </Typography>}  />)
+        row.push( <>
+          <Link to={`Alltask/${el.id}`} className={classes.link}>
+          <CustomButton
+              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
+              sx={{ p: 1, borderRadius: 2 }}
+              label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
+                   View
+              </Typography>} />
+      </Link>
+
+        </>)
         return row;
         
       });

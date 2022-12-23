@@ -6,11 +6,11 @@
  import constants from "../../../constants";
  
  export default class DeallocateTasksAPI extends API {
-   constructor(projectId, timeout = 2000) {
+   constructor(projectId,selectedFilters, timeout = 2000) {
      super("GET", timeout, false);
      this.projectId = projectId;
      this.type = constants.DE_ALLOCATE_TASKS;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_tasks/`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_tasks/?annotation_status=['${selectedFilters}']`;
    }
  
    processResponse(res) {
