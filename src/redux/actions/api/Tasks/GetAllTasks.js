@@ -6,13 +6,18 @@ import constants from "../../../constants";
  
  export default class GetAllTasksAPI extends API {
    constructor(projectId, selectedFilters, timeout = 2000) {
+    
      super("GET", timeout, false);
      this.type = constants.GET_ALL_TASKS;
      let queryString = `?project_id=${projectId}`;
      for (let key in selectedFilters) {
         if (selectedFilters[key] && selectedFilters[key] !== -1) {
-          queryString += `&${key}=["${selectedFilters[key].join('", "')}"]`
-          
+          console.log(key=="task_status","selectedFiltersselectedFilters")
+          if(key=="task_status"){  
+              queryString +=  `&${key}=${JSON.stringify(selectedFilters[key])}`
+          }else{
+            queryString +=  `&${key}=${selectedFilters[key]}`
+          }
         }
       }
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks+queryString}`;
@@ -33,6 +38,7 @@ import constants from "../../../constants";
    }
  
    getBody() {}
+   
  
    getHeaders() {
      this.headers = {
