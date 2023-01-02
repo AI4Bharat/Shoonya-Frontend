@@ -21,7 +21,7 @@ const AllTaskSearchPopup = (props) => {
     const dispatch = useDispatch();
     const { datasetId } = useParams();
   const { currentFilters, updateFilters, searchedCol ,onchange} = props;
-  const [searchValue, setSearchValue] = useState(currentFilters[searchedCol]);
+  const [searchValue, setSearchValue] = useState(currentFilters["search_"+searchedCol]);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -41,10 +41,10 @@ const AllTaskSearchPopup = (props) => {
         ...currentFilters,
         ["search_"+searchedCol]: "",
     });
-    delete currentFilters[searchedCol]
+    delete currentFilters["search_"+searchedCol]
     updateFilters({
       ...currentFilters,
-      [searchedCol]: "",
+      ["search_"+searchedCol]: "",
     }); 
     onchange()
      document.getElementById(searchedCol + "_btn").style.color = "rgba(0, 0, 0, 0.54)";
@@ -55,7 +55,7 @@ const AllTaskSearchPopup = (props) => {
     const handlesubmitSearchValue =(e)=>{
       updateFilters({
         ...currentFilters,
-        [searchedCol]: e.target.value,
+        ["search_"+searchedCol]: e.target.value,
       }); 
       setSearchValue(e.target.value)
     }
