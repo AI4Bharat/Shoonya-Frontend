@@ -27,10 +27,11 @@ import styles from './lsf.module.css'
 import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
+import Glossary from "../Glossary/Glossary";
 
 //used just in postAnnotation to support draft status update.
 
-const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
+const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes, getTaskData}) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const rootRef = useRef();
   const dispatch = useDispatch();
@@ -326,6 +327,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
+            getTaskData(taskData)
             LSFRoot(
               rootRef,
               lsfRef,
@@ -429,9 +431,11 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
 export default function LSF() {
   const [showNotes, setShowNotes] = useState(false);
+  const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
-  const {taskId} = useParams()
+  const {taskId} = useParams();
+  const [taskData, setTaskData] = useState([]);
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -439,6 +443,9 @@ export default function LSF() {
   
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
+  }
+  const handleGlossaryClick = () => {
+    setShowGlossary(!showGlossary);
   }
 
   useEffect(()=>{
@@ -459,6 +466,11 @@ export default function LSF() {
   useEffect(()=>{
     resetNotes();
   }, [taskId]);
+
+    const getTaskData = (taskData) => {
+      setTaskData(taskData)
+    }
+
   
   return (
     <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" }}>
@@ -493,6 +505,7 @@ export default function LSF() {
         >
           Notes {reviewNotesRef.current?.value !== "" && "*"}
         </Button>}
+       
         <div className={styles.collapse} style={{display: showNotes? "block" : "none",paddingBottom: "16px"}}>
           <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
@@ -527,7 +540,15 @@ export default function LSF() {
             style={{width: '99%', marginTop: '1%'}}
           />
         </div>
-        <LabelStudioWrapper resetNotes={()=>resetNotes()} annotationNotesRef={annotationNotesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
+        <Button  variant="contained" 
+         style={{marginBottom:'20px',marginLeft:"10px"}}
+         endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+         onClick={handleGlossaryClick}
+         >Glossary</Button>
+         <div style={{display: showGlossary? "block" : "none",paddingBottom: "16px"}}>
+       <Glossary taskData={taskData} />
+         </div>
+        <LabelStudioWrapper getTaskData={getTaskData} resetNotes={()=>resetNotes()} annotationNotesRef={annotationNotesRef} loader={loader} showLoader={showLoader} hideLoader={hideLoader}/>
       </Card>
     </div>
   );
