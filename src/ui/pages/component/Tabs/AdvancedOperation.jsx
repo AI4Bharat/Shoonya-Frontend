@@ -96,7 +96,7 @@ const AdvancedOperation = (props) => {
     const getExportProjectButton = async () => {
         const projectObj = ProjectDetails?.project_type === "ConversationTranslation" ?
             new GetExportProjectButtonAPI(id, ProjectDetails?.datasets[0].instance_id) : new GetExportProjectButtonAPI(id);
-        dispatch(APITransport(projectObj));
+        //dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
@@ -151,7 +151,7 @@ const AdvancedOperation = (props) => {
 
     const getPublishProjectButton = async () => {
         const projectObj = new GetPublishProjectButtonAPI(id);
-        dispatch(APITransport(projectObj));
+       // dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
