@@ -507,9 +507,9 @@ export default function LSF() {
         </Button>}
        
         <div className={styles.collapse} style={{display: showNotes? "block" : "none",paddingBottom: "16px"}}>
-          <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+          {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
-          </Alert>
+          </Alert> */}
           <TextField
             multiline 
             placeholder="Place your remarks here ..." 
