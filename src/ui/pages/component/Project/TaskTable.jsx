@@ -245,7 +245,7 @@ const TaskTable = (props) => {
     useEffect(() => {
         if (taskList?.length > 0 && taskList[0]?.data) {
             const data = taskList.map((el) => {
-                const email =  props.type === "review"&& selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised" ? el.email : ""
+                const email =  props.type === "review"&& selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised" || selectedFilters.task_status=== "accepted" ? el.email : ""
                 let row = [
                     el.id,
                     ... !!email ? [ el.email] : []
