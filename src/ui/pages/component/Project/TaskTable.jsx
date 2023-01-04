@@ -272,7 +272,7 @@ const TaskTable = (props) => {
             })
             // let colList = ["id"];
             // colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el) && !el.includes("_json")));
-            const email =  props.type === "review"&& selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised" ? "Annotator Email" : ""
+            const email =  props.type === "review"&& selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised"||selectedFilters.task_status=== "accepted" ? "Annotator Email" : ""
             let colList = ["id", ... !!email ? [email] : []];
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
