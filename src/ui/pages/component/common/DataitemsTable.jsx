@@ -23,6 +23,8 @@ const excludeKeys = [
   "datasetbase_ptr_id",
   "key",
   "instance_id",
+  "speakers_json",
+  "conversation_json",
   // "conversation_json",
   // "machine_translated_conversation_json",
   // "speakers_json"
