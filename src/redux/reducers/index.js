@@ -74,7 +74,8 @@ import FindAndReplaceWordsInAnnotation from './ProjectDetails/FindAndReplaceWord
 import getRecentTasks from './UserManagement/FetchRecentTasks';
 import datasetSearchPopup from './Dataset/DatasetSearchPopup';
 import getAllTasksdata from './Tasks/GetAllTasks';
-import glossarysentence from './ProjectDetails/GlossarySentence';
+import glossarysentence from './Glossary/GlossarySentence';
+import getDomains from "./Glossary/GetDomain";
 
 
 const index = {
@@ -158,6 +159,7 @@ const index = {
     datasetSearchPopup,
     getAllTasksdata,
     glossarysentence,
+    getDomains,
    
     
 };

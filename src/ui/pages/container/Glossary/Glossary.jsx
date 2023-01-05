@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 //Themes
 import {
@@ -17,15 +18,18 @@ import {
 import tableTheme from "../../../theme/tableTheme";
 import MUIDataTable from "mui-datatables";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import GlossarysentenceAPI from "../../../../redux/actions/api/ProjectDetails/GlossarySentence";
+import GlossarysentenceAPI from "../../../../redux/actions/api/Glossary/GlossarySentence";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LanguageCode from "../../../../utils/LanguageCode";
+import Search from "../../component/common/Search";
+import { useParams } from "react-router-dom";
 
 export default function Glossary(props) {
   const { taskData } = props;
   const dispatch = useDispatch();
   const Glossarysentence = useSelector((state) => state.glossarysentence.data);
+  const SearchWorkspaceMembers = useSelector((state) => state.SearchProjectCards.data);
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -36,8 +40,12 @@ export default function Glossary(props) {
 
   useEffect(() => {
     if (taskData && taskData.data) {
-      const filtereddata= language.filter((el) => el.label.toLowerCase() === taskData.data?.output_language.toLowerCase())
- 
+      const filtereddata = language.filter(
+        (el) =>
+          el.label.toLowerCase() ===
+          taskData.data?.output_language.toLowerCase()
+      );
+
       const Glossarysentencedata = {
         inputs: [taskData.data?.input_text],
         tgtLanguage: filtereddata[0]?.code,
@@ -159,23 +167,58 @@ export default function Glossary(props) {
     },
   ];
 
+  const pageSearch = () => {
+
+    return  Glossarysentence[0]?.glossaryPhrases.filter((el) => {
+
+        if (SearchWorkspaceMembers == "") {
+
+            return el;
+        } else if (
+            el.srcText
+                ?.toLowerCase()
+                .includes(SearchWorkspaceMembers?.toLowerCase())
+        ) {
+
+            return el;
+        } else if (
+            el.tgtText
+                ?.toLowerCase()
+                .includes(SearchWorkspaceMembers?.toLowerCase())
+        ) {
+
+            return el;
+        }
+        else if (
+          el.collectionSource
+              ?.toLowerCase()
+              .includes(SearchWorkspaceMembers?.toLowerCase())
+      ) {
+
+          return el;
+      }
+
+
+
+    })
+
+}
+
   const data =
     Glossarysentence[0]?.glossaryPhrases &&
     Glossarysentence[0]?.glossaryPhrases.length > 0
-      ? Glossarysentence[0]?.glossaryPhrases.map((el, i) => {
+      ? pageSearch().map((el, i) => {
           return [
             el.srcText,
             el.tgtText,
             el.domain,
             el.collectionSource,
             <>
-             
-                <Button onClick={() => handleCopyText(el.tgtText)}>
+              <Button onClick={() => handleCopyText(el.tgtText)}>
                 <Tooltip title="Copy">
                   <ContentCopyIcon fontSize="small" />
-                  </Tooltip>
-                </Button>
-             
+                </Tooltip>
+              </Button>
             </>,
           ];
         })
@@ -199,8 +242,8 @@ export default function Glossary(props) {
     filterType: "checkbox",
     download: false,
     print: false,
-    rowsPerPage:5,
-    rowsPerPageOptions: [5, 10, 25, 50,100],
+    rowsPerPage: 5,
+    rowsPerPageOptions: [5, 10, 25, 50, 100],
     // rowsPerPage: PageInfo.count,
     filter: false,
     // page: PageInfo.page,
@@ -208,7 +251,6 @@ export default function Glossary(props) {
     selectableRows: "none",
     search: false,
     jumpToPage: true,
-  
   };
   return (
     <>
@@ -220,8 +262,16 @@ export default function Glossary(props) {
         variant={showSnackBar.variant}
         message={showSnackBar.message}
       />
-      <ThemeProvider theme={tableTheme} >
-        <MUIDataTable  data={data} columns={columns} options={options} />
+      <Grid sx={{display:"flex",alignItems:"center"}}>
+      <Link to={`Add-Glossary/`} >
+      <Button  variant="contained" 
+        sx={{width:"150px",textDecoration:"none"}}
+         > Add Glossary</Button></Link>
+      <Search style={{margin:"0px"}}/>
+      </Grid>
+
+      <ThemeProvider theme={tableTheme}>
+        <MUIDataTable data={data} columns={columns} options={options} />
       </ThemeProvider>
     </>
   );
