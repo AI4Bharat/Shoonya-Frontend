@@ -32,7 +32,7 @@ const excludeSearch = ["status", "actions", "output_text"];
 // const excludeCols = ["context", "input_language", "output_language", "language",
 // "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json"
 //  ];
-const excludeCols = ["context", "input_language", "output_language", "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json", "language","audio_url"];
+const excludeCols = ["context", "input_language", "output_language", "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speaker_0_details", "speaker_1_details", "machine_transcribed_json", "speakers_json", "language","audio_url"];
 
 const TaskTable = (props) => {
     const classes = DatasetStyle();
