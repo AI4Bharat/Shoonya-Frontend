@@ -11,6 +11,7 @@ import { styled, alpha } from '@mui/material/styles';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Glossary from "../Glossary/Glossary";
 
 import {
   getProjectsandTasks,
@@ -78,6 +79,7 @@ const LabelStudioWrapper = ({
   showLoader,
   hideLoader,
   resetNotes,
+  getTaskData,
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const review_status = useRef();
@@ -472,6 +474,7 @@ const LabelStudioWrapper = ({
           let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
+          getTaskData(taskData)
           LSFRoot(
             rootRef,
             lsfRef,
@@ -657,6 +660,8 @@ const LabelStudioWrapper = ({
 
 export default function LSF() {
   const [showNotes, setShowNotes] = useState(false);
+  const [taskData, setTaskData] = useState([]);
+  const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
@@ -687,6 +692,13 @@ export default function LSF() {
   useEffect(() => {
     resetNotes();
   }, [taskId]);
+
+  const getTaskData = (taskData) => {
+    setTaskData(taskData)
+  }
+  const handleGlossaryClick = () => {
+    setShowGlossary(!showGlossary);
+  }
 
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
@@ -764,7 +776,16 @@ export default function LSF() {
             style={{ width: "99%", marginTop: "1%" }}
           />
         </div>
+        <Button  variant="contained" 
+         style={{marginLeft:"10px"}}
+         endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+         onClick={handleGlossaryClick}
+         >Glossary</Button>
+         <div style={{display: showGlossary? "block" : "none",paddingBottom: "16px",paddingTop:"10px"}}>
+       <Glossary taskData={taskData} />
+         </div>
         <LabelStudioWrapper
+        getTaskData={getTaskData}
           resetNotes={() => resetNotes()}
           reviewNotesRef={reviewNotesRef}
           annotationNotesRef={annotationNotesRef}
