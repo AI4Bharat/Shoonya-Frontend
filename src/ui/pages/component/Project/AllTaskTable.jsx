@@ -20,6 +20,8 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
+import SearchIcon from '@mui/icons-material/Search';
+import AllTaskSearchPopup from './AllTaskSearchPopup';
 
 const excludeCols = [
   "context",
@@ -31,6 +33,7 @@ const excludeCols = [
   "speakers_json",
   "language",
 ];
+const excludeSearch = ["status", "actions"];
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
@@ -45,18 +48,21 @@ const AllTaskTable = (props) => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [searchAnchor, setSearchAnchor] = useState(null);
+  const searchOpen = Boolean(searchAnchor);
+  const [searchedCol, setSearchedCol] = useState();
 
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data);
-console.log(AllTaskData,"AllTaskData")
+
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed", "exported"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
     task_status: [filterData.Status[0]],
   });
-
+ 
   const GetAllTasksdata = () => {
     const taskObjs = new GetAllTasksAPI(id, selectedFilters);
     dispatch(APITransport(taskObjs));
@@ -65,6 +71,7 @@ console.log(AllTaskData,"AllTaskData")
   useEffect(() => {
     GetAllTasksdata();
   }, []);
+
 
   
   useEffect(() => {
@@ -91,7 +98,6 @@ console.log(AllTaskData,"AllTaskData")
         return row;
         
       });
-     console.log(data,"data123")
       let colList = ["id"];
       colList.push(
         ...Object.keys(AllTaskData[0].data).filter(
@@ -100,7 +106,6 @@ console.log(AllTaskData,"AllTaskData")
       );
       AllTaskData[0].task_status && colList.push("status");
       colList.push("actions");
-      console.log("colList", colList);
       const cols = colList.map((col) => {
         return {
           name: col,
@@ -109,7 +114,7 @@ console.log(AllTaskData,"AllTaskData")
             filter: false,
             sort: false,
             align: "center",
-            //customHeadLabelRender: customColumnHead,
+            customHeadLabelRender: customColumnHead,
           },
         };
       });
@@ -140,6 +145,35 @@ console.log(AllTaskData,"AllTaskData")
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleShowSearch = (col, event) => {
+    setSearchAnchor(event.currentTarget);
+    setSearchedCol(col);
+  
+}
+const handleSearchClose = () => {
+  setSearchAnchor(null);
+}
+
+  const customColumnHead = (col) => {
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                columnGap: "5px",
+                flexGrow: "1",
+                alignItems: "center",
+            }}
+        >
+               {col.label}
+                {!excludeSearch.includes(col.name) && <IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
+                    <SearchIcon id={col.name + "_btn"} />
+                </IconButton>}
+        </Box>
+    );
+}
+
 
   const renderToolBar = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -209,6 +243,16 @@ console.log(AllTaskData,"AllTaskData")
           onchange={GetAllTasksdata}
         />
       )}
+       {searchOpen && <AllTaskSearchPopup
+                    open={searchOpen}
+                    anchorEl={searchAnchor}
+                     handleClose={handleSearchClose}
+                    updateFilters={setsSelectedFilters}
+                    //filterStatusData={filterData}
+                    currentFilters={selectedFilters}
+                    searchedCol={searchedCol}
+                    onchange={GetAllTasksdata}
+                />}
     </div>
   );
 };

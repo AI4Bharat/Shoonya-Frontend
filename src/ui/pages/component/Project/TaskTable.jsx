@@ -53,7 +53,7 @@ const TaskTable = (props) => {
     const TaskFilter = useSelector(state => state.setTaskFilter.data);
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-   console.log(taskList,"taskListtaskList")
+   
     const filterData = {
         Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
@@ -155,7 +155,7 @@ const TaskTable = (props) => {
     }
 
     const labelAllTasks = () => {
-        let search_filters = Object.keys(selectedFilters).filter(key => key.startsWith("search_")).reduce((acc, curr) => {
+        let search_filters = Object?.keys(selectedFilters).filter(key => key?.startsWith("search_")).reduce((acc, curr) => {
             acc[curr] = selectedFilters[curr];
             return acc;
         }, {});
