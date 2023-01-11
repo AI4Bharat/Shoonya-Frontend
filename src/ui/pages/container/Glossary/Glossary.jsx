@@ -59,17 +59,17 @@ export default function Glossary(props) {
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
         (el) =>
-          el.label.toLowerCase() ===
+          el.label===
           taskData.data?.input_language
-          .toLowerCase()
+         
       );
       setSourcelang(filtereddata[0]?.code)
     }
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
         (el) =>
-          el.label.toLowerCase() ===
-          taskData.data?.output_language.toLowerCase()
+          el.label ===
+          taskData.data?.output_language
       );
       settargetlang(filtereddata[0]?.code)
       const Glossarysentencedata = {

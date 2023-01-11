@@ -22,7 +22,12 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import AddGlossaryAPI from "../../../../redux/actions/api/Glossary/AddGlossary";
 import CustomizedSnackbars from "../../..//pages/component/common/Snackbar";
 
-const AddGlossary = ({ openDialog, handleCloseDialog,targetlang,Sourcelang }) => {
+const AddGlossary = ({
+  openDialog,
+  handleCloseDialog,
+  targetlang,
+  Sourcelang,
+}) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const allLevels = glossaryLevel;
@@ -38,33 +43,28 @@ const AddGlossary = ({ openDialog, handleCloseDialog,targetlang,Sourcelang }) =>
     message: "",
     variant: "success",
   });
-console.log(allLevels[0].key,"allLevelsallLevels")
+  console.log(allLevels[0].key, "allLevelsallLevels");
   const allDomains = useSelector((state) => state.getDomains);
 
-  // let patter = /^.+\s.+$/g;
-  // let result = SourceText.match(patter);
-  // console.log(result, "resultresult");
-  // if (result === null) {
-  //   console.log("wordvalue");
-  // } else {
-  //   console.log("wordvalue1");
-  // }
+  
 
   useEffect(() => {
     const domainApiObj = new getDomains();
     dispatch(APITransport(domainApiObj));
   }, []);
-  let patternword = new RegExp("^[^\\s]+$").test(SourceText.trim());
-  let patternSentence = new RegExp("^[^.,|,|,s]+$").test(SourceText.trim());
-  console.log(
-    patternSentence,
-    patternword === true ? allLevels[0].key : patternSentence === false ? allLevels[1].key : allLevels[2].key,
-    "patternSentence"
-  );
 
   const onSubmit = async () => {
-    let patternword = new RegExp("^[^\\s]+$").test(SourceText.trim());
-    let patternSentence = new RegExp("^[^.,|,|,s]+$").test(SourceText.trim());
+    let word_condition =
+      SourceText &&
+      SourceText.indexOf(" ") === -1 &&
+      (SourceText.split("")[SourceText.length - 1] !== "." ||
+        SourceText.split("")[SourceText.length - 1] !== "|");
+    let sentence_condition =
+      SourceText &&
+      (SourceText.split("")[SourceText.length - 1] === "." ||
+        SourceText.split("")[SourceText.length - 1] === "|") &&
+      SourceText.indexOf(" ") >= 0;
+
     const AddGlossaryData = {
       glossary: [
         {
@@ -74,8 +74,11 @@ console.log(allLevels[0].key,"allLevelsallLevels")
           tgtText: targetText,
           domain: domain,
           collectionSource: "shoonya",
-          level:
-            patternword === true ? allLevels[0].key : patternSentence === false ? allLevels[1].key : allLevels[2].key,
+          level: word_condition
+            ? allLevels[0].key
+            : sentence_condition
+            ? allLevels[1].key
+            : allLevels[2].key,
         },
       ],
     };
@@ -248,7 +251,7 @@ console.log(allLevels[0].key,"allLevelsallLevels")
                       })}
                   </Select>
                 </FormControl>
-                <Grid sx={{m: 1,minWidth: 200 }}></Grid>
+                <Grid sx={{ m: 1, minWidth: 200 }}></Grid>
                 {/* <FormControl sx={{ m: 1, minWidth: 200 }}>
             <InputLabel id="demo-simple-select-helper-label">Level</InputLabel>
             <Select
