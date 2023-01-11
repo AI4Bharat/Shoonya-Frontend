@@ -14,6 +14,9 @@ import {
   IconButton,
   DialogContentText,
   Button,
+  Popover,
+  Typography,
+  Divider,
 } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import MUIDataTable from "mui-datatables";
@@ -24,18 +27,32 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import LanguageCode from "../../../../utils/LanguageCode";
 import Search from "../../component/common/Search";
 import { useParams } from "react-router-dom";
+import ThumbsUpDownOutlinedIcon from "@mui/icons-material/ThumbsUpDownOutlined";
+import ThumbUpOffAltOutlinedIcon from "@mui/icons-material/ThumbUpOffAltOutlined";
+import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import AddGlossary from "./AddGlossary";
+import { translate } from "../../../../config/localisation";
 
 export default function Glossary(props) {
   const { taskData } = props;
   const dispatch = useDispatch();
   const Glossarysentence = useSelector((state) => state.glossarysentence.data);
-  const SearchWorkspaceMembers = useSelector((state) => state.SearchProjectCards.data);
+  const SearchWorkspaceMembers = useSelector(
+    (state) => state.SearchProjectCards.data
+  );
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
     timeout: 1500,
     visible: false,
   });
+  const [openDialog, setOpenDialog] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [targetlang, settargetlang] = useState("");
+  const [Sourcelang, setSourcelang] = useState("");
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
   const language = LanguageCode.languages;
 
   useEffect(() => {
@@ -43,9 +60,18 @@ export default function Glossary(props) {
       const filtereddata = language.filter(
         (el) =>
           el.label.toLowerCase() ===
+          taskData.data?.input_language
+          .toLowerCase()
+      );
+      setSourcelang(filtereddata[0]?.code)
+    }
+    if (taskData && taskData.data) {
+      const filtereddata = language.filter(
+        (el) =>
+          el.label.toLowerCase() ===
           taskData.data?.output_language.toLowerCase()
       );
-
+      settargetlang(filtereddata[0]?.code)
       const Glossarysentencedata = {
         inputs: [taskData.data?.input_text],
         tgtLanguage: filtereddata[0]?.code,
@@ -71,6 +97,21 @@ export default function Glossary(props) {
       timeout: 1500,
       visible: false,
     });
+  };
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+    setAnchorEl(null);
   };
 
   const columns = [
@@ -168,41 +209,30 @@ export default function Glossary(props) {
   ];
 
   const pageSearch = () => {
-
-    return  Glossarysentence[0]?.glossaryPhrases.filter((el) => {
-
-        if (SearchWorkspaceMembers == "") {
-
-            return el;
-        } else if (
-            el.srcText
-                ?.toLowerCase()
-                .includes(SearchWorkspaceMembers?.toLowerCase())
-        ) {
-
-            return el;
-        } else if (
-            el.tgtText
-                ?.toLowerCase()
-                .includes(SearchWorkspaceMembers?.toLowerCase())
-        ) {
-
-            return el;
-        }
-        else if (
-          el.collectionSource
-              ?.toLowerCase()
-              .includes(SearchWorkspaceMembers?.toLowerCase())
+    return Glossarysentence[0]?.glossaryPhrases.filter((el) => {
+      if (SearchWorkspaceMembers == "") {
+        return el;
+      } else if (
+        el.srcText
+          ?.toLowerCase()
+          .includes(SearchWorkspaceMembers?.toLowerCase())
       ) {
-
-          return el;
+        return el;
+      } else if (
+        el.tgtText
+          ?.toLowerCase()
+          .includes(SearchWorkspaceMembers?.toLowerCase())
+      ) {
+        return el;
+      } else if (
+        el.collectionSource
+          ?.toLowerCase()
+          .includes(SearchWorkspaceMembers?.toLowerCase())
+      ) {
+        return el;
       }
-
-
-
-    })
-
-}
+    });
+  };
 
   const data =
     Glossarysentence[0]?.glossaryPhrases &&
@@ -217,6 +247,11 @@ export default function Glossary(props) {
               <Button onClick={() => handleCopyText(el.tgtText)}>
                 <Tooltip title="Copy">
                   <ContentCopyIcon fontSize="small" />
+                </Tooltip>
+              </Button>
+              <Button aria-describedby={id} onClick={handleClick}>
+                <Tooltip title="Rate this translation">
+                  <ThumbsUpDownOutlinedIcon fontSize="medium" />
                 </Tooltip>
               </Button>
             </>,
@@ -262,13 +297,73 @@ export default function Glossary(props) {
         variant={showSnackBar.variant}
         message={showSnackBar.message}
       />
-      <Grid sx={{display:"flex",alignItems:"center"}}>
-      <Link to={`Add-Glossary/`} >
-      <Button  variant="contained" 
-        sx={{width:"150px",textDecoration:"none"}}
-         > Add Glossary</Button></Link>
-      <Search style={{margin:"0px"}}/>
+      <div>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          <Grid sx={{ p: "20px" }}>
+            <Typography variant="h6" align="center">
+              {" "}
+              {translate("label.Rate this translation")}
+            </Typography>
+            <Grid sx={{ padding: "10px 0px 30px 37px" }}>
+              <Button sx={{ border: "1px solid gray", borderRadius: "25px" }}>
+                <Tooltip title="Good translation">
+                  <ThumbUpOffAltOutlinedIcon fontSize="medium" />
+                </Tooltip>
+              </Button>
+
+              <Button
+                sx={{ border: "1px solid gray", borderRadius: "25px", ml: 1 }}
+              >
+                <Tooltip title="Poor translation">
+                  <ThumbDownOffAltOutlinedIcon
+                    fontSize="medium"
+                    color="inherit"
+                  />
+                </Tooltip>
+              </Button>
+            </Grid>
+            <Typography variant="body2" align="center" sx={{ width: "215px" }}>
+              {translate("button.Your feedback")}
+            </Typography>
+            <Divider sx={{ padding: "15px 0px 0px 0px" }} />
+            <Button sx={{ ml: 2, mt: 1 }} onClick={handleClickOpen}>
+              <EditOutlinedIcon fontSize="medium" />
+              <Typography variant="subtitle2">
+                {translate("button.Suggest an edit")}
+              </Typography>
+            </Button>
+          </Grid>
+        </Popover>
+      </div>
+      <Grid sx={{ display: "flex", alignItems: "center" }}>
+        <Button
+          variant="contained"
+          sx={{ width: "150px", textDecoration: "none" }}
+          onClick={handleClickOpen}
+        >
+          {" "}
+          Add Glossary
+        </Button>
+
+        <Search style={{ margin: "0px" }} />
       </Grid>
+      {openDialog && (
+        <AddGlossary
+          openDialog={openDialog}
+          handleCloseDialog={() => handleCloseDialog()}
+          targetlang={targetlang}
+          Sourcelang={Sourcelang}
+        />
+      )}
 
       <ThemeProvider theme={tableTheme}>
         <MUIDataTable data={data} columns={columns} options={options} />

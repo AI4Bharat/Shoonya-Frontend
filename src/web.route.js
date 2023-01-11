@@ -38,7 +38,7 @@ import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 import ProgressList from "./ui/pages/container/Progress/ProgressList"
 import browserhistory from "./web.history";
 import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
-import AddGlossary from "./ui/pages/container/Glossary/AddGlossary";
+
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -241,18 +241,7 @@ const App = () => {
           )}
         />
         
-        <Route
-          path="projects/:projectId/task/:taskId/Add-Glossary"
-          element={ProtectedRouteWrapper(
-            <Layout component={<AddGlossary />} Backbutton={true} />
-          )}
-        />
-         <Route
-          path="projects/:projectId/review/:taskId/Add-Glossary"
-          element={ProtectedRouteWrapper(
-            <Layout component={<AddGlossary />} Backbutton={true} />
-          )}
-        />
+      
          <Route
           path="analytics"
           element={ProtectedRouteWrapper(
