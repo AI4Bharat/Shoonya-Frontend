@@ -52,6 +52,9 @@ const localisation = {
     "label.recentTasks.annotation": "Annotations",
     "label.recentTasks.review": "Reviews",
     "button.deleteDataItems":"Delete Data Item",
+    "label.Rate this translation":"Rate this translation",
+    "button.Suggest an edit":"Suggest an edit",
+    "button.Your feedback":"Your feedback will be used to help improve the product"
   
 };
 
