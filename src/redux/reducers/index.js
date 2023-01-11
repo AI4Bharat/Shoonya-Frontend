@@ -76,6 +76,7 @@ import datasetSearchPopup from './Dataset/DatasetSearchPopup';
 import getAllTasksdata from './Tasks/GetAllTasks';
 import glossarysentence from './Glossary/GlossarySentence';
 import getDomains from "./Glossary/GetDomain";
+import getProjectTypeDetails from "./ProjectDetails/GetProjectTypeDetails";
 
 
 const index = {
@@ -160,6 +161,7 @@ const index = {
     getAllTasksdata,
     glossarysentence,
     getDomains,
+    getProjectTypeDetails
    
     
 };
