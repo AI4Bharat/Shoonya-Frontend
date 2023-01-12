@@ -51,11 +51,13 @@ const AllTaskTable = (props) => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
+  const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
+  const [currentPageNumber, setCurrentPageNumber] = useState(1);
 
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
-  const AllTaskData = useSelector((state) => state.getAllTasksdata.data);
-
+  const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
+  const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed", "exported"],
   };
@@ -64,16 +66,15 @@ const AllTaskTable = (props) => {
   });
  
   const GetAllTasksdata = () => {
-    const taskObjs = new GetAllTasksAPI(id, selectedFilters);
+    const taskObjs = new GetAllTasksAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
     dispatch(APITransport(taskObjs));
   };
 
   useEffect(() => {
     GetAllTasksdata();
-  }, []);
+  }, [currentPageNumber, currentRowPerPage]);
 
 
-  
   useEffect(() => {
     if (AllTaskData?.length > 0 && AllTaskData[0]?.data) {
       const data = AllTaskData.map((el) => {
@@ -193,33 +194,50 @@ const handleSearchClose = () => {
     );
   };
   const options = {
-    textLabels: {
-      body: {
-        noMatch: "No records",
-      },
-      toolbar: {
-        search: "Search",
-        viewColumns: "View Column",
-      },
-      pagination: { rowsPerPage: "Rows per page" },
-      options: { sortDirection: "desc" },
-    },
-    // customToolbar: fetchHeaderButton,
-    displaySelectToolbar: false,
-    fixedHeader: false,
-    filterType: "checkbox",
-    download: false,
-    print: false,
+    count: totalTaskCount,
+    rowsPerPage: currentRowPerPage,
+    page: currentPageNumber - 1,
     rowsPerPageOptions: [10, 25, 50, 100],
-    // rowsPerPage: PageInfo.count,
-    filter: false,
-    // page: PageInfo.page,
-    viewColumns: false,
+    textLabels: {
+        pagination: {
+            next: "Next >",
+            previous: "< Previous",
+            rowsPerPage: "currentRowPerPage",
+            displayRows: "OF"
+        }
+    },
+    onChangePage: (currentPage) => {
+        setCurrentPageNumber(currentPage + 1);
+    },
+    onChangeRowsPerPage: (rowPerPageCount) => {
+        setCurrentPageNumber(1);
+        setCurrentRowPerPage(rowPerPageCount);
+        console.log("rowPerPageCount", rowPerPageCount)
+    },
+    filterType: 'checkbox',
     selectableRows: "none",
+    download: false,
+    filter: false,
+    print: false,
     search: false,
+    viewColumns: false,
+    textLabels: {
+        body: {
+            noMatch: "No records ",
+        },
+        toolbar: {
+            search: "Search",
+            viewColumns: "View Column",
+        },
+        pagination: {
+            rowsPerPage: "Rows per page",
+        },
+        options: { sortDirection: "desc" },
+    },
     jumpToPage: true,
+    serverSide: true,
     customToolbar: renderToolBar,
-  };
+};
 
   return (
     <div>
