@@ -29409,8 +29409,10 @@
  
  .ant-typography mark {
      background-color: #ffe58f;
-     padding: 0
- }
+     padding: 0;
+     white-space: normal;
+     word-break: break-all;
+   }
  
  .ant-typography ins,
  .ant-typography u {
@@ -33051,6 +33053,7 @@
      height: 100%;
      min-width: 170px;
      padding: 10px 12px
+     
  }
  
  .lsf-entity-tab_bordered {
@@ -33816,11 +33819,13 @@
  
  .lsf-entity {
      margin-top: 12px;
-     padding: 0 15px
+     padding: 0 15px;
+    
  }
  
  .lsf-entity__info {
-     margin-bottom: 12px
+     margin-bottom: 12px;
+    
  }
  
  .list--2wbr2 {
