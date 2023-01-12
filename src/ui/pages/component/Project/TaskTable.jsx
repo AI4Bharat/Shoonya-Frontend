@@ -55,7 +55,7 @@ const TaskTable = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
    
     const filterData = {
-        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "accepted", "draft"],
+        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "labeled", "draft"],
         Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
             return {
                 label: el.username,
