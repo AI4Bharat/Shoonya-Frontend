@@ -29409,7 +29409,9 @@
  
  .ant-typography mark {
      background-color: #ffe58f;
-     padding: 0
+     padding: 0;
+     white-space: normal;
+     word-break: break-all;
  }
  
  .ant-typography ins,
