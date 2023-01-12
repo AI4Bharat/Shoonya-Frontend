@@ -5,7 +5,7 @@ let initialState = {
 }
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case constants.GET_PROJECT_DETAILS:
+    case constants.GET_PROJECT_TYPE_DETAILS:
       return {
         ...state,
         data: action.payload

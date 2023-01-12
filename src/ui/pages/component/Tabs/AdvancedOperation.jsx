@@ -44,6 +44,7 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
 
+
 const ProgressType = [
   "unlabeled",
   "draft",
@@ -91,7 +92,7 @@ const AdvancedOperation = (props) => {
   const [newDetails, setNewDetails] = useState();
   const [OpenExportProjectDialog, setOpenExportProjectDialog] = useState(false);
   const [datasetId, setDatasetId] = useState("");
-  const [save_type, setSave_type] = useState("");
+  const [projectType, setProjectType] = useState("");
   const [taskStatus, setTaskStatus] = useState([
     "unlabeled",
     "draft",
@@ -108,19 +109,18 @@ const AdvancedOperation = (props) => {
   const apiError = useSelector((state) => state.apiStatus.error);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  const ProjectTypes = useSelector((state) => state.getProjectTypeDetails?.data);
+  const ProjectTypes = useSelector(
+    (state) => state.getProjectTypeDetails?.data
+  );
 
-  console.log(ProjectTypes?.output_dataset?.save_type,"ProjectTypes")
-  useEffect(() => {
-    setSave_type(ProjectTypes?.output_dataset?.save_type)
-    console.log(ProjectTypes?.output_dataset?.save_type === "new_record" && (ProjectDetails?.project_type === "ConversationTranslation" ||
-    ProjectDetails.project_type === "ConversationTranslationEditing"),ProjectTypes?.output_dataset,"abcdefghi")
-  }, [ProjectTypes])
-  
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
     dispatch(APITransport(projectObj));
   };
+
+  useEffect(() => {
+   setProjectType(ProjectTypes.input_dataset?.class)
+  }, [ProjectTypes])
 
   useEffect(() => {
     getProjectDetails();
@@ -139,12 +139,14 @@ const AdvancedOperation = (props) => {
   }, []);
 
   const getExportProjectButton = async () => {
+    setOpenExportProjectDialog(false);
     const projectObj =
-      ProjectDetails?.project_type === "ConversationTranslation" ||
-      ProjectDetails.project_type == "ConversationTranslationEditing"
+      ProjectTypes?.output_dataset?.save_type === "new_record"
         ? new GetExportProjectButtonAPI(
             id,
-            ProjectDetails?.datasets[0].instance_id
+            ProjectDetails?.datasets[0].instance_id,
+            datasetId,
+            ProjectTypes?.output_dataset?.save_type
           )
         : new GetExportProjectButtonAPI(id);
     dispatch(APITransport(projectObj));
@@ -309,10 +311,6 @@ const AdvancedOperation = (props) => {
     setLoading(apiLoading);
   }, [apiLoading]);
 
-  const datavalue = () => {
-    console.log(datasetId, "datasetId");
-  };
-
 
 
   const renderSnackBar = () => {
@@ -436,8 +434,9 @@ const AdvancedOperation = (props) => {
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {(ProjectDetails?.project_type === "ConversationTranslation" ||
-            ProjectDetails.project_type === "ConversationTranslationEditing")&& ProjectTypes?.output_dataset?.save_type === "new_record" 
-              ? (
+              ProjectDetails.project_type ===
+                "ConversationTranslationEditing") &&
+            ProjectTypes?.output_dataset?.save_type === "new_record" ? (
               <CustomButton
                 sx={{
                   inlineSize: "max-content",
@@ -536,9 +535,10 @@ const AdvancedOperation = (props) => {
         {OpenExportProjectDialog && (
           <ExportProjectDialog
             OpenExportProjectDialog={OpenExportProjectDialog}
-            datavalue={datavalue}
+            datavalue={getExportProjectButton}
             datasetId={datasetId}
             setDatasetId={setDatasetId}
+            projectType={projectType}
             handleClose={handleClose}
           />
         )}

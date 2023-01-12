@@ -53,7 +53,7 @@ const AnnotationProject = (props) => {
   const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
   const DataItems = useSelector((state) => state.getDataitemsById.data);
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
-console.log(DataItems,"DataItems")
+
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -84,7 +84,7 @@ console.log(DataItems,"DataItems")
     []
   );
   const [taskReviews, setTaskReviews] = useState(false)
-
+  console.log("DatasetInstances",DatasetInstances)
   //Table related state variables
   const [columns, setColumns] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);

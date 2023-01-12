@@ -8,7 +8,7 @@ import constants from '../../../constants';
 export default class GetProjectTypeDetailsAPI extends API {
   constructor(projecType,timeout = 2000) {
     super("GET", timeout, false);
-    this.type = constants.GET_PROJECT_DETAILS
+    this.type = constants.GET_PROJECT_TYPE_DETAILS
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}types/?project_type=${projecType}`;
   }
 
