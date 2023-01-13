@@ -213,7 +213,7 @@ const AnnotationProject = (props) => {
   useEffect(() => {
     if (NewProject.id) {
       navigate(`/projects/${NewProject.id}`, { replace: true });
-      //window.location.reload();
+      window.location.reload();
     }
   }, [NewProject]);
   useEffect(() => {
@@ -300,7 +300,7 @@ const AnnotationProject = (props) => {
           temp.push({
             name: element,
             data: DatasetFields[element],
-            value: variable_Parameters_lang,
+            value: "",
           });
         }
       );
