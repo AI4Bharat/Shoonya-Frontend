@@ -54,7 +54,6 @@ const AnnotationProject = (props) => {
   const DataItems = useSelector((state) => state.getDataitemsById.data);
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
 
-
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
   const [datasetTypes, setDatasetTypes] = useState(null);
@@ -84,7 +83,8 @@ const AnnotationProject = (props) => {
     []
   );
   const [taskReviews, setTaskReviews] = useState(false)
-  console.log("DatasetInstances",DatasetInstances)
+  const [variable_Parameters_lang, setVariable_Parameters_lang] = useState("")
+
   //Table related state variables
   const [columns, setColumns] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -282,7 +282,7 @@ const AnnotationProject = (props) => {
       setColumnFields(tempColumnFields);
     }
   }, [ProjectDomains]);
-
+ 
   useEffect(() => {
     let tempInstanceIds = {};
     for (const instance in DatasetInstances) {
@@ -479,13 +479,15 @@ const AnnotationProject = (props) => {
     return temp;
   };
 
+
+    
+
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
-
-    
+  
 
 
     const newProject = {
@@ -503,7 +505,7 @@ const AnnotationProject = (props) => {
       project_type: selectedType,
       dataset_id: selectedInstances,
       label_config: "string",
-      variable_parameters: temp,
+      variable_parameters: {output_language: variable_Parameters_lang},
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
       enable_task_reviews: taskReviews,
@@ -647,6 +649,29 @@ const AnnotationProject = (props) => {
               </>
             )}
 
+        {selectedType && variableParameters?.[selectedType]?.variable_parameters !== undefined &&
+        <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                  Variable Parameters:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                <OutlinedTextField
+                  fullWidth
+                  value={variable_Parameters_lang}
+                  onChange={(e) => setVariable_Parameters_lang(e.target.value)}
+                />
+                </Grid>
+                </>
+        }
             {(selectedDomain === "Translation" || selectedDomain === "Conversation") && (selectedType === "TranslationEditing" || selectedType === "SemanticTextualSimilarity" || selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation" || selectedType === "ConversationTranslationEditing") &&
               <>
                 <Grid
