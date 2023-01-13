@@ -53,7 +53,6 @@ const AnnotationProject = (props) => {
   const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
   const DataItems = useSelector((state) => state.getDataitemsById.data);
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
-console.log(ProjectDomains,"ProjectDomains")
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -84,7 +83,8 @@ console.log(ProjectDomains,"ProjectDomains")
     []
   );
   const [taskReviews, setTaskReviews] = useState(false)
-  console.log("DatasetInstances",DatasetInstances)
+  const [variable_Parameters_lang, setVariable_Parameters_lang] = useState("")
+
   //Table related state variables
   const [columns, setColumns] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -213,7 +213,7 @@ console.log(ProjectDomains,"ProjectDomains")
   useEffect(() => {
     if (NewProject.id) {
       navigate(`/projects/${NewProject.id}`, { replace: true });
-      window.location.reload();
+      //window.location.reload();
     }
   }, [NewProject]);
   useEffect(() => {
@@ -282,7 +282,7 @@ console.log(ProjectDomains,"ProjectDomains")
       setColumnFields(tempColumnFields);
     }
   }, [ProjectDomains]);
-
+ 
   useEffect(() => {
     let tempInstanceIds = {};
     for (const instance in DatasetInstances) {
@@ -300,7 +300,7 @@ console.log(ProjectDomains,"ProjectDomains")
           temp.push({
             name: element,
             data: DatasetFields[element],
-            value: "",
+            value: variable_Parameters_lang,
           });
         }
       );
@@ -479,13 +479,15 @@ console.log(ProjectDomains,"ProjectDomains")
     return temp;
   };
 
+
+    
+
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
-
-    
+  
 
 
     const newProject = {
@@ -503,7 +505,7 @@ console.log(ProjectDomains,"ProjectDomains")
       project_type: selectedType,
       dataset_id: selectedInstances,
       label_config: "string",
-      variable_parameters: temp,
+      variable_parameters: {output_language: variable_Parameters_lang},
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
       enable_task_reviews: taskReviews,
@@ -647,7 +649,7 @@ console.log(ProjectDomains,"ProjectDomains")
               </>
             )}
 
-        {selectedType &&
+        {selectedType && variableParameters?.[selectedType]?.variable_parameters !== undefined &&
         <>
                 <Grid
                   className={classes.projectsettingGrid}
@@ -664,8 +666,8 @@ console.log(ProjectDomains,"ProjectDomains")
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
                 <OutlinedTextField
                   fullWidth
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={variable_Parameters_lang}
+                  onChange={(e) => setVariable_Parameters_lang(e.target.value)}
                 />
                 </Grid>
                 </>
