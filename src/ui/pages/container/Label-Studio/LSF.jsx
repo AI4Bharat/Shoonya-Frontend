@@ -36,7 +36,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const rootRef = useRef();
   const dispatch = useDispatch();
   const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-  const annotation_status = useRef(ProjectDetails.enable_task_reviews ? "labeled": "accepted");
+  const annotation_status = useRef(ProjectDetails.enable_task_reviews ? "labeled": "labeled");
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
   const navigate = useNavigate();
@@ -182,7 +182,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         },
 
         onLabelStudioLoad: function (ls) {
-          annotation_status.current = ProjectDetails.enable_task_reviews ? "labeled": "accepted";
+          annotation_status.current = ProjectDetails.enable_task_reviews ? "labeled": "labeled";
           //console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
           if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
