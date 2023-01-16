@@ -245,10 +245,13 @@ const TaskTable = (props) => {
     useEffect(() => {
         if (taskList?.length > 0 && taskList[0]?.data) {
             const data = taskList.map((el) => {
-                const email =  props.type === "review"&& selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised" ? el.email : ""
+                console.log(taskList,"taskListtaskList")
+                const email =  props.type === "review"? el.user_mail
+                : ""
                 let row = [
                     el.id,
-                    ... !!email ? [ el.email] : []
+                    ... !!email ? [ el.user_mail
+                    ] : []
                 ]
                 row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
                 props.type === "annotation" && taskList[0].annotation_status && row.push(el.annotation_status);
@@ -274,7 +277,7 @@ const TaskTable = (props) => {
             })
             // let colList = ["id"];
             // colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el) && !el.includes("_json")));
-            const email =  props.type === "review"&& selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised" ? "Annotator Email" : ""
+            const email =  props.type === "review" ? "Annotator Email" : ""
             let colList = ["id", ... !!email ? [email] : []];
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
