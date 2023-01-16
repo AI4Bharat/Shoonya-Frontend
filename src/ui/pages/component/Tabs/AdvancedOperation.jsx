@@ -149,7 +149,7 @@ const AdvancedOperation = (props) => {
             ProjectTypes?.output_dataset?.save_type
           )
         : new GetExportProjectButtonAPI(id);
-    dispatch(APITransport(projectObj));
+    //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
@@ -203,7 +203,7 @@ const AdvancedOperation = (props) => {
 
   const getPublishProjectButton = async () => {
     const projectObj = new GetPublishProjectButtonAPI(id);
-    dispatch(APITransport(projectObj));
+    //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
