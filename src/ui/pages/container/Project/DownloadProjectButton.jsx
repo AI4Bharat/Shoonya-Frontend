@@ -81,7 +81,7 @@ function DownloadProjectButton(props) {
   const handleDownloadJSONProject = async () => {
     SetTask([])
     const projectObj = new DownloadJSONProjectAPI(id,taskStatus);
-    dispatch(APITransport(projectObj));
+    //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
@@ -112,7 +112,7 @@ function DownloadProjectButton(props) {
   const handleDownloadCSVProject = async () => {
     SetTask([])
     const projectObj = new DownloadProjectCsvAPI(id,taskStatus);
-    dispatch(APITransport(projectObj));
+    //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
@@ -140,7 +140,7 @@ function DownloadProjectButton(props) {
   const handleDownloadTSVProject = async () => {
     SetTask([])
     const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
-    dispatch(APITransport(projectObj));
+    //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
