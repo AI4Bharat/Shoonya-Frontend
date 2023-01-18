@@ -46,13 +46,10 @@ import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetai
 
 
 const ProgressType = [
-  "unlabeled",
-  "draft",
-  "skipped",
-  "labeled",
-  "accepted",
-  "accepted_with_changes",
-  "to_be_revised",
+  "incomplete",
+  "annotated",
+  "reviewed",
+  "exported",
 ];
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -94,13 +91,10 @@ const AdvancedOperation = (props) => {
   const [datasetId, setDatasetId] = useState("");
   const [projectType, setProjectType] = useState("");
   const [taskStatus, setTaskStatus] = useState([
-    "unlabeled",
-    "draft",
-    "skipped",
-    "labeled",
-    "accepted",
-    "accepted_with_changes",
-    "to_be_revised",
+    "incomplete",
+  "annotated",
+  "reviewed",
+  "exported",
   ]);
   const { id } = useParams();
   const classes = DatasetStyle();
