@@ -213,7 +213,7 @@ const AnnotationProject = (props) => {
   useEffect(() => {
     if (NewProject.id) {
       navigate(`/projects/${NewProject.id}`, { replace: true });
-      window.location.reload();
+      //window.location.reload();
     }
   }, [NewProject]);
   useEffect(() => {
@@ -300,13 +300,13 @@ const AnnotationProject = (props) => {
           temp.push({
             name: element,
             data: DatasetFields[element],
-            value: "",
+            value: variable_Parameters_lang,
           });
         }
       );
       setSelectedVariableParameters(temp);
     }
-  }, [DatasetFields]);
+  }, [DatasetFields,variable_Parameters_lang]);
 
   useEffect(() => {
     if (LanguageChoices && LanguageChoices.length > 0) {
@@ -480,6 +480,7 @@ const AnnotationProject = (props) => {
   };
 
 
+
     
 
   const handleCreateProject = () => {
@@ -505,7 +506,7 @@ const AnnotationProject = (props) => {
       project_type: selectedType,
       dataset_id: selectedInstances,
       label_config: "string",
-      variable_parameters: {output_language: variable_Parameters_lang},
+      variable_parameters: temp,
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
       enable_task_reviews: taskReviews,
