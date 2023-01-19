@@ -33,6 +33,8 @@ import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutl
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddGlossary from "./AddGlossary";
 import { translate } from "../../../../config/localisation";
+import UpVoteAndDownVoteAPI from "../../../../redux/actions/api/Glossary/UpVoteAndDownVote";
+import SuggestAnEdit from "./SuggestAnEdit";
 
 export default function Glossary(props) {
   const { taskData } = props;
@@ -48,9 +50,19 @@ export default function Glossary(props) {
     visible: false,
   });
   const [openDialog, setOpenDialog] = useState(false);
+  const [SuggestAnEditDialog, setSuggestAnEditDialog] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [targetlang, settargetlang] = useState("");
   const [Sourcelang, setSourcelang] = useState("");
+  const [hashCode, setHashCode] = useState();
+  const[tgtText,setTgtText] = useState();
+  const[srcText,setSrcText] = useState();
+  const[domain,setDomain] = useState();
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
   const language = LanguageCode.languages;
@@ -58,20 +70,15 @@ export default function Glossary(props) {
   useEffect(() => {
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
-        (el) =>
-          el.label===
-          taskData.data?.input_language
-         
+        (el) => el.label === taskData.data?.input_language
       );
-      setSourcelang(filtereddata[0]?.code)
+      setSourcelang(filtereddata[0]?.code);
     }
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
-        (el) =>
-          el.label ===
-          taskData.data?.output_language
+        (el) => el.label === taskData.data?.output_language
       );
-      settargetlang(filtereddata[0]?.code)
+      settargetlang(filtereddata[0]?.code);
       const Glossarysentencedata = {
         inputs: [taskData.data?.input_text],
         tgtLanguage: filtereddata[0]?.code,
@@ -99,7 +106,7 @@ export default function Glossary(props) {
     });
   };
 
-  const handleClick = (event) => {
+  const handleClickThumbsUpDown = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -108,9 +115,82 @@ export default function Glossary(props) {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+    setSuggestAnEditDialog(false);
   };
   const handleClickOpen = () => {
     setOpenDialog(true);
+    
+  };
+
+  const handleClickOpenSuggestAnEdit = () => {
+    setSuggestAnEditDialog(true);
+    setAnchorEl(null);
+  };
+
+  const handleThumbsUpDown = (hashcode,srcText,tgtText,domain) => {
+    setHashCode(hashcode);
+    setSrcText(srcText);
+    setTgtText(tgtText)
+    setDomain(domain)
+  };
+
+  const OnClickUpVote = async () => {
+    const UpVotedata = {
+      item_id: hashCode,
+      action: 1,
+    };
+    console.log(UpVotedata, "UpVotedata");
+    const GlossaryObj = new UpVoteAndDownVoteAPI(UpVotedata);
+    //dispatch(APITransport(GlossaryObj));
+    const res = await fetch(GlossaryObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(GlossaryObj.getBody()),
+      headers: GlossaryObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+    setAnchorEl(null);
+  };
+
+  const OnClickDownVote = async () => {
+    const DownVotedata = {
+      item_id: hashCode,
+      action: -1,
+    };
+    console.log(DownVotedata, "UpVotedata");
+    const GlossaryObj = new UpVoteAndDownVoteAPI(DownVotedata);
+    //dispatch(APITransport(GlossaryObj));
+    const res = await fetch(GlossaryObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(GlossaryObj.getBody()),
+      headers: GlossaryObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
     setAnchorEl(null);
   };
 
@@ -249,12 +329,15 @@ export default function Glossary(props) {
                   <ContentCopyIcon fontSize="small" />
                 </Tooltip>
               </Button>
-              <Button aria-describedby={id} onClick={handleClick}>
-                <Tooltip title="Rate this translation">
-                  <ThumbsUpDownOutlinedIcon fontSize="medium" />
-                </Tooltip>
-              </Button>
+              <span onClick={() => handleThumbsUpDown(el.hash,el.srcText,el.tgtText,el.domain)}>
+                <Button aria-describedby={id} onClick={handleClickThumbsUpDown}>
+                  <Tooltip title="Rate this translation">
+                    <ThumbsUpDownOutlinedIcon fontSize="medium" />
+                  </Tooltip>
+                </Button>
+              </span>
             </>,
+            el.hash,
           ];
         })
       : [];
@@ -287,8 +370,24 @@ export default function Glossary(props) {
     search: false,
     jumpToPage: true,
   };
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
+
   return (
     <>
+      {renderSnackBar()}
       <CustomizedSnackbars
         hide={showSnackBar.timeout}
         open={showSnackBar.visible}
@@ -314,13 +413,17 @@ export default function Glossary(props) {
               {translate("label.Rate this translation")}
             </Typography>
             <Grid sx={{ padding: "10px 0px 30px 37px" }}>
-              <Button sx={{ border: "1px solid gray", borderRadius: "25px" }}>
+              <Button
+                onClick={OnClickUpVote}
+                sx={{ border: "1px solid gray", borderRadius: "25px" }}
+              >
                 <Tooltip title="Good translation">
                   <ThumbUpOffAltOutlinedIcon fontSize="medium" />
                 </Tooltip>
               </Button>
 
               <Button
+                onClick={OnClickDownVote}
                 sx={{ border: "1px solid gray", borderRadius: "25px", ml: 1 }}
               >
                 <Tooltip title="Poor translation">
@@ -335,7 +438,7 @@ export default function Glossary(props) {
               {translate("button.Your feedback")}
             </Typography>
             <Divider sx={{ padding: "15px 0px 0px 0px" }} />
-            <Button sx={{ ml: 2, mt: 1 }} onClick={handleClickOpen}>
+            <Button sx={{ ml: 2, mt: 1 }} onClick={handleClickOpenSuggestAnEdit}>
               <EditOutlinedIcon fontSize="medium" />
               <Typography variant="subtitle2">
                 {translate("button.Suggest an edit")}
@@ -363,6 +466,18 @@ export default function Glossary(props) {
           targetlang={targetlang}
           Sourcelang={Sourcelang}
         />
+      )}
+
+      {SuggestAnEditDialog && (
+      <SuggestAnEdit 
+          openDialog={SuggestAnEditDialog}
+          handleCloseDialog={() => handleCloseDialog()}
+          TargetText={tgtText}
+          sourceText={srcText}
+          Domain={domain}
+          hashCode={hashCode}
+          data={taskData.data}
+      />
       )}
 
       <ThemeProvider theme={tableTheme}>

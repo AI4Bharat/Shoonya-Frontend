@@ -9,6 +9,7 @@ import {
   DialogContent,
   Dialog,
   DialogContentText,
+  Typography,
 } from "@mui/material";
 import CustomButton from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
@@ -45,8 +46,6 @@ const AddGlossary = ({
   });
   console.log(allLevels[0].key, "allLevelsallLevels");
   const allDomains = useSelector((state) => state.getDomains);
-
-  
 
   useEffect(() => {
     const domainApiObj = new getDomains();
@@ -153,7 +152,15 @@ const AddGlossary = ({
         <DialogContentText id="alert-dialog-description">
           <Grid>
             <Grid>{renderSnackBar()}</Grid>
-            <Card className={classes.workspaceCard}>
+            <Card className={classes.AddGlossaryCard}>
+              <Typography
+                variant="h4"
+                gutterBottom
+                align="center"
+                sx={{ mb: 3 }}
+              >
+                Add Glossary
+              </Typography>
               <Grid
                 container
                 flexDirection="row"
