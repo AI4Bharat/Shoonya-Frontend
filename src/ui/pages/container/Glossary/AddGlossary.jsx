@@ -28,6 +28,7 @@ const AddGlossary = ({
   handleCloseDialog,
   targetlang,
   Sourcelang,
+  addBtnClickHandler,
 }) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -82,7 +83,7 @@ const AddGlossary = ({
       ],
     };
     const domainApiObj = new AddGlossaryAPI(AddGlossaryData);
-    //dispatch(APITransport(domainApiObj));
+    dispatch(APITransport(domainApiObj));
     const res = await fetch(domainApiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(domainApiObj.getBody()),
@@ -103,6 +104,9 @@ const AddGlossary = ({
         variant: "error",
       });
     }
+    setdomain("")
+    setSourceText("")
+    settargetText("")
   };
 
   const handleSrcLangChange = (e) => {

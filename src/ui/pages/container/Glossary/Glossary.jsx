@@ -35,6 +35,7 @@ import AddGlossary from "./AddGlossary";
 import { translate } from "../../../../config/localisation";
 import UpVoteAndDownVoteAPI from "../../../../redux/actions/api/Glossary/UpVoteAndDownVote";
 import SuggestAnEdit from "./SuggestAnEdit";
+import SuggestAnEditAPI from "../../../../redux/actions/api/Glossary/SuggestAnEdit";
 
 export default function Glossary(props) {
   const { taskData } = props;
@@ -54,12 +55,15 @@ export default function Glossary(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [targetlang, settargetlang] = useState("");
   const [Sourcelang, setSourcelang] = useState("");
-  const [hashCode, setHashCode] = useState();
-  const[tgtText,setTgtText] = useState();
-  const[srcText,setSrcText] = useState();
-  const[domain,setDomain] = useState();
-  const[level,setLevel] = useState();
-  const[collectionSource,setCollectionSource] = useState();
+  const [hashCode, setHashCode] = useState("");
+  const[tgtText,setTgtText] = useState("");
+  const[srcText,setSrcText] = useState("");
+  const[domain,setDomain] = useState("");
+  const[level,setLevel] = useState("");
+  const[collectionSource,setCollectionSource] = useState("");
+  const [sourceText, setSourceText] = useState();
+  const [targetText, settargetText] = useState();
+  const[domainValue,setDomainValue] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -89,6 +93,14 @@ export default function Glossary(props) {
       dispatch(APITransport(GlossaryObj));
     }
   }, [taskData]);
+
+
+
+  useEffect(() => {
+    setSourceText(srcText)
+    settargetText(tgtText)
+    setDomainValue(domain)
+  }, [srcText,tgtText,domain])
 
   const handleCopyText = (text) => {
     navigator.clipboard.writeText(text);
@@ -173,7 +185,7 @@ export default function Glossary(props) {
       item_id: hashCode,
       action: -1,
     };
-    console.log(DownVotedata, "UpVotedata");
+    
     const GlossaryObj = new UpVoteAndDownVoteAPI(DownVotedata);
     //dispatch(APITransport(GlossaryObj));
     const res = await fetch(GlossaryObj.apiEndPoint(), {
@@ -197,6 +209,52 @@ export default function Glossary(props) {
     }
     setAnchorEl(null);
   };
+
+
+  const submitSuggestAnEditHandler = async() =>{
+    const SuggestAnEditData = {
+      new: {
+        glossary: [
+          {
+            srcLanguage: Sourcelang,
+            tgtLanguage: targetlang,
+            srcText: sourceText,
+            tgtText: targetText,
+            domain: domain,
+            collectionSource: collectionSource,
+            level: level,
+          },
+        ],
+      },
+      hash: hashCode,
+    };
+    const GlossaryObj = new SuggestAnEditAPI(SuggestAnEditData);
+    //dispatch(APITransport(GlossaryObj));
+    const res = await fetch(GlossaryObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(GlossaryObj.getBody()),
+      headers: GlossaryObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    //setLoading(false);
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+    setSuggestAnEditDialog(false);
+  }
+
+
+  
 
   const columns = [
     {
@@ -468,6 +526,7 @@ export default function Glossary(props) {
         <AddGlossary
           openDialog={openDialog}
           handleCloseDialog={() => handleCloseDialog()}
+         // addBtnClickHandler={AddGlossaryHandler}
           targetlang={targetlang}
           Sourcelang={Sourcelang}
         />
@@ -477,14 +536,12 @@ export default function Glossary(props) {
       <SuggestAnEdit 
           openDialog={SuggestAnEditDialog}
           handleCloseDialog={() => handleCloseDialog()}
-          TargetText={tgtText}
-          sourceText={srcText}
-          Domain={domain}
-          hashCode={hashCode}
-          targetlang={targetlang}
-          Sourcelang={Sourcelang}
-          collectionSource={collectionSource}
-          level={level}
+          addBtnClickHandler={submitSuggestAnEditHandler}
+          sourceText={sourceText}
+          targetText={targetText}
+         settargetText={settargetText}
+         domainValue={domainValue}
+         setDomainValue={setDomainValue}
           data={taskData.data}
       />
       )}

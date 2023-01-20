@@ -24,22 +24,18 @@ import SuggestAnEditAPI from "../../../../redux/actions/api/Glossary/SuggestAnEd
 const SuggestAnEdit = ({
   openDialog,
   handleCloseDialog,
-  TargetText,
+  addBtnClickHandler,
   sourceText,
-  Domain,
-  hashCode,
-  targetlang,
-  Sourcelang,
-  collectionSource,
-  level,
+  targetText,
+  settargetText,
+  domainValue,
+  setDomainValue,
   data,
 }) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
-
-  const [SourceText, setSourceText] = useState(sourceText);
-  const [targetText, settargetText] = useState(TargetText);
-  const [domain, setdomain] = useState(Domain);
+console.log(sourceText,"sourceTextsourceText")
+ 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -47,41 +43,18 @@ const SuggestAnEdit = ({
   });
 
   const allDomains = useSelector((state) => state.getDomains);
-  console.log(data.input_language
-    , "datadatadata");
 
   useEffect(() => {
     const domainApiObj = new getDomains();
     dispatch(APITransport(domainApiObj));
   }, []);
 
-  const onSubmit = async () => {
-    const SuggestAnEditData = {
-      new: {
-        glossary: [
-          {
-            srcLanguage: Sourcelang,
-            tgtLanguage: targetlang,
-            srcText: SourceText,
-            tgtText: targetText,
-            domain: domain,
-            collectionSource: collectionSource,
-            level: level,
-          },
-        ],
-      },
-      hash: hashCode,
-    };
-    const GlossaryObj = new SuggestAnEditAPI(SuggestAnEditData);
-    dispatch(APITransport(GlossaryObj));
-    
-  };
 
   const handleTargetTextChange = (e) => {
     settargetText(e.target.value);
   };
   const handleDomainChange = (e) => {
-    setdomain(e.target.value);
+    setDomainValue(e.target.value);
   };
 
   const renderSnackBar = () => {
@@ -135,7 +108,7 @@ const SuggestAnEdit = ({
                   label="Source Text"
                   placeholder="Source Text"
                   sx={{ m: 1, width: 200 }}
-                  value={SourceText}
+                  value={sourceText}
                 />
                 <OutlinedTextField
                   label="Target Text"
@@ -161,7 +134,7 @@ const SuggestAnEdit = ({
                   <Select
                     labelId="demo-simple-select-helper-label"
                     id="demo-simple-select-helper"
-                    value={domain}
+                    value={domainValue}
                     label="Domain"
                     onChange={handleDomainChange}
                     sx={{
@@ -181,8 +154,8 @@ const SuggestAnEdit = ({
               <Grid sx={{ textAlignLast: "end" }}>
                 <CustomButton
                   label={translate("button.submit")}
-                  onClick={onSubmit}
-                  disabled={SourceText && targetText && domain ? false : true}
+                  onClick={() => addBtnClickHandler()}
+                  //disabled={SourceText && targetText && domain ? false : true}
                   sx={{
                     borderRadius: 2,
                     textDecoration: "none",
