@@ -28,7 +28,11 @@ const SuggestAnEdit = ({
   sourceText,
   Domain,
   hashCode,
-  data
+  targetlang,
+  Sourcelang,
+  collectionSource,
+  level,
+  data,
 }) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -43,7 +47,8 @@ const SuggestAnEdit = ({
   });
 
   const allDomains = useSelector((state) => state.getDomains);
-console.log(data,"data")
+  console.log(data.input_language
+    , "datadatadata");
 
   useEffect(() => {
     const domainApiObj = new getDomains();
@@ -52,14 +57,24 @@ console.log(data,"data")
 
   const onSubmit = async () => {
     const SuggestAnEditData = {
-      SourceText: SourceText,
-      targetText: targetText,
-      domain: domain,
-      hashCode: hashCode,
+      new: {
+        glossary: [
+          {
+            srcLanguage: Sourcelang,
+            tgtLanguage: targetlang,
+            srcText: SourceText,
+            tgtText: targetText,
+            domain: domain,
+            collectionSource: collectionSource,
+            level: level,
+          },
+        ],
+      },
+      hash: hashCode,
     };
-
-    const GlossaryObj = new SuggestAnEditAPI();
+    const GlossaryObj = new SuggestAnEditAPI(SuggestAnEditData);
     dispatch(APITransport(GlossaryObj));
+    
   };
 
   const handleTargetTextChange = (e) => {
@@ -94,13 +109,21 @@ console.log(data,"data")
           <Grid>
             <Grid>{renderSnackBar()}</Grid>
             <Card className={classes.SuggestAnEditCard}>
-            <Typography
+              <Typography
                 variant="h4"
                 gutterBottom
                 align="center"
                 sx={{ mb: 3 }}
               >
-                Suggest An Edit 
+                Suggest An Edit
+              </Typography>
+              <Typography
+                variant="body2"
+               // gutterBottom
+              
+                sx={{ mb: 3 }}
+              >
+                Note:- Source Text ({data.input_language}) , Target Text ({data.output_language})
               </Typography>
               <Grid
                 container

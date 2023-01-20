@@ -58,6 +58,8 @@ export default function Glossary(props) {
   const[tgtText,setTgtText] = useState();
   const[srcText,setSrcText] = useState();
   const[domain,setDomain] = useState();
+  const[level,setLevel] = useState();
+  const[collectionSource,setCollectionSource] = useState();
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -127,11 +129,13 @@ export default function Glossary(props) {
     setAnchorEl(null);
   };
 
-  const handleThumbsUpDown = (hashcode,srcText,tgtText,domain) => {
+  const handleThumbsUpDown = (hashcode,srcText,tgtText,domain,collectionSource,level) => {
     setHashCode(hashcode);
     setSrcText(srcText);
-    setTgtText(tgtText)
-    setDomain(domain)
+    setTgtText(tgtText);
+    setDomain(domain);
+    setCollectionSource(collectionSource);
+    setLevel(level)
   };
 
   const OnClickUpVote = async () => {
@@ -329,7 +333,7 @@ export default function Glossary(props) {
                   <ContentCopyIcon fontSize="small" />
                 </Tooltip>
               </Button>
-              <span onClick={() => handleThumbsUpDown(el.hash,el.srcText,el.tgtText,el.domain)}>
+              <span onClick={() => handleThumbsUpDown(el.hash,el.srcText,el.tgtText,el.domain,el.collectionSource,el.level)}>
                 <Button aria-describedby={id} onClick={handleClickThumbsUpDown}>
                   <Tooltip title="Rate this translation">
                     <ThumbsUpDownOutlinedIcon fontSize="medium" />
@@ -338,6 +342,7 @@ export default function Glossary(props) {
               </span>
             </>,
             el.hash,
+            el.level,
           ];
         })
       : [];
@@ -365,7 +370,7 @@ export default function Glossary(props) {
     // rowsPerPage: PageInfo.count,
     filter: false,
     // page: PageInfo.page,
-    viewColumns: false,
+    viewColumns: true,
     selectableRows: "none",
     search: false,
     jumpToPage: true,
@@ -476,6 +481,10 @@ export default function Glossary(props) {
           sourceText={srcText}
           Domain={domain}
           hashCode={hashCode}
+          targetlang={targetlang}
+          Sourcelang={Sourcelang}
+          collectionSource={collectionSource}
+          level={level}
           data={taskData.data}
       />
       )}
