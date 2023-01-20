@@ -484,7 +484,7 @@ const AnnotationProject = (props) => {
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
-      temp[`"${element.name}"`] = element.value;
+      temp[element.name] = element.value;
     });
   
 
