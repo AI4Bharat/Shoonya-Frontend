@@ -6,6 +6,7 @@
  import constants from "../../../constants";
  
  export default class DeallocateReviewTasksAPI extends API {
+
    constructor(projectId,selectedFilters, timeout = 2000) {
      super("GET", timeout, false);
      this.projectId = projectId;
