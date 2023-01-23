@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Box, Card, TextField } from "@mui/material";
+import { Tooltip, Button, Box, Card, TextField, Grid, Typography, Popover } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -12,6 +12,8 @@ import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Glossary from "../Glossary/Glossary";
+import { TabsSuggestionData } from '../../../../utils/TabsSuggestionData/TabsSuggestionData';
+import getCaretCoordinates from 'textarea-caret';
 
 import {
   getProjectsandTasks,
@@ -97,6 +99,9 @@ const LabelStudioWrapper = ({
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
+
+  const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] = useState(null);
+  const [tagSuggestionList, setTagSuggestionList] = useState();
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -493,6 +498,72 @@ const LabelStudioWrapper = ({
         }
       );
     }
+
+        // Traversing and tab formatting --------------------------- start
+        const outputTextareaHTMLEleArr = document.getElementsByName("transcribed_json");
+        if (outputTextareaHTMLEleArr.length > 0) {
+          const targetElement = outputTextareaHTMLEleArr[0];
+          if (targetElement) {
+            targetElement.oninput = function (e) {
+              let textAreaInnerText = e.target.value;
+    
+              // console.log("e ---------------------- ", e.currentTarget);
+    
+              let lastInputChar = textAreaInnerText[targetElement.selectionStart - 1];
+              if (lastInputChar === "\\" && localStorage.getItem('enableTags') === "true") {
+                let indexOfLastSpace = textAreaInnerText.lastIndexOf(" ", targetElement.selectionStart - 1) < textAreaInnerText.lastIndexOf("\n", targetElement.selectionStart - 1)
+                  ? textAreaInnerText.lastIndexOf("\n", targetElement.selectionStart - 1)
+                  : textAreaInnerText.lastIndexOf(" ", targetElement.selectionStart - 1);
+    
+                let currentSelectionRangeStart = indexOfLastSpace + 1;
+                let currentSelectionRangeEnd = targetElement.selectionStart - 1;
+                
+                let currentTargetWord = textAreaInnerText.slice(currentSelectionRangeStart, currentSelectionRangeEnd);
+                let filteredSuggestionByInput = TabsSuggestionData.filter(el => el.toLowerCase().includes(currentTargetWord.toLowerCase()));
+                if (filteredSuggestionByInput && filteredSuggestionByInput.length > 0) {
+                  const suggestionTagsContainer = <Grid
+                    sx={{
+                      width: "max-content",
+                      maxHeight: 350,
+                      padding: 1
+                    }}
+                  >
+                    {filteredSuggestionByInput?.map((suggestion, index) => {
+                      return (
+                        <Typography
+                          onClick={() => {
+                            let modifiedValue = textAreaInnerText.replace(currentTargetWord + "\\", `[${suggestion}]`);
+                            targetElement.value = modifiedValue;
+                            setShowTagSuggestionsAnchorEl(null);
+                          }}
+                          variant="body2"
+                          sx={{
+                            backgroundColor: "#ffffff",
+                            color: "#000",
+                            padding: 2,
+                            "&:hover": {
+                              color: "white",
+                              backgroundColor: "#1890ff",
+                            }
+                          }}
+                        >{suggestion}</Typography>
+                      )
+                    })}
+    
+                  </Grid>
+                  setShowTagSuggestionsAnchorEl(e.currentTarget);
+                  setTagSuggestionList(suggestionTagsContainer);
+                }
+              } else {
+                setShowTagSuggestionsAnchorEl(false);
+              }
+            }
+          }
+        }
+    
+        // Traversing and tab formatting --------------------------- end
+    
+
   }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, taskId]);
 
   useEffect(() => {
@@ -653,6 +724,21 @@ const LabelStudioWrapper = ({
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
         <div className="label-studio-root" ref={rootRef}></div>
+        <Popover
+          id={"'simple-popover'"}
+          open={Boolean(showTagSuggestionsAnchorEl)}
+          anchorEl={showTagSuggestionsAnchorEl}
+          onClose={()=>{
+            setShowTagSuggestionsAnchorEl(null);
+            setTagSuggestionList(null);
+          }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+        >
+          {tagSuggestionList}
+        </Popover>
       </Box>
       {loader}
       {renderSnackBar()}
