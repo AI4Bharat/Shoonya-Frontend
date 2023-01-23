@@ -74,6 +74,12 @@ export default function Glossary(props) {
   const language = LanguageCode.languages;
 
   useEffect(() => {
+    searchGlossary()
+  }, [taskData]);
+
+
+
+  const searchGlossary = () =>{
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
         (el) => el.label === taskData.data?.input_language
@@ -92,7 +98,8 @@ export default function Glossary(props) {
       const GlossaryObj = new GlossarysentenceAPI(Glossarysentencedata);
       dispatch(APITransport(GlossaryObj));
     }
-  }, [taskData]);
+
+  }
 
 
 
@@ -243,7 +250,10 @@ export default function Glossary(props) {
         message: resp?.message,
         variant: "success",
       });
-    } else {
+      searchGlossary()
+    }
+  
+     else {
       setSnackbarInfo({
         open: true,
         message: resp?.message,
