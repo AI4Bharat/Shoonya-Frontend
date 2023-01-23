@@ -142,7 +142,7 @@ const TaskTable = (props) => {
                 variant: "success",
             })
             setTimeout(() => {
-                window.location.reload();
+                //window.location.reload();
             }, 1000);
         } else {
             setSnackbarInfo({
@@ -278,6 +278,7 @@ const TaskTable = (props) => {
             // let colList = ["id"];
             // colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el) && !el.includes("_json")));
             const email =  props.type === "review" ? "Annotator Email" : ""
+
             let colList = ["id", ... !!email ? [email] : []];
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
@@ -570,6 +571,7 @@ const TaskTable = (props) => {
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
                                 All {props.type === "annotation" ? selectedFilters.annotation_status : selectedFilters.review_status} tasks will be de-allocated from this project.
+
                                 Please be careful as this action cannot be undone.
                             </DialogContentText>
                         </DialogContent>
