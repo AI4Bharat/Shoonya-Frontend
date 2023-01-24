@@ -11,6 +11,7 @@ const apiendpoint =  {
   getUsers:"/users/",
   authUsers:"/users/auth/users/",
   functions:"/functions/",
+  Glossary:"/v1/",
 };
 
 export default apiendpoint;

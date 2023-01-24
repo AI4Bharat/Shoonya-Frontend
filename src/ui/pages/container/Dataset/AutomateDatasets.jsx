@@ -15,7 +15,7 @@ import AutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/AutomateD
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import GetIndicTransLanguagesAPI from "../../../../redux/actions/api/Dataset/GetIndicTransLanguages";
 
-const APiType = [{ ApiTypename: "indic-trans" }, { ApiTypename: "google" }, { ApiTypename: "azure" }]
+const APiType = [{ ApiTypename: "indic-trans" }, { ApiTypename: "google" },{ ApiTypename: "azure" }]
 const AutomateDatasets = () => {
   const navigate = useNavigate();
   const classes = DatasetStyle();
@@ -35,7 +35,7 @@ const AutomateDatasets = () => {
   const [checks, setChecks] = useState('False');
   const [loading, setLoading] = useState(false);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
-  const [apitype, setApitype] = useState("indic-trans");
+  //const [apitype, setApitype] = useState("indic-trans");
 
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
   const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
@@ -123,8 +123,9 @@ const AutomateDatasets = () => {
     }
   };
 
+const apitype = translationModel===1?"indic-trans": translationModel===2?"google":"azure";
   const handleConfirm = () => {
-    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id, translationModel, checks,apitype);
+    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,apitype);
     setLoading(true);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
@@ -143,9 +144,9 @@ const AutomateDatasets = () => {
 
   if (loggedInUserData?.role === 1) return navigate("/projects");
 
-  const handleAPiType = (e) => {
-    setApitype(e.target.value)
-  }
+  // const handleAPiType = (e) => {
+  //   setApitype(e.target.value)
+  // }
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -270,6 +271,9 @@ const AutomateDatasets = () => {
                   }, ...(loggedInUserData?.role === 3 ? [{
                     name: "Google Translate",
                     value: 2
+                  },{
+                    name: "Microsoft Azure Translate",
+                    value: 3
                   }] : [])]}
                   handleChange={handleTransModelChange}
                   value={translationModel}
@@ -339,7 +343,7 @@ const AutomateDatasets = () => {
             </Grid>
             
 
-            <Grid
+            {/* <Grid
               className={classes.projectsettingGrid}
               xs={12}
               sm={12}
@@ -369,7 +373,7 @@ const AutomateDatasets = () => {
                   </Select>
                 </FormControl>
             </Grid>
-           
+            */}
             <Grid
               style={{}}
               item

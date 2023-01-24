@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import {
   Button,
   Divider,
@@ -17,49 +17,26 @@ import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 // import { translate } from "../../../../assets/localisation";
 
-const FilterList = (props) => {
-  const classes = DatasetStyle();
-  const { filterStatusData, currentFilters, updateFilters } = props;
-  const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status? currentFilters?.annotation_status:currentFilters.review_status);
+const AllTasksFilterList = (props) => {
+  const classes = DatasetStyle();        
+  const { filterStatusData, currentFilters, updateFilters,onchange} = props;
+  const [selectedStatus, setSelectedStatus] = useState(currentFilters.task_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
-console.log(currentFilters,"currentFilters")
-  // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
-  // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
-  // const handleDatasetChange = (e) => {
-  //   if (e.target.checked) setSelectedType([...selectedType, e.target.name]);
-  //   else {
-  //     const selected = Object.assign([], selectedType);
-  //     const index = selected.indexOf(e.target.name);
-
-  //     if (index > -1) {
-  //       selected.splice(index, 1);
-  //       setSelectedType(selected);
-  //     }
-  //   }
-  // };
-
+console.log(currentFilters,"selectedStatus")
 
   const handleStatusChange = (e) => {
-    let statusvalue = !!currentFilters?.annotation_status? "annotation_status":"review_status"
-    updateFilters({
-      ...currentFilters,
-      [statusvalue]:selectedStatus,
-    })
+    onchange()
     props.handleClose();
+   
   };
-  // const handleClearAll = () => {
-  //   setSelectedStatus([]);
-  //   setSelectedType([]);
-  //   clearAll({ datasetType: [], status: [] });
-  // };
-  // const isChecked = (type, param) => {
-  //   const index =
-  //     param === "status"
-  //       ? selectedStatus.indexOf(type)
-  //       : selectedType.indexOf(type);
-  //   if (index > -1) return true;
-  //   return false;
-  // };
+  useEffect(() => {
+    updateFilters({
+        ...currentFilters,
+        task_status: selectedStatus,
+      })
+}, [selectedStatus])
+
+  
 
   return (
     <div>
@@ -82,25 +59,57 @@ console.log(currentFilters,"currentFilters")
               {translate("label.filter.status")} :
             </Typography>
             <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
-              {filterStatusData.Status.map((type) => {
+              {filterStatusData.Status.map((item) => {
                 return (
                   <FormControlLabel
                     control={
-                      <Radio
-                        checked={selectedStatus === type ? true : false}
-                        name={type}
-                        color="primary"
+                        <Checkbox
+                        overlay
+                        disableIcon
+                        checked={selectedStatus.includes(item)}
+                      
+                      
+                        
+                        variant="soft"
                       />
                     }
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    value={type}
-                    label={snakeToTitleCase(type)}
+                    onChange={(event) => {
+                        if (event.target.checked) {
+                            setSelectedStatus((val) => [...val, item]);
+                        } else {
+                            setSelectedStatus((val) => val?.filter((text) => text !== item));
+                        }
+                      }}
+                      value={selectedStatus}
+                    label={snakeToTitleCase(item)}
                     sx={{
                       fontSize: "1rem",
                     }} 
                   />
                 );
               })}
+
+
+{/* {filterStatusData?.Status.map((item, index) => (
+                        
+                        <Checkbox
+                          overlay
+                          disableIcon
+                          checked={selectedStatus.includes(item)}
+                          value={selectedStatus}
+                          label={item}
+                          onChange={(event) => {
+                            if (event.target.checked) {
+                                setSelectedStatus((val) => [...val, item]);
+                            } else {
+                                setSelectedStatus((val) => val?.filter((text) => text !== item));
+                            }
+                          }}
+                          variant="soft"
+                        />
+      
+                    ))} */}
+
             </FormGroup>
             <Divider />
             <Box 
@@ -138,4 +147,4 @@ console.log(currentFilters,"currentFilters")
     </div>
   );
 };
-export default FilterList;
+export default AllTasksFilterList;
