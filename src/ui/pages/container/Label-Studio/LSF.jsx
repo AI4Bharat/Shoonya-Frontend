@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, Card, TextField, Box, Grid, Typography, Popover } from "@mui/material";
+import { Tooltip, Button, Alert, Card, TextField, Box, Grid, Typography, Popover, IconButton } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -30,6 +30,7 @@ import { translate } from '../../../../config/localisation';
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from '../../../../utils/TabsSuggestionData/TabsSuggestionData';
 import getCaretCoordinates from 'textarea-caret';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 //used just in postAnnotation to support draft status update.
@@ -375,10 +376,26 @@ const LabelStudioWrapper = ({ annotationNotesRef, loader, showLoader, hideLoader
             let currentTargetWord = textAreaInnerText.slice(currentSelectionRangeStart, currentSelectionRangeEnd);
             let filteredSuggestionByInput = TabsSuggestionData.filter(el => el.toLowerCase().includes(currentTargetWord.toLowerCase()));
             if (filteredSuggestionByInput && filteredSuggestionByInput.length > 0) {
-              const suggestionTagsContainer = <Grid
+              const suggestionTagsContainer = <Grid width= {150}>
+                <Grid
+                position="fixed"
+                backgroundColor="#ffffff"
+                width="inherit"
+                textAlign={"end"}
+              >
+                <Tooltip title="close suggestions">
+                  <IconButton onClick={()=>{
+                    setShowTagSuggestionsAnchorEl(null);
+                    targetElement.focus();
+                  }}>
+                  <CloseIcon />
+                </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid
                 sx={{
                   width: "max-content",
-                  maxHeight: 350,
+                  maxHeight: 250,
                   padding: 1
                 }}
               >
@@ -395,6 +412,7 @@ const LabelStudioWrapper = ({ annotationNotesRef, loader, showLoader, hideLoader
                         backgroundColor: "#ffffff",
                         color: "#000",
                         padding: 2,
+                        paddingTop: index === 0 ? 6 : 2,
                         "&:hover": {
                           color: "white",
                           backgroundColor: "#1890ff",
@@ -403,7 +421,7 @@ const LabelStudioWrapper = ({ annotationNotesRef, loader, showLoader, hideLoader
                     >{suggestion}</Typography>
                   )
                 })}
-
+              </Grid>
               </Grid>
               setShowTagSuggestionsAnchorEl(e.currentTarget);
               setTagSuggestionList(suggestionTagsContainer);
