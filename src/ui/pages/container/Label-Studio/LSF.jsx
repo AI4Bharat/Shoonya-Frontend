@@ -118,6 +118,8 @@ const LabelStudioWrapper = ({ annotationNotesRef, loader, showLoader, hideLoader
     let interfaces = [];
     if (predictions == null) predictions = [];
 
+    console.log("labelConfig", labelConfig);
+
     if (taskData.task_status === "freezed") {
       interfaces = [
         "panel",
@@ -165,7 +167,7 @@ const LabelStudioWrapper = ({ annotationNotesRef, loader, showLoader, hideLoader
         "edit-history",
       ];
     }
-
+    
     if (rootRef.current) {
       if (lsfRef.current) {
         lsfRef.current.destroy();

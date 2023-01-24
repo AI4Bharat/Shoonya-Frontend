@@ -427,10 +427,7 @@ const AdvancedOperation = (props) => {
         >
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            {(ProjectDetails?.project_type === "ConversationTranslation" ||
-              ProjectDetails.project_type ===
-                "ConversationTranslationEditing") &&
-            ProjectTypes?.output_dataset?.save_type === "new_record" ? (
+            {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
               <CustomButton
                 sx={{
                   inlineSize: "max-content",

@@ -9,6 +9,7 @@ import {
   DialogContent,
   Dialog,
   DialogContentText,
+  Typography,
 } from "@mui/material";
 import CustomButton from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
@@ -27,6 +28,7 @@ const AddGlossary = ({
   handleCloseDialog,
   targetlang,
   Sourcelang,
+  addBtnClickHandler,
 }) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -45,8 +47,6 @@ const AddGlossary = ({
   });
   console.log(allLevels[0].key, "allLevelsallLevels");
   const allDomains = useSelector((state) => state.getDomains);
-
-  
 
   useEffect(() => {
     const domainApiObj = new getDomains();
@@ -83,7 +83,7 @@ const AddGlossary = ({
       ],
     };
     const domainApiObj = new AddGlossaryAPI(AddGlossaryData);
-    //dispatch(APITransport(domainApiObj));
+    dispatch(APITransport(domainApiObj));
     const res = await fetch(domainApiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(domainApiObj.getBody()),
@@ -104,6 +104,9 @@ const AddGlossary = ({
         variant: "error",
       });
     }
+    setdomain("")
+    setSourceText("")
+    settargetText("")
   };
 
   const handleSrcLangChange = (e) => {
@@ -153,7 +156,15 @@ const AddGlossary = ({
         <DialogContentText id="alert-dialog-description">
           <Grid>
             <Grid>{renderSnackBar()}</Grid>
-            <Card className={classes.workspaceCard}>
+            <Card className={classes.AddGlossaryCard}>
+              <Typography
+                variant="h4"
+                gutterBottom
+                align="center"
+                sx={{ mb: 3 }}
+              >
+                Add Glossary
+              </Typography>
               <Grid
                 container
                 flexDirection="row"
