@@ -26,6 +26,7 @@ const AnnotateTask = () => {
   const TaskDetails = useSelector(state => state.getTaskDetails.data);
   const NextTask = useSelector(state => state.getNextTask.data);
   const User = useSelector((state) => state.fetchLoggedInUserData.data);
+
   const [loadTime, setLoadTime] = useState(Date.now());
   const [translatedText, setTranslatedText] = useState("");
   const [showNotes, setShowNotes] = useState(false);

@@ -73,11 +73,6 @@ import getOrganizationAnnotatorQuality from './Organization/GetOrganizationAnnot
 import FindAndReplaceWordsInAnnotation from './ProjectDetails/FindAndReplaceWordsInAnnotation';
 import getRecentTasks from './UserManagement/FetchRecentTasks';
 import datasetSearchPopup from './Dataset/DatasetSearchPopup';
-import getAllTasksdata from './Tasks/GetAllTasks';
-import glossarysentence from './Glossary/GlossarySentence';
-import getDomains from "./Glossary/GetDomain";
-import getProjectTypeDetails from "./ProjectDetails/GetProjectTypeDetails";
-
 
 const index = {
     apiStatus,
@@ -158,11 +153,6 @@ const index = {
     FindAndReplaceWordsInAnnotation,
     getRecentTasks,
     datasetSearchPopup,
-    getAllTasksdata,
-    glossarysentence,
-    getDomains,
-    getProjectTypeDetails
-   
     
 };
 

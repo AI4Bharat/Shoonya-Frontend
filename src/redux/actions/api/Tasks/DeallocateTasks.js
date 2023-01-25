@@ -10,7 +10,7 @@
      super("GET", timeout, false);
      this.projectId = projectId;
      this.type = constants.DE_ALLOCATE_TASKS;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_tasks/?annotation_status='${selectedFilters}'`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_tasks/?task_status=['${selectedFilters}']`;
    }
  
    processResponse(res) {

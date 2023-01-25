@@ -110,7 +110,7 @@ function DownloadDatasetButton(props) {
 						<CircularProgress />
 					) : (<>
       <Button
-        sx={{  p: 2, borderRadius: 5,width:"190px" }}
+        sx={{  p: 2, borderRadius: 5, ml: 2,mb:2 ,width:"190px" }}
         id="demo-customized-button"
         // aria-controls={open ? 'demo-customized-menu' : undefined}
         // aria-haspopup="true"

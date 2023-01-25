@@ -1,4 +1,3 @@
-
 import { Grid, ThemeProvider, Typography, Autocomplete, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
@@ -49,7 +48,7 @@ const BasicSettings = (props) => {
 
 
     useEffect(() => {
-        if (ProjectDetails.project_type === "MonolingualTranslation" ||ProjectDetails.project_type === "SemanticTextualSimilarity" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing"|| ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing") {
+        if (ProjectDetails.project_type === "MonolingualTranslation" ||ProjectDetails.project_type === "SemanticTextualSimilarity" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
             getLanguageChoices();
             setShowLanguage(true);
         }
@@ -275,7 +274,7 @@ const BasicSettings = (props) => {
                                 mt: 2
                             }}
                         >
-                            {ProjectDetails.project_type !== "ContextualSentenceVerification"||ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing" &&
+                            {ProjectDetails.project_type !== "ContextualSentenceVerification" &&
                             <>
                                 <Grid
                                     items
@@ -332,7 +331,7 @@ const BasicSettings = (props) => {
                                 xl={2}
                             >
                                 <Typography variant="body2" fontWeight='700' label="Required">
-                                {ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing"?  "Language" :"Target Language"}
+                                    Target Language
                                 </Typography>
                             </Grid>
                             <Grid
@@ -352,7 +351,7 @@ const BasicSettings = (props) => {
                                         <TextField
                                             {...params}
                                             inputProps={{ ...params.inputProps, style: { fontSize: "14px" } }}
-                                            placeholder={ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing" ?"Enter language":"Enter target language"}
+                                            placeholder="Enter target language"
                                         />
                                     )}
                                 />

@@ -32,14 +32,14 @@ const excludeSearch = ["status", "actions", "output_text"];
 // const excludeCols = ["context", "input_language", "output_language", "language",
 // "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json"
 //  ];
-const excludeCols = ["context", "input_language", "output_language", "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json", "language","audio_url", "speaker_0_details", "speaker_1_details", "machine_transcribed_json",];
+const excludeCols = ["context", "input_language", "output_language", "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speaker_0_details", "speaker_1_details", "machine_transcribed_json", "speakers_json", "language","audio_url"];
 
 const TaskTable = (props) => {
     const classes = DatasetStyle();
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const taskList = useSelector(state => state.getTasksByProjectId.data.result);
+    const taskList = useSelector(state => state.getTasksByProjectId.data.results);
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
     const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -55,7 +55,7 @@ const TaskTable = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
    
     const filterData = {
-        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["unreviewed", "accepted", "accepted_with_minor_changes", "accepted_with_major_changes","to_be_revised","draft","skipped"] : ["unlabeled", "skipped", "labeled", "draft"],
+        Status: ProjectDetails.enable_task_reviews ? props.type === "annotation" ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"] : ["labeled", "accepted", "accepted_with_changes", "to_be_revised"] : ["unlabeled", "skipped", "accepted", "draft"],
         Annotators: ProjectDetails?.annotators?.length > 0 ? ProjectDetails?.annotators?.map((el, i) => {
             return {
                 label: el.username,
@@ -70,7 +70,9 @@ const TaskTable = (props) => {
             }
         }) : []
     }
-    const [selectedFilters, setsSelectedFilters] = useState(props.type==="annotation"? (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : {annotation_status:filterData.Status[0], req_user: -1 }: (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ?TaskFilter.filters : {review_status:filterData.Status[0], req_user: -1 });
+  
+    const [selectedFilters, setsSelectedFilters] = useState(
+        (TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type) ? TaskFilter.filters : { task_status: filterData.Status[0], user_filter: -1 });
     const NextTask = useSelector(state => state.getNextTask.data);
     const [tasks, setTasks] = useState([]);
     const [pullSize, setPullSize] = useState(ProjectDetails.tasks_pull_count_per_batch * 0.5);
@@ -90,8 +92,9 @@ const TaskTable = (props) => {
     const [columns, setColumns] = useState([]);
     const [labellingStarted, setLabellingStarted] = useState(false);
     const [loading, setLoading] = useState(false);
+
     const getTaskListData = () => {
-        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage,selectedFilters, props.type);
+        const taskObj = new GetTasksByProjectIdAPI(id, currentPageNumber, currentRowPerPage, selectedFilters, props.type);
         dispatch(APITransport(taskObj));
     }
 
@@ -109,7 +112,7 @@ const TaskTable = (props) => {
                 message: resp?.message,
                 variant: "success",
             })
-            if (((props.type === "annotation" && selectedFilters.annotation_status === "unlabeled") || (props.type === "review" && selectedFilters.review_status === "unreviewed")) && currentPageNumber === 1) {
+            if (((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && currentPageNumber === 1) {
                 getTaskListData();
             } else {
                 setsSelectedFilters({ ...selectedFilters, task_status: props.type === "annotation" ? "unlabeled" : "labeled" });
@@ -128,7 +131,7 @@ const TaskTable = (props) => {
 
     const unassignTasks = async () => {
         setDeallocateDialog(false);
-        const deallocateObj = props.type === "annotation" ? new DeallocateTasksAPI(id,selectedFilters.annotation_status) : new DeallocateReviewTasksAPI(id,selectedFilters.review_status);
+        const deallocateObj = props.type === "annotation" ? new DeallocateTasksAPI(id,selectedFilters.task_status) : new DeallocateReviewTasksAPI(id,selectedFilters.task_status);
         const res = await fetch(deallocateObj.apiEndPoint(), {
             method: "GET",
             body: JSON.stringify(deallocateObj.getBody()),
@@ -154,23 +157,19 @@ const TaskTable = (props) => {
     }
 
     const labelAllTasks = () => {
-        let search_filters = Object?.keys(selectedFilters).filter(key => key?.startsWith("search_")).reduce((acc, curr) => {
+        let search_filters = Object.keys(selectedFilters).filter(key => key.startsWith("search_")).reduce((acc, curr) => {
             acc[curr] = selectedFilters[curr];
             return acc;
         }, {});
-        localStorage.setItem("labellingMode", props.type === "annotation" ? selectedFilters.annotation_status:selectedFilters.review_status);
+        localStorage.setItem("labellingMode", selectedFilters.task_status);
         localStorage.setItem("searchFilters", JSON.stringify(search_filters));
         localStorage.setItem("labelAll", true);
-        const datavalue= {
-            annotation_status:selectedFilters?.annotation_status,
-            ...( props.type === "review" && {mode: "review", annotation_status:selectedFilters?.review_status})
-        }
-        const getNextTaskObj = new GetNextTaskAPI( id,datavalue,null, props.type);
+        const getNextTaskObj = new GetNextTaskAPI(id, null, props.type);
         dispatch(APITransport(getNextTaskObj));
         setLabellingStarted(true);
     };
 
-    const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.total_count);
+    const totalTaskCount = useSelector(state => state.getTasksByProjectId.data.count);
 
     const handleShowSearch = (col, event) => {
         setSearchAnchor(event.currentTarget);
@@ -181,12 +180,13 @@ const TaskTable = (props) => {
         const ReplaceData = {
             user_id: userDetails.id,
             project_id: id,
-            task_status: props.type === "annotation" ? selectedFilters.annotation_status:selectedFilters.review_status,
+            task_status: selectedFilters.task_status,
             annotation_type: props.type === "annotation" ? "annotation" : "review",
             find_words: find,
             replace_words: replace,
 
         }
+
         const AnnotationObj = new FindAndReplaceWordsInAnnotationAPI(id, ReplaceData);
         dispatch(APITransport(AnnotationObj));
         const res = await fetch(AnnotationObj.apiEndPoint(), {
@@ -245,18 +245,13 @@ const TaskTable = (props) => {
     useEffect(() => {
         if (taskList?.length > 0 && taskList[0]?.data) {
             const data = taskList.map((el) => {
-                console.log(taskList,"taskListtaskList")
-                const email =  props.type === "review"? el.user_mail
-                : ""
+                const email =  props.type === "review"&&  selectedFilters.task_status=== "accepted" || selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised"  ? el.email : ""
                 let row = [
                     el.id,
-                    ... !!email ? [ el.user_mail
-                    ] : []
+                    ... !!email ? [ el.email] : []
                 ]
-                row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key)).map((key) => el.data[key]));
-                props.type === "annotation" && taskList[0].annotation_status && row.push(el.annotation_status);
-                props.type === "review" && taskList[0].review_status && row.push(el.review_status);
-        
+                row.push(...Object.keys(el.data).filter((key) => !excludeCols.includes(key) && !key.includes("_json")).map((key) => el.data[key]));
+                taskList[0].task_status && row.push(el.task_status);
                 props.type === "annotation" && row.push(<Link to={`task/${el.id}`} className={classes.link}>
                     <CustomButton
                         onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
@@ -277,8 +272,7 @@ const TaskTable = (props) => {
             })
             // let colList = ["id"];
             // colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el) && !el.includes("_json")));
-            const email =  props.type === "review" ? "Annotator Email" : ""
-
+            const email =  props.type === "review"&& selectedFilters.task_status=== "accepted" || selectedFilters.task_status=== "accepted_with_changes" || selectedFilters.task_status=== "to_be_revised" ? "Annotator Email" : ""
             let colList = ["id", ... !!email ? [email] : []];
             colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el)));
             taskList[0].task_status && colList.push("status");
@@ -342,15 +336,15 @@ const TaskTable = (props) => {
     }, [ProjectDetails.unassigned_task_count, ProjectDetails.frozen_users, ProjectDetails.tasks_pull_count_per_batch, userDetails])
 
     useEffect(() => {
-        if (totalTaskCount && ((props.type === "annotation" && selectedFilters.annotation_status === "unlabeled") || (props.type === "review" && selectedFilters.review_status === "unreviewed")) && totalTaskCount >= ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
-            setPullDisabled(`You have too many ${props.type === "annotation" ? selectedFilters.annotation_status:selectedFilters.review_status} tasks`)
+        if (totalTaskCount && ((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && totalTaskCount >= ProjectDetails?.max_pending_tasks_per_user && Object.keys(selectedFilters).filter(key => key.startsWith("search_")) === []) {
+            setPullDisabled(`You have too many ${selectedFilters.task_status} tasks`)
         } else if (pullDisabled === "You have too many unlabeled tasks" || pullDisabled === "You have too many labeled tasks") {
             setPullDisabled("")
         }
     }, [totalTaskCount, ProjectDetails.max_pending_tasks_per_user, selectedFilters])
 
     useEffect(() => {
-        if (((props.type === "annotation" && selectedFilters.annotation_status === "unlabeled") || (props.type === "review" && selectedFilters.review_status === "unreviewed")) && totalTaskCount === 0) {
+        if (((props.type === "annotation" && selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && totalTaskCount === 0) {
             setDeallocateDisabled("No more tasks to deallocate")
         } else if (deallocateDisabled === "No more tasks to deallocate") {
             setDeallocateDisabled("")
@@ -381,7 +375,7 @@ const TaskTable = (props) => {
         return (
             <Box className={classes.filterToolbarContainer}
                 sx={{ height: "80px" }}>
-                {(props.type === "annotation" || props.type === "review") && ((props.type === "annotation" && selectedFilters.annotation_status === "labeled") || selectedFilters.review_status === "accepted" || selectedFilters.accepted_with_changes === "accepted_with_changes") &&
+                {(props.type === "annotation" || props.type === "review") && ((props.type === "annotation" && selectedFilters.task_status === "labeled") || selectedFilters.task_status === "accepted" || selectedFilters.task_status === "accepted_with_changes") &&
                     <Grid container
                         justifyContent='start'
                         alignItems='center'>
@@ -432,9 +426,9 @@ const TaskTable = (props) => {
                     <Select
                         labelId="annotator-filter-label"
                         id="annotator-filter"
-                        value={selectedFilters.req_user}
+                        value={selectedFilters.user_filter}
                         label="Filter by Annotator"
-                        onChange={(e) => setsSelectedFilters({ ...selectedFilters, req_user: e.target.value })}
+                        onChange={(e) => setsSelectedFilters({ ...selectedFilters, user_filter: e.target.value })}
                         sx={{ fontSize: "16px" }}
                     >
                         <MenuItem value={-1}>All</MenuItem>
@@ -445,13 +439,13 @@ const TaskTable = (props) => {
                 </FormControl>}
                 {props.type === "review" && userDetails?.role !== 1 && !getProjectReviewers?.some((reviewer) => reviewer.id === userDetails?.id) &&
                     <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
-                        <InputLabel id="reviewer-filter-label" sx={{ fontSize: "16px", position: "inherit", top: "23px", left: "-25px" }}>Filter by Reviewer</InputLabel>
+                        <InputLabel id="reviewer-filter-label" sx={{ fontSize: "16px" }}>Filter by Reviewer</InputLabel>
                         <Select
                             labelId="reviewer-filter-label"
                             id="reviewer-filter"
-                            value={selectedFilters.req_user}
+                            value={selectedFilters.user_filter}
                             label="Filter by Reviewer"
-                            onChange={(e) => setsSelectedFilters({ ...selectedFilters, req_user: e.target.value })}
+                            onChange={(e) => setsSelectedFilters({ ...selectedFilters, user_filter: e.target.value })}
                             sx={{ fontSize: "16px" }}
                         >
                             <MenuItem value={-1}>All</MenuItem>
@@ -546,7 +540,7 @@ const TaskTable = (props) => {
                     spacing={2}
                     sx={{ mb: 2, }}
                 >
-                    {taskList?.length > 0 &&(( props.type === "annotation" && selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped")) && <Grid item xs={12} sm={12} md={3}>
+                    {((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) && <Grid item xs={12} sm={12} md={3}>
                         <Tooltip title={deallocateDisabled}>
                             <Box>
                                 <CustomButton
@@ -570,8 +564,7 @@ const TaskTable = (props) => {
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
-                                All {props.type === "annotation" ? selectedFilters.annotation_status : selectedFilters.review_status} tasks will be de-allocated from this project.
-
+                                All {props.type === "annotation" ? selectedFilters.task_status : selectedFilters.task_status} tasks will be de-allocated from this project.
                                 Please be careful as this action cannot be undone.
                             </DialogContentText>
                         </DialogContent>
@@ -582,7 +575,7 @@ const TaskTable = (props) => {
                             </Button>
                         </DialogActions>
                     </Dialog>
-                    <Grid item xs={4} sm={4} md={taskList?.length > 0 &&((props.type === "annotation" &&selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 2 : 3}>
+                    <Grid item xs={4} sm={4} md={((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 2 : 3}>
                         <FormControl size="small" sx={{ width: "100%" }}>
                             <InputLabel id="pull-select-label" sx={{ fontSize: "16px" }}>Pull Size</InputLabel>
                             <Select
@@ -601,7 +594,7 @@ const TaskTable = (props) => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={8} sm={8} md={taskList?.length > 0 &&((props.type === "annotation" && selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 3 : 4}>
+                    <Grid item xs={8} sm={8} md={((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 3 : 4}>
                         <Tooltip title={pullDisabled}>
                             <Box>
                                 <CustomButton
@@ -613,7 +606,7 @@ const TaskTable = (props) => {
                             </Box>
                         </Tooltip>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={taskList?.length > 0 &&((props.type === "annotation" && selectedFilters.annotation_status === "unlabeled"||selectedFilters.annotation_status === "draft"||selectedFilters.annotation_status === "skipped") || (props.type === "review" && selectedFilters.review_status === "unreviewed"||selectedFilters.review_status === "draft"||selectedFilters.review_status === "skipped") ) ? 4 : 5}>
+                    <Grid item xs={12} sm={12} md={((props.type === "annotation" && selectedFilters.task_status === "to_be_revised"||selectedFilters.task_status === "skipped"||selectedFilters.task_status === "draft"||selectedFilters.task_status === "unlabeled") || (props.type === "review" && selectedFilters.task_status === "labeled")) ? 4 : 5}>
                         <Tooltip title={totalTaskCount === 0 ? props.type === "annotation" ? "No more tasks to label" : "No more tasks to review" : ""}>
                             <Box>
                                 <CustomButton
@@ -668,7 +661,6 @@ const TaskTable = (props) => {
                     filterStatusData={filterData}
                     updateFilters={setsSelectedFilters}
                     currentFilters={selectedFilters}
-                   
                 />
             )}
             {renderSnackBar()}
