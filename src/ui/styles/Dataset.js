@@ -29,7 +29,7 @@ const DatasetStyle = makeStyles({
   },
   workspaceCard: {
     width: "100%",
-    minHeight: "420px",
+    minHeight: "500px",
     padding: "40px",
     justifyContent: "center", justifyItems: "center"
   },
@@ -250,18 +250,6 @@ const DatasetStyle = makeStyles({
   },
   formControl: {
     width: 300
-  },
-  AddGlossaryCard: {
-    width: "100%",
-    minHeight: "420px",
-    padding: "20px 40px 20px 40px",
-    justifyContent: "center", justifyItems: "center"
-  },
-  SuggestAnEditCard: {
-    width: "100%",
-    minHeight: "350px",
-    padding: "20px 40px 20px 40px",
-    justifyContent: "center", justifyItems: "center"
   },
 })
 

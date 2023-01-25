@@ -11,6 +11,7 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "./ColumnList";
 import SearchIcon from '@mui/icons-material/Search';
 import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
+import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import Spinner from "../../component/common/Spinner";
 
 
@@ -40,7 +41,6 @@ const DataitemsTable = () => {
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
- 
 
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
@@ -53,86 +53,48 @@ const DataitemsTable = () => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
-  console.log(searchedCol,"searchedColsearchedCol",selectedFilters)
+
 
   const getDataitems = () => {
-    const dataObj = new GetDataitemsById(
-      datasetId,
-      DatasetDetails.dataset_type,
-      selectedFilters,
-      currentPageNumber,
-      currentRowPerPage
-    );
+    const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage, DatasetDetails.dataset_type,selectedFilters);
     dispatch(APITransport(dataObj));
   };
 
-//   const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage, DatasetDetails.dataset_type,selectedFilters);
-//   dispatch(APITransport(dataObj));
-// };
-
+  
+ 
   useEffect(() => {
     setLoading(apiLoading);
 }, [apiLoading]);
  
 
-    useEffect(() => {
-      let fetchedItems =dataitemsList.results;
-      setTotalDataitems(dataitemsList.count);
-      fetchedItems = dataitemsList.results;
-      setDataitems(fetchedItems);
+useEffect(() => {
+  setTotalDataitems(dataitemsList.count);
+  let fetchedItems = dataitemsList.results;
+  setDataitems(fetchedItems);
+  let tempColumns = [];
+  let tempSelected = [];
+  if (fetchedItems?.length) {
+    Object.keys(fetchedItems[0]).forEach((key) => {
+      if (!excludeKeys.includes(key)) {
+        tempColumns.push({
+          name: key,
+          label: snakeToTitleCase(key),
+          options: {
+            filter: false,
+            sort: false,
+            align: "center",
+            customHeadLabelRender: customColumnHead,
+          },
+        });
+        tempSelected.push(key);
+      }
+    });
+  }
+  setColumns(tempColumns);
+  setSelectedColumns(tempSelected);
+}, [dataitemsList]);
 
-     
-   
-    
-    let tempColumns = [];
-    let tempSelected = [];
-    if (fetchedItems?.length) {
-      Object.keys(fetchedItems[0]).forEach((key) => {
-        if (!excludeKeys.includes(key)) {
-          tempColumns.push({
-            name: key,
-            label: snakeToTitleCase(key),
-            options: {
-              filter: false,
-              sort: false,
-              align: "center",
-              customHeadLabelRender: customColumnHead,
-            },
-          });
-          tempSelected.push(key);
-        }
-      });
-    }
-    setColumns(tempColumns);
-    setSelectedColumns(tempSelected);
-    // console.log(tempSelected,"tempSelected",tempColumns)
-    // if (dataitemsList?.length > 0 && dataitemsList[0]) {
-
-    // let colList = [];
-    //         colList.push(...Object.keys(dataitemsList?.[0])?.filter(el => !excludeKeys.includes(el)));
-    //         const cols = colList.map((col) => {
-    //             return {
-    //                 name: col,
-    //                 label: snakeToTitleCase(col),
-    //                 options: {
-    //                     filter: false,
-    //                     sort: false,
-    //                     align: "center",
-    //                     customHeadLabelRender: customColumnHead,
-    //                 }
-    //             }
-    //         });
-            
-    //         setColumns(cols);
-    //         setSelectedColumns(colList);
-            
-          
-    //       }else {
-    //         setDataitems([]);
-    //     }
-     
-     }, [dataitemsList])
-   
+ 
 
   useEffect(() => {
     getDataitems();

@@ -90,7 +90,7 @@ const ProfilePage = () => {
         {loading && <Spinner />}
         {renderSnackBar()}
           {userDetails && (
-            <><Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
+            <><Grid item xs={12} sm={12} md={4} lg={4} xl={4} sx={{ p: 2 }}>
               <Card sx={{ borderRadius: "5px", mb:2 }}>
                   <CardContent>
                     <Avatar
@@ -150,7 +150,7 @@ const ProfilePage = () => {
                 </Card>
              } 
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
+            <Grid item xs={12} sm={12} md={8} lg={8} xl={8} sx={{ p: 2 }}>
               <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 }}>
                 <CardContent>
                   <Typography variant="h4" sx={{mb: 1}}>{userDetails.organization.title}</Typography>
