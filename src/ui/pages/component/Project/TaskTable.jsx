@@ -141,6 +141,7 @@ const TaskTable = (props) => {
                 message: resp?.message,
                 variant: "success",
             })
+            getTaskListData()
             setTimeout(() => {
                 //window.location.reload();
             }, 1000);
@@ -245,7 +246,6 @@ const TaskTable = (props) => {
     useEffect(() => {
         if (taskList?.length > 0 && taskList[0]?.data) {
             const data = taskList.map((el) => {
-                console.log(taskList,"taskListtaskList")
                 const email =  props.type === "review"? el.user_mail
                 : ""
                 let row = [
