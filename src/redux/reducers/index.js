@@ -77,6 +77,7 @@ import getAllTasksdata from './Tasks/GetAllTasks';
 import glossarysentence from './Glossary/GlossarySentence';
 import getDomains from "./Glossary/GetDomain";
 import getProjectTypeDetails from "./ProjectDetails/GetProjectTypeDetails";
+import getTaskAnalyticsData from "./Progress/TaskAnalytics";
 
 
 const index = {
@@ -161,7 +162,8 @@ const index = {
     getAllTasksdata,
     glossarysentence,
     getDomains,
-    getProjectTypeDetails
+    getProjectTypeDetails,
+    getTaskAnalyticsData,
    
     
 };

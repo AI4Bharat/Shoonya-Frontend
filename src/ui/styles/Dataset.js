@@ -263,6 +263,30 @@ const DatasetStyle = makeStyles({
     padding: "20px 40px 20px 40px",
     justifyContent: "center", justifyItems: "center"
   },
+  
+  heading: {
+    textAlign: "center",
+    marginBottom: "35px",
+    color: "#3A3A3A",
+    fontSize: "2.5rem",
+    fontWeight: 400,
+  },
+  topBar: {
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: "#DEECFF",
+    fontSize: "18px",
+  },
+
+  topBarInnerBox: {
+    width: "25%",
+    display: "flex",
+    flexDirection: "column",
+    textAlign: "center",
+    boxShadow: "3px 0 2px -2px #00000029",
+  },
+  toolTip: {
+    width: "200px", height: "180px", fontSize:"16px", backgroundColor: "white", color: "black", padding: "5px 10px 10px 10px", border: "1px solid gray"  }
 })
 
 export default DatasetStyle
