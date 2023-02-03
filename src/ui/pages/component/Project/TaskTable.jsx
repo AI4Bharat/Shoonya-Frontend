@@ -381,7 +381,9 @@ const TaskTable = (props) => {
         return (
             <Box className={classes.filterToolbarContainer}
                 sx={{ height: "80px" }}>
-                {(props.type === "annotation" || props.type === "review") && ((props.type === "annotation" && selectedFilters.annotation_status === "labeled") || selectedFilters.review_status === "accepted" || selectedFilters.accepted_with_changes === "accepted_with_changes") &&
+                    {props.ProjectDetails.project_type === "ContextualTranslationEditing" && (
+                    <>
+                    {(props.type === "annotation" || props.type === "review") && ((props.type === "annotation" && selectedFilters.annotation_status === "labeled") || selectedFilters.review_status === "accepted" || selectedFilters.accepted_with_changes === "accepted_with_changes") &&
                     <Grid container
                         justifyContent='start'
                         alignItems='center'>
@@ -426,6 +428,8 @@ const TaskTable = (props) => {
                     </Grid>
 
                 }
+                    </>
+               )}
 
                 {props.type === "annotation" && userDetails?.role !== 1 && !getProjectUsers?.some((annotator) => annotator.id === userDetails?.id) && <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
                     <InputLabel id="annotator-filter-label" sx={{ fontSize: "16px", position: "inherit", top: "23px", left: "-20px" }}>Filter by Annotator</InputLabel>
@@ -595,9 +599,9 @@ const TaskTable = (props) => {
                                 disabled={pullDisabled}
                                 sx={{ fontSize: "16px" }}
                             >
-                                <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch * 0.5}>{ProjectDetails?.tasks_pull_count_per_batch * 0.5}</MenuItem>
+                                <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch * 0.5}>{Math.round(ProjectDetails?.tasks_pull_count_per_batch * 0.5)}</MenuItem>
                                 <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch}>{ProjectDetails?.tasks_pull_count_per_batch}</MenuItem>
-                                <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch * 1.5}>{ProjectDetails?.tasks_pull_count_per_batch * 1.5}</MenuItem>
+                                <MenuItem value={ProjectDetails?.tasks_pull_count_per_batch * 1.5}>{Math.round(ProjectDetails?.tasks_pull_count_per_batch * 1.5)}</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>
