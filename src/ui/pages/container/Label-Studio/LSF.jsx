@@ -492,7 +492,7 @@ const LabelStudioWrapper = ({ annotationNotesRef, loader, showLoader, hideLoader
             </Tooltip>}
           </Grid>
           <Grid item>
-            {localStorage.getItem("labelAll") === "true" ? (
+            {/* {localStorage.getItem("labelAll") === "true" ? ( */}
               <Tooltip title="Go to next task">
                 <Button
                   value="Next"
@@ -504,9 +504,9 @@ const LabelStudioWrapper = ({ annotationNotesRef, loader, showLoader, hideLoader
                   Next
                 </Button>
               </Tooltip>
-            ) : (
+            {/* ) : (
               <div style={{ minWidth: "160px" }} />
-            )}
+            )} */}
           </Grid>
         </Grid>
       </div>}
