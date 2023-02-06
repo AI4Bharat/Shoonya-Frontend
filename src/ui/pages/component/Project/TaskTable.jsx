@@ -96,7 +96,7 @@ const TaskTable = (props) => {
     }
 
     const fetchNewTasks = async () => {
-        const batchObj = props.type === "annotation" ? new PullNewBatchAPI(id, pullSize) : new PullNewReviewBatchAPI(id, pullSize);
+        const batchObj = props.type === "annotation" ? new PullNewBatchAPI(id, Math.round(pullSize)) : new PullNewReviewBatchAPI(id, Math.round(pullSize));
         const res = await fetch(batchObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(batchObj.getBody()),
