@@ -381,7 +381,7 @@ const TaskTable = (props) => {
         return (
             <Box className={classes.filterToolbarContainer}
                 sx={{ height: "80px" }}>
-                    {props.ProjectDetails.project_type === "ContextualTranslationEditing" && (
+                    {props.ProjectDetails?.project_type === "ContextualTranslationEditing" && (
                     <>
                     {(props.type === "annotation" || props.type === "review") && ((props.type === "annotation" && selectedFilters.annotation_status === "labeled") || selectedFilters.review_status === "accepted" || selectedFilters.accepted_with_changes === "accepted_with_changes") &&
                     <Grid container
