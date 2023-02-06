@@ -82,27 +82,27 @@ function DownloadProjectButton(props) {
     SetTask([])
     const projectObj = new DownloadJSONProjectAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    setLoading(false);
-    if (res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: "success",
-        variant: "success",
-      })
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: "success",
+    //     variant: "success",
+    //   })
 
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      })
-    }
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   })
+    // }
    
   };
   const handleClose = () => {
@@ -111,57 +111,59 @@ function DownloadProjectButton(props) {
 
   const handleDownloadCSVProject = async () => {
     SetTask([])
+    setLoading(true)
     const projectObj = new DownloadProjectCsvAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    setLoading(false);
-    if (res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: "success",
-        variant: "success",
-      })
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: "success",
+    //     variant: "success",
+    //   })
 
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      })
-    }
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   })
+    // }
    
   };
 
   const handleDownloadTSVProject = async () => {
     SetTask([])
+    setLoading(true)
     const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    setLoading(false);
-    if (res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: "success",
-        variant: "success",
-      })
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: "success",
+    //     variant: "success",
+    //   })
 
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      })
-    }
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   })
+    // }
     
   };
  

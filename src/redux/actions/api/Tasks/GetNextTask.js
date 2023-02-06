@@ -6,18 +6,23 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class GetNextTaskAPI extends API {
-  constructor(projectId, taskId, mode="annotation", timeout = 2000) {
+  constructor(projectId,projectObj, mode="annotation", timeout = 2000) {
+
+    console.log(projectObj,"projectObjprojectObj")
     super("POST", timeout, false);
+    let queryStr = "";
     this.projectId = projectId;
     this.labellingMode = localStorage.getItem("labellingMode");
     this.searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
+    this.projectObj = projectObj;
     this.type = constants.GET_NEXT_TASK;
-    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/next/?${taskId ? 'current_task_id=' + taskId : ''}${this.labellingMode ? '&task_status=' + this.labellingMode : ''}${mode === "review" ? '&mode=review' : ''}`;
-    if (localStorage.getItem("labelAll")) {
-      Object.keys(this.searchFilters).forEach(key => {
-        this.endpoint += `&${key}=${this.searchFilters[key]}`;
+    if (localStorage.getItem("labelAll") ) {
+      Object.keys(this.searchFilters).forEach((key,index) => {
+        let keyValStr = `${key}=${this.searchFilters[key]}`;
+        queryStr += index === 0 ? keyValStr : `&${keyValStr}`;
       });
     }
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/next/?${queryStr}`;
   }
 
   processResponse(res) {
@@ -32,7 +37,7 @@ export default class GetNextTaskAPI extends API {
   }
 
   getBody() {
-    return { id: this.projectId };
+    return this.projectObj;
   }
 
   getHeaders() {
