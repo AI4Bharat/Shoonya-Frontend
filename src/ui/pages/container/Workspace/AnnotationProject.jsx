@@ -54,7 +54,6 @@ const AnnotationProject = (props) => {
   const DataItems = useSelector((state) => state.getDataitemsById.data);
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
 
-
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
   const [datasetTypes, setDatasetTypes] = useState(null);
@@ -84,6 +83,7 @@ const AnnotationProject = (props) => {
     []
   );
   const [taskReviews, setTaskReviews] = useState(false)
+  const [variable_Parameters_lang, setVariable_Parameters_lang] = useState("")
 
   //Table related state variables
   const [columns, setColumns] = useState(null);
@@ -282,7 +282,7 @@ const AnnotationProject = (props) => {
       setColumnFields(tempColumnFields);
     }
   }, [ProjectDomains]);
-
+ 
   useEffect(() => {
     let tempInstanceIds = {};
     for (const instance in DatasetInstances) {
@@ -300,13 +300,13 @@ const AnnotationProject = (props) => {
           temp.push({
             name: element,
             data: DatasetFields[element],
-            value: "",
+            value: variable_Parameters_lang,
           });
         }
       );
       setSelectedVariableParameters(temp);
     }
-  }, [DatasetFields]);
+  }, [DatasetFields,variable_Parameters_lang]);
 
   useEffect(() => {
     if (LanguageChoices && LanguageChoices.length > 0) {
@@ -352,7 +352,7 @@ const AnnotationProject = (props) => {
     setSelectedType("");
     setSamplingParameters(null);
     setConfirmed(false);
-    if (selectedDomain === "Translation" || selectedDomain === "Conversation" ||selectedDomain === "Monolingual") {
+    if (selectedDomain === "Translation" || selectedDomain === "Conversation" ||selectedDomain === "Monolingual"||selectedDomain === "Audio") {
       const langChoicesObj = new GetLanguageChoicesAPI();
       dispatch(APITransport(langChoicesObj));
     }
@@ -449,13 +449,13 @@ const AnnotationProject = (props) => {
 }
 
   useEffect(() => {
-    if (selectedInstances && datasetTypes) {
+    if (selectedInstances && datasetTypes ) {
       getDataItems();
     }
   }, [currentPageNumber, currentRowPerPage]);
 
   const getDataItems = () => {
-    const dataObj = new GetDataitemsByIdAPI(selectedInstances, currentPageNumber, currentRowPerPage, datasetTypes[selectedType]);
+    const dataObj = new GetDataitemsByIdAPI(selectedInstances,  datasetTypes[selectedType],selectedFilters,currentPageNumber,currentRowPerPage);
     dispatch(APITransport(dataObj));
     
   };
@@ -479,13 +479,14 @@ const AnnotationProject = (props) => {
     return temp;
   };
 
+
+
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
-
-    
+  
 
 
     const newProject = {
@@ -647,6 +648,29 @@ const AnnotationProject = (props) => {
               </>
             )}
 
+        {selectedType && variableParameters?.[selectedType]?.variable_parameters !== undefined &&
+        <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                  Variable Parameters:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                <OutlinedTextField
+                  fullWidth
+                  value={variable_Parameters_lang}
+                  onChange={(e) => setVariable_Parameters_lang(e.target.value)}
+                />
+                </Grid>
+                </>
+        }
             {(selectedDomain === "Translation" || selectedDomain === "Conversation") && (selectedType === "TranslationEditing" || selectedType === "SemanticTextualSimilarity" || selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation" || selectedType === "ConversationTranslationEditing") &&
               <>
                 <Grid
@@ -692,7 +716,7 @@ const AnnotationProject = (props) => {
               </>
             }
 
-            {(selectedDomain === "Monolingual" || selectedDomain === "Translation") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation") &&
+            {(selectedDomain === "Monolingual" || selectedDomain === "Translation"||selectedDomain === "Audio") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation"||selectedType==="SingleSpeakerAudioTranscriptionEditing") &&
               <><Grid
                 className={classes.projectsettingGrid}
                 xs={12}
@@ -701,8 +725,9 @@ const AnnotationProject = (props) => {
                 lg={12}
                 xl={12}
               >
+                  
                 <Typography gutterBottom component="div">
-                  Target Language:
+                 {selectedType==="SingleSpeakerAudioTranscriptionEditing"?  "Language:" :"Target Language:"}
                 </Typography>
               </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>

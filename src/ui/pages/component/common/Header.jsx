@@ -124,6 +124,15 @@ const Header = () => {
     }
   };
 
+  const handleTagsChange = (event) => {
+    if (event.target.checked) {
+      localStorage.setItem("enableTags", true);
+    } else {
+      localStorage.setItem("enableTags", false);
+    }
+  }
+
+
  
   const renderTabs = () => {
     if (loggedInUserData?.role === 1) {
@@ -451,6 +460,16 @@ const Header = () => {
         />
       ),
     },
+    {
+      name: "Enable Tags Dropdown",
+      control: (
+        <Checkbox
+          onChange={handleTagsChange}
+          defaultChecked={localStorage.getItem("enableTags") === "true"}
+        />
+      ),
+    },
+
     // {
     //   name: "Help",
     //   onclick: () => {},
