@@ -16,7 +16,6 @@ const ProjectCardList = (props) => {
   const filterId = popoverOpen ? "simple-popover" : undefined;
 
 
-console.log(selectedFilters,"selectedFiltersselectedFilters")
   const SearchProject = useSelector((state) => state.SearchProjectCards.data);
 
   const handleShowFilter = (event) => {
@@ -180,7 +179,7 @@ console.log(selectedFilters,"selectedFiltersselectedFilters")
 
   return (
     <>
-      <ThemeProvider theme={tableTheme}>
+      <ThemeProvider theme={tableTheme} sx={{mt:4}}>
         <MUIDataTable
           title={""}
           data={data}

@@ -116,7 +116,9 @@ console.log(selectedFilters.project_type,"selectedTypeselectedType")
               setsSelectedFilters={setsSelectedFilters} 
             />
           ) : (
-            <ProjectCard projectData={projectData} />
+            <ProjectCard projectData={projectData}
+             selectedFilters={selectedFilters} 
+            setsSelectedFilters={setsSelectedFilters}  />
           )}
         </Box>
       </Box>
