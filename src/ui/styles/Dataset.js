@@ -59,7 +59,7 @@ const DatasetStyle = makeStyles({
     padding: "18px",
     // marginTop: "20px",
     // width: "600px",
-    maxHeight: "270px",
+    maxHeight: "400px",
     overflow: "auto",
     display: "flex",
     flexDirection: "column",

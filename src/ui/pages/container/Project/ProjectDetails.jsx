@@ -262,7 +262,7 @@ const Projects = () => {
 
                     </Grid>
                     {isAnnotators && <TabPanel value={value} index={0} >
-                        <TaskTable type="annotation" />
+                        <TaskTable type="annotation"  ProjectDetails={ProjectDetails}/>
                     </TabPanel>}
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
                         <TaskTable type="review" />
