@@ -359,8 +359,8 @@ const TaskTable = (props) => {
   useEffect(() => {
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
-        const email = props.type === "review" ? el.user_mail : "";
-        let row = [el.id, ...(!!email ? [el.user_mail] : [])];
+        const email = props.type === "review" ? el.annotator_mail : "";
+        let row = [el.id, ...(!!email ? [el.annotator_mail] : [])];
         row.push(
           ...Object.keys(el.data)
             .filter((key) => !excludeCols.includes(key))
