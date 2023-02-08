@@ -47,7 +47,7 @@ const filterAnnotations = (annotations, user_id) => {
   let flag = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
-    return annotation.completed_by === user_id && annotation.parent_annotation;
+    return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "labeled") {
