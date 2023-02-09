@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Grid, ThemeProvider, Box, Typography, Paper } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import DatasetStyle from "../../../styles/Dataset";
+import DatasetStyle from "../../../../styles/Dataset";
 import React, { PureComponent } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, Label } from "recharts";
+import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
+
 
 function ContextualTranslationEditing(props) {
   const classes = DatasetStyle();
@@ -135,6 +137,7 @@ function ContextualTranslationEditing(props) {
             </Box>
           </Box>
           <Grid>
+          <ResponsiveChartContainer>
             <BarChart
               width={1100}
               height={600}
@@ -211,6 +214,7 @@ function ContextualTranslationEditing(props) {
                 
               />
             </BarChart>
+            </ResponsiveChartContainer>
           </Grid>
         </Paper>
       </Box>

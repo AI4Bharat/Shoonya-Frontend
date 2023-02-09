@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Grid, ThemeProvider, Box, Typography, Paper } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import DatasetStyle from "../../../styles/Dataset";
+import DatasetStyle from "../../../../styles/Dataset";
 import React, { PureComponent } from "react";
 import {
   BarChart,
@@ -15,6 +15,8 @@ import {
   ResponsiveContainer,
   Label,
 } from "recharts";
+import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
+
 
 function SingleSpeakerAudioTranscriptionEditing(props) {
   const classes = DatasetStyle();
@@ -144,6 +146,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
             </Box>
           </Box>
           <Grid>
+          <ResponsiveChartContainer>
             <BarChart
               width={1100}
               height={600}
@@ -219,6 +222,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
                 fill="rgba(243, 156, 18 )"
               />
             </BarChart>
+            </ResponsiveChartContainer>
           </Grid>
         </Paper>
       </Box>
