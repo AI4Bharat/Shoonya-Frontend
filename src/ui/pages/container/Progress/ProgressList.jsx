@@ -1,7 +1,10 @@
 import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
 import React from 'react'
 import { useState } from 'react'
-import ProgressAnalytics from '../../component/Tabs/ProgressAnalytics';
+import ProgressAnalytics from './ProgressAnalytics';
+import TaskAnalytics from "./TaskAnalytics/TaskAnalytics";
+import MetaAnalytics from "./MetaAnalytics/MetaAnalytics";
+import {useSelector} from "react-redux";
 
 
 
@@ -30,31 +33,27 @@ const ProgressList = () => {
     const handleTabChange = (e, v) => {
         setTabValue(v)
     }
+    const loggedInUserData = useSelector(
+        (state) => state.fetchLoggedInUserData.data
+      );
     return (
       
         < >
-              {/* <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        sx={{mb:3,}}
-                    >
-                        <Typography variant="h3" gutterBottom component="div"sx={{fontWeight: '1.6875rem'}}>
-                           
-                        </Typography>
-                    </Grid> */}
             <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
-                    <Tab label="Progress Analytics " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                   
+                    <Tab label="Task Analytics " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="Meta Analytics " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="Advance Analytics " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />  
                 </Tabs>
             </Box>
-            {/* <Divider/> */}
-            <Box sx={{ p: 1 }}>
+            <Box sx={{ p: 1}}>
                 <TabPanel value={tabValue} index={0}>
+                <TaskAnalytics loggedInUserData ={loggedInUserData} />  
+                </TabPanel> 
+                <TabPanel value={tabValue} index={1}>
+                <MetaAnalytics loggedInUserData ={loggedInUserData} />  
+                </TabPanel>  
+                <TabPanel value={tabValue} index={2}>
                 <ProgressAnalytics />  
                 </TabPanel>   
             </Box>
