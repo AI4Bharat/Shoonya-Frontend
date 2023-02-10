@@ -100,10 +100,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
             Count of Annotated and Reviewed Audio Transcription
           </Typography>
         </Typography>
-        <Typography variant="body" sx={{fontSize:"17px"}}>
-          Note : Quality sentence pairs are generated after a pipeline of
-          Annotated & Reviewed tasks.
-        </Typography>
+       
         <Paper>
           <Box className={classes.topBar}>
             <Box className={classes.topBarInnerBox}>
@@ -128,7 +125,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Sentence Pairs
+              Total Audio Files Annotated
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -137,7 +134,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Quality/Reviewed Sentence Pairs
+              Total quality/ reviewed audio files
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewTasksCount &&
