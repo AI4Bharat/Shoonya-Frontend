@@ -13,7 +13,7 @@ import themeDefault from "../../../../theme/theme";
 export default function MetaAnalytics(props) {
     const dispatch = useDispatch();
     const {loggedInUserData} = props
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const apiLoading = useSelector((state) => state.apiStatus.loading);
     const metaAnalyticsData = useSelector(
         (state) => state.getMetaAnalyticsData.data
@@ -29,8 +29,11 @@ export default function MetaAnalytics(props) {
       }, []);
 
       useEffect(() => {
-        setLoading(apiLoading);
-      }, [apiLoading]);
+        if(metaAnalyticsData.length > 0){
+          setLoading(false);
+
+        }
+      }, [metaAnalyticsData]);
   return (
     <div>
         {loading && <Spinner />}

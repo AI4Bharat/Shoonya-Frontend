@@ -14,7 +14,7 @@ import Spinner from "../../../component/common/Spinner";
 const Shoonya = (props) => {
   const dispatch = useDispatch();
 const {loggedInUserData} = props
-const [loading, setLoading] = useState(false);
+const [loading, setLoading] = useState(true);
 const apiLoading = useSelector((state) => state.apiStatus.loading);
   const taskAnalyticsData = useSelector(
     (state) => state.getTaskAnalyticsData.data
@@ -32,8 +32,10 @@ const apiLoading = useSelector((state) => state.apiStatus.loading);
   }, []);
 
   useEffect(() => {
-    setLoading(apiLoading);
-  }, [apiLoading]);
+    if(taskAnalyticsData.length > 0){
+      setLoading(false);
+    }
+  }, [taskAnalyticsData]);
 
   return (
     <>
