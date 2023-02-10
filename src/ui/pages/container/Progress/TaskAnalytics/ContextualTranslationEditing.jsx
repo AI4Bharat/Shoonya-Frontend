@@ -90,7 +90,6 @@ function ContextualTranslationEditing(props) {
             Count of Annotated and Reviewed Translation Tasks
           </Typography>
         </Typography>
-
         <Typography variant="body" sx={{fontSize:"17px"}}>
           Note : Quality sentence pairs are generated after a pipeline of
           Annotated & Reviewed tasks.

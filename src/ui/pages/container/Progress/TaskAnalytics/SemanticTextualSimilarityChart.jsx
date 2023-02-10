@@ -101,11 +101,6 @@ function SemanticTextualSimilarityChart(props) {
             Count of Annotated and Reviewed Translation Rating
           </Typography>
         </Typography>
-
-        <Typography variant="body" sx={{fontSize:"17px"}}>
-          Note : Quality sentence pairs are generated after a pipeline of
-          Annotated & Reviewed tasks.
-        </Typography>
         <Paper>
           <Box className={classes.topBar}>
             <Box className={classes.topBarInnerBox}>
