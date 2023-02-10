@@ -50,6 +50,7 @@ const filterAnnotations = (annotations, user_id) => {
     return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
   if (userAnnotation) {
+    filteredAnnotations = [userAnnotation];
     if (userAnnotation.annotation_status === "labeled") {
       let review = annotations.find(
         (annotation) => annotation.parent_annotation === userAnnotation.id
@@ -65,10 +66,6 @@ const filterAnnotations = (annotations, user_id) => {
           filteredAnnotations = [review];
           flag = true;
         }
-        else
-          filteredAnnotations = [userAnnotation];
-      } else {
-        filteredAnnotations = [userAnnotation];
       }
     }
   }
