@@ -50,6 +50,7 @@ const filterAnnotations = (annotations, user_id) => {
     return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
   if (userAnnotation) {
+    filteredAnnotations = [userAnnotation];
     if (userAnnotation.annotation_status === "labeled") {
       let review = annotations.find(
         (annotation) => annotation.parent_annotation === userAnnotation.id
@@ -65,10 +66,6 @@ const filterAnnotations = (annotations, user_id) => {
           filteredAnnotations = [review];
           flag = true;
         }
-        else
-          filteredAnnotations = [userAnnotation];
-      } else {
-        filteredAnnotations = [userAnnotation];
       }
     }
   }
@@ -103,6 +100,7 @@ const LabelStudioWrapper = ({
   });
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
+  const [isAccepted, setIsAccepted] = useState(false);
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
 
@@ -167,12 +165,14 @@ const LabelStudioWrapper = ({
     annotations,
     predictions,
     annotationNotesRef,
-    projectType
+    projectType,
+    setIsAccepted,
   ) {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
     const [filteredAnnotations, isAccepted] = filterAnnotations(annotations, userData.id);
+    setIsAccepted(isAccepted);
     console.log("labelConfig", labelConfig);
 
     if (taskData.task_status === "freezed") {
@@ -180,8 +180,8 @@ const LabelStudioWrapper = ({
         "panel",
         // "update",
         // "submit",
-        ...(!isAccepted && ["skip"]),
-        "controls",
+        "skip",
+        ...(!isAccepted && ["controls"]),
         "infobar",
         "topbar",
         "instruction",
@@ -206,7 +206,7 @@ const LabelStudioWrapper = ({
         "update",
         "submit",
         "skip",
-        ...(taskData?.annotation_users?.some((user) => user === userData.id)
+        ...(taskData?.annotation_users?.some((user) => user === userData.id && !isAccepted)
           ? ["controls"]
           : []),
         "infobar",
@@ -418,7 +418,8 @@ const LabelStudioWrapper = ({
               annotations,
               predictions,
               annotationNotesRef,
-              labelConfig.project_type
+              labelConfig.project_type,
+              setIsAccepted,
             );
             hideLoader();
           }
@@ -579,6 +580,9 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
+      {!loader && isAccepted && <Alert severity="success" sx={{mb: 3}}>
+            This annotation has already been accepted by the reviewer.
+          </Alert>}
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -590,7 +594,7 @@ const LabelStudioWrapper = ({
             <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
-              ) && (
+              ) && !isAccepted && (
                 <Tooltip title="Save task for later">
                   <Button
                     value="Draft"
