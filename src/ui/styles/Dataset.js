@@ -293,7 +293,13 @@ const DatasetStyle = makeStyles({
     width: "280px", height: "220px", fontSize: "16px", backgroundColor: "white", color: "black", padding: "5px 10px 10px 10px", border: "1px solid gray"
   },
 
-
+  textTransliteration:{
+    borderRadius: "3px",
+            height: "58px",
+            padding: "15px 0px 0px 10px",
+            resize: "none",
+            margin: "10px", width: "200px",fontSize:"16px"
+  }
 
 })
 
