@@ -17,7 +17,6 @@ const Transliteration = (props) => {
   const [text, setText] = useState();
   const [languageList, setLanguageList] = useState([{DisplayName:"data"}]);
   const [selectedLang, setSelectedLang] = useState("");
-  console.log(selectedLang,"selectedLang",languageList)
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -32,7 +31,7 @@ const Transliteration = (props) => {
   let searchFilters = JSON.parse(localStorage.getItem("TaskData"));
 
   var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
-console.log(data,"data")
+
   useEffect(() => {
     if(params.taskId ){
       setText(searchFilters.data.machine_translation)

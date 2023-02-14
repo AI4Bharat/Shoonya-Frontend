@@ -9,6 +9,9 @@ import {
   TextField,
   Box,
   Grid,
+  Typography,
+  Popover,
+  IconButton,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -36,6 +39,38 @@ import "./lsf.css";
 import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import Glossary from "../Glossary/Glossary";
+import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
+import getCaretCoordinates from "textarea-caret";
+import CloseIcon from "@mui/icons-material/Close";
+
+const filterAnnotations = (annotations, user_id) => {
+  let flag = false;
+  let filteredAnnotations = annotations;
+  let userAnnotation = annotations.find((annotation) => {
+    return annotation.completed_by === user_id && !annotation.parent_annotation;
+  });
+  if (userAnnotation) {
+    filteredAnnotations = [userAnnotation];
+    if (userAnnotation.annotation_status === "labeled") {
+      let review = annotations.find(
+        (annotation) => annotation.parent_annotation === userAnnotation.id
+      );
+      if (review) {
+        if (
+          [
+            "accepted",
+            "accepted_with_minor_changes",
+            "accepted_with_major_changes",
+          ].includes(review.annotation_status)
+        ){
+          filteredAnnotations = [review];
+          flag = true;
+        }
+      }
+    }
+  }
+  return [filteredAnnotations, flag];
+};
 
 //used just in postAnnotation to support draft status update.
 
@@ -68,8 +103,13 @@ const LabelStudioWrapper = ({
   });
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
+  const [isAccepted, setIsAccepted] = useState(false);
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
+
+  const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
+    useState(null);
+  const [tagSuggestionList, setTagSuggestionList] = useState();
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -128,11 +168,15 @@ const LabelStudioWrapper = ({
     annotations,
     predictions,
     annotationNotesRef,
-    projectType
+    projectType,
+    setIsAccepted,
   ) {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
+    const [filteredAnnotations, isAccepted] = filterAnnotations(annotations, userData.id);
+    setIsAccepted(isAccepted);
+    console.log("labelConfig", labelConfig);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -140,7 +184,7 @@ const LabelStudioWrapper = ({
         // "update",
         // "submit",
         "skip",
-        "controls",
+        ...(!isAccepted && ["controls"]),
         "infobar",
         "topbar",
         "instruction",
@@ -152,7 +196,7 @@ const LabelStudioWrapper = ({
         "annotations:menu",
         "annotations:current",
         // "annotations:add-new",
-        "annotations:delete",
+        // "annotations:delete",
         // "annotations:view-all",
         "predictions:tabs",
         "predictions:menu",
@@ -165,7 +209,7 @@ const LabelStudioWrapper = ({
         "update",
         "submit",
         "skip",
-        ...(taskData?.annotation_users?.some((user) => user === userData.id)
+        ...(taskData?.annotation_users?.some((user) => user === userData.id && !isAccepted)
           ? ["controls"]
           : []),
         "infobar",
@@ -179,7 +223,7 @@ const LabelStudioWrapper = ({
         "annotations:menu",
         "annotations:current",
         // "annotations:add-new",
-        "annotations:delete",
+        // "annotations:delete",
         // "annotations:view-all",
         "predictions:tabs",
         "predictions:menu",
@@ -205,7 +249,7 @@ const LabelStudioWrapper = ({
         },
 
         task: {
-          annotations: annotations,
+          annotations: filteredAnnotations,
           predictions: predictions,
           id: taskData.id,
           data: taskData.data,
@@ -319,7 +363,7 @@ const LabelStudioWrapper = ({
                       });
                     else {
                       hideLoader();
-                      // window.location.reload();
+                      window.location.reload();
                     }
                   }
                 });
@@ -387,13 +431,131 @@ const LabelStudioWrapper = ({
               annotations,
               predictions,
               annotationNotesRef,
-              labelConfig.project_type
+              labelConfig.project_type,
+              setIsAccepted,
             );
             hideLoader();
           }
         );
       }
     }
+
+    // Traversing and tab formatting --------------------------- start
+    const outputTextareaHTMLEleArr =
+      document.getElementsByName("transcribed_json");
+    if (outputTextareaHTMLEleArr.length > 0) {
+      const targetElement = outputTextareaHTMLEleArr[0];
+      if (targetElement) {
+        targetElement.oninput = function (e) {
+          let textAreaInnerText = e.target.value;
+
+          // console.log("e ---------------------- ", e.currentTarget);
+
+          let lastInputChar =
+            textAreaInnerText[targetElement.selectionStart - 1];
+          if (
+            lastInputChar === "\\" &&
+            localStorage.getItem("enableTags") === "true"
+          ) {
+            let indexOfLastSpace =
+              textAreaInnerText.lastIndexOf(
+                " ",
+                targetElement.selectionStart - 1
+              ) <
+              textAreaInnerText.lastIndexOf(
+                "\n",
+                targetElement.selectionStart - 1
+              )
+                ? textAreaInnerText.lastIndexOf(
+                    "\n",
+                    targetElement.selectionStart - 1
+                  )
+                : textAreaInnerText.lastIndexOf(
+                    " ",
+                    targetElement.selectionStart - 1
+                  );
+
+            let currentSelectionRangeStart = indexOfLastSpace + 1;
+            let currentSelectionRangeEnd = targetElement.selectionStart - 1;
+
+            let currentTargetWord = textAreaInnerText.slice(
+              currentSelectionRangeStart,
+              currentSelectionRangeEnd
+            );
+            let filteredSuggestionByInput = TabsSuggestionData.filter((el) =>
+              el.toLowerCase().includes(currentTargetWord.toLowerCase())
+            );
+            if (
+              filteredSuggestionByInput &&
+              filteredSuggestionByInput.length > 0
+            ) {
+              const suggestionTagsContainer = (
+                <Grid width={150}>
+                  <Grid
+                    position="fixed"
+                    backgroundColor="#ffffff"
+                    width="inherit"
+                    textAlign={"end"}
+                  >
+                    <Tooltip title="close suggestions">
+                      <IconButton
+                        onClick={() => {
+                          setShowTagSuggestionsAnchorEl(null);
+                          targetElement.focus();
+                        }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    sx={{
+                      width: "max-content",
+                      maxHeight: 250,
+                      padding: 1,
+                    }}
+                  >
+                    {filteredSuggestionByInput?.map((suggestion, index) => {
+                      return (
+                        <Typography
+                          onClick={() => {
+                            let modifiedValue = textAreaInnerText.replace(
+                              currentTargetWord + "\\",
+                              `[${suggestion}]`
+                            );
+                            targetElement.value = modifiedValue;
+                            setShowTagSuggestionsAnchorEl(null);
+                          }}
+                          variant="body2"
+                          sx={{
+                            backgroundColor: "#ffffff",
+                            color: "#000",
+                            padding: 2,
+                            paddingTop: index === 0 ? 6 : 2,
+                            "&:hover": {
+                              color: "white",
+                              backgroundColor: "#1890ff",
+                            },
+                          }}
+                        >
+                          {suggestion}
+                        </Typography>
+                      );
+                    })}
+                  </Grid>
+                </Grid>
+              );
+              setShowTagSuggestionsAnchorEl(e.currentTarget);
+              setTagSuggestionList(suggestionTagsContainer);
+            }
+          } else {
+            setShowTagSuggestionsAnchorEl(false);
+          }
+        };
+      }
+    }
+
+    // Traversing and tab formatting --------------------------- end
   }, [labelConfig, userData, annotationNotesRef, taskId, ProjectDetails]);
 
   useEffect(() => {
@@ -439,6 +601,9 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
+      {!loader && isAccepted && <Alert severity="success" sx={{mb: 3}}>
+            This annotation has already been accepted by the reviewer.
+          </Alert>}
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -450,7 +615,7 @@ const LabelStudioWrapper = ({
             <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
-              ) && (
+              ) && !isAccepted && (
                 <Tooltip title="Save task for later">
                   <Button
                     value="Draft"
@@ -472,34 +637,49 @@ const LabelStudioWrapper = ({
               )}
             </Grid>
             <Grid item>
-              {localStorage.getItem("labelAll") === "true" ? (
-                <Tooltip title="Go to next task">
-                  <Button
-                    value="Next"
-                    type="default"
-                    onClick={onNextAnnotation}
-                    style={{
-                      minWidth: "160px",
-                      border: "1px solid #e6e6e6",
-                      color: "#09f",
-                      pt: 3,
-                      pb: 3,
-                      borderBottom: "None",
-                    }}
-                    className="lsf-button"
-                  >
-                    Next
-                  </Button>
-                </Tooltip>
-              ) : (
-                <div style={{ minWidth: "160px" }} />
-              )}
+              {/* {localStorage.getItem("labelAll") === "true" ? ( */}
+              <Tooltip title="Go to next task">
+                <Button
+                  value="Next"
+                  type="default"
+                  onClick={onNextAnnotation}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Next
+                </Button>
+              </Tooltip>
+              {/* ) : (
+              <div style={{ minWidth: "160px" }} />
+            )} */}
             </Grid>
           </Grid>
         </div>
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
         <div className="label-studio-root" ref={rootRef}></div>
+        <Popover
+          id={"'simple-popover'"}
+          open={Boolean(showTagSuggestionsAnchorEl)}
+          anchorEl={showTagSuggestionsAnchorEl}
+          onClose={() => {
+            setShowTagSuggestionsAnchorEl(null);
+            setTagSuggestionList(null);
+          }}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          {tagSuggestionList}
+        </Popover>
       </Box>
 
       {loader}

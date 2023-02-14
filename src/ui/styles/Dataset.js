@@ -59,7 +59,7 @@ const DatasetStyle = makeStyles({
     padding: "18px",
     // marginTop: "20px",
     // width: "600px",
-    maxHeight: "270px",
+    maxHeight: "400px",
     overflow: "auto",
     display: "flex",
     flexDirection: "column",
@@ -180,16 +180,16 @@ const DatasetStyle = makeStyles({
     width: "300px",
     //textAlign: "left",
     //justifyContent:"center"
-   //float: "right",
-    marginBottom:"10px",
-  //   position: "absolute",
-  //  Right: "200px",
-  //  top:"155px",
-  
+    //float: "right",
+    marginBottom: "10px",
+    //   position: "absolute",
+    //  Right: "200px",
+    //  top:"155px",
+
   },
   searchIcon: {
     // padding: theme.spacing(0, 2),
-   // height: "100%",
+    // height: "100%",
     position: "absolute",
     pointerEvents: "none",
     display: "flex",
@@ -197,35 +197,35 @@ const DatasetStyle = makeStyles({
     justifyContent: "center",
     color: "#00000029",
     marginLeft: "10px",
-    marginTop:"10px",
+    marginTop: "10px",
   },
   divider: {
     borderLeft: "1px solid #E0E0E0",
     height: "200px",
     position: "absolute",
   },
-  rootdiv:{
-    marginTop:"25px",
+  rootdiv: {
+    marginTop: "25px",
   },
-  ToolbarContainer:{
+  ToolbarContainer: {
     position: "absolute",
-      bottom: "14px",
-       right: "45px"
+    bottom: "14px",
+    right: "45px"
 
   },
-  TotalSummarydata:{
-    padding:"4px 0px 0px 4px",
+  TotalSummarydata: {
+    padding: "4px 0px 0px 4px",
   },
-  projectgrid:{
-    textAlign:"start"
+  projectgrid: {
+    textAlign: "start"
   },
   // fixedWidthContainer: {
-	// 	maxWidth: "5%",
-	// },
+  // 	maxWidth: "5%",
+  // },
   root: {
-		minHeight: 40,
-		alignItems: "center",
-	},
+    minHeight: 40,
+    alignItems: "center",
+  },
   modelValue: {
     fontSize: "14px",
     fontFamily: "Roboto",
@@ -251,6 +251,56 @@ const DatasetStyle = makeStyles({
   formControl: {
     width: 300
   },
+  AddGlossaryCard: {
+    width: "100%",
+    minHeight: "420px",
+    padding: "20px 40px 20px 40px",
+    justifyContent: "center", justifyItems: "center"
+  },
+  SuggestAnEditCard: {
+    width: "100%",
+    minHeight: "350px",
+    padding: "20px 40px 20px 40px",
+    justifyContent: "center", justifyItems: "center"
+  },
+
+  heading: {
+    textAlign: "center",
+    marginBottom: "35px",
+    color: "#3A3A3A",
+    fontSize: "2.5rem",
+    fontWeight: 400,
+  },
+  topBar: {
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: "#DEECFF",
+    fontSize: "18px",
+  },
+
+  topBarInnerBox: {
+    width: "25%",
+    display: "flex",
+    flexDirection: "column",
+    textAlign: "center",
+    boxShadow: "3px 0 2px -2px #00000029",
+  },
+  toolTip: {
+    width: "200px", height: "180px", fontSize: "16px", backgroundColor: "white", color: "black", padding: "5px 10px 10px 10px", border: "1px solid gray"
+  },
+
+    toolTips: {
+    width: "280px", height: "220px", fontSize: "16px", backgroundColor: "white", color: "black", padding: "5px 10px 10px 10px", border: "1px solid gray"
+  },
+
+  textTransliteration:{
+    borderRadius: "3px",
+            height: "58px",
+            padding: "15px 0px 0px 10px",
+            resize: "none",
+            margin: "10px", width: "200px",fontSize:"16px"
+  }
+
 })
 
 export default DatasetStyle

@@ -43,16 +43,14 @@ import DeleteProjectTasks from "../../container/Project/DeleteProjectTasks";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
+import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 
 
 const ProgressType = [
-  "unlabeled",
-  "draft",
-  "skipped",
-  "labeled",
-  "accepted",
-  "accepted_with_changes",
-  "to_be_revised",
+  "incomplete",
+  "annotated",
+  "reviewed",
+  "exported",
 ];
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -94,13 +92,10 @@ const AdvancedOperation = (props) => {
   const [datasetId, setDatasetId] = useState("");
   const [projectType, setProjectType] = useState("");
   const [taskStatus, setTaskStatus] = useState([
-    "unlabeled",
-    "draft",
-    "skipped",
-    "labeled",
-    "accepted",
-    "accepted_with_changes",
-    "to_be_revised",
+    "incomplete",
+  "annotated",
+  "reviewed",
+  "exported",
   ]);
   const { id } = useParams();
   const classes = DatasetStyle();
@@ -171,6 +166,37 @@ const AdvancedOperation = (props) => {
       });
     }
   };
+
+  const getDownloadProjectAnnotations=async()=>{
+    // 'https://backend.shoonya.ai4bharat.org/projects/606/export_project_tasks/'
+    // SetTask([])
+    // setLoading(true)
+    const projectObj = new getDownloadProjectAnnotationsAPI(id,taskStatus);
+    dispatch(APITransport(projectObj));
+    // const projectObj = new GetPublishProjectButtonAPI(id);
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "success",
+    //   });
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   });
+    // }
+
+      
+  }
 
   const handleReviewToggle = async () => {
     setLoading(true);
@@ -272,6 +298,9 @@ const AdvancedOperation = (props) => {
     setIsArchived(ProjectDetails?.is_archived);
   }, [ProjectDetails]);
 
+  const handleDownloadProjectAnnotations = () => {
+    getDownloadProjectAnnotations();
+  };
   const handleExportProject = () => {
     getExportProjectButton();
   };
@@ -431,12 +460,31 @@ const AdvancedOperation = (props) => {
           sx={{ float: "left" }}
           columnSpacing={2}
         >
+          {ProjectDetails.project_type=='ContextualTranslationEditing'?(
+          <Grid
+              item
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+
+          >
+              <CustomButton
+                  sx={{
+                      inlineSize: "max-content",
+                      p: 2,
+                      borderRadius: 3,
+                      ml: 2,
+                      width: "300px",
+
+                  }}
+                  onClick={handleDownloadProjectAnnotations}
+                  label="Downoload Project Annotations" />
+          </Grid>):" "}
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            {(ProjectDetails?.project_type === "ConversationTranslation" ||
-              ProjectDetails.project_type ===
-                "ConversationTranslationEditing") &&
-            ProjectTypes?.output_dataset?.save_type === "new_record" ? (
+            {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
               <CustomButton
                 sx={{
                   inlineSize: "max-content",

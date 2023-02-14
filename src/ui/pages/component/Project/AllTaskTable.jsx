@@ -64,9 +64,9 @@ const AllTaskTable = (props) => {
   const [selectedFilters, setsSelectedFilters] = useState({
     task_status: [filterData.Status[0]],
   });
- 
+
   const GetAllTasksdata = () => {
-    const taskObjs = new GetAllTasksAPI(id, currentPageNumber, currentRowPerPage, selectedFilters);
+    const taskObjs = new GetAllTasksAPI(id, currentPageNumber,selectedFilters, currentRowPerPage);
     dispatch(APITransport(taskObjs));
   };
 

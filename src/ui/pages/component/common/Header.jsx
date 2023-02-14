@@ -30,6 +30,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Logout from "../../../../redux/actions/UserManagement/Logout";
 import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
+import CustomizedSnackbars from "../common/Snackbar";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -38,6 +39,11 @@ const Header = () => {
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
   const [showTransliterationModel, setShowTransliterationModel] = useState(false);
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -124,6 +130,32 @@ const Header = () => {
     }
   };
 
+  const handleTagsChange = (event) => {
+    if (event.target.checked) {
+      localStorage.setItem("enableTags", true);
+      setSnackbarInfo({
+        open: true,
+        message: "Please type blackslash ( \\ ) to access the tags",
+        variant: "info",
+       
+      });
+    } else {
+      localStorage.setItem("enableTags", false);
+    }
+  }
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
  
   const renderTabs = () => {
     if (loggedInUserData?.role === 1) {
@@ -139,6 +171,7 @@ const Header = () => {
           sm={12}
           md={7}
         >
+           
           {/* <Typography variant="body1">
             <NavLink
               hidden={loggedInUserData.role === 1}
@@ -451,6 +484,16 @@ const Header = () => {
         />
       ),
     },
+    {
+      name: "Enable Tags Dropdown",
+      control: (
+        <Checkbox
+          onChange={handleTagsChange}
+          defaultChecked={localStorage.getItem("enableTags") === "true"}
+        />
+      ),
+    },
+
     // {
     //   name: "Help",
     //   onclick: () => {},
@@ -514,7 +557,7 @@ const Header = () => {
                 {tabs.map((tab) => tab)}
               </Grid> */}
               {renderTabs()}
-
+              {renderSnackBar()}
               <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
                 <Grid
                   container

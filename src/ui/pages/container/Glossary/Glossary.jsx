@@ -33,6 +33,9 @@ import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutl
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddGlossary from "./AddGlossary";
 import { translate } from "../../../../config/localisation";
+import UpVoteAndDownVoteAPI from "../../../../redux/actions/api/Glossary/UpVoteAndDownVote";
+import SuggestAnEdit from "./SuggestAnEdit";
+import SuggestAnEditAPI from "../../../../redux/actions/api/Glossary/SuggestAnEdit";
 
 export default function Glossary(props) {
   const { taskData } = props;
@@ -48,30 +51,47 @@ export default function Glossary(props) {
     visible: false,
   });
   const [openDialog, setOpenDialog] = useState(false);
+  const [SuggestAnEditDialog, setSuggestAnEditDialog] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [targetlang, settargetlang] = useState("");
   const [Sourcelang, setSourcelang] = useState("");
+  const [hashCode, setHashCode] = useState("");
+  const[tgtText,setTgtText] = useState("");
+  const[srcText,setSrcText] = useState("");
+  const[domain,setDomain] = useState("");
+  const[level,setLevel] = useState("");
+  const[collectionSource,setCollectionSource] = useState("");
+  const [sourceText, setSourceText] = useState();
+  const [targetText, settargetText] = useState();
+  const[domainValue,setDomainValue] = useState()
+  const[glossaryData,setGlossarydata] = useState()
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
   const language = LanguageCode.languages;
 
   useEffect(() => {
+    searchGlossary()
+  }, [taskData]);
+
+
+
+  const searchGlossary = () =>{
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
-        (el) =>
-          el.label===
-          taskData.data?.input_language
-         
+        (el) => el.label === taskData.data?.input_language
       );
-      setSourcelang(filtereddata[0]?.code)
+      setSourcelang(filtereddata[0]?.code);
     }
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
-        (el) =>
-          el.label ===
-          taskData.data?.output_language
+        (el) => el.label === taskData.data?.output_language
       );
-      settargetlang(filtereddata[0]?.code)
+      settargetlang(filtereddata[0]?.code);
       const Glossarysentencedata = {
         inputs: [taskData.data?.input_text],
         tgtLanguage: filtereddata[0]?.code,
@@ -79,7 +99,16 @@ export default function Glossary(props) {
       const GlossaryObj = new GlossarysentenceAPI(Glossarysentencedata);
       dispatch(APITransport(GlossaryObj));
     }
-  }, [taskData]);
+
+  }
+
+
+
+  useEffect(() => {
+    setSourceText(srcText)
+    settargetText(tgtText)
+    setDomainValue(domain)
+  }, [srcText,tgtText,domain])
 
   const handleCopyText = (text) => {
     navigator.clipboard.writeText(text);
@@ -99,7 +128,7 @@ export default function Glossary(props) {
     });
   };
 
-  const handleClick = (event) => {
+  const handleClickThumbsUpDown = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -108,11 +137,135 @@ export default function Glossary(props) {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+    setSuggestAnEditDialog(false);
   };
   const handleClickOpen = () => {
     setOpenDialog(true);
+    
+  };
+
+  const handleClickOpenSuggestAnEdit = () => {
+    setSuggestAnEditDialog(true);
     setAnchorEl(null);
   };
+
+  const handleThumbsUpDown = (hashcode,srcText,tgtText,domain,collectionSource,level) => {
+    setHashCode(hashcode);
+    setSrcText(srcText);
+    setTgtText(tgtText);
+    setDomain(domain);
+    setCollectionSource(collectionSource);
+    setLevel(level)
+  };
+
+  const OnClickUpVote = async () => {
+    const UpVotedata = {
+      item_id: hashCode,
+      action: 1,
+    };
+    console.log(UpVotedata, "UpVotedata");
+    const GlossaryObj = new UpVoteAndDownVoteAPI(UpVotedata);
+    //dispatch(APITransport(GlossaryObj));
+    const res = await fetch(GlossaryObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(GlossaryObj.getBody()),
+      headers: GlossaryObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+    setAnchorEl(null);
+  };
+
+  const OnClickDownVote = async () => {
+    const DownVotedata = {
+      item_id: hashCode,
+      action: -1,
+    };
+    
+    const GlossaryObj = new UpVoteAndDownVoteAPI(DownVotedata);
+    //dispatch(APITransport(GlossaryObj));
+    const res = await fetch(GlossaryObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(GlossaryObj.getBody()),
+      headers: GlossaryObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+    setAnchorEl(null);
+  };
+
+
+  const submitSuggestAnEditHandler = async() =>{
+    const SuggestAnEditData = {
+      new: {
+        glossary: [
+          {
+            srcLanguage: Sourcelang,
+            tgtLanguage: targetlang,
+            srcText: sourceText,
+            tgtText: targetText,
+            domain: domain,
+            collectionSource: collectionSource,
+            level: level,
+          },
+        ],
+      },
+      hash: hashCode,
+    };
+    const GlossaryObj = new SuggestAnEditAPI(SuggestAnEditData);
+    //dispatch(APITransport(GlossaryObj));
+    const res = await fetch(GlossaryObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(GlossaryObj.getBody()),
+      headers: GlossaryObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    //setLoading(false);
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+      searchGlossary()
+    }
+  
+     else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+    setSuggestAnEditDialog(false);
+  }
+
+
+  
 
   const columns = [
     {
@@ -208,6 +361,8 @@ export default function Glossary(props) {
     },
   ];
 
+
+
   const pageSearch = () => {
     return Glossarysentence[0]?.glossaryPhrases.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -234,30 +389,40 @@ export default function Glossary(props) {
     });
   };
 
-  const data =
-    Glossarysentence[0]?.glossaryPhrases &&
-    Glossarysentence[0]?.glossaryPhrases.length > 0
-      ? pageSearch().map((el, i) => {
-          return [
-            el.srcText,
-            el.tgtText,
-            el.domain,
-            el.collectionSource,
-            <>
-              <Button onClick={() => handleCopyText(el.tgtText)}>
-                <Tooltip title="Copy">
-                  <ContentCopyIcon fontSize="small" />
-                </Tooltip>
-              </Button>
-              <Button aria-describedby={id} onClick={handleClick}>
-                <Tooltip title="Rate this translation">
-                  <ThumbsUpDownOutlinedIcon fontSize="medium" />
-                </Tooltip>
-              </Button>
-            </>,
-          ];
-        })
-      : [];
+
+      useEffect(() => {
+      
+        const data= Glossarysentence[0]?.glossaryPhrases &&
+        Glossarysentence[0]?.glossaryPhrases.length > 0
+          ? pageSearch().map((el, i) => {
+              return [
+                el.srcText,
+                el.tgtText,
+                el.domain,
+                el.collectionSource,
+                <>
+                  <Button onClick={() => handleCopyText(el.tgtText)}>
+                    <Tooltip title="Copy">
+                      <ContentCopyIcon fontSize="small" />
+                    </Tooltip>
+                  </Button>
+                  <span onClick={() => handleThumbsUpDown(el.hash,el.srcText,el.tgtText,el.domain,el.collectionSource,el.level)}>
+                    <Button aria-describedby={id} onClick={handleClickThumbsUpDown}>
+                      <Tooltip title="Rate this translation">
+                        <ThumbsUpDownOutlinedIcon fontSize="medium" />
+                      </Tooltip>
+                    </Button>
+                  </span>
+                </>,
+                el.hash,
+                el.level,
+              ];
+            })
+          : [];
+          setGlossarydata(data)
+      }, [Glossarysentence, SearchWorkspaceMembers])
+
+    
 
   const options = {
     textLabels: {
@@ -282,13 +447,29 @@ export default function Glossary(props) {
     // rowsPerPage: PageInfo.count,
     filter: false,
     // page: PageInfo.page,
-    viewColumns: false,
+    viewColumns: true,
     selectableRows: "none",
     search: false,
     jumpToPage: true,
   };
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
+
   return (
     <>
+      {renderSnackBar()}
       <CustomizedSnackbars
         hide={showSnackBar.timeout}
         open={showSnackBar.visible}
@@ -314,13 +495,17 @@ export default function Glossary(props) {
               {translate("label.Rate this translation")}
             </Typography>
             <Grid sx={{ padding: "10px 0px 30px 37px" }}>
-              <Button sx={{ border: "1px solid gray", borderRadius: "25px" }}>
+              <Button
+                onClick={OnClickUpVote}
+                sx={{ border: "1px solid gray", borderRadius: "25px" }}
+              >
                 <Tooltip title="Good translation">
                   <ThumbUpOffAltOutlinedIcon fontSize="medium" />
                 </Tooltip>
               </Button>
 
               <Button
+                onClick={OnClickDownVote}
                 sx={{ border: "1px solid gray", borderRadius: "25px", ml: 1 }}
               >
                 <Tooltip title="Poor translation">
@@ -335,7 +520,7 @@ export default function Glossary(props) {
               {translate("button.Your feedback")}
             </Typography>
             <Divider sx={{ padding: "15px 0px 0px 0px" }} />
-            <Button sx={{ ml: 2, mt: 1 }} onClick={handleClickOpen}>
+            <Button sx={{ ml: 2, mt: 1 }} onClick={handleClickOpenSuggestAnEdit}>
               <EditOutlinedIcon fontSize="medium" />
               <Typography variant="subtitle2">
                 {translate("button.Suggest an edit")}
@@ -360,13 +545,29 @@ export default function Glossary(props) {
         <AddGlossary
           openDialog={openDialog}
           handleCloseDialog={() => handleCloseDialog()}
+         // addBtnClickHandler={AddGlossaryHandler}
           targetlang={targetlang}
           Sourcelang={Sourcelang}
         />
       )}
 
+      {SuggestAnEditDialog && (
+      <SuggestAnEdit 
+          openDialog={SuggestAnEditDialog}
+          handleCloseDialog={() => handleCloseDialog()}
+          addBtnClickHandler={submitSuggestAnEditHandler}
+          sourceText={sourceText}
+          targetText={targetText}
+         settargetText={settargetText}
+         domainValue={domainValue}
+         setDomainValue={setDomainValue}
+          data={taskData.data}
+          targetlang={targetlang}
+      />
+      )}
+
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable data={data} columns={columns} options={options} />
+        <MUIDataTable data={glossaryData} columns={columns} options={options} />
       </ThemeProvider>
     </>
   );
