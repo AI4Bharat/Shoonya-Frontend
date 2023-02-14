@@ -101,6 +101,7 @@ const filterAnnotations = (annotations, user_id) => {
         "accepted",
         "accepted_with_minor_changes",
         "accepted_with_major_changes",
+        "draft"
       ].includes(userAnnotation.annotation_status)
     ) {
       filteredAnnotations = [userAnnotation];
