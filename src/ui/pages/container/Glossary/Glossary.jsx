@@ -562,6 +562,7 @@ export default function Glossary(props) {
          domainValue={domainValue}
          setDomainValue={setDomainValue}
           data={taskData.data}
+          targetlang={targetlang}
       />
       )}
 
