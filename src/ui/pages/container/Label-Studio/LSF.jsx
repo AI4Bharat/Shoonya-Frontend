@@ -118,9 +118,9 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: true,
+        bottomSidePanel: false,
         continuousLabeling: false,
-        enableAutoSave: false,
+        enableAutoSave: true,
         enableHotkeys: true,
         enableLabelTooltips: true,
         enablePanelHotkeys: true,
