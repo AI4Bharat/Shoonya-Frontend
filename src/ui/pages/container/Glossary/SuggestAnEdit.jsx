@@ -140,7 +140,7 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
                 <OutlinedTextField
                   label="Source Text"
                   placeholder="Source Text"
-                  sx={{ m: 1, width: 200 }}
+                  sx={{  m: 1, width: 200 ,input: { color: 'rgba(0, 0, 0, 0.6)' } }}
                   value={sourceText}
                 />
                 { targetData.length > 0 && targetlang !== "en" ? (
