@@ -295,10 +295,11 @@ const DatasetStyle = makeStyles({
 
   textTransliteration:{
     borderRadius: "3px",
-            height: "58px",
-            padding: "15px 0px 0px 10px",
+            height: "60px",
+            padding: "15px 10px 10px 10px",
             resize: "none",
-            margin: "10px", width: "200px",fontSize:"16px"
+            margin: "7px 0px 0px 0px",
+             width: "200px",fontSize:"16px"
   }
 
 })
