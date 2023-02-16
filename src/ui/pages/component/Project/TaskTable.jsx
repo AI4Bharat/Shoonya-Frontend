@@ -247,7 +247,12 @@ const TaskTable = (props) => {
         acc[curr] = selectedFilters[curr];
         return acc;
       }, {});
-    
+      localStorage.setItem(
+        "labellingMode",
+        props.type === "annotation"
+          ? selectedFilters.annotation_status
+          : selectedFilters.review_status
+      );
    
     localStorage.setItem("searchFilters", JSON.stringify(search_filters));
     localStorage.setItem("labelAll", true);
@@ -349,12 +354,7 @@ const TaskTable = (props) => {
     } else {
       getTaskListData();
     }
-    localStorage.setItem(
-      "labellingMode",
-      props.type === "annotation"
-        ? selectedFilters.annotation_status
-        : selectedFilters.review_status
-    );
+    
   }, [selectedFilters]);
 
   useEffect(() => {
