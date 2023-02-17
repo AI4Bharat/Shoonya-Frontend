@@ -567,7 +567,7 @@ const TaskTable = (props) => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
       <Box className={classes.filterToolbarContainer} sx={{ height: "80px" }}>
-        {props.ProjectDetails?.project_type ===
+        {/* {props.ProjectDetails?.project_type ===
           "ContextualTranslationEditing" && (
           <>
             {(props.type === "annotation" || props.type === "review") &&
@@ -634,7 +634,7 @@ const TaskTable = (props) => {
                 </Grid>
               )}
           </>
-        )}
+        )} */}
 
         {props.type === "annotation" &&
           userDetails?.role !== 1 &&
