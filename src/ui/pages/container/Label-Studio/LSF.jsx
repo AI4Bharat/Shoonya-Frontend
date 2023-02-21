@@ -119,7 +119,7 @@ const projectType = ProjectDetails?.project_type.includes("Audio")
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-      bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? true :false ,
+        bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? false : true ,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
