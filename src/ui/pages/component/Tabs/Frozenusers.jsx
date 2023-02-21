@@ -41,14 +41,15 @@ const columns = [
     },
     
     
-    {
-        name: "Actions",
-        label: "Actions",
-        options: {
-            filter: false,
-            sort: false,
-        }
-    }];
+    // {
+    //     name: "Actions",
+    //     label: "Actions",
+    //     options: {
+    //         filter: false,
+    //         sort: false,
+    //     }
+    // }
+];
     const data =  ProjectDetails?.frozen_users &&  ProjectDetails?.frozen_users.length > 0 ? ProjectDetails?.frozen_users.map((el,i)=>{
         const userRole = el.role && UserMappedByRole(el.role).element;    
             return [
@@ -57,11 +58,11 @@ const columns = [
             userRole ? userRole : el.role,
            <>
            
-             <CustomButton
+             {/* <CustomButton
              sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
              label = "Remove"
             //  onClick={()=>handleRemoveWorkspaceManager(el.id)}
-         />
+         /> */}
          </>
                 ]
     }) : [];
