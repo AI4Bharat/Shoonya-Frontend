@@ -113,12 +113,13 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-
+console.log(ProjectDetails?.project_type.includes("Audio"),"aaaaaaaaaa")
+const projectType = ProjectDetails?.project_type.includes("Audio")
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: true,
+      bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? true :false ,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
@@ -562,15 +563,15 @@ const LabelStudioWrapper = ({
     showLoader();
   }, [taskId]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!ProjectDetails?.project_type.includes("Audio")) {
-        autoSaveFlag.current = true;
-        lsfRef.current.store.submitAnnotation();
-      }
-    }, AUTO_SAVE_INTERVAL);
-    return () => clearInterval(interval);
-  }, [ProjectDetails]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (!ProjectDetails?.project_type.includes("Audio")) {
+  //       autoSaveFlag.current = true;
+  //       lsfRef.current.store.submitAnnotation();
+  //     }
+  //   }, AUTO_SAVE_INTERVAL);
+  //   return () => clearInterval(interval);
+  // }, [ProjectDetails]);
 
   const handleDraftAnnotationClick = async () => {
     annotation_status.current = "draft";
