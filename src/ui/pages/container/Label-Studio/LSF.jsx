@@ -188,7 +188,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -215,7 +215,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -564,11 +564,13 @@ const LabelStudioWrapper = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      autoSaveFlag.current = true;
-      lsfRef.current.store.submitAnnotation();
+      if (!ProjectDetails?.project_type.includes("Audio")) {
+        autoSaveFlag.current = true;
+        lsfRef.current.store.submitAnnotation();
+      }
     }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
-  }, []);
+  }, [ProjectDetails]);
 
   const handleDraftAnnotationClick = async () => {
     annotation_status.current = "draft";
