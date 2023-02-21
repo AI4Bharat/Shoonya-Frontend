@@ -113,12 +113,13 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-
+console.log(ProjectDetails?.project_type.includes("Audio"),"aaaaaaaaaa")
+const projectType = ProjectDetails?.project_type.includes("Audio")
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: false,
+        bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? false : true ,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
@@ -188,7 +189,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -215,7 +216,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -562,13 +563,15 @@ const LabelStudioWrapper = ({
     showLoader();
   }, [taskId]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      autoSaveFlag.current = true;
-      lsfRef.current.store.submitAnnotation();
-    }, AUTO_SAVE_INTERVAL);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (!ProjectDetails?.project_type.includes("Audio")) {
+  //       autoSaveFlag.current = true;
+  //       lsfRef.current.store.submitAnnotation();
+  //     }
+  //   }, AUTO_SAVE_INTERVAL);
+  //   return () => clearInterval(interval);
+  // }, [ProjectDetails]);
 
   const handleDraftAnnotationClick = async () => {
     annotation_status.current = "draft";
