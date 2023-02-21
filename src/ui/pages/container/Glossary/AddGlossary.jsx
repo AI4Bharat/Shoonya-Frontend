@@ -60,6 +60,8 @@ const AddGlossary = ({
 
   const allDomains = useSelector((state) => state.getDomains);
 
+  const allDomains = useSelector((state) => state.getDomains);
+console.log(selectedSourceLang,"LanguageCodeLanguageCode",Sourcelang)
   useEffect(() => {
     const domainApiObj = new getDomains();
     dispatch(APITransport(domainApiObj));
@@ -157,8 +159,6 @@ const AddGlossary = ({
    
    
   }, [])
-
-
 
 
   const renderTargetText = (props) => {
@@ -273,6 +273,7 @@ const AddGlossary = ({
                   marginTop: 4,
                 }}
               >
+
                
                 { Sourcedata.length > 0 && selectedSourceLang !== "en" ? (
                  <IndicTransliterate
@@ -282,6 +283,7 @@ const AddGlossary = ({
                     setSourceText(SourceText);
                   }}
                   renderComponent={(props) => renderSourceText(props)}
+
                  
                 />): ( <OutlinedTextField
                 placeholder="Source Text"

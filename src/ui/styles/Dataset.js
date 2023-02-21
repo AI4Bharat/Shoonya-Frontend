@@ -295,6 +295,7 @@ const DatasetStyle = makeStyles({
 
   textTransliteration:{
     borderRadius: "3px",
+
             height: "60px",
             padding: "15px 10px 10px 10px",
             resize: "none",

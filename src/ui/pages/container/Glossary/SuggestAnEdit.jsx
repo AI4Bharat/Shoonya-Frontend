@@ -143,6 +143,7 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
                   sx={{  m: 1, width: 200 ,input: { color: 'rgba(0, 0, 0, 0.6)' } }}
                   value={sourceText}
                 />
+
                 { targetData.length > 0 && targetlang !== "en" ? (
                  <IndicTransliterate
                   lang={Targetlanguage.LangCode ? Targetlanguage.LangCode : (targetData.length > 0  ?  targetData[0]?.LangCode : "en" )}
@@ -153,12 +154,14 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
                   renderComponent={(props) => renderTargetText(props)}
                 />): (
                  <OutlinedTextField
+
                   label="Target Text"
                   placeholder="Target Text"
                   sx={{ m: 1, width: 200 }}
                   value={targetText}
                   onChange={handleTargetTextChange}
                 />)}
+
               </Grid>
               <Grid
                 container
