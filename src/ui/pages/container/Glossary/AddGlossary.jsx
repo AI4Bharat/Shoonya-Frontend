@@ -53,9 +53,13 @@ const AddGlossary = ({
   const [Sourcelanguage, setSourcelanguage] = useState([]);
   const [Targetlanguage, setTargetlanguage] = useState([]);
 
+  var data = Targetlanguage?.filter((e)=>e.LangCode.includes(selectedTargetLang))
+  var Sourcedata = Sourcelanguage?.filter((e)=>e.LangCode.includes(selectedSourceLang))
+
+  console.log(Sourcedata,"SourcedataSourcedata" ,selectedSourceLang ==="en",Sourcelanguage )
 
   const allDomains = useSelector((state) => state.getDomains);
-console.log(selectedSourceLang,"LanguageCodeLanguageCode",Sourcelang)
+
   useEffect(() => {
     const domainApiObj = new getDomains();
     dispatch(APITransport(domainApiObj));
@@ -141,21 +145,21 @@ console.log(selectedSourceLang,"LanguageCodeLanguageCode",Sourcelang)
   };
 
   useEffect(() => {
-
+  
     getTransliterationLanguages()
-      .then(langs => {
-        setSourcelanguage(langs);
-        setTargetlanguage(langs)
-      })
-      .catch(err => {
-        console.log(err);
-      })
+    .then(langs => {
+      setSourcelanguage(langs);
+      setTargetlanguage(langs)
+    })
+    .catch(err => {
+      console.log(err);
+    }) 
+   
+   
   }, [])
 
-  var data = Targetlanguage?.filter((e)=>e.LangCode.includes(targetlang))
-  var Sourcedata = Sourcelanguage?.filter((e)=>e.LangCode.includes(Sourcelang))
 
-  console.log(Sourcedata,"datadatadata",data)
+
 
   const renderTargetText = (props) => {
     return (
@@ -269,29 +273,36 @@ console.log(selectedSourceLang,"LanguageCodeLanguageCode",Sourcelang)
                   marginTop: 4,
                 }}
               >
-                {/* <OutlinedTextField
-                  placeholder="Source Text"
-                  sx={{ m: 1, width: 200 }}
-                  value={SourceText}
-                  onChange={handleSourceTextChange}
-                /> */}
+               
+                { Sourcedata.length > 0 && selectedSourceLang !== "en" ? (
                  <IndicTransliterate
-                  lang={Sourcelanguage.LangCode  ? Sourcelanguage.LangCode  : (Sourcedata.length > 0   ?   Sourcedata[0]?.LangCode : selectedSourceLang === "en" ? "en" : "hi" )}
+                  lang={Sourcelanguage.LangCode  ? Sourcelanguage.LangCode  : (Sourcedata.length > 0   ?   Sourcedata[0]?.LangCode  : "hi" )}
                   value={SourceText}
                   onChangeText={(SourceText) => {
                     setSourceText(SourceText);
                   }}
                   renderComponent={(props) => renderSourceText(props)}
-                  sx={{ m: 1, width: "200px" }}
-                />
+                 
+                />): ( <OutlinedTextField
+                placeholder="Source Text"
+                sx={{ m: 1, width: 200 }}
+                value={SourceText}
+                onChange={handleSourceTextChange}
+              />)}
+               { data.length > 0 && selectedTargetLang !== "en" ? (
                 <IndicTransliterate
-                  lang={Targetlanguage.LangCode  ? Targetlanguage.LangCode : (data.length > 0  ?  data[0]?.LangCode : selectedTargetLang === "en" ? "en" : "hi")}
+                  lang={Targetlanguage.LangCode  ? Targetlanguage.LangCode : (data.length > 0  ?  data[0]?.LangCode : "hi")}
                   value={targetText}
                   onChangeText={(targetText) => {
                     settargetText(targetText);
                   }}
                   renderComponent={(props) => renderTargetText(props)}
-                />
+                />): ( <OutlinedTextField
+                  placeholder="Target Text"
+                  sx={{ m: 1, width: 200 }}
+                  value={targetText}
+                  onChange={handleTargetTextChange}
+                />)}
               </Grid>
 
               <Grid
@@ -325,29 +336,7 @@ console.log(selectedSourceLang,"LanguageCodeLanguageCode",Sourcelang)
                   </Select>
                 </FormControl>
                 <Grid sx={{ m: 1, minWidth: 200 }}></Grid>
-                {/* <FormControl sx={{ m: 1, minWidth: 200 }}>
-            <InputLabel id="demo-simple-select-helper-label">Level</InputLabel>
-            <Select
-              labelId="demo-simple-select-helper-label"
-              id="demo-simple-select-helper"
-              value={level}
-              label="Level"
-              onChange={handleLevelChange}
-              sx={{
-                textAlign: "left",
-              }}
-            >
-              {allLevels.map((el, i) => {
-                return <MenuItem value={el.key}>{el.name}</MenuItem>;
-              })}
-            </Select>
-          </FormControl> */}
-                {/* <OutlinedTextField
-            placeholder="Collection Source"
-            sx={{ width: 200 }}
-            value={collectionSource}
-            onChange={handleCollectionSourceTextChange}
-          /> */}
+               
               </Grid>
 
               <Grid sx={{ textAlignLast: "end" }}>

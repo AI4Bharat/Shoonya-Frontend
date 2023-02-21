@@ -144,6 +144,7 @@ const LabelStudioWrapper = ({
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   let loaded = useRef();
 
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
@@ -157,7 +158,7 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: true,
+        bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? false : true ,
         continuousLabeling: false,
         enableAutoSave: false,
         enableHotkeys: true,
