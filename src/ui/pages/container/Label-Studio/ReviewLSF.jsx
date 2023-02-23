@@ -158,7 +158,7 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? false : true ,
+        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
         continuousLabeling: false,
         enableAutoSave: false,
         enableHotkeys: true,
