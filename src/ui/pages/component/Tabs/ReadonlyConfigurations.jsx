@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import CustomButton from "../../component/common/Button";
 
 const ReadonlyConfigurations = (props) => {
   const classes = DatasetStyle();
@@ -85,6 +87,15 @@ const ReadonlyConfigurations = (props) => {
                 <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
                   {dataset?.instance_name}
                 </Typography>
+                <Link
+                    to={`/datasets/${dataset?.instance_id}`}
+                    style={{ textDecoration: "none" }}
+                    >
+                    <CustomButton
+                        sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
+                        label="View Dataset"
+                    />
+                </Link>
               </Grid>
             ))}
 
