@@ -159,8 +159,6 @@ const AddGlossary = ({
   }, [])
 
 
-
-
   const renderTargetText = (props) => {
     return (
       <>
@@ -273,6 +271,7 @@ const AddGlossary = ({
                   marginTop: 4,
                 }}
               >
+
                
                 { Sourcedata.length > 0 && selectedSourceLang !== "en" ? (
                  <IndicTransliterate
@@ -282,6 +281,7 @@ const AddGlossary = ({
                     setSourceText(SourceText);
                   }}
                   renderComponent={(props) => renderSourceText(props)}
+
                  
                 />): ( <OutlinedTextField
                 placeholder="Source Text"
