@@ -43,7 +43,6 @@ import DeleteProjectTasks from "../../container/Project/DeleteProjectTasks";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
-import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 
 
 const ProgressType = [
@@ -167,37 +166,6 @@ const AdvancedOperation = (props) => {
     }
   };
 
-  const getDownloadProjectAnnotations=async()=>{
-    // 'https://backend.shoonya.ai4bharat.org/projects/606/export_project_tasks/'
-    // SetTask([])
-    // setLoading(true)
-    const projectObj = new getDownloadProjectAnnotationsAPI(id,taskStatus);
-    dispatch(APITransport(projectObj));
-    // const projectObj = new GetPublishProjectButtonAPI(id);
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "success",
-    //   });
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   });
-    // }
-
-      
-  }
-
   const handleReviewToggle = async () => {
     setLoading(true);
     const reviewObj = ProjectDetails.enable_task_reviews
@@ -298,9 +266,6 @@ const AdvancedOperation = (props) => {
     setIsArchived(ProjectDetails?.is_archived);
   }, [ProjectDetails]);
 
-  const handleDownloadProjectAnnotations = () => {
-    getDownloadProjectAnnotations();
-  };
   const handleExportProject = () => {
     getExportProjectButton();
   };
@@ -460,28 +425,6 @@ const AdvancedOperation = (props) => {
           sx={{ float: "left" }}
           columnSpacing={2}
         >
-          {ProjectDetails.project_type=='ContextualTranslationEditing'?(
-          <Grid
-              item
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-
-          >
-              <CustomButton
-                  sx={{
-                      inlineSize: "max-content",
-                      p: 2,
-                      borderRadius: 3,
-                      ml: 2,
-                      width: "300px",
-
-                  }}
-                  onClick={handleDownloadProjectAnnotations}
-                  label="Downoload Project Annotations" />
-          </Grid>):" "}
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (

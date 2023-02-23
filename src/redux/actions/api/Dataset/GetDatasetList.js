@@ -6,29 +6,12 @@
  import constant from '../../../constants';
 
  export default class GetDatasetsAPI extends API {
-   constructor(selectedFilters,timeout = 2000) {
+   constructor(timeout = 2000) {
      super("GET", timeout, false);
      this.type = constant.GET_DATASET_LIST
-     let queryString = "";
-
-    for (let key in selectedFilters) {
-      if (selectedFilters[key] && selectedFilters[key] !== "") {
-        switch (key) {
-          case 'dataset_visibility':
-            queryString += `${key}=${selectedFilters[key]}`
-            break;
-          case 'dataset_type':
-            queryString += `&${key}=${selectedFilters[key]}`
-            break;
-         
-          default:
-            queryString += ``
-
-        }
-      }
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/?${queryString}`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/`;
    }
-  }
+
    processResponse(res) {
     super.processResponse(res);
     if (res) {
