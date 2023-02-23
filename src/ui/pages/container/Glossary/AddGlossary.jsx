@@ -60,6 +60,8 @@ const AddGlossary = ({
 
   const allDomains = useSelector((state) => state.getDomains);
 
+  const allDomains = useSelector((state) => state.getDomains);
+console.log(selectedSourceLang,"LanguageCodeLanguageCode",Sourcelang)
   useEffect(() => {
     const domainApiObj = new getDomains();
     dispatch(APITransport(domainApiObj));
