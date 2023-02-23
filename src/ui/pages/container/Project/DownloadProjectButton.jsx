@@ -79,7 +79,7 @@ function DownloadProjectButton(props) {
 
   };
   const handleDownloadJSONProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
+    SetTask([])
     const projectObj = new DownloadJSONProjectAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
     // const res = await fetch(projectObj.apiEndPoint(), {
@@ -110,7 +110,7 @@ function DownloadProjectButton(props) {
   };
 
   const handleDownloadCSVProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
+    SetTask([])
     setLoading(true)
     const projectObj = new DownloadProjectCsvAPI(id,taskStatus);
     dispatch(APITransport(projectObj));
@@ -139,7 +139,7 @@ function DownloadProjectButton(props) {
   };
 
   const handleDownloadTSVProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
+    SetTask([])
     setLoading(true)
     const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
     dispatch(APITransport(projectObj));

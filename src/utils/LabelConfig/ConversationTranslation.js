@@ -31,7 +31,6 @@ const generateLabelConfig = (taskData) => {
                 transcription="true"
                 maxSubmissions="1"
                 showSubmitButton="false"
-                editable="false"
                 />`
             }
             ).join("")}

@@ -36,46 +36,28 @@ const fetchAnnotation = async (taskID) => {
   }
 };
 
-const postAnnotation = async (
-  result,
-  task,
-  completed_by,
-  load_time,
-  lead_time,
-  annotation_status,
-  notes
-) => {
+const postAnnotation = async (result, task, completed_by, load_time, lead_time, annotation_status, notes) => {
   try {
-    await axiosInstance
-      .post(`/annotation/`, {
-        result: result,
-        task: task,
-        completed_by: completed_by,
-        lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-        annotation_status: annotation_status,
-        annotation_notes: notes,
-      })
-      .then((res) => {
-        if (res.status !== 201) {
-          // message.error("Error creating annotation.");
-        }
-      });
+    await axiosInstance.post(`/annotation/`, {
+      result: result,
+      task: task,
+      completed_by: completed_by,
+      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status: annotation_status,
+      annotation_notes: notes
+    },
+    )
+    .then((res)=> {
+    if(res.status !== 201){
+      // message.error("Error creating annotation.");
+    }
+  })
   } catch (err) {
     return err;
   }
 };
 
-const postReview = async (
-  result,
-  task,
-  completed_by,
-  parentAnnotation,
-  load_time,
-  lead_time,
-  review_status,
-  annotation_notes,
-  review_notes
-) => {
+const postReview = async (result, task, completed_by, parentAnnotation, load_time, lead_time, review_status, annotation_notes, review_notes) => {
   try {
     await axiosInstance.post(`/annotation/`, {
       result: result,
@@ -86,60 +68,42 @@ const postReview = async (
       annotation_status: review_status,
       annotation_notes: annotation_notes,
       review_notes: review_notes,
-      mode: "review",
+      mode: "review"
     });
   } catch (err) {
     return err;
   }
 };
 
-const patchAnnotation = async (
-  result,
-  annotationID,
-  load_time,
-  lead_time,
-  annotation_status,
-  notes
-) => {
+const patchAnnotation = async (result, annotationID, load_time, lead_time, annotation_status, notes) => {
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
-      ...(annotation_status !== "skipped" && { result: result }),
-      ...(annotation_status && {
-        lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-        annotation_status: annotation_status,
-      }),
-      annotation_notes: notes,
+      ...(annotation_status !== "skipped" && {result: result}),
+      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status: annotation_status,
+      annotation_notes: notes
     });
   } catch (err) {
     return err;
   }
 };
 
-const patchReview = async (
-  annotationID,
-  load_time,
-  lead_time,
-  review_status,
-  result,
-  parentAnnotation,
-  reviewnotes
-) => {
+const patchReview = async ( annotationID, load_time, lead_time,review_status,result,parentAnnotation,reviewnotes ) => {
   try {
+   
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-      annotation_status: review_status,
+      annotation_status:review_status,
       result: result,
       review_notes: reviewnotes,
-      ...((review_status === "to_be_revised" ||
-        review_status === "accepted" ||
-        review_status === "accepted_with_minor_changes" ||
-        review_status === "accepted_with_major_changes") && {
-        lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-        annotation_status: review_status,
-        result: result,
-        parent_annotation: parentAnnotation,
-        review_notes: reviewnotes,
-      }),
+      ...((review_status === "to_be_revised" || review_status === "accepted"|| review_status === "accepted_with_minor_changes"||review_status === "accepted_with_major_changes") &&  {
+      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status:review_status,
+      result: result,
+      parent_annotation: parentAnnotation,
+      review_notes: reviewnotes,
+    })
+    
     });
     // if (review_status === "to_be_revised") {
     //   await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
@@ -149,7 +113,7 @@ const patchReview = async (
   } catch (err) {
     return err;
   }
-};
+}
 
 const deleteAnnotation = async (annotationID) => {
   try {
@@ -159,7 +123,7 @@ const deleteAnnotation = async (annotationID) => {
   }
 };
 
-const getNextProject = async (projectID, taskID, mode = "annotation") => {
+const getNextProject = async (projectID, taskID, mode="annotation") => {
   try {
     let labellingMode = localStorage.getItem("labellingMode");
     let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
@@ -172,27 +136,27 @@ const getNextProject = async (projectID, taskID, mode = "annotation") => {
     // }
     for (let key in searchFilters) {
       if (searchFilters[key] && localStorage.getItem("labelAll")) {
-        requestUrl += `?${key}=${searchFilters[key]}`;
+        requestUrl += `?${key}=${searchFilters[key]}`
+        
       }
     }
     let response = await axiosInstance.post(requestUrl, {
       id: projectID,
-      current_task_id: taskID,
-      ...(mode === "annotation" && {
-        annotation_status: labellingMode,
-      }),
-      ...(mode === "review" && {
-        mode: "review",
-        annotation_status: labellingMode,
-      }),
+      current_task_id:taskID,
+      ...( mode === "annotation" && {
+      annotation_status:labellingMode}),
+      ...( mode === "review" && {mode: "review",
+      annotation_status:labellingMode,})
     });
     if (response.status === 204) {
       // message.error("Error getting next task.");
-    } else {
+    }
+    else {
       return response.data;
     }
-  } catch (err) {
-    return err;
+  }
+  catch (err) {
+    return err
   }
 };
 

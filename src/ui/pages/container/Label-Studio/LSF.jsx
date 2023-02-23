@@ -74,8 +74,6 @@ const filterAnnotations = (annotations, user_id) => {
 
 //used just in postAnnotation to support draft status update.
 
-const AUTO_SAVE_INTERVAL = 20000;
-
 const LabelStudioWrapper = ({
   annotationNotesRef,
   loader,
@@ -91,7 +89,6 @@ const LabelStudioWrapper = ({
   const annotation_status = useRef(
     ProjectDetails.enable_task_reviews ? "labeled" : "labeled"
   );
-  const autoSaveFlag = useRef(false);
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
   const navigate = useNavigate();
@@ -113,15 +110,14 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-console.log(ProjectDetails?.project_type.includes("Audio"),"aaaaaaaaaa")
-const projectType = ProjectDetails?.project_type.includes("Audio")
+
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? false : true ,
+        bottomSidePanel: true,
         continuousLabeling: false,
-        enableAutoSave: true,
+        enableAutoSave: false,
         enableHotkeys: true,
         enableLabelTooltips: true,
         enablePanelHotkeys: true,
@@ -189,7 +185,7 @@ const projectType = ProjectDetails?.project_type.includes("Audio")
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
+        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -216,7 +212,7 @@ const projectType = ProjectDetails?.project_type.includes("Audio")
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
+        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -289,7 +285,7 @@ const projectType = ProjectDetails?.project_type.includes("Audio")
                 });
               else {
                 hideLoader();
-                // window.location.reload();
+                window.location.reload();
               }
             });
           } else
@@ -325,15 +321,13 @@ const projectType = ProjectDetails?.project_type.includes("Audio")
 
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.annotation_status !== "freezed") {
-            let isAutoSave = autoSaveFlag.current;
-            autoSaveFlag.current = false;
             for (let i = 0; i < annotations.length; i++) {
               if (
                 !annotations[i].result?.length ||
                 annotation.serializeAnnotation()[0].id ===
                   annotations[i].result[0].id
               ) {
-                !isAutoSave && showLoader();
+                showLoader();
                 let temp = annotation.serializeAnnotation();
 
                 for (let i = 0; i < temp.length; i++) {
@@ -341,31 +335,23 @@ const projectType = ProjectDetails?.project_type.includes("Audio")
                     temp[i].value.text = [temp[i].value.text[0]];
                   }
                 }
+
                 patchAnnotation(
                   temp,
                   annotations[i].id,
                   load_time,
                   annotations[i].lead_time,
-                  isAutoSave ? annotations[i].annotation_status : annotation_status.current,
+                  annotation_status.current,
                   annotationNotesRef.current.value
-                ).then((err) => {
-                  if (err) {
-                    setSnackbarInfo({
-                      open: true,
-                      message: "Error in saving annotation",
-                      variant: "error",
-                    });
-                  }
-                  if (!isAutoSave) {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id).then((res) => {
-                        hideLoader();
-                        tasksComplete(res?.id || null);
-                      });
-                    else {
+                ).then(() => {
+                  if (localStorage.getItem("labelAll"))
+                    getNextProject(projectId, taskData.id).then((res) => {
                       hideLoader();
-                      window.location.reload();
-                    }
+                      tasksComplete(res?.id || null);
+                    });
+                  else {
+                    hideLoader();
+                    window.location.reload();
                   }
                 });
               }
@@ -562,16 +548,6 @@ const projectType = ProjectDetails?.project_type.includes("Audio")
   useEffect(() => {
     showLoader();
   }, [taskId]);
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (!ProjectDetails?.project_type.includes("Audio")) {
-  //       autoSaveFlag.current = true;
-  //       lsfRef.current.store.submitAnnotation();
-  //     }
-  //   }, AUTO_SAVE_INTERVAL);
-  //   return () => clearInterval(interval);
-  // }, [ProjectDetails]);
 
   const handleDraftAnnotationClick = async () => {
     annotation_status.current = "draft";
