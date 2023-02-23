@@ -240,7 +240,6 @@ const TaskTable = (props) => {
       });
     }
   };
-
   const labelAllTasks = () => {
     let search_filters = Object?.keys(selectedFilters)
       .filter((key) => key?.startsWith("search_"))
