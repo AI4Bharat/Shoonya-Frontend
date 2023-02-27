@@ -113,13 +113,12 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-console.log(ProjectDetails?.project_type.includes("Audio"),"aaaaaaaaaa")
-const projectType = ProjectDetails?.project_type.includes("Audio")
+// const projectType = ProjectDetails?.project_type?.includes("Audio")
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type.includes("Audio") ? false : true ,
+        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
