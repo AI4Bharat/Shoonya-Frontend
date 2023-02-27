@@ -31,7 +31,7 @@ const DatasetDetails = () => {
     const dispatch = useDispatch();
     const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
     const DatasetMembers = useSelector((state) => state.getDatasetMembers.data);
-    
+    console.log(DatasetMembers,"DatasetMembersDatasetMembers")
     useEffect(() => {
 		dispatch(APITransport(new GetDatasetDetailsAPI(datasetId)));
 		dispatch(APITransport(new GetDatasetMembersAPI(datasetId)));

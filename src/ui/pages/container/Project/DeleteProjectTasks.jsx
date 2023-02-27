@@ -146,12 +146,12 @@ export default function DeleteProjectTasks() {
                     p: 2,
                     borderRadius: 3,
                     ml: 2,
-                    mb: 2,
                     width: "300px"
                 }}
                 aria-describedby={Id}
                 variant="contained"
-                onClick={handleClick}>
+                onClick={handleClick}
+                color="error">
                 Delete Project Tasks
             </Button>
 
@@ -349,7 +349,7 @@ export default function DeleteProjectTasks() {
                 <DialogContent>
 
                     <DialogContentText id="alert-dialog-description">
-                    Are you you want to delete these tasks? Please note this action cannot be undone.
+                    Are you want to delete these tasks? Please note this action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

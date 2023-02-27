@@ -44,6 +44,7 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
 import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
+import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
 
 
 const ProgressType = [
@@ -106,6 +107,9 @@ const AdvancedOperation = (props) => {
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const ProjectTypes = useSelector(
     (state) => state.getProjectTypeDetails?.data
+  );
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
   );
 
   const getProjectDetails = () => {
@@ -537,6 +541,10 @@ const AdvancedOperation = (props) => {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeleteProjectTasks />
           </Grid>
+          {loggedInUserData?.role === 2 && (<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <DeallocationAnnotatorsAndReviewers />
+          </Grid>)}
+          
         </Grid>
 
         <Grid
