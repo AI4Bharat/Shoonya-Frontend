@@ -349,7 +349,7 @@ export default function DeleteProjectTasks() {
                 <DialogContent>
 
                     <DialogContentText id="alert-dialog-description">
-                    Are you want to delete these tasks? Please note this action cannot be undone.
+                    Are you  sure want to delete these tasks? Please note this action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
