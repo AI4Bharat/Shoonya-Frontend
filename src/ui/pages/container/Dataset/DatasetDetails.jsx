@@ -1,7 +1,8 @@
 import {useState} from 'react';
-import { Box, Card, Grid, ThemeProvider, Typography, Tabs, Tab } from "@mui/material";
+import { Box, Card, Grid, ThemeProvider, Typography, Tabs, Tab ,IconButton, Tooltip} from "@mui/material";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import themeDefault from '../../../theme/theme'
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useEffect } from "react";
@@ -29,8 +30,10 @@ const DatasetDetails = () => {
     )
 
     const dispatch = useDispatch();
+    let navigate = useNavigate();
     const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
     const DatasetMembers = useSelector((state) => state.getDatasetMembers.data);
+    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     
     useEffect(() => {
 		dispatch(APITransport(new GetDatasetDetailsAPI(datasetId)));
@@ -56,6 +59,11 @@ const DatasetDetails = () => {
         ])
     }, [DatasetDetails.instance_id]);
 
+    const handleOpenSettings = () => {
+        // navigate(`/projects/${id}/projectsetting`);
+        navigate(`/datasets/${datasetId}/datasetsetting`)
+    }
+
     return (
         <ThemeProvider theme={themeDefault}>
             <Grid
@@ -71,9 +79,32 @@ const DatasetDetails = () => {
                         padding: 5,
                     }}
                 >
-                    <Typography variant="h3">
+                    {/* <Typography variant="h3">
                         {DatasetDetails.instance_name}
-                    </Typography>
+                    </Typography> */}
+                    <Grid
+                        container
+                        direction='row'
+                        justifyContent='center'
+                        alignItems='center'
+                        sx={{ mb: 3 }}
+                    >
+                        <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
+                            <Typography  variant="h3">{DatasetDetails.instance_name}</Typography>
+                        </Grid>
+
+                        {userDetails?.role !== 1 && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                            <Tooltip title={translate("label.showProjectSettings")}>
+                                <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
+                                    <SettingsOutlinedIcon
+                                        color="primary.dark"
+                                        fontSize="large"
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        </Grid>}
+
+                    </Grid>
                     {/* <Grid
                         container
                         alignItems="center"
