@@ -231,6 +231,11 @@ const AdvancedOperation = (props) => {
     }
   };
 
+  const handleDownoadMetadataToggle = async () => {
+    // setLoading(true);
+    setDownloadMetadataToggle((downloadMetadataToggle)=>!downloadMetadataToggle)
+  };
+
   const getPublishProjectButton = async () => {
     const projectObj = new GetPublishProjectButtonAPI(id);
     //dispatch(APITransport(projectObj));
@@ -292,6 +297,7 @@ const AdvancedOperation = (props) => {
 
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
   const [isArchived, setIsArchived] = useState(false);
+  const [downloadMetadataToggle,setDownloadMetadataToggle]=useState(true)
   console.log(ProjectDetails.is_archived, "is_archived", isArchived);
   const getArchiveProjectAPI = () => {
     const projectObj = new GetArchiveProjectAPI(id);
@@ -536,6 +542,7 @@ const AdvancedOperation = (props) => {
             <DownloadProjectButton
               taskStatus={taskStatus}
               SetTask={setTaskStatus}
+              downloadMetadataToggle={downloadMetadataToggle}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -567,6 +574,30 @@ const AdvancedOperation = (props) => {
               labelPlacement="start"
               checked={ProjectDetails.enable_task_reviews}
               onChange={handleReviewToggle}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid
+          container
+          // direction="row"
+          xs={12}
+          md={12}
+          lg={2}
+          xl={2}
+          sm={12}
+          spacing={1}
+          rowGap={2}
+          columnSpacing={2}
+        >
+          {/* <div className={classes.divider} ></div> */}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <FormControlLabel
+              control={<Switch color="primary" />}
+              label="Download Metadata"
+              labelPlacement="start"
+              checked={downloadMetadataToggle}
+              onChange={handleDownoadMetadataToggle}
             />
           </Grid>
         </Grid>
