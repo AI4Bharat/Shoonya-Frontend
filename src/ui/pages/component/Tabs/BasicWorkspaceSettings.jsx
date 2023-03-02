@@ -7,18 +7,20 @@ import OutlinedTextField from "../common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
 // import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
-import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
+// import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 // import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
-import GetSaveButtonAPI from "../../../../redux/actions/api/Dataset/DatasetEditUpdate";
+// import GetSaveButtonAPI from "../../../../redux/actions/api/Dataset/DatasetEditUpdate";
+import GetWorkspaceSaveButtonAPI from "../../../../redux/actions/api/WorkspaceDetails/WorkspaceEditUpdate";
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import CustomButton from "../common/Button";
 import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../common/Spinner";
+import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 
 
 
-const BasicDatasetSettings = (props) => {
+const BasicWorkspaceSettings = (props) => {
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -27,47 +29,44 @@ const BasicDatasetSettings = (props) => {
     const [value, setValue] = useState();
     const [loading, setLoading] = useState(false);
     const [newDetails, setNewDetails] = useState();
-    const { datasetId } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
-    console.log(DatasetDetails)
+    
    
-    const GetDatasetDetails = () => {
-        const DatasetObj = new GetDatasetDetailsAPI(datasetId);
-        dispatch(APITransport(DatasetObj));
-    }
+    const workspaceDetails = useSelector(state=>state.getWorkspaceDetails.data);
+    console.log('test')
+    console.log(workspaceDetails)
+    const getWorkspaceDetails = ()=>{
+        const workspaceObj = new GetWorkspacesDetailsAPI(id);
+        dispatch(APITransport(workspaceObj));
+      }
 
     useEffect(() => {
-        GetDatasetDetails();
+        getWorkspaceDetails();
     }, []);
 
     useEffect(() => {
         setNewDetails({
-            instance_name: DatasetDetails?.instance_name,
-            instance_description: DatasetDetails?.instance_description=='' || DatasetDetails?.instance_description=='None'?'':DatasetDetails.instance_description,
+            workspace_name: workspaceDetails?.workspace_name
         });
-    }, [DatasetDetails]);
+    }, [workspaceDetails]);
 
     const handleSave = async () => {
 
         const sendData = {
-            instance_name: newDetails.instance_name,
-            instance_description: newDetails.instance_description,
-
-            parent_instance_id: DatasetDetails.parent_instance_id,
-            dataset_type: DatasetDetails.dataset_type,
-            organisation_id: DatasetDetails.organisation_id,
-            users: DatasetDetails.users,
+            workspace_name: newDetails.workspace_name,
+            organization: workspaceDetails.organization,
+            is_archived: workspaceDetails.is_archived
         }
-        const DatasetObj = new GetSaveButtonAPI(datasetId, sendData);
-        dispatch(APITransport(DatasetObj));
-        const res = await fetch(DatasetObj.apiEndPoint(), {
+        const workspaceObj = new GetWorkspaceSaveButtonAPI(id, sendData);
+        dispatch(APITransport(workspaceObj));
+        const res = await fetch(workspaceObj.apiEndPoint(), {
             method: "PUT",
-            body: JSON.stringify(DatasetObj.getBody()),
-            headers: DatasetObj.getHeaders().headers,
+            body: JSON.stringify(workspaceObj.getBody()),
+            headers: workspaceObj.getHeaders().headers,
         });
         const resp = await res.json();
         setLoading(false);
@@ -97,7 +96,7 @@ const BasicDatasetSettings = (props) => {
         setLoading(apiLoading);
     }, [apiLoading])
 
-    const handleDatasetName = (event) => {
+    const handleWorkspaceName = (event) => {
 
         event.preventDefault();
         setNewDetails((prev) => ({
@@ -153,7 +152,7 @@ const BasicDatasetSettings = (props) => {
                         xl={2}
                     >
                         <Typography variant="body2" fontWeight='700' label="Required">
-                            Dataset Name
+                            Workspace Name
                         </Typography>
                     </Grid>
                     <Grid
@@ -166,51 +165,11 @@ const BasicDatasetSettings = (props) => {
                     >
                         <OutlinedTextField
                             fullWidth
-                            name="instance_name"
+                            name="workspace_name"
                             InputProps={{ style: { fontSize: "14px", width: "500px" } }}
                             // value={ProjectDetails.title}
-                            value={newDetails?.instance_name}
-                            onChange={handleDatasetName} />
-                    </Grid>
-                </Grid>
-                <Grid
-                    container
-                    direction='row'
-                    sx={{
-                        alignItems: "center",
-                        // justifyContent: "space-between",
-                        mt: 2
-                    }}
-                >
-                    <Grid
-                        items
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={2}
-                        xl={2}
-                    >
-
-                        <Typography variant="body2" fontWeight='700'>
-                            Dataset Description
-                        </Typography>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        md={12}
-                        lg={9}
-                        xl={9}
-                        sm={12}
-
-                    >
-                        <OutlinedTextField
-                            fullWidth
-                            name="instance_description"
-                            InputProps={{ style: { fontSize: "14px", width: "500px" } }}
-                            value={newDetails?.instance_description}
-                            onChange={handleDatasetName}
-                        />
+                            value={newDetails?.workspace_name}
+                            onChange={handleWorkspaceName} />
                     </Grid>
                 </Grid>
                 <Grid
@@ -227,7 +186,7 @@ const BasicDatasetSettings = (props) => {
                     }}
                 >
                     <CustomButton sx={{ inlineSize: "max-content", marginRight: "10px", width: "80px" }}
-                        onClick={() => navigate(`/dataset/:id/`)}
+                        onClick={() => navigate(`/workspace/:id/`)}
                         // onClick={handleCancel}
                         label="Cancel" />
                     <CustomButton sx={{ inlineSize: "max-content", width: "80px" }}
@@ -239,4 +198,4 @@ const BasicDatasetSettings = (props) => {
     )
 }
 
-export default BasicDatasetSettings;
+export default BasicWorkspaceSettings;

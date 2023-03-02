@@ -40,6 +40,7 @@ import browserhistory from "./web.history";
 import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
 // import DatasetSettings from "./ui/pages/container/Dataset/DatasetSettings";
 import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
+import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
 
 
 const App = () => {
@@ -189,6 +190,12 @@ const App = () => {
           path="workspaces/:id"
           element={ProtectedRouteWrapper(
             <Layout component={<WorkSpace />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="workspaces/:id/workspacesetting"
+          element={ProtectedRouteWrapper(
+            <Layout component={<WorkspaceSettingTabs />} Backbutton={true} />
           )}
         />
         <Route
