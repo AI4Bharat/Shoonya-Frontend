@@ -143,7 +143,7 @@ const MembersTable = (props) => {
     // });
     const handleProjectMember = async (userid) => {
         const projectObj = new RemoveProjectMemberAPI(id, { ids: [userid] });
-        dispatch(APITransport(projectObj));
+        //dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
@@ -169,7 +169,7 @@ const MembersTable = (props) => {
     }
     const handleProjectReviewer = async (Projectid) => {
         const projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] });
-        dispatch(APITransport(projectObj));
+       // dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
