@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import { ThemeProvider, Grid } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
@@ -8,15 +8,44 @@ import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRol
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useParams } from "react-router-dom";
+import CustomizedSnackbars from '../common/Snackbar';
 
-export default function Frozenusers() {
-  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+
+export default function Frozenusers(props) {
+  const { onRemoveFrozenusers,ProjectDetails } = props;
+
   const dispatch = useDispatch();
   const { id } = useParams();
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
 
-  const handleRemoveFrozenUsers = (FrozenUserId) => {
+  const handleRemoveFrozenUsers = async(FrozenUserId) => {
     const projectObj = new RemoveFrozenUserAPI(id, { ids: [FrozenUserId] });
-    dispatch(APITransport(projectObj));
+    //dispatch(APITransport(projectObj));
+    const res = await fetch(projectObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(projectObj.getBody()),
+      headers: projectObj.getHeaders().headers,
+  });
+  const resp = await res.json();
+  // setLoading(false);
+  if (res.ok) {
+      setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+      })
+      onRemoveFrozenusers();
+  } else {
+      setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+      })
+  }
   };
 
   const columns = [
@@ -112,8 +141,23 @@ export default function Frozenusers() {
     search: false,
     jumpToPage: true,
   };
+
+  const renderSnackBar = () => {
+    return (
+        <CustomizedSnackbars
+            open={snackbar.open}
+            handleClose={() =>
+                setSnackbarInfo({ open: false, message: "", variant: "" })
+            }
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            variant={snackbar.variant}
+            message={snackbar.message}
+        />
+    );
+};
   return (
     <div>
+        {renderSnackBar()}
       <ThemeProvider theme={tableTheme}>
         <MUIDataTable
           // title={""}
