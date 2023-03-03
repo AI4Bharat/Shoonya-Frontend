@@ -161,7 +161,7 @@ const DatasetDetails = () => {
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.logs")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {/* <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} /> */}
                         </Tabs>
                     </Box>
                     <TabPanel value={selectedTab} index={0}>
@@ -176,9 +176,9 @@ const DatasetDetails = () => {
                     <TabPanel value={selectedTab} index={3}>
                         <DatasetLogs datasetId={datasetId} />
                     </TabPanel>
-                    <TabPanel value={selectedTab} index={4}>
+                    {/* <TabPanel value={selectedTab} index={4}>
                         <DatasetSettings datasetId={datasetId} />
-                    </TabPanel>
+                    </TabPanel> */}
                 </Card>
             </Grid>
         </ThemeProvider>
