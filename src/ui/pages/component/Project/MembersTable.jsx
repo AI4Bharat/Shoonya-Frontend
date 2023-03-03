@@ -22,7 +22,6 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
 
-
 const columns = [
   {
     name: "Name",
@@ -86,6 +85,7 @@ const MembersTable = (props) => {
   const dispatch = useDispatch();
   const [userRole, setUserRole] = useState();
   const [loading, setLoading] = useState(false);
+
   const { dataSource, hideButton, onRemoveSuccessGetUpdatedMembers } = props;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -98,7 +98,7 @@ const MembersTable = (props) => {
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
   );
-  console.log(ProjectDetails.frozen_users, "ProjectDetailsProjectDetails");
+ 
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -128,12 +128,7 @@ const MembersTable = (props) => {
   const handleUserDialogOpen = () => {
     setAddUserDialogOpen(true);
   };
-  // const Projectdata = ProjectDetails && ProjectDetails.filter((el,i)=>{
-  //     return [
-  //                 el.email,
-
-  //             ]
-  // });
+ 
   const handleProjectMember = async (userid) => {
     const projectObj = new RemoveProjectMemberAPI(id, { ids: [userid] });
     //dispatch(APITransport(projectObj));
@@ -185,32 +180,31 @@ const MembersTable = (props) => {
     }
   };
 
-  const handleRemoveFrozenUsers = async(FrozenUserId) => {
+  const handleRemoveFrozenUsers = async (FrozenUserId) => {
     const projectObj = new RemoveFrozenUserAPI(id, { ids: [FrozenUserId] });
     //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
       headers: projectObj.getHeaders().headers,
-  });
-  const resp = await res.json();
-  // setLoading(false);
-  if (res.ok) {
+    });
+    const resp = await res.json();
+    // setLoading(false);
+    if (res.ok) {
       setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "success",
-      })
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
       onRemoveSuccessGetUpdatedMembers();
-  } else {
+    } else {
       setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "error",
-      })
-  }
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
   };
-
 
   useEffect(() => {
     setLoading(apiLoading);
@@ -234,7 +228,7 @@ const MembersTable = (props) => {
             el.username,
             el.email,
             userRole ? userRole : el.role,
-            <>
+            <div >
               <CustomButton
                 sx={{ p: 1, borderRadius: 2 }}
                 onClick={() => {
@@ -244,25 +238,17 @@ const MembersTable = (props) => {
               />
 
               {props.type === addUserTypes.PROJECT_ANNOTATORS && (
-                <>
-                  <CustomButton
-                    sx={{
-                      borderRadius: 2,
-                      backgroundColor: "#cf5959",
-                      m: 1,
-                      height: "40px",
-                    }}
-                    label="Remove"
-                    onClick={() => handleProjectMember(el.id)}
-                    disabled={projectlist(el.id)}
-                  />
-                  {ProjectDetails.frozen_users && ProjectDetails.frozen_users.length > 0 &&
-                  <CustomButton
-                    sx={{ borderRadius: 2, backgroundColor: "#cf5959" }}
-                    label="Remove"
-                    onClick={() => handleRemoveFrozenUsers(el.id)}
-                  />}
-                </>
+                <CustomButton
+                  sx={{
+                    borderRadius: 2,
+                    backgroundColor: "#cf5959",
+                    m: 1,
+                    height: "40px",
+                  }}
+                  label="Remove"
+                  onClick={() => handleProjectMember(el.id)}
+                  disabled={projectlist(el.id)}
+                />
               )}
               {props.type === addUserTypes.PROJECT_REVIEWER && (
                 <CustomButton
@@ -277,7 +263,17 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-            </>,
+
+             
+                {projectlist(el.id) &&(
+                  <CustomButton
+                    sx={{ borderRadius: 2}}
+                    label="Add"
+                    onClick={() => handleRemoveFrozenUsers(el.id)}
+                  />
+                )} 
+               
+            </div>,
           ];
         })
       : [];
