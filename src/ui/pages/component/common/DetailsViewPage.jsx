@@ -1,4 +1,4 @@
-import { Box, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
+import { Box, Card, Grid, Tab, Tabs, ThemeProvider, Typography,IconButton, Tooltip } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from '../../../theme/theme'
@@ -24,6 +24,7 @@ import AddUsersDialog from "./AddUsersDialog";
 import addUserTypes from "../../../../constants/addUserTypes";
 import AddWorkspaceDialog from "../Workspace/AddWorkspaceDialog";
 import Spinner from "../../component/common/Spinner";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import {  useSelector,useDispatch } from 'react-redux';
 import WorkspaceSetting from "../Tabs/WorkspaceSetting";
 
@@ -53,6 +54,7 @@ const DetailsViewPage = (props) => {
     const { pageType, title, createdBy ,onArchiveWorkspace} = props;
     const { id,orgId } = useParams();
     const classes = DatasetStyle();
+    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const dispatch = useDispatch();
     const [value, setValue] = React.useState(0);
     const [loading, setLoading] = useState(false);
@@ -72,6 +74,8 @@ const DetailsViewPage = (props) => {
     useEffect(() => {
         // getDashboardWorkspaceData();
     }, []);
+
+    let navigate = useNavigate();
     
     const handleAnnotatorDialogClose = () => {
         setAddAnnotatorsDialogOpen(false);
@@ -100,6 +104,9 @@ const DetailsViewPage = (props) => {
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
+    const handleOpenSettings = () => {
+        navigate(`/workspaces/${id}/workspacesetting`);
+    }
     return (
         <ThemeProvider theme={themeDefault}>
              {loading && <Spinner />}
@@ -110,9 +117,32 @@ const DetailsViewPage = (props) => {
                 alignItems='center'
             >
                 <Card className={classes.workspaceCard}>
-                    <Typography variant="h2" gutterBottom component="div">
+                    {pageType === componentType.Type_Organization && <Typography variant="h2" gutterBottom component="div">
                         {title}
-                    </Typography>
+                    </Typography>}
+                    {pageType === componentType.Type_Workspace && <Grid
+                        container
+                        direction='row'
+                        justifyContent='center'
+                        alignItems='center'
+                        sx={{ mb: 3 }}
+                    >
+                        <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
+                            <Typography  variant="h3">{title}</Typography>
+                        </Grid>
+
+                        {userDetails?.role !== 1 && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                            <Tooltip title={translate("label.showProjectSettings")}>
+                                <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
+                                    <SettingsOutlinedIcon
+                                        color="primary.dark"
+                                        fontSize="large"
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        </Grid>}
+
+                    </Grid>}
                     <Typography variant="body1" gutterBottom component="div">
                         Created by : {createdBy}
                     </Typography>
@@ -133,7 +163,7 @@ const DetailsViewPage = (props) => {
                             {pageType === componentType.Type_Organization && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
 
-                            <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {pageType === componentType.Type_Organization && <Tab label={'Organization '+translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0} style={{ textAlign: "center", maxWidth: "100%" }}>
@@ -215,7 +245,6 @@ const DetailsViewPage = (props) => {
                     </TabPanel>
                     <TabPanel value={value} index={4}>
                         {pageType === componentType.Type_Organization && <OrganizationSettings />}
-                        {pageType === componentType.Type_Workspace && <WorkspaceSetting  onArchiveWorkspace={onArchiveWorkspace}/> }
                     </TabPanel>
                 </Card>
             </Grid>
