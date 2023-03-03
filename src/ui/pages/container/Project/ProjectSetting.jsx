@@ -5,7 +5,6 @@ import BasicSettings from '../../component/Tabs/BasicSettings';
 import ReadonlyConfigurations from '../../component/Tabs/ReadonlyConfigurations'
 import AdvancedOperation from '../../component/Tabs/AdvancedOperation';
 import ProjectLogs from './ProjectLogs';
-import Frozenusers from '../../component/Tabs/Frozenusers';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
@@ -78,7 +77,6 @@ const ProjectSetting = () => {
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="Basic " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label=" Advanced " sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Frozen Users " sx={{ fontSize: 17, fontWeight: '700' }} />
                     <Tab label=" Read-only " sx={{ fontSize: 17, fontWeight: '700' }} />
                     <Tab label=" Logs " sx={{ fontSize: 17, fontWeight: '700' }} />
                 </Tabs>
@@ -92,12 +90,9 @@ const ProjectSetting = () => {
                     <AdvancedOperation />
                 </TabPanel>
                 <TabPanel value={tabValue} index={2}>
-                < Frozenusers ProjectDetails={ProjectDetails} onRemoveFrozenusers={() => getProjectDetails()} />
-                </TabPanel>
-                <TabPanel value={tabValue} index={3}>
                 <ReadonlyConfigurations />
                 </TabPanel>
-                <TabPanel value={tabValue} index={4}>
+                <TabPanel value={tabValue} index={3}>
                     <ProjectLogs />
                 </TabPanel>
             </Box>
