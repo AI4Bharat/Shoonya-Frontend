@@ -698,6 +698,7 @@ export default function LSF() {
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
+  const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
   const [alertData, setAlertData] = useState({
     open: false,
@@ -708,6 +709,7 @@ export default function LSF() {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
 
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
@@ -717,6 +719,12 @@ export default function LSF() {
       setAlertData({ open: true, message: `Tag ${copyValue} copied to clipboard`, variant: "info" });
     }
   }
+
+  useEffect(()=>{
+    if(ProjectDetails?.project_type && ProjectDetails?.project_type.toLowerCase().includes("audio")){
+      setShowTagsInput(true);
+    }
+  }, [ProjectDetails])
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -843,8 +851,7 @@ export default function LSF() {
           <Glossary taskData={taskData} />
         </div>
 
-        {/* <Typography variant="subtitle1">Select Language :</Typography> */}
-        <Autocomplete
+        {showTagsInput && <Autocomplete
           freeSolo
           value={selectedTag}
           onChange={handleTagChange}
@@ -859,7 +866,7 @@ export default function LSF() {
               autoComplete: 'new-password', // disable autocomplete and autofill
             }}
           />}
-        />
+        />}
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({...alertData, open: false })}
