@@ -38,6 +38,9 @@ import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 import ProgressList from "./ui/pages/container/Progress/ProgressList"
 import browserhistory from "./web.history";
 import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
+// import DatasetSettings from "./ui/pages/container/Dataset/DatasetSettings";
+import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
+import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
 
 
 const App = () => {
@@ -162,6 +165,7 @@ const App = () => {
             <Layout component={<ProjectSetting />} Backbutton={true} />
           )}
         />
+        
         <Route
           path="projects/:projectId/task/:taskId"
           element={ProtectedRouteWrapper(
@@ -186,6 +190,12 @@ const App = () => {
           path="workspaces/:id"
           element={ProtectedRouteWrapper(
             <Layout component={<WorkSpace />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="workspaces/:id/workspacesetting"
+          element={ProtectedRouteWrapper(
+            <Layout component={<WorkspaceSettingTabs />} Backbutton={true} />
           )}
         />
         <Route
@@ -220,6 +230,12 @@ const App = () => {
           path="datasets/:datasetId"
           element={ProtectedRouteWrapper(
             <Layout component={<DatasetDetails />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="datasets/:datasetId/datasetsetting"
+          element={ProtectedRouteWrapper(
+            <Layout component={<DatasetSettingTabs />} Backbutton={true} />
           )}
         />
         <Route

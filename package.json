@@ -15,6 +15,7 @@
     "@mui/styles": "^5.8.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.6",
     "@mui/x-date-pickers-pro": "^5.0.0-alpha.6",
+    "@react-hook/media-query": "^1.1.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
     "@testing-library/user-event": "^13.5.0",

@@ -43,6 +43,8 @@ import DeleteProjectTasks from "../../container/Project/DeleteProjectTasks";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
+import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
+import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
 
 
 const ProgressType = [
@@ -106,6 +108,9 @@ const AdvancedOperation = (props) => {
   const ProjectTypes = useSelector(
     (state) => state.getProjectTypeDetails?.data
   );
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
 
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
@@ -166,6 +171,37 @@ const AdvancedOperation = (props) => {
     }
   };
 
+  const getDownloadProjectAnnotations=async()=>{
+    // 'https://backend.shoonya.ai4bharat.org/projects/606/export_project_tasks/'
+    // SetTask([])
+    // setLoading(true)
+    const projectObj = new getDownloadProjectAnnotationsAPI(id,taskStatus);
+    dispatch(APITransport(projectObj));
+    // const projectObj = new GetPublishProjectButtonAPI(id);
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "success",
+    //   });
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   });
+    // }
+
+      
+  }
+
   const handleReviewToggle = async () => {
     setLoading(true);
     const reviewObj = ProjectDetails.enable_task_reviews
@@ -193,6 +229,11 @@ const AdvancedOperation = (props) => {
         variant: "error",
       });
     }
+  };
+
+  const handleDownoadMetadataToggle = async () => {
+    // setLoading(true);
+    setDownloadMetadataToggle((downloadMetadataToggle)=>!downloadMetadataToggle)
   };
 
   const getPublishProjectButton = async () => {
@@ -256,6 +297,7 @@ const AdvancedOperation = (props) => {
 
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
   const [isArchived, setIsArchived] = useState(false);
+  const [downloadMetadataToggle,setDownloadMetadataToggle]=useState(true)
   console.log(ProjectDetails.is_archived, "is_archived", isArchived);
   const getArchiveProjectAPI = () => {
     const projectObj = new GetArchiveProjectAPI(id);
@@ -266,6 +308,9 @@ const AdvancedOperation = (props) => {
     setIsArchived(ProjectDetails?.is_archived);
   }, [ProjectDetails]);
 
+  const handleDownloadProjectAnnotations = () => {
+    getDownloadProjectAnnotations();
+  };
   const handleExportProject = () => {
     getExportProjectButton();
   };
@@ -425,6 +470,28 @@ const AdvancedOperation = (props) => {
           sx={{ float: "left" }}
           columnSpacing={2}
         >
+          {ProjectDetails.project_type=='ContextualTranslationEditing'?(
+          <Grid
+              item
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+
+          >
+              <CustomButton
+                  sx={{
+                      inlineSize: "max-content",
+                      p: 2,
+                      borderRadius: 3,
+                      ml: 2,
+                      width: "300px",
+
+                  }}
+                  onClick={handleDownloadProjectAnnotations}
+                  label="Downoload Project Annotations" />
+          </Grid>):" "}
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
@@ -475,11 +542,16 @@ const AdvancedOperation = (props) => {
             <DownloadProjectButton
               taskStatus={taskStatus}
               SetTask={setTaskStatus}
+              downloadMetadataToggle={downloadMetadataToggle}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeleteProjectTasks />
           </Grid>
+          {loggedInUserData?.role === 2 && (<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <DeallocationAnnotatorsAndReviewers />
+          </Grid>)}
+          
         </Grid>
 
         <Grid
@@ -502,6 +574,30 @@ const AdvancedOperation = (props) => {
               labelPlacement="start"
               checked={ProjectDetails.enable_task_reviews}
               onChange={handleReviewToggle}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid
+          container
+          // direction="row"
+          xs={12}
+          md={12}
+          lg={2}
+          xl={2}
+          sm={12}
+          spacing={1}
+          rowGap={2}
+          columnSpacing={2}
+        >
+          {/* <div className={classes.divider} ></div> */}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <FormControlLabel
+              control={<Switch color="primary" />}
+              label="Download Metadata"
+              labelPlacement="start"
+              checked={downloadMetadataToggle}
+              onChange={handleDownoadMetadataToggle}
             />
           </Grid>
         </Grid>

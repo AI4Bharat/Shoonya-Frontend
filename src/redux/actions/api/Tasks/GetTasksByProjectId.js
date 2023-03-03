@@ -12,7 +12,7 @@ export default class GetTasksByProjectIdAPI extends API {
     super("GET", timeout, false);
     const datavalue = []
     this.type = constants.GET_TASK_LIST;
-    let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}`;
+    let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}`;
     for (let key in selectedFilters) {
      if (selectedFilters[key] && selectedFilters[key] !== -1) {
     switch (key) {

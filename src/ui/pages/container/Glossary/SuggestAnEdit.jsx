@@ -20,6 +20,11 @@ import getDomains from "../../../../redux/actions/api/Glossary/GetDomains";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CustomizedSnackbars from "../../../pages/component/common/Snackbar";
 import SuggestAnEditAPI from "../../../../redux/actions/api/Glossary/SuggestAnEdit";
+import {
+  IndicTransliterate,
+  getTransliterationLanguages,
+} from "@ai4bharat/indic-transliterate";
+import "@ai4bharat/indic-transliterate/dist/index.css";
 
 const SuggestAnEdit = ({
   openDialog,
@@ -31,11 +36,12 @@ const SuggestAnEdit = ({
   domainValue,
   setDomainValue,
   data,
+  targetlang
 }) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
-console.log(sourceText,"sourceTextsourceText")
- 
+
+const [Targetlanguage, setTargetlanguage] = useState([]);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -55,6 +61,32 @@ console.log(sourceText,"sourceTextsourceText")
   };
   const handleDomainChange = (e) => {
     setDomainValue(e.target.value);
+  };
+
+  useEffect(() => {
+
+    getTransliterationLanguages()
+      .then(langs => {
+        setTargetlanguage(langs)
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }, [])
+
+  var targetData = Targetlanguage?.filter((e)=>e.LangCode.includes(targetlang))
+
+  const renderTargetText = (props) => {
+    return (
+      <>
+        <textarea
+          {...props}
+          placeholder={"Target Text"}
+          rows={2}
+          className={classes.textTransliteration}
+        />
+      </>
+    );
   };
 
   const renderSnackBar = () => {
@@ -103,20 +135,33 @@ console.log(sourceText,"sourceTextsourceText")
                 flexDirection="row"
                 justifyContent="space-around"
                 alignItems="center"
+               
               >
                 <OutlinedTextField
                   label="Source Text"
                   placeholder="Source Text"
-                  sx={{ m: 1, width: 200 }}
+                  sx={{  m: 1, width: 200 ,input: { color: 'rgba(0, 0, 0, 0.6)' } }}
                   value={sourceText}
                 />
-                <OutlinedTextField
+
+                { targetData.length > 0 && targetlang !== "en" ? (
+                 <IndicTransliterate
+                  lang={Targetlanguage.LangCode ? Targetlanguage.LangCode : (targetData.length > 0  ?  targetData[0]?.LangCode : "en" )}
+                  value={targetText}
+                  onChangeText={(targetText) => {
+                    settargetText(targetText);
+                  }}
+                  renderComponent={(props) => renderTargetText(props)}
+                />): (
+                 <OutlinedTextField
+
                   label="Target Text"
                   placeholder="Target Text"
                   sx={{ m: 1, width: 200 }}
                   value={targetText}
                   onChange={handleTargetTextChange}
-                />
+                />)}
+
               </Grid>
               <Grid
                 container

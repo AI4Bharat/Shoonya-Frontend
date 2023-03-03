@@ -22,6 +22,11 @@ import getDomains from "../../../../redux/actions/api/Glossary/GetDomains";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import AddGlossaryAPI from "../../../../redux/actions/api/Glossary/AddGlossary";
 import CustomizedSnackbars from "../../..//pages/component/common/Snackbar";
+import {
+  IndicTransliterate,
+  getTransliterationLanguages,
+} from "@ai4bharat/indic-transliterate";
+import "@ai4bharat/indic-transliterate/dist/index.css";
 
 const AddGlossary = ({
   openDialog,
@@ -45,7 +50,14 @@ const AddGlossary = ({
     message: "",
     variant: "success",
   });
-  console.log(allLevels[0].key, "allLevelsallLevels");
+  const [Sourcelanguage, setSourcelanguage] = useState([]);
+  const [Targetlanguage, setTargetlanguage] = useState([]);
+
+  var data = Targetlanguage?.filter((e)=>e.LangCode.includes(selectedTargetLang))
+  var Sourcedata = Sourcelanguage?.filter((e)=>e.LangCode.includes(selectedSourceLang))
+
+  console.log(Sourcedata,"SourcedataSourcedata" ,selectedSourceLang ==="en",Sourcelanguage )
+
   const allDomains = useSelector((state) => state.getDomains);
 
   useEffect(() => {
@@ -104,9 +116,9 @@ const AddGlossary = ({
         variant: "error",
       });
     }
-    setdomain("")
-    setSourceText("")
-    settargetText("")
+    setdomain("");
+    setSourceText("");
+    settargetText("");
   };
 
   const handleSrcLangChange = (e) => {
@@ -132,6 +144,46 @@ const AddGlossary = ({
     setlevel(e.target.value);
   };
 
+  useEffect(() => {
+  
+    getTransliterationLanguages()
+    .then(langs => {
+      setSourcelanguage(langs);
+      setTargetlanguage(langs)
+    })
+    .catch(err => {
+      console.log(err);
+    }) 
+   
+   
+  }, [])
+
+
+  const renderTargetText = (props) => {
+    return (
+      <>
+        <textarea
+          {...props}
+          placeholder={"Target Text"}
+          rows={2}
+          className={classes.textTransliteration}
+        />
+      </>
+    );
+  };
+  const renderSourceText = (props) => {
+    return (
+      <>
+        <textarea
+          {...props}
+          placeholder={"Source Text"}
+          rows={2}
+          className={classes.textTransliteration}
+         
+        />
+      </>
+    );
+  };
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -219,19 +271,40 @@ const AddGlossary = ({
                   marginTop: 4,
                 }}
               >
-                <OutlinedTextField
-                  placeholder="Source Text"
-                  sx={{ m: 1, width: 200 }}
+
+               
+                { Sourcedata.length > 0 && selectedSourceLang !== "en" ? (
+                 <IndicTransliterate
+                  lang={Sourcelanguage.LangCode  ? Sourcelanguage.LangCode  : (Sourcedata.length > 0   ?   Sourcedata[0]?.LangCode  : "hi" )}
                   value={SourceText}
-                  onChange={handleSourceTextChange}
-                />
-                <OutlinedTextField
+                  onChangeText={(SourceText) => {
+                    setSourceText(SourceText);
+                  }}
+                  renderComponent={(props) => renderSourceText(props)}
+
+                 
+                />): ( <OutlinedTextField
+                placeholder="Source Text"
+                sx={{ m: 1, width: 200 }}
+                value={SourceText}
+                onChange={handleSourceTextChange}
+              />)}
+               { data.length > 0 && selectedTargetLang !== "en" ? (
+                <IndicTransliterate
+                  lang={Targetlanguage.LangCode  ? Targetlanguage.LangCode : (data.length > 0  ?  data[0]?.LangCode : "hi")}
+                  value={targetText}
+                  onChangeText={(targetText) => {
+                    settargetText(targetText);
+                  }}
+                  renderComponent={(props) => renderTargetText(props)}
+                />): ( <OutlinedTextField
                   placeholder="Target Text"
                   sx={{ m: 1, width: 200 }}
                   value={targetText}
                   onChange={handleTargetTextChange}
-                />
+                />)}
               </Grid>
+
               <Grid
                 container
                 flexDirection="row"
@@ -263,29 +336,7 @@ const AddGlossary = ({
                   </Select>
                 </FormControl>
                 <Grid sx={{ m: 1, minWidth: 200 }}></Grid>
-                {/* <FormControl sx={{ m: 1, minWidth: 200 }}>
-            <InputLabel id="demo-simple-select-helper-label">Level</InputLabel>
-            <Select
-              labelId="demo-simple-select-helper-label"
-              id="demo-simple-select-helper"
-              value={level}
-              label="Level"
-              onChange={handleLevelChange}
-              sx={{
-                textAlign: "left",
-              }}
-            >
-              {allLevels.map((el, i) => {
-                return <MenuItem value={el.key}>{el.name}</MenuItem>;
-              })}
-            </Select>
-          </FormControl> */}
-                {/* <OutlinedTextField
-            placeholder="Collection Source"
-            sx={{ width: 200 }}
-            value={collectionSource}
-            onChange={handleCollectionSourceTextChange}
-          /> */}
+               
               </Grid>
 
               <Grid sx={{ textAlignLast: "end" }}>

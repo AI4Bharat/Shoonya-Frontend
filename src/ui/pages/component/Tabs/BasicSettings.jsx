@@ -17,6 +17,8 @@ import Spinner from "../common/Spinner";
 
 
 const BasicSettings = (props) => {
+    const {ProjectDetails } = props;
+
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -34,19 +36,7 @@ const BasicSettings = (props) => {
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-   
-    const getProjectDetails = () => {
-        const projectObj = new GetProjectDetailsAPI(id);
-        dispatch(APITransport(projectObj));
-    }
-
-
-
-    useEffect(() => {
-        getProjectDetails();
-    }, []);
-
+  
 
     useEffect(() => {
         if (ProjectDetails.project_type === "MonolingualTranslation" ||ProjectDetails.project_type === "SemanticTextualSimilarity" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing"|| ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing") {

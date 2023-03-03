@@ -55,7 +55,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
   useEffect(() => {
     localStorage.setItem("labelStudio:settings", JSON.stringify({
-      bottomSidePanel: true,
+      bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
       continuousLabeling: false,
       enableAutoSave: false,
       enableHotkeys: true,
@@ -149,7 +149,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         "annotations:current",
         // "annotations:add-new",
         "annotations:delete",
-        // "annotations:view-all",
+        "annotations:view-all",
         "predictions:tabs",
         "predictions:menu",
         // "auto-annotation",

@@ -64,6 +64,7 @@ export default function Glossary(props) {
   const [sourceText, setSourceText] = useState();
   const [targetText, settargetText] = useState();
   const[domainValue,setDomainValue] = useState()
+  const[glossaryData,setGlossarydata] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -360,6 +361,8 @@ export default function Glossary(props) {
     },
   ];
 
+
+
   const pageSearch = () => {
     return Glossarysentence[0]?.glossaryPhrases.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -386,34 +389,40 @@ export default function Glossary(props) {
     });
   };
 
-  const data =
-    Glossarysentence[0]?.glossaryPhrases &&
-    Glossarysentence[0]?.glossaryPhrases.length > 0
-      ? pageSearch().map((el, i) => {
-          return [
-            el.srcText,
-            el.tgtText,
-            el.domain,
-            el.collectionSource,
-            <>
-              <Button onClick={() => handleCopyText(el.tgtText)}>
-                <Tooltip title="Copy">
-                  <ContentCopyIcon fontSize="small" />
-                </Tooltip>
-              </Button>
-              <span onClick={() => handleThumbsUpDown(el.hash,el.srcText,el.tgtText,el.domain,el.collectionSource,el.level)}>
-                <Button aria-describedby={id} onClick={handleClickThumbsUpDown}>
-                  <Tooltip title="Rate this translation">
-                    <ThumbsUpDownOutlinedIcon fontSize="medium" />
-                  </Tooltip>
-                </Button>
-              </span>
-            </>,
-            el.hash,
-            el.level,
-          ];
-        })
-      : [];
+
+      useEffect(() => {
+      
+        const data= Glossarysentence[0]?.glossaryPhrases &&
+        Glossarysentence[0]?.glossaryPhrases.length > 0
+          ? pageSearch().map((el, i) => {
+              return [
+                el.srcText,
+                el.tgtText,
+                el.domain,
+                el.collectionSource,
+                <>
+                  <Button onClick={() => handleCopyText(el.tgtText)}>
+                    <Tooltip title="Copy">
+                      <ContentCopyIcon fontSize="small" />
+                    </Tooltip>
+                  </Button>
+                  <span onClick={() => handleThumbsUpDown(el.hash,el.srcText,el.tgtText,el.domain,el.collectionSource,el.level)}>
+                    <Button aria-describedby={id} onClick={handleClickThumbsUpDown}>
+                      <Tooltip title="Rate this translation">
+                        <ThumbsUpDownOutlinedIcon fontSize="medium" />
+                      </Tooltip>
+                    </Button>
+                  </span>
+                </>,
+                el.hash,
+                el.level,
+              ];
+            })
+          : [];
+          setGlossarydata(data)
+      }, [Glossarysentence, SearchWorkspaceMembers])
+
+    
 
   const options = {
     textLabels: {
@@ -553,11 +562,12 @@ export default function Glossary(props) {
          domainValue={domainValue}
          setDomainValue={setDomainValue}
           data={taskData.data}
+          targetlang={targetlang}
       />
       )}
 
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable data={data} columns={columns} options={options} />
+        <MUIDataTable data={glossaryData} columns={columns} options={options} />
       </ThemeProvider>
     </>
   );

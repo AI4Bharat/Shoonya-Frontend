@@ -101,7 +101,7 @@ const WorkspaceReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: false,
+            sort: true,
             align: "center",
           },
         });
@@ -128,7 +128,7 @@ const WorkspaceReports = () => {
           label: key,
           options: {
             filter: false,
-            sort: false,
+            sort: true,
             align: "center",
           },
         });
