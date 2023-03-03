@@ -484,15 +484,15 @@ const Header = () => {
         />
       ),
     },
-    {
-      name: "Enable Tags Dropdown",
-      control: (
-        <Checkbox
-          onChange={handleTagsChange}
-          defaultChecked={localStorage.getItem("enableTags") === "true"}
-        />
-      ),
-    },
+    // {
+    //   name: "Enable Tags Dropdown",
+    //   control: (
+    //     <Checkbox
+    //       onChange={handleTagsChange}
+    //       defaultChecked={localStorage.getItem("enableTags") === "true"}
+    //     />
+    //   ),
+    // },
 
     // {
     //   name: "Help",
