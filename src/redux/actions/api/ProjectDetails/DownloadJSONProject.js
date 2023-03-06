@@ -6,9 +6,9 @@
  export default class DownloadProjectJSONAPI extends API {
     constructor(projectId, taskStatus ,downloadMetadataToggle=false, timeout = 2000) {
       super("POST", timeout, false);
-      this.projectBody={include_input_data_metadata_json:downloadMetadataToggle}
+      this.projectBody={}//object with key-value pair
       this.type = constants.DOWNLOAD_PROJECT_JSON;
-      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=JSON&task_status=${taskStatus}`;
+      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=JSON&task_status=${taskStatus}&include_input_data_metadata_json=${downloadMetadataToggle}`;
     }
   
     processResponse(res) {
