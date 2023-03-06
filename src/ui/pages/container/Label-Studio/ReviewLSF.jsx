@@ -23,6 +23,7 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
+import InfoIcon from '@mui/icons-material/Info';
 import getCaretCoordinates from "textarea-caret";
 
 import {
@@ -1025,22 +1026,36 @@ export default function LSF() {
         >
           <Glossary taskData={taskData} />
         </div>
-        {showTagsInput && <Autocomplete
-          freeSolo
-          value={selectedTag}
-          onChange={handleTagChange}
-          options={TabsSuggestionData}
-          size={"small"}
-          getOptionLabel={(option) => option}
-          sx={{ width: 300, display: "inline-flex", marginLeft: "10px", marginBottom: "20px", }}
-          renderInput={(params) => <TextField {...params} label="Select Noise Tag"
-            placeholder="Select Noise Tag"
-            inputProps={{
-              ...params.inputProps,
-              autoComplete: 'new-password', // disable autocomplete and autofill
+        {showTagsInput &&
+          <div
+            style={{
+              display: "inline-flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: "30px",
             }}
-          />}
-        />}
+          >
+            <Autocomplete
+              id="demo"
+              value={selectedTag}
+              onChange={handleTagChange}
+              options={TabsSuggestionData}
+              size={"small"}
+              getOptionLabel={(option) => option}
+              sx={{ width: 300, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
+              renderInput={(params) => <TextField {...params} label="Select Noise Tag"
+                placeholder="Select Noise Tag"
+                style={{ fontSize: "14px" }}
+              />}
+              renderOption={(props, option, state) => {
+                return <MenuItem {...props}>{option}</MenuItem>
+              }}
+
+            />
+            <Tooltip title="Lorem ipsum dolor sit amet" placement="right">
+              <InfoIcon color="primary" />
+            </Tooltip>
+          </div>}
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({...alertData, open: false })}
