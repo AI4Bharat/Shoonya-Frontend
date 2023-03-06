@@ -957,6 +957,12 @@ export default function LSF() {
           pt: 3,
         }}
       >
+        <div
+          style={{
+            display: "flow-root",
+            marginBottom: "30px"
+          }}
+        >
         {!loader && (
           <Button
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -1032,7 +1038,6 @@ export default function LSF() {
               display: "inline-flex",
               justifyContent: "center",
               alignItems: "center",
-              marginBottom: "30px",
             }}
           >
             <Autocomplete
@@ -1056,6 +1061,7 @@ export default function LSF() {
               <InfoIcon color="primary" />
             </Tooltip>
           </div>}
+          </div>
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({...alertData, open: false })}
