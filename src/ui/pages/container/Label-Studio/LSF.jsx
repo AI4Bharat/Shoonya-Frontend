@@ -784,13 +784,19 @@ export default function LSF() {
           pt: 3,
         }}
       >
+        <div
+            style={{
+              display: "flow-root",
+              marginBottom: "30px"
+            }}
+          >
         {!loader && (
           <Button
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
             variant="contained"
             color={reviewNotesRef.current?.value !== "" ? "success" : "primary"}
             onClick={handleCollapseClick}
-            style={{ marginBottom: "20px" }}
+            // style={{ marginBottom: "20px" }}
           >
             Notes {reviewNotesRef.current?.value !== "" && "*"}
           </Button>
@@ -838,7 +844,7 @@ export default function LSF() {
         </div>
         <Button
           variant="contained"
-          style={{ marginBottom: "20px", marginLeft: "10px" }}
+          style={{ marginLeft: "10px" }}
           endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
           onClick={handleGlossaryClick}
         >
@@ -854,15 +860,8 @@ export default function LSF() {
         </div>
 
         {showTagsInput &&
-          <div
-            style={{
-              display: "inline-flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: "30px",
-            }}
-          >
-            <Autocomplete
+        <div style={{display: "inline-flex", justifyContent: "center", alignItems: "center"}}>
+        <Autocomplete
               id="demo"
               value={selectedTag}
               onChange={handleTagChange}
@@ -882,7 +881,10 @@ export default function LSF() {
             <Tooltip title="Lorem ipsum dolor sit amet" placement="right">
               <InfoIcon color="primary" />
             </Tooltip>
-          </div>}
+        </div>
+            
+          }
+          </div>
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({ ...alertData, open: false })}
