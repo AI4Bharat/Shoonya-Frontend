@@ -12,6 +12,7 @@ import {
   Typography,
   Popover,
   IconButton,
+  Autocomplete,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -62,7 +63,7 @@ const filterAnnotations = (annotations, user_id) => {
             "accepted_with_minor_changes",
             "accepted_with_major_changes",
           ].includes(review.annotation_status)
-        ){
+        ) {
           filteredAnnotations = [review];
           flag = true;
         }
@@ -113,12 +114,12 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-// const projectType = ProjectDetails?.project_type?.includes("Audio")
+  // const projectType = ProjectDetails?.project_type?.includes("Audio")
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
+        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
@@ -188,7 +189,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
+        ...((projectType === "AudioTranscription" || projectType === "AudioTranscriptionEditing")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -215,7 +216,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription"||projectType === "AudioTranscriptionEditing")
+        ...((projectType === "AudioTranscription" || projectType === "AudioTranscriptionEditing")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -330,7 +331,7 @@ const LabelStudioWrapper = ({
               if (
                 !annotations[i].result?.length ||
                 annotation.serializeAnnotation()[0].id ===
-                  annotations[i].result[0].id
+                annotations[i].result[0].id
               ) {
                 !isAutoSave && showLoader();
                 let temp = annotation.serializeAnnotation();
@@ -415,7 +416,7 @@ const LabelStudioWrapper = ({
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
-              labelConfig.project_type === "ConversationTranslationEditing"
+                labelConfig.project_type === "ConversationTranslationEditing"
                 ? generateLabelConfig(taskData.data)
                 : labelConfig.label_config;
             setLabelConfig(tempLabelConfig);
@@ -441,119 +442,119 @@ const LabelStudioWrapper = ({
     }
 
     // Traversing and tab formatting --------------------------- start
-    const outputTextareaHTMLEleArr =
-      document.getElementsByName("transcribed_json");
-    if (outputTextareaHTMLEleArr.length > 0) {
-      const targetElement = outputTextareaHTMLEleArr[0];
-      if (targetElement) {
-        targetElement.oninput = function (e) {
-          let textAreaInnerText = e.target.value;
+    // const outputTextareaHTMLEleArr =
+    //   document.getElementsByName("transcribed_json");
+    // if (outputTextareaHTMLEleArr.length > 0) {
+    //   const targetElement = outputTextareaHTMLEleArr[0];
+    //   if (targetElement) {
+    //     targetElement.oninput = function (e) {
+    //       let textAreaInnerText = e.target.value;
 
-          // console.log("e ---------------------- ", e.currentTarget);
+    //       // console.log("e ---------------------- ", e.currentTarget);
 
-          let lastInputChar =
-            textAreaInnerText[targetElement.selectionStart - 1];
-          if (
-            lastInputChar === "\\" &&
-            localStorage.getItem("enableTags") === "true"
-          ) {
-            let indexOfLastSpace =
-              textAreaInnerText.lastIndexOf(
-                " ",
-                targetElement.selectionStart - 1
-              ) <
-              textAreaInnerText.lastIndexOf(
-                "\n",
-                targetElement.selectionStart - 1
-              )
-                ? textAreaInnerText.lastIndexOf(
-                    "\n",
-                    targetElement.selectionStart - 1
-                  )
-                : textAreaInnerText.lastIndexOf(
-                    " ",
-                    targetElement.selectionStart - 1
-                  );
+    //       let lastInputChar =
+    //         textAreaInnerText[targetElement.selectionStart - 1];
+    //       if (
+    //         lastInputChar === "\\" &&
+    //         localStorage.getItem("enableTags") === "true"
+    //       ) {
+    //         let indexOfLastSpace =
+    //           textAreaInnerText.lastIndexOf(
+    //             " ",
+    //             targetElement.selectionStart - 1
+    //           ) <
+    //             textAreaInnerText.lastIndexOf(
+    //               "\n",
+    //               targetElement.selectionStart - 1
+    //             )
+    //             ? textAreaInnerText.lastIndexOf(
+    //               "\n",
+    //               targetElement.selectionStart - 1
+    //             )
+    //             : textAreaInnerText.lastIndexOf(
+    //               " ",
+    //               targetElement.selectionStart - 1
+    //             );
 
-            let currentSelectionRangeStart = indexOfLastSpace + 1;
-            let currentSelectionRangeEnd = targetElement.selectionStart - 1;
+    //         let currentSelectionRangeStart = indexOfLastSpace + 1;
+    //         let currentSelectionRangeEnd = targetElement.selectionStart - 1;
 
-            let currentTargetWord = textAreaInnerText.slice(
-              currentSelectionRangeStart,
-              currentSelectionRangeEnd
-            );
-            let filteredSuggestionByInput = TabsSuggestionData.filter((el) =>
-              el.toLowerCase().includes(currentTargetWord.toLowerCase())
-            );
-            if (
-              filteredSuggestionByInput &&
-              filteredSuggestionByInput.length > 0
-            ) {
-              const suggestionTagsContainer = (
-                <Grid width={150}>
-                  <Grid
-                    position="fixed"
-                    backgroundColor="#ffffff"
-                    width="inherit"
-                    textAlign={"end"}
-                  >
-                    <Tooltip title="close suggestions">
-                      <IconButton
-                        onClick={() => {
-                          setShowTagSuggestionsAnchorEl(null);
-                          targetElement.focus();
-                        }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      width: "max-content",
-                      maxHeight: 250,
-                      padding: 1,
-                    }}
-                  >
-                    {filteredSuggestionByInput?.map((suggestion, index) => {
-                      return (
-                        <Typography
-                          onClick={() => {
-                            let modifiedValue = textAreaInnerText.replace(
-                              currentTargetWord + "\\",
-                              `[${suggestion}]`
-                            );
-                            targetElement.value = modifiedValue;
-                            setShowTagSuggestionsAnchorEl(null);
-                          }}
-                          variant="body2"
-                          sx={{
-                            backgroundColor: "#ffffff",
-                            color: "#000",
-                            padding: 2,
-                            paddingTop: index === 0 ? 6 : 2,
-                            "&:hover": {
-                              color: "white",
-                              backgroundColor: "#1890ff",
-                            },
-                          }}
-                        >
-                          {suggestion}
-                        </Typography>
-                      );
-                    })}
-                  </Grid>
-                </Grid>
-              );
-              setShowTagSuggestionsAnchorEl(e.currentTarget);
-              setTagSuggestionList(suggestionTagsContainer);
-            }
-          } else {
-            setShowTagSuggestionsAnchorEl(false);
-          }
-        };
-      }
-    }
+    //         let currentTargetWord = textAreaInnerText.slice(
+    //           currentSelectionRangeStart,
+    //           currentSelectionRangeEnd
+    //         );
+    //         let filteredSuggestionByInput = TabsSuggestionData.filter((el) =>
+    //           el.toLowerCase().includes(currentTargetWord.toLowerCase())
+    //         );
+    //         if (
+    //           filteredSuggestionByInput &&
+    //           filteredSuggestionByInput.length > 0
+    //         ) {
+    //           const suggestionTagsContainer = (
+    //             <Grid width={150}>
+    //               <Grid
+    //                 position="fixed"
+    //                 backgroundColor="#ffffff"
+    //                 width="inherit"
+    //                 textAlign={"end"}
+    //               >
+    //                 <Tooltip title="close suggestions">
+    //                   <IconButton
+    //                     onClick={() => {
+    //                       setShowTagSuggestionsAnchorEl(null);
+    //                       targetElement.focus();
+    //                     }}
+    //                   >
+    //                     <CloseIcon />
+    //                   </IconButton>
+    //                 </Tooltip>
+    //               </Grid>
+    //               <Grid
+    //                 sx={{
+    //                   width: "max-content",
+    //                   maxHeight: 250,
+    //                   padding: 1,
+    //                 }}
+    //               >
+    //                 {filteredSuggestionByInput?.map((suggestion, index) => {
+    //                   return (
+    //                     <Typography
+    //                       onClick={() => {
+    //                         let modifiedValue = textAreaInnerText.replace(
+    //                           currentTargetWord + "\\",
+    //                           `[${suggestion}]`
+    //                         );
+    //                         targetElement.value = modifiedValue;
+    //                         setShowTagSuggestionsAnchorEl(null);
+    //                       }}
+    //                       variant="body2"
+    //                       sx={{
+    //                         backgroundColor: "#ffffff",
+    //                         color: "#000",
+    //                         padding: 2,
+    //                         paddingTop: index === 0 ? 6 : 2,
+    //                         "&:hover": {
+    //                           color: "white",
+    //                           backgroundColor: "#1890ff",
+    //                         },
+    //                       }}
+    //                     >
+    //                       {suggestion}
+    //                     </Typography>
+    //                   );
+    //                 })}
+    //               </Grid>
+    //             </Grid>
+    //           );
+    //           setShowTagSuggestionsAnchorEl(e.currentTarget);
+    //           setTagSuggestionList(suggestionTagsContainer);
+    //         }
+    //       } else {
+    //         setShowTagSuggestionsAnchorEl(false);
+    //       }
+    //     };
+    //   }
+    // }
 
     // Traversing and tab formatting --------------------------- end
   }, [labelConfig, userData, annotationNotesRef, taskId, ProjectDetails]);
@@ -603,9 +604,9 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
-      {!loader && isAccepted && <Alert severity="success" sx={{mb: 3}}>
-            This annotation has already been accepted by the reviewer.
-          </Alert>}
+      {!loader && isAccepted && <Alert severity="success" sx={{ mb: 3 }}>
+        This annotation has already been accepted by the reviewer.
+      </Alert>}
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -618,25 +619,25 @@ const LabelStudioWrapper = ({
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) && !isAccepted && (
-                <Tooltip title="Save task for later">
-                  <Button
-                    value="Draft"
-                    type="default"
-                    onClick={handleDraftAnnotationClick}
-                    style={{
-                      minWidth: "160px",
-                      border: "1px solid #e6e6e6",
-                      color: "#e80",
-                      pt: 3,
-                      pb: 3,
-                      borderBottom: "None",
-                    }}
-                    className="lsf-button"
-                  >
-                    Draft
-                  </Button>
-                </Tooltip>
-              )}
+                  <Tooltip title="Save task for later">
+                    <Button
+                      value="Draft"
+                      type="default"
+                      onClick={handleDraftAnnotationClick}
+                      style={{
+                        minWidth: "160px",
+                        border: "1px solid #e6e6e6",
+                        color: "#e80",
+                        pt: 3,
+                        pb: 3,
+                        borderBottom: "None",
+                      }}
+                      className="lsf-button"
+                    >
+                      Draft
+                    </Button>
+                  </Tooltip>
+                )}
             </Grid>
             <Grid item>
               {/* {localStorage.getItem("labelAll") === "true" ? ( */}
@@ -697,10 +698,25 @@ export default function LSF() {
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
+  const [selectedTag, setSelectedTag] = useState("");
+  const [alertData, setAlertData] = useState({
+    open: false,
+    message: "",
+    variant: "info"
+  })
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
+
+  const handleTagChange = (event, value, reason) => {
+    if (reason === "selectOption") {
+      setSelectedTag(value);
+      let copyValue = `[${value}]`;
+      navigator.clipboard.writeText(copyValue);
+      setAlertData({ open: true, message: `Tag ${copyValue} copied to clipboard`, variant: "info" });
+    }
+  }
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -826,6 +842,34 @@ export default function LSF() {
         >
           <Glossary taskData={taskData} />
         </div>
+
+        {/* <Typography variant="subtitle1">Select Language :</Typography> */}
+        <Autocomplete
+          freeSolo
+          value={selectedTag}
+          onChange={handleTagChange}
+          options={TabsSuggestionData}
+          size={"small"}
+          getOptionLabel={(option) => option}
+          sx={{ width: 300, display: "inline-flex", marginLeft: "10px", marginBottom: "20px", }}
+          renderInput={(params) => <TextField {...params} label="Select Noise Tag"
+            placeholder="Select Noise Tag"
+            inputProps={{
+              ...params.inputProps,
+              autoComplete: 'new-password', // disable autocomplete and autofill
+            }}
+          />}
+        />
+        <CustomizedSnackbars
+          open={alertData.open}
+          handleClose={() => setAlertData({...alertData, open: false })}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          variant={alertData.variant}
+          message={alertData.message}
+        />
         <LabelStudioWrapper
           getTaskData={getTaskData}
           resetNotes={() => resetNotes()}

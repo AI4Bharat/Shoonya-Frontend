@@ -3,18 +3,19 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from "../../../constants";
   
- export default class DownloadProjectCsvAPI extends API {
-    constructor(projectId,taskStatus, downloadMetadataToggle=false,timeout = 2000) {
+ export default class RemoveFrozenUserAPI extends API {
+    constructor(projectId,projectObj, timeout = 2000) {
+        console.log(projectId,"projectId")
       super("POST", timeout, false);
-      this.projectBody={include_input_data_metadata_json:downloadMetadataToggle}
-      this.type = constants.DOWNLOAD_PROJECT_CSV;
-      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=CSV&task_status=${taskStatus}`;
+      this.projectObj = projectObj;
+    //   this.type = constants.REMOVE_PROJECT_MEMBER;
+      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/remove_frozen_user/`;
     }
   
     processResponse(res) {
       super.processResponse(res);
       if (res) {
-          this.downloadProjectCsv = res;
+          this.removeFrozenUser = res;
       }
   }
   
@@ -23,7 +24,7 @@
     }
  
     getBody() {
-      return this.projectBody
+      return this.projectObj;
     }
    
   
@@ -38,7 +39,7 @@
     }
   
     getPayload() {
-      return this.downloadProjectCsv;
+      return this.removeFrozenUser;
     }
   }
   
