@@ -5,6 +5,8 @@ import SemanticTextualSimilarityChart from "./SemanticTextualSimilarityChart";
 import ContextualSentenceVerificationChart from "./ContextualSentenceVerificationChart";
 import TaskAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/TaskAnalytics";
 import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
+import AudioSegmentation from "./AudioSegmentation";
+import AudioTranscription from "./AudioTranscription";
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -19,8 +21,6 @@ const apiLoading = useSelector((state) => state.apiStatus.loading);
   const taskAnalyticsData = useSelector(
     (state) => state.getTaskAnalyticsData.data
   );
-
-
   const getTaskAnalyticsdata = () => {
      setLoading(true)
     const userObj = new TaskAnalyticsDataAPI();
@@ -45,6 +45,16 @@ const apiLoading = useSelector((state) => state.apiStatus.loading);
       </Grid>
       <Grid style={{marginTop:"40px"}}>
         <SingleSpeakerAudioTranscriptionEditing
+          taskAnalyticsData={taskAnalyticsData}
+        />
+      </Grid>
+      <Grid style={{marginTop:"40px"}}>
+        <AudioTranscription
+          taskAnalyticsData={taskAnalyticsData}
+        />
+      </Grid>
+      <Grid style={{marginTop:"40px"}}>
+        <AudioSegmentation
           taskAnalyticsData={taskAnalyticsData}
         />
       </Grid>
