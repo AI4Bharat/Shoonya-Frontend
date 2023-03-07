@@ -1047,7 +1047,7 @@ export default function LSF() {
               options={TabsSuggestionData}
               size={"small"}
               getOptionLabel={(option) => option}
-              sx={{ width: 300, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
+              sx={{ width: 200, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
               renderInput={(params) => <TextField {...params} label="Select Noise Tag"
                 placeholder="Select Noise Tag"
                 style={{ fontSize: "14px" }}
