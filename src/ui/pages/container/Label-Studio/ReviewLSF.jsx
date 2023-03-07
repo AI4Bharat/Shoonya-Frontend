@@ -1057,7 +1057,7 @@ export default function LSF() {
               }}
 
             />
-            <Tooltip title="Lorem ipsum dolor sit amet" placement="right">
+            <Tooltip title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription." placement="right">
               <InfoIcon color="primary" />
             </Tooltip>
           </div>}
