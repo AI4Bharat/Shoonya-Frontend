@@ -10,6 +10,7 @@ import {
   Grid,
   Typography,
   Popover,
+  Autocomplete,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -22,6 +23,7 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
+import InfoIcon from '@mui/icons-material/Info';
 import getCaretCoordinates from "textarea-caret";
 
 import {
@@ -572,99 +574,99 @@ const LabelStudioWrapper = ({
     }
 
     // Traversing and tab formatting --------------------------- start
-    const outputTextareaHTMLEleArr =
-      document.getElementsByName("transcribed_json");
-    if (outputTextareaHTMLEleArr.length > 0) {
-      const targetElement = outputTextareaHTMLEleArr[0];
-      if (targetElement) {
-        targetElement.oninput = function (e) {
-          let textAreaInnerText = e.target.value;
+    // const outputTextareaHTMLEleArr =
+    //   document.getElementsByName("transcribed_json");
+    // if (outputTextareaHTMLEleArr.length > 0) {
+    //   const targetElement = outputTextareaHTMLEleArr[0];
+    //   if (targetElement) {
+    //     targetElement.oninput = function (e) {
+    //       let textAreaInnerText = e.target.value;
 
-          // console.log("e ---------------------- ", e.currentTarget);
+    //       // console.log("e ---------------------- ", e.currentTarget);
 
-          let lastInputChar =
-            textAreaInnerText[targetElement.selectionStart - 1];
-          if (
-            lastInputChar === "\\" &&
-            localStorage.getItem("enableTags") === "true"
-          ) {
-            let indexOfLastSpace =
-              textAreaInnerText.lastIndexOf(
-                " ",
-                targetElement.selectionStart - 1
-              ) <
-              textAreaInnerText.lastIndexOf(
-                "\n",
-                targetElement.selectionStart - 1
-              )
-                ? textAreaInnerText.lastIndexOf(
-                    "\n",
-                    targetElement.selectionStart - 1
-                  )
-                : textAreaInnerText.lastIndexOf(
-                    " ",
-                    targetElement.selectionStart - 1
-                  );
+    //       let lastInputChar =
+    //         textAreaInnerText[targetElement.selectionStart - 1];
+    //       if (
+    //         lastInputChar === "\\" &&
+    //         localStorage.getItem("enableTags") === "true"
+    //       ) {
+    //         let indexOfLastSpace =
+    //           textAreaInnerText.lastIndexOf(
+    //             " ",
+    //             targetElement.selectionStart - 1
+    //           ) <
+    //           textAreaInnerText.lastIndexOf(
+    //             "\n",
+    //             targetElement.selectionStart - 1
+    //           )
+    //             ? textAreaInnerText.lastIndexOf(
+    //                 "\n",
+    //                 targetElement.selectionStart - 1
+    //               )
+    //             : textAreaInnerText.lastIndexOf(
+    //                 " ",
+    //                 targetElement.selectionStart - 1
+    //               );
 
-            let currentSelectionRangeStart = indexOfLastSpace + 1;
-            let currentSelectionRangeEnd = targetElement.selectionStart - 1;
+    //         let currentSelectionRangeStart = indexOfLastSpace + 1;
+    //         let currentSelectionRangeEnd = targetElement.selectionStart - 1;
 
-            let currentTargetWord = textAreaInnerText.slice(
-              currentSelectionRangeStart,
-              currentSelectionRangeEnd
-            );
-            let filteredSuggestionByInput = TabsSuggestionData.filter((el) =>
-              el.toLowerCase().includes(currentTargetWord.toLowerCase())
-            );
-            if (
-              filteredSuggestionByInput &&
-              filteredSuggestionByInput.length > 0
-            ) {
-              const suggestionTagsContainer = (
-                <Grid
-                  sx={{
-                    width: "max-content",
-                    maxHeight: 350,
-                    padding: 1,
-                  }}
-                >
-                  {filteredSuggestionByInput?.map((suggestion, index) => {
-                    return (
-                      <Typography
-                        onClick={() => {
-                          let modifiedValue = textAreaInnerText.replace(
-                            currentTargetWord + "\\",
-                            `[${suggestion}]`
-                          );
-                          targetElement.value = modifiedValue;
-                          setShowTagSuggestionsAnchorEl(null);
-                        }}
-                        variant="body2"
-                        sx={{
-                          backgroundColor: "#ffffff",
-                          color: "#000",
-                          padding: 2,
-                          "&:hover": {
-                            color: "white",
-                            backgroundColor: "#1890ff",
-                          },
-                        }}
-                      >
-                        {suggestion}
-                      </Typography>
-                    );
-                  })}
-                </Grid>
-              );
-              setShowTagSuggestionsAnchorEl(e.currentTarget);
-              setTagSuggestionList(suggestionTagsContainer);
-            }
-          } else {
-            setShowTagSuggestionsAnchorEl(false);
-          }
-        };
-      }
-    }
+    //         let currentTargetWord = textAreaInnerText.slice(
+    //           currentSelectionRangeStart,
+    //           currentSelectionRangeEnd
+    //         );
+    //         let filteredSuggestionByInput = TabsSuggestionData.filter((el) =>
+    //           el.toLowerCase().includes(currentTargetWord.toLowerCase())
+    //         );
+    //         if (
+    //           filteredSuggestionByInput &&
+    //           filteredSuggestionByInput.length > 0
+    //         ) {
+    //           const suggestionTagsContainer = (
+    //             <Grid
+    //               sx={{
+    //                 width: "max-content",
+    //                 maxHeight: 350,
+    //                 padding: 1,
+    //               }}
+    //             >
+    //               {filteredSuggestionByInput?.map((suggestion, index) => {
+    //                 return (
+    //                   <Typography
+    //                     onClick={() => {
+    //                       let modifiedValue = textAreaInnerText.replace(
+    //                         currentTargetWord + "\\",
+    //                         `[${suggestion}]`
+    //                       );
+    //                       targetElement.value = modifiedValue;
+    //                       setShowTagSuggestionsAnchorEl(null);
+    //                     }}
+    //                     variant="body2"
+    //                     sx={{
+    //                       backgroundColor: "#ffffff",
+    //                       color: "#000",
+    //                       padding: 2,
+    //                       "&:hover": {
+    //                         color: "white",
+    //                         backgroundColor: "#1890ff",
+    //                       },
+    //                     }}
+    //                   >
+    //                     {suggestion}
+    //                   </Typography>
+    //                 );
+    //               })}
+    //             </Grid>
+    //           );
+    //           setShowTagSuggestionsAnchorEl(e.currentTarget);
+    //           setTagSuggestionList(suggestionTagsContainer);
+    //         }
+    //       } else {
+    //         setShowTagSuggestionsAnchorEl(false);
+    //       }
+    //     };
+    //   }
+    // }
 
     // Traversing and tab formatting --------------------------- end
   }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, taskId]);
@@ -871,10 +873,33 @@ export default function LSF() {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
+  const [showTagsInput, setShowTagsInput] = useState(false);
+  const [selectedTag, setSelectedTag] = useState("");
+  const [alertData, setAlertData] = useState({
+    open: false,
+    message: "",
+    variant: "info"
+  })
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+
+  const handleTagChange = (event, value, reason) => {
+    if (reason === "selectOption") {
+      setSelectedTag(value);
+      let copyValue = `[${value}]`;
+      navigator.clipboard.writeText(copyValue);
+      setAlertData({ open: true, message: `Tag ${copyValue} copied to clipboard`, variant: "info" });
+    }
+  }
+
+  useEffect(()=>{
+    if(ProjectDetails?.project_type && ProjectDetails?.project_type.toLowerCase().includes("audio")){
+      setShowTagsInput(true);
+    }
+  }, [ProjectDetails])
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -932,6 +957,12 @@ export default function LSF() {
           pt: 3,
         }}
       >
+        <div
+          style={{
+            display: "flow-root",
+            marginBottom: "30px"
+          }}
+        >
         {!loader && (
           <Button
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -1001,6 +1032,46 @@ export default function LSF() {
         >
           <Glossary taskData={taskData} />
         </div>
+        {showTagsInput &&
+          <div
+            style={{
+              display: "inline-flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Autocomplete
+              id="demo"
+              value={selectedTag}
+              onChange={handleTagChange}
+              options={TabsSuggestionData}
+              size={"small"}
+              getOptionLabel={(option) => option}
+              sx={{ width: 200, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
+              renderInput={(params) => <TextField {...params} label="Select Noise Tag"
+                placeholder="Select Noise Tag"
+                style={{ fontSize: "14px" }}
+              />}
+              renderOption={(props, option, state) => {
+                return <MenuItem {...props}>{option}</MenuItem>
+              }}
+
+            />
+            <Tooltip title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription." placement="right">
+              <InfoIcon color="primary" />
+            </Tooltip>
+          </div>}
+          </div>
+        <CustomizedSnackbars
+          open={alertData.open}
+          handleClose={() => setAlertData({...alertData, open: false })}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          variant={alertData.variant}
+          message={alertData.message}
+        />
         <LabelStudioWrapper
           getTaskData={getTaskData}
           resetNotes={() => resetNotes()}

@@ -38,7 +38,7 @@ const StyledMenu = styled((props) => (
 
 
 function DownloadProjectButton(props) {
-  const { taskStatus,SetTask } = props;
+  const { taskStatus,SetTask,downloadMetadataToggle} = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const [downloadres, setdownloadres] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -80,7 +80,7 @@ function DownloadProjectButton(props) {
   };
   const handleDownloadJSONProject = async () => {
     // SetTask([]) //used to clear the selected task statuses
-    const projectObj = new DownloadJSONProjectAPI(id,taskStatus);
+    const projectObj = new DownloadJSONProjectAPI(id,taskStatus,downloadMetadataToggle);
     dispatch(APITransport(projectObj));
     // const res = await fetch(projectObj.apiEndPoint(), {
     //   method: "POST",
@@ -112,7 +112,7 @@ function DownloadProjectButton(props) {
   const handleDownloadCSVProject = async () => {
     // SetTask([]) //used to clear the selected task statuses
     setLoading(true)
-    const projectObj = new DownloadProjectCsvAPI(id,taskStatus);
+    const projectObj = new DownloadProjectCsvAPI(id,taskStatus,downloadMetadataToggle);
     dispatch(APITransport(projectObj));
     // const res = await fetch(projectObj.apiEndPoint(), {
     //   method: "POST",
@@ -141,7 +141,7 @@ function DownloadProjectButton(props) {
   const handleDownloadTSVProject = async () => {
     // SetTask([]) //used to clear the selected task statuses
     setLoading(true)
-    const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
+    const projectObj = new DownloadProjectTsvAPI(id,taskStatus,downloadMetadataToggle);
     dispatch(APITransport(projectObj));
     // const res = await fetch(projectObj.apiEndPoint(), {
     //   method: "POST",
