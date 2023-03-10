@@ -108,7 +108,7 @@ const ProjectLogs = () => {
         }}
       >
         
-          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
           <FormControl fullWidth size="small">
             <InputLabel id="task-type-filter-label" sx={{fontSize: "16px"}}>Filter by Task Type</InputLabel>
                 <Select
