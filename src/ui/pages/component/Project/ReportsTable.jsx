@@ -252,6 +252,8 @@ const ReportsTable = (props) => {
                 </Card>
             </Box>}
             {ProjectReport?.length > 0 ? (
+                <>
+                <Typography variant="body2" color="#F8644F">* User Inactive</Typography>
             <ThemeProvider theme={tableTheme}>
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
@@ -263,7 +265,9 @@ const ReportsTable = (props) => {
                     />
                 )
             }
+            
              </ThemeProvider>
+             </>
              ):
 
              <Grid
