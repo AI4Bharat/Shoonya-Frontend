@@ -5,7 +5,7 @@ import DatasetStyle from "../../../../styles/Dataset";
 import { useEffect, useState } from "react";
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
-export default function SingleSpeakerAudioTranscriptionEditing(props) {
+export default function AudioSegmentation(props) {
   const { metaAnalyticsData } = props;
   const classes = DatasetStyle();
   const [totalAudioHours, setTotalAudioHours] = useState();
@@ -14,15 +14,15 @@ export default function SingleSpeakerAudioTranscriptionEditing(props) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    metaAnalyticsData[2]?.sort(
+    metaAnalyticsData[4]?.sort(
       (a, b) =>
         b.annotation_aud_duration_tohour - a.annotation_aud_duration_tohour
     );
-    setData(metaAnalyticsData[2]);
+    setData(metaAnalyticsData[4]);
     let allAnnotatorAudioHours = 0;
     let allReviewAudioHours = 0;
     var languages;
-    metaAnalyticsData[2]?.map((element, index) => {
+    metaAnalyticsData[4]?.map((element, index) => {
         allAnnotatorAudioHours +=
         element.annotation_aud_duration_tohour;
         allReviewAudioHours += element.review_aud_duration_tohour;
@@ -34,7 +34,7 @@ export default function SingleSpeakerAudioTranscriptionEditing(props) {
     setTotalAudioHours(
         allAnnotatorAudioHours + allReviewAudioHours
     );
-  }, [metaAnalyticsData[2]]);
+  }, [metaAnalyticsData[4]]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -89,9 +89,9 @@ export default function SingleSpeakerAudioTranscriptionEditing(props) {
         style={{ marginBottom: "35px" }}
         className={classes.heading}
       >
-       Audio Duration Dashboard - Audio Transcription Editing
+       Audio Duration Dashboard - Audio Segmentation
         <Typography variant="body1">
-          Count of Annotated and Reviewed Audio Transcription Editing
+          Count of Annotated and Reviewed Audio Segmentation
         </Typography>
       </Typography>
       

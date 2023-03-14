@@ -17,6 +17,7 @@ import Switch from "@mui/material/Switch";
 import DownloadDatasetButton from "./DownloadDataSetButton";
 import DeleteDataItems from "./DeleteDataItems";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import DeduplicateDataItems from "../../container/Dataset/DeduplicateDataItems";
 
 
 const style = {
@@ -181,6 +182,9 @@ export default function DatasetSettings() {
 
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 <DeleteDataItems />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <DeduplicateDataItems />
               </Grid>
 
               <div>
