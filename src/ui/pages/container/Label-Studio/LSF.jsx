@@ -42,7 +42,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
 import getCaretCoordinates from "textarea-caret";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -78,6 +78,10 @@ const filterAnnotations = (annotations, user_id) => {
 //used just in postAnnotation to support draft status update.
 
 const AUTO_SAVE_INTERVAL = 20000;
+const AUDIO_PROJECT_SAVE_CHECK = [
+  "AudioTranscription",
+  "AudioTranscriptionEditing",
+];
 
 const LabelStudioWrapper = ({
   annotationNotesRef,
@@ -121,7 +125,9 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true,
+        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
+          ? false
+          : true,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
@@ -172,12 +178,15 @@ const LabelStudioWrapper = ({
     predictions,
     annotationNotesRef,
     projectType,
-    setIsAccepted,
+    setIsAccepted
   ) {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, isAccepted] = filterAnnotations(annotations, userData.id);
+    const [filteredAnnotations, isAccepted] = filterAnnotations(
+      annotations,
+      userData.id
+    );
     setIsAccepted(isAccepted);
     console.log("labelConfig", labelConfig);
 
@@ -191,7 +200,8 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription" || projectType === "AudioTranscriptionEditing")
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -212,13 +222,16 @@ const LabelStudioWrapper = ({
         "update",
         "submit",
         "skip",
-        ...(taskData?.annotation_users?.some((user) => user === userData.id && !isAccepted)
+        ...(taskData?.annotation_users?.some(
+          (user) => user === userData.id && !isAccepted
+        )
           ? ["controls"]
           : []),
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription" || projectType === "AudioTranscriptionEditing")
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -326,14 +339,53 @@ const LabelStudioWrapper = ({
         },
 
         onUpdateAnnotation: function (ls, annotation) {
+          let isAutoSave = autoSaveFlag.current;
+          autoSaveFlag.current = false;
+          if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
+            let temp = annotation.serializeAnnotation();
+            console.log("temp", temp);
+            const counter = temp.reduce(
+              function (acc, curr) {
+                if (curr.from_name === "labels") {
+                  acc.labels++;
+                } else if (curr.from_name === "transcribed_json") {
+                  acc.textareas++;
+                }
+                return acc;
+              },
+              { labels: 0, textareas: 0 }
+            );
+            if (counter.labels !== counter.textareas) {
+              if (isAutoSave) return;
+              setSnackbarInfo({
+                open: true,
+                message: "Please fill the annotations for every label selected",
+                variant: "warning",
+              });
+              return;
+            }
+            if (
+              temp.find(
+                (curr) =>
+                  curr.from_name === "transcribed_json" &&
+                  /\d/.test(curr.value.text)
+              )
+            ) {
+              if (isAutoSave) return;
+              setSnackbarInfo({
+                open: true,
+                message: "Please remove numeric text from the annotations",
+                variant: "warning",
+              });
+              return;
+            }
+          }
           if (taskData.annotation_status !== "freezed") {
-            let isAutoSave = autoSaveFlag.current;
-            autoSaveFlag.current = false;
             for (let i = 0; i < annotations.length; i++) {
               if (
                 !annotations[i].result?.length ||
                 annotation.serializeAnnotation()[0].id ===
-                annotations[i].result[0].id
+                  annotations[i].result[0].id
               ) {
                 !isAutoSave && showLoader();
                 let temp = annotation.serializeAnnotation();
@@ -348,7 +400,9 @@ const LabelStudioWrapper = ({
                   annotations[i].id,
                   load_time,
                   annotations[i].lead_time,
-                  isAutoSave ? annotations[i].annotation_status : annotation_status.current,
+                  isAutoSave
+                    ? annotations[i].annotation_status
+                    : annotation_status.current,
                   annotationNotesRef.current.value
                 ).then((err) => {
                   if (err) {
@@ -418,7 +472,7 @@ const LabelStudioWrapper = ({
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
-                labelConfig.project_type === "ConversationTranslationEditing"
+              labelConfig.project_type === "ConversationTranslationEditing"
                 ? generateLabelConfig(taskData.data)
                 : labelConfig.label_config;
             setLabelConfig(tempLabelConfig);
@@ -435,7 +489,7 @@ const LabelStudioWrapper = ({
               predictions,
               annotationNotesRef,
               labelConfig.project_type,
-              setIsAccepted,
+              setIsAccepted
             );
             hideLoader();
           }
@@ -606,9 +660,11 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
-      {!loader && isAccepted && <Alert severity="success" sx={{ mb: 3 }}>
-        This annotation has already been accepted by the reviewer.
-      </Alert>}
+      {!loader && isAccepted && (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          This annotation has already been accepted by the reviewer.
+        </Alert>
+      )}
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -620,7 +676,8 @@ const LabelStudioWrapper = ({
             <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
-              ) && !isAccepted && (
+              ) &&
+                !isAccepted && (
                   <Tooltip title="Save task for later">
                     <Button
                       value="Draft"
@@ -705,8 +762,8 @@ export default function LSF() {
   const [alertData, setAlertData] = useState({
     open: false,
     message: "",
-    variant: "info"
-  })
+    variant: "info",
+  });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -718,15 +775,22 @@ export default function LSF() {
       setSelectedTag(value);
       let copyValue = `[${value}]`;
       navigator.clipboard.writeText(copyValue);
-      setAlertData({ open: true, message: `Tag ${copyValue} copied to clipboard`, variant: "info" });
+      setAlertData({
+        open: true,
+        message: `Tag ${copyValue} copied to clipboard`,
+        variant: "info",
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    if (ProjectDetails?.project_type && ProjectDetails?.project_type.toLowerCase().includes("audio")) {
+    if (
+      ProjectDetails?.project_type &&
+      ProjectDetails?.project_type.toLowerCase().includes("audio")
+    ) {
       setShowTagsInput(true);
     }
-  }, [ProjectDetails])
+  }, [ProjectDetails]);
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -853,7 +917,7 @@ export default function LSF() {
           <Glossary taskData={taskData} />
         </div>
 
-        {showTagsInput &&
+        {showTagsInput && (
           <div
             style={{
               display: "inline-flex",
@@ -869,26 +933,35 @@ export default function LSF() {
               options={TabsSuggestionData}
               size={"small"}
               getOptionLabel={(option) => option}
-              sx={{ width: 300, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
-              renderInput={(params) => <TextField {...params} label="Select Noise Tag"
-                placeholder="Select Noise Tag"
-                style={{ fontSize: "14px" }}
-              />}
-              renderOption={(props, option, state) => {
-                return <MenuItem {...props}>{option}</MenuItem>
+              sx={{
+                width: 300,
+                display: "inline-flex",
+                marginLeft: "10px",
+                marginRight: "10px",
               }}
-
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Noise Tag"
+                  placeholder="Select Noise Tag"
+                  style={{ fontSize: "14px" }}
+                />
+              )}
+              renderOption={(props, option, state) => {
+                return <MenuItem {...props}>{option}</MenuItem>;
+              }}
             />
             <Tooltip title="Lorem ipsum dolor sit amet" placement="right">
               <InfoIcon color="primary" />
             </Tooltip>
-          </div>}
+          </div>
+        )}
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({ ...alertData, open: false })}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: "top",
+            horizontal: "right",
           }}
           variant={alertData.variant}
           message={alertData.message}
