@@ -71,7 +71,7 @@ const Login = () => {
   }, []);
 
   const createToken = () => {
-    const apiObj = new LoginAPI(credentials.email, credentials.password);
+    const apiObj = new LoginAPI(credentials.email.toLowerCase() , credentials.password);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),

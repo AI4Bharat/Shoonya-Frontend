@@ -957,6 +957,12 @@ export default function LSF() {
           pt: 3,
         }}
       >
+        <div
+          style={{
+            display: "flow-root",
+            marginBottom: "30px"
+          }}
+        >
         {!loader && (
           <Button
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -1032,7 +1038,6 @@ export default function LSF() {
               display: "inline-flex",
               justifyContent: "center",
               alignItems: "center",
-              marginBottom: "30px",
             }}
           >
             <Autocomplete
@@ -1042,7 +1047,7 @@ export default function LSF() {
               options={TabsSuggestionData}
               size={"small"}
               getOptionLabel={(option) => option}
-              sx={{ width: 300, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
+              sx={{ width: 200, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
               renderInput={(params) => <TextField {...params} label="Select Noise Tag"
                 placeholder="Select Noise Tag"
                 style={{ fontSize: "14px" }}
@@ -1052,10 +1057,11 @@ export default function LSF() {
               }}
 
             />
-            <Tooltip title="Lorem ipsum dolor sit amet" placement="right">
+            <Tooltip title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription." placement="right">
               <InfoIcon color="primary" />
             </Tooltip>
           </div>}
+          </div>
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({...alertData, open: false })}

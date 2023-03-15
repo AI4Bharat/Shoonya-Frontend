@@ -848,114 +848,125 @@ export default function LSF() {
           pt: 3,
         }}
       >
-        {!loader && (
-          <Button
-            endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-            variant="contained"
-            color={reviewNotesRef.current?.value !== "" ? "success" : "primary"}
-            onClick={handleCollapseClick}
-            style={{ marginBottom: "20px" }}
-          >
-            Notes {reviewNotesRef.current?.value !== "" && "*"}
-          </Button>
-        )}
-
         <div
-          className={styles.collapse}
           style={{
-            display: showNotes ? "block" : "none",
-            paddingBottom: "16px",
+            display: "flow-root",
+            marginBottom: "30px",
           }}
         >
-          {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+          {!loader && (
+            <Button
+              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color={
+                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+              }
+              onClick={handleCollapseClick}
+              // style={{ marginBottom: "20px" }}
+            >
+              Notes {reviewNotesRef.current?.value !== "" && "*"}
+            </Button>
+          )}
+
+          <div
+            className={styles.collapse}
+            style={{
+              display: showNotes ? "block" : "none",
+              paddingBottom: "16px",
+            }}
+          >
+            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-          <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Annotation Notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={annotationNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-            }}
-            style={{ width: "99%" }}
-          />
-          <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Review Notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={reviewNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-              readOnly: true,
-            }}
-            style={{ width: "99%", marginTop: "1%" }}
-          />
-        </div>
-        <Button
-          variant="contained"
-          style={{ marginBottom: "20px", marginLeft: "10px" }}
-          endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-          onClick={handleGlossaryClick}
-        >
-          Glossary
-        </Button>
-        <div
-          style={{
-            display: showGlossary ? "block" : "none",
-            paddingBottom: "16px",
-          }}
-        >
-          <Glossary taskData={taskData} />
-        </div>
-
-        {showTagsInput && (
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Annotation Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={annotationNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+              }}
+              style={{ width: "99%" }}
+            />
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Review Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={reviewNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            />
+          </div>
+          <Button
+            variant="contained"
+            style={{ marginLeft: "10px" }}
+            endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+            onClick={handleGlossaryClick}
+          >
+            Glossary
+          </Button>
           <div
             style={{
-              display: "inline-flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: "30px",
+              display: showGlossary ? "block" : "none",
+              paddingBottom: "16px",
             }}
           >
-            <Autocomplete
-              id="demo"
-              value={selectedTag}
-              onChange={handleTagChange}
-              options={TabsSuggestionData}
-              size={"small"}
-              getOptionLabel={(option) => option}
-              sx={{
-                width: 300,
-                display: "inline-flex",
-                marginLeft: "10px",
-                marginRight: "10px",
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Select Noise Tag"
-                  placeholder="Select Noise Tag"
-                  style={{ fontSize: "14px" }}
-                />
-              )}
-              renderOption={(props, option, state) => {
-                return <MenuItem {...props}>{option}</MenuItem>;
-              }}
-            />
-            <Tooltip title="Lorem ipsum dolor sit amet" placement="right">
-              <InfoIcon color="primary" />
-            </Tooltip>
+            <Glossary taskData={taskData} />
           </div>
-        )}
+
+          {showTagsInput && (
+            <div
+              style={{
+                display: "inline-flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Autocomplete
+                id="demo"
+                value={selectedTag}
+                onChange={handleTagChange}
+                options={TabsSuggestionData}
+                size={"small"}
+                getOptionLabel={(option) => option}
+                sx={{
+                  width: 200,
+                  display: "inline-flex",
+                  marginLeft: "10px",
+                  marginRight: "10px",
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Noise Tag"
+                    placeholder="Select Noise Tag"
+                    style={{ fontSize: "14px" }}
+                  />
+                )}
+                renderOption={(props, option, state) => {
+                  return <MenuItem {...props}>{option}</MenuItem>;
+                }}
+              />
+              <Tooltip
+                title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription."
+                placement="right"
+              >
+                <InfoIcon color="primary" />
+              </Tooltip>
+            </div>
+          )}
+        </div>
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({ ...alertData, open: false })}
