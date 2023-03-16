@@ -212,7 +212,7 @@ const MembersTable = (props) => {
 
   const projectlist = (el) => {
     let temp = false;
-    ProjectDetails?.frozen_users.forEach((em) => {
+    ProjectDetails?.frozen_users?.forEach((em) => {
       if (el == em.id) {
         temp = true;
       }
@@ -220,7 +220,7 @@ const MembersTable = (props) => {
     return temp;
   };
   const data =
-    dataSource && dataSource.length > 0
+    dataSource && dataSource?.length > 0
       ? pageSearch().map((el, i) => {
           const userRoleFromList = el.role && UserMappedByRole(el.role).element;
 
