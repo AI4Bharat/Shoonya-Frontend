@@ -22,55 +22,6 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
 
-const columns = [
-  {
-    name: "Name",
-    label: "Name",
-    options: {
-      filter: false,
-      sort: false,
-      align: "center",
-      setCellHeaderProps: (sort) => ({
-        style: { height: "70px", padding: "16px" },
-      }),
-    },
-  },
-  {
-    name: "Email",
-    label: "Email",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-  {
-    name: "Role",
-    label: "Role",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-  {
-    name: "Actions",
-    label: "Actions",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-];
-
-const options = {
-  filterType: "checkbox",
-  selectableRows: "none",
-  download: false,
-  filter: false,
-  print: false,
-  search: false,
-  viewColumns: false,
-  jumpToPage: true,
-};
 
 const addLabel = {
   organization: "Invite Users to Organization",
@@ -98,7 +49,7 @@ const MembersTable = (props) => {
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
   );
- 
+ console.log(userDetails,"userDetailsuserDetails")
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -277,6 +228,51 @@ const MembersTable = (props) => {
           ];
         })
       : [];
+
+      const columns = [
+        {
+          name: "Name",
+          label: "Name",
+          options: {
+            filter: false,
+            sort: false,
+            align: "center",
+            setCellHeaderProps: (sort) => ({
+              style: { height: "70px", padding: "16px" },
+            }),
+          },
+        },
+        {
+          name: "Email",
+          label: "Email",
+          options: {
+            filter: false,
+            sort: false,
+          },
+        },
+        {
+          name: "Role",
+          label: "Role",
+          options: {
+            filter: false,
+            sort: false,
+          },
+        },
+        {
+          name: "Actions",
+          label: "Actions",
+          options: {
+            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && userDetails.role === 1 )  ? false : true ,
+            filter: false,
+            sort: false,
+            align: "center",
+          },
+        },
+      ];
+      
+    
+      
+
   const options = {
     textLabels: {
       body: {
