@@ -37,7 +37,7 @@ export default class GetOrganizationUserReportsAPI extends API {
       from_date: this.startDate,
       to_date: this.endDate,
       tgt_language: this.targetLanguage,
-      ...(  this.onlyReviewProjects == true ||this.onlyReviewProjects == false ) && {only_review_projects: this.onlyReviewProjects},
+      ...{project_progress_stage: this.onlyReviewProjects},
       sort_by_column_name: this.sortByColumn,
       descending_order: this.descOrder,
       reports_type: this.reportsType,
