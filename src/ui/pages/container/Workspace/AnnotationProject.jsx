@@ -53,7 +53,6 @@ const AnnotationProject = (props) => {
   const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
   const DataItems = useSelector((state) => state.getDataitemsById.data);
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
-console.log(DataItems,"DataItems")
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -84,6 +83,7 @@ console.log(DataItems,"DataItems")
     []
   );
   const [taskReviews, setTaskReviews] = useState(false)
+  const [variable_Parameters_lang, setVariable_Parameters_lang] = useState("")
 
   //Table related state variables
   const [columns, setColumns] = useState(null);
@@ -106,9 +106,9 @@ console.log(DataItems,"DataItems")
     "parent_data",
     "id",
     "rating",
-    "conversation_json",
-    "machine_translated_conversation_json",
-    "speakers_json"
+    // "conversation_json",
+    // "machine_translated_conversation_json",
+    // "speakers_json"
   ];
   const renderToolBar = () => {
     return (
@@ -282,7 +282,7 @@ console.log(DataItems,"DataItems")
       setColumnFields(tempColumnFields);
     }
   }, [ProjectDomains]);
-
+ 
   useEffect(() => {
     let tempInstanceIds = {};
     for (const instance in DatasetInstances) {
@@ -300,13 +300,13 @@ console.log(DataItems,"DataItems")
           temp.push({
             name: element,
             data: DatasetFields[element],
-            value: "",
+            value: variable_Parameters_lang,
           });
         }
       );
       setSelectedVariableParameters(temp);
     }
-  }, [DatasetFields]);
+  }, [DatasetFields,variable_Parameters_lang]);
 
   useEffect(() => {
     if (LanguageChoices && LanguageChoices.length > 0) {
@@ -329,7 +329,7 @@ console.log(DataItems,"DataItems")
     let tempSelected = [];
     if (fetchedItems?.length) {
       Object.keys(fetchedItems[0]).forEach((key) => {
-        if (!excludeKeys.includes(key)) {
+        if (!excludeKeys.includes(key) && !key.includes("_json")) {
           tempColumns.push({
             name: key,
             label: snakeToTitleCase(key),
@@ -479,24 +479,25 @@ console.log(DataItems,"DataItems")
     return temp;
   };
 
+
+
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
-
-    
+  
 
 
     const newProject = {
       title: title,
       description: description,
-      created_by: User.id,
+      created_by: User?.id,
       is_archived: false,
       is_published: false,
       users: [User?.id],
       workspace_id: id,
-      organization_id: User.organization.id,
+      organization_id: User?.organization?.id,
       filter_string: filterString,
       sampling_mode: samplingMode,
       sampling_parameters_json: samplingParameters,
@@ -647,6 +648,29 @@ console.log(DataItems,"DataItems")
               </>
             )}
 
+        {selectedType && variableParameters?.[selectedType]?.variable_parameters !== undefined &&
+        <>
+                <Grid
+                  className={classes.projectsettingGrid}
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                >
+                  <Typography gutterBottom component="div">
+                  Variable Parameters:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                <OutlinedTextField
+                  fullWidth
+                  value={variable_Parameters_lang}
+                  onChange={(e) => setVariable_Parameters_lang(e.target.value)}
+                />
+                </Grid>
+                </>
+        }
             {(selectedDomain === "Translation" || selectedDomain === "Conversation") && (selectedType === "TranslationEditing" || selectedType === "SemanticTextualSimilarity" || selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation" || selectedType === "ConversationTranslationEditing") &&
               <>
                 <Grid
@@ -692,7 +716,7 @@ console.log(DataItems,"DataItems")
               </>
             }
 
-            {(selectedDomain === "Monolingual" || selectedDomain === "Translation"||selectedDomain === "Audio") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation"||selectedType==="SingleSpeakerAudioTranscriptionEditing") &&
+            {(selectedDomain === "Monolingual" || selectedDomain === "Translation"||selectedDomain === "Audio") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation"||selectedType==="SingleSpeakerAudioTranscriptionEditing"||selectedType === "AudioTranscription"||selectedType === "AudioSegmentation" || selectedType === "AudioTranscriptionEditing") &&
               <><Grid
                 className={classes.projectsettingGrid}
                 xs={12}
@@ -703,7 +727,7 @@ console.log(DataItems,"DataItems")
               >
                   
                 <Typography gutterBottom component="div">
-                 {selectedType==="SingleSpeakerAudioTranscriptionEditing"?  "Language:" :"Target Language:"}
+                 {(selectedType==="SingleSpeakerAudioTranscriptionEditing")?  "Language:" :"Target Language:"}
                 </Typography>
               </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>

@@ -48,7 +48,6 @@ const ReportsTable = (props) => {
     const classes = DatasetStyle();
     const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
     const [submitted, setSubmitted] = useState(false);
-
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -156,6 +155,16 @@ const ReportsTable = (props) => {
        
     }
 
+
+    let frozenUsers = ProjectDetails.frozen_users.map((e,)=>{
+        let temp = ProjectReport.find(element=> element.id === e.id)
+        if(temp?.ProjectReport) {
+          e.ProjectReport = temp.ProjectReport;
+        }
+        return e;
+      })
+ 
+
     const renderSnackBar = () => {
         return (
           <CustomizedSnackbars
@@ -252,18 +261,23 @@ const ReportsTable = (props) => {
                 </Card>
             </Box>}
             {ProjectReport?.length > 0 ? (
+                <>
+                { frozenUsers.length > 0 && (
+                <Typography variant="body2" color="#F8644F">* User Inactive</Typography>)}
             <ThemeProvider theme={tableTheme}>
             {
                 showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
                     <MUIDataTable
-                        title={radiobutton==="AnnotatationReports"? "Annotatation Report" :"Reviewer Report"}
+                        title={radiobutton==="AnnotatationReports"? "Annotation Report" :"Reviewer Report"}
                         data={ProjectReport}
                         columns={columns.filter(col => selectedColumns.includes(col.name))}
                         options={options}
                     />
                 )
             }
+            
              </ThemeProvider>
+             </>
              ):
 
              <Grid

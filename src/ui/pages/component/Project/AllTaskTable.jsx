@@ -20,6 +20,8 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
+import SearchIcon from '@mui/icons-material/Search';
+import AllTaskSearchPopup from './AllTaskSearchPopup';
 
 const excludeCols = [
   "context",
@@ -31,6 +33,7 @@ const excludeCols = [
   "speakers_json",
   "language",
 ];
+const excludeSearch = ["status", "actions"];
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
@@ -45,11 +48,16 @@ const AllTaskTable = (props) => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [searchAnchor, setSearchAnchor] = useState(null);
+  const searchOpen = Boolean(searchAnchor);
+  const [searchedCol, setSearchedCol] = useState();
+  const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
+  const [currentPageNumber, setCurrentPageNumber] = useState(1);
 
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
-  const AllTaskData = useSelector((state) => state.getAllTasksdata.data);
-console.log(AllTaskData,"AllTaskData")
+  const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
+  const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed", "exported"],
   };
@@ -58,15 +66,15 @@ console.log(AllTaskData,"AllTaskData")
   });
 
   const GetAllTasksdata = () => {
-    const taskObjs = new GetAllTasksAPI(id, selectedFilters);
+    const taskObjs = new GetAllTasksAPI(id, currentPageNumber,selectedFilters, currentRowPerPage);
     dispatch(APITransport(taskObjs));
   };
 
   useEffect(() => {
     GetAllTasksdata();
-  }, []);
+  }, [currentPageNumber, currentRowPerPage]);
 
-  
+
   useEffect(() => {
     if (AllTaskData?.length > 0 && AllTaskData[0]?.data) {
       const data = AllTaskData.map((el) => {
@@ -77,13 +85,20 @@ console.log(AllTaskData,"AllTaskData")
             .map((key) => el.data[key])
         );
         AllTaskData[0].task_status && row.push(el.task_status);
-        row.push(<CustomButton  sx={{ p: 1, borderRadius: 2 }} label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
-        View
-    </Typography>}  />)
+        row.push( <>
+          <Link to={`Alltask/${el.id}`} className={classes.link}>
+          <CustomButton
+              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
+              sx={{ p: 1, borderRadius: 2 }}
+              label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
+                   View
+              </Typography>} />
+      </Link>
+
+        </>)
         return row;
         
       });
-     console.log(data,"data123")
       let colList = ["id"];
       colList.push(
         ...Object.keys(AllTaskData[0].data).filter(
@@ -92,7 +107,6 @@ console.log(AllTaskData,"AllTaskData")
       );
       AllTaskData[0].task_status && colList.push("status");
       colList.push("actions");
-      console.log("colList", colList);
       const cols = colList.map((col) => {
         return {
           name: col,
@@ -101,7 +115,7 @@ console.log(AllTaskData,"AllTaskData")
             filter: false,
             sort: false,
             align: "center",
-            //customHeadLabelRender: customColumnHead,
+            customHeadLabelRender: customColumnHead,
           },
         };
       });
@@ -132,6 +146,35 @@ console.log(AllTaskData,"AllTaskData")
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleShowSearch = (col, event) => {
+    setSearchAnchor(event.currentTarget);
+    setSearchedCol(col);
+  
+}
+const handleSearchClose = () => {
+  setSearchAnchor(null);
+}
+
+  const customColumnHead = (col) => {
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                columnGap: "5px",
+                flexGrow: "1",
+                alignItems: "center",
+            }}
+        >
+               {col.label}
+                {!excludeSearch.includes(col.name) && <IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
+                    <SearchIcon id={col.name + "_btn"} />
+                </IconButton>}
+        </Box>
+    );
+}
+
 
   const renderToolBar = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -151,33 +194,50 @@ console.log(AllTaskData,"AllTaskData")
     );
   };
   const options = {
-    textLabels: {
-      body: {
-        noMatch: "No records",
-      },
-      toolbar: {
-        search: "Search",
-        viewColumns: "View Column",
-      },
-      pagination: { rowsPerPage: "Rows per page" },
-      options: { sortDirection: "desc" },
-    },
-    // customToolbar: fetchHeaderButton,
-    displaySelectToolbar: false,
-    fixedHeader: false,
-    filterType: "checkbox",
-    download: false,
-    print: false,
+    count: totalTaskCount,
+    rowsPerPage: currentRowPerPage,
+    page: currentPageNumber - 1,
     rowsPerPageOptions: [10, 25, 50, 100],
-    // rowsPerPage: PageInfo.count,
-    filter: false,
-    // page: PageInfo.page,
-    viewColumns: false,
+    textLabels: {
+        pagination: {
+            next: "Next >",
+            previous: "< Previous",
+            rowsPerPage: "currentRowPerPage",
+            displayRows: "OF"
+        }
+    },
+    onChangePage: (currentPage) => {
+        setCurrentPageNumber(currentPage + 1);
+    },
+    onChangeRowsPerPage: (rowPerPageCount) => {
+        setCurrentPageNumber(1);
+        setCurrentRowPerPage(rowPerPageCount);
+        console.log("rowPerPageCount", rowPerPageCount)
+    },
+    filterType: 'checkbox',
     selectableRows: "none",
+    download: false,
+    filter: false,
+    print: false,
     search: false,
+    viewColumns: false,
+    textLabels: {
+        body: {
+            noMatch: "No records ",
+        },
+        toolbar: {
+            search: "Search",
+            viewColumns: "View Column",
+        },
+        pagination: {
+            rowsPerPage: "Rows per page",
+        },
+        options: { sortDirection: "desc" },
+    },
     jumpToPage: true,
+    serverSide: true,
     customToolbar: renderToolBar,
-  };
+};
 
   return (
     <div>
@@ -201,6 +261,16 @@ console.log(AllTaskData,"AllTaskData")
           onchange={GetAllTasksdata}
         />
       )}
+       {searchOpen && <AllTaskSearchPopup
+                    open={searchOpen}
+                    anchorEl={searchAnchor}
+                     handleClose={handleSearchClose}
+                    updateFilters={setsSelectedFilters}
+                    //filterStatusData={filterData}
+                    currentFilters={selectedFilters}
+                    searchedCol={searchedCol}
+                    onchange={GetAllTasksdata}
+                />}
     </div>
   );
 };

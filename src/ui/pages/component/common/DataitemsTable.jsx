@@ -22,9 +22,14 @@ const excludeKeys = [
   "datasetbase_ptr_id",
   "key",
   "instance_id",
+  "speakers_json",
   "conversation_json",
-  "machine_translated_conversation_json",
-  "speakers_json"
+  "transcribed_json",
+  "machine_transcribed_json",
+  "prediction_json",
+  // "conversation_json",
+  // "machine_translated_conversation_json",
+  // "speakers_json"
 ];
 
 const DataitemsTable = () => {
@@ -35,7 +40,8 @@ const DataitemsTable = () => {
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
-  console.log(DatasetDetails,"DatasetDetails",filterdataitemsList)
+ console.log(dataitemsList,"dataitemsListdataitemsList")
+
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -47,8 +53,8 @@ const DataitemsTable = () => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
-
-
+  localStorage.setItem("DataitemsList", JSON.stringify(columns));
+  
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
       datasetId,
@@ -60,7 +66,10 @@ const DataitemsTable = () => {
     dispatch(APITransport(dataObj));
   };
 
- 
+//   const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage, DatasetDetails.dataset_type,selectedFilters);
+//   dispatch(APITransport(dataObj));
+// };
+
   useEffect(() => {
     setLoading(apiLoading);
 }, [apiLoading]);

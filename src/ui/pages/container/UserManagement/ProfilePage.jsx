@@ -13,7 +13,9 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
+
 
 const ProfilePage = () => {
 
@@ -141,7 +143,7 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
-                {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
+                {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.RecentTasks )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.AnnotatorRecentTasks ))  &&
                 <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
@@ -154,10 +156,10 @@ const ProfilePage = () => {
               <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 }}>
                 <CardContent>
                   <Typography variant="h4" sx={{mb: 1}}>{userDetails.organization.title}</Typography>
-                  {UserMappedByRole(userDetails.role).element}
+                  {UserMappedByRole(userDetails.role)?.element}
                 </CardContent>
               </Card>
-               {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
+               {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.MyProgress )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.AnnotatorMyProgress))  &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>

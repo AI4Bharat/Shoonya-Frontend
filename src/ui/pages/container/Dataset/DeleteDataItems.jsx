@@ -35,6 +35,7 @@ export default function DeleteDataItems() {
         message: "",
         variant: "success",
     });
+    const Dataitems = JSON.parse( localStorage.getItem("DataitemsList"))
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -150,7 +151,13 @@ export default function DeleteDataItems() {
                 sx={{ width: "150px" }}
                 aria-describedby={id}
                 variant="contained"
-                onClick={handleClick}>
+                onClick={handleClick}
+                disabled={
+                    Dataitems.length < 0
+                      ? true
+                      : false
+                  }
+                >
                 Delete Data Item
             </Button>
 

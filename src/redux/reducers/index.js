@@ -74,7 +74,12 @@ import FindAndReplaceWordsInAnnotation from './ProjectDetails/FindAndReplaceWord
 import getRecentTasks from './UserManagement/FetchRecentTasks';
 import datasetSearchPopup from './Dataset/DatasetSearchPopup';
 import getAllTasksdata from './Tasks/GetAllTasks';
-
+import glossarysentence from './Glossary/GlossarySentence';
+import getDomains from "./Glossary/GetDomain";
+import getProjectTypeDetails from "./ProjectDetails/GetProjectTypeDetails";
+import getTaskAnalyticsData from "./Progress/TaskAnalytics";
+import getMetaAnalyticsData from "./Progress/MetaAnalytics";
+import getDownloadProjectAnnotations from "./ProjectDetails/DownloadProjectAnnotations"
 
 const index = {
     apiStatus,
@@ -156,6 +161,12 @@ const index = {
     getRecentTasks,
     datasetSearchPopup,
     getAllTasksdata,
+    glossarysentence,
+    getDomains,
+    getProjectTypeDetails,
+    getTaskAnalyticsData,
+    getMetaAnalyticsData,
+    getDownloadProjectAnnotations,
    
     
 };

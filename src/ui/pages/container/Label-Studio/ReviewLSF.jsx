@@ -1,23 +1,37 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
 import LabelStudio from "@heartexlabs/label-studio";
-import { Tooltip, Button, Box, Card, TextField } from "@mui/material";
+import {
+  Tooltip,
+  Button,
+  Box,
+  Card,
+  TextField,
+  Grid,
+  Typography,
+  Popover,
+  Autocomplete,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
-import { styled, alpha } from '@mui/material/styles';
-import Menu, { MenuProps } from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { styled, alpha } from "@mui/material/styles";
+import Menu, { MenuProps } from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Glossary from "../Glossary/Glossary";
+import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
+import InfoIcon from '@mui/icons-material/Info';
+import getCaretCoordinates from "textarea-caret";
 
 import {
   getProjectsandTasks,
   getNextProject,
   fetchAnnotation,
   postReview,
-  patchReview
+  patchReview,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 import { useParams, useNavigate } from "react-router-dom";
@@ -32,42 +46,79 @@ const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
     anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
+      vertical: "bottom",
+      horizontal: "right",
     }}
     transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
+      vertical: "top",
+      horizontal: "right",
     }}
     {...props}
   />
 ))(({ theme }) => ({
-  '& .MuiPaper-root': {
+  "& .MuiPaper-root": {
     borderRadius: 6,
     marginTop: theme.spacing(1),
     minWidth: 180,
     color:
-      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+      theme.palette.mode === "light"
+        ? "rgb(55, 65, 81)"
+        : theme.palette.grey[300],
     boxShadow:
-      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
-    '& .MuiMenu-list': {
-      padding: '4px 0',
+      "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
+    "& .MuiMenu-list": {
+      padding: "4px 0",
     },
-    '& .MuiMenuItem-root': {
-      '& .MuiSvgIcon-root': {
+    "& .MuiMenuItem-root": {
+      "& .MuiSvgIcon-root": {
         fontSize: 18,
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },
-      '&:active': {
+      "&:active": {
         backgroundColor: alpha(
           theme.palette.primary.main,
-          theme.palette.action.selectedOpacity,
+          theme.palette.action.selectedOpacity
         ),
       },
     },
   },
 }));
+
+const filterAnnotations = (annotations, user_id) => {
+  let filteredAnnotations = annotations;
+  let userAnnotation = annotations.find((annotation) => {
+    return annotation.completed_by === user_id && annotation.parent_annotation;
+  });
+  if (userAnnotation) {
+    if (userAnnotation.annotation_status === "unreviewed") {
+      filteredAnnotations =
+        userAnnotation.result.length > 0
+          ? annotations.filter(
+              (annotation) => annotation.id === userAnnotation.parent_annotation
+            )
+          : annotations.filter((annotation) => !annotation.parent_annotation);
+    } else if (
+      [
+        "accepted",
+        "accepted_with_minor_changes",
+        "accepted_with_major_changes",
+        "draft"
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+    } else if (userAnnotation.annotation_status === "skipped") {
+      filteredAnnotations = annotations.filter(
+        (annotation) => !annotation.parent_annotation
+      );
+    } else if (userAnnotation.annotation_status === "to_be_revised") {
+      filteredAnnotations = annotations.filter(
+        (annotation) => annotation.id === userAnnotation.parent_annotation
+      );
+    }
+  }
+  return filteredAnnotations;
+};
 
 //used just in postAnnotation to support draft status update.
 
@@ -78,6 +129,7 @@ const LabelStudioWrapper = ({
   showLoader,
   hideLoader,
   resetNotes,
+  getTaskData,
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const review_status = useRef();
@@ -94,30 +146,38 @@ const LabelStudioWrapper = ({
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   let loaded = useRef();
 
-  console.log("projectId, taskId", projectId, taskId);
+  const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
+    useState(null);
+  const [tagSuggestionList, setTagSuggestionList] = useState();
+
+  //console.log("projectId, taskId", projectId, taskId);
   // debugger
 
   useEffect(() => {
-    localStorage.setItem("labelStudio:settings", JSON.stringify({
-      bottomSidePanel: true,
-      continuousLabeling: false,
-      enableAutoSave: false,
-      enableHotkeys: true,
-      enableLabelTooltips: true,
-      enablePanelHotkeys: true,
-      enableTooltips: false,
-      fullscreen: false,
-      imageFullSize: false,
-      selectAfterCreate: false,
-      showAnnotationsPanel: true,
-      showLabels: false,
-      showLineNumbers: false,
-      showPredictionsPanel: true,
-      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
-    }))
-  }, [])
+    localStorage.setItem(
+      "labelStudio:settings",
+      JSON.stringify({
+        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
+        continuousLabeling: false,
+        enableAutoSave: false,
+        enableHotkeys: true,
+        enableLabelTooltips: true,
+        enablePanelHotkeys: true,
+        enableTooltips: false,
+        fullscreen: false,
+        imageFullSize: false,
+        selectAfterCreate: false,
+        showAnnotationsPanel: true,
+        showLabels: false,
+        showLineNumbers: false,
+        showPredictionsPanel: true,
+        sidePanelMode: "SIDEPANEL_MODE_REGIONS",
+      })
+    );
+  }, []);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -149,30 +209,35 @@ const LabelStudioWrapper = ({
     annotations,
     predictions,
     annotationNotesRef,
-    reviewNotesRef
+    reviewNotesRef,
+    projectType
   ) {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
 
+    console.log("taskData", taskData, annotations);
+
     if (taskData.task_status === "freezed") {
       interfaces = [
         "panel",
-        // "update",
+        //"update",
         // "submit",
         "skip",
         "controls",
         "infobar",
         "topbar",
         "instruction",
-        // "side-column",
+        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+          ? ["side-column"]
+          : []),
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
         "annotations:current",
         // "annotations:add-new",
         "annotations:delete",
-        // "annotations:view-all",
+        "annotations:view-all",
         "predictions:tabs",
         "predictions:menu",
         // "auto-annotation",
@@ -181,21 +246,23 @@ const LabelStudioWrapper = ({
     } else {
       interfaces = [
         "panel",
-        "update",
+        //"update",
         "submit",
         "skip",
-        // "controls",
+        "controls",
         "infobar",
         "topbar",
         "instruction",
-        // "side-column",
+        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+          ? ["side-column"]
+          : []),
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
         "annotations:current",
         // "annotations:add-new",
         // "annotations:delete",
-        // "annotations:view-all",
+        "annotations:view-all",
         "predictions:tabs",
         "predictions:menu",
         // "auto-annotation",
@@ -221,7 +288,7 @@ const LabelStudioWrapper = ({
 
         task: {
           // annotations: annotations.filter((annotation) => !annotation.parent_annotation).concat(annotations.filter((annotation) => annotation.id === taskData.correct_annotation)),
-          annotations: (taskData.task_status === "accepted" || taskData.task_status === "accepted_with_changes") && annotations.filter((annotation) => annotation.id === taskData.correct_annotation).length > 0 ? annotations.filter((annotation) => annotation.id === taskData.correct_annotation) : annotations.filter((annotation) => !annotation.parent_annotation),
+          annotations: filterAnnotations(annotations, userData.id),
           predictions: predictions,
           id: taskData.id,
           data: taskData.data,
@@ -235,105 +302,183 @@ const LabelStudioWrapper = ({
           //   );
           //   ls.annotationStore.selectAnnotation(annotation.result[0].id);
           // } else {
-            // let hasReview = false;
-            // for (let i = 0; i < annotations.length; i++) {
-            //   console.log(annotations[i], "test");
-            //   if (annotations[i].parent_annotation) {
-            //     ls.annotationStore.selectAnnotation(annotations[i].result[0].id);
-            //     // hasReview = true;
-            //     break;
-            //   }
-            // }
-            // if (!hasReview) {
-            //   var c = ls.annotationStore.addAnnotation({
-            //     userGenerate: true,
-            //   });
-            //   ls.annotationStore.selectAnnotation(c.id);
-            // }
+          // let hasReview = false;
+          // for (let i = 0; i < annotations.length; i++) {
+          //   console.log(annotations[i], "test");
+          //   if (annotations[i].parent_annotation) {
+          //     ls.annotationStore.selectAnnotation(annotations[i].result[0].id);
+          //     // hasReview = true;
+          //     break;
+          //   }
+          // }
+          // if (!hasReview) {
+          //   var c = ls.annotationStore.addAnnotation({
+          //     userGenerate: true,
+          //   });
+          //   ls.annotationStore.selectAnnotation(c.id);
+          // }
           // }
           load_time = new Date();
         },
+
+        onSkipTask: function (annotation) {
+          // message.warning('Notes will not be saved for skipped tasks!');
+          let review = annotations.find(
+            (annotation) => !annotation.parentAnnotation
+          );
+          if (review) {
+            showLoader();
+            patchReview(
+              review.id,
+              load_time,
+              review.lead_time,
+              "skipped",
+              reviewNotesRef.current.value
+            ).then(() => {
+              getNextProject(projectId, taskData.id, "review").then((res) => {
+                hideLoader();
+                tasksComplete(res?.id || null);
+              });
+            });
+          }
+        },
+
+        // onUpdateAnnotation: function (ls, annotation) {
+        //   console.log(  annotations," annotation.serializeAnnotation()")
+        //   if (taskData.task_status !== "freezed") {
+        //     for (let i = 0; i < annotations.length; i++) {
+        //       if (
+        //         annotation.serializeAnnotation()[0]?.id ===
+        //         annotations[i].result[0]?.id
+        //       ) {
+        //         let temp, review;
+        //         showLoader();
+        //         if (annotations[i].parent_annotation) {
+        //           review = annotations[i];
+        //         } else {
+        //           review = annotations.find((annotation) => annotation.parent_annotation === annotations[i].id);
+        //         }
+        //         if (review) {
+        //           temp = review.result;
+        //           temp[0].value = annotation.serializeAnnotation()[0].value;
+        //           for (let i = 0; i < temp.length; i++) {
+        //             if (temp[i].value.text) {
+        //               temp[i].value.text = [temp[i].value.text[0]];
+        //             }
+        //           }
+        //           patchReview(
+        //             //projectType === "SingleSpeakerAudioTranscriptionEditing" ? annotation.serializeAnnotation() : temp,
+        //             review.id,
+        //             review.parent_annotation,
+        //             load_time,
+        //             review.lead_time,
+        //             review_status.current,
+        //             // annotationNotesRef.current.value,
+        //             reviewNotesRef.current.value
+        //           ).then(() => {
+        //             if (localStorage.getItem("labelAll"))
+        //               getNextProject(projectId, taskData.id, "review").then(
+        //                 (res) => {
+        //                   hideLoader();
+        //                   tasksComplete(res?.id || null);
+        //                 }
+        //               );
+        //             else {
+        //               hideLoader();
+        //               window.location.reload();
+        //             }
+        //           });
+        //         } else {
+        //           var c = ls.annotationStore.addAnnotation({
+        //             userGenerate: true,
+        //           });
+        //           temp = c;
+        //           c = annotation.serializeAnnotation();
+        //           c[0].id = temp.id;
+        //           temp = c;
+        //           for (let i = 0; i < temp.length; i++) {
+        //             if (temp[i].value.text) {
+        //               temp[i].value.text = [temp[i].value.text[0]];
+        //             }
+        //           }
+        //           postReview(
+        //            // projectType === "SingleSpeakerAudioTranscriptionEditing" ? annotation.serializeAnnotation() : temp,
+        //             taskData.id,
+        //             userData.id,
+        //             annotations[i].id,
+        //             load_time,
+        //             annotations[i].lead_time,
+        //             review_status.current,
+        //             annotationNotesRef.current.value,
+        //             reviewNotesRef.current.value
+        //           ).then(() => {
+        //             if (localStorage.getItem("labelAll"))
+        //               getNextProject(projectId, taskData.id, "review").then(
+        //                 (res) => {
+        //                   hideLoader();
+        //                   tasksComplete(res?.id || null);
+        //                 }
+        //               );
+        //             else {
+        //               hideLoader();
+        //               window.location.reload();
+        //             }
+        //           });
+        //         }
+        //       }
+        //     }
+        //   } else
+        //     setSnackbarInfo({
+        //       open: true,
+        //       message: "Task is frozen",
+        //       variant: "error",
+        //     });
+        // },
+
         onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.task_status !== "freezed") {
+          if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
               if (
+                !annotations[i].result?.length ||
                 annotation.serializeAnnotation()[0].id ===
-                annotations[i].result[0].id
+                  annotations[i].result[0].id
               ) {
-                let temp, review;
                 showLoader();
-                if (annotations[i].parent_annotation) {
-                  review = annotations[i];
-                } else {
-                  review = annotations.find((annotation) => annotation.parent_annotation === annotations[i].id);
-                }
-                if (review) {
-                  temp = review.result;
-                  temp[0].value = annotation.serializeAnnotation()[0].value;
-                  for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
-                      temp[i].value.text = [temp[i].value.text[0]];
-                    }
+                let temp = annotation.serializeAnnotation();
+
+                for (let i = 0; i < temp.length; i++) {
+                  if (temp[i].value.text) {
+                    temp[i].value.text = [temp[i].value.text[0]];
                   }
-                  patchReview(
-                    temp,
-                    review.id,
-                    review.parent_annotation,
-                    load_time,
-                    review.lead_time,
-                    review_status.current,
-                    // annotationNotesRef.current.value,
-                    reviewNotesRef.current.value
-                  ).then(() => {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id, "review").then(
-                        (res) => {
-                          hideLoader();
-                          tasksComplete(res?.id || null);
-                        }
-                      );
-                    else {
-                      hideLoader();
-                      window.location.reload();
-                    }
-                  });
-                } else {
-                  var c = ls.annotationStore.addAnnotation({
-                    userGenerate: true,
-                  });
-                  temp = c;
-                  c = annotation.serializeAnnotation();
-                  c[0].id = temp.id;
-                  temp = c;
-                  for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
-                      temp[i].value.text = [temp[i].value.text[0]];
-                    }
-                  }
-                  postReview(
-                    temp,
-                    taskData.id,
-                    userData.id,
-                    annotations[i].id,
-                    load_time,
-                    annotations[i].lead_time,
-                    review_status.current,
-                    annotationNotesRef.current.value,
-                    reviewNotesRef.current.value
-                  ).then(() => {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id, "review").then(
-                        (res) => {
-                          hideLoader();
-                          tasksComplete(res?.id || null);
-                        }
-                      );
-                    else {
-                      hideLoader();
-                      window.location.reload();
-                    }
-                  });
                 }
+
+                let review = annotations.filter(
+                  (value) => value.parent_annotation != null
+                )[0];
+
+                patchReview(
+                  review.id,
+                  load_time,
+                  review.lead_time,
+                  review_status.current,
+                  projectType === "SingleSpeakerAudioTranscriptionEditing"
+                    ? annotation.serializeAnnotation()
+                    : temp,
+                  review.parent_annotation,
+                  reviewNotesRef.current.value
+                ).then(() => {
+                  if (localStorage.getItem("labelAll"))
+                    getNextProject(projectId, taskData.id, "review").then(
+                      (res) => {
+                        hideLoader();
+                        tasksComplete(res?.id || null);
+                      }
+                    );
+                  else {
+                    hideLoader();
+                    window.location.reload();
+                  }
+                });
               }
             }
           } else
@@ -349,23 +494,39 @@ const LabelStudioWrapper = ({
 
   const setNotes = (taskData, annotations) => {
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
-      let reviewerAnnotations = annotations.filter((annotation) => !!annotation.parent_annotation);
+      let reviewerAnnotations = annotations.filter(
+        (annotation) => !!annotation.parent_annotation
+      );
       if (reviewerAnnotations.length > 0) {
-        let correctAnnotation = reviewerAnnotations.find((annotation) => annotation.id === taskData.correct_annotation);
+        let correctAnnotation = reviewerAnnotations.find(
+          (annotation) => annotation.id === taskData.correct_annotation
+        );
         if (correctAnnotation) {
           reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
-          annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === correctAnnotation.parent_annotation)?.annotation_notes ?? "";
+          annotationNotesRef.current.value =
+            annotations.find(
+              (annotation) =>
+                annotation.id === correctAnnotation.parent_annotation
+            )?.annotation_notes ?? "";
         } else {
-          reviewNotesRef.current.value = reviewerAnnotations[0].review_notes ?? "";
-          annotationNotesRef.current.value = annotations.find((annotation) => annotation.id === reviewerAnnotations[0].parent_annotation)?.annotation_notes ?? "";
+          reviewNotesRef.current.value =
+            reviewerAnnotations[0].review_notes ?? "";
+          annotationNotesRef.current.value =
+            annotations.find(
+              (annotation) =>
+                annotation.id === reviewerAnnotations[0].parent_annotation
+            )?.annotation_notes ?? "";
         }
       } else {
-        let normalAnnotation = annotations.find((annotation) => !annotation.parent_annotation);
-        annotationNotesRef.current.value = normalAnnotation.annotation_notes ?? "";
+        let normalAnnotation = annotations.find(
+          (annotation) => !annotation.parent_annotation
+        );
+        annotationNotesRef.current.value =
+          normalAnnotation.annotation_notes ?? "";
         reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
       }
     }
-  }
+  };
 
   // we're running an effect on component mount and rendering LSF inside rootRef node
   useEffect(() => {
@@ -379,16 +540,21 @@ const LabelStudioWrapper = ({
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
-          console.log("[labelConfig, taskData, annotations, predictions]", [
-            labelConfig,
-            taskData,
-            annotations,
-            predictions,
-          ]);
+          // console.log("[labelConfig, taskData, annotations, predictions]", [
+          //   labelConfig,
+          //   taskData,
+          //   annotations,
+          //   predictions,
+          // ]);
           setNotes(taskData, annotations);
-          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.label_config;
+          let tempLabelConfig =
+            labelConfig.project_type === "ConversationTranslation" ||
+            labelConfig.project_type === "ConversationTranslationEditing"
+              ? generateLabelConfig(taskData.data)
+              : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
+          getTaskData(taskData);
           LSFRoot(
             rootRef,
             lsfRef,
@@ -399,12 +565,110 @@ const LabelStudioWrapper = ({
             annotations,
             predictions,
             annotationNotesRef,
-            reviewNotesRef
+            reviewNotesRef,
+            labelConfig.project_type
           );
           hideLoader();
         }
       );
     }
+
+    // Traversing and tab formatting --------------------------- start
+    // const outputTextareaHTMLEleArr =
+    //   document.getElementsByName("transcribed_json");
+    // if (outputTextareaHTMLEleArr.length > 0) {
+    //   const targetElement = outputTextareaHTMLEleArr[0];
+    //   if (targetElement) {
+    //     targetElement.oninput = function (e) {
+    //       let textAreaInnerText = e.target.value;
+
+    //       // console.log("e ---------------------- ", e.currentTarget);
+
+    //       let lastInputChar =
+    //         textAreaInnerText[targetElement.selectionStart - 1];
+    //       if (
+    //         lastInputChar === "\\" &&
+    //         localStorage.getItem("enableTags") === "true"
+    //       ) {
+    //         let indexOfLastSpace =
+    //           textAreaInnerText.lastIndexOf(
+    //             " ",
+    //             targetElement.selectionStart - 1
+    //           ) <
+    //           textAreaInnerText.lastIndexOf(
+    //             "\n",
+    //             targetElement.selectionStart - 1
+    //           )
+    //             ? textAreaInnerText.lastIndexOf(
+    //                 "\n",
+    //                 targetElement.selectionStart - 1
+    //               )
+    //             : textAreaInnerText.lastIndexOf(
+    //                 " ",
+    //                 targetElement.selectionStart - 1
+    //               );
+
+    //         let currentSelectionRangeStart = indexOfLastSpace + 1;
+    //         let currentSelectionRangeEnd = targetElement.selectionStart - 1;
+
+    //         let currentTargetWord = textAreaInnerText.slice(
+    //           currentSelectionRangeStart,
+    //           currentSelectionRangeEnd
+    //         );
+    //         let filteredSuggestionByInput = TabsSuggestionData.filter((el) =>
+    //           el.toLowerCase().includes(currentTargetWord.toLowerCase())
+    //         );
+    //         if (
+    //           filteredSuggestionByInput &&
+    //           filteredSuggestionByInput.length > 0
+    //         ) {
+    //           const suggestionTagsContainer = (
+    //             <Grid
+    //               sx={{
+    //                 width: "max-content",
+    //                 maxHeight: 350,
+    //                 padding: 1,
+    //               }}
+    //             >
+    //               {filteredSuggestionByInput?.map((suggestion, index) => {
+    //                 return (
+    //                   <Typography
+    //                     onClick={() => {
+    //                       let modifiedValue = textAreaInnerText.replace(
+    //                         currentTargetWord + "\\",
+    //                         `[${suggestion}]`
+    //                       );
+    //                       targetElement.value = modifiedValue;
+    //                       setShowTagSuggestionsAnchorEl(null);
+    //                     }}
+    //                     variant="body2"
+    //                     sx={{
+    //                       backgroundColor: "#ffffff",
+    //                       color: "#000",
+    //                       padding: 2,
+    //                       "&:hover": {
+    //                         color: "white",
+    //                         backgroundColor: "#1890ff",
+    //                       },
+    //                     }}
+    //                   >
+    //                     {suggestion}
+    //                   </Typography>
+    //                 );
+    //               })}
+    //             </Grid>
+    //           );
+    //           setShowTagSuggestionsAnchorEl(e.currentTarget);
+    //           setTagSuggestionList(suggestionTagsContainer);
+    //         }
+    //       } else {
+    //         setShowTagSuggestionsAnchorEl(false);
+    //       }
+    //     };
+    //   }
+    // }
+
+    // Traversing and tab formatting --------------------------- end
   }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, taskId]);
 
   useEffect(() => {
@@ -481,82 +745,97 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            {taskData?.review_user === userData?.id && <Tooltip title="Save task for later">
-              <Button
-                type="default"
-                onClick={() => handleAcceptClick("draft")}
-                style={{
-                  minWidth: "160px",
-                  border: "1px solid #e6e6e6",
-                  color: "#e80",
-                  pt: 3,
-                  pb: 3,
-                  borderBottom: "None",
-                }}
-                className="lsf-button"
-              >
-                Draft
-              </Button>
-            </Tooltip>}
-            {taskData?.review_user === userData?.id && <Tooltip title="Revise Annotation">
-              <Button
-                value="to_be_revised"
-                type="default"
-                onClick={handleReviseClick}
-                style={{
-                  minWidth: "160px",
-                  border: "1px solid #e6e6e6",
-                  color: "#f5222d",
-                  pt: 3,
-                  pb: 3,
-                  borderBottom: "None",
-                  borderLeft: "None",
-                }}
-                className="lsf-button"
-              >
-               Revise
-              </Button>
-            </Tooltip>}
-            {taskData?.review_user === userData?.id && <Tooltip title="Accept Annotation">
-              <Button
-                id="accept-button"
-                value="Accept"
-                type="default"
-                aria-controls={open ? 'accept-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
-                style={{
-                  minWidth: "160px",
-                  border: "1px solid #e6e6e6",
-                  color: "#52c41a",
-                  pt: 3,
-                  pb: 3,
-                  borderBottom: "None",
-                  borderLeft: "None",
-                }}
-                className="lsf-button"
-                onClick={handleClick}
-                endIcon={<KeyboardArrowDownIcon />}
-              >
-                Accept
-              </Button>
-            </Tooltip>}
+            {taskData?.review_user === userData?.id && (
+              <Tooltip title="Save task for later">
+                <Button
+                  type="default"
+                  onClick={() => handleAcceptClick("draft")}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#e80",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Draft
+                </Button>
+              </Tooltip>
+            )}
+            {taskData?.review_user === userData?.id && (
+              <Tooltip title="Revise Annotation">
+                <Button
+                  value="to_be_revised"
+                  type="default"
+                  onClick={handleReviseClick}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#f5222d",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    borderLeft: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Revise
+                </Button>
+              </Tooltip>
+            )}
+            {taskData?.review_user === userData?.id && (
+              <Tooltip title="Accept Annotation">
+                <Button
+                  id="accept-button"
+                  value="Accept"
+                  type="default"
+                  aria-controls={open ? "accept-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? "true" : undefined}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#52c41a",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    borderLeft: "None",
+                  }}
+                  className="lsf-button"
+                  onClick={handleClick}
+                  endIcon={<KeyboardArrowDownIcon />}
+                >
+                  Accept
+                </Button>
+              </Tooltip>
+            )}
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
-                'aria-labelledby': 'accept-button',
+                "aria-labelledby": "accept-button",
               }}
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
             >
-              <MenuItem onClick={() => handleAcceptClick("accepted")} disableRipple>
+              <MenuItem
+                onClick={() => handleAcceptClick("accepted")}
+                disableRipple
+              >
                 with No Changes
               </MenuItem>
-              <MenuItem onClick={() => handleAcceptClick("accepted_with_minor_changes")} disableRipple>
+              <MenuItem
+                onClick={() => handleAcceptClick("accepted_with_minor_changes")}
+                disableRipple
+              >
                 with Minor Changes
               </MenuItem>
-              <MenuItem onClick={() => handleAcceptClick("accepted_wth_major_changes")} disableRipple>
+              <MenuItem
+                onClick={() => handleAcceptClick("accepted_with_major_changes")}
+                disableRipple
+              >
                 with Major Changes
               </MenuItem>
             </StyledMenu>
@@ -565,6 +844,21 @@ const LabelStudioWrapper = ({
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
         <div className="label-studio-root" ref={rootRef}></div>
+        <Popover
+          id={"'simple-popover'"}
+          open={Boolean(showTagSuggestionsAnchorEl)}
+          anchorEl={showTagSuggestionsAnchorEl}
+          onClose={() => {
+            setShowTagSuggestionsAnchorEl(null);
+            setTagSuggestionList(null);
+          }}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          {tagSuggestionList}
+        </Popover>
       </Box>
       {loader}
       {renderSnackBar()}
@@ -574,13 +868,38 @@ const LabelStudioWrapper = ({
 
 export default function LSF() {
   const [showNotes, setShowNotes] = useState(false);
+  const [taskData, setTaskData] = useState([]);
+  const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
+  const [showTagsInput, setShowTagsInput] = useState(false);
+  const [selectedTag, setSelectedTag] = useState("");
+  const [alertData, setAlertData] = useState({
+    open: false,
+    message: "",
+    variant: "info"
+  })
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+
+  const handleTagChange = (event, value, reason) => {
+    if (reason === "selectOption") {
+      setSelectedTag(value);
+      let copyValue = `[${value}]`;
+      navigator.clipboard.writeText(copyValue);
+      setAlertData({ open: true, message: `Tag ${copyValue} copied to clipboard`, variant: "info" });
+    }
+  }
+
+  useEffect(()=>{
+    if(ProjectDetails?.project_type && ProjectDetails?.project_type.toLowerCase().includes("audio")){
+      setShowTagsInput(true);
+    }
+  }, [ProjectDetails])
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -604,6 +923,13 @@ export default function LSF() {
   useEffect(() => {
     resetNotes();
   }, [taskId]);
+
+  const getTaskData = (taskData) => {
+    setTaskData(taskData);
+  };
+  const handleGlossaryClick = () => {
+    setShowGlossary(!showGlossary);
+  };
 
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
@@ -631,11 +957,19 @@ export default function LSF() {
           pt: 3,
         }}
       >
+        <div
+          style={{
+            display: "flow-root",
+            marginBottom: "30px"
+          }}
+        >
         {!loader && (
           <Button
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
             variant="contained"
-            color={annotationNotesRef.current?.value !== "" ? "success" : "primary"}
+            color={
+              annotationNotesRef.current?.value !== "" ? "success" : "primary"
+            }
             onClick={handleCollapseClick}
           >
             Notes {annotationNotesRef.current?.value !== "" && "*"}
@@ -681,7 +1015,65 @@ export default function LSF() {
             style={{ width: "99%", marginTop: "1%" }}
           />
         </div>
+        <Button
+          variant="contained"
+          style={{ marginLeft: "10px" }}
+          endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+          onClick={handleGlossaryClick}
+        >
+          Glossary
+        </Button>
+        <div
+          style={{
+            display: showGlossary ? "block" : "none",
+            paddingBottom: "16px",
+            paddingTop: "10px",
+          }}
+        >
+          <Glossary taskData={taskData} />
+        </div>
+        {showTagsInput &&
+          <div
+            style={{
+              display: "inline-flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Autocomplete
+              id="demo"
+              value={selectedTag}
+              onChange={handleTagChange}
+              options={TabsSuggestionData}
+              size={"small"}
+              getOptionLabel={(option) => option}
+              sx={{ width: 200, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
+              renderInput={(params) => <TextField {...params} label="Select Noise Tag"
+                placeholder="Select Noise Tag"
+                style={{ fontSize: "14px" }}
+              />}
+              renderOption={(props, option, state) => {
+                return <MenuItem {...props}>{option}</MenuItem>
+              }}
+
+            />
+            <Tooltip title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription." placement="right">
+              <InfoIcon color="primary" />
+            </Tooltip>
+          </div>}
+          </div>
+        <CustomizedSnackbars
+          open={alertData.open}
+          handleClose={() => setAlertData({...alertData, open: false })}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          variant={alertData.variant}
+          message={alertData.message}
+        />
         <LabelStudioWrapper
+          getTaskData={getTaskData}
           resetNotes={() => resetNotes()}
           reviewNotesRef={reviewNotesRef}
           annotationNotesRef={annotationNotesRef}

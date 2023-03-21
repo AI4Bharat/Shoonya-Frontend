@@ -30,6 +30,8 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Logout from "../../../../redux/actions/UserManagement/Logout";
 import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
+import CustomizedSnackbars from "../common/Snackbar";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -38,6 +40,11 @@ const Header = () => {
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
   const [showTransliterationModel, setShowTransliterationModel] = useState(false);
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -62,7 +69,6 @@ const Header = () => {
   }, []);
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
   const onLogoutClick = () => {
     handleCloseUserMenu();
     dispatch(Logout());
@@ -77,7 +83,6 @@ const Header = () => {
       handleTransliterationModelClose();
     }
   };
-  
   useEffect(() => {
     window.addEventListener("keydown", keyPress);
     return () => {
@@ -124,9 +129,35 @@ const Header = () => {
     }
   };
 
+  const handleTagsChange = (event) => {
+    if (event.target.checked) {
+      localStorage.setItem("enableTags", true);
+      setSnackbarInfo({
+        open: true,
+        message: "Please type blackslash ( \\ ) to access the tags",
+        variant: "info",
+       
+      });
+    } else {
+      localStorage.setItem("enableTags", false);
+    }
+  }
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
  
   const renderTabs = () => {
-    if (loggedInUserData?.role === 1) {
+    if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleAnnotatorReviewer) {
       return(
         <Grid
           container
@@ -139,6 +170,7 @@ const Header = () => {
           sm={12}
           md={7}
         >
+           
           {/* <Typography variant="body1">
             <NavLink
               hidden={loggedInUserData.role === 1}
@@ -203,7 +235,7 @@ const Header = () => {
           </Typography> */}
         </Grid>
       )
-    } else if (loggedInUserData?.role === 2) {
+    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleManager) {
       return(<Grid
           container
           direction="row"
@@ -275,7 +307,7 @@ const Header = () => {
             </NavLink>
           </Typography>
         </Grid>)
-    } else if (loggedInUserData?.role === 3) {
+    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleOrganizationOwner) {
       return(<Grid
           container
           direction="row"
@@ -346,7 +378,7 @@ const Header = () => {
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs}
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -362,7 +394,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs || roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideWorkspaces}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -385,7 +417,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs}
         to="/datasets"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -452,6 +484,16 @@ const Header = () => {
       ),
     },
     // {
+    //   name: "Enable Tags Dropdown",
+    //   control: (
+    //     <Checkbox
+    //       onChange={handleTagsChange}
+    //       defaultChecked={localStorage.getItem("enableTags") === "true"}
+    //     />
+    //   ),
+    // },
+
+    // {
     //   name: "Help",
     //   onclick: () => {},
     // },
@@ -514,7 +556,7 @@ const Header = () => {
                 {tabs.map((tab) => tab)}
               </Grid> */}
               {renderTabs()}
-
+              {renderSnackBar()}
               <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
                 <Grid
                   container

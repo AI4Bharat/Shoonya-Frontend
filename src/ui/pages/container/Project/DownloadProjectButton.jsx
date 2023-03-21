@@ -38,7 +38,7 @@ const StyledMenu = styled((props) => (
 
 
 function DownloadProjectButton(props) {
-  const { taskStatus,SetTask } = props;
+  const { taskStatus,SetTask,downloadMetadataToggle} = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const [downloadres, setdownloadres] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -79,30 +79,30 @@ function DownloadProjectButton(props) {
 
   };
   const handleDownloadJSONProject = async () => {
-    SetTask([])
-    const projectObj = new DownloadJSONProjectAPI(id,taskStatus);
+    // SetTask([]) //used to clear the selected task statuses
+    const projectObj = new DownloadJSONProjectAPI(id,taskStatus,downloadMetadataToggle);
     dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    setLoading(false);
-    if (res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: "success",
-        variant: "success",
-      })
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: "success",
+    //     variant: "success",
+    //   })
 
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      })
-    }
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   })
+    // }
    
   };
   const handleClose = () => {
@@ -110,58 +110,60 @@ function DownloadProjectButton(props) {
   };
 
   const handleDownloadCSVProject = async () => {
-    SetTask([])
-    const projectObj = new DownloadProjectCsvAPI(id,taskStatus);
+    // SetTask([]) //used to clear the selected task statuses
+    setLoading(true)
+    const projectObj = new DownloadProjectCsvAPI(id,taskStatus,downloadMetadataToggle);
     dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    setLoading(false);
-    if (res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: "success",
-        variant: "success",
-      })
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: "success",
+    //     variant: "success",
+    //   })
 
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      })
-    }
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   })
+    // }
    
   };
 
   const handleDownloadTSVProject = async () => {
-    SetTask([])
-    const projectObj = new DownloadProjectTsvAPI(id,taskStatus);
+    // SetTask([]) //used to clear the selected task statuses
+    setLoading(true)
+    const projectObj = new DownloadProjectTsvAPI(id,taskStatus,downloadMetadataToggle);
     dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    setLoading(false);
-    if (res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: "success",
-        variant: "success",
-      })
+    // const res = await fetch(projectObj.apiEndPoint(), {
+    //   method: "POST",
+    //   body: JSON.stringify(projectObj.getBody()),
+    //   headers: projectObj.getHeaders().headers,
+    // });
+    // const resp = await res.json();
+    // setLoading(false);
+    // if (res.ok) {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: "success",
+    //     variant: "success",
+    //   })
 
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      })
-    }
+    // } else {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: resp?.message,
+    //     variant: "error",
+    //   })
+    // }
     
   };
  
