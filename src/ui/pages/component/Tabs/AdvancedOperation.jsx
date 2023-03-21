@@ -54,6 +54,8 @@ const ProgressType = [
   "reviewed",
   "exported",
 ];
+
+const projectStage = ["Annotation Stage","Review Stage","SuperCheck Stage"]
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -99,6 +101,7 @@ const AdvancedOperation = (props) => {
   "reviewed",
   "exported",
   ]);
+  const [taskReviews,setTaskReviews] = useState("")
   const { id } = useParams();
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -203,7 +206,8 @@ const AdvancedOperation = (props) => {
       
   }
 
-  const handleReviewToggle = async () => {
+  const handleReviewToggle = async (e) => {
+    setTaskReviews(e.target.value)
     setLoading(true);
     const reviewObj = ProjectDetails.enable_task_reviews
       ? new DisableTaskReviewsAPI(id)
@@ -560,15 +564,15 @@ const AdvancedOperation = (props) => {
           // direction="row"
           xs={12}
           md={12}
-          lg={2}
-          xl={2}
+          lg={4}
+          xl={4}
           sm={12}
           spacing={1}
           rowGap={2}
           columnSpacing={2}
         >
           {/* <div className={classes.divider} ></div> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <FormControlLabel
               control={<Switch color="primary" />}
               label="Task Reviews"
@@ -576,6 +580,30 @@ const AdvancedOperation = (props) => {
               checked={ProjectDetails.enable_task_reviews}
               onChange={handleReviewToggle}
             />
+          </Grid> */}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}             
+           sx={{ ml: 2 }}
+         >
+            <FormControl  size="small" className={classes.formControl}>
+              <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
+              Task Reviews
+              </InputLabel>
+              <Select
+                labelId="task-Reviews-label"
+                id="task-Reviews-select"
+                value={taskReviews}
+                label="Task Reviews"
+                onChange={handleReviewToggle}
+
+                // onChange={(e) => setTaskReviews(e.target.value)}
+              >
+                {projectStage.map((type, index) => (
+                  <MenuItem value={type} key={index}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
 
@@ -584,8 +612,8 @@ const AdvancedOperation = (props) => {
           // direction="row"
           xs={12}
           md={12}
-          lg={2}
-          xl={2}
+          lg={4}
+          xl={4}
           sm={12}
           spacing={1}
           rowGap={2}
