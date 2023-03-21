@@ -20,7 +20,7 @@ import DatasetStyle from "../../../styles/Dataset";
 import ProjectDescription from "./ProjectDescription";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AllTaskTable from "../../component/Project/AllTaskTable";
-import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 
 
@@ -191,7 +191,6 @@ const Projects = () => {
         navigate(`/projects/${id}/projectsetting`);
     }
  
-
     return (
         <ThemeProvider theme={themeDefault}>
             {/* <Header /> */}
@@ -221,7 +220,7 @@ const Projects = () => {
                             <Typography  variant="h3">{ProjectDetails.title}</Typography>
                         </Grid>
 
-                        {userDetails?.role !== 1 && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                        {roles.filter((role) => role.role === loggedInUserData?.role)[0]?.projectSettingsIconButton && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
                             <Tooltip title={translate("label.showProjectSettings")}>
                                 <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
                                     <SettingsOutlinedIcon
@@ -257,7 +256,7 @@ const Projects = () => {
                                 {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700', flexDirection: "row-reverse" }} onClick={handleClick} />
-                                {loggedInUserData.role !== 1 && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
+                                {(roles.filter((role) => role.role === loggedInUserData?.role)[0]?.allTaskTab) && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
                         </Box>
 
                     </Grid>
@@ -276,9 +275,9 @@ const Projects = () => {
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 4 : 2 : 2}>
                         <ReportsTable annotationreviewertype={annotationreviewertype} />
                     </TabPanel>
-                 {loggedInUserData.role !== 1  && <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
+               {(roles.filter((role) => role.role === loggedInUserData?.role)[0]?.allTaskTab) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
                         <AllTaskTable  />
-                    </TabPanel>}
+                    </TabPanel>)}
                 </Card>
             </Grid>
         </ThemeProvider>

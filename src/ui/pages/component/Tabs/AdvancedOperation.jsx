@@ -45,6 +45,7 @@ import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
 import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 
 const ProgressType = [
@@ -548,9 +549,9 @@ const AdvancedOperation = (props) => {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeleteProjectTasks />
           </Grid>
-          {loggedInUserData?.role !== 1 && (<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeallocationAnnotatorsAndReviewers />
-          </Grid>)}
+          </Grid>
           
         </Grid>
 

@@ -173,13 +173,13 @@ const MembersTable = (props) => {
   const data =
     dataSource && dataSource?.length > 0
       ? pageSearch().map((el, i) => {
-          const userRoleFromList = el.role && UserMappedByRole(el.role).element;
+          const userRoleFromList = el.role && UserMappedByRole(el.role)?.element;
 
           return [
             el.username,
             el.email,
             userRoleFromList ? userRoleFromList : el.role,
-            (userRole==2 || userRole==3) && <div >
+            (userRole==4 || userRole==5) && <div >
               <CustomButton
                 sx={{ p: 1, borderRadius: 2 }}
                 onClick={() => {
