@@ -31,6 +31,7 @@ import Logout from "../../../../redux/actions/UserManagement/Logout";
 import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -68,7 +69,6 @@ const Header = () => {
   }, []);
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
   const onLogoutClick = () => {
     handleCloseUserMenu();
     dispatch(Logout());
@@ -83,7 +83,6 @@ const Header = () => {
       handleTransliterationModelClose();
     }
   };
-  
   useEffect(() => {
     window.addEventListener("keydown", keyPress);
     return () => {
@@ -158,7 +157,7 @@ const Header = () => {
   };
  
   const renderTabs = () => {
-    if (loggedInUserData?.role === 1) {
+    if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleAnnotatorReviewer) {
       return(
         <Grid
           container
@@ -236,7 +235,7 @@ const Header = () => {
           </Typography> */}
         </Grid>
       )
-    } else if (loggedInUserData?.role === 2) {
+    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleManager) {
       return(<Grid
           container
           direction="row"
@@ -308,7 +307,7 @@ const Header = () => {
             </NavLink>
           </Typography>
         </Grid>)
-    } else if (loggedInUserData?.role === 3) {
+    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleOrganizationOwner) {
       return(<Grid
           container
           direction="row"
@@ -379,7 +378,7 @@ const Header = () => {
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs}
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -395,7 +394,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs || roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideWorkspaces}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -418,7 +417,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs}
         to="/datasets"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
