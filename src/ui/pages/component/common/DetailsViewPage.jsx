@@ -27,6 +27,7 @@ import Spinner from "../../component/common/Spinner";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import {  useSelector,useDispatch } from 'react-redux';
 import WorkspaceSetting from "../Tabs/WorkspaceSetting";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 function TabPanel(props) {
 
@@ -131,7 +132,7 @@ const DetailsViewPage = (props) => {
                             <Typography  variant="h3">{title}</Typography>
                         </Grid>
 
-                        {userDetails?.role !== 1 && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                        {roles.filter((role) => role.role === userDetails?.role)[0]?.projectSettingsIconButton && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
                             <Tooltip title={translate("label.showProjectSettings")}>
                                 <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
                                     <SettingsOutlinedIcon
