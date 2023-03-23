@@ -39,7 +39,10 @@ export default [
         ArchivedProjectsFilter:true,
         allTaskTab:true,
         Choicetranslationmodel:true,
-      
+        filterbyAnnotator:true,
+        filterbyReviewer:true,
+        isAnnotators:true,
+        isReviewer:true,
     },
     {
         label: "OrganizationOwner", 
@@ -52,6 +55,10 @@ export default [
         ArchivedProjectsFilter:true,
         allTaskTab:true,
         hideWorkspaces:true,
+        filterbyAnnotator:true,
+        filterbyReviewer:true,
+        isAnnotators:true,
+        isReviewer:true,
     },
     {
         label: "Admin", 
@@ -63,6 +70,10 @@ export default [
         deallocationAnnotatorsAndReviewers:true,
         ArchivedProjectsFilter:true,
         allTaskTab:true,
+        filterbyAnnotator:true,
+        filterbyReviewer:true,
+        isAnnotators:true,
+        isReviewer:true,
         
     }
 ]
