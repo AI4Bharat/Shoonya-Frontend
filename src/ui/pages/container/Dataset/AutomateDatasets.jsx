@@ -14,6 +14,7 @@ import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatas
 import AutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/AutomateDatasets";
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import GetIndicTransLanguagesAPI from "../../../../redux/actions/api/Dataset/GetIndicTransLanguages";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 const APiType = [{ ApiTypename: "indic-trans" }, { ApiTypename: "google" },{ ApiTypename: "azure" }]
 const AutomateDatasets = () => {
@@ -268,7 +269,7 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                   menuOptions={[{
                     name: "AI4Bharat IndicTrans",
                     value: 1
-                  }, ...(loggedInUserData?.role === 3 ? [{
+                  }, ...(roles.filter((role) => role.role === loggedInUserData?.role)[0]?.Choicetranslationmodel ? [{
                     name: "Google Translate",
                     value: 2
                   },{
