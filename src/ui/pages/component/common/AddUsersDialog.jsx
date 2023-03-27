@@ -69,8 +69,8 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
             (workspaceAnnotator) =>
               projectDetails?.annotation_reviewers.findIndex(
                 (projectUser) => projectUser?.id === workspaceAnnotator?.id
-              ) === -1
-          )
+              ) === -1   && workspaceAnnotator?.role != 1
+          ) 
           .map((user) => ({ id: user.id, email: user.email, username: user.username }));
         break;
     case addUserTypes.ANNOTATOR:
@@ -199,7 +199,6 @@ const AddUsersDialog = ({
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails?.data);
   const orgUsers = useSelector((state) => state.getOrganizationUsers?.data);
   const dispatch = useDispatch();
-
   useEffect(() => {
     let id = '';
     switch (userType) {

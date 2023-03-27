@@ -96,7 +96,8 @@ const TaskTable = (props) => {
 
 
   const filterData = {
-    Status: ProjectDetails.enable_task_reviews
+    Status: ProjectDetails.project_stage == 2
+
       ? props.type === "annotation"
         ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"]
         : [

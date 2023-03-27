@@ -5,12 +5,13 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from "../../../constants";
  
- export default class EnableTaskReviewsAPI extends API {
-   constructor(id, timeout = 2000) {
+ export default class TaskReviewsAPI extends API {
+   constructor(id,taskReviews, timeout = 2000) {
      super("POST", timeout, false);
-     this.type = constants.ENABLE_TASK_REVIEWS;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${id}/allow_task_reviews/`;
-   }
+     this.taskReviews = taskReviews;
+     this.type = constants.TASK_REVIEWS;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${id}/change_project_stage/`;
+   } 
  
    processResponse(res) {
      super.processResponse(res);
@@ -22,8 +23,12 @@
    apiEndPoint() {
      return this.endpoint;
    }
+   getBody() {
+    return {
+      project_stage: this.taskReviews,
+    };
+  }
  
-   getBody() {}
  
    getHeaders() {
      this.headers = {
