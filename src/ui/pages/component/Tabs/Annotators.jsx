@@ -138,7 +138,7 @@ const AnnotatorsTable = (props) => {
     //     ["Shoonya User", "user123@tarento.com", 0, ]
     // ];
     const data = workspaceAnnotators && workspaceAnnotators.length > 0 ? pageSearch().map((el, i) => {
-        const userRole = el.role && UserMappedByRole(el.role).element;
+        const userRole = el.role && UserMappedByRole(el.role)?.element;
         console.log("userRole", userRole);
         return [
             el.username,

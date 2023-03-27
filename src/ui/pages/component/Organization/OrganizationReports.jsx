@@ -246,9 +246,9 @@ const OrganizationReports = () => {
     if ((reportTypes === "AnnotatorQuantity" || reportTypes === "Reviewer") && reportfilter != "" && radiobutton === "UsersReports") {
 
       if (reportfilter.toString() == "Review disabled") {
-        ReviewData.push(false)
+        ReviewData.push(1)
       } else if (reportfilter.toString() == "Review Enabled") {
-        ReviewData.push(true)
+        ReviewData.push(2)
       }
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,

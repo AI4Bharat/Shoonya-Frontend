@@ -6,6 +6,7 @@ export default [
          AnnotatorRecentTasks:true,
          AnnotatorMyProgress:true,
          hidetabs:true,
+         hideActionscolumn:true,
          
     },
     {
@@ -15,6 +16,7 @@ export default [
          AnnotatorRecentTasks:true,
          AnnotatorMyProgress:true,
          hidetabs:true,
+         hideActionscolumn:true,
       
     },
     {
@@ -24,6 +26,7 @@ export default [
         AnnotatorRecentTasks:true,
         AnnotatorMyProgress:true,
         hidetabs:true,
+        hideActionscolumn:true,
     },
     {
         label: "WorkspaceManager", 
@@ -34,8 +37,12 @@ export default [
         RecentTasks:true,
         deallocationAnnotatorsAndReviewers:true,
         ArchivedProjectsFilter:true,
-        allTaskTab:true
-      
+        allTaskTab:true,
+        Choicetranslationmodel:true,
+        filterbyAnnotator:true,
+        filterbyReviewer:true,
+        isAnnotators:true,
+        isReviewer:true,
     },
     {
         label: "OrganizationOwner", 
@@ -48,6 +55,10 @@ export default [
         ArchivedProjectsFilter:true,
         allTaskTab:true,
         hideWorkspaces:true,
+        filterbyAnnotator:true,
+        filterbyReviewer:true,
+        isAnnotators:true,
+        isReviewer:true,
     },
     {
         label: "Admin", 
@@ -59,6 +70,10 @@ export default [
         deallocationAnnotatorsAndReviewers:true,
         ArchivedProjectsFilter:true,
         allTaskTab:true,
+        filterbyAnnotator:true,
+        filterbyReviewer:true,
+        isAnnotators:true,
+        isReviewer:true,
         
     }
 ]

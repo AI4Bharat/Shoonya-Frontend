@@ -45,6 +45,7 @@ import Spinner from "../../component/common/Spinner";
 import OutlinedTextField from "../common/OutlinedTextField";
 import FindAndReplaceDialog from "../../component/common/FindAndReplaceDialog"
 import FindAndReplaceWordsInAnnotationAPI from "../../../../redux/actions/api/ProjectDetails/FindAndReplaceWordsinAnnotation";
+import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 const excludeSearch = ["status", "actions", "output_text"];
 // const excludeCols = ["context", "input_language", "output_language", "language",
@@ -85,12 +86,14 @@ const TaskTable = (props) => {
   const getProjectUsers = useSelector(
     (state) => state.getProjectDetails.data.annotators
   );
+
   const getProjectReviewers = useSelector(
     (state) => state.getProjectDetails.data.annotation_reviewers
   );
   const TaskFilter = useSelector((state) => state.setTaskFilter.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+
 
   const filterData = {
     Status: ProjectDetails.project_stage == 2
@@ -637,7 +640,7 @@ const TaskTable = (props) => {
         )} */}
 
         {props.type === "annotation" &&
-          userDetails?.role !== 1 &&
+         roles.filter((role) => role.role === userDetails?.role)[0]?.filterbyAnnotator  &&
           !getProjectUsers?.some(
             (annotator) => annotator.id === userDetails?.id
           ) && (
@@ -674,7 +677,7 @@ const TaskTable = (props) => {
             </FormControl>
           )}
         {props.type === "review" &&
-          userDetails?.role !== 1 &&
+          roles.filter((role) => role.role === userDetails?.role)[0]?.filterbyReviewer &&
           !getProjectReviewers?.some(
             (reviewer) => reviewer.id === userDetails?.id
           ) && (

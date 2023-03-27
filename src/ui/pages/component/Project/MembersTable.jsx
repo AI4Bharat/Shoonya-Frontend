@@ -21,6 +21,7 @@ import RemoveProjectReviewerAPI from "../../../../redux/actions/api/ProjectDetai
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
+import roles from "../../../../utils/UserMappedByRole/UserRoles"
 
 
 const addLabel = {
@@ -49,7 +50,6 @@ const MembersTable = (props) => {
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
   );
- console.log(userDetails,"userDetailsuserDetails")
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -262,7 +262,7 @@ const MembersTable = (props) => {
           name: "Actions",
           label: "Actions",
           options: {
-            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && userDetails.role === 1 )  ? false : true ,
+            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && roles.filter((role) => role.role === userDetails?.role)[0]?.hideActionscolumn)  ? false : true ,
             filter: false,
             sort: false,
             align: "center",
