@@ -92,7 +92,7 @@ const LabelStudioWrapper = ({
   const dispatch = useDispatch();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const annotation_status = useRef(
-    ProjectDetails.enable_task_reviews ? "labeled" : "labeled"
+    ProjectDetails.project_stage == 2 ? "labeled" : "labeled"
   );
   const autoSaveFlag = useRef(false);
   // this reference will be populated when LSF initialized and can be used somewhere else
@@ -259,7 +259,7 @@ const LabelStudioWrapper = ({
         },
 
         onLabelStudioLoad: function (ls) {
-          annotation_status.current = ProjectDetails.enable_task_reviews
+          annotation_status.current = ProjectDetails.project_stage == 2
             ? "labeled"
             : "labeled";
           //console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
