@@ -277,7 +277,7 @@ export default function Glossary(props) {
         align: "center",
         setCellHeaderProps: () => ({
           style: {
-            height: "30px",
+            height: "35px",
             fontSize: "16px",
             padding: "16px",
             textAlign: "center",

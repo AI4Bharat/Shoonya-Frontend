@@ -157,7 +157,7 @@ const Header = () => {
   };
  
   const renderTabs = () => {
-    if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleAnnotatorReviewer) {
+    if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayHeaderButtonAnnotatorReviewer) {
       return(
         <Grid
           container
@@ -235,7 +235,7 @@ const Header = () => {
           </Typography> */}
         </Grid>
       )
-    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleManager) {
+    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayHeaderManager) {
       return(<Grid
           container
           direction="row"
@@ -307,7 +307,7 @@ const Header = () => {
             </NavLink>
           </Typography>
         </Grid>)
-    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.roleOrganizationOwner) {
+    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayHeaderOrganizationOwnerAdmin) {
       return(<Grid
           container
           direction="row"
@@ -378,7 +378,7 @@ const Header = () => {
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideHeaderButton}
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -394,7 +394,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs || roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideWorkspaces}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideHeaderButton || roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideWorkspaces}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -417,7 +417,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hidetabs}
+        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideHeaderButton}
         to="/datasets"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu

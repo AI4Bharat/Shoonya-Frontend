@@ -143,7 +143,7 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
-                {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.RecentTasks )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.AnnotatorRecentTasks ))  &&
+                {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.RecentTasks )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayRecentTasksinAnnotator ))  &&
                 <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
@@ -159,7 +159,7 @@ const ProfilePage = () => {
                   {UserMappedByRole(userDetails.role)?.element}
                 </CardContent>
               </Card>
-               {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.MyProgress )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.AnnotatorMyProgress))  &&
+               {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.MyProgress )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayMyProgressinAnnotator))  &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
