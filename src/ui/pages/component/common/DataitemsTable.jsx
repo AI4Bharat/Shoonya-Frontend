@@ -40,7 +40,7 @@ const DataitemsTable = () => {
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
- 
+ console.log(dataitemsList,"dataitemsListdataitemsList")
 
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
@@ -53,8 +53,8 @@ const DataitemsTable = () => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
-  console.log(searchedCol,"searchedColsearchedCol",selectedFilters)
-
+  localStorage.setItem("DataitemsList", JSON.stringify(columns));
+  
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
       datasetId,

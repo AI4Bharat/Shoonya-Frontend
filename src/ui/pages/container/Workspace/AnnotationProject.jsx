@@ -716,7 +716,7 @@ const AnnotationProject = (props) => {
               </>
             }
 
-            {(selectedDomain === "Monolingual" || selectedDomain === "Translation"||selectedDomain === "Audio") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation"||selectedType==="SingleSpeakerAudioTranscriptionEditing") &&
+            {(selectedDomain === "Monolingual" || selectedDomain === "Translation"||selectedDomain === "Audio") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation"||selectedType==="SingleSpeakerAudioTranscriptionEditing"||selectedType === "AudioTranscription"||selectedType === "AudioSegmentation" || selectedType === "AudioTranscriptionEditing") &&
               <><Grid
                 className={classes.projectsettingGrid}
                 xs={12}
@@ -727,7 +727,7 @@ const AnnotationProject = (props) => {
               >
                   
                 <Typography gutterBottom component="div">
-                 {selectedType==="SingleSpeakerAudioTranscriptionEditing"?  "Language:" :"Target Language:"}
+                 {(selectedType==="SingleSpeakerAudioTranscriptionEditing")?  "Language:" :"Target Language:"}
                 </Typography>
               </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>

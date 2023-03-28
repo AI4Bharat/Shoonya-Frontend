@@ -7,6 +7,8 @@ import APITransport from "../../../../../redux/actions/apitransport/apitransport
 import ContextualTranslationEditing from "./ContextualTranslationEditing";
 import SemanticTextualSimilarity_Scale5 from "./SemanticTextualSimilarity_Scale5";
 import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
+import AudioTranscription from "./AudioTranscription";
+import AudioSegmentation from "./AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
 import themeDefault from "../../../../theme/theme";
 
@@ -45,7 +47,12 @@ export default function MetaAnalytics(props) {
       </Grid>
       <Grid style={{marginTop:"15px"}}>
       <SingleSpeakerAudioTranscriptionEditing  metaAnalyticsData={metaAnalyticsData}/>
-
+      </Grid>
+      <Grid style={{marginTop:"15px"}}>
+      <AudioTranscription  metaAnalyticsData={metaAnalyticsData}/>
+      </Grid>
+      <Grid style={{marginTop:"15px"}}>
+      <AudioSegmentation  metaAnalyticsData={metaAnalyticsData}/>
       </Grid>
     </div>
   )

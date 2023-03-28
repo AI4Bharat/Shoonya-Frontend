@@ -118,7 +118,7 @@ const Projects = () => {
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
       );
-    console.log(loggedInUserData,"loggedInUserData")
+ 
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
 

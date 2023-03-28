@@ -1,14 +1,8 @@
 import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
 import React from 'react'
-import { useState ,useEffect} from 'react'
-import BasicSettings from '../../component/Tabs/BasicSettings';
-import ReadonlyConfigurations from '../../component/Tabs/ReadonlyConfigurations'
-import AdvancedOperation from '../../component/Tabs/AdvancedOperation';
-import ProjectLogs from './ProjectLogs';
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from 'react-router-dom';
-import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import { useState } from 'react'
+import BasicDatasetSettings from '../../component/Tabs/BasicDatasetSettings';
+import DatasetSettings from './DatasetSettings';
 
 
 function TabPanel(props) {
@@ -31,24 +25,11 @@ function TabPanel(props) {
     );
 }
 
-const ProjectSetting = () => {
-    const dispatch = useDispatch();
-    const { id } = useParams();
+const DatasetSettingTabs = () => {
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (e, v) => {
         setTabValue(v)
     }
-    const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-
-    const getProjectDetails = () => {
-        const projectObj = new GetProjectDetailsAPI(id);
-
-        dispatch(APITransport(projectObj));
-    }
-
-    useEffect(() => {
-        getProjectDetails();
-    }, [])
     return (
         <Card
         sx={{
@@ -70,30 +51,22 @@ const ProjectSetting = () => {
                         sx={{mb:3,}}
                     >
                         <Typography variant="h3" gutterBottom component="div"sx={{fontWeight: '1.6875rem'}}>
-                            Project Settings
+                            DataSet Settings
                         </Typography>
                     </Grid>
             <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="Basic " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label=" Advanced " sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Read-only " sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Logs " sx={{ fontSize: 17, fontWeight: '700' }} />
                 </Tabs>
             </Box>
             <Divider/>
             <Box sx={{ p: 1 }}>
                 <TabPanel value={tabValue} index={0}>
-                <BasicSettings   ProjectDetails={ProjectDetails}/>  
+                    <BasicDatasetSettings />  
                 </TabPanel>
                 <TabPanel value={tabValue} index={1}>
-                    <AdvancedOperation />
-                </TabPanel>
-                <TabPanel value={tabValue} index={2}>
-                <ReadonlyConfigurations />
-                </TabPanel>
-                <TabPanel value={tabValue} index={3}>
-                    <ProjectLogs />
+                    <DatasetSettings />
                 </TabPanel>
             </Box>
         </Box>
@@ -101,4 +74,4 @@ const ProjectSetting = () => {
     )
 }
 
-export default ProjectSetting
+export default DatasetSettingTabs

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useParams,useNavigate } from "react-router-dom";
 import { Card, CircularProgress, Grid, Typography,Modal,Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
@@ -16,6 +17,7 @@ import Switch from "@mui/material/Switch";
 import DownloadDatasetButton from "./DownloadDataSetButton";
 import DeleteDataItems from "./DeleteDataItems";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import DeduplicateDataItems from "../../container/Dataset/DeduplicateDataItems";
 
 
 const style = {
@@ -31,7 +33,9 @@ const style = {
 };
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
-export default function DatasetSettings({ datasetId }) {
+export default function DatasetSettings() {
+  const { datasetId } = useParams();
+  // console.log('current',datasetId)
   const dispatch = useDispatch();
   const fileRef = useRef();
   const [loading, setLoading] = useState(false);
@@ -178,6 +182,9 @@ export default function DatasetSettings({ datasetId }) {
 
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 <DeleteDataItems />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <DeduplicateDataItems />
               </Grid>
 
               <div>

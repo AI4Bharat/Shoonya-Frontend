@@ -18,7 +18,7 @@ import {
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
 
-function SingleSpeakerAudioTranscriptionEditing(props) {
+function AudioTranscription(props) {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const { taskAnalyticsData } = props;
@@ -28,17 +28,17 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    taskAnalyticsData[3]?.sort(
+    taskAnalyticsData[4]?.sort(
       (a, b) =>
         b.annotation_cumulative_tasks_count -
         a.annotation_cumulative_tasks_count
     );
-    setData(taskAnalyticsData[3]);
+    setData(taskAnalyticsData[4]);
 
     let allAnnotatorCumulativeTasksCount = 0;
     let allReviewCumulativeTasksCount = 0;
     var languages;
-    taskAnalyticsData[3]?.map((element, index) => {
+    taskAnalyticsData[4]?.map((element, index) => {
       allAnnotatorCumulativeTasksCount +=
         element.annotation_cumulative_tasks_count;
       allReviewCumulativeTasksCount += element.review_cumulative_tasks_count;
@@ -50,7 +50,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
     setTotalTaskCount(
       allAnnotatorCumulativeTasksCount + allReviewCumulativeTasksCount
     );
-  }, [taskAnalyticsData[3]]);
+  }, [taskAnalyticsData[4]]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -95,9 +95,9 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
     <>
       <Box className={classes.modelChartSection}>
         <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-          Tasks Dashboard - Audio Transcription Editing
+          Tasks Dashboard - Audio Transcription
           <Typography variant="body1">
-            Count of Annotated and Reviewed Audio Transcription Editing
+            Count of Annotated and Reviewed Audio Transcription
           </Typography>
         </Typography>
        
@@ -226,4 +226,5 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
     </>
   );
 }
-export default SingleSpeakerAudioTranscriptionEditing;
+export default AudioTranscription
+;

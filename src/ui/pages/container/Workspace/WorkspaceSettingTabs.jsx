@@ -1,14 +1,13 @@
 import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
 import React from 'react'
-import { useState ,useEffect} from 'react'
-import BasicSettings from '../../component/Tabs/BasicSettings';
-import ReadonlyConfigurations from '../../component/Tabs/ReadonlyConfigurations'
-import AdvancedOperation from '../../component/Tabs/AdvancedOperation';
-import ProjectLogs from './ProjectLogs';
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from 'react'
+import {  useSelector,useDispatch } from 'react-redux';
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useParams } from 'react-router-dom';
-import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import BasicWorkspaceSettings from '../../component/Tabs/BasicWorkspaceSettings';
+import WorkspaceSetting from '../../component/Tabs/WorkspaceSetting';
+// import DatasetSettings from './DatasetSettings';
+import GetWorkspacesDetailsAPI from '../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails';
 
 
 function TabPanel(props) {
@@ -31,24 +30,19 @@ function TabPanel(props) {
     );
 }
 
-const ProjectSetting = () => {
-    const dispatch = useDispatch();
-    const { id } = useParams();
+const WorkspaceSettingTabs = () => {
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (e, v) => {
         setTabValue(v)
     }
-    const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-
-    const getProjectDetails = () => {
-        const projectObj = new GetProjectDetailsAPI(id);
-
-        dispatch(APITransport(projectObj));
-    }
-
-    useEffect(() => {
-        getProjectDetails();
-    }, [])
+    const dispatch = useDispatch();
+    const {id} = useParams();
+   
+    const workspaceDtails = useSelector(state=>state.getWorkspaceDetails.data);
+    const getWorkspaceDetails = ()=>{
+        const workspaceObj = new GetWorkspacesDetailsAPI(id);
+        dispatch(APITransport(workspaceObj));
+      }
     return (
         <Card
         sx={{
@@ -70,30 +64,26 @@ const ProjectSetting = () => {
                         sx={{mb:3,}}
                     >
                         <Typography variant="h3" gutterBottom component="div"sx={{fontWeight: '1.6875rem'}}>
-                            Project Settings
+                        Workspace Settings
                         </Typography>
                     </Grid>
             <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="Basic " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label=" Advanced " sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Read-only " sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Logs " sx={{ fontSize: 17, fontWeight: '700' }} />
                 </Tabs>
             </Box>
             <Divider/>
             <Box sx={{ p: 1 }}>
                 <TabPanel value={tabValue} index={0}>
-                <BasicSettings   ProjectDetails={ProjectDetails}/>  
+                    <BasicWorkspaceSettings />  
                 </TabPanel>
                 <TabPanel value={tabValue} index={1}>
-                    <AdvancedOperation />
-                </TabPanel>
-                <TabPanel value={tabValue} index={2}>
-                <ReadonlyConfigurations />
-                </TabPanel>
-                <TabPanel value={tabValue} index={3}>
-                    <ProjectLogs />
+                    <WorkspaceSetting 
+                        title={workspaceDtails && workspaceDtails.workspace_name}
+                        createdBy={workspaceDtails && workspaceDtails.created_by ?.username}
+                        onArchiveWorkspace={()=>getWorkspaceDetails()}
+                    />
                 </TabPanel>
             </Box>
         </Box>
@@ -101,4 +91,4 @@ const ProjectSetting = () => {
     )
 }
 
-export default ProjectSetting
+export default WorkspaceSettingTabs
