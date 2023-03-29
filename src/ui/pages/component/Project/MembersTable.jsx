@@ -179,7 +179,7 @@ const MembersTable = (props) => {
             el.username,
             el.email,
             userRoleFromList ? userRoleFromList : el.role,
-            (userRole==4 || userRole==5) && <div >
+             ( roles.filter((role) => role.role === userDetails?.role)[0]?.displayViewandRemoveButton ) && <div >
               <CustomButton
                 sx={{ p: 1, borderRadius: 2 }}
                 onClick={() => {
