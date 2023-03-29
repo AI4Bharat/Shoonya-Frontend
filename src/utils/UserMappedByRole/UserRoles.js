@@ -43,6 +43,7 @@ export default [
         filterbyReviewer:true,
         isAnnotators:true,
         isReviewer:true,
+        displayViewandRemoveButton:true,
     },
     {
         label: "OrganizationOwner", 
@@ -59,6 +60,7 @@ export default [
         filterbyReviewer:true,
         isAnnotators:true,
         isReviewer:true,
+        displayViewandRemoveButton:true,
     },
     {
         label: "Admin", 
@@ -74,6 +76,7 @@ export default [
         filterbyReviewer:true,
         isAnnotators:true,
         isReviewer:true,
+        displayViewandRemoveButton:true,
         
     }
 ]
