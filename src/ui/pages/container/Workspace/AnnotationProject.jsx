@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, ThemeProvider, Typography, Card ,IconButton} from "@mui/material";
+import { Box, Chip, Grid, ThemeProvider, Typography, Card ,IconButton,InputLabel} from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState } from "react";
@@ -36,6 +36,7 @@ const isNum = (str) => {
   var reg = new RegExp('^[0-9]*$');
   return reg.test(String(str));
 }
+const projectStage = [{name:"Annotation Stage",value: 1}, {name:"Review Stage",value: 2}]
 
 const AnnotationProject = (props) => {
   const { id } = useParams();
@@ -82,9 +83,8 @@ const AnnotationProject = (props) => {
   const [selectedVariableParameters, setSelectedVariableParameters] = useState(
     []
   );
-  const [taskReviews, setTaskReviews] = useState(false)
+  const [taskReviews, setTaskReviews] = useState(1)
   const [variable_Parameters_lang, setVariable_Parameters_lang] = useState("")
-
   //Table related state variables
   const [columns, setColumns] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -507,12 +507,12 @@ const AnnotationProject = (props) => {
       variable_parameters: temp,
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
-      enable_task_reviews: taskReviews,
+      project_stage: taskReviews,
     };
 
     if (sourceLanguage) newProject['src_language'] = sourceLanguage;
     if (targetLanguage) newProject['tgt_language'] = targetLanguage;
-
+console.log(newProject,"newProjectnewProject")
     const projectObj = new CreateProjectAPI(newProject);
     dispatch(APITransport(projectObj));
   };
@@ -520,6 +520,12 @@ const AnnotationProject = (props) => {
   const handleSearchClose = () => {
     setSearchAnchor(null);
   }
+
+  const handleReviewToggle = async (e) => {
+    setTaskReviews(e.target.value)
+   
+  };
+
  
 
 
@@ -1087,25 +1093,40 @@ const AnnotationProject = (props) => {
                 </Grid>
               </>
             )}
-            {confirmed && (<Grid
-              item
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sx={{ mt: 3 }}
+            {confirmed && (
+              <>
+             <Grid
+             xs={12}
+             sm={12}
+             md={12}
+             lg={12}
+             xl={12}
+             className={classes.projectsettingGrid}
+           >
+             <Typography gutterBottom component="div" label="Required">
+             Project Stage:
+             </Typography>
+           </Grid>
+           <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+             <FormControl fullWidth  className={classes.formControl}>
+              <Select
+                labelId="task-Reviews-label"
+                id="task-Reviews-select"
+                value={taskReviews}
+                onChange={handleReviewToggle}
+              >
+                {projectStage.map((type, index) => (
+                  <MenuItem value={type.value} key={index} >
+                    {type.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+           </Grid>
 
-            >
-              <FormControlLabel
-                sx={{ marginLeft: "1px" }}
-                control={<Switch color="primary" />}
-                label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
-                labelPlacement="start"
-                checked={taskReviews}
-                onChange={(event) => setTaskReviews(event.target.checked)}
-              />
-            </Grid>)}
+           </>
+            
+           )}
 
             <Grid
               className={classes.projectsettingGrid}
