@@ -79,7 +79,7 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
           (orgUser) =>
             workspaceAnnotators.findIndex(
               (annotator) => annotator?.id === orgUser?.id
-            ) === -1
+            ) === -1 
         )
         .map((user) => ({ email: user.email, username: user.username, id: user.id }));
       break;
@@ -88,9 +88,10 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
         ?.filter(
           (orgUser) =>
             workspaceManagers.findIndex(
-              (manager) => manager?.id === orgUser?.id
-            ) === -1
+              (manager) =>  manager?.id === orgUser?.id
+            ) === -1  && orgUser?.role != 1 && orgUser?.role != 2 && orgUser?.role != 3
         )
+       
         .map((user) => ({ id: user.id, email: user.email, username: user.username }));
       break;
     default:
@@ -199,6 +200,7 @@ const AddUsersDialog = ({
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails?.data);
   const orgUsers = useSelector((state) => state.getOrganizationUsers?.data);
   const dispatch = useDispatch();
+  console.log(availableUsers,"availableUsersavailableUsers")
   useEffect(() => {
     let id = '';
     switch (userType) {
