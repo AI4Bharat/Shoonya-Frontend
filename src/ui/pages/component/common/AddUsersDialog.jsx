@@ -200,7 +200,7 @@ const AddUsersDialog = ({
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails?.data);
   const orgUsers = useSelector((state) => state.getOrganizationUsers?.data);
   const dispatch = useDispatch();
-  console.log(availableUsers,"availableUsersavailableUsers")
+
   useEffect(() => {
     let id = '';
     switch (userType) {
