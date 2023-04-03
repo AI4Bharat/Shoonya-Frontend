@@ -32,6 +32,7 @@ import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
 import roles from "../../../../utils/UserMappedByRole/UserRoles";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -51,7 +52,7 @@ const Header = () => {
 
   const dispatch = useDispatch();
   let navigate = useNavigate();
-
+console.log(userRole,"userRoleuserRole")
   const classes = headerStyle();
 
   const loggedInUserData = useSelector(
