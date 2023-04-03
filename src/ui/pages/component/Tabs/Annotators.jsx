@@ -42,7 +42,7 @@ const AnnotatorsTable = (props) => {
             user_id: Projectid,
         }
         const projectObj = new RemoveWorkspaceMemberAPI(id, workspacedata);
-        dispatch(APITransport(projectObj));
+        // dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
