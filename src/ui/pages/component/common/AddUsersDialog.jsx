@@ -200,7 +200,7 @@ const AddUsersDialog = ({
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails?.data);
   const orgUsers = useSelector((state) => state.getOrganizationUsers?.data);
   const dispatch = useDispatch();
-
+console.log(selectedUsers,"selectedUsersselectedUsers")
   useEffect(() => {
     let id = '';
     switch (userType) {
@@ -234,7 +234,7 @@ const AddUsersDialog = ({
   };
 
   const dialogCloseHandler = () => {
-    setSelectedUsers([]);
+    setSelectedUsers(userType === addUserTypes.MANAGER ? null : []);
     handleDialogClose();
   };
 
@@ -246,7 +246,8 @@ const AddUsersDialog = ({
           Select users to be added.
         </DialogContentText>
         <Autocomplete
-          multiple={userType !== addUserTypes.MANAGER}
+          multiple={userType !== addUserTypes.MANAGER ? true : false}
+          // multiple={userType !== addUserTypes.MANAGER}
           limitTags={3}
           onChange={(e, newVal) => setSelectedUsers(newVal)}
           options={availableUsers}
