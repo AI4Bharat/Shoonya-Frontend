@@ -8,6 +8,7 @@ export default [
          hideHeaderButton:true,
          hideActionscolumn:true,
          
+         
     },
     {
         label: "Reviewer",
@@ -17,7 +18,7 @@ export default [
          displayMyProgressinAnnotator:true,
          hideHeaderButton:true,
          hideActionscolumn:true,
-      
+         displayReviewerReports:true,
     },
     {
         label: "SuperChecker", 
@@ -27,6 +28,7 @@ export default [
         displayMyProgressinAnnotator:true,
         hideHeaderButton:true,
         hideActionscolumn:true,
+        displayReviewerReports:true,
     },
     {
         label: "WorkspaceManager", 
@@ -44,6 +46,7 @@ export default [
         isAnnotators:true,
         isReviewer:true,
         displayViewandRemoveButton:true,
+        displayReviewerReports:true,
     },
     {
         label: "OrganizationOwner", 
@@ -61,6 +64,7 @@ export default [
         isAnnotators:true,
         isReviewer:true,
         displayViewandRemoveButton:true,
+        displayReviewerReports:true,
     },
     {
         label: "Admin", 
@@ -77,6 +81,7 @@ export default [
         isAnnotators:true,
         isReviewer:true,
         displayViewandRemoveButton:true,
+        displayReviewerReports:true,
         
     }
 ]
