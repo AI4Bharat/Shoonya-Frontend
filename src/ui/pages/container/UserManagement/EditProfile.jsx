@@ -72,7 +72,7 @@ const MyProfile = () => {
 
   const handleUpdateEmail = () => {
     setEmailVerifyLoading(true);
-    const apiObj = new UpdateEmailAPI(email);
+    const apiObj = new UpdateEmailAPI(email.toLowerCase());
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
@@ -186,7 +186,7 @@ const MyProfile = () => {
                 isOpen={showEmailDialog}
                 handleClose={handleEmailDialogClose}
                 oldEmail={userDetails.email}
-                newEmail={email}
+                newEmail={email?.toLowerCase()}
                 onSuccess={handleVerificationSuccess}
               />
             </Grid>
