@@ -14,7 +14,7 @@ import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatas
 import AutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/AutomateDatasets";
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import GetIndicTransLanguagesAPI from "../../../../redux/actions/api/Dataset/GetIndicTransLanguages";
-import roles from "../../../../utils/UserMappedByRole/UserRoles";
+import roles from "../../../../utils/UserMappedByRole/Roles";
 
 const APiType = [{ ApiTypename: "indic-trans" }, { ApiTypename: "google" },{ ApiTypename: "azure" }]
 const AutomateDatasets = () => {
@@ -143,7 +143,7 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
     });
   };
 
-  if (loggedInUserData?.role === 1) return navigate("/projects");
+  if (roles?.Annotator === loggedInUserData?.role) return navigate("/projects");
 
   // const handleAPiType = (e) => {
   //   setApitype(e.target.value)
@@ -269,7 +269,7 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                   menuOptions={[{
                     name: "AI4Bharat IndicTrans",
                     value: 1
-                  }, ...(roles.filter((role) => role.role === loggedInUserData?.role)[0]?.Choicetranslationmodel ? [{
+                  }, ...((roles?.OrganizationOwner === loggedInUserData?.role || roles?.Admin === loggedInUserData?.role )? [{
                     name: "Google Translate",
                     value: 2
                   },{

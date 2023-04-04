@@ -31,7 +31,6 @@ import Logout from "../../../../redux/actions/UserManagement/Logout";
 import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
-import roles from "../../../../utils/UserMappedByRole/UserRoles";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const Header = () => {
@@ -158,7 +157,7 @@ console.log(userRole,"userRoleuserRole")
   };
  
   const renderTabs = () => {
-    if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayHeaderButtonAnnotatorReviewer) {
+    if (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role) {
       return(
         <Grid
           container
@@ -236,7 +235,7 @@ console.log(userRole,"userRoleuserRole")
           </Typography> */}
         </Grid>
       )
-    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayHeaderManager) {
+    } else if (userRole.WorkspaceManager === loggedInUserData?.role) {
       return(<Grid
           container
           direction="row"
@@ -308,7 +307,7 @@ console.log(userRole,"userRoleuserRole")
             </NavLink>
           </Typography>
         </Grid>)
-    } else if (roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayHeaderOrganizationOwnerAdmin) {
+    } else if (userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role) {
       return(<Grid
           container
           direction="row"
@@ -379,7 +378,7 @@ console.log(userRole,"userRoleuserRole")
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideHeaderButton}
+        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role }
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -395,7 +394,7 @@ console.log(userRole,"userRoleuserRole")
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideHeaderButton || roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideWorkspaces}
+        hidden={ userRole.WorkspaceManager !== loggedInUserData?.role}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -418,7 +417,7 @@ console.log(userRole,"userRoleuserRole")
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={roles.filter((role) => role.role === loggedInUserData?.role)[0]?.hideHeaderButton}
+        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role}
         to="/datasets"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu

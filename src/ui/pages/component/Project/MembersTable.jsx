@@ -21,7 +21,7 @@ import RemoveProjectReviewerAPI from "../../../../redux/actions/api/ProjectDetai
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
-import roles from "../../../../utils/UserMappedByRole/UserRoles"
+import roles from "../../../../utils/UserMappedByRole/Roles"
 
 
 const addLabel = {
@@ -179,7 +179,7 @@ const MembersTable = (props) => {
             el.username,
             el.email,
             userRoleFromList ? userRoleFromList : el.role,
-             ( roles.filter((role) => role.role === userDetails?.role)[0]?.displayViewandRemoveButton ) && <div >
+            (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ) && <div >
               <CustomButton
                 sx={{ p: 1, borderRadius: 2 }}
                 onClick={() => {
@@ -262,7 +262,7 @@ const MembersTable = (props) => {
           name: "Actions",
           label: "Actions",
           options: {
-            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && roles.filter((role) => role.role === userDetails?.role)[0]?.hideActionscolumn)  ? false : true ,
+            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ))  ?  true : false,
             filter: false,
             sort: false,
             align: "center",
