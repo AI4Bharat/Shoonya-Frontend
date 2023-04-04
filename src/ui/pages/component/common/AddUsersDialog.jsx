@@ -234,7 +234,7 @@ const AddUsersDialog = ({
   };
 
   const dialogCloseHandler = () => {
-    setSelectedUsers([]);
+    setSelectedUsers(userType === addUserTypes.MANAGER ? null : []);
     handleDialogClose();
   };
 
