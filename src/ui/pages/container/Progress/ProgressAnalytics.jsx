@@ -27,7 +27,8 @@ import { addDays } from 'date-fns';
 import colorsData from '../../../../utils/Colors_JSON/Colors_JSON';
 import axios from "axios";
 import html2canvas from 'html2canvas';
-import locale, { modifiedStaticRanges } from "../../../../utils/Date_Range/getDateRangeFormat"
+import locale, { modifiedStaticRanges } from "../../../../utils/Date_Range/getDateRangeFormat";
+import { MenuProps } from "../../../../utils/utils";
 import { jsPDF } from "jspdf";
 ChartJS.register(
   CategoryScale,
@@ -799,6 +800,7 @@ function ProgressList() {
                     label="Project Type"
                     sx={{padding:"1px"}}
                     onChange={(e) => setSelectedType(e.target.value)}
+                    MenuProps={MenuProps}
                   >
                     {projectTypes.map((type, index) => (
                       <MenuItem value={type} key={index}>

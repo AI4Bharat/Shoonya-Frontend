@@ -11,6 +11,7 @@ import Snackbar from "../../component/common/Snackbar";
 import UpdateEmailDialog from "../../component/common/UpdateEmailDialog"
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import {participationType} from '../../../../config/dropDownValues';
+import { MenuProps } from "../../../../utils/utils";
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
@@ -254,6 +255,7 @@ const MyProfile = () => {
                 value={newDetails?.languages? newDetails.languages : []}
                 onChange={handleFieldChange}
                 style={{zIndex: "0"}}
+                MenuProps={MenuProps}
                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

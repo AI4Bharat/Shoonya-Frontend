@@ -20,6 +20,7 @@ import getDomains from "../../../../redux/actions/api/Glossary/GetDomains";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CustomizedSnackbars from "../../../pages/component/common/Snackbar";
 import SuggestAnEditAPI from "../../../../redux/actions/api/Glossary/SuggestAnEdit";
+import { MenuProps } from "../../../../utils/utils";
 import {
   IndicTransliterate,
   getTransliterationLanguages,
@@ -185,6 +186,7 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
                     sx={{
                       textAlign: "left",
                     }}
+                    MenuProps={MenuProps}
                   >
                     {allDomains &&
                       allDomains.length > 0 &&

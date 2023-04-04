@@ -15,6 +15,7 @@ import AutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/AutomateD
 import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import GetIndicTransLanguagesAPI from "../../../../redux/actions/api/Dataset/GetIndicTransLanguages";
 import roles from "../../../../utils/UserMappedByRole/Roles";
+import { MenuProps } from "../../../../utils/utils";
 
 const APiType = [{ ApiTypename: "indic-trans" }, { ApiTypename: "google" },{ ApiTypename: "azure" }]
 const AutomateDatasets = () => {
@@ -43,7 +44,7 @@ const AutomateDatasets = () => {
   const DatasetTypes = useSelector((state) => state.GetDatasetType.data);
   const LanguageChoicesIndicTrans = useSelector((state) => state.getIndicTransLanguages.data);
   const LanguageChoicesAll = useSelector((state) => state.getLanguageChoices.data);
-
+  
   useEffect(() => {
     const obj = new GetDatasetTypeAPI();
     dispatch(APITransport(obj));
@@ -212,17 +213,22 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                   Source dataset instance:
                 </Typography>
               </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <MenuItems
-                  menuOptions={srcInstances.map((instance) => {
-                    return {
-                      name: instance["instance_name"],
-                      value: instance["instance_id"],
-                    }
-                  })}
-                  handleChange={(value) => setSrcInstance(value)}
-                  value={srcInstance}
-                />
+              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}> 
+            <FormControl fullWidth >
+            <Select
+              labelId="project-type-label"
+              id="project-type-select"
+              value={srcInstance}
+              onChange={(e) => setSrcInstance(e.target.value)}
+              MenuProps={MenuProps}
+            >
+              {srcInstances.map((type, index) => (
+                <MenuItem value={type.instance_id} key={index}>
+                  {type.instance_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
               </Grid>
             </>}
             {tgtDatasetType && tgtInstances.length > 0 && <>
@@ -238,17 +244,22 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                   Target dataset instance:
                 </Typography>
               </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <MenuItems
-                  menuOptions={tgtInstances.map((instance) => {
-                    return {
-                      name: instance["instance_name"],
-                      value: instance["instance_id"],
-                    }
-                  })}
-                  handleChange={(value) => setTgtInstance(value)}
-                  value={tgtInstance}
-                />
+              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>    
+            <FormControl fullWidth >
+            <Select
+              labelId="project-type-label"
+              id="project-type-select"
+              value={tgtInstance}
+              onChange={(e) => setTgtInstance(e.target.value)}
+              MenuProps={MenuProps}
+            >
+              {tgtInstances.map((type, index) => (
+                <MenuItem value={type.instance_id} key={index}>
+                  {type.instance_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
               </Grid>
             </>}
             {tgtDatasetType === "TranslationPair" && <>
@@ -307,6 +318,7 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                        console.log(e.target.value,"e.target.value")}}
                     value={languages}
                     multiple
+                    MenuProps={MenuProps}
                   >
                     {languageChoices.map((lang) => (
                       <MenuItem key={lang.name} value={lang.name}>

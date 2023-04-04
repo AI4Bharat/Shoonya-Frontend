@@ -30,6 +30,7 @@ import { isSameDay, format } from 'date-fns/esm';
 import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import { MenuProps } from "../../../../utils/utils";
 
 const WorkspaceReports = () => {
   const WorkspaceDetails = useSelector(
@@ -275,6 +276,7 @@ const WorkspaceReports = () => {
               value={selectedType}
               label="Project Type"
               onChange={(e) => setSelectedType(e.target.value)}
+              MenuProps={MenuProps}
             >
               {projectTypes.map((type, index) => (
                 <MenuItem value={type} key={index}>
@@ -302,6 +304,7 @@ const WorkspaceReports = () => {
               value={reportType}
               label="Report Type"
               onChange={(e) => setReportType(e.target.value)}
+              MenuProps={MenuProps}
             >
               <MenuItem value={"user"}>User Reports</MenuItem>
               <MenuItem value={"project"}>Project Reports</MenuItem>
@@ -319,6 +322,7 @@ const WorkspaceReports = () => {
               value={language}
               label="Target Language"
               onChange={(e) => setLanguage(e.target.value)}
+              MenuProps={MenuProps}
             >
               <MenuItem value={"all"}>All languages</MenuItem>
               {LanguageChoices.language?.map((lang) => (

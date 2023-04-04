@@ -45,6 +45,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useParams } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
+import { MenuProps } from "../../../../utils/utils";
 
 const MyProgress = () => {
   const { id } = useParams();
@@ -290,6 +291,7 @@ const MyProgress = () => {
                 value={selectedType}
                 label="Project Type"
                 onChange={(e) => setSelectedType(e.target.value)}
+                MenuProps={MenuProps}
               >
                 {projectTypes.map((type, index) => (
                   <MenuItem value={type} key={index}>
