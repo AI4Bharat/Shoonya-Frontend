@@ -273,7 +273,7 @@ const Projects = () => {
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 4 : 2 : 2}>
-                        <ReportsTable annotationreviewertype={annotationreviewertype} />
+                        <ReportsTable annotationreviewertype={annotationreviewertype}  userDetails={userDetails}/>
                     </TabPanel>
                {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
                         <AllTaskTable  />
