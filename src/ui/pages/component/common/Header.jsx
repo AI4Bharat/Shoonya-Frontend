@@ -378,7 +378,7 @@ console.log(userRole,"userRoleuserRole")
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role }
+        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role ||userRole.WorkspaceManager === loggedInUserData?.role  }
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
