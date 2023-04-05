@@ -452,7 +452,7 @@ const Header = () => {
       name: "My Progress",
       onclick: () => {
         handleCloseUserMenu();
-        navigate(`/profile/${loggedInUserData.id}`);
+        navigate(`/progress/${loggedInUserData.id}`);
       },
     },
     {
