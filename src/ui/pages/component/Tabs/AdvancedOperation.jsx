@@ -44,7 +44,6 @@ import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
 import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
-import roles from "../../../../utils/UserMappedByRole/UserRoles";
 
 
 const ProgressType = [
