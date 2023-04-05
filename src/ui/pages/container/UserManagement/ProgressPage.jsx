@@ -14,7 +14,8 @@ import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import roles from "../../../../utils/UserMappedByRole/UserRoles";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+
 
 
 const ProgressPage = () => {
@@ -101,7 +102,7 @@ const ProgressPage = () => {
               </Card>
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
-                {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.RecentTasks )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayRecentTasksinAnnotator ))  &&
+            {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && userRole.Annotator === loggedInUserData?.role))  &&
                 <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
@@ -112,7 +113,7 @@ const ProgressPage = () => {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
               
-               {((roles.filter((role) => role.role === loggedInUserData?.role)[0]?.MyProgress )||(LoggedInUserId === userDetails?.id && roles.filter((role) => role.role === loggedInUserData?.role)[0]?.displayMyProgressinAnnotator))  &&
+            {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && userRole.Annotator === loggedInUserData?.role))  &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>

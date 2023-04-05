@@ -14,7 +14,7 @@ import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import roles from "../../../../utils/UserMappedByRole/UserRoles";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 
 const ProfilePage = () => {

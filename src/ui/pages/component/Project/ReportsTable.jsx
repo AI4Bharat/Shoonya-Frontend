@@ -21,7 +21,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import roles from "../../../../utils/UserMappedByRole/UserRoles"
+import roles from "../../../../utils/UserMappedByRole/Roles"
 
 const ReportsTable = (props) => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
@@ -202,7 +202,7 @@ const ReportsTable = (props) => {
 
                     >
                         <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />
-                    {roles.filter((role) => role.role === props.userDetails?.role)[0]?.displayReviewerReports &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
+                    {roles.Annotator !== props.userDetails?.role &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
 
                     </RadioGroup>
                 </FormControl>
