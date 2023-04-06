@@ -67,7 +67,10 @@ const AnnotationProject = (props) => {
   const filterdataitemsList = useSelector(
     (state) => state.datasetSearchPopup.data
   );
-
+  const returnData = DataItems?.results?.map((objName) => {
+    const data = JSON.stringify(objName.metadata_json);
+    console.log(data, "DataItemsDataItems");
+  });
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
   const [datasetTypes, setDatasetTypes] = useState(null);
@@ -76,7 +79,6 @@ const AnnotationProject = (props) => {
   const [variableParameters, setVariableParameters] = useState(null);
   const [languageOptions, setLanguageOptions] = useState([]);
   const [searchedCol, setSearchedCol] = useState();
-  console.log(languageOptions, "languageOptionslanguageOptions");
   //Form related state variables
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -110,7 +112,7 @@ const AnnotationProject = (props) => {
   const searchOpen = Boolean(searchAnchor);
   const excludeKeys = [
     "parent_data_id",
-    "metadata_json",
+    // "metadata_json",
     "instance_id_id",
     "datasetbase_ptr_id",
     "key",
@@ -121,7 +123,11 @@ const AnnotationProject = (props) => {
     "rating",
     // "conversation_json",
     // "machine_translated_conversation_json",
-    // "speakers_json"
+    "speakers_json",
+    "transcribed_json",
+    "conversation_json"
+
+
   ];
   const renderToolBar = () => {
     return (
@@ -168,7 +174,6 @@ const AnnotationProject = (props) => {
       </Box>
     );
   };
-
   const options = {
     count: totalDataitems,
     rowsPerPage: currentRowPerPage,
@@ -341,19 +346,28 @@ const AnnotationProject = (props) => {
     let tempColumns = [];
     let tempSelected = [];
     if (fetchedItems?.length) {
-      Object.keys(fetchedItems[0]).forEach((key) => {
-        if (!excludeKeys.includes(key) && !key.includes("_json")) {
+      Object.keys(fetchedItems[0]).forEach((keys) => {
+        if (!excludeKeys.includes(keys)) {
           tempColumns.push({
-            name: key,
-            label: snakeToTitleCase(key),
+            name: keys,
+            label: snakeToTitleCase(keys),
             options: {
               filter: false,
               sort: false,
               align: "center",
               customHeadLabelRender: customColumnHead,
+              customBodyRender: (value) => {
+                if (keys == "metadata_json" && value !== null ) {
+                 const data = JSON.stringify(value)
+                 const metadata = data.replace(/\\/g, "");
+                  return metadata;
+                } else {
+                  return value;
+                }
+              },
             },
           });
-          tempSelected.push(key);
+          tempSelected.push(keys);
         }
       });
     }
@@ -755,7 +769,7 @@ const AnnotationProject = (props) => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                     <FormControl fullWidth>
+                    <FormControl fullWidth>
                       <Select
                         fullWidth
                         labelId="select-Language"
@@ -802,7 +816,7 @@ const AnnotationProject = (props) => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                     <FormControl fullWidth>
+                    <FormControl fullWidth>
                       <Select
                         fullWidth
                         labelId="select-Language"
@@ -819,7 +833,6 @@ const AnnotationProject = (props) => {
                         ))}
                       </Select>
                     </FormControl>
-                    
                   </Grid>
                 </>
               )}
@@ -1049,6 +1062,7 @@ const AnnotationProject = (props) => {
                       data={tableData}
                       columns={columns.filter((column) =>
                         selectedColumns.includes(column.name)
+                       
                       )}
                       options={options}
                     />
