@@ -262,7 +262,7 @@ const MembersTable = (props) => {
           name: "Actions",
           label: "Actions",
           options: {
-            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ))  ?  true : false,
+            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && (roles?.Annotator === userDetails?.role || roles?.Reviewer === userDetails?.role || roles?.SuperChecker === userDetails?.role ))  ? false :  true,
             filter: false,
             sort: false,
             align: "center",
