@@ -67,10 +67,7 @@ const AnnotationProject = (props) => {
   const filterdataitemsList = useSelector(
     (state) => state.datasetSearchPopup.data
   );
-  const returnData = DataItems?.results?.map((objName) => {
-    const data = JSON.stringify(objName.metadata_json);
-    console.log(data, "DataItemsDataItems");
-  });
+ 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
   const [datasetTypes, setDatasetTypes] = useState(null);
