@@ -162,7 +162,7 @@ const Projects = () => {
     };
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const isAnnotators =(userRole.Annotator !== loggedInUserData?.role || userRole.Reviewer !== loggedInUserData?.role || userRole.SuperChecker !== loggedInUserData?.role )  || ProjectDetails?.annotators?.some((user) => user.id === userDetails.id);
-    const isReviewer = ProjectDetails?.project_stage == 2 && ((userRole.Annotator !== loggedInUserData?.role || userRole.Reviewer !== loggedInUserData?.role || userRole.SuperChecker !== loggedInUserData?.role ) || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
+    const isReviewer = ProjectDetails?.project_stage == 2 && ((userRole.Annotator !== loggedInUserData?.role) || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
