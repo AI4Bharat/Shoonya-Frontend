@@ -21,7 +21,8 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import roles from "../../../../utils/UserMappedByRole/Roles"
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+
 
 const ReportsTable = (props) => {
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
@@ -49,6 +50,11 @@ const ReportsTable = (props) => {
     const classes = DatasetStyle();
     const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
     const [submitted, setSubmitted] = useState(false);
+    
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
+  console.log(loggedInUserData,"loggedInUserDataloggedInUserData")
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -157,7 +163,7 @@ const ReportsTable = (props) => {
     }
 
 
-    let frozenUsers = ProjectDetails.frozen_users.map((e,)=>{
+    let frozenUsers = ProjectDetails?.frozen_users?.map((e,)=>{
         let temp = ProjectReport.find(element=> element.id === e.id)
         if(temp?.ProjectReport) {
           e.ProjectReport = temp.ProjectReport;
@@ -202,7 +208,7 @@ const ReportsTable = (props) => {
 
                     >
                         <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />
-                    {roles.Annotator !== props.userDetails?.role &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
+                    {userRole.Annotator !== props.userDetails?.role &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
 
                     </RadioGroup>
                 </FormControl>
@@ -261,9 +267,9 @@ const ReportsTable = (props) => {
                     />
                 </Card>
             </Box>}
-            {ProjectReport?.length > 0 ? (
+            { ProjectReport?.length > 0  ? (
                 <>
-                { frozenUsers.length > 0 && (
+                {!(userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role )  &&  frozenUsers.length > 0 &&  (
                 <Typography variant="body2" color="#F8644F">* User Inactive</Typography>)}
             <ThemeProvider theme={tableTheme}>
             {
