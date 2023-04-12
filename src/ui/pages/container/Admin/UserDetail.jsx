@@ -78,6 +78,7 @@ const UserDetail = (props) => {
 
   const handleUpdateEditProfile = async () => {
     const data = {
+      email:email,
       first_name: firstName,
       last_name: lastName,
       languages: language,
@@ -99,6 +100,7 @@ const UserDetail = (props) => {
         message: resp?.message,
         variant: "success",
       });
+      getUserDetail();
     } else {
       setSnackbarInfo({
         open: true,
