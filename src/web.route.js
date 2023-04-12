@@ -42,6 +42,7 @@ import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
 // import DatasetSettings from "./ui/pages/container/Dataset/DatasetSettings";
 import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
 import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
+import DashBoard from "./ui/pages/container/Admin/DashBoard";
 
 
 const App = () => {
@@ -138,6 +139,11 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
         <Route path="/invite/:inviteCode" element={<SignUp />} />
+        <Route
+          path="/admin"
+          element={ProtectedRouteWrapper(<Layout component={<DashBoard />}  />)}
+        />
+        
         <Route
           path="/edit-profile"
           element={ProtectedRouteWrapper(<Layout component={<EditProfile />} Backbutton={true} />)}

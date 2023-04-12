@@ -54,7 +54,7 @@ const ReportsTable = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-  console.log(loggedInUserData,"loggedInUserDataloggedInUserData")
+  console.log(ProjectDetails,"ProjectDetails")
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -162,7 +162,6 @@ const ReportsTable = (props) => {
        
     }
 
-
     let frozenUsers = ProjectDetails?.frozen_users?.map((e,)=>{
         let temp = ProjectReport.find(element=> element.id === e.id)
         if(temp?.ProjectReport) {
@@ -208,7 +207,7 @@ const ReportsTable = (props) => {
 
                     >
                         <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />
-                    {userRole.Annotator !== props.userDetails?.role &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
+                    {(ProjectDetails.project_stage === 2 && userRole.Annotator !== props.userDetails?.role ) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
 
                     </RadioGroup>
                 </FormControl>

@@ -51,7 +51,6 @@ const Header = () => {
 
   const dispatch = useDispatch();
   let navigate = useNavigate();
-console.log(userRole,"userRoleuserRole")
   const classes = headerStyle();
 
   const loggedInUserData = useSelector(
@@ -307,7 +306,7 @@ console.log(userRole,"userRoleuserRole")
             </NavLink>
           </Typography>
         </Grid>)
-    } else if (userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role) {
+    } else if (userRole.OrganizationOwner === loggedInUserData?.role) {
       return(<Grid
           container
           direction="row"
@@ -367,8 +366,81 @@ console.log(userRole,"userRoleuserRole")
               Analytics
             </NavLink>
           </Typography>
-        </Grid>)
-    } else {
+        </Grid>)   
+    } 
+    else if (userRole.Admin === loggedInUserData?.role) {
+      return(<Grid
+          container
+          direction="row"
+          // justifyContent="space-evenly"
+          // spacing={0}
+          columnGap={2}
+          rowGap={2}
+          xs={12}
+          sm={12}
+          md={8}
+        >
+          <Typography variant="body1">
+            <NavLink
+              to={
+                loggedInUserData && loggedInUserData.organization
+                  ? `/my-organization/${loggedInUserData.organization.id}`
+                  : `/my-organization/1`
+              }
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Organization
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Projects
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/datasets"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Datasets
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+             to="/analytics"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Analytics
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+             to="/admin"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Admin
+            </NavLink>
+          </Typography>
+        </Grid>)}
+    else {
       return(
         null
       )
@@ -438,6 +510,19 @@ console.log(userRole,"userRoleuserRole")
       Analytics
     </NavLink>
   </Typography>,
+  <Typography variant="body1">
+  <NavLink
+    to="/admin"
+    hidden={userRole.Admin !== loggedInUserData?.role }
+
+    className={({ isActive }) =>
+      isActive ? classes.highlightedMenu : classes.headerMenu
+    }
+    activeClassName={classes.highlightedMenu}
+  >
+    Admin
+  </NavLink>
+</Typography>,
   ];
 
   const userSettings = [
