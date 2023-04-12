@@ -13,7 +13,9 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+import EditProfile from "../../container/UserManagement/EditProfile"
 
 const ProfilePage = () => {
 
@@ -90,28 +92,41 @@ const ProfilePage = () => {
         {loading && <Spinner />}
         {renderSnackBar()}
           {userDetails && (
-            <><Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
-              <Card sx={{ borderRadius: "5px", mb:2 }}>
-                  <CardContent>
+            <><Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ p: 2 }}>
+              <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 ,display:'flex', justifyContent:'center'}}>
+                <CardContent>
+                  <Typography variant="h4" sx={{mb: 1}}>{userDetails.organization.title}</Typography>
+                </CardContent>
+              </Card>
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} xl={4} sx={{ p: 2 , display:'flex', justifyContent:'center' }}>
+              <Card sx={{ borderRadius: "5px", mb:2}}>
+                  <CardContent sx={{display:'flex', justifyContent:'center', flexDirection: 'column' }}>
                     <Avatar
                       alt="user_profile_pic"
                       variant="contained"
-                      sx={{ color: "#FFFFFF !important", bgcolor: "#2A61AD !important", width: 96, height: 96, mb: 2 }}
+                      sx={{ color: "#FFFFFF !important", bgcolor: "#2A61AD !important", width: 96, height: 96, mb: 1, alignSelf: 'center' }}
                     >
                       {userDetails.username.split("")[0]}
                     </Avatar>
-                    <Typography variant="h3">
+                    <Typography variant="h3" sx={{alignSelf: 'center',mb: 2}}>
+                      {UserMappedByRole(userDetails.role).element}
+                    </Typography>
+                    <Typography variant="h3" sx={{alignSelf: 'center'}}>
                       {userDetails.first_name} {userDetails.last_name}
                     </Typography>
-                    <Typography variant="subtitle1" sx={{mb: 1}}>
+                    <Typography variant="subtitle1" sx={{mb: 1, alignSelf: 'center'}}>
                       {userDetails.username}
                     </Typography>
+                    <Card style={{alignSelf: 'center'}}>
                     <Typography variant="body1" sx={{display: "flex", gap: "5px", alignItems: "center"}}>
                       <MailOutlineIcon />{userDetails.email}
                     </Typography>
                     {userDetails.phone && <Typography variant="body1" sx={{display: "flex", gap: "5px", alignItems: "center"}}>
                       <PhoneOutlinedIcon />{userDetails.phone}
                     </Typography>}
+                    </Card>
+                    
                     {userDetails.languages.length > 0 && (
                       <Typography variant="body1">Languages: 
                         {userDetails.languages.map
@@ -120,8 +135,9 @@ const ProfilePage = () => {
                       </Typography>
                     )}
                     {LoggedInUserId === userDetails.id &&
-                      <Grid container spacing={2} sx={{mt: 1, alignItems: "center"}}>
-                        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                      <Grid container spacing={2} sx={{mt: 1, alignItems: "center",display: 'inline-flex',justifyContent: 'center'}}>
+                        {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6}> */}
+                        <Grid item>
                           <Tooltip title={(userDetails.enable_mail ? "Disable" : "Enable") + " daily mails"}>
                             <FormControlLabel
                               control={<Switch color="primary" />}
@@ -132,41 +148,37 @@ const ProfilePage = () => {
                             />
                           </Tooltip>
                         </Grid>
-                        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                        {/* <Grid item>
                           <CustomButton
                             label="Edit Profile"
                             onClick={() => navigate("/edit-profile")}
                           />
+                        </Grid> */}
+                        <Grid item>
+                          <CustomButton
+                            label="View Progress"
+                            onClick={() => navigate(`/progress/${loggedInUserData.id}`)}
+                          />
                         </Grid>
+                        {/* </Grid> */}
+                        {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                          <CustomButton
+                            label="Edit Profile"
+                            onClick={() => navigate("/edit-profile")}
+                          />
+                        </Grid> */}
                       </Grid>}
                   </CardContent>
                 </Card>
-                {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
-                <Card>
-                  <CardContent>
-                    <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
-                    <RecentTasks />
-                  </CardContent>
-                </Card>
-             } 
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
-              <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 }}>
-                <CardContent>
-                  <Typography variant="h4" sx={{mb: 1}}>{userDetails.organization.title}</Typography>
-                  {UserMappedByRole(userDetails.role).element}
-                </CardContent>
-              </Card>
-               {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
-                <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
-                  <CardContent>
-                    <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
-                    <MyProgress />
-                  </CardContent>
-                </Card>
-                } 
-            </Grid></>
+            <Grid item xs={12} sm={12} md={8} lg={8} xl={8} sx={{ p: 2 }}>
+              <Card sx={{ borderRadius: "5px", mb:2}}>
+            <EditProfile />
+            </Card>
+            </Grid>
+            </>
           )}
+          
       </Grid>
   )
 }

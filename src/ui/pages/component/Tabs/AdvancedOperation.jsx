@@ -35,8 +35,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import Spinner from "../../component/common/Spinner";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import EnableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/EnableTaskReviews";
-import DisableTaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/DisableTaskReviews";
+import TaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/TaskReviews";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import DeleteProjectTasks from "../../container/Project/DeleteProjectTasks";
@@ -53,6 +52,7 @@ const ProgressType = [
   "reviewed",
   "exported",
 ];
+const projectStage = [{name:"Annotation Stage",value: 1}, {name:"Review Stage",value: 2} ,{name:"SuperCheck Stage",value: 3}]
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -98,6 +98,7 @@ const AdvancedOperation = (props) => {
   "reviewed",
   "exported",
   ]);
+  const [taskReviews,setTaskReviews] = useState("")
   const { id } = useParams();
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -111,12 +112,10 @@ const AdvancedOperation = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
     dispatch(APITransport(projectObj));
   };
-
   useEffect(() => {
    setProjectType(ProjectTypes.input_dataset?.class)
   }, [ProjectTypes])
@@ -130,6 +129,7 @@ const AdvancedOperation = (props) => {
       title: ProjectDetails.title,
       description: ProjectDetails.description,
     });
+    setTaskReviews(ProjectDetails.project_stage)
   }, [ProjectDetails]);
 
   useEffect(() => {
@@ -137,6 +137,7 @@ const AdvancedOperation = (props) => {
     dispatch(APITransport(typesObj));
   }, []);
 
+ 
   const getExportProjectButton = async () => {
     setOpenExportProjectDialog(false);
     const projectObj =
@@ -202,11 +203,10 @@ const AdvancedOperation = (props) => {
       
   }
 
-  const handleReviewToggle = async () => {
-    setLoading(true);
-    const reviewObj = ProjectDetails.enable_task_reviews
-      ? new DisableTaskReviewsAPI(id)
-      : new EnableTaskReviewsAPI(id);
+  const handleReviewToggle = async (e) => {
+    setTaskReviews(e.target.value)
+    setLoading(true); 
+    const reviewObj =  new TaskReviewsAPI(id,e.target.value);
     const res = await fetch(reviewObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(reviewObj.getBody()),
@@ -349,7 +349,6 @@ const AdvancedOperation = (props) => {
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
-
 
 
   const renderSnackBar = () => {
@@ -548,9 +547,9 @@ const AdvancedOperation = (props) => {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeleteProjectTasks />
           </Grid>
-          {loggedInUserData?.role !== 1 && (<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeallocationAnnotatorsAndReviewers />
-          </Grid>)}
+          </Grid>
           
         </Grid>
 
@@ -559,15 +558,16 @@ const AdvancedOperation = (props) => {
           // direction="row"
           xs={12}
           md={12}
-          lg={2}
-          xl={2}
+          lg={4}
+          xl={4}
           sm={12}
           spacing={1}
           rowGap={2}
           columnSpacing={2}
+          sx={{mb:"10px"}}
         >
           {/* <div className={classes.divider} ></div> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <FormControlLabel
               control={<Switch color="primary" />}
               label="Task Reviews"
@@ -575,6 +575,28 @@ const AdvancedOperation = (props) => {
               checked={ProjectDetails.enable_task_reviews}
               onChange={handleReviewToggle}
             />
+          </Grid> */}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}             
+           sx={{ ml: 2 }}
+         >
+            <FormControl  size="small" className={classes.formControl}>
+              <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
+              Project Stage
+              </InputLabel>
+              <Select
+                labelId="task-Reviews-label"
+                id="task-Reviews-select"
+                value={taskReviews}
+                label="Task Reviews"
+                onChange={handleReviewToggle}
+              >
+                {projectStage.map((type, index) => (
+                  <MenuItem value={type.value} key={index} disabled={type.value == 3} >
+                    {type.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
 
@@ -583,8 +605,8 @@ const AdvancedOperation = (props) => {
           // direction="row"
           xs={12}
           md={12}
-          lg={2}
-          xl={2}
+          lg={4}
+          xl={4}
           sm={12}
           spacing={1}
           rowGap={2}

@@ -31,6 +31,7 @@ import ReviewLSF from "./ui/pages/container/Label-Studio/ReviewLSF";
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
 import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
+import ProgressPage from "./ui/pages/container/UserManagement/ProgressPage";
 import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
 import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
@@ -41,6 +42,7 @@ import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
 // import DatasetSettings from "./ui/pages/container/Dataset/DatasetSettings";
 import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
 import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
+import DashBoard from "./ui/pages/container/Admin/DashBoard";
 
 
 const App = () => {
@@ -138,6 +140,11 @@ const App = () => {
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
         <Route path="/invite/:inviteCode" element={<SignUp />} />
         <Route
+          path="/admin"
+          element={ProtectedRouteWrapper(<Layout component={<DashBoard />}  />)}
+        />
+        
+        <Route
           path="/edit-profile"
           element={ProtectedRouteWrapper(<Layout component={<EditProfile />} Backbutton={true} />)}
         />
@@ -148,6 +155,10 @@ const App = () => {
         <Route
           path="/profile/:id"
           element={ProtectedRouteWrapper(<Layout component={<ProfilePage />} Backbutton={true} />)}
+        />
+        <Route
+          path="/progress/:id"
+          element={ProtectedRouteWrapper(<Layout component={<ProgressPage />} Backbutton={true} />)}
         />
         <Route
           path="/projects"
