@@ -978,7 +978,6 @@ const TaskTable = (props) => {
                         ? "No more tasks to label"
                         : "No more tasks to review"
                       : ""
-                      
                   }
                 >
                   <Box>
