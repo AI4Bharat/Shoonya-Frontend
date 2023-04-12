@@ -143,7 +143,7 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
-                {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && userRole.Annotator === loggedInUserData?.role ))  &&
+                {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role ||  userRole.Reviewer === loggedInUserData?.role)))  &&
                 <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
@@ -159,7 +159,7 @@ const ProfilePage = () => {
                   {UserMappedByRole(userDetails.role)?.element}
                 </CardContent>
               </Card>
-               {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && userRole.Annotator === loggedInUserData?.role))  &&
+               {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role)))  &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>

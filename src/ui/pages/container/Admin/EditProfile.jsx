@@ -6,9 +6,9 @@ import {
   Select,
   Card,
   MenuItem,
-  DialogContent,
-  Dialog,
-  DialogContentText,
+  OutlinedInput,
+  Box,
+  Chip,
   Typography,
 } from "@mui/material";
 import CustomButton from "../../component/common/Button";
@@ -17,7 +17,7 @@ import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
+import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import { MenuProps } from "../../../../utils/utils";
 import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 
@@ -46,27 +46,24 @@ const EditProfile = (props) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const [languageOptions, setLanguageOptions] = useState([]);
-  const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
 
-  const getLanguageChoices = () => {
-    const langObj = new GetLanguageChoicesAPI();
+  const LanguageList = useSelector((state) => state.fetchLanguages.data);
+
+  const getLanguageList = () => {
+    const langObj = new FetchLanguagesAPI();
+
     dispatch(APITransport(langObj));
   };
 
   useEffect(() => {
-    getLanguageChoices();
+    getLanguageList();
   }, []);
 
   useEffect(() => {
-    if (LanguageChoices && LanguageChoices.length > 0) {
-      let temp = [];
-      console.log(LanguageChoices);
-      LanguageChoices.forEach((element) => {
-        temp.push(element[0]);
-      });
-      setLanguageOptions(temp);
+    if (LanguageList) {
+      setLanguageOptions(LanguageList.language);
     }
-  }, [LanguageChoices]);
+  }, [LanguageList]);
 
   return (
     <Grid>
@@ -120,25 +117,46 @@ const EditProfile = (props) => {
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mb: 2 }}>
           <FormControl sx={{ m: 1, minWidth: 210 }}>
-            <InputLabel id="demo-simple-select-helper-label">
-              Language
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-helper-label"
-              id="demo-simple-select-helper"
-              value={Language}
-              label="Language"
-              onChange={(e) => setLanguage(e.target.value)}
-              sx={{
-                textAlign: "left",
+            <InputLabel
+              id="lang-label"
+              style={{
+                fontSize: "1.25rem",
+                zIndex: "1",
+                position: "absolute",
+                display: "block",
+                transform: "translate(14px, -9px) scale(0.75)",
+                backgroundColor: "white",
+                paddingLeft: "4px",
+                paddingRight: "4px",
               }}
-              MenuProps={MenuProps}
             >
-              {languageOptions &&
-                languageOptions.length > 0 &&
-                languageOptions.map((el, i) => {
-                  return <MenuItem value={el}>{el}</MenuItem>;
-                })}
+              Languages
+            </InputLabel>
+
+            <Select
+              multiple
+              fullWidth
+              labelId="lang-label"
+              name="languages"
+              value={Language ? Language : []}
+              onChange={(e) => setLanguage(e.target.value)}
+              style={{ zIndex: "0" }}
+              MenuProps={MenuProps}
+              input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+            >
+              {languageOptions?.length &&
+                languageOptions.map((lang) => (
+                  <MenuItem key={lang} value={lang}>
+                    {lang}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Grid>

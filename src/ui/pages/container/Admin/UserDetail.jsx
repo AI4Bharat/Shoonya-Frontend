@@ -13,6 +13,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import UserInfo from "./UserInfo";
 import Spinner from "../../component/common/Spinner";
 import GetUserDetailUpdateAPI from "../../../../redux/actions/api/Admin/EditProfile";
+import { el } from "date-fns/locale";
 
 const UserDetail = (props) => {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ const UserDetail = (props) => {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState([]);
   const [participationType, setParticipationType] = useState("");
   const [Role, setRole] = useState("");
 
@@ -85,6 +86,7 @@ const UserDetail = (props) => {
       participation_type: participationType,
       role: Role,
     };
+  
     const UserObj = new GetUserDetailUpdateAPI(id, data);
     //  dispatch(APITransport(UserObj));
     const res = await fetch(UserObj.apiEndPoint(), {
@@ -230,12 +232,13 @@ const UserDetail = (props) => {
       ? pageSearch().map((el, i) => {
           const userRoleFromList =
             el.role && UserMappedByRole(el.role)?.element;
+
           return [
             el.id,
             el.email,
             el.first_name,
             el.last_name,
-            el.languages,
+            el.languages.join(", "),
             el.participation_type,
             userRoleFromList ? userRoleFromList : el.role,
             <>
@@ -258,6 +261,9 @@ const UserDetail = (props) => {
           ];
         })
       : [];
+
+    
+ 
 
   const options = {
     textLabels: {
