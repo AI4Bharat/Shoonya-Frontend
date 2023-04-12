@@ -79,7 +79,8 @@ import getDomains from "./Glossary/GetDomain";
 import getProjectTypeDetails from "./ProjectDetails/GetProjectTypeDetails";
 import getTaskAnalyticsData from "./Progress/TaskAnalytics";
 import getMetaAnalyticsData from "./Progress/MetaAnalytics";
-import getDownloadProjectAnnotations from "./ProjectDetails/DownloadProjectAnnotations"
+import getDownloadProjectAnnotations from "./ProjectDetails/DownloadProjectAnnotations";
+import getUserDetails from "./Admin/UserDetail";
 
 const index = {
     apiStatus,
@@ -167,6 +168,7 @@ const index = {
     getTaskAnalyticsData,
     getMetaAnalyticsData,
     getDownloadProjectAnnotations,
+    getUserDetails,
    
     
 };
