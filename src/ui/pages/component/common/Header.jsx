@@ -31,6 +31,7 @@ import Logout from "../../../../redux/actions/UserManagement/Logout";
 import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -50,7 +51,6 @@ const Header = () => {
 
   const dispatch = useDispatch();
   let navigate = useNavigate();
-
   const classes = headerStyle();
 
   const loggedInUserData = useSelector(
@@ -68,7 +68,6 @@ const Header = () => {
   }, []);
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
   const onLogoutClick = () => {
     handleCloseUserMenu();
     dispatch(Logout());
@@ -83,7 +82,6 @@ const Header = () => {
       handleTransliterationModelClose();
     }
   };
-  
   useEffect(() => {
     window.addEventListener("keydown", keyPress);
     return () => {
@@ -158,7 +156,7 @@ const Header = () => {
   };
  
   const renderTabs = () => {
-    if (loggedInUserData?.role === 1) {
+    if (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role) {
       return(
         <Grid
           container
@@ -236,7 +234,7 @@ const Header = () => {
           </Typography> */}
         </Grid>
       )
-    } else if (loggedInUserData?.role === 2) {
+    } else if (userRole.WorkspaceManager === loggedInUserData?.role) {
       return(<Grid
           container
           direction="row"
@@ -308,7 +306,7 @@ const Header = () => {
             </NavLink>
           </Typography>
         </Grid>)
-    } else if (loggedInUserData?.role === 3) {
+    } else if (userRole.OrganizationOwner === loggedInUserData?.role) {
       return(<Grid
           container
           direction="row"
@@ -368,8 +366,81 @@ const Header = () => {
               Analytics
             </NavLink>
           </Typography>
-        </Grid>)
-    } else {
+        </Grid>)   
+    } 
+    else if (userRole.Admin === loggedInUserData?.role) {
+      return(<Grid
+          container
+          direction="row"
+          // justifyContent="space-evenly"
+          // spacing={0}
+          columnGap={2}
+          rowGap={2}
+          xs={12}
+          sm={12}
+          md={8}
+        >
+          <Typography variant="body1">
+            <NavLink
+              to={
+                loggedInUserData && loggedInUserData.organization
+                  ? `/my-organization/${loggedInUserData.organization.id}`
+                  : `/my-organization/1`
+              }
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Organization
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Projects
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/datasets"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Datasets
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+             to="/analytics"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Analytics
+            </NavLink>
+          </Typography>
+          <Typography variant="body1">
+            <NavLink
+             to="/admin"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Admin
+            </NavLink>
+          </Typography>
+        </Grid>)}
+    else {
       return(
         null
       )
@@ -379,7 +450,7 @@ const Header = () => {
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role ||userRole.WorkspaceManager === loggedInUserData?.role  }
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -395,7 +466,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
+        hidden={ userRole.WorkspaceManager !== loggedInUserData?.role}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -418,7 +489,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={loggedInUserData.role === 1}
+        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role}
         to="/datasets"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -439,6 +510,19 @@ const Header = () => {
       Analytics
     </NavLink>
   </Typography>,
+  <Typography variant="body1">
+  <NavLink
+    to="/admin"
+    hidden={userRole.Admin !== loggedInUserData?.role }
+
+    className={({ isActive }) =>
+      isActive ? classes.highlightedMenu : classes.headerMenu
+    }
+    activeClassName={classes.highlightedMenu}
+  >
+    Admin
+  </NavLink>
+</Typography>,
   ];
 
   const userSettings = [

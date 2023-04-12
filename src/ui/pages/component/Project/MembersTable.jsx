@@ -21,6 +21,7 @@ import RemoveProjectReviewerAPI from "../../../../redux/actions/api/ProjectDetai
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
+import roles from "../../../../utils/UserMappedByRole/Roles"
 
 
 const addLabel = {
@@ -49,7 +50,6 @@ const MembersTable = (props) => {
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
   );
- console.log(userDetails,"userDetailsuserDetails")
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -173,13 +173,13 @@ const MembersTable = (props) => {
   const data =
     dataSource && dataSource?.length > 0
       ? pageSearch().map((el, i) => {
-          const userRoleFromList = el.role && UserMappedByRole(el.role).element;
+          const userRoleFromList = el.role && UserMappedByRole(el.role)?.element;
 
           return [
             el.username,
             el.email,
             userRoleFromList ? userRoleFromList : el.role,
-            (userRole==2 || userRole==3) && <div >
+            (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ) && <div >
               <CustomButton
                 sx={{ p: 1, borderRadius: 2 }}
                 onClick={() => {
@@ -262,7 +262,7 @@ const MembersTable = (props) => {
           name: "Actions",
           label: "Actions",
           options: {
-            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && userDetails.role === 1 )  ? false : true ,
+            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && (roles?.Annotator === userDetails?.role || roles?.Reviewer === userDetails?.role || roles?.SuperChecker === userDetails?.role ))  ? false :  true,
             filter: false,
             sort: false,
             align: "center",

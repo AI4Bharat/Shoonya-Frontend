@@ -20,7 +20,7 @@ import DatasetStyle from "../../../styles/Dataset";
 import ProjectDescription from "./ProjectDescription";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AllTaskTable from "../../component/Project/AllTaskTable";
-import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 
 
@@ -161,8 +161,8 @@ const Projects = () => {
         setValue(newValue);
     };
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    const isAnnotators = userDetails.role !== 1 || ProjectDetails?.annotators?.some((user) => user.id === userDetails.id);
-    const isReviewer = ProjectDetails?.enable_task_reviews && (userDetails?.role !== 1 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
+    const isAnnotators =(userRole.Annotator !== loggedInUserData?.role || userRole.Reviewer !== loggedInUserData?.role || userRole.SuperChecker !== loggedInUserData?.role )  || ProjectDetails?.annotators?.some((user) => user.id === userDetails.id);
+    const isReviewer = ProjectDetails?.project_stage == 2 && ((userRole.Annotator !== loggedInUserData?.role) || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
@@ -191,7 +191,6 @@ const Projects = () => {
         navigate(`/projects/${id}/projectsetting`);
     }
  
-
     return (
         <ThemeProvider theme={themeDefault}>
             {/* <Header /> */}
@@ -221,7 +220,7 @@ const Projects = () => {
                             <Typography  variant="h3">{ProjectDetails.title}</Typography>
                         </Grid>
 
-                        {userDetails?.role !== 1 && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                        {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
                             <Tooltip title={translate("label.showProjectSettings")}>
                                 <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
                                     <SettingsOutlinedIcon
@@ -257,7 +256,7 @@ const Projects = () => {
                                 {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700', flexDirection: "row-reverse" }} onClick={handleClick} />
-                                {loggedInUserData.role !== 1 && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
+                                {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
                         </Box>
 
                     </Grid>
@@ -274,11 +273,11 @@ const Projects = () => {
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 4 : 2 : 2}>
-                        <ReportsTable annotationreviewertype={annotationreviewertype} />
+                        <ReportsTable annotationreviewertype={annotationreviewertype}  userDetails={userDetails}/>
                     </TabPanel>
-                 {loggedInUserData.role !== 1  && <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
+               {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
                         <AllTaskTable  />
-                    </TabPanel>}
+                    </TabPanel>)}
                 </Card>
             </Grid>
         </ThemeProvider>

@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import roles from "../../../../utils/UserMappedByRole/Roles";
 
 const UserType = ["annotator", "reviewer"];
 const archivedProjects = ["true", "false"];
@@ -178,7 +179,7 @@ const ProjectFilterList = (props) => {
               })}
             </FormGroup>
           </Grid>
-          {loggedInUserData?.role !== 1  &&
+          {(roles?.WorkspaceManager === loggedInUserData?.role || roles?.OrganizationOwner === loggedInUserData?.role || roles?.Admin === loggedInUserData?.role )  &&
           <Grid item xs={5} sm={5} md={5} lg={5} xl={5} sx={{mt:2}}>
             <Typography
               variant="body2"

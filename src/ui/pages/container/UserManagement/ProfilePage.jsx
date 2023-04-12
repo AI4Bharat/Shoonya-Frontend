@@ -13,7 +13,9 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+
 
 const ProfilePage = () => {
 
@@ -141,7 +143,7 @@ const ProfilePage = () => {
                       </Grid>}
                   </CardContent>
                 </Card>
-                {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
+                {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role ||  userRole.Reviewer === loggedInUserData?.role)))  &&
                 <Card>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
@@ -154,10 +156,10 @@ const ProfilePage = () => {
               <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 }}>
                 <CardContent>
                   <Typography variant="h4" sx={{mb: 1}}>{userDetails.organization.title}</Typography>
-                  {UserMappedByRole(userDetails.role).element}
+                  {UserMappedByRole(userDetails.role)?.element}
                 </CardContent>
               </Card>
-               {((loggedInUserData?.role === 2 || loggedInUserData?.role === 3 )||(LoggedInUserId === userDetails?.id && loggedInUserData?.role === 1))  &&
+               {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role)))  &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>

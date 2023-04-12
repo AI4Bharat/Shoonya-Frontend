@@ -40,7 +40,7 @@ const ManagersTable = (props) => {
 const handleRemoveWorkspaceManager = async(userid)=>{
    
         const projectObj = new RemoveWorkspaceManagerAPI(id, {ids:[userid]},);
-        dispatch(APITransport(projectObj));
+        // dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),

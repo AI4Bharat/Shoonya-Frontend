@@ -27,6 +27,7 @@ import {
   getTransliterationLanguages,
 } from "@ai4bharat/indic-transliterate";
 import "@ai4bharat/indic-transliterate/dist/index.css";
+import { MenuProps } from "../../../../utils/utils";
 
 const AddGlossary = ({
   openDialog,
@@ -236,6 +237,7 @@ const AddGlossary = ({
                     sx={{
                       textAlign: "left",
                     }}
+                    MenuProps={MenuProps}
                   >
                     {LanguageCode.languages.map((el, i) => {
                       return <MenuItem value={el.code}>{el.label}</MenuItem>;
@@ -255,6 +257,7 @@ const AddGlossary = ({
                     sx={{
                       textAlign: "left",
                     }}
+                    MenuProps={MenuProps}
                   >
                     {LanguageCode.languages.map((el, i) => {
                       return <MenuItem value={el.code}>{el.label}</MenuItem>;
@@ -327,6 +330,7 @@ const AddGlossary = ({
                     sx={{
                       textAlign: "left",
                     }}
+                    MenuProps={MenuProps}
                   >
                     {allDomains &&
                       allDomains.length > 0 &&

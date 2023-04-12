@@ -246,9 +246,9 @@ const OrganizationReports = () => {
     if ((reportTypes === "AnnotatorQuantity" || reportTypes === "Reviewer") && reportfilter != "" && radiobutton === "UsersReports") {
 
       if (reportfilter.toString() == "Review disabled") {
-        ReviewData.push(false)
+        ReviewData.push(1)
       } else if (reportfilter.toString() == "Review Enabled") {
-        ReviewData.push(true)
+        ReviewData.push(2)
       }
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,
@@ -354,6 +354,9 @@ const OrganizationReports = () => {
           <FormControl fullWidth size="small" >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
             <Select
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
               labelId="project-type-label"
               id="project-type-select"
               value={selectedType}
@@ -372,6 +375,9 @@ const OrganizationReports = () => {
           <FormControl fullWidth size="small" disabled={radiobutton === "ProjectReports"}>
             <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>Report Type</InputLabel>
             <Select
+             style={{ zIndex: "0" }}
+             inputProps={{ "aria-label": "Without label" }}
+             MenuProps={MenuProps}
               labelId="report-type-label"
               id="report-select"
               value={reportTypes}
@@ -416,6 +422,7 @@ const OrganizationReports = () => {
               value={targetLanguage}
               label="Target Language"
               onChange={(e) => setTargetLanguage(e.target.value)}
+              MenuProps={MenuProps}
             >
               <MenuItem value={"all"}>All languages</MenuItem>
               {LanguageChoices.language?.map((lang) => (

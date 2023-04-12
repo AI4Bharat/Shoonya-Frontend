@@ -16,6 +16,7 @@ import MembersTable from '../../component/Project/MembersTable';
 import DatasetSettings from './DatasetSettings';
 import DatasetLogs from './DatasetLogs';
 import DatasetDescription from './DatasetDescription';
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const DatasetDetails = () => {
 
@@ -93,7 +94,7 @@ const DatasetDetails = () => {
                             <Typography  variant="h3">{DatasetDetails.instance_name}</Typography>
                         </Grid>
 
-                        {userDetails?.role !== 1 && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                        {(userRole.Annotator !== userDetails?.role || userRole.Reviewer !== userDetails?.role || userRole.SuperChecker !== userDetails?.role )  && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
                             <Tooltip title={translate("label.showProjectSettings")}>
                                 <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
                                     <SettingsOutlinedIcon
