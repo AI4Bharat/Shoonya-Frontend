@@ -417,7 +417,6 @@ const TaskTable = (props) => {
       });
       // let colList = ["id"];
       // colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el) && !el.includes("_json")));
-      console.log(taskList,"taskListtaskList",props.type)
 
       const annotatorEmail = taskList[0]?.hasOwnProperty("annotator_mail")
       const email = props.type === "review" && annotatorEmail ? "Annotator Email" : "";
