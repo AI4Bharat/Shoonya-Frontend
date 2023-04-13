@@ -52,7 +52,7 @@ const ProgressType = [
   "reviewed",
   "exported",
 ];
-const projectStage = [{name:"Annotation Stage",value: 1}, {name:"Review Stage",value: 2} ,{name:"SuperCheck Stage",value: 3}]
+const projectStage = [{name:"Annotation Stage",value: 1 ,disabled:false}, {name:"Review Stage",value: 2,disabled:false} ,{name:"Super Check Stage",value: 3,disabled:false}]
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -205,6 +205,17 @@ const AdvancedOperation = (props) => {
 
   const handleReviewToggle = async (e) => {
     setTaskReviews(e.target.value)
+    if (taskReviews===2) {
+      const disableSuperchecker = [...projectStage].map((opt) => {
+        if (  opt.value === 3 ) opt.disabled = true;
+        else opt.disabled = false;
+        return opt;
+      });
+      console.log(disableSuperchecker,"taskReviewstaskReviews")
+
+      setTaskReviews(disableSuperchecker);
+    }
+
     setLoading(true); 
     const reviewObj =  new TaskReviewsAPI(id,e.target.value);
     const res = await fetch(reviewObj.apiEndPoint(), {
@@ -589,9 +600,10 @@ const AdvancedOperation = (props) => {
                 value={taskReviews}
                 label="Task Reviews"
                 onChange={handleReviewToggle}
+                getOptionDisabled={(option) => option.disabled}
               >
                 {projectStage.map((type, index) => (
-                  <MenuItem value={type.value} key={index} disabled={type.value == 3} >
+                  <MenuItem value={type.value} key={index} disabled={type.disabled} >
                     {type.name}
                   </MenuItem>
                 ))}

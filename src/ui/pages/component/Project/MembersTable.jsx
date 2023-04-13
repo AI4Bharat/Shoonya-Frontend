@@ -28,6 +28,7 @@ const addLabel = {
   organization: "Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
+  [addUserTypes.PROJECT_SUPERCHECKER]: "Add SuperChecker to Project",
 };
 
 const MembersTable = (props) => {
@@ -50,6 +51,7 @@ const MembersTable = (props) => {
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
   );
+
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {

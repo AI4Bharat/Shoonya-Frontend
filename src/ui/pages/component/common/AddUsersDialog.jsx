@@ -31,12 +31,14 @@ const DialogHeading = {
   [addUserTypes.MANAGER]: 'Assign Manager',
   [addUserTypes.PROJECT_ANNOTATORS]: 'Add Project Annotators',
   [addUserTypes.PROJECT_REVIEWER]: 'Add Project Reviewers',
+  [addUserTypes.PROJECT_SUPERCHECKER]: 'Add Project SuperChecker',
 }
 
 // fetch all users in the current organization/workspace
 const fetchAllUsers = (userType, id, dispatch) => {
   switch (userType) {
     case addUserTypes.PROJECT_ANNOTATORS:
+      case addUserTypes.PROJECT_SUPERCHECKER:
     case addUserTypes.PROJECT_REVIEWER:
       const workspaceAnnotatorsObj = new GetWorkspacesAnnotatorsDataAPI(id);
       dispatch(APITransport(workspaceAnnotatorsObj));
@@ -73,6 +75,16 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
           ) 
           .map((user) => ({ id: user.id, email: user.email, username: user.username }));
         break;
+        case addUserTypes.PROJECT_SUPERCHECKER:
+          return workspaceAnnotators
+            .filter(
+              (workspaceAnnotator) =>
+                projectDetails?.annotation_reviewers.findIndex(
+                  (projectUser) => projectUser?.id === workspaceAnnotator?.id
+                ) === -1   && (workspaceAnnotator?.role != 1 && workspaceAnnotator?.role != 2 ) 
+            ) 
+            .map((user) => ({ id: user.id, email: user.email, username: user.username }));
+          break;
     case addUserTypes.ANNOTATOR:
       return orgUsers
         ?.filter(
@@ -140,6 +152,25 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
           return reviewerRespData;
         }
         break;
+        case addUserTypes.PROJECT_SUPERCHECKER:
+        const addsuperCheckerObj = new AddProjectReviewersAPI(
+          id,
+          users.map((user) => user.id),
+        );
+        const superCheckerRes = await fetch(addsuperCheckerObj.apiEndPoint(), {
+          method: "POST",
+          body: JSON.stringify(addsuperCheckerObj.getBody()),
+          headers: addsuperCheckerObj.getHeaders().headers,
+        });
+  
+        const superCheckerRespData = await superCheckerRes.json();
+  
+        if (superCheckerRes.ok) {
+          const projectObj = new GetProjectDetailsAPI(id);
+          dispatch(APITransport(projectObj));
+          return superCheckerRespData;
+        }
+        break;
 
     case addUserTypes.ANNOTATOR:
       const addAnnotatorsObj = new AddAnnotatorsToWorkspaceAPI(
@@ -205,6 +236,7 @@ const AddUsersDialog = ({
     let id = '';
     switch (userType) {
       case addUserTypes.PROJECT_ANNOTATORS:
+        case addUserTypes.PROJECT_SUPERCHECKER:
       case addUserTypes.PROJECT_REVIEWER:
         id = projectDetails?.workspace_id;
         break;

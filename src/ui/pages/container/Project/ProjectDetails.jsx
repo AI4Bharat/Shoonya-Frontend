@@ -255,10 +255,10 @@ const Projects = () => {
 
                                 {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                                 {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
-                                <Tab label="SuperChecker Tasks" sx={{ fontSize: 16, fontWeight: '700', }} />
+                                <Tab label="Super Checker Tasks" sx={{ fontSize: 16, fontWeight: '700', }} />
                                 {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
-                                <Tab label="SuperChecker" sx={{ fontSize: 16, fontWeight: '700', }} />
+                                <Tab label="Super Checker" sx={{ fontSize: 16, fontWeight: '700', }} />
                                 <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700', flexDirection: "row-reverse" }} onClick={handleClick} />
                                 {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}    
                                
@@ -282,7 +282,7 @@ const Projects = () => {
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3: 3 }>
-                        <SuperChecker  />
+                        <MembersTable  type={addUserTypes.PROJECT_SUPERCHECKER} />
                     </TabPanel>
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 6 : 4 : 4}>
                         <ReportsTable annotationreviewertype={annotationreviewertype}  userDetails={userDetails}/>

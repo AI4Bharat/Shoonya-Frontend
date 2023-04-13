@@ -20,7 +20,7 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 const SuperCheckerFilter = (props) => {
   const classes = DatasetStyle();
   const { filterStatusData, currentFilters, updateFilters } = props;
-  const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status? currentFilters?.annotation_status:currentFilters.review_status);
+  const [selectedStatus, setSelectedStatus] = useState(currentFilters?.task_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
 console.log(currentFilters,"currentFilters")
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
@@ -40,7 +40,7 @@ console.log(currentFilters,"currentFilters")
 
 
   const handleStatusChange = (e) => {
-    let statusvalue = !!currentFilters?.annotation_status? "annotation_status":"review_status"
+    let statusvalue = currentFilters?.task_status
     updateFilters({
       ...currentFilters,
       [statusvalue]:selectedStatus,

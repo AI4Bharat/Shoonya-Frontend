@@ -22,7 +22,7 @@ import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import AllTaskSearchPopup from './AllTaskSearchPopup';
-import SuperCheckerFilter from "./SuperCheckerFilter";
+import SuperCheckerFilter from './SuperCheckerFilter'
 
 const excludeCols = [
   "context",
@@ -63,7 +63,7 @@ const SuperCheckerTasks = (props) => {
     Status: ["unvalidated", "validated", "validated with Changes", "skipped","draft","rejected"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
-    task_status: [filterData.Status[0]],
+    task_status: filterData.Status[0]
   });
 
   const GetAllTasksdata = () => {
@@ -181,11 +181,11 @@ const handleSearchClose = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
       <Box className={classes.filterToolbarContainer} sx={{ height: "80px" }}>
-        {/* <ColumnList
+        <ColumnList
                 columns={columns}
                 setColumns={setSelectedColumns}
                 selectedColumns={selectedColumns}
-            /> */}
+            />
         <Tooltip title="Filter Table">
           <Button onClick={handleShowFilter}>
             <FilterListIcon />
