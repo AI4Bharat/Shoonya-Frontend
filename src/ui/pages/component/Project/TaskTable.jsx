@@ -812,7 +812,7 @@ const TaskTable = (props) => {
                 selectedFilters.review_status === "draft" ||
                 selectedFilters.review_status === "skipped") && (
                 <Grid item xs={12} sm={12} md={3}>
-                  <Tooltip title={deallocateDisabled || pullDisabled}>
+                  <Tooltip title={deallocateDisabled }>
                     <Box>
                       <CustomButton
                         sx={{
@@ -823,7 +823,7 @@ const TaskTable = (props) => {
                         }}
                         label={"De-allocate Tasks"}
                         onClick={() => setDeallocateDialog(true)}
-                        disabled={deallocateDisabled || pullDisabled}
+                        disabled={deallocateDisabled }
                         color={"warning"}
                       />
                     </Box>
@@ -980,7 +980,6 @@ const TaskTable = (props) => {
                         ? "No more tasks to label"
                         : "No more tasks to review"
                       : ""
-                      || pullDisabled
                   }
                 >
                   <Box>
@@ -997,7 +996,7 @@ const TaskTable = (props) => {
                           : "Start reviewing now"
                       }
                       onClick={labelAllTasks}
-                      disabled={totalTaskCount === 0 || pullDisabled}
+                      disabled={totalTaskCount === 0 }
                     />
                   </Box>
                 </Tooltip>

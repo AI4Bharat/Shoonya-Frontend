@@ -32,6 +32,7 @@ const generateLabelConfig = (taskData) => {
                 maxSubmissions="1"
                 showSubmitButton="false"
                 editable="false"
+                required="true"
                 />`
             }
             ).join("")}
