@@ -22,6 +22,7 @@ import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import AllTaskSearchPopup from './AllTaskSearchPopup';
+import SuperCheckerFilter from "./SuperCheckerFilter";
 
 const excludeCols = [
   "context",
@@ -34,7 +35,7 @@ const excludeCols = [
   "language",
 ];
 const excludeSearch = ["status", "actions"];
-const AllTaskTable = (props) => {
+const SuperCheckerTasks = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
   const [loading, setLoading] = useState(false);
@@ -59,7 +60,7 @@ const AllTaskTable = (props) => {
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
   const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
   const filterData = {
-    Status: ["incomplete", "annotated", "reviewed", "exported","Super Checked"],
+    Status: ["unvalidated", "validated", "validated with Changes", "skipped","draft","rejected"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
     task_status: [filterData.Status[0]],
@@ -250,7 +251,7 @@ const handleSearchClose = () => {
         />
       </ThemeProvider>
       {popoverOpen && (
-        <AllTasksFilterList
+        <SuperCheckerFilter
           id={filterId}
           open={popoverOpen}
           anchorEl={anchorEl}
@@ -275,4 +276,4 @@ const handleSearchClose = () => {
   );
 };
 
-export default AllTaskTable;
+export default SuperCheckerTasks;
