@@ -16,6 +16,7 @@ import { MenuProps } from "../../../../utils/utils";
 import CustomButton from "../../component/common/Button";
 
 const MyProfile = () => {
+  const { id } = useParams();
   const [newDetails, setNewDetails] = useState();
   const [initLangs, setInitLangs] = useState([]);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
@@ -26,11 +27,12 @@ const MyProfile = () => {
   const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
   const navigate = useNavigate();
 
-  const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+  // const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+  const userDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
   const dispatch = useDispatch();
   const LanguageList = useSelector(state => state.fetchLanguages.data);
-
+  console.log(userDetails)
   const getLanguageList = () => {
       const langObj = new FetchLanguagesAPI();
 
