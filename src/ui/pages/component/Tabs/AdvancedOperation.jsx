@@ -204,15 +204,34 @@ const AdvancedOperation = (props) => {
   }
 
   const handleReviewToggle = async (e) => {
+    let ProjectStageValue = e.target.value
     setTaskReviews(e.target.value)
-    if (taskReviews===2) {
+    
+    if (ProjectStageValue === 1) {
       const disableSuperchecker = [...projectStage].map((opt) => {
         if (  opt.value === 3 ) opt.disabled = true;
         else opt.disabled = false;
         return opt;
-      });
-      console.log(disableSuperchecker,"taskReviewstaskReviews")
+      })
+     
+      setTaskReviews(disableSuperchecker);
+    }
+    else if (ProjectStageValue === 2) {
+      const disableSuperchecker = [...projectStage].map((opt) => {
+        if (  opt.value === 3 ) opt.disabled = false;
+        else opt.disabled = false;
+        return opt;
 
+      });
+      setTaskReviews(disableSuperchecker);
+    }
+    else if (ProjectStageValue === 3) {
+      const disableSuperchecker = [...projectStage].map((opt) => {
+        if (  opt.value === 1 ) opt.disabled = true;
+        else opt.disabled = false;
+        return opt;
+
+      });
       setTaskReviews(disableSuperchecker);
     }
 
