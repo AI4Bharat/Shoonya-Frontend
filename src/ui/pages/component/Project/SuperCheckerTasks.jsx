@@ -12,6 +12,15 @@ import {
   Button,
   IconButton,
   Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  DialogContentText,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import ColumnList from "../common/ColumnList";
@@ -54,6 +63,10 @@ const SuperCheckerTasks = (props) => {
   const [searchedCol, setSearchedCol] = useState();
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
+  const [deallocateDialog, setDeallocateDialog] = useState(false);
+  const [deallocateDisabled, setDeallocateDisabled] = useState("");
+  const [pullDisabled, setPullDisabled] = useState("");
+  const ProjectDetails = []
 
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
@@ -65,6 +78,9 @@ const SuperCheckerTasks = (props) => {
   const [selectedFilters, setsSelectedFilters] = useState({
     task_status: filterData.Status[0]
   });
+  const [pullSize, setPullSize] = useState(
+    ProjectDetails.tasks_pull_count_per_batch * 0.5
+  );
 
   const GetAllTasksdata = () => {
     const taskObjs = new GetAllTasksAPI(id, currentPageNumber,selectedFilters, currentRowPerPage);
@@ -74,6 +90,28 @@ const SuperCheckerTasks = (props) => {
   useEffect(() => {
     GetAllTasksdata();
   }, [currentPageNumber, currentRowPerPage]);
+
+  useEffect(() => {
+    if (
+      (
+        (props.type === "superChecker" &&
+          selectedFilters.task_status === "unvalidated")) &&
+      totalTaskCount === 0
+    ) {
+      setDeallocateDisabled("No more tasks to deallocate");
+    } else if (deallocateDisabled === "No more tasks to deallocate") {
+      setDeallocateDisabled("");
+    }
+  }, [totalTaskCount, selectedFilters]);
+
+  useEffect(() => {
+    if (ProjectDetails) {
+      if (props.type === "superChecker" && ProjectDetails.labeled_task_count === 0)
+        setPullDisabled("No more unassigned tasks in this project");
+      else if (pullDisabled === "No more unassigned tasks in this project")
+        setPullDisabled("");
+    }
+  }, [ProjectDetails.labeled_task_count]);
 
 
   useEffect(() => {
@@ -87,12 +125,12 @@ const SuperCheckerTasks = (props) => {
         );
         AllTaskData[0].task_status && row.push(el.task_status);
         row.push( <>
-          <Link to={`Alltask/${el.id}`} className={classes.link}>
+          <Link to={`SuperChecker/${el.id}`} className={classes.link}>
           <CustomButton
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                   View
+                  review
               </Typography>} />
       </Link>
 
@@ -154,6 +192,44 @@ const SuperCheckerTasks = (props) => {
 }
 const handleSearchClose = () => {
   setSearchAnchor(null);
+}
+
+
+const unassignTasks = async () => {
+  setDeallocateDialog(false);
+  // const deallocateObj = new DeallocateReviewTasksAPI(id, selectedFilters.review_status);
+  // const res = await fetch(deallocateObj.apiEndPoint(), {
+  //   method: "GET",
+  //   body: JSON.stringify(deallocateObj.getBody()),
+  //   headers: deallocateObj.getHeaders().headers,
+  // });
+  // const resp = await res.json();
+  // if (res.ok) {
+  //   setSnackbarInfo({
+  //     open: true,
+  //     message: resp?.message,
+  //     variant: "success",
+  //   });
+  //   getTaskListData();
+  //   setTimeout(() => {
+  //     //window.location.reload();
+  //   }, 1000);
+  // } else {
+  //   setSnackbarInfo({
+  //     open: true,
+  //     message: resp?.message,
+  //     variant: "error",
+  //   });
+  // }
+};
+
+
+const fetchNewTasks = async () => {
+ 
+};
+
+const labelAllTasks = () =>{
+
 }
 
   const customColumnHead = (col) => {
@@ -242,6 +318,158 @@ const handleSearchClose = () => {
 
   return (
     <div>
+         <Grid container direction="row" spacing={2} sx={{ mb: 2 }}>
+         <Grid item xs={12} sm={12} md={3}>
+                  <Tooltip title={deallocateDisabled }>
+                    <Box>
+                      <CustomButton
+                        sx={{
+                          p: 1,
+                          width: "100%",
+                          borderRadius: 2,
+                          margin: "auto",
+                        }}
+                        label={"De-allocate Tasks"}
+                        onClick={() => setDeallocateDialog(true)}
+                        disabled={deallocateDisabled }
+                        color={"warning"}
+                      />
+                    </Box>
+                  </Tooltip>
+                </Grid>
+
+                <Dialog
+                open={deallocateDialog}
+                onClose={() => setDeallocateDialog(false)}
+                aria-labelledby="deallocate-dialog-title"
+                aria-describedby="deallocate-dialog-description"
+              >
+                <DialogTitle id="deallocate-dialog-title">
+                  {"De-allocate Tasks?"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    All{" "}
+                    <snap style={{ color: "#1DA3CE" }}>
+                      {selectedFilters.task_status}{" "}
+                      tasks
+                    </snap>{" "}
+                    will be de-allocated from this project. Please be careful as
+                    this action cannot be undone.
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setDeallocateDialog(false)}
+                    variant="outlined"
+                    color="error"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={unassignTasks}
+                    variant="contained"
+                    color="error"
+                    autoFocus
+                  >
+                    Confirm
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
+              <Grid
+                item
+                xs={4}
+                sm={4}
+                md={2}
+              >
+                 <FormControl size="small" sx={{ width: "100%" }}>
+                  <InputLabel id="pull-select-label" sx={{ fontSize: "16px" }}>
+                    Pull Size
+                  </InputLabel>
+                  <Select
+                    labelId="pull-select-label"
+                    id="pull-select"
+                    value={pullSize}
+                    // defaultValue={5}
+                    label="Pull Size"
+                    onChange={(e) => setPullSize(e.target.value)}
+                    disabled={pullDisabled}
+                    sx={{ fontSize: "16px" }}
+                  >
+                    <MenuItem
+                      value={ProjectDetails?.tasks_pull_count_per_batch * 0.5}
+                    >
+                      {Math.round(
+                        ProjectDetails?.tasks_pull_count_per_batch * 0.5
+                      )}
+                    </MenuItem>
+                    <MenuItem
+                      value={ProjectDetails?.tasks_pull_count_per_batch}
+                    >
+                      {ProjectDetails?.tasks_pull_count_per_batch}
+                    </MenuItem>
+                    <MenuItem
+                      value={ProjectDetails?.tasks_pull_count_per_batch * 1.5}
+                    >
+                      {Math.round(
+                        ProjectDetails?.tasks_pull_count_per_batch * 1.5
+                      )}
+                    </MenuItem>
+                  </Select>
+                </FormControl> 
+              </Grid>
+
+              <Grid
+                item
+                xs={8}
+                sm={8}
+                md={3}
+              >
+                 <Tooltip title={pullDisabled}>
+                  <Box>
+                    <CustomButton
+                      sx={{
+                        p: 1,
+                        width: "100%",
+                        borderRadius: 2,
+                        margin: "auto",
+                      }}
+                      label={"Pull New Batch"}
+                      disabled={pullDisabled}
+                      onClick={fetchNewTasks}
+                    />
+                  </Box>
+                </Tooltip>
+                 </Grid>
+                 <Grid
+                item
+                xs={12}
+                sm={12}
+                md={4}
+              >
+                 <Tooltip
+                  title={
+                    totalTaskCount === 0 ? "No more tasks to review": ""
+                  }
+                >
+                  <Box>
+                    <CustomButton
+                      sx={{
+                        p: 1,
+                        borderRadius: 2,
+                        margin: "auto",
+                        width: "100%",
+                      }}
+                      label={"Start reviewing now"}
+                      onClick={labelAllTasks}
+                      disabled={totalTaskCount === 0 }
+                    />
+                  </Box>
+                </Tooltip>
+                </Grid>
+         </Grid>
+      
       <ThemeProvider theme={tableTheme}>
         <MUIDataTable
           // title={""}

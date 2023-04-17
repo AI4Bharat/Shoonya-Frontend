@@ -54,7 +54,7 @@ const ReportsTable = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-  console.log(ProjectDetails,"ProjectDetails")
+
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -140,6 +140,9 @@ const ReportsTable = (props) => {
        else if(radiobutton === "ReviewerReports") {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
         }
+        else if(radiobutton === "SuperCheckerReports") {
+            console.log(" this is SuperCheckerReports")
+        }
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
@@ -208,7 +211,7 @@ const ReportsTable = (props) => {
                     >
                         <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />
                     {(ProjectDetails.project_stage === 2 && userRole.Annotator !== props.userDetails?.role ) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
-
+                     <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker"  />
                     </RadioGroup>
                 </FormControl>
                 </Grid >

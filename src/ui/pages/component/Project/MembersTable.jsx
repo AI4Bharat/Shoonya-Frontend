@@ -320,7 +320,7 @@ const MembersTable = (props) => {
     <React.Fragment>
       {userRole !== 1 && !hideButton ? (
         <CustomButton
-          sx={{ borderRadius: 2, whiteSpace: "nowrap" }}
+          sx={{ borderRadius: 2, whiteSpace: "nowrap",mb:2 }}
           startIcon={<PersonAddAlt />}
           label={props.type ? addLabel[props.type] : "Add Users"}
           fullWidth
@@ -348,8 +348,9 @@ const MembersTable = (props) => {
         </Grid>
       )}
 
-      <ThemeProvider theme={tableTheme} sx={{ marginTop: "20px" }}>
+      <ThemeProvider theme={tableTheme} >
         <MUIDataTable
+        sx={{ marginTop: "20px" }}
           title={""}
           data={data}
           columns={columns}

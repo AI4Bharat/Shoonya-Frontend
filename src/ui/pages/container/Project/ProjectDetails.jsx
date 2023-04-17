@@ -273,7 +273,7 @@ const Projects = () => {
                         <TaskTable type="review" />
                     </TabPanel>}
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1: 1 } >
-                        <SuperCheckerTasks />   
+                        <SuperCheckerTasks  type="superChecker"/>   
                     </TabPanel>
                     {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 3 : 2 : 2} >
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS} />
