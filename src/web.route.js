@@ -31,6 +31,7 @@ import ReviewLSF from "./ui/pages/container/Label-Studio/ReviewLSF";
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
 import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
+import ProgressPage from "./ui/pages/container/UserManagement/ProgressPage";
 import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
 import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
@@ -164,6 +165,10 @@ const App = () => {
           element={ProtectedRouteWrapper(
             <Layout component={<Projects />} Backbutton={true} backPressNavigationPath={"/projects"} />
           )}
+        />
+        <Route
+          path="/progress/:id"
+          element={ProtectedRouteWrapper(<Layout component={<ProgressPage />} Backbutton={true} />)}
         />
         <Route
           path="projects/:id/projectsetting"
