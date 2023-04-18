@@ -63,73 +63,6 @@ const MyProfile = () => {
     setOriginalEmail(userDetails.email);
   }, [userDetails]);
 
-  const handleFieldChange = (event) => {
-    event.preventDefault();
-    setNewDetails((prev) => ({
-      ...prev,
-      [event.target.name]: event.target.value,
-    }));
-  };
-
-  const handleEmailChange = (event) => {
-    event.preventDefault();
-    setEmail(event.target.value);
-    event.target.value !== originalEmail ? setEnableVerifyEmail(true) : setEnableVerifyEmail(false);
-  };
-
-  const handleUpdateEmail = () => {
-    setEmailVerifyLoading(true);
-    const apiObj = new UpdateEmailAPI(email.toLowerCase());
-    fetch(apiObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(apiObj.getBody()),
-      headers: apiObj.getHeaders().headers,
-    }).then(async (res) => {
-      setEmailVerifyLoading(false);
-      if (!res.ok) throw await res.json();
-      else return await res.json();
-    }).then((res) => {
-      setSnackbarState({ open: true, message: res.message, variant: "success" });
-      setShowEmailDialog(true);
-    }).catch((err) => {
-      setSnackbarState({ open: true, message: err.message, variant: "error" });
-    });
-  };
-
-  const handleEmailDialogClose = () => {
-    setShowEmailDialog(false);
-  };
-  
-  const handleVerificationSuccess = () => {
-    setEnableVerifyEmail(false);
-    setOriginalEmail(email);
-    setSnackbarState({ open: true, message: "Email successfully updated", variant: "success" });
-  }
-  
-  const handleSubmit = () => {
-    const apiObj = new UpdateProfileAPI(
-      newDetails.username,
-      newDetails.first_name,
-      newDetails.last_name,
-      newDetails.languages,
-      newDetails.phone,
-      newDetails.availability_status,
-      newDetails.participation_type
-    );
-    fetch(apiObj.apiEndPoint(), {
-      method: "PATCH",
-      body: JSON.stringify(apiObj.getBody()),
-      headers: apiObj.getHeaders().headers,
-    }).then(async (res) => {
-      const rsp_data = await res.json();
-      setSnackbarState({
-        open: true,
-        message: rsp_data.message,
-        variant: res.status === 200 ? "success" : "error",
-      })
-    });
-  }
-
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
@@ -151,7 +84,7 @@ const MyProfile = () => {
           <Grid container spacing={4}>
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <Typography variant="h3" align="center">
-                Logged In User Profile Details
+                Profile Details
               </Typography>
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
@@ -161,7 +94,6 @@ const MyProfile = () => {
                 label="First Name"
                 name="first_name"
                 value={newDetails?.first_name}
-                onChange={handleFieldChange}
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
@@ -172,7 +104,6 @@ const MyProfile = () => {
                 label="Last Name"
                 name="last_name"
                 value={newDetails?.last_name}
-                onChange={handleFieldChange}
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
@@ -182,23 +113,8 @@ const MyProfile = () => {
                 fullWidth
                 label="Email"
                 value={email}
-                onChange={handleEmailChange}
                 InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  endAdornment: (enableVerifyEmail && <InputAdornment position="end">
-                    <Button variant="text" color="primary" onClick={handleUpdateEmail} sx={{gap:"4px"}}>
-                      {emailVerifyLoading && <CircularProgress size="1rem" color="primary"/>}VERIFY EMAIL
-                    </Button>
-                  </InputAdornment>)
-                }}
               ></OutlinedTextField>
-              <UpdateEmailDialog 
-                isOpen={showEmailDialog}
-                handleClose={handleEmailDialogClose}
-                oldEmail={userDetails.email}
-                newEmail={email?.toLowerCase()}
-                onSuccess={handleVerificationSuccess}
-              />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
               <OutlinedTextField
@@ -207,7 +123,6 @@ const MyProfile = () => {
                 label="Phone"
                 name="phone"
                 value={newDetails?.phone}
-                onChange={handleFieldChange}
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
@@ -228,7 +143,6 @@ const MyProfile = () => {
                 label="Username"
                 name="username"
                 value={newDetails?.username}
-                onChange={handleFieldChange}
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
@@ -249,7 +163,6 @@ const MyProfile = () => {
                 labelId="availability-label"
                 name="availability_status"
                 value={newDetails?.availability_status}
-                onChange={handleFieldChange}
                 InputLabelProps={{ shrink: true }}
               >
                 <MenuItem value="1">Available</MenuItem>
@@ -265,7 +178,6 @@ const MyProfile = () => {
                 labelId="lang-label"
                 name="languages"
                 value={newDetails?.languages? newDetails.languages : []}
-                onChange={handleFieldChange}
                 style={{zIndex: "0"}}
                 MenuProps={MenuProps}
                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
@@ -294,7 +206,6 @@ const MyProfile = () => {
                 label="Availability Status"
                 name="availability_status"
                 value={newDetails?.availability_status}
-                onChange={handleFieldChange}
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
               </Grid>
@@ -306,7 +217,6 @@ const MyProfile = () => {
                 labelId="lang-label"
                 name="participation_type"
                 value={newDetails?.participation_type? newDetails.participation_type : []}
-                onChange={handleFieldChange}
                 style={{zIndex: "0"}}
                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
               >
@@ -326,13 +236,6 @@ const MyProfile = () => {
                 justifyContent="flex-end"
                 style={{marginTop: 20}}
             >
-                {/* <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit}
-                >
-                    Update Profile
-                </Button> */}
                 {LoggedInUserId === userDetails.id &&
                     <Grid item>
                         <CustomButton
