@@ -23,6 +23,7 @@ import AssignManagerToWorkspaceAPI from "../../../../redux/actions/api/Workspace
 import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 import AddProjectReviewersAPI from "../../../../redux/actions/api/ProjectDetails/AddProjectReviewers";
+import AddProjectSuperCheckerAPI from "../../../../redux/actions/api/ProjectDetails/AddProjectSuperChecker";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CustomButton from "./Button";
 
@@ -153,7 +154,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
         }
         break;
         case addUserTypes.PROJECT_SUPERCHECKER:
-        const addsuperCheckerObj = new AddProjectReviewersAPI(
+        const addsuperCheckerObj = new AddProjectSuperCheckerAPI(
           id,
           users.map((user) => user.id),
         );

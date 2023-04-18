@@ -120,6 +120,7 @@ const Projects = () => {
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
       );
+      console.log(ProjectDetails.review_supercheckers,"ProjectDetailsProjectDetails")
  
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
@@ -282,7 +283,7 @@ const Projects = () => {
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3: 3 }>
-                        <MembersTable  type={addUserTypes.PROJECT_SUPERCHECKER} />
+                        <MembersTable  dataSource={ProjectDetails.review_supercheckers} type={addUserTypes.PROJECT_SUPERCHECKER} onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} />
                     </TabPanel>
                     <TabPanel value={value} index={isAnnotators ? isReviewer ? 6 : 4 : 4}>
                         <ReportsTable annotationreviewertype={annotationreviewertype}  userDetails={userDetails}/>

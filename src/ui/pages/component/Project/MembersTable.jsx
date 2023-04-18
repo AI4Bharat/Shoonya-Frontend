@@ -108,7 +108,15 @@ const MembersTable = (props) => {
     }
   };
   const handleProjectReviewer = async (Projectid) => {
-    const projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] });
+    let projectObj 
+    if(props.type === addUserTypes.PROJECT_REVIEWER){
+      projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] },props.type);
+    }else if(props.type === addUserTypes.PROJECT_SUPERCHECKER){
+       projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] },props.type);
+    }
+
+
+   
     // dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
@@ -203,7 +211,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-              {props.type === addUserTypes.PROJECT_REVIEWER && (
+              {(props.type === addUserTypes.PROJECT_REVIEWER || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -216,7 +224,6 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-
              
                 {projectlist(el.id) &&(
                   <CustomButton

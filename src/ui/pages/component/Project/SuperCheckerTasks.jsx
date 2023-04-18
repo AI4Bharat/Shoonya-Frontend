@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
 import GetAllTasksAPI from "../../../../redux/actions/api/Tasks/GetAllTasks";
+import PullNewSuperCheckerBatchAPI from "../../../../redux/actions/api/Tasks/PullNewSuperCheckerBatch";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import {
   ThemeProvider,
@@ -66,11 +67,12 @@ const SuperCheckerTasks = (props) => {
   const [deallocateDialog, setDeallocateDialog] = useState(false);
   const [deallocateDisabled, setDeallocateDisabled] = useState("");
   const [pullDisabled, setPullDisabled] = useState("");
-  const ProjectDetails = []
+
 
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
   const filterData = {
     Status: ["unvalidated", "validated", "validated with Changes", "skipped","draft","rejected"],
@@ -81,6 +83,8 @@ const SuperCheckerTasks = (props) => {
   const [pullSize, setPullSize] = useState(
     ProjectDetails.tasks_pull_count_per_batch * 0.5
   );
+
+console.log(ProjectDetails,"ProjectDetailsProjectDetails")
 
   const GetAllTasksdata = () => {
     const taskObjs = new GetAllTasksAPI(id, currentPageNumber,selectedFilters, currentRowPerPage);
@@ -225,6 +229,10 @@ const unassignTasks = async () => {
 
 
 const fetchNewTasks = async () => {
+  const taskObj = new PullNewSuperCheckerBatchAPI(
+    id,Math.round(pullSize)
+  );
+  dispatch(APITransport(taskObj));
  
 };
 
