@@ -123,9 +123,9 @@ const AnnotationProject = (props) => {
     // "machine_translated_conversation_json",
     "speakers_json",
     "transcribed_json",
-    "conversation_json"
-
-
+    "conversation_json",
+    "prediction_json",
+    "machine_transcribed_json", 
   ];
   const renderToolBar = () => {
     return (

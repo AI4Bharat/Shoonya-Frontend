@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import FetchUserByIdAPI from '../../../../redux/actions/api/UserManagement/FetchUserById';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip } from '@mui/material';
+import { Avatar, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip, Paper } from '@mui/material';
 import MyProgress from '../../component/Tabs/MyProgress';
 import RecentTasks from '../../component/Tabs/RecentTasks';
 import CustomButton from "../../component/common/Button";
@@ -15,6 +15,7 @@ import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRol
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import MyProfile from "../../container/UserManagement/ProfileDetails"
 
 
 const ProfilePage = () => {
@@ -92,37 +93,56 @@ const ProfilePage = () => {
         {loading && <Spinner />}
         {renderSnackBar()}
           {userDetails && (
-            <><Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
-              <Card sx={{ borderRadius: "5px", mb:2 }}>
+            <>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ p: 2 }}>
+                <Paper variant="outlined" sx={{ minWidth: 275, borderRadius: "5px" ,backgroundColor:'ButtonHighlight', textAlign:'center'}}>
                   <CardContent>
-                    <Avatar
-                      alt="user_profile_pic"
-                      variant="contained"
-                      sx={{ color: "#FFFFFF !important", bgcolor: "#2A61AD !important", width: 96, height: 96, mb: 2 }}
-                    >
-                      {userDetails.username.split("")[0]}
-                    </Avatar>
-                    <Typography variant="h3">
+                    <Typography variant="h4">{userDetails.organization.title}</Typography>
+                  </CardContent>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} xl={4} sx={{ p: 2 }}>
+                <Card sx={{ borderRadius: "5px", mb:2 }}>
+                  <CardContent sx={{display:'flex', justifyContent:'center',flexDirection: 'column'}}>
+                    <Card sx={{display:'flex',flexDirection: 'row', justifyContent:'space-evenly',border: "none"}}>
+                    
+                      <Avatar
+                        alt="user_profile_pic"
+                        variant="contained"
+                        sx={{ color: "#FFFFFF !important", bgcolor: "#2A61AD !important", width: 96, height: 96, mb: 2,alignSelf: 'center' }}
+                      >
+                        {userDetails.username.split("")[0]}
+                      </Avatar>
+                    
+                      <Typography variant="h3" sx={{alignSelf: 'center',mb: 2}}>
+                        {UserMappedByRole(userDetails.role).element}
+                      </Typography>
+                    
+                    </Card>
+                    <Typography variant="h3" sx={{mb: 1,alignSelf: 'center', textAlign:'center'}}>
                       {userDetails.first_name} {userDetails.last_name}
                     </Typography>
-                    <Typography variant="subtitle1" sx={{mb: 1}}>
+                    <Typography variant="subtitle1" sx={{mb: 1,alignSelf: 'center', textAlign:'center'}}>
                       {userDetails.username}
                     </Typography>
-                    <Typography variant="body1" sx={{display: "flex", gap: "5px", alignItems: "center"}}>
-                      <MailOutlineIcon />{userDetails.email}
-                    </Typography>
-                    {userDetails.phone && <Typography variant="body1" sx={{display: "flex", gap: "5px", alignItems: "center"}}>
-                      <PhoneOutlinedIcon />{userDetails.phone}
-                    </Typography>}
+                    <Card style={{alignSelf: 'center',border: "none", boxShadow: "none", alignItems: "center" ,textAlign:'center'}}>
+                      <Typography variant="body1" sx={{display: "flex", gap: "5px", alignItems: "center"}}>
+                        <MailOutlineIcon />{userDetails.email}
+                      </Typography>
+                      {userDetails.phone && <Typography variant="body1" sx={{ alignItems: "center",alignSelf: 'center'}}>
+                        <PhoneOutlinedIcon />{userDetails.phone}
+                      </Typography>}
+                    </Card>
                     {userDetails.languages.length > 0 && (
-                      <Typography variant="body1">Languages: 
+                      <Typography variant="body1" sx={{display: "flex", gap: "5px", alignItems: "center",alignSelf: 'center', textAlign:'center'}}>Languages: 
                         {userDetails.languages.map
                           (lang => <Chip label={lang} variant="outlined" sx={{ ml: 1 }}></Chip>
                         )}
                       </Typography>
                     )}
-                    {LoggedInUserId === userDetails.id &&
-                      <Grid container spacing={2} sx={{mt: 1, alignItems: "center"}}>
+                    {/* {LoggedInUserId === userDetails.id && */}
+                    {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role) )) &&
+                      <Grid container spacing={2} sx={{mt: 1, alignItems: "center", display: 'inline-flex',justifyContent: 'center'}}>
                         <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
                           <Tooltip title={(userDetails.enable_mail ? "Disable" : "Enable") + " daily mails"}>
                             <FormControlLabel
@@ -134,39 +154,34 @@ const ProfilePage = () => {
                             />
                           </Tooltip>
                         </Grid>
-                        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                        {/* <Grid item>
                           <CustomButton
                             label="Edit Profile"
                             onClick={() => navigate("/edit-profile")}
                           />
+                        </Grid> */}
+                        <Grid item>
+                          <CustomButton
+                            label="View Progress"
+                            onClick={() => navigate(`/progress/${UserDetails.id}`)}
+                          />
                         </Grid>
                       </Grid>}
                   </CardContent>
-                </Card>
-                {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role ||  userRole.Reviewer === loggedInUserData?.role)))  &&
-                <Card>
-                  <CardContent>
-                    <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
-                    <RecentTasks />
-                  </CardContent>
-                </Card>
-             } 
+                </Card> 
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
-              <Card sx={{ minWidth: 275, borderRadius: "5px", mb: 2 }}>
-                <CardContent>
-                  <Typography variant="h4" sx={{mb: 1}}>{userDetails.organization.title}</Typography>
-                  {UserMappedByRole(userDetails.role)?.element}
-                </CardContent>
-              </Card>
-               {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role)))  &&
+            <Grid item xs={12} sm={12} md={8} lg={8} xl={8} sx={{ p: 2 }}>
+               {/* {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && userRole.Annotator === loggedInUserData?.role))  &&
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
                     <MyProgress />
                   </CardContent>
                 </Card>
-                } 
+                }  */}
+              <Card sx={{ borderRadius: "5px", mb:2}}>
+                <MyProfile/>
+              </Card>
             </Grid></>
           )}
       </Grid>
