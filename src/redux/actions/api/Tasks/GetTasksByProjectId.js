@@ -8,7 +8,6 @@ import constants from "../../../constants";
 
 export default class GetTasksByProjectIdAPI extends API {
   constructor(projectId, pageNo, countPerPage, selectedFilters, taskType, timeout = 2000) {
-  
     super("GET", timeout, false);
     const datavalue = []
     this.type = constants.GET_TASK_LIST;
@@ -22,6 +21,9 @@ export default class GetTasksByProjectIdAPI extends API {
              case 'review_status':
              queryString +=`&${key}=["${selectedFilters[key]}"]`
                  break;
+             case 'supercheck_status':
+                  queryString +=`&${key}=["${selectedFilters[key]}"]`
+                      break;
              default:
              queryString +=`&${key}=${selectedFilters[key]}`
             

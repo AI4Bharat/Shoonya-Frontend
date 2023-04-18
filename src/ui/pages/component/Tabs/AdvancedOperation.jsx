@@ -213,7 +213,7 @@ const AdvancedOperation = (props) => {
         else opt.disabled = false;
         return opt;
       })
-     
+      console.log(disableSuperchecker,"disableSuperchecker")
       setTaskReviews(disableSuperchecker);
     }
     else if (ProjectStageValue === 2) {
@@ -223,6 +223,7 @@ const AdvancedOperation = (props) => {
         return opt;
 
       });
+      console.log(disableSuperchecker,"disableSuperchecker")
       setTaskReviews(disableSuperchecker);
     }
     else if (ProjectStageValue === 3) {
@@ -232,6 +233,7 @@ const AdvancedOperation = (props) => {
         return opt;
 
       });
+      console.log(disableSuperchecker,"disableSuperchecker")
       setTaskReviews(disableSuperchecker);
     }
 
@@ -261,6 +263,7 @@ const AdvancedOperation = (props) => {
     }
   };
 
+  console.log(taskReviews,"taskReviewstaskReviews")
   const handleDownoadMetadataToggle = async () => {
     // setLoading(true);
     setDownloadMetadataToggle((downloadMetadataToggle)=>!downloadMetadataToggle)
@@ -619,7 +622,7 @@ const AdvancedOperation = (props) => {
                 value={taskReviews}
                 label="Task Reviews"
                 onChange={handleReviewToggle}
-                getOptionDisabled={(option) => option.disabled}
+                // getOptionDisabled={(option) => option.disabled}
               >
                 {projectStage.map((type, index) => (
                   <MenuItem value={type.value} key={index} disabled={type.disabled} >

@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import GetAllTasksAPI from "../../../../redux/actions/api/Tasks/GetAllTasks";
 import PullNewSuperCheckerBatchAPI from "../../../../redux/actions/api/Tasks/PullNewSuperCheckerBatch";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import DeallocateSuperCheckerTasksAPI from "../../../../redux/actions/api/Tasks/DeAllocateSuperCheckerTasks";
+import CustomizedSnackbars from "../../component/common/Snackbar";
+import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import {
   ThemeProvider,
   Grid,
@@ -71,28 +74,37 @@ const SuperCheckerTasks = (props) => {
 
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
-  const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
   const filterData = {
-    Status: ["unvalidated", "validated", "validated with Changes", "skipped","draft","rejected"],
+    Status: ["unvalidated","validated","validated with Changes","skipped","draft","rejected"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
-    task_status: filterData.Status[0]
+    supercheck_status: filterData.Status[0]
   });
   const [pullSize, setPullSize] = useState(
     ProjectDetails.tasks_pull_count_per_batch * 0.5
   );
 
-console.log(ProjectDetails,"ProjectDetailsProjectDetails")
+  const taskList = useSelector(
+    (state) => state.getTasksByProjectId.data.result
+  );
 
-  const GetAllTasksdata = () => {
-    const taskObjs = new GetAllTasksAPI(id, currentPageNumber,selectedFilters, currentRowPerPage);
-    dispatch(APITransport(taskObjs));
+  console.log(taskList,"taskListtaskList")
+
+  const getTaskListData = () => {
+    const taskObj = new GetTasksByProjectIdAPI(
+      id,
+      currentPageNumber,
+      currentRowPerPage,
+      selectedFilters,
+      props.type
+    );
+    dispatch(APITransport(taskObj));
   };
 
   useEffect(() => {
-    GetAllTasksdata();
+    getTaskListData();
   }, [currentPageNumber, currentRowPerPage]);
 
   useEffect(() => {
@@ -119,15 +131,15 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
 
 
   useEffect(() => {
-    if (AllTaskData?.length > 0 && AllTaskData[0]?.data) {
-      const data = AllTaskData.map((el) => {
+    if (taskList?.length > 0 && taskList[0]?.data) {
+      const data = taskList.map((el) => {
         let row = [el.id];
         row.push(
           ...Object.keys(el.data)
             .filter((key) => !excludeCols.includes(key))
             .map((key) => el.data[key])
         );
-        AllTaskData[0].task_status && row.push(el.task_status);
+        taskList[0].task_status && row.push(el.task_status);
         row.push( <>
           <Link to={`SuperChecker/${el.id}`} className={classes.link}>
           <CustomButton
@@ -144,11 +156,11 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
       });
       let colList = ["id"];
       colList.push(
-        ...Object.keys(AllTaskData[0].data).filter(
+        ...Object.keys(taskList[0].data).filter(
           (el) => !excludeCols.includes(el)
         )
       );
-      AllTaskData[0].task_status && colList.push("status");
+      taskList[0].task_status && colList.push("status");
       colList.push("actions");
       const cols = colList.map((col) => {
         return {
@@ -169,7 +181,7 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
     } else {
       setTasks([]);
     }
-  }, [AllTaskData]);
+  }, [taskList]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {
@@ -201,30 +213,27 @@ const handleSearchClose = () => {
 
 const unassignTasks = async () => {
   setDeallocateDialog(false);
-  // const deallocateObj = new DeallocateReviewTasksAPI(id, selectedFilters.review_status);
-  // const res = await fetch(deallocateObj.apiEndPoint(), {
-  //   method: "GET",
-  //   body: JSON.stringify(deallocateObj.getBody()),
-  //   headers: deallocateObj.getHeaders().headers,
-  // });
-  // const resp = await res.json();
-  // if (res.ok) {
-  //   setSnackbarInfo({
-  //     open: true,
-  //     message: resp?.message,
-  //     variant: "success",
-  //   });
-  //   getTaskListData();
-  //   setTimeout(() => {
-  //     //window.location.reload();
-  //   }, 1000);
-  // } else {
-  //   setSnackbarInfo({
-  //     open: true,
-  //     message: resp?.message,
-  //     variant: "error",
-  //   });
-  // }
+  const deallocateObj = new DeallocateSuperCheckerTasksAPI(id, selectedFilters.task_status);
+  const res = await fetch(deallocateObj.apiEndPoint(), {
+    method: "GET",
+    body: JSON.stringify(deallocateObj.getBody()),
+    headers: deallocateObj.getHeaders().headers,
+  });
+  const resp = await res.json();
+  if (res.ok) {
+    setSnackbarInfo({
+      open: true,
+      message: resp?.message,
+      variant: "success",
+    });
+    getTaskListData();
+  } else {
+    setSnackbarInfo({
+      open: true,
+      message: resp?.message,
+      variant: "error",
+    });
+  }
 };
 
 
@@ -322,6 +331,19 @@ const labelAllTasks = () =>{
     jumpToPage: true,
     serverSide: true,
     customToolbar: renderToolBar,
+};
+const renderSnackBar = () => {
+  return (
+    <CustomizedSnackbars
+      open={snackbar.open}
+      handleClose={() =>
+        setSnackbarInfo({ open: false, message: "", variant: "" })
+      }
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      variant={snackbar.variant}
+      message={snackbar.message}
+    />
+  );
 };
 
   return (
@@ -495,7 +517,7 @@ const labelAllTasks = () =>{
           filterStatusData={filterData}
           updateFilters={setsSelectedFilters}
           currentFilters={selectedFilters}
-          onchange={GetAllTasksdata}
+          onchange={getTaskListData}
         />
       )}
        {searchOpen && <AllTaskSearchPopup
@@ -506,8 +528,9 @@ const labelAllTasks = () =>{
                     //filterStatusData={filterData}
                     currentFilters={selectedFilters}
                     searchedCol={searchedCol}
-                    onchange={GetAllTasksdata}
+                    onchange={getTaskListData}
                 />}
+              {renderSnackBar()}
     </div>
   );
 };
