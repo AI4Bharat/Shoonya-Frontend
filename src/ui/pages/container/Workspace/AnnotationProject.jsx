@@ -49,6 +49,7 @@ const isNum = (str) => {
 const projectStage = [
   { name: "Annotation Stage", value: 1 },
   { name: "Review Stage", value: 2 },
+  {name:"Super Check Stage",value: 3}
 ];
 
 const AnnotationProject = (props) => {

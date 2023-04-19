@@ -59,7 +59,7 @@ const AllTaskTable = (props) => {
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
   const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
   const filterData = {
-    Status: ["incomplete", "annotated", "reviewed", "exported"],
+    Status: ["incomplete", "annotated", "reviewed","super_checked","exported"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
     task_status: [filterData.Status[0]],

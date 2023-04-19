@@ -139,7 +139,7 @@ const TaskTable = (props) => {
       ? TaskFilter.filters
       : { review_status: filterData.Status[0], req_user: -1 }
   );
-  const NextTask = useSelector((state) => state.getNextTask.data);
+  const NextTask = useSelector((state) => state?.getNextTask?.data);
   const [tasks, setTasks] = useState([]);
   const [pullSize, setPullSize] = useState(
     ProjectDetails.tasks_pull_count_per_batch * 0.5
@@ -256,6 +256,7 @@ const TaskTable = (props) => {
     localStorage.setItem("labelAll", true);
     const datavalue = {
       annotation_status: selectedFilters?.annotation_status,
+      mode: "annotation",
       ...(props.type === "review" && {
         mode: "review",
         annotation_status: selectedFilters?.review_status,
@@ -541,10 +542,10 @@ const TaskTable = (props) => {
   }, [totalTaskCount, selectedFilters]);
 
   useEffect(() => {
-    if (labellingStarted && Object.keys(NextTask).length > 0) {
+    if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
       navigate(
         `/projects/${id}/${props.type === "annotation" ? "task" : "review"}/${
-          NextTask.id
+          NextTask?.id
         }`
       );
     }
@@ -788,7 +789,9 @@ const TaskTable = (props) => {
     serverSide: true,
     customToolbar: renderToolBar,
   };
-
+console.log(props.type === "review" ,
+ProjectDetails?.annotation_reviewers,
+ userDetails?.id,"valuesdata")
   return (
     <div>
       {((props.type === "annotation" &&
@@ -796,7 +799,7 @@ const TaskTable = (props) => {
           (annotation) => annotation.id === userDetails?.id
         )) ||
         (props.type === "review" &&
-          ProjectDetails?.annotation_reviewers.some(
+          ProjectDetails?.annotation_reviewers?.some(
             (reviewer) => reviewer.id === userDetails?.id
           ))) &&
         (ProjectDetails.project_mode === "Annotation" ? (

@@ -90,6 +90,7 @@ const RecentTasks = () => {
         <Tabs value={taskType} onChange={(e, newVal) => setTaskType(newVal)} aria-label="basic tabs example" sx={{mb: 2}}>
             <Tab label={translate("label.recentTasks.annotation")} value="annotation" sx={{ fontSize: 16, fontWeight: '700'}}/>
             <Tab label={translate("label.recentTasks.review")} value="review" sx={{ fontSize: 16, fontWeight: '700'}}/>
+            <Tab label="Super Checker" value="SuperChecker" sx={{ fontSize: 16, fontWeight: '700'}}/>
         </Tabs>
       </Box>
       <ThemeProvider theme={tableTheme}>

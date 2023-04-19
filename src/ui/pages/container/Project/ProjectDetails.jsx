@@ -21,6 +21,8 @@ import ProjectDescription from "./ProjectDescription";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AllTaskTable from "../../component/Project/AllTaskTable";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import SuperCheckerTasks from "../../component/Project/SuperCheckerTasks";
+import SuperChecker from "../../component/Project/SuperChecker";
 
 
 
@@ -118,6 +120,7 @@ const Projects = () => {
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
       );
+      console.log(ProjectDetails.review_supercheckers,"ProjectDetailsProjectDetails")
  
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
@@ -161,8 +164,11 @@ const Projects = () => {
         setValue(newValue);
     };
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    const isAnnotators =(userRole.Annotator !== loggedInUserData?.role || userRole.Reviewer !== loggedInUserData?.role || userRole.SuperChecker !== loggedInUserData?.role )  || ProjectDetails?.annotators?.some((user) => user.id === userDetails.id);
-    const isReviewer = ProjectDetails?.project_stage == 2 && ((userRole.Annotator !== loggedInUserData?.role) || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id));
+    
+    const isAnnotators =((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role)  || (ProjectDetails?.annotators?.some((user) => user.id === userDetails.id )));
+    const isReviewer = ((ProjectDetails?.project_stage == 2) || ((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role)) || (ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id)));
+    const isSuperChecker = ((ProjectDetails?.project_stage == 3 ) || ((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role)) || (ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === userDetails?.id)))
+
     useEffect(() => {
         setLoading(apiLoading);
     }, [apiLoading])
@@ -253,10 +259,14 @@ const Projects = () => {
 
                                 {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                                 {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                               {isSuperChecker && <Tab label="Super Check Tasks" sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
+                               {isSuperChecker && <Tab label="Super Checker" sx={{ fontSize: 16, fontWeight: '700', }} /> }
                                 <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700', flexDirection: "row-reverse" }} onClick={handleClick} />
-                                {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}      </Tabs>
+                                {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: '700'}}  />}    
+                               
+                                  </Tabs>
                         </Box>
 
                     </Grid>
@@ -266,18 +276,25 @@ const Projects = () => {
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
                         <TaskTable type="review" />
                     </TabPanel>}
-                    {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 : 1} >
+                   {isSuperChecker && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 :2} >
+                        <SuperCheckerTasks  type="superChecker"/>   
+                    </TabPanel>}
+                    {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer  ? isSuperChecker ? 3 : 2 : 1 : 2} >
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS} />
                     </TabPanel>}
-                    {isReviewer && <TabPanel value={value} index={isAnnotators ? 3 : 1}>
+                    {isReviewer && <TabPanel value={value} index={isAnnotators ? isReviewer ? isSuperChecker? 4 :3: 3 : 2}>
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
-                    <TabPanel value={value} index={isAnnotators ? isReviewer ? 4 : 2 : 2}>
+                   {isSuperChecker &&<TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker?  5 : 2 : 3: 3 }>
+                        <MembersTable  dataSource={ProjectDetails.review_supercheckers} type={addUserTypes.PROJECT_SUPERCHECKER} onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} />
+                    </TabPanel>}
+                    <TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker?  6 :4: 2 : 2}>
                         <ReportsTable annotationreviewertype={annotationreviewertype}  userDetails={userDetails}/>
                     </TabPanel>
-               {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3 : 3}>
+               {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker ? 7 :5: 5 : 2}>
                         <AllTaskTable  />
                     </TabPanel>)}
+                    
                 </Card>
             </Grid>
         </ThemeProvider>

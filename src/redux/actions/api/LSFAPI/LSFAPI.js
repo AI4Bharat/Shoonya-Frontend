@@ -93,6 +93,9 @@ const postReview = async (
   }
 };
 
+
+
+
 const patchAnnotation = async (
   result,
   annotationID,
@@ -151,6 +154,33 @@ const patchReview = async (
   }
 };
 
+
+const patchSuperChecker = async (
+  annotationID,
+  load_time,
+  lead_time,
+  review_status,
+  result,
+  parentAnnotation,
+ 
+) => {
+  try {
+    await axiosInstance.patch(`/annotation/${annotationID}/`, {
+      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status: review_status,
+      result: result,
+      parent_annotation: parentAnnotation,
+       
+    });
+   
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+
 const deleteAnnotation = async (annotationID) => {
   try {
     await axiosInstance.delete(`/annotation/${annotationID}/`);
@@ -185,6 +215,10 @@ const getNextProject = async (projectID, taskID, mode = "annotation") => {
         mode: "review",
         annotation_status: labellingMode,
       }),
+      ...(mode === "supercheck" && {
+        mode: "supercheck",
+        annotation_status: labellingMode,
+      }),
     });
     if (response.status === 204) {
       // message.error("Error getting next task.");
@@ -213,4 +247,5 @@ export {
   fetchAnnotation,
   postReview,
   patchReview,
+  patchSuperChecker,
 };

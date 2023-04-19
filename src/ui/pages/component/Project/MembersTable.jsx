@@ -28,6 +28,7 @@ const addLabel = {
   organization: "Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
+  [addUserTypes.PROJECT_SUPERCHECKER]: "Add SuperChecker to Project",
 };
 
 const MembersTable = (props) => {
@@ -50,6 +51,7 @@ const MembersTable = (props) => {
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
   );
+
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -106,7 +108,15 @@ const MembersTable = (props) => {
     }
   };
   const handleProjectReviewer = async (Projectid) => {
-    const projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] });
+    let projectObj 
+    if(props.type === addUserTypes.PROJECT_REVIEWER){
+      projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] },props.type);
+    }else if(props.type === addUserTypes.PROJECT_SUPERCHECKER){
+       projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] },props.type);
+    }
+
+
+   
     // dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
@@ -201,7 +211,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-              {props.type === addUserTypes.PROJECT_REVIEWER && (
+              {(props.type === addUserTypes.PROJECT_REVIEWER || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -214,7 +224,6 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-
              
                 {projectlist(el.id) &&(
                   <CustomButton
@@ -318,7 +327,7 @@ const MembersTable = (props) => {
     <React.Fragment>
       {userRole !== 1 && !hideButton ? (
         <CustomButton
-          sx={{ borderRadius: 2, whiteSpace: "nowrap" }}
+          sx={{ borderRadius: 2, whiteSpace: "nowrap",mb:2 }}
           startIcon={<PersonAddAlt />}
           label={props.type ? addLabel[props.type] : "Add Users"}
           fullWidth
@@ -346,8 +355,9 @@ const MembersTable = (props) => {
         </Grid>
       )}
 
-      <ThemeProvider theme={tableTheme} sx={{ marginTop: "20px" }}>
+      <ThemeProvider theme={tableTheme} >
         <MUIDataTable
+        sx={{ marginTop: "20px" }}
           title={""}
           data={data}
           columns={columns}
