@@ -130,7 +130,7 @@ const ReportsTable = (props) => {
 
     const handleSubmit = async() => {
         let projectObj;
-        let reports_type = "review_reports"
+        let reports_type = radiobutton === "SuperCheckerReports" ? "superchecker_reports" : "review_reports"
         setReportRequested(true);
         setSubmitted(true);
 
@@ -141,7 +141,7 @@ const ReportsTable = (props) => {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
         }
         else if(radiobutton === "SuperCheckerReports") {
-            console.log(" this is SuperCheckerReports")
+            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
         }
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {

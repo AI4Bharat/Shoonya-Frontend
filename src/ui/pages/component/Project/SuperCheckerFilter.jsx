@@ -20,47 +20,22 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 const SuperCheckerFilter = (props) => {
   const classes = DatasetStyle();
   const { filterStatusData, currentFilters, updateFilters } = props;
-  const [selectedStatus, setSelectedStatus] = useState(currentFilters?.task_status);
+  const [selectedStatus, setSelectedStatus] = useState(currentFilters?.supercheck_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
 console.log(currentFilters,"currentFilters")
-  // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
-  // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
-  // const handleDatasetChange = (e) => {
-  //   if (e.target.checked) setSelectedType([...selectedType, e.target.name]);
-  //   else {
-  //     const selected = Object.assign([], selectedType);
-  //     const index = selected.indexOf(e.target.name);
 
-  //     if (index > -1) {
-  //       selected.splice(index, 1);
-  //       setSelectedType(selected);
-  //     }
-  //   }
-  // };
+  
 
 
   const handleStatusChange = (e) => {
-    let statusvalue = currentFilters?.task_status
+    let statusvalue =  !!currentFilters?.supercheck_status? "supercheck_status":""
     updateFilters({
       ...currentFilters,
       [statusvalue]:selectedStatus,
     })
     props.handleClose();
   };
-  // const handleClearAll = () => {
-  //   setSelectedStatus([]);
-  //   setSelectedType([]);
-  //   clearAll({ datasetType: [], status: [] });
-  // };
-  // const isChecked = (type, param) => {
-  //   const index =
-  //     param === "status"
-  //       ? selectedStatus.indexOf(type)
-  //       : selectedType.indexOf(type);
-  //   if (index > -1) return true;
-  //   return false;
-  // };
-
+  
   return (
     <div>
       <Popover

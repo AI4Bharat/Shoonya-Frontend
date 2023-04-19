@@ -14,6 +14,7 @@ export default class GetNextTaskAPI extends API {
     this.projectId = projectId;
     this.labellingMode = localStorage.getItem("labellingMode");
     this.searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
+    console.log(this.searchFilters = JSON.parse(localStorage.getItem("searchFilters")),"searchFilterssearchFilters")
     this.projectObj = projectObj;
     this.type = constants.GET_NEXT_TASK;
     if (localStorage.getItem("labelAll") ) {

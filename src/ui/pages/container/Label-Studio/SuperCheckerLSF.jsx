@@ -31,7 +31,7 @@ import {
   getNextProject,
   fetchAnnotation,
   postReview,
-  patchReview,
+  patchSuperChecker,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 import { useParams, useNavigate } from "react-router-dom";
@@ -182,7 +182,7 @@ const LabelStudioWrapper = ({
   const tasksComplete = (id) => {
     if (id) {
       resetNotes();
-      navigate(`/projects/${projectId}/review/${id}`);
+      navigate(`/projects/${projectId}/SuperChecker/${id}`);
     } else {
       // navigate(-1);
       resetNotes();
@@ -192,9 +192,9 @@ const LabelStudioWrapper = ({
         variant: "info",
       });
       setTimeout(() => {
-        localStorage.removeItem("labelAll");
-        window.location.replace(`/#/projects/${projectId}`);
-        window.location.reload();
+        // localStorage.removeItem("labelAll");
+        // window.location.replace(`/#/projects/${projectId}`);
+        // window.location.reload();
       }, 1000);
     }
   };
@@ -216,7 +216,7 @@ const LabelStudioWrapper = ({
     let interfaces = [];
     if (predictions == null) predictions = [];
 
-    console.log("taskData", taskData, annotations);
+   
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -328,14 +328,14 @@ const LabelStudioWrapper = ({
           );
           if (review) {
             showLoader();
-            patchReview(
+            patchSuperChecker(
               review.id,
               load_time,
               review.lead_time,
               "skipped",
               reviewNotesRef.current.value
             ).then(() => {
-              getNextProject(projectId, taskData.id, "review").then((res) => {
+              getNextProject(projectId, taskData.id, "supercheck").then((res) => {
                 hideLoader();
                 tasksComplete(res?.id || null);
               });
@@ -361,23 +361,24 @@ const LabelStudioWrapper = ({
                   }
                 }
 
-                let review = annotations.filter(
-                  (value) => value.parent_annotation != null
+                let superChecker = annotations.filter(
+                  (value) => value.annotation_type === 3
                 )[0];
+               
 
-                patchReview(
-                  review.id,
+                patchSuperChecker(
+                  superChecker.id,
                   load_time,
-                  review.lead_time,
+                  superChecker.lead_time,
                   review_status.current,
                   projectType === "SingleSpeakerAudioTranscriptionEditing"
                     ? annotation.serializeAnnotation()
                     : temp,
-                  review.parent_annotation,
-                  reviewNotesRef.current.value
+                    superChecker.parent_annotation,
+                 
                 ).then(() => {
                   if (localStorage.getItem("labelAll"))
-                    getNextProject(projectId, taskData.id, "review").then(
+                    getNextProject(projectId, taskData.id, "supercheck").then(
                       (res) => {
                         hideLoader();
                         tasksComplete(res?.id || null);
@@ -492,7 +493,7 @@ const LabelStudioWrapper = ({
 
   const onNextAnnotation = async () => {
     showLoader();
-    getNextProject(projectId, taskId, "review").then((res) => {
+    getNextProject(projectId, taskId, "supercheck").then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
       tasksComplete(res?.id || null);
@@ -509,7 +510,7 @@ const LabelStudioWrapper = ({
   };
 
   const handleRejectClick = async () => {
-    review_status.current = "Reject";
+    review_status.current = "rejected";
     lsfRef.current.store.submitAnnotation();
   };
 
@@ -560,7 +561,7 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            {taskData?.review_user === userData?.id && (
+            {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Save task for later">
                 <Button
                   type="default"
@@ -579,7 +580,7 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {taskData?.review_user === userData?.id && (
+            {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Reject">
                 <Button
                   value="Reject"
@@ -600,7 +601,7 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {taskData?.review_user === userData?.id && (
+            {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Validate">
                 <Button
                   id="accept-button"
@@ -636,16 +637,16 @@ const LabelStudioWrapper = ({
               onClose={handleClose}
             >
               <MenuItem
-                onClick={() => handleAcceptClick("Validate")}
+                onClick={() => handleAcceptClick("validated")}
                 disableRipple
               >
-                Validate No Changes
+                Validated No Changes
               </MenuItem>
               <MenuItem
-                onClick={() => handleAcceptClick("Validate with Changes")}
+                onClick={() => handleAcceptClick("validated_with_changes")}
                 disableRipple
               >
-                Validat with Changes
+                Validated with Changes
               </MenuItem>
             </StyledMenu>
           </div>

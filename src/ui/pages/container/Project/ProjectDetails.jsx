@@ -259,7 +259,7 @@ const Projects = () => {
 
                                 {isAnnotators && <Tab label={translate("label.annotationTasks")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                                 {isReviewer && <Tab label={translate("label.reviewTasks")} sx={{ fontSize: 16, fontWeight: '700', }} />}
-                               {isSuperChecker && <Tab label="Super Checker Tasks" sx={{ fontSize: 16, fontWeight: '700', }} />}
+                               {isSuperChecker && <Tab label="Super Check Tasks" sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isAnnotators && <Tab label={translate("label.annotators")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                 {isReviewer && <Tab label={translate("label.reviewers")} sx={{ fontSize: 16, fontWeight: '700', }} />}
                                {isSuperChecker && <Tab label="Super Checker" sx={{ fontSize: 16, fontWeight: '700', }} /> }
@@ -276,22 +276,22 @@ const Projects = () => {
                     {isReviewer && <TabPanel value={value} index={isAnnotators ? 1 : 0}>
                         <TaskTable type="review" />
                     </TabPanel>}
-                   {isSuperChecker && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1: 1 } >
+                   {isSuperChecker && <TabPanel value={value} index={isAnnotators ? isReviewer ? 2 : 1 :2} >
                         <SuperCheckerTasks  type="superChecker"/>   
                     </TabPanel>}
-                    {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer ? 3 : 2 : 2} >
+                    {isAnnotators && <TabPanel value={value} index={isAnnotators ? isReviewer  ? isSuperChecker ? 3 : 2 : 1 : 2} >
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotators} type={addUserTypes.PROJECT_ANNOTATORS} />
                     </TabPanel>}
-                    {isReviewer && <TabPanel value={value} index={isAnnotators ? 4 : 1}>
+                    {isReviewer && <TabPanel value={value} index={isAnnotators ? isReviewer ? isSuperChecker? 4 :3: 3 : 2}>
                         <MembersTable onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} dataSource={ProjectDetails.annotation_reviewers} type={addUserTypes.PROJECT_REVIEWER} />
                     </TabPanel>}
-                   {isSuperChecker &&<TabPanel value={value} index={isAnnotators ? isReviewer ? 5 : 3: 3 }>
+                   {isSuperChecker &&<TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker?  5 : 2 : 3: 3 }>
                         <MembersTable  dataSource={ProjectDetails.review_supercheckers} type={addUserTypes.PROJECT_SUPERCHECKER} onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} />
                     </TabPanel>}
-                    <TabPanel value={value} index={isAnnotators ? isReviewer ? 6 : 4 : 4}>
+                    <TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker?  6 :4: 2 : 2}>
                         <ReportsTable annotationreviewertype={annotationreviewertype}  userDetails={userDetails}/>
                     </TabPanel>
-               {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ? 7 : 5 : 5}>
+               {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker ? 7 :5: 5 : 2}>
                         <AllTaskTable  />
                     </TabPanel>)}
                     

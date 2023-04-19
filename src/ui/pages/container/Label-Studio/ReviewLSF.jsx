@@ -148,7 +148,7 @@ const LabelStudioWrapper = ({
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   let loaded = useRef();
-
+  console.log(taskData,"taskDatataskDatakData")
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();

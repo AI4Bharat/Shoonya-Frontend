@@ -8,6 +8,8 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DeallocateSuperCheckerTasksAPI from "../../../../redux/actions/api/Tasks/DeAllocateSuperCheckerTasks";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+
 import {
   ThemeProvider,
   Grid,
@@ -35,7 +37,10 @@ import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import AllTaskSearchPopup from './AllTaskSearchPopup';
-import SuperCheckerFilter from './SuperCheckerFilter'
+import SuperCheckerFilter from './SuperCheckerFilter';
+import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
+import SetTaskFilter from "../../../../redux/actions/Tasks/SetTaskFilter";
+
 
 const excludeCols = [
   "context",
@@ -51,6 +56,7 @@ const excludeSearch = ["status", "actions"];
 const SuperCheckerTasks = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const [snackbar, setSnackbarInfo] = useState({
@@ -70,12 +76,16 @@ const SuperCheckerTasks = (props) => {
   const [deallocateDialog, setDeallocateDialog] = useState(false);
   const [deallocateDisabled, setDeallocateDisabled] = useState("");
   const [pullDisabled, setPullDisabled] = useState("");
+  const [labellingStarted, setLabellingStarted] = useState(false);
 
 
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
+  const totalTaskCount = useSelector((state) => state.getTasksByProjectId.data.total_count);
+  const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+  const NextTask = useSelector((state) => state?.getNextTask?.data);
+  
   const filterData = {
     Status: ["unvalidated","validated","validated with Changes","skipped","draft","rejected"],
   };
@@ -90,7 +100,6 @@ const SuperCheckerTasks = (props) => {
     (state) => state.getTasksByProjectId.data.result
   );
 
-  console.log(taskList,"taskListtaskList")
 
   const getTaskListData = () => {
     const taskObj = new GetTasksByProjectIdAPI(
@@ -111,7 +120,7 @@ const SuperCheckerTasks = (props) => {
     if (
       (
         (props.type === "superChecker" &&
-          selectedFilters.task_status === "unvalidated")) &&
+          selectedFilters.supercheck_status === "unvalidated")) &&
       totalTaskCount === 0
     ) {
       setDeallocateDisabled("No more tasks to deallocate");
@@ -122,13 +131,61 @@ const SuperCheckerTasks = (props) => {
 
   useEffect(() => {
     if (ProjectDetails) {
-      if (props.type === "superChecker" && ProjectDetails.labeled_task_count === 0)
+      if (props.type === "superChecker" && ProjectDetails.reviewed_task_count === 0)
         setPullDisabled("No more unassigned tasks in this project");
       else if (pullDisabled === "No more unassigned tasks in this project")
         setPullDisabled("");
     }
-  }, [ProjectDetails.labeled_task_count]);
+  }, [ProjectDetails.reviewed_task_count]);
 
+
+  useEffect(() => {
+    if (ProjectDetails) {
+      if (
+        props.type === "superChecker" &&
+        ProjectDetails.unassigned_task_count === 0
+      )
+        setPullDisabled("No more unassigned tasks in this project");
+      else if (pullDisabled === "No more unassigned tasks in this project")
+        setPullDisabled("");
+
+      ProjectDetails.frozen_users?.forEach((user) => {
+        if (user.id === userDetails?.id)
+          setPullDisabled("You're no more a part of this project");
+        else if (pullDisabled === "You're no more a part of this project")
+          setPullDisabled("");
+      });
+      setPullSize(ProjectDetails.tasks_pull_count_per_batch * 0.5);
+    }
+  }, [
+    ProjectDetails.unassigned_task_count,
+    ProjectDetails.frozen_users,
+    ProjectDetails.tasks_pull_count_per_batch,
+    userDetails,
+  ]);
+
+  useEffect(() => {
+    if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
+      navigate(
+        `/projects/${id}/SuperChecker/${
+          NextTask?.id
+        }`
+      );
+    }
+   
+  }, [NextTask]);
+
+  useEffect(() => {
+    dispatch(SetTaskFilter(id, selectedFilters, props.type));
+    if (currentPageNumber !== 1) {
+      setCurrentPageNumber(1);
+    } else {
+      getTaskListData();
+    }
+    localStorage.setItem(
+      "labellingMode", selectedFilters.supercheck_status
+    );
+  }, [selectedFilters]);
 
   useEffect(() => {
     if (taskList?.length > 0 && taskList[0]?.data) {
@@ -139,14 +196,14 @@ const SuperCheckerTasks = (props) => {
             .filter((key) => !excludeCols.includes(key))
             .map((key) => el.data[key])
         );
-        taskList[0].task_status && row.push(el.task_status);
+        taskList[0].supercheck_status && row.push(el.supercheck_status);
         row.push( <>
           <Link to={`SuperChecker/${el.id}`} className={classes.link}>
           <CustomButton
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                  review
+                Validate
               </Typography>} />
       </Link>
 
@@ -213,7 +270,7 @@ const handleSearchClose = () => {
 
 const unassignTasks = async () => {
   setDeallocateDialog(false);
-  const deallocateObj = new DeallocateSuperCheckerTasksAPI(id, selectedFilters.task_status);
+  const deallocateObj = new DeallocateSuperCheckerTasksAPI(id, selectedFilters.supercheck_status);
   const res = await fetch(deallocateObj.apiEndPoint(), {
     method: "GET",
     body: JSON.stringify(deallocateObj.getBody()),
@@ -238,14 +295,65 @@ const unassignTasks = async () => {
 
 
 const fetchNewTasks = async () => {
-  const taskObj = new PullNewSuperCheckerBatchAPI(
-    id,Math.round(pullSize)
-  );
-  dispatch(APITransport(taskObj));
+  const batchObj = new PullNewSuperCheckerBatchAPI(id, Math.round(pullSize))
+const res = await fetch(batchObj.apiEndPoint(), {
+  method: "POST",
+  body: JSON.stringify(batchObj.getBody()),
+  headers: batchObj.getHeaders().headers,
+});
+const resp = await res.json();
+if (res.ok) {
+  setSnackbarInfo({
+    open: true,
+    message: resp?.message,
+    variant: "success",
+  });
+  if (
+    ((props.type === "superChecker" &&
+      selectedFilters.supercheck_status === "unvalidated") 
+    ) &&
+    currentPageNumber === 1
+  ) {
+    getTaskListData();
+  } else {
+    setsSelectedFilters({
+      ...selectedFilters,
+      task_status: props.type === "superChecker" ? "unvalidated" : "",
+    });
+    setCurrentPageNumber(1);
+  }
+  const projectObj = new GetProjectDetailsAPI(id);
+  dispatch(APITransport(projectObj));
+} else {
+  setSnackbarInfo({
+    open: true,
+    message: resp?.message,
+    variant: "error",
+  });
+}
  
 };
 
 const labelAllTasks = () =>{
+
+  let search_filters = Object?.keys(selectedFilters)
+  .filter((key) => key?.startsWith("search_"))
+  .reduce((acc, curr) => {
+    acc[curr] = selectedFilters[curr];
+    return acc;
+  }, {});
+
+localStorage.setItem("searchFilters", JSON.stringify(search_filters));
+localStorage.setItem("labelAll", true);
+const datavalue = {
+  supercheck_status: selectedFilters?.supercheck_status,
+    mode: "supercheck",
+  
+};
+const getNextTaskObj = new GetNextTaskAPI(id, datavalue, null, props.type);
+dispatch(APITransport(getNextTaskObj));
+setLabellingStarted(true);
+
 
 }
 
@@ -348,8 +456,21 @@ const renderSnackBar = () => {
 
   return (
     <div>
-         <Grid container direction="row" spacing={2} sx={{ mb: 2 }}>
-         <Grid item xs={12} sm={12} md={3}>
+        {(props.type === "superChecker"  &&
+        ProjectDetails?.review_supercheckers?.some(
+          (supercheckers) => supercheckers.id === userDetails?.id
+        )
+        ) 
+        &&
+        (ProjectDetails.project_mode === "Annotation" ? (
+          ProjectDetails.is_published ? (
+            <Grid container direction="row" spacing={2} sx={{ mb: 2 }}>
+              {((props.type === "superChecker" &&
+                selectedFilters.supercheck_status === "unvalidated") ||
+                selectedFilters.supercheck_status === "draft" ||
+                selectedFilters.supercheck_status === "skipped" 
+              ) && (
+                <Grid item xs={12} sm={12} md={3}>
                   <Tooltip title={deallocateDisabled }>
                     <Box>
                       <CustomButton
@@ -367,8 +488,8 @@ const renderSnackBar = () => {
                     </Box>
                   </Tooltip>
                 </Grid>
-
-                <Dialog
+              )}
+              <Dialog
                 open={deallocateDialog}
                 onClose={() => setDeallocateDialog(false)}
                 aria-labelledby="deallocate-dialog-title"
@@ -381,7 +502,7 @@ const renderSnackBar = () => {
                   <DialogContentText id="alert-dialog-description">
                     All{" "}
                     <snap style={{ color: "#1DA3CE" }}>
-                      {selectedFilters.task_status}{" "}
+                      {selectedFilters.supercheck_status}
                       tasks
                     </snap>{" "}
                     will be de-allocated from this project. Please be careful as
@@ -406,14 +527,20 @@ const renderSnackBar = () => {
                   </Button>
                 </DialogActions>
               </Dialog>
-
               <Grid
                 item
                 xs={4}
                 sm={4}
-                md={2}
+                md={
+                  (props.type === "superChecker" &&
+                    selectedFilters.supercheck_status === "unvalidated") ||
+                  selectedFilters.supercheck_status === "draft" ||
+                  selectedFilters.supercheck_status === "skipped" 
+                    ? 2
+                    : 3
+                }
               >
-                 <FormControl size="small" sx={{ width: "100%" }}>
+                <FormControl size="small" sx={{ width: "100%" }}>
                   <InputLabel id="pull-select-label" sx={{ fontSize: "16px" }}>
                     Pull Size
                   </InputLabel>
@@ -447,16 +574,22 @@ const renderSnackBar = () => {
                       )}
                     </MenuItem>
                   </Select>
-                </FormControl> 
+                </FormControl>
               </Grid>
-
               <Grid
                 item
                 xs={8}
                 sm={8}
-                md={3}
+                md={
+                  (props.type === "superChecker" &&
+                    selectedFilters.supercheck_status === "unvalidated") ||
+                  selectedFilters.supercheck_status === "draft" ||
+                  selectedFilters.supercheck_status === "skipped" 
+                    ? 3
+                    : 4
+                }
               >
-                 <Tooltip title={pullDisabled}>
+                <Tooltip title={pullDisabled}>
                   <Box>
                     <CustomButton
                       sx={{
@@ -471,16 +604,25 @@ const renderSnackBar = () => {
                     />
                   </Box>
                 </Tooltip>
-                 </Grid>
-                 <Grid
+              </Grid>
+              <Grid
                 item
                 xs={12}
                 sm={12}
-                md={4}
+                md={
+                  (props.type === "superChecker" &&
+                    selectedFilters.supercheck_status === "unvalidated") ||
+                  selectedFilters.supercheck_status === "draft" ||
+                  selectedFilters.supercheck_status === "skipped" 
+                    ? 4
+                    : 5
+                }
               >
-                 <Tooltip
+                <Tooltip
                   title={
-                    totalTaskCount === 0 ? "No more tasks to review": ""
+                    totalTaskCount === 0
+                        ? "No more tasks to review"
+                      : ""
                   }
                 >
                   <Box>
@@ -491,14 +633,42 @@ const renderSnackBar = () => {
                         margin: "auto",
                         width: "100%",
                       }}
-                      label={"Start reviewing now"}
+                      label={ "Start validating now"}
                       onClick={labelAllTasks}
                       disabled={totalTaskCount === 0 }
                     />
                   </Box>
                 </Tooltip>
-                </Grid>
-         </Grid>
+              </Grid>
+            </Grid>
+          ) : (
+            <Button
+              type="primary"
+              style={{
+                width: "100%",
+                marginBottom: "1%",
+                marginRight: "1%",
+                marginTop: "1%",
+              }}
+            >
+              Disabled
+            </Button>
+          )
+        ) : (
+          <></>
+          // <CustomButton
+          //   sx={{
+          //     p: 1,
+          //     width: "98%",
+          //     borderRadius: 2,
+          //     mb: 3,
+          //     ml: "1%",
+          //     mr: "1%",
+          //     mt: "1%",
+          //   }}
+          //   label={"Add New Item"}
+          // />
+        ))}
       
       <ThemeProvider theme={tableTheme}>
         <MUIDataTable
