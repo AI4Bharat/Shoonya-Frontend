@@ -91,7 +91,7 @@ const filterAnnotations = (annotations, user_id) => {
     return annotation.completed_by === user_id && annotation.parent_annotation;
   });
   if (userAnnotation) {
-    if (userAnnotation.annotation_status === "unreviewed") {
+    if (userAnnotation.annotation_status === "unvalidated") {
       filteredAnnotations =
         userAnnotation.result.length > 0
           ? annotations.filter(
@@ -100,9 +100,8 @@ const filterAnnotations = (annotations, user_id) => {
           : annotations.filter((annotation) => !annotation.parent_annotation);
     } else if (
       [
-        "accepted",
-        "accepted_with_minor_changes",
-        "accepted_with_major_changes",
+        "validated",
+        "validated_with_changes",
         "draft"
       ].includes(userAnnotation.annotation_status)
     ) {
@@ -111,11 +110,7 @@ const filterAnnotations = (annotations, user_id) => {
       filteredAnnotations = annotations.filter(
         (annotation) => !annotation.parent_annotation
       );
-    } else if (userAnnotation.annotation_status === "to_be_revised") {
-      filteredAnnotations = annotations.filter(
-        (annotation) => annotation.id === userAnnotation.parent_annotation
-      );
-    }
+    } 
   }
   return filteredAnnotations;
 };
@@ -192,9 +187,9 @@ const LabelStudioWrapper = ({
         variant: "info",
       });
       setTimeout(() => {
-        // localStorage.removeItem("labelAll");
-        // window.location.replace(`/#/projects/${projectId}`);
-        // window.location.reload();
+        localStorage.removeItem("labelAll");
+        window.location.replace(`/#/projects/${projectId}`);
+        window.location.reload();
       }, 1000);
     }
   };
