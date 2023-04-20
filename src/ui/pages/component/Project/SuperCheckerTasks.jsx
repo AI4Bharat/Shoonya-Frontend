@@ -346,7 +346,7 @@ const labelAllTasks = () =>{
 localStorage.setItem("searchFilters", JSON.stringify(search_filters));
 localStorage.setItem("labelAll", true);
 const datavalue = {
-  supercheck_status: selectedFilters?.supercheck_status,
+  annotation_status: selectedFilters?.supercheck_status,
     mode: "supercheck",
   
 };

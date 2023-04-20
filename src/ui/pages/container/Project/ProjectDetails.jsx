@@ -166,8 +166,8 @@ const Projects = () => {
     const apiLoading = useSelector(state => state.apiStatus.loading);
     
     const isAnnotators =((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role)  || (ProjectDetails?.annotators?.some((user) => user.id === userDetails.id )));
-    const isReviewer = ((ProjectDetails?.project_stage == 2) || ((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role)) || (ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id)));
-    const isSuperChecker = ((ProjectDetails?.project_stage == 3 ) || ((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role)) || (ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === userDetails?.id)))
+    const isReviewer = ((ProjectDetails?.project_stage == 2 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id)));
+    const isSuperChecker = (( ProjectDetails?.project_stage == 3  || ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === userDetails?.id)))
 
     useEffect(() => {
         setLoading(apiLoading);
