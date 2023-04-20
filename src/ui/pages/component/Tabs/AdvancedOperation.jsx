@@ -98,7 +98,7 @@ const AdvancedOperation = (props) => {
   "reviewed",
   "exported",
   ]);
-  const [taskReviews,setTaskReviews] = useState("")
+  const [taskReviews,setTaskReviews] = useState( "")
   const { id } = useParams();
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -213,7 +213,7 @@ const AdvancedOperation = (props) => {
         else opt.disabled = false;
         return opt;
       })
-      console.log(disableSuperchecker,"disableSuperchecker")
+     
       setTaskReviews(disableSuperchecker);
     }
     else if (ProjectStageValue === 2) {
@@ -223,7 +223,7 @@ const AdvancedOperation = (props) => {
         return opt;
 
       });
-      console.log(disableSuperchecker,"disableSuperchecker")
+      
       setTaskReviews(disableSuperchecker);
     }
     else if (ProjectStageValue === 3) {
@@ -233,7 +233,7 @@ const AdvancedOperation = (props) => {
         return opt;
 
       });
-      console.log(disableSuperchecker,"disableSuperchecker")
+    
       setTaskReviews(disableSuperchecker);
     }
 
@@ -263,7 +263,6 @@ const AdvancedOperation = (props) => {
     }
   };
 
-  console.log(taskReviews,"taskReviewstaskReviews")
   const handleDownoadMetadataToggle = async () => {
     // setLoading(true);
     setDownloadMetadataToggle((downloadMetadataToggle)=>!downloadMetadataToggle)
@@ -331,7 +330,6 @@ const AdvancedOperation = (props) => {
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
   const [isArchived, setIsArchived] = useState(false);
   const [downloadMetadataToggle,setDownloadMetadataToggle]=useState(true)
-  console.log(ProjectDetails.is_archived, "is_archived", isArchived);
   const getArchiveProjectAPI = () => {
     const projectObj = new GetArchiveProjectAPI(id);
     dispatch(APITransport(projectObj));

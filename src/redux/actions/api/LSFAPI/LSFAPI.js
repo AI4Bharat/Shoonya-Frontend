@@ -209,6 +209,7 @@ const getNextProject = async (projectID, taskID, mode = "annotation") => {
       id: projectID,
       current_task_id: taskID,
       ...(mode === "annotation" && {
+        mode: "annotation",
         annotation_status: labellingMode,
       }),
       ...(mode === "review" && {

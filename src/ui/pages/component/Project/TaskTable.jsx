@@ -96,9 +96,7 @@ const TaskTable = (props) => {
 
 
   const filterData = {
-    Status: ProjectDetails.project_stage == 2
-
-      ? props.type === "annotation"
+    Status: ProjectDetails.project_stage == 2 && props.type === "annotation"
         ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"]
         : [
             "unreviewed",
@@ -108,8 +106,9 @@ const TaskTable = (props) => {
             "to_be_revised",
             "draft",
             "skipped",
-          ]
-      : ["unlabeled", "skipped", "labeled", "draft"],
+           "rejected"
+          ],
+      // : ["unlabeled", "skipped", "labeled", "draft"],
     Annotators:
       ProjectDetails?.annotators?.length > 0
         ? ProjectDetails?.annotators?.map((el, i) => {
@@ -255,8 +254,8 @@ const TaskTable = (props) => {
     localStorage.setItem("searchFilters", JSON.stringify(search_filters));
     localStorage.setItem("labelAll", true);
     const datavalue = {
-      annotation_status: selectedFilters?.annotation_status,
-      mode: "annotation",
+       annotation_status: selectedFilters?.annotation_status,
+       mode: "annotation",
       ...(props.type === "review" && {
         mode: "review",
         annotation_status: selectedFilters?.review_status,
