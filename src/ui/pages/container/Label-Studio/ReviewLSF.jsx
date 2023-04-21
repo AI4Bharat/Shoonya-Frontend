@@ -116,6 +116,11 @@ const filterAnnotations = (annotations, user_id) => {
         (annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 1
       );
     }
+    else if (userAnnotation.annotation_status === "rejected") {
+      filteredAnnotations = annotations.filter(
+        (annotation) =>  annotation.annotation_type === 2
+      );
+    }
   }
   return filteredAnnotations;
 };
