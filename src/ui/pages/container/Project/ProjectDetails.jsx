@@ -141,8 +141,8 @@ const Projects = () => {
     const projectStatus = ProjectDetails.is_published
       ? "Published"
       : ProjectDetails.is_archived
-      ? "Archived"
-      : "Draft";
+        ? "Archived"
+        : "Draft";
     setProjectData([
       {
         name: "Project ID",
@@ -347,7 +347,7 @@ const Projects = () => {
         {TabPanData.map((el, i) => {
           return (
             <TabPanel
-              value={i}
+              value={value}
               index={i}
             >
               
@@ -384,8 +384,8 @@ const Projects = () => {
                     : 2
                   : 1
                 : !isSuperChecker && isReviewer
-                ? 1
-                : 1
+                  ? 1
+                  : 1
             }
           >
             <MembersTable
@@ -406,8 +406,8 @@ const Projects = () => {
                     : 3
                   : 3
                 : !isSuperChecker && isAnnotators
-                ? 2
-                : 1
+                  ? 2
+                  : 1
             }
           >
             <MembersTable
@@ -441,8 +441,8 @@ const Projects = () => {
                   : 4
                 : 4
               : !isSuperChecker && isAnnotators
-              ? 4
-              : 2
+                ? 4
+                : 2
           }
         >
           <ReportsTable
@@ -453,15 +453,15 @@ const Projects = () => {
         {(userRole.WorkspaceManager === loggedInUserData?.role ||
           userRole.OrganizationOwner === loggedInUserData?.role ||
           userRole.Admin === loggedInUserData?.role) && (
-          <TabPanel
-            value={value}
-            index={
-              isAnnotators ? (isReviewer ? (isSuperChecker ? 7 : 5) : 5) : 2
-            }
-          >
-            <AllTaskTable />
-          </TabPanel>
-        )}
+            <TabPanel
+              value={value}
+              index={
+                isAnnotators ? (isReviewer ? (isSuperChecker ? 7 : 5) : 5) : 2
+              }
+            >
+              <AllTaskTable />
+            </TabPanel>
+          )}
       </>
     );
   };
@@ -498,20 +498,20 @@ const Projects = () => {
             {(userRole.WorkspaceManager === loggedInUserData?.role ||
               userRole.OrganizationOwner === loggedInUserData?.role ||
               userRole.Admin === loggedInUserData?.role) && (
-              <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                <Tooltip title={translate("label.showProjectSettings")}>
-                  <IconButton
-                    onClick={handleOpenSettings}
-                    sx={{ marginLeft: "140px" }}
-                  >
-                    <SettingsOutlinedIcon
-                      color="primary.dark"
-                      fontSize="large"
-                    />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            )}
+                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+                  <Tooltip title={translate("label.showProjectSettings")}>
+                    <IconButton
+                      onClick={handleOpenSettings}
+                      sx={{ marginLeft: "140px" }}
+                    >
+                      <SettingsOutlinedIcon
+                        color="primary.dark"
+                        fontSize="large"
+                      />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              )}
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mb: 2 }}>
             <Grid container spacing={2}>
