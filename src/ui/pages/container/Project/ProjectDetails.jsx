@@ -227,18 +227,53 @@ const Projects = () => {
     navigate(`/projects/${id}/projectsetting`);
   };
 
-//   const tabIndex = () =>{
-//       switch(isAnnotators) {
-//           case "annotation":
-//               console.log("annotationannotation")
-//             break;
-//           case 1:
+  //   const tabIndex = () =>{
+  //       switch(isAnnotators) {
+  //           case "annotation":
+  //               console.log("annotationannotation")
+  //             break;
+  //           case 1:
 
-//             break;
-//           default:
+  //             break;
+  //           default:
 
-//         }
-//   }
+  //         }
+  //   }
+
+  const TabPanData = [
+    {
+      tabEle: (
+        <Tab
+          label={translate("label.annotationTasks")}
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: (
+        <TaskTable type="annotation" ProjectDetails={ProjectDetails} />
+      ),
+      showTab: isAnnotators,
+    },
+    {
+      tabEle: (
+        <Tab
+          label={translate("label.reviewTasks")}
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: <TaskTable type="review" />,
+      showTab: isReviewer,
+    },
+    {
+      tabEle: (
+        <Tab
+          label="Super Check Tasks"
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: <SuperCheckerTasks type="superChecker" />,
+      showTab: isReviewer,
+    },
+  ];
 
   const renderTabs = () => {
     return (
@@ -250,25 +285,28 @@ const Projects = () => {
               onChange={handleChange}
               aria-label="basic tabs example"
             >
-              {isAnnotators && (
+              {TabPanData.map((el, i) => {
+                return el.showTab && el.tabEle;
+              })}
+              {/* {isAnnotators && (
                 <Tab
                   label={translate("label.annotationTasks")}
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )}
-              {isReviewer && (
+              )} */}
+              {/* {isReviewer && (
                 <Tab
                   label={translate("label.reviewTasks")}
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )}
-              {isSuperChecker && (
+              )} */}
+              {/* {isSuperChecker && (
                 <Tab
                   label="Super Check Tasks"
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )}
-              {isAnnotators && (
+              )} */}
+              {/* {isAnnotators && (
                 <Tab
                   label={translate("label.annotators")}
                   sx={{ fontSize: 16, fontWeight: "700" }}
@@ -302,33 +340,52 @@ const Projects = () => {
                   label="All Tasks"
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )}
+              )} */}
             </Tabs>
           </Box>
         </Grid>
-        {isAnnotators && (
+        {TabPanData.map((el, i) => {
+          return (
+            <TabPanel
+              value={i}
+              index={i}
+            >
+              
+              {el.tabPanelEle}
+            </TabPanel>
+          );
+        })}
+        {/* {isAnnotators && (
           <TabPanel value={value} index={0}>
             <TaskTable type="annotation" ProjectDetails={ProjectDetails} />
           </TabPanel>
-        )}
-        {isReviewer && (
+        )} */}
+        {/* {isReviewer && (
           <TabPanel value={value} index={isAnnotators ? 1 : 0}>
             <TaskTable type="review" />
           </TabPanel>
-        )}
-        {isSuperChecker && (
+        )} */}
+        {/* {isSuperChecker && (
           <TabPanel
             value={value}
-            index={isAnnotators ? (isReviewer ? 2 : 1) : 2}
+            index={isAnnotators ? (isReviewer ? 2 : 1) : 1}
           >
             <SuperCheckerTasks type="superChecker" />
           </TabPanel>
-        )}
+        )} */}
         {isAnnotators && (
           <TabPanel
             value={value}
             index={
-              isAnnotators ? (isReviewer ? (isSuperChecker ? 3 : 2) : 1) : 2
+              isAnnotators
+                ? isReviewer
+                  ? isSuperChecker
+                    ? 3
+                    : 2
+                  : 1
+                : !isSuperChecker && isReviewer
+                ? 1
+                : 1
             }
           >
             <MembersTable
@@ -342,7 +399,15 @@ const Projects = () => {
           <TabPanel
             value={value}
             index={
-              isAnnotators ? (isReviewer ? (isSuperChecker ? 4 : 3) : 3) : 2
+              isAnnotators
+                ? isReviewer
+                  ? isSuperChecker
+                    ? 4
+                    : 3
+                  : 3
+                : !isSuperChecker && isAnnotators
+                ? 2
+                : 1
             }
           >
             <MembersTable
@@ -368,7 +433,17 @@ const Projects = () => {
         )}
         <TabPanel
           value={value}
-          index={isAnnotators ? (isReviewer ? (isSuperChecker ? 6 : 4) : 4) : 2}
+          index={
+            isAnnotators
+              ? isReviewer
+                ? isSuperChecker
+                  ? 6
+                  : 4
+                : 4
+              : !isSuperChecker && isAnnotators
+              ? 4
+              : 2
+          }
         >
           <ReportsTable
             annotationreviewertype={annotationreviewertype}
