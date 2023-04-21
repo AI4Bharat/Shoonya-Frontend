@@ -106,11 +106,11 @@ const filterAnnotations = (annotations, user_id) => {
       ].includes(userAnnotation.annotation_status)
     ) {
       filteredAnnotations = [userAnnotation];
-    } else if (userAnnotation.annotation_status === "skipped") {
+    } else if (userAnnotation.annotation_status === "skipped" || userAnnotation.annotation_status === "rejected") {
       filteredAnnotations = annotations.filter(
         (value) => value.annotation_type === 2
       );
-    } 
+    }   
   }
   return filteredAnnotations;
 };
