@@ -15,6 +15,7 @@ import {
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
+import { useDispatch, useSelector } from "react-redux";
 // import { translate } from "../../../../assets/localisation";
 
 const FilterList = (props) => {
@@ -22,7 +23,9 @@ const FilterList = (props) => {
   const { filterStatusData, currentFilters, updateFilters } = props;
   const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status? currentFilters?.annotation_status:currentFilters.review_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
-console.log(currentFilters,"currentFilters")
+
+const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
   // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
   // const handleDatasetChange = (e) => {
@@ -98,6 +101,7 @@ console.log(currentFilters,"currentFilters")
                     sx={{
                       fontSize: "1rem",
                     }} 
+                    disabled={(ProjectDetails.project_stage === 2 || ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === userDetails?.id)) && type === "rejected"}
                   />
                 );
               })}

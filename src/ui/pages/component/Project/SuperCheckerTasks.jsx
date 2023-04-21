@@ -87,7 +87,7 @@ const SuperCheckerTasks = (props) => {
   const NextTask = useSelector((state) => state?.getNextTask?.data);
   
   const filterData = {
-    Status: ["unvalidated","validated","validated with Changes","skipped","draft","rejected"],
+    Status: ["unvalidated","validated","validated_with_changes","skipped","draft","rejected"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
     supercheck_status: filterData.Status[0]

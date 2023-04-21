@@ -108,6 +108,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
           "to_be_revised",
           "draft",
           "skipped",
+          "rejected",
         ]
     : ["unlabeled", "skipped", "labeled", "draft"],
     Annotators:

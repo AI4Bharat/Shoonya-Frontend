@@ -153,6 +153,7 @@ const LabelStudioWrapper = ({
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
 
+
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
 
@@ -324,8 +325,8 @@ const LabelStudioWrapper = ({
         onSkipTask: function (annotation) {
           // message.warning('Notes will not be saved for skipped tasks!');
           let review = annotations.find(
-            (annotation) => !annotation.parentAnnotation
-          );
+            (value) => value.annotation_type === 2
+          ); 
           if (review) {
             showLoader();
             patchReview(
