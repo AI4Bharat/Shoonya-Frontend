@@ -97,7 +97,7 @@ const filterAnnotations = (annotations, user_id) => {
           ? annotations.filter(
               (annotation) => annotation.id === userAnnotation.parent_annotation
             )
-          : annotations.filter((annotation) => !annotation.parent_annotation);
+          : annotations.filter((value) => value.annotation_type === 1);
     } else if (
       [
         "accepted",
@@ -109,11 +109,11 @@ const filterAnnotations = (annotations, user_id) => {
       filteredAnnotations = [userAnnotation];
     } else if (userAnnotation.annotation_status === "skipped") {
       filteredAnnotations = annotations.filter(
-        (annotation) => !annotation.parent_annotation
+        (value) => value.annotation_type === 1
       );
     } else if (userAnnotation.annotation_status === "to_be_revised") {
       filteredAnnotations = annotations.filter(
-        (annotation) => annotation.id === userAnnotation.parent_annotation
+        (annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 1
       );
     }
   }

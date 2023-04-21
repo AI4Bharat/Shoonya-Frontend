@@ -97,7 +97,7 @@ const filterAnnotations = (annotations, user_id) => {
           ? annotations.filter(
               (annotation) => annotation.id === userAnnotation.parent_annotation
             )
-          : annotations.filter((value) => value.annotation_type === 3 );
+          : annotations.filter((value) => value.annotation_type === 2 );
     } else if (
       [
         "validated",
@@ -108,7 +108,7 @@ const filterAnnotations = (annotations, user_id) => {
       filteredAnnotations = [userAnnotation];
     } else if (userAnnotation.annotation_status === "skipped") {
       filteredAnnotations = annotations.filter(
-        (value) => value.annotation_type === 3
+        (value) => value.annotation_type === 2
       );
     } 
   }
