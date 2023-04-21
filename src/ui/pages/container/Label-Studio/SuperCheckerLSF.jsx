@@ -319,7 +319,7 @@ const LabelStudioWrapper = ({
         onSkipTask: function (annotation) {
           // message.warning('Notes will not be saved for skipped tasks!');
           let review = annotations.find(
-            (annotation) => !annotation.parentAnnotation
+            (value) => value.annotation_type === 3
           );
           if (review) {
             showLoader();

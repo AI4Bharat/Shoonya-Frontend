@@ -143,7 +143,7 @@ const SuperCheckerTasks = (props) => {
     if (ProjectDetails) {
       if (
         props.type === "superChecker" &&
-        ProjectDetails.unassigned_task_count === 0
+        ProjectDetails.labeled_task_count === 0
       )
         setPullDisabled("No more unassigned tasks in this project");
       else if (pullDisabled === "No more unassigned tasks in this project")
@@ -158,7 +158,7 @@ const SuperCheckerTasks = (props) => {
       setPullSize(ProjectDetails.tasks_pull_count_per_batch * 0.5);
     }
   }, [
-    ProjectDetails.unassigned_task_count,
+    ProjectDetails.labeled_task_count,
     ProjectDetails.frozen_users,
     ProjectDetails.tasks_pull_count_per_batch,
     userDetails,

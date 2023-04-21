@@ -94,21 +94,22 @@ const TaskTable = (props) => {
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
 
-
+console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id),"hhhhhhhhh")
   const filterData = {
-    Status: ProjectDetails.project_stage == 2 && props.type === "annotation"
-        ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"]
-        : [
-            "unreviewed",
-            "accepted",
-            "accepted_with_minor_changes",
-            "accepted_with_major_changes",
-            "to_be_revised",
-            "draft",
-            "skipped",
-           "rejected"
-          ],
-      // : ["unlabeled", "skipped", "labeled", "draft"],
+    Status: ((ProjectDetails.project_stage == 2||ProjectDetails.project_stage == 3) || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id))
+
+    ? props.type === "annotation"
+      ? ["unlabeled", "skipped", "draft", "labeled", "to_be_revised"]
+      : [
+          "unreviewed",
+          "accepted",
+          "accepted_with_minor_changes",
+          "accepted_with_major_changes",
+          "to_be_revised",
+          "draft",
+          "skipped",
+        ]
+    : ["unlabeled", "skipped", "labeled", "draft"],
     Annotators:
       ProjectDetails?.annotators?.length > 0
         ? ProjectDetails?.annotators?.map((el, i) => {

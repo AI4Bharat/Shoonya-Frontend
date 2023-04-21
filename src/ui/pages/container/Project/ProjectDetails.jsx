@@ -120,7 +120,7 @@ const Projects = () => {
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
       );
-      console.log(ProjectDetails.review_supercheckers,"ProjectDetailsProjectDetails")
+    
  
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
@@ -166,8 +166,8 @@ const Projects = () => {
     const apiLoading = useSelector(state => state.apiStatus.loading);
     
     const isAnnotators =((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role)  || (ProjectDetails?.annotators?.some((user) => user.id === userDetails.id )));
-    const isReviewer = ((ProjectDetails?.project_stage == 2 || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id)));
-    const isSuperChecker = (( ProjectDetails?.project_stage == 3  || ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === userDetails?.id)))
+    const isReviewer = (((ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) || ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === userDetails?.id)));
+    const isSuperChecker = (( ProjectDetails?.project_stage == 3 || ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === userDetails?.id)))
 
     useEffect(() => {
         setLoading(apiLoading);
@@ -288,7 +288,7 @@ const Projects = () => {
                    {isSuperChecker &&<TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker?  5 : 2 : 3: 3 }>
                         <MembersTable  dataSource={ProjectDetails.review_supercheckers} type={addUserTypes.PROJECT_SUPERCHECKER} onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()} />
                     </TabPanel>}
-                    <TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker?  6 :4: 2 : 2}>
+                    <TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker?  6 :4: 4 : 2}>
                         <ReportsTable annotationreviewertype={annotationreviewertype}  userDetails={userDetails}/>
                     </TabPanel>
                {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role ) && ( <TabPanel value={value} index={isAnnotators ? isReviewer ?isSuperChecker ? 7 :5: 5 : 2}>
