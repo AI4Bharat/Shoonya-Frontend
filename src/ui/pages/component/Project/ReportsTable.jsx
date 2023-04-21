@@ -54,7 +54,6 @@ const ReportsTable = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -209,9 +208,9 @@ const ReportsTable = (props) => {
                         onChange={handleChangeReports}
 
                     >
-                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />
-                    {(ProjectDetails.project_stage === 2 && userRole.Annotator !== props.userDetails?.role ) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
-                     <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker"  />
+                       {((ProjectDetails.project_stage == 1 || ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) || (ProjectDetails?.annotators?.some((user) => user.id === loggedInUserData.id ))) && <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />}
+                    {((ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) || (ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === loggedInUserData?.id))) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
+                    {((ProjectDetails.project_stage == 3) || (ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === loggedInUserData?.id))) && <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker"  />}
                     </RadioGroup>
                 </FormControl>
                 </Grid >
