@@ -97,7 +97,7 @@ const filterAnnotations = (annotations, user_id) => {
           ? annotations.filter(
               (annotation) => annotation.id === userAnnotation.parent_annotation
             )
-          : annotations.filter((annotation) => !annotation.parent_annotation);
+          : annotations.filter((value) => value.annotation_type === 3 );
     } else if (
       [
         "validated",
@@ -108,7 +108,7 @@ const filterAnnotations = (annotations, user_id) => {
       filteredAnnotations = [userAnnotation];
     } else if (userAnnotation.annotation_status === "skipped") {
       filteredAnnotations = annotations.filter(
-        (annotation) => !annotation.parent_annotation
+        (value) => value.annotation_type === 3
       );
     } 
   }
@@ -120,6 +120,7 @@ const filterAnnotations = (annotations, user_id) => {
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
+  superCheckerNotesRef,
   loader,
   showLoader,
   hideLoader,
@@ -147,6 +148,7 @@ const LabelStudioWrapper = ({
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
+
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -205,6 +207,7 @@ const LabelStudioWrapper = ({
     predictions,
     annotationNotesRef,
     reviewNotesRef,
+    superCheckerNotesRef,
     projectType
   ) {
     let load_time;
@@ -400,12 +403,13 @@ const LabelStudioWrapper = ({
   const setNotes = (taskData, annotations) => {
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
       let reviewerAnnotations = annotations.filter(
-        (annotation) => !!annotation.parent_annotation
+        (value) => value.annotation_type === 3
       );
       if (reviewerAnnotations.length > 0) {
         let correctAnnotation = reviewerAnnotations.find(
           (annotation) => annotation.id === taskData.correct_annotation
         );
+     
         if (correctAnnotation) {
           reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
           annotationNotesRef.current.value =
@@ -424,7 +428,7 @@ const LabelStudioWrapper = ({
         }
       } else {
         let normalAnnotation = annotations.find(
-          (annotation) => !annotation.parent_annotation
+          (value) => value.annotation_type === 3
         );
         annotationNotesRef.current.value =
           normalAnnotation.annotation_notes ?? "";
@@ -470,6 +474,7 @@ const LabelStudioWrapper = ({
             annotations,
             predictions,
             annotationNotesRef,
+            superCheckerNotesRef,
             reviewNotesRef,
             labelConfig.project_type
           );
@@ -480,7 +485,7 @@ const LabelStudioWrapper = ({
 
 
     // Traversing and tab formatting --------------------------- end
-  }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, taskId]);
+  }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, superCheckerNotesRef,taskId]);
 
   useEffect(() => {
     showLoader();
@@ -529,6 +534,7 @@ const LabelStudioWrapper = ({
       />
     );
   };
+
 
   return (
     <div>
@@ -677,6 +683,7 @@ export default function LSF() {
   const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
+  const superCheckerNotesRef = useRef(null)
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -737,8 +744,8 @@ export default function LSF() {
           onClick={() => {
             localStorage.removeItem("labelAll");
             navigate(`/projects/${projectId}`);
-            //window.location.replace(`/#/projects/${projectId}`);
-            //window.location.reload();
+            window.location.replace(`/#/projects/${projectId}`);
+            window.location.reload();
           }}
         >
           Back to Project
@@ -809,6 +816,22 @@ export default function LSF() {
             }}
             style={{ width: "99%", marginTop: "1%" }}
           />
+
+<TextField
+            multiline
+            placeholder="Place your remarks here ..."
+            label="Supercheck notes"
+            // value={notesValue}
+            // onChange={event=>setNotesValue(event.target.value)}
+            inputRef={superCheckerNotesRef}
+            rows={2}
+            maxRows={4}
+            inputProps={{
+              style: { fontSize: "1rem" },
+              readOnly: true,
+            }}
+            style={{ width: "99%", marginTop: "1%" }}
+          />
         </div>
         <Button
           variant="contained"
@@ -872,6 +895,7 @@ export default function LSF() {
           resetNotes={() => resetNotes()}
           reviewNotesRef={reviewNotesRef}
           annotationNotesRef={annotationNotesRef}
+          superCheckerNotesRef={superCheckerNotesRef}
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}
