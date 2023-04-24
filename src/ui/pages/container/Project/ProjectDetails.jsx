@@ -179,21 +179,30 @@ const Projects = () => {
   const apiLoading = useSelector((state) => state.apiStatus.loading);
 
   const isAnnotators =
-    userRole.WorkspaceManager === loggedInUserData?.role ||
+    (userRole.WorkspaceManager === loggedInUserData?.role ||
     userRole.OrganizationOwner === loggedInUserData?.role ||
     userRole.Admin === loggedInUserData?.role ||
-    ProjectDetails?.annotators?.some((user) => user.id === userDetails.id);
+    ProjectDetails?.annotators?.some((user) => user.id === userDetails.id));
+
   const isReviewer =
-    ProjectDetails?.project_stage == 2 ||
+    (ProjectDetails?.project_stage == 2 ||
     ProjectDetails?.project_stage == 3 ||
     ProjectDetails?.annotation_reviewers?.some(
       (reviewer) => reviewer.id === userDetails?.id
-    );
+    ));
   const isSuperChecker =
-    ProjectDetails?.project_stage == 3 ||
+    (ProjectDetails?.project_stage == 3 ||
     ProjectDetails?.review_supercheckers?.some(
       (superchecker) => superchecker.id === userDetails?.id
-    );
+    ));
+
+  const allTask =
+    userRole.WorkspaceManager === loggedInUserData?.role ||
+    userRole.OrganizationOwner === loggedInUserData?.role ||
+    userRole.Admin === loggedInUserData?.role;
+
+
+    console.log(isAnnotators,isReviewer,isSuperChecker,allTask,"allTaskallTaskallTask")
 
   useEffect(() => {
     setLoading(apiLoading);
@@ -227,18 +236,130 @@ const Projects = () => {
     navigate(`/projects/${id}/projectsetting`);
   };
 
-//   const tabIndex = () =>{
-//       switch(isAnnotators) {
-//           case "annotation":
-//               console.log("annotationannotation")
-//             break;
-//           case 1:
+  
 
-//             break;
-//           default:
+  const TabPanData = [
+    {
+      tabEle: (
+        <Tab
+          label={translate("label.annotationTasks")}
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: (
+        <TaskTable type="annotation" ProjectDetails={ProjectDetails} />
+      ),
+      showTab: isAnnotators,
+      tabType :"annotation"
+    },
+    {
+      tabEle: (
+        <Tab
+        label={translate("label.reviewTasks")}
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: <TaskTable type="review" />,
+      showTab: isReviewer,
+      tabType :"review"
+    },
+    {
+      tabEle: (
+        <Tab
+          label="Super Check Tasks"
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: <SuperCheckerTasks type="superChecker" />,
+      showTab: isSuperChecker,
+      tabType :"superChecker"
+    },
 
-//         }
-//   }
+    {
+      tabEle: (
+        <Tab
+          label={translate("label.annotators")}
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: (
+        <MembersTable
+          onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()}
+          dataSource={ProjectDetails.annotators}
+          type={addUserTypes.PROJECT_ANNOTATORS}
+        />
+      ),
+      showTab: isAnnotators,
+      tabType :"annotatorsmember"
+    },
+    {
+      tabEle: (
+        <Tab
+        label={translate("label.reviewers")}
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: (
+        <MembersTable
+          onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()}
+          dataSource={ProjectDetails.annotation_reviewers}
+          type={addUserTypes.PROJECT_REVIEWER}
+        />
+      ),
+      showTab: isReviewer,
+      tabType :"reviewersmember"
+    },
+    {
+      tabEle: (
+        <Tab
+          label="Super Check "
+          sx={{ fontSize: 16, fontWeight: "700" }}
+        />
+      ),
+      tabPanelEle: (
+        <MembersTable
+          dataSource={ProjectDetails.review_supercheckers}
+          type={addUserTypes.PROJECT_SUPERCHECKER}
+          onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()}
+        />
+      ),
+      showTab: isSuperChecker,
+      tabType :"supercheckersmember"
+    },
+
+    {
+      tabEle: (
+        <Tab
+          label={translate("label.reports")}
+          sx={{
+            fontSize: 16,
+            fontWeight: "700",
+            flexDirection: "row-reverse",
+          }}
+          onClick={handleClick}
+        />
+      ),
+      tabPanelEle: (
+        <ReportsTable
+          annotationreviewertype={annotationreviewertype}
+          userDetails={userDetails}
+        />
+      ),
+      showTab: (isAnnotators || isReviewer || isSuperChecker),
+      tabType :"reports"
+    },
+
+    {
+      tabEle: (
+        <Tab label="All Tasks" sx={{ fontSize: 16, fontWeight: "700" }} />
+      ),
+      tabPanelEle: <AllTaskTable />,
+      showTab: allTask,
+      tabType :"allTask"
+    },
+  ];
+
+  const filteredTabPanData = TabPanData.filter((el,i)=> el.showTab);
 
   const renderTabs = () => {
     return (
@@ -250,143 +371,24 @@ const Projects = () => {
               onChange={handleChange}
               aria-label="basic tabs example"
             >
-              {isAnnotators && (
-                <Tab
-                  label={translate("label.annotationTasks")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                />
-              )}
-              {isReviewer && (
-                <Tab
-                  label={translate("label.reviewTasks")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                />
-              )}
-              {isSuperChecker && (
-                <Tab
-                  label="Super Check Tasks"
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                />
-              )}
-              {isAnnotators && (
-                <Tab
-                  label={translate("label.annotators")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                />
-              )}
-              {isReviewer && (
-                <Tab
-                  label={translate("label.reviewers")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                />
-              )}
-              {isSuperChecker && (
-                <Tab
-                  label="Super Checker"
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                />
-              )}
-              <Tab
-                label={translate("label.reports")}
-                sx={{
-                  fontSize: 16,
-                  fontWeight: "700",
-                  flexDirection: "row-reverse",
-                }}
-                onClick={handleClick}
-              />
-              {(userRole.WorkspaceManager === loggedInUserData?.role ||
-                userRole.OrganizationOwner === loggedInUserData?.role ||
-                userRole.Admin === loggedInUserData?.role) && (
-                <Tab
-                  label="All Tasks"
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                />
-              )}
+              {filteredTabPanData.map((el, i) => {
+                return el.tabEle;
+              })}
             </Tabs>
           </Box>
         </Grid>
-        {isAnnotators && (
-          <TabPanel value={value} index={0}>
-            <TaskTable type="annotation" ProjectDetails={ProjectDetails} />
+        {filteredTabPanData.map((el, i,array) => {
+          return (
+            <>
+          
+          <TabPanel value={value}  index={i}>
+            {el.tabPanelEle}
+          
           </TabPanel>
-        )}
-        {isReviewer && (
-          <TabPanel value={value} index={isAnnotators ? 1 : 0}>
-            <TaskTable type="review" />
-          </TabPanel>
-        )}
-        {isSuperChecker && (
-          <TabPanel
-            value={value}
-            index={isAnnotators ? (isReviewer ? 2 : 1) : 2}
-          >
-            <SuperCheckerTasks type="superChecker" />
-          </TabPanel>
-        )}
-        {isAnnotators && (
-          <TabPanel
-            value={value}
-            index={
-              isAnnotators ? (isReviewer ? (isSuperChecker ? 3 : 2) : 1) : 2
-            }
-          >
-            <MembersTable
-              onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()}
-              dataSource={ProjectDetails.annotators}
-              type={addUserTypes.PROJECT_ANNOTATORS}
-            />
-          </TabPanel>
-        )}
-        {isReviewer && (
-          <TabPanel
-            value={value}
-            index={
-              isAnnotators ? (isReviewer ? (isSuperChecker ? 4 : 3) : 3) : 2
-            }
-          >
-            <MembersTable
-              onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()}
-              dataSource={ProjectDetails.annotation_reviewers}
-              type={addUserTypes.PROJECT_REVIEWER}
-            />
-          </TabPanel>
-        )}
-        {isSuperChecker && (
-          <TabPanel
-            value={value}
-            index={
-              isAnnotators ? (isReviewer ? (isSuperChecker ? 5 : 2) : 3) : 3
-            }
-          >
-            <MembersTable
-              dataSource={ProjectDetails.review_supercheckers}
-              type={addUserTypes.PROJECT_SUPERCHECKER}
-              onRemoveSuccessGetUpdatedMembers={() => getProjectDetails()}
-            />
-          </TabPanel>
-        )}
-        <TabPanel
-          value={value}
-          index={isAnnotators ? (isReviewer ? (isSuperChecker ? 6 : 4) : 4) : 2}
-        >
-          <ReportsTable
-            annotationreviewertype={annotationreviewertype}
-            userDetails={userDetails}
-          />
-        </TabPanel>
-        {(userRole.WorkspaceManager === loggedInUserData?.role ||
-          userRole.OrganizationOwner === loggedInUserData?.role ||
-          userRole.Admin === loggedInUserData?.role) && (
-          <TabPanel
-            value={value}
-            index={
-              isAnnotators ? (isReviewer ? (isSuperChecker ? 7 : 5) : 5) : 2
-            }
-          >
-            <AllTaskTable />
-          </TabPanel>
-        )}
+            </> 
+          ) 
+        })}
+       
       </>
     );
   };
