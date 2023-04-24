@@ -114,6 +114,7 @@ const Projects = () => {
     { name: "Status", value: null },
     { name: "Unassigned Task", value: null },
     { name: "Total Labeled Task", value: null },
+    { name: "Reviewed Task Count", value: null },
   ]);
   let navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -130,7 +131,7 @@ const Projects = () => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-
+console.log(ProjectDetails,"ProjectDetailsProjectDetails")
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
 
@@ -168,6 +169,11 @@ const Projects = () => {
         name: "Unassigned Review Tasks",
         value: ProjectDetails.labeled_task_count,
       },
+      
+      {
+        name: "Unassigned Super Check Tasks",
+        value: ProjectDetails.reviewed_task_count,
+      },
     ]);
   }, [ProjectDetails.id]);
   const [loading, setLoading] = useState(false);
@@ -185,24 +191,26 @@ const Projects = () => {
     ProjectDetails?.annotators?.some((user) => user.id === userDetails.id));
 
   const isReviewer =
-    (ProjectDetails?.project_stage == 2 ||
-    ProjectDetails?.project_stage == 3 ||
+    (userRole.WorkspaceManager === loggedInUserData?.role ||
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role &&  ProjectDetails?.project_stage === 3|| ProjectDetails?.project_stage === 2 ||
     ProjectDetails?.annotation_reviewers?.some(
       (reviewer) => reviewer.id === userDetails?.id
-    ));
+    ) );
   const isSuperChecker =
-    (ProjectDetails?.project_stage == 3 ||
-    ProjectDetails?.review_supercheckers?.some(
+    ( userRole.WorkspaceManager === loggedInUserData?.role ||
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role &&
+      ProjectDetails?.project_stage === 3 ||
+      ProjectDetails?.review_supercheckers?.some(
       (superchecker) => superchecker.id === userDetails?.id
-    ));
+    ) );
 
   const allTask =
     userRole.WorkspaceManager === loggedInUserData?.role ||
     userRole.OrganizationOwner === loggedInUserData?.role ||
     userRole.Admin === loggedInUserData?.role;
 
-
-    console.log(isAnnotators,isReviewer,isSuperChecker,allTask,"allTaskallTaskallTask")
 
   useEffect(() => {
     setLoading(apiLoading);
@@ -250,7 +258,6 @@ const Projects = () => {
         <TaskTable type="annotation" ProjectDetails={ProjectDetails} />
       ),
       showTab: isAnnotators,
-      tabType :"annotation"
     },
     {
       tabEle: (
@@ -261,7 +268,6 @@ const Projects = () => {
       ),
       tabPanelEle: <TaskTable type="review" />,
       showTab: isReviewer,
-      tabType :"review"
     },
     {
       tabEle: (
@@ -272,7 +278,6 @@ const Projects = () => {
       ),
       tabPanelEle: <SuperCheckerTasks type="superChecker" />,
       showTab: isSuperChecker,
-      tabType :"superChecker"
     },
 
     {
@@ -290,7 +295,6 @@ const Projects = () => {
         />
       ),
       showTab: isAnnotators,
-      tabType :"annotatorsmember"
     },
     {
       tabEle: (
@@ -307,12 +311,11 @@ const Projects = () => {
         />
       ),
       showTab: isReviewer,
-      tabType :"reviewersmember"
     },
     {
       tabEle: (
         <Tab
-          label="Super Check "
+          label="Super Checkers "
           sx={{ fontSize: 16, fontWeight: "700" }}
         />
       ),
@@ -324,7 +327,6 @@ const Projects = () => {
         />
       ),
       showTab: isSuperChecker,
-      tabType :"supercheckersmember"
     },
 
     {
@@ -345,8 +347,7 @@ const Projects = () => {
           userDetails={userDetails}
         />
       ),
-      showTab: (isAnnotators || isReviewer || isSuperChecker),
-      tabType :"reports"
+      showTab: (isAnnotators || isReviewer || isSuperChecker)
     },
 
     {
@@ -355,7 +356,6 @@ const Projects = () => {
       ),
       tabPanelEle: <AllTaskTable />,
       showTab: allTask,
-      tabType :"allTask"
     },
   ];
 
@@ -443,7 +443,7 @@ const Projects = () => {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mb: 2 }}>
             <Grid container spacing={2}>
               {projectData?.map((des, i) => (
-                <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+                <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
                   <ProjectDescription
                     name={des.name}
                     value={des.value}
