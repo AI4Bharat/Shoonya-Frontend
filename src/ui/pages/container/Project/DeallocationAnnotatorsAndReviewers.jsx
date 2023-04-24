@@ -88,7 +88,6 @@ export default function DeallocationAnnotatorsAndReviewers() {
     setAnchorEl(event.currentTarget);
   };
 
-  console.log(radiobutton,"radiobuttonradiobutton")
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -175,7 +174,6 @@ const handleok = async() => {
     }
 }
 
-console.log(ProjectDetails,"ProjectDetailsProjectDetails")
 
 const renderSnackBar = () => {
     return (

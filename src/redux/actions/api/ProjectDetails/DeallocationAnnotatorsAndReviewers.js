@@ -6,7 +6,7 @@ import constants from "../../../constants";
    constructor(projectId,radiobutton,annotatorsUser,reviewerssUser,annotationStatus,reviewStatus,superCheckUser,SuperCheckStatus,projectObj, timeout = 2000) {
     super("GET", timeout, false);
      this.projectObj = projectObj;
-     const queryString = radiobutton === "annotation" ? `unassign_tasks/?annotator_id=${annotatorsUser}&annotation_status=["${annotationStatus}"]` : radiobutton === "review"? `unassign_review_tasks/?reviewer_id=${reviewerssUser}&reviewer_status=["${reviewStatus}"]`:`unassign_superCheck_tasks/?${superCheckUser}&[${SuperCheckStatus}]`;
+     const queryString = radiobutton === "annotation" ? `unassign_tasks/?annotator_id=${annotatorsUser}&annotation_status=["${annotationStatus}"]` : radiobutton === "review"? `unassign_review_tasks/?reviewer_id=${reviewerssUser}&review_status=["${reviewStatus}"]`:`unassign_supercheck_tasks/?superchecker_id=${superCheckUser}&supercheck_status=["${SuperCheckStatus}"]`;
      console.log(queryString,"queryStringqueryString")
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/${queryString}`;
    }
