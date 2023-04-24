@@ -11,7 +11,7 @@ export default class DeallocateSuperCheckerTasksAPI extends API {
     super("GET", timeout, false);
     this.projectId = projectId;
     this.type = constants.DE_ALLOCATE_SUPERCHECKER_TASKS;
-    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_supercheck_tasks/`;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_supercheck_tasks/?supercheck_status=['${selectedFilters}']`;
   }
   processResponse(res) {
     super.processResponse(res);

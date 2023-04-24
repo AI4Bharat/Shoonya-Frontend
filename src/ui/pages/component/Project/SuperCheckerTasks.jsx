@@ -502,8 +502,8 @@ const renderSnackBar = () => {
                   <DialogContentText id="alert-dialog-description">
                     All{" "}
                     <snap style={{ color: "#1DA3CE" }}>
-                      {selectedFilters.supercheck_status}
-                      tasks
+                      {selectedFilters.supercheck_status}{" "}
+                        tasks
                     </snap>{" "}
                     will be de-allocated from this project. Please be careful as
                     this action cannot be undone.

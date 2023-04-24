@@ -141,8 +141,8 @@ const Projects = () => {
     const projectStatus = ProjectDetails.is_published
       ? "Published"
       : ProjectDetails.is_archived
-        ? "Archived"
-        : "Draft";
+      ? "Archived"
+      : "Draft";
     setProjectData([
       {
         name: "Project ID",
@@ -227,53 +227,18 @@ const Projects = () => {
     navigate(`/projects/${id}/projectsetting`);
   };
 
-  //   const tabIndex = () =>{
-  //       switch(isAnnotators) {
-  //           case "annotation":
-  //               console.log("annotationannotation")
-  //             break;
-  //           case 1:
+//   const tabIndex = () =>{
+//       switch(isAnnotators) {
+//           case "annotation":
+//               console.log("annotationannotation")
+//             break;
+//           case 1:
 
-  //             break;
-  //           default:
+//             break;
+//           default:
 
-  //         }
-  //   }
-
-  const TabPanData = [
-    {
-      tabEle: (
-        <Tab
-          label={translate("label.annotationTasks")}
-          sx={{ fontSize: 16, fontWeight: "700" }}
-        />
-      ),
-      tabPanelEle: (
-        <TaskTable type="annotation" ProjectDetails={ProjectDetails} />
-      ),
-      showTab: isAnnotators,
-    },
-    {
-      tabEle: (
-        <Tab
-          label={translate("label.reviewTasks")}
-          sx={{ fontSize: 16, fontWeight: "700" }}
-        />
-      ),
-      tabPanelEle: <TaskTable type="review" />,
-      showTab: isReviewer,
-    },
-    {
-      tabEle: (
-        <Tab
-          label="Super Check Tasks"
-          sx={{ fontSize: 16, fontWeight: "700" }}
-        />
-      ),
-      tabPanelEle: <SuperCheckerTasks type="superChecker" />,
-      showTab: isReviewer,
-    },
-  ];
+//         }
+//   }
 
   const renderTabs = () => {
     return (
@@ -285,28 +250,25 @@ const Projects = () => {
               onChange={handleChange}
               aria-label="basic tabs example"
             >
-              {TabPanData.map((el, i) => {
-                return el.showTab && el.tabEle;
-              })}
-              {/* {isAnnotators && (
+              {isAnnotators && (
                 <Tab
                   label={translate("label.annotationTasks")}
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )} */}
-              {/* {isReviewer && (
+              )}
+              {isReviewer && (
                 <Tab
                   label={translate("label.reviewTasks")}
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )} */}
-              {/* {isSuperChecker && (
+              )}
+              {isSuperChecker && (
                 <Tab
                   label="Super Check Tasks"
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )} */}
-              {/* {isAnnotators && (
+              )}
+              {isAnnotators && (
                 <Tab
                   label={translate("label.annotators")}
                   sx={{ fontSize: 16, fontWeight: "700" }}
@@ -340,52 +302,33 @@ const Projects = () => {
                   label="All Tasks"
                   sx={{ fontSize: 16, fontWeight: "700" }}
                 />
-              )} */}
+              )}
             </Tabs>
           </Box>
         </Grid>
-        {TabPanData.map((el, i) => {
-          return (
-            <TabPanel
-              value={value}
-              index={i}
-            >
-              
-              {el.tabPanelEle}
-            </TabPanel>
-          );
-        })}
-        {/* {isAnnotators && (
+        {isAnnotators && (
           <TabPanel value={value} index={0}>
             <TaskTable type="annotation" ProjectDetails={ProjectDetails} />
           </TabPanel>
-        )} */}
-        {/* {isReviewer && (
+        )}
+        {isReviewer && (
           <TabPanel value={value} index={isAnnotators ? 1 : 0}>
             <TaskTable type="review" />
           </TabPanel>
-        )} */}
-        {/* {isSuperChecker && (
+        )}
+        {isSuperChecker && (
           <TabPanel
             value={value}
-            index={isAnnotators ? (isReviewer ? 2 : 1) : 1}
+            index={isAnnotators ? (isReviewer ? 2 : 1) : 2}
           >
             <SuperCheckerTasks type="superChecker" />
           </TabPanel>
-        )} */}
+        )}
         {isAnnotators && (
           <TabPanel
             value={value}
             index={
-              isAnnotators
-                ? isReviewer
-                  ? isSuperChecker
-                    ? 3
-                    : 2
-                  : 1
-                : !isSuperChecker && isReviewer
-                  ? 1
-                  : 1
+              isAnnotators ? (isReviewer ? (isSuperChecker ? 3 : 2) : 1) : 2
             }
           >
             <MembersTable
@@ -399,15 +342,7 @@ const Projects = () => {
           <TabPanel
             value={value}
             index={
-              isAnnotators
-                ? isReviewer
-                  ? isSuperChecker
-                    ? 4
-                    : 3
-                  : 3
-                : !isSuperChecker && isAnnotators
-                  ? 2
-                  : 1
+              isAnnotators ? (isReviewer ? (isSuperChecker ? 4 : 3) : 3) : 2
             }
           >
             <MembersTable
@@ -433,17 +368,7 @@ const Projects = () => {
         )}
         <TabPanel
           value={value}
-          index={
-            isAnnotators
-              ? isReviewer
-                ? isSuperChecker
-                  ? 6
-                  : 4
-                : 4
-              : !isSuperChecker && isAnnotators
-                ? 4
-                : 2
-          }
+          index={isAnnotators ? (isReviewer ? (isSuperChecker ? 6 : 4) : 4) : 2}
         >
           <ReportsTable
             annotationreviewertype={annotationreviewertype}
@@ -453,15 +378,15 @@ const Projects = () => {
         {(userRole.WorkspaceManager === loggedInUserData?.role ||
           userRole.OrganizationOwner === loggedInUserData?.role ||
           userRole.Admin === loggedInUserData?.role) && (
-            <TabPanel
-              value={value}
-              index={
-                isAnnotators ? (isReviewer ? (isSuperChecker ? 7 : 5) : 5) : 2
-              }
-            >
-              <AllTaskTable />
-            </TabPanel>
-          )}
+          <TabPanel
+            value={value}
+            index={
+              isAnnotators ? (isReviewer ? (isSuperChecker ? 7 : 5) : 5) : 2
+            }
+          >
+            <AllTaskTable />
+          </TabPanel>
+        )}
       </>
     );
   };
@@ -498,20 +423,20 @@ const Projects = () => {
             {(userRole.WorkspaceManager === loggedInUserData?.role ||
               userRole.OrganizationOwner === loggedInUserData?.role ||
               userRole.Admin === loggedInUserData?.role) && (
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Tooltip title={translate("label.showProjectSettings")}>
-                    <IconButton
-                      onClick={handleOpenSettings}
-                      sx={{ marginLeft: "140px" }}
-                    >
-                      <SettingsOutlinedIcon
-                        color="primary.dark"
-                        fontSize="large"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              )}
+              <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+                <Tooltip title={translate("label.showProjectSettings")}>
+                  <IconButton
+                    onClick={handleOpenSettings}
+                    sx={{ marginLeft: "140px" }}
+                  >
+                    <SettingsOutlinedIcon
+                      color="primary.dark"
+                      fontSize="large"
+                    />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            )}
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mb: 2 }}>
             <Grid container spacing={2}>
