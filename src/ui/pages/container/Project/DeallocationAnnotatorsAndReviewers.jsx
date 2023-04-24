@@ -36,6 +36,8 @@ let ReviewStatus =  [
     "draft",
     "skipped",
   ];
+
+  let SuperChecker = ["unvalidated","validated","validated_with_changes","skipped","draft","rejected"];
   const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -61,17 +63,21 @@ export default function DeallocationAnnotatorsAndReviewers() {
   const dispatch = useDispatch();
   const {id} = useParams();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [radiobutton, setRadiobutton] = useState(true);
+  const [radiobutton, setRadiobutton] = useState("annotation");
   const [openDialog, setOpenDialog] = useState(false);
   const[annotatorsUser,setAnnotatorsUser] = useState("")
   const[annotationStatus,setAnnotationStatus] = useState([])
   const[reviewerssUser,setReviewersUser] = useState("")
+  const[superCheckersUser,setSuperCheckersUser] = useState("")
   const[reviewStatus,setReviewStatus] = useState([])
+  const[superCheckStatus,setSuperCheckStatus] = useState([])
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
     variant: "success",
 });
+
+
 
 
   const open = Boolean(anchorEl);
@@ -82,6 +88,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
     setAnchorEl(event.currentTarget);
   };
 
+  console.log(radiobutton,"radiobuttonradiobutton")
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -89,13 +96,18 @@ export default function DeallocationAnnotatorsAndReviewers() {
     setAnnotationStatus([])
     setReviewersUser("")
     setReviewStatus([])
+    setSuperCheckersUser("")
+    setSuperCheckStatus([])
   };
 
   const handleAnnotation = () => {
-    setRadiobutton(true);
+    setRadiobutton("annotation");
   };
   const handleReview = () => {
-    setRadiobutton(false);
+    setRadiobutton("review");
+  };
+  const handlesuperChecker = () => {
+    setRadiobutton("superChecker");
   };
 
   const handleSubmit = () => {
@@ -109,6 +121,8 @@ const handleCloseDialog = () => {
     setAnnotationStatus([])
     setReviewersUser("")
     setReviewStatus([])
+    setSuperCheckersUser("")
+    setSuperCheckStatus([])
 };
 
 const handleChangeAnnotationStatus = (event) => {
@@ -120,6 +134,12 @@ const handleChangeAnnotationStatus = (event) => {
     const value = event.target.value;
     setReviewStatus(value);
   }
+  const handleChangeSuperCheckerStatus = (event) =>{
+    const value = event.target.value;
+    setSuperCheckStatus(value);
+  }
+
+  
 
 const handleok = async() => {
     setAnchorEl(null);
@@ -128,7 +148,9 @@ const handleok = async() => {
     setAnnotationStatus([])
     setReviewersUser("")
     setReviewStatus([])
-    const projectObj = new DeallocationAnnotatorsAndReviewersAPI(id,radiobutton,annotatorsUser,reviewerssUser,annotationStatus,reviewStatus);
+    setSuperCheckersUser("")
+    setSuperCheckStatus([])
+    const projectObj = new DeallocationAnnotatorsAndReviewersAPI(id,radiobutton,annotatorsUser,reviewerssUser,annotationStatus,reviewStatus,superCheckersUser,superCheckStatus);
     // dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
         method: "GET",
@@ -152,6 +174,8 @@ const handleok = async() => {
         })
     }
 }
+
+console.log(ProjectDetails,"ProjectDetailsProjectDetails")
 
 const renderSnackBar = () => {
     return (
@@ -215,11 +239,17 @@ const renderSnackBar = () => {
                   label="Reviewers"
                   onClick={handleReview}
                 />
+                <FormControlLabel
+                  value="superChecker"
+                  control={<Radio />}
+                  label="Super Check"
+                  onClick={handlesuperChecker}
+                />
               </RadioGroup>
             </FormControl>
           </Grid>
         </Grid>
-        {radiobutton === true && (
+        {radiobutton === "annotation" && (
           <>
             <Grid
               container
@@ -227,7 +257,7 @@ const renderSnackBar = () => {
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"250px"
+                width:"350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -259,7 +289,7 @@ const renderSnackBar = () => {
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"250px"
+                width:"350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -298,7 +328,7 @@ const renderSnackBar = () => {
             </Grid>
           </>
         )}
-        {radiobutton === false && (
+        {radiobutton === "review" && (
           <>
             <Grid
               container
@@ -306,7 +336,7 @@ const renderSnackBar = () => {
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"250px"
+                width:"350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -338,7 +368,7 @@ const renderSnackBar = () => {
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"250px"
+                width:"350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -358,6 +388,84 @@ const renderSnackBar = () => {
                
               >
                 {ReviewStatus.map((option) => (
+                  <MenuItem
+                    sx={{ textTransform: "capitalize" }}
+                    key={option}
+                    value={option}
+                  >
+                    {/* <ListItemIcon>
+                      <Checkbox checked={annotationStatus.indexOf(option) > -1} />
+                    </ListItemIcon> */}
+                    <ListItemText primary={snakeToTitleCase(option)} />
+                  </MenuItem>
+                ))}
+              </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </>
+        )}
+
+   {radiobutton === "superChecker" && (
+          <>
+            <Grid
+              container
+              direction="row"
+              sx={{
+                alignItems: "center",
+                p: 1,
+                width:"350px"
+              }}
+            >
+              <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body2" fontWeight="700" label="Required">
+                  Select User:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+              <FormControl fullWidth size="small">
+                  <Select
+                    labelId="demo-simple-select-helper-label"
+                    id="demo-simple-select-helper"
+                    value={superCheckersUser}
+                     onChange={(e) => setSuperCheckersUser(e.target.value)}
+                    sx={{
+                      textAlign: "left",
+                    }}
+                  >
+                    {ProjectDetails?.review_supercheckers.map((el, i) => {
+                      return <MenuItem value={el.id}>{el.username}</MenuItem>;
+                    })}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid
+              container
+              direction="row"
+              sx={{
+                alignItems: "center",
+                p: 1,
+                width:"350px"
+              }}
+            >
+              <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body2" fontWeight="700" label="Required">
+                  Select Super Check Status :
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                <FormControl fullWidth size="small">
+                <Select
+                labelId="Select-Task-Statuses"
+                multiple
+                value={superCheckStatus}
+                onChange={handleChangeSuperCheckerStatus}
+                renderValue={(superCheckStatus) => superCheckStatus.join(", ")}
+                MenuProps={MenuProps}
+               
+              >
+                {SuperChecker.map((option) => (
                   <MenuItem
                     sx={{ textTransform: "capitalize" }}
                     key={option}
