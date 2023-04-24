@@ -245,7 +245,6 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
   };
 
   
-
   const TabPanData = [
     {
       tabEle: (
