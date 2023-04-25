@@ -186,25 +186,24 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
 
   const isAnnotators =
     (userRole.WorkspaceManager === loggedInUserData?.role ||
-    userRole.OrganizationOwner === loggedInUserData?.role ||
-    userRole.Admin === loggedInUserData?.role ||
-    ProjectDetails?.annotators?.some((user) => user.id === userDetails.id));
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role || ProjectDetails?.project_stage === 1 ||
+      ProjectDetails?.annotators?.some((user) => user.id === userDetails.id));
 
   const isReviewer =
-    (userRole.WorkspaceManager === loggedInUserData?.role ||
+    ((userRole.WorkspaceManager === loggedInUserData?.role ||
       userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role &&  ProjectDetails?.project_stage === 3|| ProjectDetails?.project_stage === 2 ||
+      userRole.Admin === loggedInUserData?.role) ? (ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) : ProjectDetails?.project_stage == 2 ||
     ProjectDetails?.annotation_reviewers?.some(
       (reviewer) => reviewer.id === userDetails?.id
-    ) );
+    ));
   const isSuperChecker =
-    ( userRole.WorkspaceManager === loggedInUserData?.role ||
+    ((userRole.WorkspaceManager === loggedInUserData?.role ||
       userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role &&
-      ProjectDetails?.project_stage === 3 ||
-      ProjectDetails?.review_supercheckers?.some(
+      userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
+    ProjectDetails?.review_supercheckers?.some(
       (superchecker) => superchecker.id === userDetails?.id
-    ) );
+    ));
 
   const allTask =
     userRole.WorkspaceManager === loggedInUserData?.role ||

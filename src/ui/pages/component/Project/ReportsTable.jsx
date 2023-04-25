@@ -209,7 +209,7 @@ const ReportsTable = (props) => {
 
                     >
                        {((ProjectDetails.project_stage == 1 || ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) || (ProjectDetails?.annotators?.some((user) => user.id === loggedInUserData.id ))) && <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />}
-                    {((ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) || (ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === loggedInUserData?.id))) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
+                    {((ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) && (ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === loggedInUserData?.id))) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
                     {((ProjectDetails.project_stage == 3) || (ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === loggedInUserData?.id))) && <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker"  />}
                     </RadioGroup>
                 </FormControl>
