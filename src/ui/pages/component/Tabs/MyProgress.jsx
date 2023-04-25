@@ -267,7 +267,7 @@ const MyProgress = () => {
           >
             <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
             <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
-            <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" />
+            {/* <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" /> */}
 
           </RadioGroup>
         </FormControl>
