@@ -325,7 +325,7 @@ const MembersTable = (props) => {
 
   return (
     <React.Fragment>
-      {(roles?.WorkspaceManager === userDetails?.role && roles?.OrganizationOwner === userDetails?.role && roles?.Admin === userDetails?.role )  && !hideButton ? (
+      {(roles?.Annotator !== userDetails?.role &&  roles?.Reviewer !== userDetails?.role && roles?.SuperChecker !== userDetails?.role )  && !hideButton ? (
         <CustomButton
           sx={{ borderRadius: 2, whiteSpace: "nowrap",mb:2 }}
           startIcon={<PersonAddAlt />}

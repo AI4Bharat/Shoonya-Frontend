@@ -14,7 +14,7 @@ import themeDefault from "../../../theme/theme";
 import MUIDataTable from "mui-datatables";
 import { translate } from "../../../../config/localisation";
 
-const TASK_TYPES = ["annotation", "review"]
+const TASK_TYPES = ["annotation", "review","supercheck"]
 
 const RecentTasks = () => {
 
@@ -90,7 +90,7 @@ const RecentTasks = () => {
         <Tabs value={taskType} onChange={(e, newVal) => setTaskType(newVal)} aria-label="basic tabs example" sx={{mb: 2}}>
             <Tab label={translate("label.recentTasks.annotation")} value="annotation" sx={{ fontSize: 16, fontWeight: '700'}}/>
             <Tab label={translate("label.recentTasks.review")} value="review" sx={{ fontSize: 16, fontWeight: '700'}}/>
-            <Tab label="Super Check" value="SuperChecker" sx={{ fontSize: 16, fontWeight: '700'}}/>
+            <Tab label="Super Check" value="supercheck" sx={{ fontSize: 16, fontWeight: '700'}}/>
         </Tabs>
       </Box>
       <ThemeProvider theme={tableTheme}>
