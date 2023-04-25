@@ -52,7 +52,7 @@ const ProgressType = [
   "reviewed",
   "exported",
 ];
-const projectStage = [{name:"Annotation Stage",value: 1}, {name:"Review Stage",value: 2} ,{name:"SuperCheck Stage",value: 3}]
+const projectStage = [{name:"Annotation Stage",value: 1 ,disabled:false}, {name:"Review Stage",value: 2,disabled:false} ,{name:"Super Check Stage",value: 3,disabled:false}]
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -98,7 +98,7 @@ const AdvancedOperation = (props) => {
   "reviewed",
   "exported",
   ]);
-  const [taskReviews,setTaskReviews] = useState("")
+  const [taskReviews,setTaskReviews] = useState( "")
   const { id } = useParams();
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -204,7 +204,39 @@ const AdvancedOperation = (props) => {
   }
 
   const handleReviewToggle = async (e) => {
+    let ProjectStageValue = e.target.value
     setTaskReviews(e.target.value)
+    
+    if (ProjectStageValue === 1) {
+      const disableSuperchecker = [...projectStage].map((opt) => {
+        if (  opt.value === 3 ) opt.disabled = true;
+        else opt.disabled = false;
+        return opt;
+      })
+     
+      setTaskReviews(disableSuperchecker);
+    }
+    else if (ProjectStageValue === 2) {
+      const disableSuperchecker = [...projectStage].map((opt) => {
+        if (  opt.value === 3 ) opt.disabled = false;
+        else opt.disabled = false;
+        return opt;
+
+      });
+      
+      setTaskReviews(disableSuperchecker);
+    }
+    else if (ProjectStageValue === 3) {
+      const disableSuperchecker = [...projectStage].map((opt) => {
+        if (  opt.value === 1 ) opt.disabled = true;
+        else opt.disabled = false;
+        return opt;
+
+      });
+    
+      setTaskReviews(disableSuperchecker);
+    }
+
     setLoading(true); 
     const reviewObj =  new TaskReviewsAPI(id,e.target.value);
     const res = await fetch(reviewObj.apiEndPoint(), {
@@ -298,7 +330,6 @@ const AdvancedOperation = (props) => {
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
   const [isArchived, setIsArchived] = useState(false);
   const [downloadMetadataToggle,setDownloadMetadataToggle]=useState(true)
-  console.log(ProjectDetails.is_archived, "is_archived", isArchived);
   const getArchiveProjectAPI = () => {
     const projectObj = new GetArchiveProjectAPI(id);
     dispatch(APITransport(projectObj));
@@ -589,9 +620,10 @@ const AdvancedOperation = (props) => {
                 value={taskReviews}
                 label="Task Reviews"
                 onChange={handleReviewToggle}
+                // getOptionDisabled={(option) => option.disabled}
               >
                 {projectStage.map((type, index) => (
-                  <MenuItem value={type.value} key={index} disabled={type.value == 3} >
+                  <MenuItem value={type.value} key={index} disabled={type.disabled} >
                     {type.name}
                   </MenuItem>
                 ))}

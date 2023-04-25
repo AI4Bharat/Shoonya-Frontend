@@ -54,7 +54,6 @@ const ReportsTable = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-  console.log(ProjectDetails,"ProjectDetails")
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -130,7 +129,7 @@ const ReportsTable = (props) => {
 
     const handleSubmit = async() => {
         let projectObj;
-        let reports_type = "review_reports"
+        let reports_type = radiobutton === "SuperCheckerReports" ? "superchecker_reports" : "review_reports"
         setReportRequested(true);
         setSubmitted(true);
 
@@ -138,6 +137,9 @@ const ReportsTable = (props) => {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
         }
        else if(radiobutton === "ReviewerReports") {
+            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
+        }
+        else if(radiobutton === "SuperCheckerReports") {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
         }
         dispatch(APITransport(projectObj));
@@ -206,9 +208,9 @@ const ReportsTable = (props) => {
                         onChange={handleChangeReports}
 
                     >
-                        <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />
-                    {(ProjectDetails.project_stage === 2 && userRole.Annotator !== props.userDetails?.role ) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
-
+                       {((ProjectDetails.project_stage == 1 || ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) || (ProjectDetails?.annotators?.some((user) => user.id === loggedInUserData.id ))) && <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />}
+                    {((ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) && (ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === loggedInUserData?.id))) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
+                    {((ProjectDetails.project_stage == 3) || (ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === loggedInUserData?.id))) && <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker"  />}
                     </RadioGroup>
                 </FormControl>
                 </Grid >

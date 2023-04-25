@@ -31,7 +31,7 @@ import {
   getNextProject,
   fetchAnnotation,
   postReview,
-  patchReview,
+  patchSuperChecker,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 
 import { useParams, useNavigate } from "react-router-dom";
@@ -91,36 +91,26 @@ const filterAnnotations = (annotations, user_id) => {
     return annotation.completed_by === user_id && annotation.parent_annotation;
   });
   if (userAnnotation) {
-    if (userAnnotation.annotation_status === "unreviewed") {
+    if (userAnnotation.annotation_status === "unvalidated") {
       filteredAnnotations =
         userAnnotation.result.length > 0
           ? annotations.filter(
               (annotation) => annotation.id === userAnnotation.parent_annotation
             )
-          : annotations.filter((value) => value.annotation_type === 1);
+          : annotations.filter((value) => value.annotation_type === 2 );
     } else if (
       [
-        "accepted",
-        "accepted_with_minor_changes",
-        "accepted_with_major_changes",
+        "validated",
+        "validated_with_changes",
         "draft"
       ].includes(userAnnotation.annotation_status)
     ) {
       filteredAnnotations = [userAnnotation];
-    } else if (userAnnotation.annotation_status === "skipped") {
+    } else if (userAnnotation.annotation_status === "skipped" || userAnnotation.annotation_status === "rejected") {
       filteredAnnotations = annotations.filter(
-        (value) => value.annotation_type === 1
+        (value) => value.annotation_type === 2
       );
-    } else if (userAnnotation.annotation_status === "to_be_revised") {
-      filteredAnnotations = annotations.filter(
-        (annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 1
-      );
-    }
-    else if (userAnnotation.annotation_status === "rejected") {
-      filteredAnnotations = annotations.filter(
-        (annotation) =>  annotation.annotation_type === 2
-      );
-    }
+    }   
   }
   return filteredAnnotations;
 };
@@ -130,6 +120,7 @@ const filterAnnotations = (annotations, user_id) => {
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
+  superCheckerNotesRef,
   loader,
   showLoader,
   hideLoader,
@@ -153,7 +144,7 @@ const LabelStudioWrapper = ({
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   let loaded = useRef();
-  console.log(taskData,"taskDatataskDatakData")
+
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
@@ -188,7 +179,7 @@ const LabelStudioWrapper = ({
   const tasksComplete = (id) => {
     if (id) {
       resetNotes();
-      navigate(`/projects/${projectId}/review/${id}`);
+      navigate(`/projects/${projectId}/SuperChecker/${id}`);
     } else {
       // navigate(-1);
       resetNotes();
@@ -216,13 +207,14 @@ const LabelStudioWrapper = ({
     predictions,
     annotationNotesRef,
     reviewNotesRef,
+    superCheckerNotesRef,
     projectType
   ) {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
 
-    console.log("taskData", taskData, annotations);
+   
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -330,18 +322,18 @@ const LabelStudioWrapper = ({
         onSkipTask: function (annotation) {
           // message.warning('Notes will not be saved for skipped tasks!');
           let review = annotations.find(
-            (value) => value.annotation_type === 2
-          ); 
+            (value) => value.annotation_type === 3
+          );
           if (review) {
             showLoader();
-            patchReview(
+            patchSuperChecker(
               review.id,
               load_time,
               review.lead_time,
               "skipped",
               reviewNotesRef.current.value
             ).then(() => {
-              getNextProject(projectId, taskData.id, "review").then((res) => {
+              getNextProject(projectId, taskData.id, "supercheck").then((res) => {
                 hideLoader();
                 tasksComplete(res?.id || null);
               });
@@ -349,98 +341,7 @@ const LabelStudioWrapper = ({
           }
         },
 
-        // onUpdateAnnotation: function (ls, annotation) {
-        //   console.log(  annotations," annotation.serializeAnnotation()")
-        //   if (taskData.task_status !== "freezed") {
-        //     for (let i = 0; i < annotations.length; i++) {
-        //       if (
-        //         annotation.serializeAnnotation()[0]?.id ===
-        //         annotations[i].result[0]?.id
-        //       ) {
-        //         let temp, review;
-        //         showLoader();
-        //         if (annotations[i].parent_annotation) {
-        //           review = annotations[i];
-        //         } else {
-        //           review = annotations.find((annotation) => annotation.parent_annotation === annotations[i].id);
-        //         }
-        //         if (review) {
-        //           temp = review.result;
-        //           temp[0].value = annotation.serializeAnnotation()[0].value;
-        //           for (let i = 0; i < temp.length; i++) {
-        //             if (temp[i].value.text) {
-        //               temp[i].value.text = [temp[i].value.text[0]];
-        //             }
-        //           }
-        //           patchReview(
-        //             //projectType === "SingleSpeakerAudioTranscriptionEditing" ? annotation.serializeAnnotation() : temp,
-        //             review.id,
-        //             review.parent_annotation,
-        //             load_time,
-        //             review.lead_time,
-        //             review_status.current,
-        //             // annotationNotesRef.current.value,
-        //             reviewNotesRef.current.value
-        //           ).then(() => {
-        //             if (localStorage.getItem("labelAll"))
-        //               getNextProject(projectId, taskData.id, "review").then(
-        //                 (res) => {
-        //                   hideLoader();
-        //                   tasksComplete(res?.id || null);
-        //                 }
-        //               );
-        //             else {
-        //               hideLoader();
-        //               window.location.reload();
-        //             }
-        //           });
-        //         } else {
-        //           var c = ls.annotationStore.addAnnotation({
-        //             userGenerate: true,
-        //           });
-        //           temp = c;
-        //           c = annotation.serializeAnnotation();
-        //           c[0].id = temp.id;
-        //           temp = c;
-        //           for (let i = 0; i < temp.length; i++) {
-        //             if (temp[i].value.text) {
-        //               temp[i].value.text = [temp[i].value.text[0]];
-        //             }
-        //           }
-        //           postReview(
-        //            // projectType === "SingleSpeakerAudioTranscriptionEditing" ? annotation.serializeAnnotation() : temp,
-        //             taskData.id,
-        //             userData.id,
-        //             annotations[i].id,
-        //             load_time,
-        //             annotations[i].lead_time,
-        //             review_status.current,
-        //             annotationNotesRef.current.value,
-        //             reviewNotesRef.current.value
-        //           ).then(() => {
-        //             if (localStorage.getItem("labelAll"))
-        //               getNextProject(projectId, taskData.id, "review").then(
-        //                 (res) => {
-        //                   hideLoader();
-        //                   tasksComplete(res?.id || null);
-        //                 }
-        //               );
-        //             else {
-        //               hideLoader();
-        //               window.location.reload();
-        //             }
-        //           });
-        //         }
-        //       }
-        //     }
-        //   } else
-        //     setSnackbarInfo({
-        //       open: true,
-        //       message: "Task is frozen",
-        //       variant: "error",
-        //     });
-        // },
-
+      
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
@@ -458,23 +359,24 @@ const LabelStudioWrapper = ({
                   }
                 }
 
-                let review = annotations.filter(
-                  (value) => value.parent_annotation != null
+                let superChecker = annotations.filter(
+                  (value) => value.annotation_type === 3
                 )[0];
+               
 
-                patchReview(
-                  review.id,
+                patchSuperChecker(
+                  superChecker.id,
                   load_time,
-                  review.lead_time,
+                  superChecker.lead_time,
                   review_status.current,
                   projectType === "SingleSpeakerAudioTranscriptionEditing"
                     ? annotation.serializeAnnotation()
                     : temp,
-                  review.parent_annotation,
-                  reviewNotesRef.current.value
+                    superChecker.parent_annotation,
+                 
                 ).then(() => {
                   if (localStorage.getItem("labelAll"))
-                    getNextProject(projectId, taskData.id, "review").then(
+                    getNextProject(projectId, taskData.id, "supercheck").then(
                       (res) => {
                         hideLoader();
                         tasksComplete(res?.id || null);
@@ -501,12 +403,13 @@ const LabelStudioWrapper = ({
   const setNotes = (taskData, annotations) => {
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
       let reviewerAnnotations = annotations.filter(
-        (annotation) => !!annotation.parent_annotation
+        (value) => value.annotation_type === 3
       );
       if (reviewerAnnotations.length > 0) {
         let correctAnnotation = reviewerAnnotations.find(
           (annotation) => annotation.id === taskData.correct_annotation
         );
+     
         if (correctAnnotation) {
           reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
           annotationNotesRef.current.value =
@@ -525,7 +428,7 @@ const LabelStudioWrapper = ({
         }
       } else {
         let normalAnnotation = annotations.find(
-          (annotation) => !annotation.parent_annotation
+          (value) => value.annotation_type === 3
         );
         annotationNotesRef.current.value =
           normalAnnotation.annotation_notes ?? "";
@@ -571,6 +474,7 @@ const LabelStudioWrapper = ({
             annotations,
             predictions,
             annotationNotesRef,
+            superCheckerNotesRef,
             reviewNotesRef,
             labelConfig.project_type
           );
@@ -579,103 +483,9 @@ const LabelStudioWrapper = ({
       );
     }
 
-    // Traversing and tab formatting --------------------------- start
-    // const outputTextareaHTMLEleArr =
-    //   document.getElementsByName("transcribed_json");
-    // if (outputTextareaHTMLEleArr.length > 0) {
-    //   const targetElement = outputTextareaHTMLEleArr[0];
-    //   if (targetElement) {
-    //     targetElement.oninput = function (e) {
-    //       let textAreaInnerText = e.target.value;
-
-    //       // console.log("e ---------------------- ", e.currentTarget);
-
-    //       let lastInputChar =
-    //         textAreaInnerText[targetElement.selectionStart - 1];
-    //       if (
-    //         lastInputChar === "\\" &&
-    //         localStorage.getItem("enableTags") === "true"
-    //       ) {
-    //         let indexOfLastSpace =
-    //           textAreaInnerText.lastIndexOf(
-    //             " ",
-    //             targetElement.selectionStart - 1
-    //           ) <
-    //           textAreaInnerText.lastIndexOf(
-    //             "\n",
-    //             targetElement.selectionStart - 1
-    //           )
-    //             ? textAreaInnerText.lastIndexOf(
-    //                 "\n",
-    //                 targetElement.selectionStart - 1
-    //               )
-    //             : textAreaInnerText.lastIndexOf(
-    //                 " ",
-    //                 targetElement.selectionStart - 1
-    //               );
-
-    //         let currentSelectionRangeStart = indexOfLastSpace + 1;
-    //         let currentSelectionRangeEnd = targetElement.selectionStart - 1;
-
-    //         let currentTargetWord = textAreaInnerText.slice(
-    //           currentSelectionRangeStart,
-    //           currentSelectionRangeEnd
-    //         );
-    //         let filteredSuggestionByInput = TabsSuggestionData.filter((el) =>
-    //           el.toLowerCase().includes(currentTargetWord.toLowerCase())
-    //         );
-    //         if (
-    //           filteredSuggestionByInput &&
-    //           filteredSuggestionByInput.length > 0
-    //         ) {
-    //           const suggestionTagsContainer = (
-    //             <Grid
-    //               sx={{
-    //                 width: "max-content",
-    //                 maxHeight: 350,
-    //                 padding: 1,
-    //               }}
-    //             >
-    //               {filteredSuggestionByInput?.map((suggestion, index) => {
-    //                 return (
-    //                   <Typography
-    //                     onClick={() => {
-    //                       let modifiedValue = textAreaInnerText.replace(
-    //                         currentTargetWord + "\\",
-    //                         `[${suggestion}]`
-    //                       );
-    //                       targetElement.value = modifiedValue;
-    //                       setShowTagSuggestionsAnchorEl(null);
-    //                     }}
-    //                     variant="body2"
-    //                     sx={{
-    //                       backgroundColor: "#ffffff",
-    //                       color: "#000",
-    //                       padding: 2,
-    //                       "&:hover": {
-    //                         color: "white",
-    //                         backgroundColor: "#1890ff",
-    //                       },
-    //                     }}
-    //                   >
-    //                     {suggestion}
-    //                   </Typography>
-    //                 );
-    //               })}
-    //             </Grid>
-    //           );
-    //           setShowTagSuggestionsAnchorEl(e.currentTarget);
-    //           setTagSuggestionList(suggestionTagsContainer);
-    //         }
-    //       } else {
-    //         setShowTagSuggestionsAnchorEl(false);
-    //       }
-    //     };
-    //   }
-    // }
 
     // Traversing and tab formatting --------------------------- end
-  }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, taskId]);
+  }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, superCheckerNotesRef,taskId]);
 
   useEffect(() => {
     showLoader();
@@ -683,7 +493,7 @@ const LabelStudioWrapper = ({
 
   const onNextAnnotation = async () => {
     showLoader();
-    getNextProject(projectId, taskId, "review").then((res) => {
+    getNextProject(projectId, taskId, "supercheck").then((res) => {
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
       tasksComplete(res?.id || null);
@@ -699,8 +509,8 @@ const LabelStudioWrapper = ({
     setAnchorEl(null);
   };
 
-  const handleReviseClick = async () => {
-    review_status.current = "to_be_revised";
+  const handleRejectClick = async () => {
+    review_status.current = "rejected";
     lsfRef.current.store.submitAnnotation();
   };
 
@@ -724,6 +534,7 @@ const LabelStudioWrapper = ({
       />
     );
   };
+
 
   return (
     <div>
@@ -751,7 +562,7 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            {taskData?.review_user === userData?.id && (
+            {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Save task for later">
                 <Button
                   type="default"
@@ -770,12 +581,12 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {taskData?.review_user === userData?.id && (
-              <Tooltip title="Revise Annotation">
+            {taskData?.super_check_user === userData?.id && (
+              <Tooltip title="Reject">
                 <Button
-                  value="to_be_revised"
+                  value="Reject"
                   type="default"
-                  onClick={handleReviseClick}
+                  onClick={handleRejectClick}
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
@@ -787,15 +598,15 @@ const LabelStudioWrapper = ({
                   }}
                   className="lsf-button"
                 >
-                  Revise
+                 Reject
                 </Button>
               </Tooltip>
             )}
-            {taskData?.review_user === userData?.id && (
-              <Tooltip title="Accept Annotation">
+            {taskData?.super_check_user === userData?.id && (
+              <Tooltip title="Validate">
                 <Button
                   id="accept-button"
-                  value="Accept"
+                  value="Validate"
                   type="default"
                   aria-controls={open ? "accept-menu" : undefined}
                   aria-haspopup="true"
@@ -813,7 +624,7 @@ const LabelStudioWrapper = ({
                   onClick={handleClick}
                   endIcon={<KeyboardArrowDownIcon />}
                 >
-                  Accept
+                 Validate
                 </Button>
               </Tooltip>
             )}
@@ -827,22 +638,16 @@ const LabelStudioWrapper = ({
               onClose={handleClose}
             >
               <MenuItem
-                onClick={() => handleAcceptClick("accepted")}
+                onClick={() => handleAcceptClick("validated")}
                 disableRipple
               >
-                with No Changes
+                Validated No Changes
               </MenuItem>
               <MenuItem
-                onClick={() => handleAcceptClick("accepted_with_minor_changes")}
+                onClick={() => handleAcceptClick("validated_with_changes")}
                 disableRipple
               >
-                with Minor Changes
-              </MenuItem>
-              <MenuItem
-                onClick={() => handleAcceptClick("accepted_with_major_changes")}
-                disableRipple
-              >
-                with Major Changes
+                Validated with Changes
               </MenuItem>
             </StyledMenu>
           </div>
@@ -878,6 +683,7 @@ export default function LSF() {
   const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
+  const superCheckerNotesRef = useRef(null)
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -911,16 +717,6 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
-  // useEffect(() => {
-  //   fetchAnnotation(taskId).then((data) => {
-  //     if (data && Array.isArray(data) && data.length > 0) {
-  //       let correctAnnotation = data.find((item) => item.status === "correct");
-  //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
-  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
-  //     }
-  //   });
-  // }, [taskId]);
-
   const resetNotes = () => {
     setShowNotes(false);
     reviewNotesRef.current.value = "";
@@ -948,8 +744,8 @@ export default function LSF() {
           onClick={() => {
             localStorage.removeItem("labelAll");
             navigate(`/projects/${projectId}`);
-            //window.location.replace(`/#/projects/${projectId}`);
-            //window.location.reload();
+            window.location.replace(`/#/projects/${projectId}`);
+            window.location.reload();
           }}
         >
           Back to Project
@@ -1020,6 +816,22 @@ export default function LSF() {
             }}
             style={{ width: "99%", marginTop: "1%" }}
           />
+
+<TextField
+            multiline
+            placeholder="Place your remarks here ..."
+            label="Supercheck notes"
+            // value={notesValue}
+            // onChange={event=>setNotesValue(event.target.value)}
+            inputRef={superCheckerNotesRef}
+            rows={2}
+            maxRows={4}
+            inputProps={{
+              style: { fontSize: "1rem" },
+              readOnly: true,
+            }}
+            style={{ width: "99%", marginTop: "1%" }}
+          />
         </div>
         <Button
           variant="contained"
@@ -1083,6 +895,7 @@ export default function LSF() {
           resetNotes={() => resetNotes()}
           reviewNotesRef={reviewNotesRef}
           annotationNotesRef={annotationNotesRef}
+          superCheckerNotesRef={superCheckerNotesRef}
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}

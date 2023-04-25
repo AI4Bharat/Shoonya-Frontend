@@ -8,6 +8,7 @@ import constants from "../../../constants";
  
  export default class FetchRecentTasksAPI extends API {
    constructor(user_id, task_type, pageNo, countPerPage, timeout = 2000) {
+    console.log(task_type,"task_typetask_type")
      super("POST", timeout, false);
      this.userId = user_id;
      this.taskType = task_type;

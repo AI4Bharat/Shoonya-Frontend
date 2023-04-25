@@ -26,7 +26,7 @@ export default function ProjectList() {
   });
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const projectData = useSelector((state) => state.getProjects.data);
-console.log(selectedFilters.project_type,"selectedTypeselectedType")
+  
   const getDashboardprojectData = () => {
     setLoading(true);
     const projectObj = new GetProjectsAPI(selectedFilters);

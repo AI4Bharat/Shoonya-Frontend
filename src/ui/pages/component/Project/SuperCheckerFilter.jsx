@@ -15,55 +15,27 @@ import {
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
-import { useDispatch, useSelector } from "react-redux";
 // import { translate } from "../../../../assets/localisation";
 
-const FilterList = (props) => {
+const SuperCheckerFilter = (props) => {
   const classes = DatasetStyle();
   const { filterStatusData, currentFilters, updateFilters } = props;
-  const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status? currentFilters?.annotation_status:currentFilters.review_status);
+  const [selectedStatus, setSelectedStatus] = useState(currentFilters?.supercheck_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
+console.log(currentFilters,"currentFilters")
 
-const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-  // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
-  // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
-  // const handleDatasetChange = (e) => {
-  //   if (e.target.checked) setSelectedType([...selectedType, e.target.name]);
-  //   else {
-  //     const selected = Object.assign([], selectedType);
-  //     const index = selected.indexOf(e.target.name);
-
-  //     if (index > -1) {
-  //       selected.splice(index, 1);
-  //       setSelectedType(selected);
-  //     }
-  //   }
-  // };
+  
 
 
   const handleStatusChange = (e) => {
-    let statusvalue = !!currentFilters?.annotation_status? "annotation_status":"review_status"
+    let statusvalue =  !!currentFilters?.supercheck_status? "supercheck_status":""
     updateFilters({
       ...currentFilters,
       [statusvalue]:selectedStatus,
     })
     props.handleClose();
   };
-  // const handleClearAll = () => {
-  //   setSelectedStatus([]);
-  //   setSelectedType([]);
-  //   clearAll({ datasetType: [], status: [] });
-  // };
-  // const isChecked = (type, param) => {
-  //   const index =
-  //     param === "status"
-  //       ? selectedStatus.indexOf(type)
-  //       : selectedType.indexOf(type);
-  //   if (index > -1) return true;
-  //   return false;
-  // };
-
+  
   return (
     <div>
       <Popover
@@ -101,7 +73,6 @@ const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
                     sx={{
                       fontSize: "1rem",
                     }} 
-                    disabled={(ProjectDetails.project_stage === 2 || ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === userDetails?.id)) && type === "rejected"}
                   />
                 );
               })}
@@ -142,4 +113,4 @@ const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     </div>
   );
 };
-export default FilterList;
+export default SuperCheckerFilter;
