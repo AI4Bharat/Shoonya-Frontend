@@ -271,7 +271,7 @@ const MembersTable = (props) => {
           name: "Actions",
           label: "Actions",
           options: {
-            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER) && (roles?.Annotator === userDetails?.role || roles?.Reviewer === userDetails?.role || roles?.SuperChecker === userDetails?.role ))  ? false :  true,
+            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER ||props.type === addUserTypes.PROJECT_SUPERCHECKER) && (roles?.Annotator === userDetails?.role || roles?.Reviewer === userDetails?.role || roles?.SuperChecker === userDetails?.role ))  ? false :  true,
             filter: false,
             sort: false,
             align: "center",
@@ -325,7 +325,7 @@ const MembersTable = (props) => {
 
   return (
     <React.Fragment>
-      {userRole !== 1 && !hideButton ? (
+      {(roles?.WorkspaceManager === userDetails?.role && roles?.OrganizationOwner === userDetails?.role && roles?.Admin === userDetails?.role )  && !hideButton ? (
         <CustomButton
           sx={{ borderRadius: 2, whiteSpace: "nowrap",mb:2 }}
           startIcon={<PersonAddAlt />}
