@@ -86,7 +86,6 @@ const MyProgress = () => {
   const dispatch = useDispatch();
 
   const classes = DatasetStyle();
-
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
     dispatch(APITransport(typesObj));
@@ -97,7 +96,6 @@ const MyProgress = () => {
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading])
-
 
 
 
@@ -175,11 +173,13 @@ const MyProgress = () => {
     const reviewdata = {
       user_id: id,
       project_type: selectedType,
-      reports_type: radiobutton === "AnnotatationReports" ? "annotation" : "review",
+      reports_type: radiobutton === "AnnotatationReports" ? "annotation" :radiobutton ==="ReviewerReports" ? "review" : "supercheck" ,
       start_date: format(selectRange[0].startDate, 'yyyy-MM-dd'),
       end_date: format(selectRange[0].endDate, 'yyyy-MM-dd'),
 
     }
+
+    
     const progressObj = new GetUserAnalyticsAPI(reviewdata);
     dispatch(APITransport(progressObj));
     // setShowSpinner(true);
@@ -267,6 +267,7 @@ const MyProgress = () => {
           >
             <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
             <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
+            <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" />
 
           </RadioGroup>
         </FormControl>
@@ -426,6 +427,8 @@ const MyProgress = () => {
           </Grid>
         </Grid>
         }
+      
+
         {radiobutton === "ReviewerReports" && totalsummary && <Grid
           container
           alignItems="center"
@@ -463,6 +466,55 @@ const MyProgress = () => {
           >
             <Typography variant="subtitle1">Average Review Time (In Seconds) : </Typography>
             <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Avg Review Time (sec)"]}</Typography>
+          </Grid>
+          <Grid
+            container
+            alignItems="center"
+            direction="row"
+            justifyContent="flex-start"
+
+          >
+            <Typography variant="subtitle1">Word Count : </Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Word Count"]}</Typography>
+          </Grid>
+        </Grid>}
+        {radiobutton === "SuperCheckerReports" && totalsummary && <Grid
+          container
+          alignItems="center"
+          direction="row"
+          sx={{ mb: 3, mt: 2 }}
+
+        >
+          <Grid
+            container
+            alignItems="center"
+            direction="row"
+            justifyContent="flex-start"
+
+          >
+            <Typography variant="h6">Total Summary </Typography>
+
+          </Grid>
+
+          <Grid
+            container
+            alignItems="center"
+            direction="row"
+            justifyContent="flex-start"
+
+          >
+            <Typography variant="subtitle1">Super Checker Tasks : </Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata} >{UserAnalyticstotalsummary?.at(0)?.["Super Checker Tasks"]}</Typography>
+          </Grid>
+          <Grid
+            container
+            alignItems="center"
+            direction="row"
+            justifyContent="flex-start"
+
+          >
+            <Typography variant="subtitle1">Average Super Checker Time (In Seconds) : </Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Avg Super Checker Time (sec)"]}</Typography>
           </Grid>
           <Grid
             container
