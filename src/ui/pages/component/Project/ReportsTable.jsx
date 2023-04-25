@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, CircularProgress, Card, Radio,Typography,ThemeProvider } from '@mui/material';
+import { Box, Button, Grid, CircularProgress, Card, Radio, Typography, ThemeProvider } from '@mui/material';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
@@ -41,8 +41,8 @@ const ReportsTable = (props) => {
         open: false,
         message: "",
         variant: "success",
-      });
-    
+    });
+
 
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -50,10 +50,10 @@ const ReportsTable = (props) => {
     const classes = DatasetStyle();
     const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
     const [submitted, setSubmitted] = useState(false);
-    
-  const loggedInUserData = useSelector(
-    (state) => state.fetchLoggedInUserData.data
-  );
+
+    const loggedInUserData = useSelector(
+        (state) => state.fetchLoggedInUserData.data
+    );
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -82,30 +82,30 @@ const ReportsTable = (props) => {
     const handleChangeReports = (e) => {
         setRadiobutton(e.target.value)
     }
-   
+
 
     const renderToolBar = () => {
         const buttonSXStyle = { borderRadius: 2, margin: 2 }
         return (
-            
+
             <Box className={classes.ToolbarContainer}>
                 <ColumnList
                     columns={columns}
                     setColumns={setSelectedColumns}
                     selectedColumns={selectedColumns}
                 />
-               
+
             </Box>
         )
     }
 
 
-    
+
 
     const options = {
         filterType: 'checkbox',
         selectableRows: "none",
-        download:true,
+        download: true,
         filter: false,
         print: false,
         search: false,
@@ -117,8 +117,8 @@ const ReportsTable = (props) => {
                 noMatch: 'No Record Found!'
             },
         },
-       
-        
+
+
     };
 
     const handleRangeChange = (ranges) => {
@@ -127,7 +127,7 @@ const ReportsTable = (props) => {
         setSelectRange([selection]);
     };
 
-    const handleSubmit = async() => {
+    const handleSubmit = async () => {
         let projectObj;
         let reports_type = radiobutton === "SuperCheckerReports" ? "superchecker_reports" : "review_reports"
         setReportRequested(true);
@@ -136,90 +136,103 @@ const ReportsTable = (props) => {
         if (radiobutton === "AnnotatationReports") {
             projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'));
         }
-       else if(radiobutton === "ReviewerReports") {
-            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
+        else if (radiobutton === "ReviewerReports") {
+            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'), reports_type);
         }
-        else if(radiobutton === "SuperCheckerReports") {
-            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'),reports_type);
+        else if (radiobutton === "SuperCheckerReports") {
+            projectObj = new GetProjectReportAPI(id, format(selectRange[0].startDate, 'yyyy-MM-dd'), format(selectRange[0].endDate, 'yyyy-MM-dd'), reports_type);
         }
         dispatch(APITransport(projectObj));
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
             headers: projectObj.getHeaders().headers,
-          });
-          const resp = await res.json();
-          console.log(resp,"resp")
-          if (resp.message ) {
+        });
+        const resp = await res.json();
+        console.log(resp, "resp")
+        if (resp.message) {
             setSnackbarInfo({
                 open: true,
                 message: resp?.message,
                 variant: "error",
-              })
-            
-      
-          } 
-        
+            })
+
+
+        }
+
         setShowPicker(false)
-       
+
     }
 
-    let frozenUsers = ProjectDetails?.frozen_users?.map((e,)=>{
-        let temp = ProjectReport.find(element=> element.id === e.id)
-        if(temp?.ProjectReport) {
-          e.ProjectReport = temp.ProjectReport;
+    let frozenUsers = ProjectDetails?.frozen_users?.map((e,) => {
+        let temp = ProjectReport.find(element => element.id === e.id)
+        if (temp?.ProjectReport) {
+            e.ProjectReport = temp.ProjectReport;
         }
         return e;
-      })
- 
+    })
+
 
     const renderSnackBar = () => {
         return (
-          <CustomizedSnackbars
-            open={snackbar.open}
-            handleClose={() =>
-              setSnackbarInfo({ open: false, message: "", variant: "" })
-            }
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            variant={snackbar.variant}
-            message={snackbar.message}
-          />
+            <CustomizedSnackbars
+                open={snackbar.open}
+                handleClose={() =>
+                    setSnackbarInfo({ open: false, message: "", variant: "" })
+                }
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                variant={snackbar.variant}
+                message={snackbar.message}
+            />
         );
-      };
+    };
 
     return (
         <React.Fragment>
             {renderSnackBar()}
-            <Grid container direction="row" rowSpacing={2} sx={{  mb: 2 ,}}>
-            <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
-             <Typography gutterBottom component="div" sx={{marginTop: "10px",fontSize:"16px",}}>
-             Select Report Type :
-             </Typography>
-           </Grid >
-           <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
-                <FormControl >
+            <Grid container direction="row" rowSpacing={2} sx={{ mb: 2, }}>
+                <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
+                    <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
+                        Select Report Type :
+                    </Typography>
+                </Grid >
+                <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
+                    <FormControl >
 
-                    <RadioGroup
-                        row
-                        aria-labelledby="demo-row-radio-buttons-group-label"
-                        name="row-radio-buttons-group"
-                        sx={{ marginTop: "5px"}}
-                        value={radiobutton}
-                        onChange={handleChangeReports}
+                        <RadioGroup
+                            row
+                            aria-labelledby="demo-row-radio-buttons-group-label"
+                            name="row-radio-buttons-group"
+                            sx={{ marginTop: "5px" }}
+                            value={radiobutton}
+                            onChange={handleChangeReports}
 
-                    >
-                       {((ProjectDetails.project_stage == 1 || ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) || (ProjectDetails?.annotators?.some((user) => user.id === loggedInUserData.id ))) && <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator"  />}
-                    {((ProjectDetails.project_stage == 2 || ProjectDetails.project_stage == 3 ) && (ProjectDetails?.annotation_reviewers?.some((reviewer) => reviewer.id === loggedInUserData?.id))) &&  <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer"  />}
-                    {((ProjectDetails.project_stage == 3) || (ProjectDetails?.review_supercheckers?.some((superchecker) => superchecker.id === loggedInUserData?.id))) && <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker"  />}
-                    </RadioGroup>
-                </FormControl>
+                        >
+                            {(userRole.WorkspaceManager === loggedInUserData?.role ||
+                                userRole.OrganizationOwner === loggedInUserData?.role ||
+                                userRole.Admin === loggedInUserData?.role || ProjectDetails?.project_stage === 1 ||
+                                ProjectDetails?.annotators?.some((user) => user.id === loggedInUserData.id)) && <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />}
+                            {((userRole.WorkspaceManager === loggedInUserData?.role ||
+                                userRole.OrganizationOwner === loggedInUserData?.role ||
+                                userRole.Admin === loggedInUserData?.role) ? (ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) : ProjectDetails?.project_stage == 2 ||
+                            ProjectDetails?.annotation_reviewers?.some(
+                                (reviewer) => reviewer.id === loggedInUserData?.id
+                            )) && <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />}
+                            {((userRole.WorkspaceManager === loggedInUserData?.role ||
+                                userRole.OrganizationOwner === loggedInUserData?.role ||
+                                userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
+                            ProjectDetails?.review_supercheckers?.some(
+                                (superchecker) => superchecker.id === loggedInUserData?.id
+                            )) && <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" />}
+                        </RadioGroup>
+                    </FormControl>
                 </Grid >
                 <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
                     <Button
                         endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                         variant="contained"
                         color="primary"
-                        sx={{width:"130px"}}
+                        sx={{ width: "130px" }}
                         onClick={() => setShowPicker(!showPicker)}
                     >
                         Pick Dates
@@ -230,7 +243,7 @@ const ReportsTable = (props) => {
                         fullWidth
                         variant="contained"
                         onClick={handleSubmit}
-                        sx={{width:"130px"}}
+                        sx={{ width: "130px" }}
                     >
                         Submit
                     </Button>
@@ -268,37 +281,37 @@ const ReportsTable = (props) => {
                     />
                 </Card>
             </Box>}
-            { ProjectReport?.length > 0  ? (
+            {ProjectReport?.length > 0 ? (
                 <>
-                {!(userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role )  &&  frozenUsers.length > 0 &&  (
-                <Typography variant="body2" color="#F8644F">* User Inactive</Typography>)}
-            <ThemeProvider theme={tableTheme}>
-            {
-                showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
-                    <MUIDataTable
-                        title={radiobutton==="AnnotatationReports"? "Annotation Report" :"Reviewer Report"}
-                        data={ProjectReport}
-                        columns={columns.filter(col => selectedColumns.includes(col.name))}
-                        options={options}
-                    />
-                )
-            }
-            
-             </ThemeProvider>
-             </>
-             ):
+                    {!(userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role) && frozenUsers.length > 0 && (
+                        <Typography variant="body2" color="#F8644F">* User Inactive</Typography>)}
+                    <ThemeProvider theme={tableTheme}>
+                        {
+                            showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
+                                <MUIDataTable
+                                    title={radiobutton === "AnnotatationReports" ? "Annotation Report" : "Reviewer Report"}
+                                    data={ProjectReport}
+                                    columns={columns.filter(col => selectedColumns.includes(col.name))}
+                                    options={options}
+                                />
+                            )
+                        }
 
-             <Grid
-          container
-          justifyContent="center"
-        >
-          <Grid item sx={{mt:"10%"}}>
-            {showSpinner ? <CircularProgress color="primary" size={50} /> : (
-            !ProjectReport?.length && submitted && <>No results</>
-            )}
-          </Grid>
-          </Grid>
-}
+                    </ThemeProvider>
+                </>
+            ) :
+
+                <Grid
+                    container
+                    justifyContent="center"
+                >
+                    <Grid item sx={{ mt: "10%" }}>
+                        {showSpinner ? <CircularProgress color="primary" size={50} /> : (
+                            !ProjectReport?.length && submitted && <>No results</>
+                        )}
+                    </Grid>
+                </Grid>
+            }
         </React.Fragment>
     )
 }
