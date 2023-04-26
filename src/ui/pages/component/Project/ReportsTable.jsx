@@ -25,6 +25,7 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 
 const ReportsTable = (props) => {
+    const {isSuperChecker,isReviewer,isAnnotators}=props
     const ProjectDetails = useSelector(state => state.getProjectDetails.data);
     const [selectRange, setSelectRange] = useState([{
         startDate: new Date(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
@@ -48,7 +49,7 @@ const ReportsTable = (props) => {
     const dispatch = useDispatch();
     const ProjectReport = useSelector(state => state.getProjectReport.data);
     const classes = DatasetStyle();
-    const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
+    const [radiobutton, setRadiobutton] = useState(isAnnotators?"AnnotatationReports":isReviewer?"ReviewerReports":"SuperCheckerReports");
     const [submitted, setSubmitted] = useState(false);
 
     const loggedInUserData = useSelector(
