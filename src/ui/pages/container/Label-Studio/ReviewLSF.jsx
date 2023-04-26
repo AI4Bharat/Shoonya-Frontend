@@ -124,7 +124,7 @@ const filterAnnotations = (
       ) {
         filteredAnnotations = [superCheckedAnnotation];
         setFilterMessage(
-          "You are seeing the Super Checker's Annotations in read only mode"
+          "This is the Super Checker's Annotation in read only mode"
         );
         setDisableBtns(true);
         disable = true;
@@ -757,7 +757,7 @@ const LabelStudioWrapper = ({
   return (
     <div>
       {filterMessage && (
-        <Alert severity="warning" showIcon style={{ marginBottom: "1%" }}>
+        <Alert severity="info" showIcon style={{ marginBottom: "1%" }}>
           {filterMessage}
         </Alert>
       )}
