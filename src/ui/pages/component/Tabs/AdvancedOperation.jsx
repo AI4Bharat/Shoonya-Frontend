@@ -44,6 +44,8 @@ import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
 import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
+import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
+import userRole from "../../../../utils/UserMappedByRole/Roles"
 
 
 const ProgressType = [
@@ -337,7 +339,7 @@ const AdvancedOperation = (props) => {
 
   useEffect(() => {
     setIsArchived(ProjectDetails?.is_archived);
-  }, [ProjectDetails]);
+  }, [ProjectDetails]);  
 
   const handleDownloadProjectAnnotations = () => {
     getDownloadProjectAnnotations();
@@ -630,7 +632,21 @@ const AdvancedOperation = (props) => {
               </Select>
             </FormControl>
           </Grid>
+
+        {((userRole.WorkspaceManager === loggedInUserData?.role ||
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
+    ProjectDetails?.review_supercheckers?.some(
+      (superchecker) => superchecker.id === loggedInUserData?.id
+    )) &&
+          <Grid item xs={12} sm={12} md={12} lg={6} xl={6}             
+         >
+              <SuperCheckSettings ProjectDetails={ProjectDetails}/>
+          </Grid>}
         </Grid>
+
+
+       
 
         <Grid
           container
@@ -643,6 +659,7 @@ const AdvancedOperation = (props) => {
           spacing={1}
           rowGap={2}
           columnSpacing={2}
+          sx={{mt:1}}
         >
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
