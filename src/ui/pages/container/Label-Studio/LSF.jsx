@@ -20,6 +20,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
+import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 
 import {
   getProjectsandTasks,
@@ -418,10 +419,11 @@ const LabelStudioWrapper = ({
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
-                labelConfig.project_type === "ConversationTranslationEditing"
+                labelConfig.project_type === "ConversationTranslationEditing"     
                 ? generateLabelConfig(taskData.data)
+                : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data)
                 : labelConfig.label_config;
-            setLabelConfig(tempLabelConfig);
+                setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
             getTaskData(taskData);
             LSFRoot(
