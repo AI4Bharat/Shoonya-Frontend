@@ -85,6 +85,7 @@ const StyledMenu = styled((props) => (
   },
 }));
 
+
 const filterAnnotations = (annotations, user_id) => {
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
@@ -144,11 +145,9 @@ const LabelStudioWrapper = ({
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   let loaded = useRef();
-
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
-
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -535,6 +534,8 @@ const LabelStudioWrapper = ({
     );
   };
 
+  const ProjectsData = (localStorage.getItem("projectData"))
+ const ProjectData = JSON.parse(ProjectsData)
 
   return (
     <div>
@@ -581,7 +582,8 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {taskData?.super_check_user === userData?.id && (
+            {taskData?.super_check_user === userData?.id  && (
+              <>  { (ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count?true:false ) &&(
               <Tooltip title="Reject">
                 <Button
                   value="Reject"
@@ -601,6 +603,7 @@ const LabelStudioWrapper = ({
                  Reject
                 </Button>
               </Tooltip>
+)}</>
             )}
             {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Validate">
@@ -697,8 +700,8 @@ export default function LSF() {
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-
   const handleTagChange = (event, value, reason) => {
+
     if (reason === "selectOption") {
       setSelectedTag(value);
       let copyValue = `[${value}]`;

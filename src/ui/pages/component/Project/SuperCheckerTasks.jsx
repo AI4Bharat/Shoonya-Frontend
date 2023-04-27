@@ -99,7 +99,7 @@ const SuperCheckerTasks = (props) => {
   const taskList = useSelector(
     (state) => state.getTasksByProjectId.data.result
   );
-
+  localStorage.setItem("projectData", JSON.stringify(ProjectDetails));
 
   const getTaskListData = () => {
     const taskObj = new GetTasksByProjectIdAPI(
