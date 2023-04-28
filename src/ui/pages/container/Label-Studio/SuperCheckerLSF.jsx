@@ -25,6 +25,7 @@ import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 import InfoIcon from '@mui/icons-material/Info';
 import getCaretCoordinates from "textarea-caret";
+import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification"
 
 import {
   getProjectsandTasks,
@@ -459,6 +460,7 @@ const LabelStudioWrapper = ({
             labelConfig.project_type === "ConversationTranslation" ||
             labelConfig.project_type === "ConversationTranslationEditing"
               ? generateLabelConfig(taskData.data)
+              : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data)
               : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);

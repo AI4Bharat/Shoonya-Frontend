@@ -6,24 +6,25 @@ const conversationVerificationLabelConfig = (taskData) => {
     const sourceChat = (taskData.unverified_conversation_json)?.map((item, idx) => {
         const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
         return (
-        `<View style="display: flex; flex-direction: column; font-weight: 500; gap: 4px; margin: 0 0 8px;">
+            `<View style="display: flex; flex-direction: column; font-weight: 500; gap: 4px; margin: 0 0 8px;">
             <Text name="speaker_${idx}" value="${speaker.name} (${speaker.gender})" />
-            ${item.sentences.map((sentence, idx2) =>  {
-            return `<View style="font-weight: normal; font-size: 16px; width: 90%; margin: 0 0 12px; background: #d9d9d9; border-radius: 8px; padding: 4px 10px;">
+            ${item.sentences.map((sentence, idx2) => {
+                return `<View style="font-weight: normal; font-size: 16px; width: 90%; margin: 0 0 12px; background: #d9d9d9; border-radius: 8px; padding: 4px 10px;">
                 <Text name="dialog_${idx}_${idx2}" value="${sentence}" />
             </View>`
             }).join("")}
         </View>`
-    )}).join("");
+        )
+    }).join("");
 
     const outputChat = (taskData.unverified_conversation_json)?.map((item, idx) => {
         const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
         return (
-        `<View style="display: flex; flex-direction: column; width: 90%; font-weight: 500;">
+            `<View style="display: flex; flex-direction: column; width: 90%; font-weight: 500;">
             <Text name="output_speaker_${idx}" value="${speaker.name} (${speaker.gender})" />
             ${item.sentences.map((sentence, idx2) => {
-            const rows = Math.floor(sentence.length / 36) + 1;
-            return `
+                const rows = Math.floor(sentence.length / 36) + 1;
+                return `
                 <TextArea
                 name="output_${idx}_${idx2}"
                 toName="dialog_${idx}_${idx2}"
@@ -38,7 +39,8 @@ const conversationVerificationLabelConfig = (taskData) => {
             }
             ).join("")}
         </View>`
-    )}).join("");
+        )
+    }).join("");
 
     const metadata = Object.keys(taskData).map((key) => {
         if (["unverified_conversation_json", "speakers_json"].includes(key) || !taskData[key]) return "";
@@ -48,22 +50,6 @@ const conversationVerificationLabelConfig = (taskData) => {
             <Text name="${key}" value="${taskData[key]}" />
         </View>`;
     }).join("");
-
-
-    // const qualityStatus = (taskData.unverified_conversation_json)?.map((item, idx) => {
-    //     return (
-    //     `<View >
-    //     <Choices name="quality_status"  choice="single-radio" required="true">
-    //     <Choice alias="Clean" value="Clean" />
-    //     <Choice alias="Profane" value="Profane" />
-    //     <Choice alias="Difficultvocabulary" value="Difficult vocabulary" />
-    //     <Choice alias="Ambiguoussentence" value="Ambiguous sentence" />
-    //     <Choice alias="Corrupt" value="Corrupt" />
-    //   </Choices>
-    //     </View>`
-    // )}).join("");
-
-    // console.log(qualityStatus,"qualityStatus")
 
     return `
         <View>
@@ -79,12 +65,8 @@ const conversationVerificationLabelConfig = (taskData) => {
               <Choice alias="Difficultvocabulary" value="Difficult vocabulary" />
               <Choice alias="Ambiguoussentence" value="Ambiguous sentence" />
               <Choice alias="Corrupt" value="Corrupt" />
-            </Choices>
-           
-          </View>
-         
-
-          
+            </Choices> 
+          </View>  
         <View style="font-size: large; display: grid; grid-template: auto/1fr 1fr; column-gap: 1em;">
             <Header size="3" value="Unverified Conversation"/>
             <Header size="3" value="Verified Conversation"/>
@@ -95,7 +77,6 @@ const conversationVerificationLabelConfig = (taskData) => {
             ${outputChat}
             </View>
         </View>
-       
         </View>`;
 };
 
