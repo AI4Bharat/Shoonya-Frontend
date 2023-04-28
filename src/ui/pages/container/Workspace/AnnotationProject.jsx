@@ -120,13 +120,14 @@ const AnnotationProject = (props) => {
     "id",
     "rating",
     // "conversation_json",
-    // "machine_translated_conversation_json",
+    "machine_translated_conversation_json",
     "speakers_json",
     "transcribed_json",
     "conversation_json",
     "prediction_json",
     "machine_transcribed_json", 
-    "unverified_conversation_json",
+   "unverified_conversation_json",
+
   ];
   const renderToolBar = () => {
     return (
