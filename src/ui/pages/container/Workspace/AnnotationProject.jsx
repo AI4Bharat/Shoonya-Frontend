@@ -126,6 +126,7 @@ const AnnotationProject = (props) => {
     "conversation_json",
     "prediction_json",
     "machine_transcribed_json", 
+    "unverified_conversation_json",
   ];
   const renderToolBar = () => {
     return (
