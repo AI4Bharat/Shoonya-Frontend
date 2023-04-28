@@ -61,9 +61,6 @@ const conversationVerificationLabelConfig = (taskData) => {
             <View>
             <Choices name="quality_status"   toName="quality_status" choice="single-radio" required="true" showInLine="true">
               <Choice alias="Clean" value="Clean" />
-              <Choice alias="Profane" value="Profane" />
-              <Choice alias="Difficultvocabulary" value="Difficult vocabulary" />
-              <Choice alias="Ambiguoussentence" value="Ambiguous sentence" />
               <Choice alias="Corrupt" value="Corrupt" />
             </Choices> 
           </View>  
