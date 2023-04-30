@@ -51,6 +51,7 @@ const excludeCols = [
   "machine_translated_conversation_json",
   "speakers_json",
   "language",
+  "unverified_conversation_json",
 ];
 const excludeSearch = ["status", "actions"];
 const SuperCheckerTasks = (props) => {
@@ -99,7 +100,7 @@ const SuperCheckerTasks = (props) => {
   const taskList = useSelector(
     (state) => state.getTasksByProjectId.data.result
   );
-
+  localStorage.setItem("projectData", JSON.stringify(ProjectDetails));
 
   const getTaskListData = () => {
     const taskObj = new GetTasksByProjectIdAPI(

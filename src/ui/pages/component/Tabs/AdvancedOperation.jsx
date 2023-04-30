@@ -44,12 +44,15 @@ import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
 import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
+import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
+import userRole from "../../../../utils/UserMappedByRole/Roles"
 
 
 const ProgressType = [
   "incomplete",
   "annotated",
   "reviewed",
+  "super_checked",
   "exported",
 ];
 const projectStage = [{name:"Annotation Stage",value: 1 ,disabled:false}, {name:"Review Stage",value: 2,disabled:false} ,{name:"Super Check Stage",value: 3,disabled:false}]
@@ -92,12 +95,6 @@ const AdvancedOperation = (props) => {
   const [OpenExportProjectDialog, setOpenExportProjectDialog] = useState(false);
   const [datasetId, setDatasetId] = useState("");
   const [projectType, setProjectType] = useState("");
-  const [taskStatus, setTaskStatus] = useState([
-    "incomplete",
-  "annotated",
-  "reviewed",
-  "exported",
-  ]);
   const [taskReviews,setTaskReviews] = useState( "")
   const { id } = useParams();
   const classes = DatasetStyle();
@@ -112,6 +109,21 @@ const AdvancedOperation = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
+
+  const isSuperChecker =
+  ((userRole.WorkspaceManager === loggedInUserData?.role ||
+    userRole.OrganizationOwner === loggedInUserData?.role ||
+    userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
+  ProjectDetails?.review_supercheckers?.some(
+    (superchecker) => superchecker.id === loggedInUserData?.id
+  ));
+
+  const [taskStatus, setTaskStatus] = useState(isSuperChecker ?["incomplete", "annotated", "reviewed", "super_checked", "exported", ]:[ "incomplete", "annotated","reviewed","super_checked","exported",]);
+
+  let ProgressTypeValue = "super_checked"
+  const filterdata = ProgressType.filter(item => item !== ProgressTypeValue)
+  const FilterProgressType = isSuperChecker ? ProgressType : filterdata
+
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
     dispatch(APITransport(projectObj));
@@ -337,7 +349,7 @@ const AdvancedOperation = (props) => {
 
   useEffect(() => {
     setIsArchived(ProjectDetails?.is_archived);
-  }, [ProjectDetails]);
+  }, [ProjectDetails]);  
 
   const handleDownloadProjectAnnotations = () => {
     getDownloadProjectAnnotations();
@@ -470,7 +482,7 @@ const AdvancedOperation = (props) => {
                 renderValue={(taskStatus) => taskStatus.join(", ")}
                 MenuProps={MenuProps}
               >
-                {ProgressType.map((option) => (
+                {FilterProgressType.map((option) => (
                   <MenuItem
                     sx={{ textTransform: "capitalize" }}
                     key={option}
@@ -630,7 +642,21 @@ const AdvancedOperation = (props) => {
               </Select>
             </FormControl>
           </Grid>
+
+        {((userRole.WorkspaceManager === loggedInUserData?.role ||
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
+    ProjectDetails?.review_supercheckers?.some(
+      (superchecker) => superchecker.id === loggedInUserData?.id
+    )) &&
+          <Grid item xs={12} sm={12} md={12} lg={6} xl={6}             
+         >
+              <SuperCheckSettings ProjectDetails={ProjectDetails}/>
+          </Grid>}
         </Grid>
+
+
+       
 
         <Grid
           container
@@ -643,6 +669,7 @@ const AdvancedOperation = (props) => {
           spacing={1}
           rowGap={2}
           columnSpacing={2}
+          sx={{mt:1}}
         >
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

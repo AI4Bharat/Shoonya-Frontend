@@ -131,19 +131,20 @@ const Projects = () => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-console.log(ProjectDetails,"ProjectDetailsProjectDetails")
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
 
     dispatch(APITransport(projectObj));
   };
+
+
   useEffect(() => {
     getProjectDetails();
     const projectStatus = ProjectDetails.is_published
       ? "Published"
       : ProjectDetails.is_archived
-      ? "Archived"
-      : "Draft";
+        ? "Archived"
+        : "Draft";
     setProjectData([
       {
         name: "Project ID",
@@ -169,7 +170,7 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
         name: "Unassigned Review Tasks",
         value: ProjectDetails.labeled_task_count,
       },
-      
+
       {
         name: "Unassigned Super Check Tasks",
         value: ProjectDetails.reviewed_task_count,
@@ -243,7 +244,12 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
     navigate(`/projects/${id}/projectsetting`);
   };
 
-  
+
+  let projectValue = "Unassigned Super Check Tasks"
+  const filterdata = projectData.filter(item => item.name !== projectValue)
+  const projectFilterData = isSuperChecker ? projectData : filterdata
+
+
   const TabPanData = [
     {
       tabEle: (
@@ -260,7 +266,7 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
     {
       tabEle: (
         <Tab
-        label={translate("label.reviewTasks")}
+          label={translate("label.reviewTasks")}
           sx={{ fontSize: 16, fontWeight: "700" }}
         />
       ),
@@ -297,7 +303,7 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
     {
       tabEle: (
         <Tab
-        label={translate("label.reviewers")}
+          label={translate("label.reviewers")}
           sx={{ fontSize: 16, fontWeight: "700" }}
         />
       ),
@@ -325,7 +331,7 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
         />
       ),
       showTab: isSuperChecker,
-      
+
     },
 
     {
@@ -344,6 +350,9 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
         <ReportsTable
           annotationreviewertype={annotationreviewertype}
           userDetails={userDetails}
+          isAnnotators={isAnnotators}
+          isReviewer={isReviewer}
+          isSuperChecker={isSuperChecker}
         />
       ),
       showTab: (isAnnotators || isReviewer || isSuperChecker)
@@ -358,7 +367,7 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
     },
   ];
 
-  const filteredTabPanData = TabPanData.filter((el,i)=> el.showTab);
+  const filteredTabPanData = TabPanData.filter((el, i) => el.showTab);
 
   const renderTabs = () => {
     return (
@@ -376,18 +385,18 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
             </Tabs>
           </Box>
         </Grid>
-        {filteredTabPanData.map((el, i,array) => {
+        {filteredTabPanData.map((el, i, array) => {
           return (
             <>
-          
-          <TabPanel value={value}  index={i}>
-            {el.tabPanelEle}
-          
-          </TabPanel>
-            </> 
-          ) 
+
+              <TabPanel value={value} index={i}>
+                {el.tabPanelEle}
+
+              </TabPanel>
+            </>
+          )
         })}
-       
+
       </>
     );
   };
@@ -424,25 +433,25 @@ console.log(ProjectDetails,"ProjectDetailsProjectDetails")
             {(userRole.WorkspaceManager === loggedInUserData?.role ||
               userRole.OrganizationOwner === loggedInUserData?.role ||
               userRole.Admin === loggedInUserData?.role) && (
-              <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                <Tooltip title={translate("label.showProjectSettings")}>
-                  <IconButton
-                    onClick={handleOpenSettings}
-                    sx={{ marginLeft: "140px" }}
-                  >
-                    <SettingsOutlinedIcon
-                      color="primary.dark"
-                      fontSize="large"
-                    />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            )}
+                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+                  <Tooltip title={translate("label.showProjectSettings")}>
+                    <IconButton
+                      onClick={handleOpenSettings}
+                      sx={{ marginLeft: "140px" }}
+                    >
+                      <SettingsOutlinedIcon
+                        color="primary.dark"
+                        fontSize="large"
+                      />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              )}
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mb: 2 }}>
             <Grid container spacing={2}>
-              {projectData?.map((des, i) => (
-                <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+              {projectFilterData?.map((des, i) => (
+                <Grid item xs={isSuperChecker?3:4} sm={isSuperChecker?3:4} md={isSuperChecker?3:4} lg={isSuperChecker?3:4} xl={isSuperChecker?3:4}>
                   <ProjectDescription
                     name={des.name}
                     value={des.value}

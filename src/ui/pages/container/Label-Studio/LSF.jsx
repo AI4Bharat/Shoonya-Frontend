@@ -20,6 +20,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
+import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 
 import {
   getProjectsandTasks,
@@ -42,37 +43,71 @@ import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
 import getCaretCoordinates from "textarea-caret";
 import CloseIcon from "@mui/icons-material/Close";
 
-const filterAnnotations = (annotations, user_id) => {
-  let flag = false;
+const filterAnnotations = (
+  annotations,
+  user_id,
+  setDisableBtns,
+  setFilterMessage
+) => {
+  let disable = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
+  console.log(userAnnotation, "test");
   if (userAnnotation) {
-    filteredAnnotations = [userAnnotation];
     if (userAnnotation.annotation_status === "labeled") {
-      let review = annotations.find(
-        (annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 2
+      const superCheckedAnnotation = annotations.find(
+        (annotation) => annotation.annotation_type === 3
       );
-      if (review) {
+      let review = annotations.find(
+        (annotation) =>
+          annotation.parent_annotation === userAnnotation.id &&
+          annotation.annotation_type === 2
+      );
+      console.log(superCheckedAnnotation, review, annotations, "test");
+      if (
+        superCheckedAnnotation &&
+        ["draft", "skipped", "validated", "validated_with_changes"].includes(
+          superCheckedAnnotation.annotation_status
+        )
+      ) {
+        filteredAnnotations = [superCheckedAnnotation];
+        setFilterMessage(
+          "This is the Super Checker's Annotation in read only mode"
+        );
+        setDisableBtns(true);
+        disable = true;
+      } else if (review) {
         if (
           [
+            "skipped",
+            "draft",
+            "rejected",
             "accepted",
             "accepted_with_minor_changes",
             "accepted_with_major_changes",
           ].includes(review.annotation_status)
         ) {
           filteredAnnotations = [review];
-          flag = true;
+          disable = true;
+          setDisableBtns(true);
+          setFilterMessage(
+            "This is the Reviewer's Annotation in read only mode"
+          );
         }
+      } else {
+        filteredAnnotations = [userAnnotation];
       }
+    } else {
+      filteredAnnotations = [userAnnotation];
     }
   }
-  return [filteredAnnotations, flag];
+  return [filteredAnnotations, disable];
 };
 
 //used just in postAnnotation to support draft status update.
@@ -106,13 +141,14 @@ const LabelStudioWrapper = ({
   });
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
-  const [isAccepted, setIsAccepted] = useState(false);
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
 
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
+  const [disableBtns, setDisableBtns] = useState(false);
+  const [filterMessage, setFilterMessage] = useState(null);
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -121,7 +157,9 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true,
+        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
+          ? false
+          : true,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
@@ -171,14 +209,17 @@ const LabelStudioWrapper = ({
     annotations,
     predictions,
     annotationNotesRef,
-    projectType,
-    setIsAccepted,
+    projectType
   ) {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, isAccepted] = filterAnnotations(annotations, userData.id);
-    setIsAccepted(isAccepted);
+    const [filteredAnnotations, disableLSFControls] = filterAnnotations(
+      annotations,
+      userData.id,
+      setDisableBtns,
+      setFilterMessage
+    );
     console.log("labelConfig", labelConfig);
 
     if (taskData.task_status === "freezed") {
@@ -187,11 +228,12 @@ const LabelStudioWrapper = ({
         // "update",
         // "submit",
         "skip",
-        ...(!isAccepted && ["controls"]),
+        ...(!disableLSFControls && ["controls"]),
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription" || projectType === "AudioTranscriptionEditing")
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -212,13 +254,16 @@ const LabelStudioWrapper = ({
         "update",
         "submit",
         "skip",
-        ...(taskData?.annotation_users?.some((user) => user === userData.id && !isAccepted)
+        ...(taskData?.annotation_users?.some(
+          (user) => user === userData.id && !disableLSFControls
+        )
           ? ["controls"]
           : []),
         "infobar",
         "topbar",
         "instruction",
-        ...((projectType === "AudioTranscription" || projectType === "AudioTranscriptionEditing")
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -259,9 +304,8 @@ const LabelStudioWrapper = ({
         },
 
         onLabelStudioLoad: function (ls) {
-          annotation_status.current = ProjectDetails.project_stage == 2
-            ? "labeled"
-            : "labeled";
+          annotation_status.current =
+            ProjectDetails.project_stage == 2 ? "labeled" : "labeled";
           //console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
           if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
@@ -333,7 +377,7 @@ const LabelStudioWrapper = ({
               if (
                 !annotations[i].result?.length ||
                 annotation.serializeAnnotation()[0].id ===
-                annotations[i].result[0].id
+                  annotations[i].result[0].id
               ) {
                 !isAutoSave && showLoader();
                 let temp = annotation.serializeAnnotation();
@@ -348,7 +392,9 @@ const LabelStudioWrapper = ({
                   annotations[i].id,
                   load_time,
                   annotations[i].lead_time,
-                  isAutoSave ? annotations[i].annotation_status : annotation_status.current,
+                  isAutoSave
+                    ? annotations[i].annotation_status
+                    : annotation_status.current,
                   annotationNotesRef.current.value
                 ).then((err) => {
                   if (err) {
@@ -418,10 +464,11 @@ const LabelStudioWrapper = ({
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
-                labelConfig.project_type === "ConversationTranslationEditing"
+                labelConfig.project_type === "ConversationTranslationEditing"     
                 ? generateLabelConfig(taskData.data)
+                : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data)
                 : labelConfig.label_config;
-            setLabelConfig(tempLabelConfig);
+                setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
             getTaskData(taskData);
             LSFRoot(
@@ -434,8 +481,7 @@ const LabelStudioWrapper = ({
               annotations,
               predictions,
               annotationNotesRef,
-              labelConfig.project_type,
-              setIsAccepted,
+              labelConfig.project_type
             );
             hideLoader();
           }
@@ -606,9 +652,11 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
-      {!loader && isAccepted && <Alert severity="success" sx={{ mb: 3 }}>
-        This annotation has already been accepted by the reviewer.
-      </Alert>}
+      {filterMessage && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          {filterMessage}
+        </Alert>
+      )}
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -620,7 +668,8 @@ const LabelStudioWrapper = ({
             <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
-              ) && !isAccepted && (
+              ) &&
+                !disableBtns && (
                   <Tooltip title="Save task for later">
                     <Button
                       value="Draft"
@@ -705,8 +754,8 @@ export default function LSF() {
   const [alertData, setAlertData] = useState({
     open: false,
     message: "",
-    variant: "info"
-  })
+    variant: "info",
+  });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -718,15 +767,22 @@ export default function LSF() {
       setSelectedTag(value);
       let copyValue = `[${value}]`;
       navigator.clipboard.writeText(copyValue);
-      setAlertData({ open: true, message: `Tag ${copyValue} copied to clipboard`, variant: "info" });
+      setAlertData({
+        open: true,
+        message: `Tag ${copyValue} copied to clipboard`,
+        variant: "info",
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    if (ProjectDetails?.project_type && ProjectDetails?.project_type.toLowerCase().includes("audio")) {
+    if (
+      ProjectDetails?.project_type &&
+      ProjectDetails?.project_type.toLowerCase().includes("audio")
+    ) {
       setShowTagsInput(true);
     }
-  }, [ProjectDetails])
+  }, [ProjectDetails]);
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -785,112 +841,130 @@ export default function LSF() {
         }}
       >
         <div
-            style={{
-              display: "flow-root",
-              marginBottom: "30px"
-            }}
-          >
-        {!loader && (
-          <Button
-            endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-            variant="contained"
-            color={reviewNotesRef.current?.value !== "" ? "success" : "primary"}
-            onClick={handleCollapseClick}
-            // style={{ marginBottom: "20px" }}
-          >
-            Notes {reviewNotesRef.current?.value !== "" && "*"}
-          </Button>
-        )}
-
-        <div
-          className={styles.collapse}
           style={{
-            display: showNotes ? "block" : "none",
-            paddingBottom: "16px",
+            display: "flow-root",
+            marginBottom: "30px",
           }}
         >
-          {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+          {!loader && (
+            <Button
+              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color={
+                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+              }
+              onClick={handleCollapseClick}
+              // style={{ marginBottom: "20px" }}
+            >
+              Notes {reviewNotesRef.current?.value !== "" && "*"}
+            </Button>
+          )}
+
+          <div
+            className={styles.collapse}
+            style={{
+              display: showNotes ? "block" : "none",
+              paddingBottom: "16px",
+            }}
+          >
+            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-          <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Annotation Notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={annotationNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-            }}
-            style={{ width: "99%" }}
-          />
-          <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Review Notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={reviewNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-              readOnly: true,
-            }}
-            style={{ width: "99%", marginTop: "1%" }}
-          />
-        </div>
-        <Button
-          variant="contained"
-          style={{ marginLeft: "10px" }}
-          endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-          onClick={handleGlossaryClick}
-        >
-          Glossary
-        </Button>
-        <div
-          style={{
-            display: showGlossary ? "block" : "none",
-            paddingBottom: "16px",
-          }}
-        >
-          <Glossary taskData={taskData} />
-        </div>
-
-        {showTagsInput &&
-        <div style={{display: "inline-flex", justifyContent: "center", alignItems: "center"}}>
-        <Autocomplete
-              id="demo"
-              value={selectedTag}
-              onChange={handleTagChange}
-              options={TabsSuggestionData}
-              size={"small"}
-              getOptionLabel={(option) => option}
-              sx={{ width: 200, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
-              renderInput={(params) => <TextField {...params} label="Select Noise Tag"
-                placeholder="Select Noise Tag"
-                style={{ fontSize: "14px" }}
-              />}
-              renderOption={(props, option, state) => {
-                return <MenuItem {...props}>{option}</MenuItem>
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Annotation Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={annotationNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
               }}
-
+              style={{ width: "99%" }}
             />
-            <Tooltip title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription." placement="right">
-              <InfoIcon color="primary" />
-            </Tooltip>
-        </div>
-            
-          }
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Review Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={reviewNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            />
           </div>
+          <Button
+            variant="contained"
+            style={{ marginLeft: "10px" }}
+            endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+            onClick={handleGlossaryClick}
+          >
+            Glossary
+          </Button>
+          <div
+            style={{
+              display: showGlossary ? "block" : "none",
+              paddingBottom: "16px",
+            }}
+          >
+            <Glossary taskData={taskData} />
+          </div>
+
+          {showTagsInput && (
+            <div
+              style={{
+                display: "inline-flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Autocomplete
+                id="demo"
+                value={selectedTag}
+                onChange={handleTagChange}
+                options={TabsSuggestionData}
+                size={"small"}
+                getOptionLabel={(option) => option}
+                sx={{
+                  width: 200,
+                  display: "inline-flex",
+                  marginLeft: "10px",
+                  marginRight: "10px",
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Noise Tag"
+                    placeholder="Select Noise Tag"
+                    style={{ fontSize: "14px" }}
+                  />
+                )}
+                renderOption={(props, option, state) => {
+                  return <MenuItem {...props}>{option}</MenuItem>;
+                }}
+              />
+              <Tooltip
+                title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription."
+                placement="right"
+              >
+                <InfoIcon color="primary" />
+              </Tooltip>
+            </div>
+          )}
+        </div>
         <CustomizedSnackbars
           open={alertData.open}
           handleClose={() => setAlertData({ ...alertData, open: false })}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: "top",
+            horizontal: "right",
           }}
           variant={alertData.variant}
           message={alertData.message}
