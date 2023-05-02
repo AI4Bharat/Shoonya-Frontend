@@ -151,7 +151,6 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-console.log(superCheckerNotesRef.current?.value,"hhhhhhhhhhhhhhhhhh")
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
@@ -212,8 +211,6 @@ console.log(superCheckerNotesRef.current?.value,"hhhhhhhhhhhhhhhhhh")
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
-
-   
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -343,8 +340,6 @@ console.log(superCheckerNotesRef.current?.value,"hhhhhhhhhhhhhhhhhh")
 
       
         onUpdateAnnotation: function (ls, annotation) {
-
-          console.log(superCheckerNotesRef.current?.value,"superCheckerNotesRef.current.value")
           if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
               if (
@@ -483,8 +478,8 @@ console.log(superCheckerNotesRef.current?.value,"hhhhhhhhhhhhhhhhhh")
             annotations,
             predictions,
             annotationNotesRef,
-            superCheckerNotesRef,
             reviewNotesRef,
+            superCheckerNotesRef,
             labelConfig.project_type
           );
           hideLoader();
@@ -747,7 +742,6 @@ export default function LSF() {
   const handleGlossaryClick = () => {
     setShowGlossary(!showGlossary);
   };
-  console.log("superCheckerNotesRef",superCheckerNotesRef.current?.value)
 
 
   return (
@@ -830,6 +824,7 @@ export default function LSF() {
             maxRows={4}
             inputProps={{
               style: { fontSize: "1rem" },
+              readOnly: true,
             }}
             style={{ width: "99%", marginTop: "1%" }}
           />
