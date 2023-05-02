@@ -118,7 +118,6 @@ const filterAnnotations = (annotations, user_id) => {
 };
 
 //used just in postAnnotation to support draft status update.
-
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -320,6 +319,7 @@ const LabelStudioWrapper = ({
         },
 
         onSkipTask: function (annotation) {
+
           // message.warning('Notes will not be saved for skipped tasks!');
           let review = annotations.find(
             (value) => value.annotation_type === 3
@@ -331,7 +331,7 @@ const LabelStudioWrapper = ({
               load_time,
               review.lead_time,
               "skipped",
-              reviewNotesRef.current.value
+              superCheckerNotesRef.current.value
             ).then(() => {
               getNextProject(projectId, taskData.id, "supercheck").then((res) => {
                 hideLoader();
@@ -343,6 +343,8 @@ const LabelStudioWrapper = ({
 
       
         onUpdateAnnotation: function (ls, annotation) {
+
+          console.log(superCheckerNotesRef.current.value,"superCheckerNotesRef.current.value")
           if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
               if (
@@ -373,7 +375,7 @@ const LabelStudioWrapper = ({
                     ? annotation.serializeAnnotation()
                     : temp,
                     superChecker.parent_annotation,
-                 
+                    superCheckerNotesRef.current.value
                 ).then(() => {
                   if (localStorage.getItem("labelAll"))
                     getNextProject(projectId, taskData.id, "supercheck").then(
@@ -412,6 +414,8 @@ const LabelStudioWrapper = ({
      
         if (correctAnnotation) {
           reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
+          superCheckerNotesRef.current.value = correctAnnotation.supercheck_notes ?? "";
+
           annotationNotesRef.current.value =
             annotations.find(
               (annotation) =>
@@ -420,6 +424,8 @@ const LabelStudioWrapper = ({
         } else {
           reviewNotesRef.current.value =
             reviewerAnnotations[0].review_notes ?? "";
+            superCheckerNotesRef.current.value =
+            reviewerAnnotations[0].supercheck_notes ?? "";
           annotationNotesRef.current.value =
             annotations.find(
               (annotation) =>
@@ -432,7 +438,9 @@ const LabelStudioWrapper = ({
         );
         annotationNotesRef.current.value =
           normalAnnotation.annotation_notes ?? "";
-        reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
+          reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
+          superCheckerNotesRef.current.value =  normalAnnotation.supercheck_notes ?? "";
+
       }
     }
   };
@@ -487,6 +495,8 @@ const LabelStudioWrapper = ({
 
     // Traversing and tab formatting --------------------------- end
   }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, superCheckerNotesRef,taskId]);
+
+  console.log( superCheckerNotesRef.current?.value," superCheckerNotesRef.current.value")
 
   useEffect(() => {
     showLoader();
@@ -724,7 +734,8 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
-    reviewNotesRef.current.value = "";
+    // superCheckerNotesRef.current.value = "";
+    // reviewNotesRef.current.value = "";
   };
 
   useEffect(() => {
@@ -737,6 +748,8 @@ export default function LSF() {
   const handleGlossaryClick = () => {
     setShowGlossary(!showGlossary);
   };
+  console.log("superCheckerNotesRef",superCheckerNotesRef.current?.value)
+
 
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
@@ -823,20 +836,19 @@ export default function LSF() {
           />
 
 <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Supercheck notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={superCheckerNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-              readOnly: true,
-            }}
-            style={{ width: "99%", marginTop: "1%" }}
-          />
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Super Checker Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={superCheckerNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            />
         </div>
         <Button
           variant="contained"

@@ -162,7 +162,7 @@ const patchSuperChecker = async (
   review_status,
   result,
   parentAnnotation,
- 
+  superchecknotes, 
 ) => {
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
@@ -170,7 +170,7 @@ const patchSuperChecker = async (
       annotation_status: review_status,
       result: result,
       parent_annotation: parentAnnotation,
-       
+      supercheck_notes:superchecknotes
     });
    
   } catch (err) {
