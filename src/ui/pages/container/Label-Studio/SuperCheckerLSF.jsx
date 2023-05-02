@@ -151,7 +151,7 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-
+console.log(superCheckerNotesRef.current?.value,"hhhhhhhhhhhhhhhhhh")
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
@@ -344,59 +344,59 @@ const LabelStudioWrapper = ({
       
         onUpdateAnnotation: function (ls, annotation) {
 
-          console.log(superCheckerNotesRef.current.value,"superCheckerNotesRef.current.value")
-          if (taskData.annotation_status !== "freezed") {
-            for (let i = 0; i < annotations.length; i++) {
-              if (
-                !annotations[i].result?.length ||
-                annotation.serializeAnnotation()[0].id ===
-                  annotations[i].result[0].id
-              ) {
-                showLoader();
-                let temp = annotation.serializeAnnotation();
+          console.log(superCheckerNotesRef.current?.value,"superCheckerNotesRef.current.value")
+          // if (taskData.annotation_status !== "freezed") {
+          //   for (let i = 0; i < annotations.length; i++) {
+          //     if (
+          //       !annotations[i].result?.length ||
+          //       annotation.serializeAnnotation()[0].id ===
+          //         annotations[i].result[0].id
+          //     ) {
+          //       showLoader();
+          //       let temp = annotation.serializeAnnotation();
 
-                for (let i = 0; i < temp.length; i++) {
-                  if (temp[i].value.text) {
-                    temp[i].value.text = [temp[i].value.text[0]];
-                  }
-                }
+          //       for (let i = 0; i < temp.length; i++) {
+          //         if (temp[i].value.text) {
+          //           temp[i].value.text = [temp[i].value.text[0]];
+          //         }
+          //       }
 
-                let superChecker = annotations.filter(
-                  (value) => value.annotation_type === 3
-                )[0];
+          //       let superChecker = annotations.filter(
+          //         (value) => value.annotation_type === 3
+          //       )[0];
                
 
-                patchSuperChecker(
-                  superChecker.id,
-                  load_time,
-                  superChecker.lead_time,
-                  review_status.current,
-                  projectType === "SingleSpeakerAudioTranscriptionEditing"
-                    ? annotation.serializeAnnotation()
-                    : temp,
-                    superChecker.parent_annotation,
-                    superCheckerNotesRef.current.value
-                ).then(() => {
-                  if (localStorage.getItem("labelAll"))
-                    getNextProject(projectId, taskData.id, "supercheck").then(
-                      (res) => {
-                        hideLoader();
-                        tasksComplete(res?.id || null);
-                      }
-                    );
-                  else {
-                    hideLoader();
-                    window.location.reload();
-                  }
-                });
-              }
-            }
-          } else
-            setSnackbarInfo({
-              open: true,
-              message: "Task is frozen",
-              variant: "error",
-            });
+          //       patchSuperChecker(
+          //         superChecker.id,
+          //         load_time,
+          //         superChecker.lead_time,
+          //         review_status.current,
+          //         projectType === "SingleSpeakerAudioTranscriptionEditing"
+          //           ? annotation.serializeAnnotation()
+          //           : temp,
+          //           superChecker.parent_annotation,
+          //           superCheckerNotesRef.current.value
+          //       ).then(() => {
+          //         if (localStorage.getItem("labelAll"))
+          //           getNextProject(projectId, taskData.id, "supercheck").then(
+          //             (res) => {
+          //               hideLoader();
+          //               tasksComplete(res?.id || null);
+          //             }
+          //           );
+          //         else {
+          //           hideLoader();
+          //           // window.location.reload();
+          //         }
+          //       });
+          //     }
+          //   }
+          // } else
+          //   setSnackbarInfo({
+          //     open: true,
+          //     message: "Task is frozen",
+          //     variant: "error",
+          //   });
         },
       });
     }
@@ -496,7 +496,6 @@ const LabelStudioWrapper = ({
     // Traversing and tab formatting --------------------------- end
   }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, superCheckerNotesRef,taskId]);
 
-  console.log( superCheckerNotesRef.current?.value," superCheckerNotesRef.current.value")
 
   useEffect(() => {
     showLoader();
@@ -734,8 +733,8 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
-    // superCheckerNotesRef.current.value = "";
-    // reviewNotesRef.current.value = "";
+    superCheckerNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
   };
 
   useEffect(() => {
@@ -788,11 +787,11 @@ export default function LSF() {
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
             variant="contained"
             color={
-              annotationNotesRef.current?.value !== "" ? "success" : "primary"
+              reviewNotesRef.current?.value !== "" ? "success" : "primary"
             }
             onClick={handleCollapseClick}
           >
-            Notes {annotationNotesRef.current?.value !== "" && "*"}
+            Notes {reviewNotesRef.current?.value !== "" && "*"}
           </Button>
         )}
         <div
