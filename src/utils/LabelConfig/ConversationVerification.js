@@ -7,7 +7,7 @@ const conversationVerificationLabelConfig = (taskData) => {
         const speaker = taskData?.speakers_json.find(s => s?.speaker_id === item?.speaker_id);
         return (
             `<View style="display: flex; flex-direction: column; font-weight: 500; gap: 4px; margin: 0 0 8px;">
-            <Text name="Speaker ${idx}" value="${speaker?.name} (${speaker?.gender})" />
+            <Text name="speaker_${idx}" value="${speaker?.name} (${speaker?.gender})" />
             ${item?.sentences.map((sentence, idx2) => {
                 return `<View style="font-weight: normal; font-size: 16px; width: 90%; margin: 0 0 12px; background: #d9d9d9; border-radius: 8px; padding: 4px 10px;">
                 <Text name="dialog_${idx}_${idx2}" value="${sentence}" />
@@ -21,7 +21,7 @@ const conversationVerificationLabelConfig = (taskData) => {
         const speaker = taskData?.speakers_json.find(s => s?.speaker_id === item?.speaker_id);
         return (
             `<View style="display: flex; flex-direction: column; width: 90%; font-weight: 500;">
-            <Text name="Speaker ${idx}" value="${speaker?.name} (${speaker?.gender})" />
+            <Text name="output_speaker_${idx}" value="${speaker?.name} (${speaker?.gender})" />
             ${item.sentences.map((sentence, idx2) => {
                 const rows = Math.floor(sentence.length / 36) + 1;
                 return `
