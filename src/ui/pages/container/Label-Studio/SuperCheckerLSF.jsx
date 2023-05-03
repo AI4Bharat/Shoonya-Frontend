@@ -23,9 +23,9 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
 import getCaretCoordinates from "textarea-caret";
-import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification"
+import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 
 import {
   getProjectsandTasks,
@@ -86,7 +86,6 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-
 const filterAnnotations = (annotations, user_id) => {
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
@@ -99,20 +98,21 @@ const filterAnnotations = (annotations, user_id) => {
           ? annotations.filter(
               (annotation) => annotation.id === userAnnotation.parent_annotation
             )
-          : annotations.filter((value) => value.annotation_type === 2 );
+          : annotations.filter((value) => value.annotation_type === 2);
     } else if (
-      [
-        "validated",
-        "validated_with_changes",
-        "draft"
-      ].includes(userAnnotation.annotation_status)
+      ["validated", "validated_with_changes", "draft"].includes(
+        userAnnotation.annotation_status
+      )
     ) {
       filteredAnnotations = [userAnnotation];
-    } else if (userAnnotation.annotation_status === "skipped" || userAnnotation.annotation_status === "rejected") {
+    } else if (
+      userAnnotation.annotation_status === "skipped" ||
+      userAnnotation.annotation_status === "rejected"
+    ) {
       filteredAnnotations = annotations.filter(
         (value) => value.annotation_type === 2
       );
-    }   
+    }
   }
   return filteredAnnotations;
 };
@@ -155,7 +155,9 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
+        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
+          ? false
+          : true,
         continuousLabeling: false,
         enableAutoSave: false,
         enableHotkeys: true,
@@ -316,11 +318,8 @@ const LabelStudioWrapper = ({
         },
 
         onSkipTask: function (annotation) {
-
           // message.warning('Notes will not be saved for skipped tasks!');
-          let review = annotations.find(
-            (value) => value.annotation_type === 3
-          );
+          let review = annotations.find((value) => value.annotation_type === 3);
           if (review) {
             showLoader();
             patchSuperChecker(
@@ -330,15 +329,16 @@ const LabelStudioWrapper = ({
               "skipped",
               superCheckerNotesRef.current.value
             ).then(() => {
-              getNextProject(projectId, taskData.id, "supercheck").then((res) => {
-                hideLoader();
-                tasksComplete(res?.id || null);
-              });
+              getNextProject(projectId, taskData.id, "supercheck").then(
+                (res) => {
+                  hideLoader();
+                  tasksComplete(res?.id || null);
+                }
+              );
             });
           }
         },
 
-      
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
@@ -359,7 +359,6 @@ const LabelStudioWrapper = ({
                 let superChecker = annotations.filter(
                   (value) => value.annotation_type === 3
                 )[0];
-               
 
                 patchSuperChecker(
                   superChecker.id,
@@ -369,8 +368,8 @@ const LabelStudioWrapper = ({
                   projectType === "SingleSpeakerAudioTranscriptionEditing"
                     ? annotation.serializeAnnotation()
                     : temp,
-                    superChecker.parent_annotation,
-                    superCheckerNotesRef.current.value
+                  superChecker.parent_annotation,
+                  superCheckerNotesRef.current.value
                 ).then(() => {
                   if (localStorage.getItem("labelAll"))
                     getNextProject(projectId, taskData.id, "supercheck").then(
@@ -399,30 +398,45 @@ const LabelStudioWrapper = ({
 
   const setNotes = (taskData, annotations) => {
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
-      let reviewerAnnotations = annotations.filter(
-        (value) => value.annotation_type === 3
+      let userAnnotation = annotations.find(
+        (annotation) =>
+          annotation.completed_by === userData.id &&
+          annotation.annotation_type === 3
       );
-      if (reviewerAnnotations.length > 0) {
-        let correctAnnotation = reviewerAnnotations.find(
-          (annotation) => annotation.id === taskData.correct_annotation
+      if (userAnnotation) {
+        let reviewAnnotation = annotations.find(
+          (annotation) => annotation.id === userAnnotation.parent_annotation
         );
-     
-        if (correctAnnotation) {
-          reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
-          superCheckerNotesRef.current.value = correctAnnotation.supercheck_notes ?? "";
-
-        
-        } else {
-          reviewNotesRef.current.value =
-            reviewerAnnotations[0].review_notes ?? "";
-            superCheckerNotesRef.current.value =
-            reviewerAnnotations[0].supercheck_notes ?? "";
-        
-        }
+        reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
+        superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
       } else {
-        let normalAnnotation = annotations.find(
-          (value) => value.annotation_type === 3
+        let reviewerAnnotations = annotations.filter(
+          (value) => value.annotation_type === 2
         );
+        if (reviewerAnnotations.length > 0) {
+          let correctAnnotation = reviewerAnnotations.find(
+            (annotation) => annotation.id === taskData.correct_annotation
+          );
+
+          if (correctAnnotation) {
+            let superCheckerAnnotation = annotations.find(
+              (annotation) =>
+                annotation.parent_annotation === correctAnnotation.id
+            );
+            reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
+            superCheckerNotesRef.current.value =
+              superCheckerAnnotation.supercheck_notes ?? "";
+          } else {
+            let superCheckerAnnotation = annotations.find(
+              (annotation) =>
+                annotation.parent_annotation === reviewerAnnotations[0].id
+            );
+            reviewNotesRef.current.value =
+              reviewerAnnotations[0].review_notes ?? "";
+            superCheckerNotesRef.current.value =
+              superCheckerAnnotation.supercheck_notes ?? "";
+          }
+        }
       }
     }
   };
@@ -450,7 +464,8 @@ const LabelStudioWrapper = ({
             labelConfig.project_type === "ConversationTranslation" ||
             labelConfig.project_type === "ConversationTranslationEditing"
               ? generateLabelConfig(taskData.data)
-              : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data)
+              : labelConfig.project_type === "ConversationVerification"
+              ? conversationVerificationLabelConfig(taskData.data)
               : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
@@ -474,10 +489,15 @@ const LabelStudioWrapper = ({
       );
     }
 
-
     // Traversing and tab formatting --------------------------- end
-  }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, superCheckerNotesRef,taskId]);
-
+  }, [
+    labelConfig,
+    userData,
+    annotationNotesRef,
+    reviewNotesRef,
+    superCheckerNotesRef,
+    taskId,
+  ]);
 
   useEffect(() => {
     showLoader();
@@ -527,22 +547,23 @@ const LabelStudioWrapper = ({
     );
   };
 
-  const ProjectsData = (localStorage.getItem("projectData"))
- const ProjectData = JSON.parse(ProjectsData)
+  const ProjectsData = localStorage.getItem("projectData");
+  const ProjectData = JSON.parse(ProjectsData);
 
   return (
     <div>
-      {(ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count) ? false
-                    : true &&
-      <div style={{textAlign: "right",marginBottom: "15px"}}>
-      <Typography
-              variant="body"
-              color="#f5222d"
-            >
-         Note: The 'Revision Loop Count' limit has been reached for this task.
-            </Typography>
-      </div>}
-       
+      {ProjectData.revision_loop_count >
+      taskData?.revision_loop_count?.super_check_count
+        ? false
+        : true && (
+            <div style={{ textAlign: "right", marginBottom: "15px" }}>
+              <Typography variant="body" color="#f5222d">
+                Note: The 'Revision Loop Count' limit has been reached for this
+                task.
+              </Typography>
+            </div>
+          )}
+
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -586,20 +607,29 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {taskData?.super_check_user === userData?.id  && (
-             
+            {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Reject">
                 <Button
                   value="Reject"
                   type="default"
                   onClick={handleRejectClick}
-                  disabled={(ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count) ? false
-                    : true}
+                  disabled={
+                    ProjectData.revision_loop_count >
+                    taskData?.revision_loop_count?.super_check_count
+                      ? false
+                      : true
+                  }
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
-                    color: ((ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count) ? false
-                    : true)?"#B2BABB":"#f5222d",
+                    color: (
+                      ProjectData.revision_loop_count >
+                      taskData?.revision_loop_count?.super_check_count
+                        ? false
+                        : true
+                    )
+                      ? "#B2BABB"
+                      : "#f5222d",
                     pt: 3,
                     pb: 3,
                     borderBottom: "None",
@@ -607,10 +637,9 @@ const LabelStudioWrapper = ({
                   }}
                   className="lsf-button"
                 >
-                 Reject
+                  Reject
                 </Button>
               </Tooltip>
-
             )}
             {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Validate">
@@ -634,7 +663,7 @@ const LabelStudioWrapper = ({
                   onClick={handleClick}
                   endIcon={<KeyboardArrowDownIcon />}
                 >
-                 Validate
+                  Validate
                 </Button>
               </Tooltip>
             )}
@@ -693,35 +722,41 @@ export default function LSF() {
   const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
-  const superCheckerNotesRef = useRef(null)
+  const superCheckerNotesRef = useRef(null);
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
   const [alertData, setAlertData] = useState({
     open: false,
     message: "",
-    variant: "info"
-  })
+    variant: "info",
+  });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const handleTagChange = (event, value, reason) => {
-
     if (reason === "selectOption") {
       setSelectedTag(value);
       let copyValue = `[${value}]`;
       navigator.clipboard.writeText(copyValue);
-      setAlertData({ open: true, message: `Tag ${copyValue} copied to clipboard`, variant: "info" });
+      setAlertData({
+        open: true,
+        message: `Tag ${copyValue} copied to clipboard`,
+        variant: "info",
+      });
     }
-  }
+  };
 
-  useEffect(()=>{
-    if(ProjectDetails?.project_type && ProjectDetails?.project_type.toLowerCase().includes("audio")){
+  useEffect(() => {
+    if (
+      ProjectDetails?.project_type &&
+      ProjectDetails?.project_type.toLowerCase().includes("audio")
+    ) {
       setShowTagsInput(true);
     }
-  }, [ProjectDetails])
+  }, [ProjectDetails]);
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -743,7 +778,6 @@ export default function LSF() {
   const handleGlossaryClick = () => {
     setShowGlossary(!showGlossary);
   };
-
 
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
@@ -774,48 +808,48 @@ export default function LSF() {
         <div
           style={{
             display: "flow-root",
-            marginBottom: "30px"
+            marginBottom: "30px",
           }}
         >
-        {!loader && (
-          <Button
-            endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-            variant="contained"
-            color={
-              reviewNotesRef.current?.value !== "" ? "success" : "primary"
-            }
-            onClick={handleCollapseClick}
+          {!loader && (
+            <Button
+              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color={
+                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+              }
+              onClick={handleCollapseClick}
+            >
+              Notes {reviewNotesRef.current?.value !== "" && "*"}
+            </Button>
+          )}
+          <div
+            className={styles.collapse}
+            style={{
+              display: showNotes ? "block" : "none",
+              paddingBottom: "16px",
+            }}
           >
-            Notes {reviewNotesRef.current?.value !== "" && "*"}
-          </Button>
-        )}
-        <div
-          className={styles.collapse}
-          style={{
-            display: showNotes ? "block" : "none",
-            paddingBottom: "16px",
-          }}
-        >
-          {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-          <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Review Notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={reviewNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-              readOnly: true,
-            }}
-            style={{ width: "99%", marginTop: "1%" }}
-          />
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Review Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={reviewNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            />
 
-<TextField
+            <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Super Checker Notes"
@@ -829,60 +863,72 @@ export default function LSF() {
               }}
               style={{ width: "99%", marginTop: "1%" }}
             />
-        </div>
-        <Button
-          variant="contained"
-          style={{ marginLeft: "10px" }}
-          endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-          onClick={handleGlossaryClick}
-        >
-          Glossary
-        </Button>
-        <div
-          style={{
-            display: showGlossary ? "block" : "none",
-            paddingBottom: "16px",
-            paddingTop: "10px",
-          }}
-        >
-          <Glossary taskData={taskData} />
-        </div>
-        {showTagsInput &&
+          </div>
+          <Button
+            variant="contained"
+            style={{ marginLeft: "10px" }}
+            endIcon={showGlossary ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+            onClick={handleGlossaryClick}
+          >
+            Glossary
+          </Button>
           <div
             style={{
-              display: "inline-flex",
-              justifyContent: "center",
-              alignItems: "center",
+              display: showGlossary ? "block" : "none",
+              paddingBottom: "16px",
+              paddingTop: "10px",
             }}
           >
-            <Autocomplete
-              id="demo"
-              value={selectedTag}
-              onChange={handleTagChange}
-              options={TabsSuggestionData}
-              size={"small"}
-              getOptionLabel={(option) => option}
-              sx={{ width: 200, display: "inline-flex", marginLeft: "10px", marginRight: "10px" }}
-              renderInput={(params) => <TextField {...params} label="Select Noise Tag"
-                placeholder="Select Noise Tag"
-                style={{ fontSize: "14px" }}
-              />}
-              renderOption={(props, option, state) => {
-                return <MenuItem {...props}>{option}</MenuItem>
-              }}
-
-            />
-            <Tooltip title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription." placement="right">
-              <InfoIcon color="primary" />
-            </Tooltip>
-          </div>}
+            <Glossary taskData={taskData} />
           </div>
+          {showTagsInput && (
+            <div
+              style={{
+                display: "inline-flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Autocomplete
+                id="demo"
+                value={selectedTag}
+                onChange={handleTagChange}
+                options={TabsSuggestionData}
+                size={"small"}
+                getOptionLabel={(option) => option}
+                sx={{
+                  width: 200,
+                  display: "inline-flex",
+                  marginLeft: "10px",
+                  marginRight: "10px",
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Noise Tag"
+                    placeholder="Select Noise Tag"
+                    style={{ fontSize: "14px" }}
+                  />
+                )}
+                renderOption={(props, option, state) => {
+                  return <MenuItem {...props}>{option}</MenuItem>;
+                }}
+              />
+              <Tooltip
+                title="Select the appropriate noise tag which can be linked to a selected audio region. Selecting the tag copies the value, which can be pasted in respective location of the transcription."
+                placement="right"
+              >
+                <InfoIcon color="primary" />
+              </Tooltip>
+            </div>
+          )}
+        </div>
         <CustomizedSnackbars
           open={alertData.open}
-          handleClose={() => setAlertData({...alertData, open: false })}
+          handleClose={() => setAlertData({ ...alertData, open: false })}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+            vertical: "bottom",
+            horizontal: "right",
           }}
           variant={alertData.variant}
           message={alertData.message}
