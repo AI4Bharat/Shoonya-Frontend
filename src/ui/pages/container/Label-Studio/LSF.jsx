@@ -58,7 +58,6 @@ const filterAnnotations = (
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
-  console.log(userAnnotation, "test");
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "labeled") {
       const superCheckedAnnotation = annotations.find(
@@ -69,7 +68,6 @@ const filterAnnotations = (
           annotation.parent_annotation === userAnnotation.id &&
           annotation.annotation_type === 2
       );
-      console.log(superCheckedAnnotation, review, annotations, "test");
       if (
         superCheckedAnnotation &&
         ["draft", "skipped", "validated", "validated_with_changes"].includes(
@@ -82,32 +80,29 @@ const filterAnnotations = (
         );
         setDisableBtns(true);
         disable = true;
-      } else if (review) {
-        if (
-          [
-            "skipped",
-            "draft",
-            "rejected",
-            "accepted",
-            "accepted_with_minor_changes",
-            "accepted_with_major_changes",
-          ].includes(review.annotation_status)
-        ) {
-          filteredAnnotations = [review];
-          disable = true;
-          setDisableBtns(true);
-          setFilterMessage(
-            "This is the Reviewer's Annotation in read only mode"
-          );
-        }
+      } else if (
+        review &&
+        [
+          "skipped",
+          "draft",
+          "rejected",
+          "accepted",
+          "accepted_with_minor_changes",
+          "accepted_with_major_changes",
+        ].includes(review.annotation_status)
+      ) {
+        filteredAnnotations = [review];
+        disable = true;
+        setDisableBtns(true);
+        setFilterMessage("This is the Reviewer's Annotation in read only mode");
       } else {
         filteredAnnotations = [userAnnotation];
       }
     } else {
       filteredAnnotations = [userAnnotation];
     }
+    return [filteredAnnotations, disable];
   }
-  return [filteredAnnotations, disable];
 };
 
 //used just in postAnnotation to support draft status update.
@@ -335,7 +330,7 @@ const LabelStudioWrapper = ({
                 });
               else {
                 hideLoader();
-                // window.location.reload();
+                window.location.reload();
               }
             });
           } else
@@ -464,11 +459,12 @@ const LabelStudioWrapper = ({
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
-                labelConfig.project_type === "ConversationTranslationEditing"     
+              labelConfig.project_type === "ConversationTranslationEditing"
                 ? generateLabelConfig(taskData.data)
-                : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data)
+                : labelConfig.project_type === "ConversationVerification"
+                ? conversationVerificationLabelConfig(taskData.data)
                 : labelConfig.label_config;
-                setLabelConfig(tempLabelConfig);
+            setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
             getTaskData(taskData);
             LSFRoot(
