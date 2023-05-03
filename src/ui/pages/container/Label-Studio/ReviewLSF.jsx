@@ -244,8 +244,8 @@ const LabelStudioWrapper = ({
     annotations,
     predictions,
     annotationNotesRef,
-    superCheckerNotesRef,
     reviewNotesRef,
+    superCheckerNotesRef,
     projectType
   ) {
     let load_time;
@@ -493,7 +493,6 @@ const LabelStudioWrapper = ({
                 let review = annotations.filter(
                   (value) => value.parent_annotation != null
                 )[0];
-
                 patchReview(
                   review.id,
                   load_time,
@@ -618,6 +617,7 @@ const LabelStudioWrapper = ({
             predictions,
             annotationNotesRef,
             reviewNotesRef,
+            superCheckerNotesRef,
             labelConfig.project_type
           );
           hideLoader();
