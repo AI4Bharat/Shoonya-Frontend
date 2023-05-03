@@ -335,7 +335,7 @@ const LabelStudioWrapper = ({
                 });
               else {
                 hideLoader();
-                // window.location.reload();
+                window.location.reload();
               }
             });
           } else

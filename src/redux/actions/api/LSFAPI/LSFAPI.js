@@ -162,15 +162,16 @@ const patchSuperChecker = async (
   review_status,
   result,
   parentAnnotation,
- 
+  superchecknotes, 
 ) => {
+  console.log(superchecknotes,"superchecknotes")
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status: review_status,
       result: result,
       parent_annotation: parentAnnotation,
-       
+      supercheck_notes:superchecknotes
     });
    
   } catch (err) {

@@ -118,7 +118,6 @@ const filterAnnotations = (annotations, user_id) => {
 };
 
 //used just in postAnnotation to support draft status update.
-
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -152,7 +151,6 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
-
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
@@ -213,8 +211,6 @@ const LabelStudioWrapper = ({
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
-
-   
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -320,6 +316,7 @@ const LabelStudioWrapper = ({
         },
 
         onSkipTask: function (annotation) {
+
           // message.warning('Notes will not be saved for skipped tasks!');
           let review = annotations.find(
             (value) => value.annotation_type === 3
@@ -331,7 +328,7 @@ const LabelStudioWrapper = ({
               load_time,
               review.lead_time,
               "skipped",
-              reviewNotesRef.current.value
+              superCheckerNotesRef.current.value
             ).then(() => {
               getNextProject(projectId, taskData.id, "supercheck").then((res) => {
                 hideLoader();
@@ -373,7 +370,7 @@ const LabelStudioWrapper = ({
                     ? annotation.serializeAnnotation()
                     : temp,
                     superChecker.parent_annotation,
-                 
+                    superCheckerNotesRef.current.value
                 ).then(() => {
                   if (localStorage.getItem("labelAll"))
                     getNextProject(projectId, taskData.id, "supercheck").then(
@@ -412,27 +409,20 @@ const LabelStudioWrapper = ({
      
         if (correctAnnotation) {
           reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
-          annotationNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === correctAnnotation.parent_annotation
-            )?.annotation_notes ?? "";
+          superCheckerNotesRef.current.value = correctAnnotation.supercheck_notes ?? "";
+
+        
         } else {
           reviewNotesRef.current.value =
             reviewerAnnotations[0].review_notes ?? "";
-          annotationNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === reviewerAnnotations[0].parent_annotation
-            )?.annotation_notes ?? "";
+            superCheckerNotesRef.current.value =
+            reviewerAnnotations[0].supercheck_notes ?? "";
+        
         }
       } else {
         let normalAnnotation = annotations.find(
           (value) => value.annotation_type === 3
         );
-        annotationNotesRef.current.value =
-          normalAnnotation.annotation_notes ?? "";
-        reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
       }
     }
   };
@@ -475,8 +465,8 @@ const LabelStudioWrapper = ({
             annotations,
             predictions,
             annotationNotesRef,
-            superCheckerNotesRef,
             reviewNotesRef,
+            superCheckerNotesRef,
             labelConfig.project_type
           );
           hideLoader();
@@ -487,6 +477,7 @@ const LabelStudioWrapper = ({
 
     // Traversing and tab formatting --------------------------- end
   }, [labelConfig, userData, annotationNotesRef, reviewNotesRef, superCheckerNotesRef,taskId]);
+
 
   useEffect(() => {
     showLoader();
@@ -724,6 +715,7 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
+    superCheckerNotesRef.current.value = "";
     reviewNotesRef.current.value = "";
   };
 
@@ -737,6 +729,7 @@ export default function LSF() {
   const handleGlossaryClick = () => {
     setShowGlossary(!showGlossary);
   };
+
 
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>
@@ -775,11 +768,11 @@ export default function LSF() {
             endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
             variant="contained"
             color={
-              annotationNotesRef.current?.value !== "" ? "success" : "primary"
+              reviewNotesRef.current?.value !== "" ? "success" : "primary"
             }
             onClick={handleCollapseClick}
           >
-            Notes {annotationNotesRef.current?.value !== "" && "*"}
+            Notes {reviewNotesRef.current?.value !== "" && "*"}
           </Button>
         )}
         <div
@@ -795,21 +788,6 @@ export default function LSF() {
           <TextField
             multiline
             placeholder="Place your remarks here ..."
-            label="Annotation Notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={annotationNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-              readOnly: true,
-            }}
-            style={{ width: "99%", marginTop: "1%" }}
-          />
-          <TextField
-            multiline
-            placeholder="Place your remarks here ..."
             label="Review Notes"
             // value={notesValue}
             // onChange={event=>setNotesValue(event.target.value)}
@@ -818,25 +796,25 @@ export default function LSF() {
             maxRows={4}
             inputProps={{
               style: { fontSize: "1rem" },
+              readOnly: true,
             }}
             style={{ width: "99%", marginTop: "1%" }}
           />
 
 <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Supercheck notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={superCheckerNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-              readOnly: true,
-            }}
-            style={{ width: "99%", marginTop: "1%" }}
-          />
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Super Checker Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={superCheckerNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            />
         </div>
         <Button
           variant="contained"
