@@ -25,7 +25,7 @@ import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 import InfoIcon from "@mui/icons-material/Info";
 import getCaretCoordinates from "textarea-caret";
-import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification"
+import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 
 import {
   getProjectsandTasks,
@@ -531,49 +531,65 @@ const LabelStudioWrapper = ({
 
   const setNotes = (taskData, annotations) => {
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
-      let reviewerAnnotations = annotations.filter(
-        (annotation) => !!annotation.parent_annotation
+      let userAnnotation = annotations.find(
+        (annotation) =>
+          annotation.completed_by === userData.id &&
+          annotation.annotation_type === 2
       );
-      if (reviewerAnnotations.length > 0) {
-        let correctAnnotation = reviewerAnnotations.find(
-          (annotation) => annotation.id === taskData.correct_annotation
-        );
-        if (correctAnnotation) {
-          reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
-          annotationNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === correctAnnotation.parent_annotation
-            )?.annotation_notes ?? "";
-            superCheckerNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === correctAnnotation.parent_annotation
-            )?.supercheck_notes?? "";
-        } else {
-          reviewNotesRef.current.value =
-            reviewerAnnotations[0].review_notes ?? "";
-          annotationNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === reviewerAnnotations[0].parent_annotation
-            )?.annotation_notes ?? "";
-            superCheckerNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === reviewerAnnotations[0].parent_annotation
-            )?.supercheck_notes ?? "";
-        }
-      } else {
+      if (userAnnotation) {
         let normalAnnotation = annotations.find(
-          (annotation) => !annotation.parent_annotation
+          (annotation) => annotation.id === userAnnotation.parent_annotation
         );
-        annotationNotesRef.current.value =
-          normalAnnotation.annotation_notes ?? "";
-        reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
-        superCheckerNotesRef.current.value =
-        normalAnnotation.supercheck_notes?? "";
-     
+        let superCheckerAnnotation = annotations.find(
+          (annotation) => annotation.parent_annotation === userAnnotation.id
+        );
+        annotationNotesRef.current.value = normalAnnotation?.annotation_notes ?? "";
+        reviewNotesRef.current.value = userAnnotation?.review_notes ?? "";
+        superCheckerNotesRef.current.value = superCheckerAnnotation?.supercheck_notes ?? "";
+      } else {
+        let reviewerAnnotations = annotations.filter(
+          (annotation) => annotation.annotation_type === 2
+        );
+        if (reviewerAnnotations.length > 0) {
+          let correctAnnotation = reviewerAnnotations.find(
+            (annotation) => annotation.id === taskData.correct_annotation
+          );
+          if (correctAnnotation) {
+            reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
+            annotationNotesRef.current.value =
+              annotations.find(
+                (annotation) =>
+                  annotation.id === correctAnnotation.parent_annotation
+              )?.annotation_notes ?? "";
+            superCheckerNotesRef.current.value =
+              annotations.find(
+                (annotation) =>
+                  annotation.parent_annotation === correctAnnotation.id
+              )?.supercheck_notes ?? "";
+          } else {
+            reviewNotesRef.current.value =
+              reviewerAnnotations[0].review_notes ?? "";
+            annotationNotesRef.current.value =
+              annotations.find(
+                (annotation) =>
+                  annotation.id === reviewerAnnotations[0].parent_annotation
+              )?.annotation_notes ?? "";
+            superCheckerNotesRef.current.value =
+              annotations.find(
+                (annotation) =>
+                  annotation.parent_annotation === reviewerAnnotations[0].id
+              )?.supercheck_notes ?? "";
+          }
+        } else {
+          let normalAnnotation = annotations.find(
+            (annotation) => annotation.annotation_type === 1
+          );
+          annotationNotesRef.current.value =
+            normalAnnotation.annotation_notes ?? "";
+          reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
+          superCheckerNotesRef.current.value =
+            normalAnnotation.supercheck_notes ?? "";
+        }
       }
     }
   };
@@ -601,7 +617,8 @@ const LabelStudioWrapper = ({
             labelConfig.project_type === "ConversationTranslation" ||
             labelConfig.project_type === "ConversationTranslationEditing"
               ? generateLabelConfig(taskData.data)
-              : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data)
+              : labelConfig.project_type === "ConversationVerification"
+              ? conversationVerificationLabelConfig(taskData.data)
               : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
@@ -929,7 +946,7 @@ export default function LSF() {
   const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
-  const superCheckerNotesRef = useRef(null)
+  const superCheckerNotesRef = useRef(null);
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -1033,11 +1050,16 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                annotationNotesRef.current?.value !== "" || superCheckerNotesRef.current?.value !== "" ? "success" : "primary"
+                annotationNotesRef.current?.value !== "" ||
+                superCheckerNotesRef.current?.value !== ""
+                  ? "success"
+                  : "primary"
               }
               onClick={handleCollapseClick}
             >
-              Notes {annotationNotesRef.current?.value !== "" || superCheckerNotesRef.current?.value !== "" && "*"}
+              Notes{" "}
+              {annotationNotesRef.current?.value !== "" ||
+                (superCheckerNotesRef.current?.value !== "" && "*")}
             </Button>
           )}
           <div
@@ -1079,7 +1101,7 @@ export default function LSF() {
               }}
               style={{ width: "99%", marginTop: "1%" }}
             />
-             <TextField
+            <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Super Checker Notes"
