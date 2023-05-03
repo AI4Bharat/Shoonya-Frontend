@@ -156,6 +156,7 @@ const filterAnnotations = (
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
+  superCheckerNotesRef,
   loader,
   showLoader,
   hideLoader,
@@ -243,6 +244,7 @@ const LabelStudioWrapper = ({
     annotations,
     predictions,
     annotationNotesRef,
+    superCheckerNotesRef,
     reviewNotesRef,
     projectType
   ) {
@@ -544,6 +546,11 @@ const LabelStudioWrapper = ({
               (annotation) =>
                 annotation.id === correctAnnotation.parent_annotation
             )?.annotation_notes ?? "";
+            superCheckerNotesRef.current.value =
+            annotations.find(
+              (annotation) =>
+                annotation.id === correctAnnotation.parent_annotation
+            )?.supercheck_notes?? "";
         } else {
           reviewNotesRef.current.value =
             reviewerAnnotations[0].review_notes ?? "";
@@ -552,6 +559,11 @@ const LabelStudioWrapper = ({
               (annotation) =>
                 annotation.id === reviewerAnnotations[0].parent_annotation
             )?.annotation_notes ?? "";
+            superCheckerNotesRef.current.value =
+            annotations.find(
+              (annotation) =>
+                annotation.id === reviewerAnnotations[0].parent_annotation
+            )?.supercheck_notes ?? "";
         }
       } else {
         let normalAnnotation = annotations.find(
@@ -560,6 +572,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.value =
           normalAnnotation.annotation_notes ?? "";
         reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
+        superCheckerNotesRef.current.value =
+        normalAnnotation.supercheck_notes?? "";
+     
       }
     }
   };
@@ -914,6 +929,7 @@ export default function LSF() {
   const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
+  const superCheckerNotesRef = useRef(null)
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -1017,11 +1033,11 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                annotationNotesRef.current?.value !== "" ? "success" : "primary"
+                annotationNotesRef.current?.value !== "" || superCheckerNotesRef.current?.value !== "" ? "success" : "primary"
               }
               onClick={handleCollapseClick}
             >
-              Notes {annotationNotesRef.current?.value !== "" && "*"}
+              Notes {annotationNotesRef.current?.value !== "" || superCheckerNotesRef.current?.value !== "" && "*"}
             </Button>
           )}
           <div
@@ -1060,6 +1076,21 @@ export default function LSF() {
               maxRows={4}
               inputProps={{
                 style: { fontSize: "1rem" },
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            />
+             <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Super Checker Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={superCheckerNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
             />
@@ -1138,6 +1169,7 @@ export default function LSF() {
           resetNotes={() => resetNotes()}
           reviewNotesRef={reviewNotesRef}
           annotationNotesRef={annotationNotesRef}
+          superCheckerNotesRef={superCheckerNotesRef}
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}

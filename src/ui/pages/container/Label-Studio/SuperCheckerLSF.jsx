@@ -381,7 +381,7 @@ const LabelStudioWrapper = ({
                     );
                   else {
                     hideLoader();
-                    // window.location.reload();
+                    window.location.reload();
                   }
                 });
               }
@@ -411,31 +411,18 @@ const LabelStudioWrapper = ({
           reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
           superCheckerNotesRef.current.value = correctAnnotation.supercheck_notes ?? "";
 
-          annotationNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === correctAnnotation.parent_annotation
-            )?.annotation_notes ?? "";
+        
         } else {
           reviewNotesRef.current.value =
             reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
             reviewerAnnotations[0].supercheck_notes ?? "";
-          annotationNotesRef.current.value =
-            annotations.find(
-              (annotation) =>
-                annotation.id === reviewerAnnotations[0].parent_annotation
-            )?.annotation_notes ?? "";
+        
         }
       } else {
         let normalAnnotation = annotations.find(
           (value) => value.annotation_type === 3
         );
-        annotationNotesRef.current.value =
-          normalAnnotation.annotation_notes ?? "";
-          reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
-          superCheckerNotesRef.current.value =  normalAnnotation.supercheck_notes ?? "";
-
       }
     }
   };
@@ -798,21 +785,6 @@ export default function LSF() {
           {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-          <TextField
-            multiline
-            placeholder="Place your remarks here ..."
-            label="Annotation Notes"
-            // value={notesValue}
-            // onChange={event=>setNotesValue(event.target.value)}
-            inputRef={annotationNotesRef}
-            rows={2}
-            maxRows={4}
-            inputProps={{
-              style: { fontSize: "1rem" },
-              readOnly: true,
-            }}
-            style={{ width: "99%", marginTop: "1%" }}
-          />
           <TextField
             multiline
             placeholder="Place your remarks here ..."
