@@ -532,6 +532,17 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
+      {(ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count) ? false
+                    : true &&
+      <div style={{textAlign: "right",marginBottom: "15px"}}>
+      <Typography
+              variant="body"
+              color="#f5222d"
+            >
+         Note: The 'Revision Loop Count' limit has been reached for this task.
+            </Typography>
+      </div>}
+       
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -576,16 +587,19 @@ const LabelStudioWrapper = ({
               </Tooltip>
             )}
             {taskData?.super_check_user === userData?.id  && (
-              <>  { (ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count?true:false ) &&(
+             
               <Tooltip title="Reject">
                 <Button
                   value="Reject"
                   type="default"
                   onClick={handleRejectClick}
+                  disabled={(ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count) ? false
+                    : true}
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
-                    color: "#f5222d",
+                    color: ((ProjectData.revision_loop_count  > taskData?.revision_loop_count?.super_check_count) ? false
+                    : true)?"#B2BABB":"#f5222d",
                     pt: 3,
                     pb: 3,
                     borderBottom: "None",
@@ -596,7 +610,7 @@ const LabelStudioWrapper = ({
                  Reject
                 </Button>
               </Tooltip>
-)}</>
+
             )}
             {taskData?.super_check_user === userData?.id && (
               <Tooltip title="Validate">
