@@ -493,7 +493,6 @@ const LabelStudioWrapper = ({
                 let review = annotations.filter(
                   (value) => value.parent_annotation != null
                 )[0];
-                console.log(review.id, load_time, review_status.current, review.parent_annotation, reviewNotesRef.current.value, "test")
                 patchReview(
                   review.id,
                   load_time,
