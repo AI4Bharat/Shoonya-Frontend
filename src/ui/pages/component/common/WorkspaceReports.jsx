@@ -188,7 +188,6 @@ const WorkspaceReports = () => {
     setSelectRange([selection]);
     console.log(selection, "selection"); 
   };
-
   const handleDateSubmit = () => {
     setShowPicker(false);
     setReportRequested(true);
@@ -199,7 +198,7 @@ const WorkspaceReports = () => {
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
         language,
-        radiobutton === "AnnotatationReports" ? "annotation" : "review",
+        radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
       );
       dispatch(APITransport(userReportObj));
       setShowSpinner(true);
@@ -210,7 +209,7 @@ const WorkspaceReports = () => {
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
         language,
-        radiobutton === "AnnotatationReports" ? "annotation" : "review",
+        radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
       );
       dispatch(APITransport(projectReportObj));
       setShowSpinner(true);
