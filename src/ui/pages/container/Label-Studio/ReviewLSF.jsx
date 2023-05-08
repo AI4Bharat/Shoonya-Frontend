@@ -119,7 +119,7 @@ const filterAnnotations = (
       );
       if (
         superCheckedAnnotation &&
-        ["draft", "skipped", "validated", "validated_with_changes"].includes(
+        ["draft", "skipped", "validated", "validated_with_changes","unvalidated"].includes(
           superCheckedAnnotation.annotation_status
         )
       ) {
