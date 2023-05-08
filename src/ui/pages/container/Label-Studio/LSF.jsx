@@ -89,6 +89,7 @@ const filterAnnotations = (
           "accepted",
           "accepted_with_minor_changes",
           "accepted_with_major_changes",
+          "unreviewed",
         ].includes(review.annotation_status)
       ) {
         filteredAnnotations = [review];
