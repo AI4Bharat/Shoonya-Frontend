@@ -3,7 +3,7 @@ import { snakeToTitleCase } from "../utils";
 const generateLabelConfig = (taskData) => {
     console.log(taskData, "taskData");
     const sourceChat = (taskData.conversation_json??taskData.source_conversation_json)?.map((item, idx) => {
-        const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
+        const speaker = taskData.speakers_json.find(s => s.speaker_id == item.speaker_id);
         return (
         `<View style="display: flex; flex-direction: column; font-weight: 500; gap: 4px; margin: 0 0 8px;">
             <Text name="speaker_${idx}" value="${speaker.name} (${speaker.gender})" />
@@ -16,7 +16,7 @@ const generateLabelConfig = (taskData) => {
     )}).join("");
 
     const outputChat = (taskData.conversation_json??taskData.source_conversation_json)?.map((item, idx) => {
-        const speaker = taskData.speakers_json.find(s => s.speaker_id === item.speaker_id);
+        const speaker = taskData.speakers_json.find(s => s.speaker_id == item.speaker_id);
         return (
         `<View style="display: flex; flex-direction: column; width: 90%; font-weight: 500;">
             <Text name="output_speaker_${idx}" value="${speaker.name} (${speaker.gender})" />
