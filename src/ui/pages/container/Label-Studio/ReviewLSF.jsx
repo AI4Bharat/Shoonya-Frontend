@@ -119,13 +119,25 @@ const filterAnnotations = (
       );
       if (
         superCheckedAnnotation &&
-        ["draft", "skipped", "validated", "validated_with_changes","unvalidated"].includes(
+        ["validated", "validated_with_changes"].includes(
           superCheckedAnnotation.annotation_status
         )
       ) {
         filteredAnnotations = [superCheckedAnnotation];
         setFilterMessage(
           "This is the Super Checker's Annotation in read only mode"
+        );
+        setDisableBtns(true);
+        disable = true;
+      }else if (
+        superCheckedAnnotation &&
+        ["draft", "skipped", "unvalidated"].includes(
+          superCheckedAnnotation.annotation_status
+        )
+      ) {
+        filteredAnnotations = [userAnnotation];
+        setFilterMessage(
+          "This task is being validated by the super checker"
         );
         setDisableBtns(true);
         disable = true;
