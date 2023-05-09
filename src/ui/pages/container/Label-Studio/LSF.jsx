@@ -51,14 +51,17 @@ const filterAnnotations = (
   annotations,
   user_id,
   setDisableBtns,
-  setFilterMessage
+  setFilterMessage,
+  setDisableButton
 ) => {
   let disable = false;
+  let disableSkip = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
   if (userAnnotation) {
+    
     if (userAnnotation.annotation_status === "labeled") {
       const superCheckedAnnotation = annotations.find(
         (annotation) => annotation.annotation_type === 3
@@ -108,10 +111,22 @@ const filterAnnotations = (
       } else {
         filteredAnnotations = [userAnnotation];
       }
-    } else {
+    }else if (
+      userAnnotation &&
+      [
+        "to_be_revised"
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+      disableSkip = true;
+      setDisableButton(true);
+      setFilterMessage("Skip and Draft buttons are disabled, since the task is being reviewed");
+    }
+
+     else {
       filteredAnnotations = [userAnnotation];
     }
-    return [filteredAnnotations, disable];
+    return [filteredAnnotations, disable,disableSkip];
   }
 };
 
@@ -154,7 +169,7 @@ const LabelStudioWrapper = ({
   const [tagSuggestionList, setTagSuggestionList] = useState();
   const [disableBtns, setDisableBtns] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
-
+  const [disableButton, setDisableButton] = useState(false);
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
@@ -219,11 +234,12 @@ const LabelStudioWrapper = ({
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableLSFControls] = filterAnnotations(
+    const [filteredAnnotations, disableLSFControls,disableSkip] = filterAnnotations(
       annotations,
       userData.id,
       setDisableBtns,
-      setFilterMessage
+      setFilterMessage,
+      setDisableButton
     );
     console.log("labelConfig", labelConfig);
 
@@ -258,7 +274,7 @@ const LabelStudioWrapper = ({
         "panel",
         "update",
         "submit",
-        "skip",
+        ...(!disableSkip ?["skip"]:[]),
         ...(taskData?.annotation_users?.some(
           (user) => user === userData.id && !disableLSFControls
         )
@@ -655,7 +671,6 @@ const LabelStudioWrapper = ({
       />
     );
   };
-
   return (
     <div>
       {filterMessage && (
@@ -675,7 +690,7 @@ const LabelStudioWrapper = ({
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
-                !disableBtns && (
+                (!disableBtns && !disableButton) && (
                   <Tooltip title="Save task for later">
                     <Button
                       value="Draft"
