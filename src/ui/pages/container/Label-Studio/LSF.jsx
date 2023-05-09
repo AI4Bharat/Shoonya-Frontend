@@ -80,16 +80,25 @@ const filterAnnotations = (
         );
         setDisableBtns(true);
         disable = true;
-      } else if (
+      }else if (
         review &&
         [
           "skipped",
           "draft",
           "rejected",
+          "unreviewed",
+        ].includes(review.annotation_status)
+      ) {
+        filteredAnnotations = [userAnnotation];
+        disable = true;
+        setDisableBtns(true);
+        setFilterMessage("This task is being reviewed by the reviewer");
+      } else if (
+        review &&
+        [
           "accepted",
           "accepted_with_minor_changes",
           "accepted_with_major_changes",
-          "unreviewed",
         ].includes(review.annotation_status)
       ) {
         filteredAnnotations = [review];
