@@ -116,7 +116,6 @@ const filterAnnotations = (
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      console.log("rejectedrejected")
       setFilterMessage("Revise, Skip and Draft buttons are disabled, since the task is being validated by the super checker");
     } else if (userAnnotation.annotation_status === "draft") {
       filteredAnnotations = [userAnnotation];
