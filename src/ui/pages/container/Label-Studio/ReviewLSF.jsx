@@ -519,7 +519,7 @@ const LabelStudioWrapper = ({
                 }
 
                 let review = annotations.filter(
-                  (value) => value.parent_annotation != null
+                  (annotation) => annotation.annotation_type === 2
                 )[0];
                 patchReview(
                   review.id,
