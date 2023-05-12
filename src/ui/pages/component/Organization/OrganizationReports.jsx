@@ -31,7 +31,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import { snakeToTitleCase } from "../../../../utils/utils";
 
 
-const ProgressType = ["Annotation Stage", "Review Stage","Super Check Stage"]
+const ProgressType = ["Annotation Stage", "Review Stage","Super Check Stage","All Stage"]
 const ITEM_HEIGHT = 38;
 const ITEM_PADDING_TOP = 0;
 const MenuProps = {
@@ -272,7 +272,7 @@ const OrganizationReports = () => {
       );
       dispatch(APITransport(userReportObj));
 
-    } else if (reportTypes === "SuperCheck" && radiobutton === "UsersReports") {
+    } else if (reportTypes === "SuperCheck" && reportfilter === "All Stage" &&radiobutton === "UsersReports") {
       const supercheckObj = new GetOrganizationUserReportsAPI(
         orgId,
         selectedType,
