@@ -26,6 +26,7 @@ import roles from "../../../../utils/UserMappedByRole/Roles"
 
 const addLabel = {
   organization: "Invite Users to Organization",
+  organizationResendInvite: "Resend Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
   [addUserTypes.PROJECT_SUPERCHECKER]: "Add SuperChecker to Project",
@@ -33,13 +34,13 @@ const addLabel = {
 
 const MembersTable = (props) => {
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [resendUserDialogOpen, setResendUserDialogOpen] = useState(false);
   const { orgId, id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [userRole, setUserRole] = useState();
   const [loading, setLoading] = useState(false);
-
-  const { dataSource, hideButton, onRemoveSuccessGetUpdatedMembers } = props;
+  const { dataSource, hideButton, onRemoveSuccessGetUpdatedMembers,resendInvite } = props;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -75,12 +76,20 @@ const MembersTable = (props) => {
   }, []);
 
   const handleUserDialogClose = () => {
-    setAddUserDialogOpen(false);
+      setResendUserDialogOpen(false)
+      setAddUserDialogOpen(false);
+ 
   };
 
   const handleUserDialogOpen = () => {
-    setAddUserDialogOpen(true);
+    if(resendInvite){
+      setResendUserDialogOpen(true)
+    }else{
+      setAddUserDialogOpen(true);
+    }
+   
   };
+  
  
   const handleProjectMember = async (userid) => {
     const projectObj = new RemoveProjectMemberAPI(id, { ids: [userid] });
@@ -334,11 +343,13 @@ const MembersTable = (props) => {
           onClick={handleUserDialogOpen}
         />
       ) : null}
-      {props.type === "organization" ? (
+      {props.type === "organization" || props.type ==="organizationResendInvite" ? (
         <InviteUsersDialog
           handleDialogClose={handleUserDialogClose}
           isOpen={addUserDialogOpen}
           id={orgId}
+          resendInvite={resendInvite}
+          resendUserDialogOpen={resendUserDialogOpen}
         />
       ) : (
         <AddUsersDialog
@@ -346,6 +357,7 @@ const MembersTable = (props) => {
           isOpen={addUserDialogOpen}
           userType={props.type}
           id={id}
+          
         />
       )}
       {renderSnackBar()}
