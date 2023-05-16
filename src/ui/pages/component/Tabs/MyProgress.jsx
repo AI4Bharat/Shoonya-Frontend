@@ -98,7 +98,6 @@ const MyProgress = () => {
   }, [apiLoading])
 
 
-
   // useEffect(() => {
   //   if (UserDetails && Workspaces?.results) {
   //     let workspacesList = [];
@@ -267,7 +266,7 @@ const MyProgress = () => {
           >
             <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
             <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
-            {/* <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" /> */}
+            <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" />
 
           </RadioGroup>
         </FormControl>
@@ -504,7 +503,7 @@ const MyProgress = () => {
 
           >
             <Typography variant="subtitle1">Super Checker Tasks : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata} >{UserAnalyticstotalsummary?.at(0)?.["Super Checker Tasks"]}</Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata} >{UserAnalyticstotalsummary?.at(0)?.["SuperChecked Tasks"]}</Typography>
           </Grid>
           <Grid
             container
@@ -514,7 +513,7 @@ const MyProgress = () => {
 
           >
             <Typography variant="subtitle1">Average Super Checker Time (In Seconds) : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Avg Super Checker Time (sec)"]}</Typography>
+            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Avg SuperCheck Time (sec)"]}</Typography>
           </Grid>
           <Grid
             container
@@ -530,7 +529,7 @@ const MyProgress = () => {
         {UserAnalytics?.length > 0 ? (
           <ThemeProvider theme={tableTheme}>
             <MUIDataTable
-             title={radiobutton==="AnnotatationReports"? "Annotation Report" :"Reviewer Report"}
+             title={radiobutton==="AnnotatationReports"? "Annotation Report" :radiobutton==="ReviewerReports"? "Reviewer Report":"Super Checker Report"}
               data={reportData}
               columns={columns.filter((col) => selectedColumns.includes(col.name))}
               options={tableOptions}
