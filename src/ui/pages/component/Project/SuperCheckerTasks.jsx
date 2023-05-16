@@ -394,7 +394,11 @@ setLabellingStarted(true);
     return (
       <Box className={classes.filterToolbarContainer} sx={{ height: "80px" }}>
 
-        { (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ) &&   ! ProjectDetails?.review_supercheckers?.some(
+        { (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ) &&    !ProjectDetails.annotators?.some(
+            (annotator) => annotator.id === userDetails?.id
+          ) && !ProjectDetails.annotation_reviewers?.some(
+            (reviewer) => reviewer.id === userDetails?.id
+          ) && ! ProjectDetails?.review_supercheckers?.some(
             (reviewer) => reviewer.id === userDetails?.id
           ) && (
         <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
