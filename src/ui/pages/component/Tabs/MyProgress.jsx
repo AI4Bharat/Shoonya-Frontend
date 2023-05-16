@@ -97,7 +97,6 @@ const MyProgress = () => {
     setLoading(apiLoading);
   }, [apiLoading])
 
-console.log(UserAnalyticstotalsummary,"UserAnalyticstotalsummary")
 
   // useEffect(() => {
   //   if (UserDetails && Workspaces?.results) {
