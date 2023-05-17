@@ -92,11 +92,7 @@ const Login = () => {
   
   useEffect(() => {
     if (loggedInUserData && accessToken && refreshToken) {
-      if (userRole.Admin === loggedInUserData?.role) {
-        navigate(`/admin`);
-      } else {
         navigate("/projects");
-      }
     }
   }, [loggedInUserData]);
 

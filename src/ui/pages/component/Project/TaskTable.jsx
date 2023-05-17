@@ -647,7 +647,11 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
          (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role )  &&
           !getProjectUsers?.some(
             (annotator) => annotator.id === userDetails?.id
-          ) && (
+          ) && !getProjectReviewers?.some(
+            (reviewer) => reviewer.id === userDetails?.id
+          ) && ! ProjectDetails?.review_supercheckers?.some(
+            (reviewer) => reviewer.id === userDetails?.id
+          )&& (
             <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
               <InputLabel
                 id="annotator-filter-label"
@@ -682,9 +686,13 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
           )}
         {props.type === "review" &&
           (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ) &&
-          !getProjectReviewers?.some(
+          !getProjectUsers?.some(
+            (annotator) => annotator.id === userDetails?.id
+          ) && !getProjectReviewers?.some(
             (reviewer) => reviewer.id === userDetails?.id
-          ) && (
+          ) && ! ProjectDetails?.review_supercheckers?.some(
+            (reviewer) => reviewer.id === userDetails?.id
+          )&&  (
             <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
               <InputLabel
                 id="reviewer-filter-label"
