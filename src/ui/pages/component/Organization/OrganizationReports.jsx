@@ -272,7 +272,7 @@ const OrganizationReports = () => {
       );
       dispatch(APITransport(userReportObj));
 
-    } else if (reportTypes === "SuperCheck" && reportfilter === "All Stage" &&radiobutton === "UsersReports") {
+    } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" &&radiobutton === "UsersReports")) {
       const supercheckObj = new GetOrganizationUserReportsAPI(
         orgId,
         selectedType,
