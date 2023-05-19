@@ -250,7 +250,7 @@ const DetailsViewPage = (props) => {
                                 />
                             </>
                         }
-                        {pageType === componentType.Type_Organization && <Invites hideButton={true}  type="organizationResendInvite" resendInvite={true} />}
+                        {pageType === componentType.Type_Organization && <Invites hideButton={true}  reSendButton={true} />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
                         {pageType === componentType.Type_Organization && <OrganizationReports />}

@@ -4,9 +4,9 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
 export default class ResendUserInviteAPI extends API {
-   constructor(userObj, timeout = 2000) {
+   constructor(email, timeout = 2000) {
      super("POST", timeout, false);
-    this.userObj = userObj;
+     this.email = email
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.authUsers}resend_activation/`;
    }
  
@@ -22,9 +22,11 @@ export default class ResendUserInviteAPI extends API {
    }
 
    getBody() {
-    return this.userObj;
-  }
- 
+    return {
+      email : this.email
+    } 
+}
+
  
    getHeaders() {
      this.headers = {
