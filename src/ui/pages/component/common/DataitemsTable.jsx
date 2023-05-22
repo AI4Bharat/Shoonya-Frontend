@@ -23,13 +23,13 @@ const excludeKeys = [
   "key",
   "instance_id",
   "speakers_json",
-  "conversation_json",
+  // "conversation_json",
   "transcribed_json",
   "machine_transcribed_json",
   "prediction_json",
-  // "conversation_json",
-  // "machine_translated_conversation_json",
-  // "speakers_json"
+  "conversation_json",
+  "machine_translated_conversation_json",
+  "speakers_json",
   "unverified_conversation_json"
 ];
 

@@ -120,7 +120,7 @@ const filterAnnotations = (
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      setFilterMessage("Skip and Draft buttons are disabled, since the task is being reviewed");
+      setFilterMessage("Skip button is disabled, since the task is being reviewed");
     }
 
      else {
@@ -690,7 +690,7 @@ const LabelStudioWrapper = ({
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
-                (!disableBtns && !disableButton) && (
+                (!disableBtns) && (
                   <Tooltip title="Save task for later">
                     <Button
                       value="Draft"

@@ -402,27 +402,27 @@ const OrganizationReports = () => {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small" className={classes.formControl} disabled={reportTypes === "SuperCheck" || radiobutton === "ProjectReports"}>
-            <InputLabel id="mutiple-select-label" sx={{ fontSize: "16px", padding: "3px" }}>Projects Filter</InputLabel>
+          <FormControl fullWidth size="small" disabled={reportTypes === "SuperCheck" || radiobutton === "ProjectReports"} >
+            <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Projects Filter</InputLabel>
             <Select
-              labelId="mutiple-select-label"
-              label="Projects Filter"
-              value={reportfilter}
-              onChange={handleChangeprojectFilter}
-              renderValue={(reportfilter) => reportfilter}
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
               MenuProps={MenuProps}
+              labelId="project-type-label"
+              id="project-type-select"
+              value={reportfilter}
+              label="Projects Filter"
+              onChange={handleChangeprojectFilter}
             >
-              {FilterProgressType.map((option) => (
-                <MenuItem sx={{ textTransform: "capitalize", padding: "0px" }} key={option} value={option} >
-                  <ListItemIcon>
-                    <Checkbox checked={reportfilter.indexOf(option) > -1} />
-                  </ListItemIcon>
-                  <ListItemText primary={option} primaryTypographyProps={{ fontSize: '14px' }} />
+              {FilterProgressType.map((type, index) => (
+                <MenuItem value={type} key={index}>
+                  {type}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
+
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>

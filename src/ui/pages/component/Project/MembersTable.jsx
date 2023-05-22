@@ -292,7 +292,7 @@ const MembersTable = (props) => {
 
   const projectlist = (el) => {
     let temp = false;
-    ProjectDetails?.frozen_users.forEach((em) => {
+    ProjectDetails?.frozen_users?.forEach((em) => {
       if (el == em.id) {
         temp = true;
       }
