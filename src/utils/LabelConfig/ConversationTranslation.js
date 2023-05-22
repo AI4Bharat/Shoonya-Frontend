@@ -22,11 +22,12 @@ const generateLabelConfig = (taskData) => {
             <Text name="output_speaker_${idx}" value="${speaker.name} (${speaker.gender})" />
             ${item.sentences.map((sentence, idx2) => {
             const rows = Math.floor(sentence.length / 36) + 1;
+            const outputValue = taskData.machine_translated_conversation_json == null ? "-": taskData.machine_translated_conversation_json?.[idx].sentences[idx2] || " "
             return `
                 <TextArea
                 name="output_${idx}_${idx2}"
                 toName="dialog_${idx}_${idx2}"
-                value="${taskData.machine_translated_conversation_json?.[idx].sentences[idx2] || "-"}"
+                value= "${outputValue}"
                 rows="${rows}"
                 transcription="true"
                 maxSubmissions="1"
