@@ -24,6 +24,7 @@ import ResendUserInviteAPI from "../../../../redux/actions/api/Organization/Rese
 import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI";
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
+import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
 
 const columns = [
   {
@@ -79,6 +80,7 @@ const addLabel = {
   organization: "Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
+  [addUserTypes.PROJECT_SUPERCHECKER]: "Add SuperChecker to Project",
 };
 
 const MembersTable = (props) => {
@@ -164,8 +166,16 @@ const MembersTable = (props) => {
     }
   };
   const handleProjectReviewer = async (Projectid) => {
-    const projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] });
-    dispatch(APITransport(projectObj));
+    let projectObj 
+    if(props.type === addUserTypes.PROJECT_REVIEWER){
+      projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] },props.type);
+    }else if(props.type === addUserTypes.PROJECT_SUPERCHECKER){
+       projectObj = new RemoveProjectReviewerAPI(id, { ids: [Projectid] },props.type);
+    }
+
+
+   
+    // dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
@@ -248,6 +258,31 @@ const MembersTable = (props) => {
     setSelectedUsers([ ])
     setUserType(Object.keys(UserRolesList)[0])
   };
+  const handleRemoveFrozenUsers = async (FrozenUserId) => {
+    const projectObj = new RemoveFrozenUserAPI(id, { ids: [FrozenUserId] });
+    //dispatch(APITransport(projectObj));
+    const res = await fetch(projectObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(projectObj.getBody()),
+      headers: projectObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    // setLoading(false);
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+      onRemoveSuccessGetUpdatedMembers();
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+  };
 
 
   
@@ -295,7 +330,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-              {props.type === addUserTypes.PROJECT_REVIEWER && (
+              {(props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -308,6 +343,15 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
+
+           {projectlist(el.id) &&(
+                <CustomButton
+                    sx={{ borderRadius: 2}}
+                    label="Add"
+                    onClick={() => handleRemoveFrozenUsers(el.id)}
+                  />
+                )} 
+
               {reSendButton && (
                 <CustomButton
                   sx={{ p: 1, m: 1, borderRadius: 2 }}
@@ -315,6 +359,8 @@ const MembersTable = (props) => {
                   label={"Resend"}
                 />
               )}
+
+              
             </>,
           ];
         })
