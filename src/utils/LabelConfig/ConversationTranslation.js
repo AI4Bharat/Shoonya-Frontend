@@ -26,7 +26,7 @@ const generateLabelConfig = (taskData) => {
                 <TextArea
                 name="output_${idx}_${idx2}"
                 toName="dialog_${idx}_${idx2}"
-                value="${taskData.machine_translated_conversation_json?.[idx].sentences[idx2] || ""}"
+                value="${taskData.machine_translated_conversation_json?.[idx].sentences[idx2] || "-"}"
                 rows="${rows}"
                 transcription="true"
                 maxSubmissions="1"
