@@ -99,6 +99,10 @@ const filterAnnotations = (
   });
   let disable = false;
   let disableSkip = false;
+  let userAnnotationData = annotations.find(
+    (annotation) =>
+      annotation.annotation_type === 3
+  );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
       filteredAnnotations =
@@ -116,8 +120,20 @@ const filterAnnotations = (
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      setFilterMessage("Revise, Skip and Draft buttons are disabled, since the task is being validated by the super checker");
-    } else if (userAnnotation.annotation_status === "draft") {
+      setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
+    } 
+    else if (
+      userAnnotationData &&
+      [
+        "draft"
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+      disableSkip = true;
+      setDisableButton(true);
+      setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
+    }
+    else if (userAnnotation.annotation_status === "draft") {
       filteredAnnotations = [userAnnotation];
     } else if (
       [
@@ -847,7 +863,7 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            {!disableBtns && !disableButton && taskData?.review_user === userData?.id && (
+            {!disableBtns  && taskData?.review_user === userData?.id && (
               <Tooltip title="Save task for later">
                 <Button
                   type="default"

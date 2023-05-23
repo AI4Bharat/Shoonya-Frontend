@@ -20,13 +20,64 @@ import RemoveProjectMemberAPI from "../../../../redux/actions/api/ProjectDetails
 import RemoveProjectReviewerAPI from "../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
+import ResendUserInviteAPI from "../../../../redux/actions/api/Organization/ResendUserInvite";
+import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
+import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI";
+import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
-import roles from "../../../../utils/UserMappedByRole/Roles"
 
+const columns = [
+  {
+    name: "Name",
+    label: "Name",
+    options: {
+      filter: false,
+      sort: false,
+      align: "center",
+      setCellHeaderProps: (sort) => ({
+        style: { height: "70px", padding: "16px" },
+      }),
+    },
+  },
+  {
+    name: "Email",
+    label: "Email",
+    options: {
+      filter: false,
+      sort: false,
+    },
+  },
+  {
+    name: "Role",
+    label: "Role",
+    options: {
+      filter: false,
+      sort: false,
+    },
+  },
+  {
+    name: "Actions",
+    label: "Actions",
+    options: {
+      filter: false,
+      sort: false,
+    },
+  },
+];
+
+const options = {
+  filterType: "checkbox",
+  selectableRows: "none",
+  download: false,
+  filter: false,
+  print: false,
+  search: false,
+  viewColumns: false,
+  jumpToPage: true,
+};
 
 const addLabel = {
   organization: "Invite Users to Organization",
-  organizationResendInvite: "Resend Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
   [addUserTypes.PROJECT_SUPERCHECKER]: "Add SuperChecker to Project",
@@ -34,18 +85,24 @@ const addLabel = {
 
 const MembersTable = (props) => {
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
-  const [resendUserDialogOpen, setResendUserDialogOpen] = useState(false);
   const { orgId, id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [userRole, setUserRole] = useState();
   const [loading, setLoading] = useState(false);
-  const { dataSource, hideButton, onRemoveSuccessGetUpdatedMembers,resendInvite } = props;
+  const {
+    dataSource,
+    hideButton,
+    onRemoveSuccessGetUpdatedMembers,
+    reSendButton,
+  } = props;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
     variant: "success",
   });
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
@@ -76,24 +133,16 @@ const MembersTable = (props) => {
   }, []);
 
   const handleUserDialogClose = () => {
-      setResendUserDialogOpen(false)
-      setAddUserDialogOpen(false);
- 
+    setAddUserDialogOpen(false);
   };
 
   const handleUserDialogOpen = () => {
-    if(resendInvite){
-      setResendUserDialogOpen(true)
-    }else{
-      setAddUserDialogOpen(true);
-    }
-   
+    setAddUserDialogOpen(true);
   };
-  
- 
+
   const handleProjectMember = async (userid) => {
     const projectObj = new RemoveProjectMemberAPI(id, { ids: [userid] });
-    //dispatch(APITransport(projectObj));
+    dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
@@ -150,6 +199,65 @@ const MembersTable = (props) => {
     }
   };
 
+  const handleResendUser = async(email) => {
+    const projectObj = new ResendUserInviteAPI(email=email);
+    dispatch(APITransport(projectObj));
+    const res = await fetch(projectObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(projectObj.getBody()),
+      headers: projectObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    setLoading(false);
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.email,
+        variant: "success",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.email,
+        variant: "error",
+      });
+    }
+
+  };
+
+  const addBtnClickHandler = async () => {
+    setLoading(true);
+    const addMembersObj = new InviteUsersToOrgAPI(
+        orgId,
+        selectedUsers,
+        userType
+      );
+      const res = await fetch(addMembersObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(addMembersObj.getBody()),
+        headers: addMembersObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+        const orgObj = new GetOragnizationUsersAPI(id);
+        dispatch(APITransport(orgObj));
+      }else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
+      handleUserDialogClose();
+    setLoading(false);
+    setSelectedUsers([ ])
+    setUserType(Object.keys(UserRolesList)[0])
+  };
   const handleRemoveFrozenUsers = async (FrozenUserId) => {
     const projectObj = new RemoveFrozenUserAPI(id, { ids: [FrozenUserId] });
     //dispatch(APITransport(projectObj));
@@ -176,6 +284,8 @@ const MembersTable = (props) => {
     }
   };
 
+
+  
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
@@ -190,15 +300,15 @@ const MembersTable = (props) => {
     return temp;
   };
   const data =
-    dataSource && dataSource?.length > 0
+    dataSource && dataSource.length > 0
       ? pageSearch().map((el, i) => {
-          const userRoleFromList = el.role && UserMappedByRole(el.role)?.element;
+          const userRole = el.role && UserMappedByRole(el.role).element;
 
           return [
             el.username,
             el.email,
-            userRoleFromList ? userRoleFromList : el.role,
-            (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ) && <div >
+            userRole ? userRole : el.role,
+            <>
               <CustomButton
                 sx={{ p: 1, borderRadius: 2 }}
                 onClick={() => {
@@ -220,7 +330,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-              {(props.type === addUserTypes.PROJECT_REVIEWER || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
+              {(props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -233,64 +343,28 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)}
                 />
               )}
-             
-                {projectlist(el.id) &&(
-                  <CustomButton
+
+           {projectlist(el.id) &&(
+                <CustomButton
                     sx={{ borderRadius: 2}}
                     label="Add"
                     onClick={() => handleRemoveFrozenUsers(el.id)}
                   />
                 )} 
-               
-            </div>,
+
+              {reSendButton && (
+                <CustomButton
+                  sx={{ p: 1, m: 1, borderRadius: 2 }}
+                  onClick={() => handleResendUser(el.email)}
+                  label={"Resend"}
+                />
+              )}
+
+              
+            </>,
           ];
         })
       : [];
-
-      const columns = [
-        {
-          name: "Name",
-          label: "Name",
-          options: {
-            filter: false,
-            sort: false,
-            align: "center",
-            setCellHeaderProps: (sort) => ({
-              style: { height: "70px", padding: "16px" },
-            }),
-          },
-        },
-        {
-          name: "Email",
-          label: "Email",
-          options: {
-            filter: false,
-            sort: false,
-          },
-        },
-        {
-          name: "Role",
-          label: "Role",
-          options: {
-            filter: false,
-            sort: false,
-          },
-        },
-        {
-          name: "Actions",
-          label: "Actions",
-          options: {
-            display: ((props.type === addUserTypes.PROJECT_ANNOTATORS || props.type === addUserTypes.PROJECT_REVIEWER ||props.type === addUserTypes.PROJECT_SUPERCHECKER) && (roles?.Annotator === userDetails?.role || roles?.Reviewer === userDetails?.role || roles?.SuperChecker === userDetails?.role ))  ? false :  true,
-            filter: false,
-            sort: false,
-            align: "center",
-          },
-        },
-      ];
-      
-    
-      
-
   const options = {
     textLabels: {
       body: {
@@ -334,22 +408,25 @@ const MembersTable = (props) => {
 
   return (
     <React.Fragment>
-      {(roles?.Annotator !== userDetails?.role &&  roles?.Reviewer !== userDetails?.role && roles?.SuperChecker !== userDetails?.role )  && !hideButton ? (
+      {userRole !== 1 && !hideButton ? (
         <CustomButton
-          sx={{ borderRadius: 2, whiteSpace: "nowrap",mb:2 }}
+          sx={{ borderRadius: 2, whiteSpace: "nowrap" }}
           startIcon={<PersonAddAlt />}
           label={props.type ? addLabel[props.type] : "Add Users"}
           fullWidth
           onClick={handleUserDialogOpen}
         />
       ) : null}
-      {props.type === "organization" || props.type ==="organizationResendInvite" ? (
+      {props.type === "organization" ? (
         <InviteUsersDialog
           handleDialogClose={handleUserDialogClose}
           isOpen={addUserDialogOpen}
-          id={orgId}
-          resendInvite={resendInvite}
-          resendUserDialogOpen={resendUserDialogOpen}
+          selectedUsers={selectedUsers}
+          setSelectedUsers={setSelectedUsers}
+          userType={userType}
+          setUserType={setUserType}
+          addBtnClickHandler={()=>addBtnClickHandler()}
+          loading={loading}
         />
       ) : (
         <AddUsersDialog
@@ -357,7 +434,6 @@ const MembersTable = (props) => {
           isOpen={addUserDialogOpen}
           userType={props.type}
           id={id}
-          
         />
       )}
       {renderSnackBar()}
@@ -367,9 +443,8 @@ const MembersTable = (props) => {
         </Grid>
       )}
 
-      <ThemeProvider theme={tableTheme} >
+      <ThemeProvider theme={tableTheme} sx={{ marginTop: "20px" }}>
         <MUIDataTable
-        sx={{ marginTop: "20px" }}
           title={""}
           data={data}
           columns={columns}
