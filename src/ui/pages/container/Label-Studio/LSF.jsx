@@ -60,6 +60,11 @@ const filterAnnotations = (
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
+  let userAnnotationData = annotations.find(
+    (annotation) =>
+      annotation.annotation_type === 2
+  );
+
   if (userAnnotation) {
     
     if (userAnnotation.annotation_status === "labeled") {
@@ -111,7 +116,19 @@ const filterAnnotations = (
       } else {
         filteredAnnotations = [userAnnotation];
       }
-    }else if (
+    }
+    else if (
+      userAnnotationData &&
+      [
+        "draft",
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+      disableSkip = true;
+      setDisableButton(true);
+      setFilterMessage("Skip button is disabled, since the task is being reviewed");
+    }
+    else if (
       userAnnotation &&
       [
         "to_be_revised"
