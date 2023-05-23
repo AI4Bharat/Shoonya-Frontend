@@ -99,6 +99,10 @@ const filterAnnotations = (
   });
   let disable = false;
   let disableSkip = false;
+  let userAnnotationData = annotations.find(
+    (annotation) =>
+      annotation.annotation_type === 3
+  );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
       filteredAnnotations =
@@ -117,7 +121,19 @@ const filterAnnotations = (
       disableSkip = true;
       setDisableButton(true);
       setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
-    } else if (userAnnotation.annotation_status === "draft") {
+    } 
+    else if (
+      userAnnotationData &&
+      [
+        "draft"
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+      disableSkip = true;
+      setDisableButton(true);
+      setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
+    }
+    else if (userAnnotation.annotation_status === "draft") {
       filteredAnnotations = [userAnnotation];
     } else if (
       [
