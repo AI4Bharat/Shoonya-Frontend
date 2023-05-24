@@ -41,7 +41,6 @@ const DataitemsTable = () => {
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
- console.log(dataitemsList,"dataitemsListdataitemsList")
 
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
@@ -55,6 +54,7 @@ const DataitemsTable = () => {
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
   localStorage.setItem("DataitemsList", JSON.stringify(columns));
+  localStorage.setItem("Dataitem",  JSON.stringify(dataitemsList));
   
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
@@ -71,8 +71,8 @@ const DataitemsTable = () => {
 //   dispatch(APITransport(dataObj));
 // };
 
-  useEffect(() => {
-    setLoading(apiLoading);
+useEffect(() => {
+  setLoading(apiLoading);
 }, [apiLoading]);
  
 
