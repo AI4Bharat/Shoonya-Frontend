@@ -60,6 +60,11 @@ const filterAnnotations = (
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user_id && !annotation.parent_annotation;
   });
+  let userAnnotationData = annotations.find(
+    (annotation) =>
+      annotation.annotation_type === 2
+  );
+
   if (userAnnotation) {
     
     if (userAnnotation.annotation_status === "labeled") {
@@ -111,7 +116,19 @@ const filterAnnotations = (
       } else {
         filteredAnnotations = [userAnnotation];
       }
-    }else if (
+    }
+    else if (
+      userAnnotationData &&
+      [
+        "draft",
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+      disableSkip = true;
+      setDisableButton(true);
+      setFilterMessage("Skip button is disabled, since the task is being reviewed");
+    }
+    else if (
       userAnnotation &&
       [
         "to_be_revised"
@@ -120,7 +137,7 @@ const filterAnnotations = (
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      setFilterMessage("Skip and Draft buttons are disabled, since the task is being reviewed");
+      setFilterMessage("Skip button is disabled, since the task is being reviewed");
     }
 
      else {
@@ -690,7 +707,7 @@ const LabelStudioWrapper = ({
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
-                (!disableBtns && !disableButton) && (
+                (!disableBtns) && (
                   <Tooltip title="Save task for later">
                     <Button
                       value="Draft"
