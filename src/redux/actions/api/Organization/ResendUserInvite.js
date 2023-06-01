@@ -7,8 +7,8 @@ export default class ResendUserInviteAPI extends API {
    constructor(email, timeout = 2000) {
      super("POST", timeout, false);
      this.email = email
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.authUsers}resend_activation/`;
-   }
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}invite/regenerate/`;
+   }  
  
    processResponse(res) {
      super.processResponse(res);

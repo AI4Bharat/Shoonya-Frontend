@@ -5,7 +5,6 @@
   
  export default class RemoveProjectReviewerAPI extends API {
     constructor(projectId,projectObj,type, timeout = 2000) {
-      console.log(type,"typetype")
       super("POST", timeout, false);
       this.projectObj = projectObj;
       this.type = constants.REMOVE_PROJECT_REVIEWER;
