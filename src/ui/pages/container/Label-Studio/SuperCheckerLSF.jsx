@@ -564,6 +564,13 @@ const LabelStudioWrapper = ({
             </div>
           )}
 
+        { ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
+            <div style={{ textAlign: "right", marginBottom: "15px" }}>
+              <Typography variant="body" color="#f5222d">
+                Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
+              </Typography>
+            </div>)}
+
       {!loader && (
         <div
           style={{ display: "flex", justifyContent: "space-between" }}
