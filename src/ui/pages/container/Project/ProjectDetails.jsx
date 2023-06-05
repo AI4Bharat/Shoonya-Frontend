@@ -194,7 +194,7 @@ const Projects = () => {
   const isReviewer =
     ((userRole.WorkspaceManager === loggedInUserData?.role ||
       userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role) ? (ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) : ProjectDetails?.project_stage == 2 ||
+      userRole.Admin === loggedInUserData?.role) ? (ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) :
     ProjectDetails?.annotation_reviewers?.some(
       (reviewer) => reviewer.id === userDetails?.id
     ));
