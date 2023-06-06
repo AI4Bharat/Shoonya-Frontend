@@ -143,8 +143,8 @@ const filterAnnotations = (
      else {
       filteredAnnotations = [userAnnotation];
     }
-    return [filteredAnnotations, disable,disableSkip];
   }
+  return [filteredAnnotations, disable,disableSkip];
 };
 
 //used just in postAnnotation to support draft status update.

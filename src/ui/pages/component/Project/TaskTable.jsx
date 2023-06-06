@@ -391,9 +391,12 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
                 sx={{ p: 1, borderRadius: 2 }}
                 label={
                   <Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                    {ProjectDetails.project_mode === "Annotation"
-                      ? "Annotate"
-                      : "Edit"}
+                    {(props.type === "annotation" && ProjectDetails?.annotators?.some((a) => a.id === userDetails?.id)) ?
+                        (ProjectDetails.project_mode === "Annotation"
+                          ? "Annotate"
+                          : "Edit") 
+                        : "View"
+                    }
                   </Typography>
                 }
               />
