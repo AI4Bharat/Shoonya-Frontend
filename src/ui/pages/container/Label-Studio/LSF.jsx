@@ -500,7 +500,6 @@ const LabelStudioWrapper = ({
         loaded.current = taskId;
         getProjectsandTasks(projectId, taskId).then(
           ([labelConfig, taskData, annotations, predictions]) => {
-            console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             if(annotations.message?.includes("not a part of this project") || annotations.detail?.includes("Not found")){
               if(annotations.detail?.includes("Not found")) annotations.message = "Task not found";
               setSnackbarInfo({
@@ -512,7 +511,7 @@ const LabelStudioWrapper = ({
               return;
             }
             // both have loaded!
-            console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
+            // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
               labelConfig.project_type === "ConversationTranslationEditing"
