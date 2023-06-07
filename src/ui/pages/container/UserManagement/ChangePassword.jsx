@@ -72,7 +72,7 @@ const handleMouseDownPassword = (event) => {
 const loggedInUserData = useSelector(
   (state) => state.fetchLoggedInUserData.data
 );
-  const handleChangePassword = () => {
+  const handleChangePassword = async() => {
     setNewPassword("")
     setCurrentPassword("")
     const ChangePassword = {
@@ -80,53 +80,14 @@ const loggedInUserData = useSelector(
       current_password: currentPassword,
 
     }
-    
-    
-  //   let apiObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword)
-    
-  //   fetch(apiObj.apiEndPoint(), {
-  //       method: 'PATCH',
-  //       body: JSON.stringify(apiObj.getBody()),
-  //       headers: apiObj.getHeaders().headers
-  //   }).then((response) => {
-
-  //       setLoading(false)
-  //       if (response.status === 204) {
-  //         console.log(response.message);
-  //         setSnackbarInfo({
-  //             ...snackbar,
-  //             open: true,
-  //             message: "success",
-  //             variant: 'success'
-  //         })
-  //     }
-  //     else {
-  //       console.log(response.message);
-  //         setSnackbarInfo({
-  //             ...snackbar,
-  //             open: true,
-  //             message: "Invalid password  ",
-  //             variant: 'error'
-  //         })
-
-  //       }
-
-  //   })
-  //       .catch(error => {
-  //           setLoading(false)
-
-  //       })
-
-  // }
-  const projectObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword);
-  const res = await fetch(projectObj.apiEndPoint(), {
+  const userObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword);
+  const res = await fetch(userObj.apiEndPoint(), {
       method: "PATCH",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
+      body: JSON.stringify(userObj.getBody()),
+      headers: userObj.getHeaders().headers,
   });
   const resp = await res.json();
   if (res.ok) {
-    console.log(resp.message);
       setSnackbarInfo({
           open: true,
           message: resp?.message,
@@ -134,7 +95,6 @@ const loggedInUserData = useSelector(
       })
      
   } else {
-    console.log(resp.message);
       setSnackbarInfo({
           open: true,
           message: resp?.message,
