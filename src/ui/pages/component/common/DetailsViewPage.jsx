@@ -28,6 +28,9 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import {  useSelector,useDispatch } from 'react-redux';
 import WorkspaceSetting from "../Tabs/WorkspaceSetting";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
+
 
 function TabPanel(props) {
 
@@ -75,6 +78,15 @@ const DetailsViewPage = (props) => {
     useEffect(() => {
         // getDashboardWorkspaceData();
     }, []);
+    const getWorkspaceDetails = ()=>{
+        const workspaceObj = new GetWorkspacesDetailsAPI(id);
+        dispatch(APITransport(workspaceObj));
+      }
+     
+      
+      useEffect(()=>{
+        getWorkspaceDetails();
+      },[]);
 
     let navigate = useNavigate();
     
@@ -210,7 +222,7 @@ const DetailsViewPage = (props) => {
                             <>
                                 
                                 <Button className={classes.annotatorsButton} label={"Add Members to Workspace"}sx={{ width: "100%", mb: 2 }} onClick={handleAnnotatorDialogOpen} />
-                                <AnnotatorsTable />
+                                <AnnotatorsTable onRemoveSuccessGetUpdatedMembers={() => getWorkspaceDetails()} />
                                 <AddUsersDialog
                                     handleDialogClose={handleAnnotatorDialogClose}
                                     isOpen={addAnnotatorsDialogOpen}
@@ -238,7 +250,7 @@ const DetailsViewPage = (props) => {
                                 />
                             </>
                         }
-                        {pageType === componentType.Type_Organization && <Invites hideButton={true} />}
+                        {pageType === componentType.Type_Organization && <Invites hideButton={true}  reSendButton={true} />}
                     </TabPanel>
                     <TabPanel value={value} index={3}>
                         {pageType === componentType.Type_Organization && <OrganizationReports />}

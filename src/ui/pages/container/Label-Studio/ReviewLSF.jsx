@@ -90,13 +90,19 @@ const filterAnnotations = (
   annotations,
   user_id,
   setDisableBtns,
-  setFilterMessage
+  setFilterMessage,
+  setDisableButton,
 ) => {
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user_id && annotation.parent_annotation;
   });
   let disable = false;
+  let disableSkip = false;
+  let userAnnotationData = annotations.find(
+    (annotation) =>
+      annotation.annotation_type === 3
+  );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
       filteredAnnotations =
@@ -105,7 +111,29 @@ const filterAnnotations = (
               (annotation) => annotation.id === userAnnotation.parent_annotation
             )
           : annotations.filter((value) => value.annotation_type === 1);
-    } else if (userAnnotation.annotation_status === "draft") {
+    }else if (
+      userAnnotation &&
+      [
+        "rejected"
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+      disableSkip = true;
+      setDisableButton(true);
+      setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
+    } 
+    else if (
+      userAnnotationData &&
+      [
+        "draft"
+      ].includes(userAnnotation.annotation_status)
+    ) {
+      filteredAnnotations = [userAnnotation];
+      disableSkip = true;
+      setDisableButton(true);
+      setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
+    }
+    else if (userAnnotation.annotation_status === "draft") {
       filteredAnnotations = [userAnnotation];
     } else if (
       [
@@ -119,13 +147,25 @@ const filterAnnotations = (
       );
       if (
         superCheckedAnnotation &&
-        ["draft", "skipped", "validated", "validated_with_changes"].includes(
+        ["validated", "validated_with_changes"].includes(
           superCheckedAnnotation.annotation_status
         )
       ) {
         filteredAnnotations = [superCheckedAnnotation];
         setFilterMessage(
           "This is the Super Checker's Annotation in read only mode"
+        );
+        setDisableBtns(true);
+        disable = true;
+      }else if (
+        superCheckedAnnotation &&
+        ["draft", "skipped", "unvalidated"].includes(
+          superCheckedAnnotation.annotation_status
+        )
+      ) {
+        filteredAnnotations = [userAnnotation];
+        setFilterMessage(
+          "This task is being validated by the super checker"
         );
         setDisableBtns(true);
         disable = true;
@@ -148,7 +188,7 @@ const filterAnnotations = (
       );
     }
   }
-  return [filteredAnnotations, disable];
+  return [filteredAnnotations, disable,disableSkip];
 };
 
 //used just in postAnnotation to support draft status update.
@@ -185,6 +225,8 @@ const LabelStudioWrapper = ({
   const [tagSuggestionList, setTagSuggestionList] = useState();
   const [disableBtns, setDisableBtns] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
+  const [disableButton, setDisableButton] = useState(false);
+
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -252,11 +294,12 @@ const LabelStudioWrapper = ({
     let interfaces = [];
     if (predictions == null) predictions = [];
 
-    const [filteredAnnotations, disableLSFControls] = filterAnnotations(
+    const [filteredAnnotations, disableLSFControls,disableSkip] = filterAnnotations(
       annotations,
       userData.id,
       setDisableBtns,
-      setFilterMessage
+      setFilterMessage,
+      setDisableButton
     );
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -288,7 +331,8 @@ const LabelStudioWrapper = ({
         "panel",
         //"update",
         "submit",
-        "skip",
+        ...(!disableSkip ?["skip"] : []),
+        // "skip",
         ...(disableLSFControls ? [] : ["controls"]),
         "infobar",
         "topbar",
@@ -491,7 +535,7 @@ const LabelStudioWrapper = ({
                 }
 
                 let review = annotations.filter(
-                  (value) => value.parent_annotation != null
+                  (annotation) => annotation.annotation_type === 2
                 )[0];
                 patchReview(
                   review.id,
@@ -819,7 +863,7 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            {!disableBtns && taskData?.review_user === userData?.id && (
+            {!disableBtns  && taskData?.review_user === userData?.id && (
               <Tooltip title="Save task for later">
                 <Button
                   type="default"
@@ -838,7 +882,7 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {!disableBtns && taskData?.review_user === userData?.id && (
+            {!disableBtns && !disableButton && taskData?.review_user === userData?.id && (
               <Tooltip title="Revise Annotation">
                 <Button
                   value="to_be_revised"

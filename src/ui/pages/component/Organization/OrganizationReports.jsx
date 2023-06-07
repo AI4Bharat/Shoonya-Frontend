@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography, Checkbox, ListItemText, ListItemIcon, Paper } from "@mui/material";
+import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography, FormGroup,Checkbox, ListItemText, ListItemIcon, Paper } from "@mui/material";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import tableTheme from "../../../theme/tableTheme";
@@ -28,8 +28,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { styled } from '@mui/material/styles';
 import { addDays } from 'date-fns';
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import { snakeToTitleCase } from "../../../../utils/utils";
 
-const ProgressType = ["Review Enabled", "Review disabled"]
+
+const ProgressType = ["Annotation Stage", "Review Stage","Super Check Stage","All Stage"]
 const ITEM_HEIGHT = 38;
 const ITEM_PADDING_TOP = 0;
 const MenuProps = {
@@ -73,9 +75,9 @@ const OrganizationReports = () => {
   const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
-  const [reportTypes, setReportTypes] = useState("AnnotatorQuantity");
+  const [reportTypes, setReportTypes] = useState("Annotator");
   const [radiobutton, setRadiobutton] = useState("ProjectReports");
-  const [reportfilter, setReportfilter] = useState(["Review Enabled", "Review disabled"]);
+  const [reportfilter, setReportfilter] = useState(["Review Stage"]);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -88,8 +90,14 @@ const OrganizationReports = () => {
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const UserReports = useSelector((state) => state.getOrganizationUserReports.data);
   const ProjectReports = useSelector((state) => state.getOrganizationProjectReports.data);
-  const AnnotatorQuality = useSelector((state) => state.getOrganizationAnnotatorQuality.data);
+  const SuperCheck = useSelector((state) => state.getOrganizationAnnotatorQuality.data);
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
+
+  let ProgressTypeValue = "Annotation Stage"
+  const filterdata = ProgressType.filter(item => item !== ProgressTypeValue)
+  const FilterProgressType = reportTypes === "Reviewer" ?  filterdata :ProgressType
+
+
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -164,32 +172,32 @@ const OrganizationReports = () => {
     setShowSpinner(false);
   }, [ProjectReports]);
 
-  useEffect(() => {
-    if (reportRequested && AnnotatorQuality?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(AnnotatorQuality[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(AnnotatorQuality);
-      setSelectedColumns(tempSelected);
-    } else {
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
-    }
-    setShowSpinner(false);
-  }, [AnnotatorQuality]);
+  // useEffect(() => {
+  //   if (reportRequested && SuperCheck?.length) {
+  //     let tempColumns = [];
+  //     let tempSelected = [];
+  //     Object.keys(SuperCheck[0]).forEach((key) => {
+  //       tempColumns.push({
+  //         name: key,
+  //         label: key,
+  //         options: {
+  //           filter: false,
+  //           sort: true,
+  //           align: "center",
+  //         },
+  //       });
+  //       tempSelected.push(key);
+  //     });
+  //     setColumns(tempColumns);
+  //     setReportData(SuperCheck);
+  //     setSelectedColumns(tempSelected);
+  //   } else {
+  //     setColumns([]);
+  //     setReportData([]);
+  //     setSelectedColumns([]);
+  //   }
+  //   setShowSpinner(false);
+  // }, [SuperCheck]);
 
   const renderToolBar = () => {
     return (
@@ -233,7 +241,7 @@ const OrganizationReports = () => {
     setColumns([]);
     setReportData([]);
     setSelectedColumns([]);
-    if (radiobutton === "UsersReports" && reportTypes === "AnnotatorQuantity" && reportfilter == "") {
+    if (radiobutton === "UsersReports" && reportTypes === "Annotator" && reportfilter == "") {
       setSnackbarInfo({
         open: true,
         message: "Please fill Report Filter",
@@ -243,34 +251,37 @@ const OrganizationReports = () => {
     }
     let ReviewData = []
 
-    if ((reportTypes === "AnnotatorQuantity" || reportTypes === "Reviewer") && reportfilter != "" && radiobutton === "UsersReports") {
+    if ((reportTypes === "Annotator" || reportTypes === "Reviewer" ) && reportfilter != "" && radiobutton === "UsersReports") {
 
-      if (reportfilter.toString() == "Review disabled") {
+      if (reportfilter.toString() == "Annotation Stage") {
         ReviewData.push(1)
-      } else if (reportfilter.toString() == "Review Enabled") {
+      } else if (reportfilter.toString() == "Review Stage") {
         ReviewData.push(2)
+      }else if (reportfilter.toString() == "Super Check Stage") {
+        ReviewData.push(3)
       }
       const userReportObj = new GetOrganizationUserReportsAPI(
         orgId,
         selectedType,
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
-        reportTypes === "AnnotatorQuantity" ? "annotation" : "review",
+        reportTypes === "Annotator" ? "annotation" : reportTypes === "Reviewer" ? "review":"supercheck",
         targetLanguage,
         ...ReviewData,
 
       );
       dispatch(APITransport(userReportObj));
 
-    } else if (reportTypes === "AnnotatorQuality" && radiobutton === "UsersReports") {
-      const annotatorQualityObj = new GetOrganizationAnnotatorQualityAPI(
+    } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" &&radiobutton === "UsersReports")) {
+      const supercheckObj = new GetOrganizationUserReportsAPI(
         orgId,
         selectedType,
         format(selectRange[0].startDate, 'yyyy-MM-dd'),
         format(selectRange[0].endDate, 'yyyy-MM-dd'),
+        "supercheck",
         targetLanguage,
       );
-      dispatch(APITransport(annotatorQualityObj));
+      dispatch(APITransport(supercheckObj));
 
 
     }
@@ -384,35 +395,34 @@ const OrganizationReports = () => {
               label="Report Type"
               onChange={(e) => setReportTypes(e.target.value)}
             >
-              <MenuItem value={"AnnotatorQuantity"}>Annotator Quantity</MenuItem>
+              <MenuItem value={"Annotator"}>Annotator</MenuItem>
               <MenuItem value={"Reviewer"}>Reviewer</MenuItem>
-              <MenuItem value={"AnnotatorQuality"}>Annotator Quality</MenuItem>
+              <MenuItem value={"SuperCheck"}>Super Checker</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small" className={classes.formControl} disabled={reportTypes === "Reviewer" || reportTypes === "AnnotatorQuality" || radiobutton === "ProjectReports"}>
-            <InputLabel id="mutiple-select-label" sx={{ fontSize: "16px", padding: "3px" }}>Projects Filter</InputLabel>
+          <FormControl fullWidth size="small" disabled={reportTypes === "SuperCheck" || radiobutton === "ProjectReports"} >
+            <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Projects Filter</InputLabel>
             <Select
-              labelId="mutiple-select-label"
-              label="Projects Filter"
-              multiple
-              value={reportfilter}
-              onChange={handleChangeprojectFilter}
-              renderValue={(reportfilter) => reportfilter.join(", ")}
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
               MenuProps={MenuProps}
+              labelId="project-type-label"
+              id="project-type-select"
+              value={reportfilter}
+              label="Projects Filter"
+              onChange={handleChangeprojectFilter}
             >
-              {ProgressType.map((option) => (
-                <MenuItem sx={{ textTransform: "capitalize", padding: "0px" }} key={option} value={option}>
-                  <ListItemIcon>
-                    <Checkbox checked={reportfilter.indexOf(option) > -1} />
-                  </ListItemIcon>
-                  <ListItemText primary={option} primaryTypographyProps={{ fontSize: '14px' }} />
+              {FilterProgressType.map((type, index) => (
+                <MenuItem value={type} key={index}>
+                  {type}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
+
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>

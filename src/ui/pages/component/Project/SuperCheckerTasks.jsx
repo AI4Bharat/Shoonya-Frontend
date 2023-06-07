@@ -40,6 +40,8 @@ import AllTaskSearchPopup from './AllTaskSearchPopup';
 import SuperCheckerFilter from './SuperCheckerFilter';
 import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
 import SetTaskFilter from "../../../../redux/actions/Tasks/SetTaskFilter";
+import roles from "../../../../utils/UserMappedByRole/Roles";
+
 
 
 const excludeCols = [
@@ -89,9 +91,19 @@ const SuperCheckerTasks = (props) => {
   
   const filterData = {
     Status: ["unvalidated","validated","validated_with_changes","skipped","draft","rejected"],
+    SuperChecker:
+      ProjectDetails?.review_supercheckers?.length > 0
+        ? ProjectDetails?.review_supercheckers?.map((el, i) => {
+            return {
+              label: el.username,
+              value: el.id,
+            };
+          })
+        : [],
   };
+
   const [selectedFilters, setsSelectedFilters] = useState({
-    supercheck_status: filterData.Status[0]
+    supercheck_status: filterData.Status[0] ,req_user: -1
   });
   const [pullSize, setPullSize] = useState(
     ProjectDetails.tasks_pull_count_per_batch * 0.5
@@ -354,8 +366,6 @@ const datavalue = {
 const getNextTaskObj = new GetNextTaskAPI(id, datavalue, null, props.type);
 dispatch(APITransport(getNextTaskObj));
 setLabellingStarted(true);
-
-
 }
 
   const customColumnHead = (col) => {
@@ -383,6 +393,45 @@ setLabellingStarted(true);
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
       <Box className={classes.filterToolbarContainer} sx={{ height: "80px" }}>
+
+        { (roles?.WorkspaceManager === userDetails?.role || roles?.OrganizationOwner === userDetails?.role || roles?.Admin === userDetails?.role ) &&    !ProjectDetails.annotators?.some(
+            (annotator) => annotator.id === userDetails?.id
+          ) && !ProjectDetails.annotation_reviewers?.some(
+            (reviewer) => reviewer.id === userDetails?.id
+          ) && ! ProjectDetails?.review_supercheckers?.some(
+            (reviewer) => reviewer.id === userDetails?.id
+          ) && (
+        <FormControl size="small" sx={{ width: "30%", minWidth: "100px" }}>
+              <InputLabel
+                id="annotator-filter-label"
+                sx={{
+                  fontSize: "16px",
+                  position: "inherit",
+                  top: "23px",
+                  left: "-6px",
+                }}
+              >
+                Filter by SuperChecker
+              </InputLabel>
+              <Select
+                labelId="annotator-filter-label"
+                id="annotator-filter"
+                value={selectedFilters.req_user}
+                label="Filter by SuperChecker"
+                onChange={(e) =>
+                  setsSelectedFilters({
+                    ...selectedFilters,
+                    req_user: e.target.value,
+                  })
+                }
+                sx={{ fontSize: "16px" }}
+              >
+                <MenuItem value={-1}>All</MenuItem>
+                {filterData.SuperChecker.map((el, i) => (
+                  <MenuItem value={el.value}>{el.label}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>)}
         <ColumnList
                 columns={columns}
                 setColumns={setSelectedColumns}

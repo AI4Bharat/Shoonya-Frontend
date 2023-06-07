@@ -5,7 +5,6 @@
   
  export default class RemoveFrozenUserAPI extends API {
     constructor(projectId,projectObj, timeout = 2000) {
-        console.log(projectId,"projectId")
       super("POST", timeout, false);
       this.projectObj = projectObj;
     //   this.type = constants.REMOVE_PROJECT_MEMBER;
