@@ -52,7 +52,6 @@ const Login = () => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-
   const getLoggedInUserData = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
     dispatch(APITransport(loggedInUserObj));
@@ -150,9 +149,11 @@ const Login = () => {
     });
 
     const rsp_data = await res.json();
+    // console.log(rsp_data)
     if (res.ok) {
       // localStorage.setItem("token", resp.access);
-      localStorage.setItem("shoonya_access_token", rsp_data.access);
+      // localStorage.setItem("user_id", rsp_data.user_id);
+     localStorage.setItem("shoonya_access_token", rsp_data.access);
      localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
       getLoggedInUserData();
       // setLoading(false);

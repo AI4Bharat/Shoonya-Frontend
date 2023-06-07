@@ -69,8 +69,9 @@ const handleClickShowNewPassword = () => {
 const handleMouseDownPassword = (event) => {
     event.preventDefault();
 };
-
- 
+const loggedInUserData = useSelector(
+  (state) => state.fetchLoggedInUserData.data
+);
   const handleChangePassword = () => {
     setNewPassword("")
     setCurrentPassword("")
@@ -79,43 +80,68 @@ const handleMouseDownPassword = (event) => {
       current_password: currentPassword,
 
     }
-    let apiObj = new ChangePasswordAPI(ChangePassword)
+    
+    
+  //   let apiObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword)
+    
+  //   fetch(apiObj.apiEndPoint(), {
+  //       method: 'PATCH',
+  //       body: JSON.stringify(apiObj.getBody()),
+  //       headers: apiObj.getHeaders().headers
+  //   }).then((response) => {
 
-    fetch(apiObj.apiEndPoint(), {
-        method: 'POST',
-        body: JSON.stringify(apiObj.getBody()),
-        headers: apiObj.getHeaders().headers
-    }).then((response) => {
+  //       setLoading(false)
+  //       if (response.status === 204) {
+  //         console.log(response.message);
+  //         setSnackbarInfo({
+  //             ...snackbar,
+  //             open: true,
+  //             message: "success",
+  //             variant: 'success'
+  //         })
+  //     }
+  //     else {
+  //       console.log(response.message);
+  //         setSnackbarInfo({
+  //             ...snackbar,
+  //             open: true,
+  //             message: "Invalid password  ",
+  //             variant: 'error'
+  //         })
 
-        setLoading(false)
-        if (response.status === 204) {
-            setSnackbarInfo({
-                ...snackbar,
-                open: true,
-                message: "success",
-                variant: 'success'
-            })
-           
-        }
-        else {
-            setSnackbarInfo({
-                ...snackbar,
-                open: true,
-                message: "Invalid password  ",
-                variant: 'error'
-            })
+  //       }
 
-        }
+  //   })
+  //       .catch(error => {
+  //           setLoading(false)
 
-    })
-        .catch(error => {
-            setLoading(false)
+  //       })
 
-        })
-
+  // }
+  const projectObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword);
+  const res = await fetch(projectObj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(projectObj.getBody()),
+      headers: projectObj.getHeaders().headers,
+  });
+  const resp = await res.json();
+  if (res.ok) {
+    console.log(resp.message);
+      setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+      })
+     
+  } else {
+    console.log(resp.message);
+      setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+      })
   }
-
-
+  }
   const renderSnackBar = () => {
     return (
         <CustomizedSnackbars
