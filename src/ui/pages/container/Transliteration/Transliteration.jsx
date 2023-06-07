@@ -34,7 +34,7 @@ const Transliteration = (props) => {
 
   useEffect(() => {
     if(params.taskId ){
-      setText(searchFilters.data.machine_translation)
+      setText(searchFilters?.data?.machine_translation)
     }else{
       setText("")
     }
