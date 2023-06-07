@@ -65,6 +65,7 @@ const excludeCols = [
   "speaker_1_details",
   "machine_transcribed_json",
   "unverified_conversation_json",
+  "prediction_json",
 ];
 
 const TaskTable = (props) => {
