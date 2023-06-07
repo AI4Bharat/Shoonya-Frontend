@@ -5,7 +5,7 @@ const configs = {
         : "https://backend.dev2.shoonya.ai4bharat.org"
   };
   
-export default configs;
+  export default configs;
 //http://20.51.211.111:8000
 //https://backend.shoonya.ai4bharat.org/
 // https://backend.dev2.shoonya.ai4bharat.org
