@@ -52,6 +52,13 @@ const projectStage = [
   {name:"Super Check Stage",value: 3}
 ];
 
+const CreateAnnotationsAutomatically = [
+  { name: "None", value: "none" },
+  { name: "Annotation", value: "annotation" },
+  { name: "Review", value: "review" },
+  {name:"Supercheck",value: "supercheck"}
+];
+
 const AnnotationProject = (props) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -1239,6 +1246,34 @@ const AnnotationProject = (props) => {
                       onChange={handleReviewToggle}
                     >
                       {projectStage.map((type, index) => (
+                        <MenuItem value={type.value} key={index}>
+                          {type.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  className={classes.projectsettingGrid}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                  Create Annotations Automatically:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <FormControl fullWidth className={classes.formControl}>
+                    <Select
+                      labelId="task-Reviews-label"
+                      id="task-Reviews-select"
+                      value={taskReviews}
+                      onChange={handleReviewToggle}
+                    >
+                      {CreateAnnotationsAutomatically.map((type, index) => (
                         <MenuItem value={type.value} key={index}>
                           {type.name}
                         </MenuItem>
