@@ -9,6 +9,7 @@ const apiendpoint =  {
   getDatasets:"/data/",
   annotations:"/annotation/",
   getUsers:"/users/",
+  changepassword:"/users/account/",
   authUsers:"/users/auth/users/",
   functions:"/functions/",
   Glossary:"/v1/",
