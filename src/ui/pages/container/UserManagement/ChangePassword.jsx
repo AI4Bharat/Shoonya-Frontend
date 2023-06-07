@@ -69,9 +69,10 @@ const handleClickShowNewPassword = () => {
 const handleMouseDownPassword = (event) => {
     event.preventDefault();
 };
-
- 
-  const handleChangePassword = () => {
+const loggedInUserData = useSelector(
+  (state) => state.fetchLoggedInUserData.data
+);
+  const handleChangePassword = async() => {
     setNewPassword("")
     setCurrentPassword("")
     const ChangePassword = {
@@ -79,43 +80,28 @@ const handleMouseDownPassword = (event) => {
       current_password: currentPassword,
 
     }
-    let apiObj = new ChangePasswordAPI(ChangePassword)
-
-    fetch(apiObj.apiEndPoint(), {
-        method: 'POST',
-        body: JSON.stringify(apiObj.getBody()),
-        headers: apiObj.getHeaders().headers
-    }).then((response) => {
-
-        setLoading(false)
-        if (response.status === 204) {
-            setSnackbarInfo({
-                ...snackbar,
-                open: true,
-                message: "success",
-                variant: 'success'
-            })
-           
-        }
-        else {
-            setSnackbarInfo({
-                ...snackbar,
-                open: true,
-                message: "Invalid password  ",
-                variant: 'error'
-            })
-
-        }
-
-    })
-        .catch(error => {
-            setLoading(false)
-
-        })
-
+  const userObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword);
+  const res = await fetch(userObj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(userObj.getBody()),
+      headers: userObj.getHeaders().headers,
+  });
+  const resp = await res.json();
+  if (res.ok) {
+      setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+      })
+     
+  } else {
+      setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+      })
   }
-
-
+  }
   const renderSnackBar = () => {
     return (
         <CustomizedSnackbars
