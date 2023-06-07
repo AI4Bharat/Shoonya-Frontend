@@ -72,7 +72,7 @@ const handleMouseDownPassword = (event) => {
 const loggedInUserData = useSelector(
   (state) => state.fetchLoggedInUserData.data
 );
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     setNewPassword("")
     setCurrentPassword("")
     const ChangePassword = {
@@ -126,7 +126,6 @@ const loggedInUserData = useSelector(
   });
   const resp = await res.json();
   if (res.ok) {
-    console.log(resp.message);
       setSnackbarInfo({
           open: true,
           message: resp?.message,
@@ -134,7 +133,6 @@ const loggedInUserData = useSelector(
       })
      
   } else {
-    console.log(resp.message);
       setSnackbarInfo({
           open: true,
           message: resp?.message,
