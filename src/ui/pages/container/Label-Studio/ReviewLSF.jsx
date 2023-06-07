@@ -88,14 +88,14 @@ const StyledMenu = styled((props) => (
 
 const filterAnnotations = (
   annotations,
-  user_id,
+  user,
   setDisableBtns,
   setFilterMessage,
   setDisableButton,
 ) => {
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
-    return annotation.completed_by === user_id && annotation.parent_annotation;
+    return annotation.completed_by === user.id && annotation.parent_annotation;
   });
   let disable = false;
   let disableSkip = false;
@@ -187,8 +187,11 @@ const filterAnnotations = (
         (annotation) => annotation.annotation_type === 2
       );
     }
+  } else if([4, 5, 6].includes(user.role)) {
+    filteredAnnotations = annotations.filter((a) => a.annotation_type === 2);
+    disableSkip = true;
   }
-  return [filteredAnnotations, disable,disableSkip];
+  return [filteredAnnotations, disable, disableSkip];
 };
 
 //used just in postAnnotation to support draft status update.
@@ -296,7 +299,7 @@ const LabelStudioWrapper = ({
 
     const [filteredAnnotations, disableLSFControls,disableSkip] = filterAnnotations(
       annotations,
-      userData.id,
+      userData,
       setDisableBtns,
       setFilterMessage,
       setDisableButton
