@@ -118,6 +118,9 @@ const filterAnnotations = (annotations, user_id) => {
 };
 
 //used just in postAnnotation to support draft status update.
+
+const AUTO_SAVE_INTERVAL = 20000;
+
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -141,6 +144,9 @@ const LabelStudioWrapper = ({
     variant: "success",
   });
   const [taskData, setTaskData] = useState(undefined);
+  const [annotations, setAnnotations] = useState([]);
+  const [load_time, setLoadTime] = useState();
+  const [projectType, setProjectType] = useState();
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -210,7 +216,6 @@ const LabelStudioWrapper = ({
     superCheckerNotesRef,
     projectType
   ) {
-    let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
 
@@ -314,7 +319,7 @@ const LabelStudioWrapper = ({
           //   ls.annotationStore.selectAnnotation(c.id);
           // }
           // }
-          load_time = new Date();
+          setLoadTime(new Date());
         },
 
         onSkipTask: function (annotation) {
@@ -469,6 +474,7 @@ const LabelStudioWrapper = ({
               : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
+          setAnnotations(annotations);
           getTaskData(taskData);
           LSFRoot(
             rootRef,
@@ -498,6 +504,51 @@ const LabelStudioWrapper = ({
     superCheckerNotesRef,
     taskId,
   ]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lsfRef.current?.store?.annotationStore?.selected && taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            !annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id
+          ) {
+            let temp = annotation.serializeAnnotation();
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
+              }
+            }
+            let superChecker = annotations.filter(
+              (value) => value.annotation_type === 3
+            )[0];
+            patchSuperChecker(
+              superChecker.id,
+              load_time,
+              superChecker.lead_time,
+              "unvalidated",
+              projectType === "SingleSpeakerAudioTranscriptionEditing"
+                ? annotation.serializeAnnotation()
+                : temp,
+              superChecker.parent_annotation,
+              superCheckerNotesRef.current.value
+            ).then((err) => {
+              if (err) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Error in autosaving annotation",
+                  variant: "error",
+                });
+              }
+            });
+          }
+        }
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [AUTO_SAVE_INTERVAL]);
 
   useEffect(() => {
     showLoader();
