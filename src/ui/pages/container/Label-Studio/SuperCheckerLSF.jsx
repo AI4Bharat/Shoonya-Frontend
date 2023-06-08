@@ -507,13 +507,15 @@ const LabelStudioWrapper = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (lsfRef.current?.store?.annotationStore?.selected && taskData?.annotation_status !== "freezed") {
+      if (annotations.length && lsfRef.current?.store?.annotationStore?.selected && taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
+        //console.log("autoSave", annotation.serializeAnnotation(), annotations);
         for (let i = 0; i < annotations.length; i++) {
           if (
-            !annotations[i].result?.length ||
+            (!annotations[i].result?.length ||
             annotation.serializeAnnotation()[0].id ===
-              annotations[i].result[0].id
+              annotations[i].result[0].id) &&
+              !["labeled", "accepted", "accepted_with_major_changes", "accepted_with_minor_changes"].includes(annotations[i].annotation_status)
           ) {
             let temp = annotation.serializeAnnotation();
             for (let i = 0; i < temp.length; i++) {
@@ -528,7 +530,7 @@ const LabelStudioWrapper = ({
               superChecker.id,
               load_time,
               superChecker.lead_time,
-              "unvalidated",
+              annotations[i].annotation_status,
               projectType === "SingleSpeakerAudioTranscriptionEditing"
                 ? annotation.serializeAnnotation()
                 : temp,
@@ -546,9 +548,9 @@ const LabelStudioWrapper = ({
           }
         }
       }
-    }, 5000);
+    }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
-  }, [AUTO_SAVE_INTERVAL]);
+  }, [annotations]);
 
   useEffect(() => {
     showLoader();
