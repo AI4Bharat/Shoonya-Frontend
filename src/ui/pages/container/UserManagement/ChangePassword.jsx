@@ -131,43 +131,9 @@ const loggedInUserData = useSelector(
               </Typography>
             </Grid>
 
-            <Grid container direction="row">
-              <Grid
-                items
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-                className={classes.projectsettingGrid}
-              >
-                <Typography gutterBottom component="div" label="Required">
-                  New Password:
-                </Typography>
-              </Grid>
-              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                <OutlinedTextField
-                  fullWidth
-                  placeholder={translate("newPassword")}
-                  type={newvalues.showNewPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                 InputProps={{
-                  endAdornment: (
-                      <InputAdornment position="end">
-                          <IconButton
-                              onClick={handleClickShowNewPassword}
-                              onMouseDown={handleMouseDownPassword}
-                          >
-                              {newvalues.showNewPassword ? <Visibility /> : <VisibilityOff />}
-
-                          </IconButton>
-                      </InputAdornment>
-                  ),
-              }}
-                />
-              </Grid>
-            </Grid>
+            {/* <Grid container direction="row">
+             
+            </Grid> */}
 
             <Grid
               className={classes.projectsettingGrid}
@@ -179,7 +145,7 @@ const loggedInUserData = useSelector(
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Current Password:
+                Current Password
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -206,6 +172,43 @@ const loggedInUserData = useSelector(
                 
               />
             </Grid>
+
+            <Grid
+                items
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+                className={classes.projectsettingGrid}
+              >
+                <Typography gutterBottom component="div" label="Required">
+                  New Password
+                </Typography>
+              </Grid>
+              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                <OutlinedTextField
+                  fullWidth
+                  placeholder={translate("newPassword")}
+                  type={newvalues.showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                 InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowNewPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {newvalues.showNewPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
+                />
+              </Grid>
+
             <Grid
               className={classes.projectsettingGrid}
               item
