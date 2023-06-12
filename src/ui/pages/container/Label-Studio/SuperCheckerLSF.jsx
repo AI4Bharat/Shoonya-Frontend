@@ -87,6 +87,7 @@ const StyledMenu = styled((props) => (
 }));
 
 const filterAnnotations = (annotations, user) => {
+  let disableSkip = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user.id && annotation.parent_annotation;
@@ -115,8 +116,9 @@ const filterAnnotations = (annotations, user) => {
     }
   } else if([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 3);
+    disableSkip = true;
   }
-  return filteredAnnotations;
+  return [filteredAnnotations, disableSkip];
 };
 
 //used just in postAnnotation to support draft status update.
@@ -215,6 +217,7 @@ const LabelStudioWrapper = ({
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
+    const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -246,7 +249,7 @@ const LabelStudioWrapper = ({
         "panel",
         //"update",
         "submit",
-        "skip",
+        ...(!disableSkip ?["skip"]:[]),
         "controls",
         "infobar",
         "topbar",
@@ -286,7 +289,7 @@ const LabelStudioWrapper = ({
 
         task: {
           // annotations: annotations.filter((annotation) => !annotation.parent_annotation).concat(annotations.filter((annotation) => annotation.id === taskData.correct_annotation)),
-          annotations: filterAnnotations(annotations, userData),
+          annotations: filteredAnnotations,
           predictions: predictions,
           id: taskData.id,
           data: taskData.data,
