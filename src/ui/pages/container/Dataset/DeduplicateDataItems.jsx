@@ -31,7 +31,6 @@ import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar"
 
 
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -63,16 +62,49 @@ export default function DeduplicateDataItems() {
   const [openDialog, setOpenDialog] = useState(false);
   const [dataitems, setDataitems] = useState([]);
   const [dataitemsvalues, setDataitemsvalues] = useState([]);
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columns, setColumns] = useState([]);
+
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
     variant: "success",
 });
 
+
 useEffect(() => {
-    const Dataitems=JSON.parse( localStorage.getItem("DataitemsList"))
+    const Dataitems=JSON.parse(localStorage.getItem("Dataitem"))
     setDataitemsvalues(Dataitems)  
 }, [])
+
+
+
+useEffect(() => {
+  let fetchedItems =dataitemsvalues.results;
+
+
+let tempSelected = [];
+if (fetchedItems?.length) {
+  Object.keys(fetchedItems[0]).forEach((key) => {
+    
+      tempSelected.push({ name: key,
+        label: snakeToTitleCase(key),});
+  
+  });
+}
+setSelectedColumns(tempSelected);
+
+
+ }, [dataitemsvalues])
+
+ useEffect(() => {
+  const newCols = columns.map(col => {
+      col.options.display = selectedColumns.includes(col.name) ? "true" : "false";
+      return col;
+  });
+  setColumns(newCols);
+  
+}, [selectedColumns]);
 
 const handleChange = (event) => {
     const value = event.target.value;
@@ -191,7 +223,7 @@ const renderSnackBar = () => {
         MenuProps={MenuProps}
       >
         
-        {dataitemsvalues.map((option) => (
+        {selectedColumns.map((option) => (
           <MenuItem key={option.name} value={option.name}>
             <ListItemIcon>
               <Checkbox checked={dataitems.indexOf(option.name) > -1} />

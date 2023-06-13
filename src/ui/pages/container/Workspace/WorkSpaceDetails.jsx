@@ -78,7 +78,6 @@ const Workspace = (props) => {
         getWorkspaceDetails();
       },[]);
         
-      console.log( workspaceDtails," workspaceDtails")
     return (
         <ThemeProvider theme={themeDefault}>
             <DetailsViewPage 

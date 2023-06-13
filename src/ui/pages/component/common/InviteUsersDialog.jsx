@@ -19,42 +19,19 @@ import CustomButton from "./Button";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
-import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI";
-import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
 const InviteUsersDialog = ({
     handleDialogClose,
     isOpen,
-    id,
+    selectedUsers,
+    setSelectedUsers,
+    userType,
+    setUserType,
+    addBtnClickHandler,
+    loading
 }) => {
 
-  const [loading, setLoading] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
-  const dispatch = useDispatch();
 
-  const addBtnClickHandler = async () => {
-      setLoading(true);
-      const addMembersObj = new InviteUsersToOrgAPI(
-          id,
-          selectedUsers,
-          userType
-        );
-        const res = await fetch(addMembersObj.apiEndPoint(), {
-          method: "POST",
-          body: JSON.stringify(addMembersObj.getBody()),
-          headers: addMembersObj.getHeaders().headers,
-        });
-  
-        if (res.ok) {
-          const orgObj = new GetOragnizationUsersAPI(id);
-          dispatch(APITransport(orgObj));
-          dialogCloseHandler();
-        }
-      setLoading(false);
-    };
-    
       const dialogCloseHandler = () => {
         handleDialogClose();
       };
@@ -72,7 +49,7 @@ const InviteUsersDialog = ({
                 value={selectedUsers}
                 onChange={(e, newVal) => setSelectedUsers(newVal)}
                 renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
+                value?.map((option, index) => (
                     <Chip
                     variant="outlined"
                     label={option}
@@ -85,7 +62,7 @@ const InviteUsersDialog = ({
                 <TextField
                     {...params}
                     variant="outlined"
-                    label="Enter email ids of users to invite"
+                    label="Enter email ids of users to invite        "
                     placeholder="Email ids"
                 />
                 )}

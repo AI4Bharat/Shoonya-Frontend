@@ -215,7 +215,7 @@ const ReportsTable = (props) => {
                                 ProjectDetails?.annotators?.some((user) => user.id === loggedInUserData.id)) && <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />}
                             {((userRole.WorkspaceManager === loggedInUserData?.role ||
                                 userRole.OrganizationOwner === loggedInUserData?.role ||
-                                userRole.Admin === loggedInUserData?.role) ? (ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) : ProjectDetails?.project_stage == 2 ||
+                                userRole.Admin === loggedInUserData?.role) ? (ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) : 
                             ProjectDetails?.annotation_reviewers?.some(
                                 (reviewer) => reviewer.id === loggedInUserData?.id
                             )) && <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />}

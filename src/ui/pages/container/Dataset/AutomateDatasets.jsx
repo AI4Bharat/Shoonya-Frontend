@@ -125,7 +125,7 @@ const AutomateDatasets = () => {
     }
   };
 
-const apitype = translationModel===1?"indic-trans": translationModel===2?"google":"azure";
+const apitype = translationModel===1?"indic-trans": translationModel===2?"google":translationModel===3?"azure":"indic-trans-v2";
   const handleConfirm = () => {
     const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,apitype);
     setLoading(true);
@@ -286,6 +286,9 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                   },{
                     name: "Microsoft Azure Translate",
                     value: 3
+                  },{
+                    name: "AI4Bharat IndicTrans V2",
+                    value: 4
                   }] : [])]}
                   handleChange={handleTransModelChange}
                   value={translationModel}

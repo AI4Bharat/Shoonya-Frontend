@@ -10,9 +10,12 @@ import { ThemeProvider,Grid } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveWorkspaceMemberAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceMember";
 import Search from "../../component/common/Search";
+import RemoveWorkspaceFrozenUserAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceFrozenUser";
 
 const AnnotatorsTable = (props) => {
     const dispatch = useDispatch();
+    const { onRemoveSuccessGetUpdatedMembers } = props;
+
     const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const [snackbar, setSnackbarInfo] = useState({
@@ -31,6 +34,8 @@ const AnnotatorsTable = (props) => {
     }
 
     const workspaceAnnotators = useSelector(state => state.getWorkspacesAnnotatorsData.data);
+    const workspaceDtails = useSelector(state=>state.getWorkspaceDetails.data);
+
 
     useEffect(() => {
         getWorkspaceAnnotatorsData();
@@ -56,7 +61,7 @@ const AnnotatorsTable = (props) => {
                 message: resp?.message,
                 variant: "success",
             })
-            getWorkspaceAnnotatorsData();
+            onRemoveSuccessGetUpdatedMembers();
         } else {
             setSnackbarInfo({
                 open: true,
@@ -66,6 +71,32 @@ const AnnotatorsTable = (props) => {
         }
 
     }
+
+    const handleRemoveFrozenUsers = async (FrozenUserId) => {
+        const projectObj = new RemoveWorkspaceFrozenUserAPI(id, { user_id: FrozenUserId });
+        const res = await fetch(projectObj.apiEndPoint(), {
+          method: "POST",
+          body: JSON.stringify(projectObj.getBody()),
+          headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        // setLoading(false);
+        if (res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "success",
+          });
+          onRemoveSuccessGetUpdatedMembers();
+        } else {
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "error",
+          });
+        }
+      };
+    
 
     const pageSearch = () => {
 
@@ -95,6 +126,17 @@ const AnnotatorsTable = (props) => {
 
     }
     const columns = [
+        {
+            name: "id",
+            label: "Id",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center",
+                display:"excluded",
+                setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
+            }
+        },
         {
             name: "Name",
             label: "Name",
@@ -134,13 +176,23 @@ const AnnotatorsTable = (props) => {
             }
         }];
 
-    // const data = [
-    //     ["Shoonya User", "user123@tarento.com", 0, ]
-    // ];
+        const projectlist = (el) => {
+            let temp = false;
+            workspaceDtails?.frozen_users?.forEach((em) => {
+              if (el == em.id) {
+                temp = true;
+              }
+            });
+            return temp;
+          };
+
+          
+
     const data = workspaceAnnotators && workspaceAnnotators.length > 0 ? pageSearch().map((el, i) => {
         const userRole = el.role && UserMappedByRole(el.role)?.element;
         console.log("userRole", userRole);
         return [
+            el.id,
             el.username,
             el.email,
             userRole ? userRole : el.role,
@@ -155,10 +207,17 @@ const AnnotatorsTable = (props) => {
 
                 </Link>
                 <CustomButton
-                    sx={{ borderRadius: 2, backgroundColor: "#cf5959" }}
+                    sx={{ borderRadius: 2, backgroundColor: "#cf5959",mr:2 }}
                     label="Remove"
                     onClick={() => handleRemoveWorkspaceMember(el.id)}
+                    disabled={projectlist(el.id)}
                 />
+                 {projectlist(el.id) &&(
+                 <CustomButton
+                    sx={{ borderRadius: 2}}
+                    label="Add"
+                    onClick={() => handleRemoveFrozenUsers(el.id)}
+                  />)}
             </>
         ]
     }) : [];
