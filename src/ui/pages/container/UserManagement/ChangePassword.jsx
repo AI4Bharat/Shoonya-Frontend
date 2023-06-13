@@ -95,7 +95,7 @@ const loggedInUserData = useSelector(
       setSnackbarInfo({
         ...snackbar,
         open: true,
-        message: "New Password and Confirm Password Did Not Match",
+        message: "New Password and Confirm Password must match",
         variant: 'error'
     })
     }
