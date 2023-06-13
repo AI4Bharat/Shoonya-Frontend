@@ -200,7 +200,7 @@ const MembersTable = (props) => {
   };
 
   const handleResendUser = async(email) => {
-    const projectObj = new ResendUserInviteAPI(email=email);
+    const projectObj = new ResendUserInviteAPI(email=[email]);
     dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",

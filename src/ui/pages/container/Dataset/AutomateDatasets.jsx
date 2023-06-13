@@ -1,4 +1,4 @@
-import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography } from "@mui/material";
+import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography,Switch } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +36,7 @@ const AutomateDatasets = () => {
   const [translationModel, setTranslationModel] = useState('');
   const [checks, setChecks] = useState('False');
   const [loading, setLoading] = useState(false);
+  const [checked, setChecked] = useState(true);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
   //const [apitype, setApitype] = useState("indic-trans");
 
@@ -127,7 +128,7 @@ const AutomateDatasets = () => {
 
 const apitype = translationModel===1?"indic-trans": translationModel===2?"google":translationModel===3?"azure":"indic-trans-v2";
   const handleConfirm = () => {
-    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,apitype);
+    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,apitype,checked);
     setLoading(true);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
@@ -149,6 +150,10 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
   // const handleAPiType = (e) => {
   //   setApitype(e.target.value)
   // }
+
+  const handleChangeAutomatemissingitems = (event) => {
+    setChecked(event.target.checked);
+  };
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -356,6 +361,28 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                 handleChange={(value) => setChecks(value)}
                 value={checks}
               />
+            </Grid>
+            <Grid container direction="row">
+            <Grid
+              className={classes.projectsettingGrid}
+              xs={12}
+              sm={12}
+              md={4}
+              lg={4}
+              xl={4}
+            >
+              <Typography gutterBottom component="div">
+              Automate missing items only:
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={5} lg={5} xl={5} sm={12} >
+            <Switch
+              checked={checked}
+              onChange={handleChangeAutomatemissingitems}
+              inputProps={{ 'aria-label': 'controlled' }}
+              sx={{mt:2,ml:2}}
+             />
+            </Grid>
             </Grid>
             
 
