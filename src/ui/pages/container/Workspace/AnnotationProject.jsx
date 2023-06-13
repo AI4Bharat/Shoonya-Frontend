@@ -52,6 +52,13 @@ const projectStage = [
   {name:"Super Check Stage",value: 3}
 ];
 
+const CreateAnnotationsAutomatically = [
+  { name: "None", value: "none" },
+  { name: "Annotation", value: "annotation" },
+  { name: "Review", value: "review" },
+  {name:"Supercheck",value: "supercheck"}
+];
+
 const AnnotationProject = (props) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -87,7 +94,7 @@ const AnnotationProject = (props) => {
   const [samplingMode, setSamplingMode] = useState(null);
   const [random, setRandom] = useState("");
   const [batchSize, setBatchSize] = useState();
-  const [batchNumber, setBatchNumber] = useState();
+  const [batchNumber, setBatchNumber] = useState([]);
   const [samplingParameters, setSamplingParameters] = useState(null);
   const [selectedInstances, setSelectedInstances] = useState([]);
   const [confirmed, setConfirmed] = useState(false);
@@ -107,6 +114,8 @@ const AnnotationProject = (props) => {
   const [tableData, setTableData] = useState([]);
   const [searchAnchor, setSearchAnchor] = useState(null);
   const [selectedFilters, setsSelectedFilters] = useState({});
+  const [createannotationsAutomatically, setsCreateannotationsAutomatically] = useState("none");
+
   const searchOpen = Boolean(searchAnchor);
   const excludeKeys = [
     "parent_data_id",
@@ -122,12 +131,14 @@ const AnnotationProject = (props) => {
     // "conversation_json",
     "machine_translated_conversation_json",
     "speakers_json",
-    "transcribed_json",
+    // "transcribed_json",
     "conversation_json",
-    "prediction_json",
+    // "prediction_json",
     "machine_transcribed_json", 
    "unverified_conversation_json",
-
+   "annotation_bboxes",
+   "annotation_labels",
+   "annotation_transcripts",
   ];
   const renderToolBar = () => {
     return (
@@ -357,7 +368,7 @@ const AnnotationProject = (props) => {
               align: "center",
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
-                if (keys == "metadata_json" && value !== null ) {
+                if ((keys == "metadata_json" || keys == "prediction_json"|| keys == "ocr_prediction_json"|| keys == "transcribed_json"|| keys == "draft_data_json" || keys == "ocr_transcribed_json") && value !== null ) {
                  const data = JSON.stringify(value)
                  const metadata = data.replace(/\\/g, "");
                   return metadata;
@@ -412,11 +423,13 @@ const AnnotationProject = (props) => {
     }
   }, [selectedType]);
 
+
   useEffect(() => {
+
     if (batchSize && batchNumber) {
       setSamplingParameters({
         batch_size: batchSize,
-        batch_number: batchNumber,
+        batch_number:new Function( "return [" + [batchNumber ]+ "]")(),
       });
     } else {
       setSamplingParameters(null);
@@ -515,6 +528,9 @@ const AnnotationProject = (props) => {
     return temp;
   };
 
+
+  
+
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
@@ -540,11 +556,12 @@ const AnnotationProject = (props) => {
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
       project_stage: taskReviews,
+      ...(createannotationsAutomatically !== "none" && { automatic_annotation_creation_mode: createannotationsAutomatically }),
+
     };
 
     if (sourceLanguage) newProject["src_language"] = sourceLanguage;
     if (targetLanguage) newProject["tgt_language"] = targetLanguage;
-    console.log(newProject, "newProjectnewProject");
     const projectObj = new CreateProjectAPI(newProject);
     dispatch(APITransport(projectObj));
   };
@@ -556,6 +573,10 @@ const AnnotationProject = (props) => {
   const handleReviewToggle = async (e) => {
     setTaskReviews(e.target.value);
   };
+
+  const handleChangeCreateAnnotationsAutomatically = (e)=>{
+    setsCreateannotationsAutomatically(e.target.value)
+  }
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -866,13 +887,13 @@ const AnnotationProject = (props) => {
                       lg={12}
                       xl={12}
                     >
-                      {parameter.data["choices"] !== undefined ? (
+                      {parameter?.data["choices"] !== undefined ? (
                         <>
                           {selectedType === "Conversation" &&
                             (selectedType === "ContextualTranslationEditing" ||
                               selectedType === "ConversationTranslation") && (
                               <MenuItems
-                                menuOptions={parameter.data["choices"].map(
+                                menuOptions={parameter?.data["choices"].map(
                                   (element) => {
                                     return {
                                       name: element[0],
@@ -1182,12 +1203,12 @@ const AnnotationProject = (props) => {
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
                   <OutlinedTextField
                     fullWidth
-                    type="number"
-                    inputProps={{ type: "number" }}
+                    // type="number"
+                    // inputProps={{ type: "number" }}
                     value={batchNumber}
                     onChange={(e) =>
-                      isNum(e.target.value) &&
-                      setBatchNumber(Number(e.target.value))
+                      // isNum(e.target.value) &&
+                      setBatchNumber(e.target.value)
                     }
                   />
                 </Grid>
@@ -1239,6 +1260,34 @@ const AnnotationProject = (props) => {
                       onChange={handleReviewToggle}
                     >
                       {projectStage.map((type, index) => (
+                        <MenuItem value={type.value} key={index}>
+                          {type.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  className={classes.projectsettingGrid}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                  Create Annotations Automatically:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <FormControl fullWidth className={classes.formControl}>
+                    <Select
+                      labelId="task-Reviews-label"
+                      id="task-Reviews-select"
+                      value={createannotationsAutomatically}
+                      onChange={handleChangeCreateAnnotationsAutomatically}
+                    >
+                      {CreateAnnotationsAutomatically.map((type, index) => (
                         <MenuItem value={type.value} key={index}>
                           {type.name}
                         </MenuItem>
