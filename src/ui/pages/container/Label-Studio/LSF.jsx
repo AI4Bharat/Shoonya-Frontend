@@ -49,7 +49,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 const filterAnnotations = (
   annotations,
-  user_id,
+  user,
   setDisableBtns,
   setFilterMessage,
   setDisableButton
@@ -58,7 +58,7 @@ const filterAnnotations = (
   let disableSkip = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
-    return annotation.completed_by === user_id && !annotation.parent_annotation;
+    return annotation.completed_by === user.id && !annotation.parent_annotation;
   });
   let userAnnotationData = annotations.find(
     (annotation) =>
@@ -143,8 +143,10 @@ const filterAnnotations = (
      else {
       filteredAnnotations = [userAnnotation];
     }
-    return [filteredAnnotations, disable,disableSkip];
+  } else if([4, 5, 6].includes(user.role)) {
+    filteredAnnotations = annotations.filter((a) => a.annotation_type === 1);
   }
+  return [filteredAnnotations, disable, disableSkip];
 };
 
 //used just in postAnnotation to support draft status update.
@@ -253,7 +255,7 @@ const LabelStudioWrapper = ({
     if (predictions == null) predictions = [];
     const [filteredAnnotations, disableLSFControls,disableSkip] = filterAnnotations(
       annotations,
-      userData.id,
+      userData,
       setDisableBtns,
       setFilterMessage,
       setDisableButton
@@ -498,6 +500,16 @@ const LabelStudioWrapper = ({
         loaded.current = taskId;
         getProjectsandTasks(projectId, taskId).then(
           ([labelConfig, taskData, annotations, predictions]) => {
+            if(annotations.message?.includes("not a part of this project") || annotations.detail?.includes("Not found")){
+              if(annotations.detail?.includes("Not found")) annotations.message = "Task not found";
+              setSnackbarInfo({
+                open: true,
+                message: annotations.message,
+                variant: "error",
+              });
+              hideLoader();
+              return;
+            }
             // both have loaded!
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
@@ -684,7 +696,7 @@ const LabelStudioWrapper = ({
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         variant={snackbar.variant}
         message={snackbar.message}
-        autoHideDuration={2000}
+        autoHideDuration={3000}
       />
     );
   };
