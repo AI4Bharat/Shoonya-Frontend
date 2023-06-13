@@ -17,20 +17,23 @@ import Spinner from "../../component/common/Spinner";
 
 const excludeKeys = [
   "parent_data_id",
-  "metadata_json",
+  // "metadata_json",
   "instance_id_id",
   "datasetbase_ptr_id",
   "key",
   "instance_id",
   "speakers_json",
   // "conversation_json",
-  "transcribed_json",
+  // "transcribed_json",
   "machine_transcribed_json",
-  "prediction_json",
+  // "prediction_json",
   "conversation_json",
   "machine_translated_conversation_json",
   "speakers_json",
-  "unverified_conversation_json"
+  "unverified_conversation_json",
+  "annotation_bboxes",
+  "annotation_labels",
+  "annotation_transcripts",
 ];
 
 const DataitemsTable = () => {
@@ -98,6 +101,15 @@ useEffect(() => {
               sort: false,
               align: "center",
               customHeadLabelRender: customColumnHead,
+              customBodyRender: (value) => {
+                if ((key == "metadata_json" || key == "prediction_json"|| key == "ocr_prediction_json"|| key == "transcribed_json"|| key == "draft_data_json" || key == "ocr_transcribed_json") && value !== null ) {
+                 const data = JSON.stringify(value)
+                 const metadata = data.replace(/\\/g, "");
+                  return metadata;
+                } else {
+                  return value;
+                }
+              },
             },
           });
           tempSelected.push(key);
