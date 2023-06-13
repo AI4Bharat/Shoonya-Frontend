@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import CustomButton from "../common/Button";
+import GetPullNewDataAPI from "../../../../redux/actions/api/ProjectDetails/PullNewData";
 import CustomizedSnackbars from "../../component/common/Snackbar"
 import Spinner from "../../component/common/Spinner";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -12,6 +13,7 @@ import MUIDataTable from "mui-datatables";
 
 import { Grid, Stack, ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import { width } from "@mui/system";
 
 const columns = [
 	{
@@ -122,7 +124,30 @@ export default function DatasetProjectsTable({ datasetId }) {
 				})
 		}
 	}
-
+	const getPullNewDataAPI = async (project) => {
+		const projectObj = new GetPullNewDataAPI(project.id);
+		//dispatch(APITransport(projectObj));
+		const res = await fetch(projectObj.apiEndPoint(), {
+		  method: "POST",
+		  body: JSON.stringify(projectObj.getBody()),
+		  headers: projectObj.getHeaders().headers,
+		});
+		const resp = await res.json();
+		setLoading(false);
+		if (res.ok) {
+		  setSnackbarInfo({
+			open: true,
+			message: resp?.message,
+			variant: "success",
+		  });
+		} else {
+		  setSnackbarInfo({
+			open: true,
+			message: resp?.message,
+			variant: "error",
+		  });
+		}
+	  };
 	const renderSnackBar = () => {
 		return (
 				<CustomizedSnackbars
@@ -148,7 +173,8 @@ export default function DatasetProjectsTable({ datasetId }) {
 					>
 						<CustomButton sx={{ borderRadius: 2 }} label="View" />
 					</Link>
-					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getExportProjectButton(project)} label="Export" />
+					<CustomButton sx={{ borderRadius: 2 ,height:37}} onClick={() => getExportProjectButton(project)} label="Export" />
+					<CustomButton sx={{ borderRadius: 2}} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" />
 				</Stack>
 			),
 		}))
