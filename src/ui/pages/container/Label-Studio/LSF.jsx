@@ -421,7 +421,6 @@ const LabelStudioWrapper = ({
                 setAutoSave(false);
                 showLoader();
                 let temp = annotation.serializeAnnotation();
-
                 for (let i = 0; i < temp.length; i++) {
                   if (temp[i].value.text) {
                     temp[i].value.text = [temp[i].value.text[0]];
@@ -735,6 +734,12 @@ const LabelStudioWrapper = ({
   };
   return (
     <div>
+      {annotations.find((a) => a.completed_by === userData.id && !a.parent_annotation) &&
+        <div style={{ textAlign: "left", marginBottom: "15px" }}>
+          <Typography variant="body" color="#000000">
+            Auto-save enabled for this scenario.
+          </Typography>
+        </div>}
       {filterMessage && (
         <Alert severity="info" sx={{ mb: 3 }}>
           {filterMessage}

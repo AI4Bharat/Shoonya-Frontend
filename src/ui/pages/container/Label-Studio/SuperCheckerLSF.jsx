@@ -122,6 +122,9 @@ const filterAnnotations = (annotations, user) => {
 };
 
 //used just in postAnnotation to support draft status update.
+
+const AUTO_SAVE_INTERVAL = 20000;
+
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -145,6 +148,9 @@ const LabelStudioWrapper = ({
     variant: "success",
   });
   const [taskData, setTaskData] = useState(undefined);
+  const [annotations, setAnnotations] = useState([]);
+  const load_time = useRef();
+  const [projectType, setProjectType] = useState();
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -214,7 +220,6 @@ const LabelStudioWrapper = ({
     superCheckerNotesRef,
     projectType
   ) {
-    let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
     const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData);
@@ -319,7 +324,7 @@ const LabelStudioWrapper = ({
           //   ls.annotationStore.selectAnnotation(c.id);
           // }
           // }
-          load_time = new Date();
+          load_time.current = new Date();
         },
 
         onSkipTask: function (annotation) {
@@ -329,7 +334,7 @@ const LabelStudioWrapper = ({
             showLoader();
             patchSuperChecker(
               review.id,
-              load_time,
+              load_time.current,
               review.lead_time,
               "skipped",
               superCheckerNotesRef.current.value
@@ -367,7 +372,7 @@ const LabelStudioWrapper = ({
 
                 patchSuperChecker(
                   superChecker.id,
-                  load_time,
+                  load_time.current,
                   superChecker.lead_time,
                   review_status.current,
                   projectType === "SingleSpeakerAudioTranscriptionEditing"
@@ -474,6 +479,7 @@ const LabelStudioWrapper = ({
               : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
+          setAnnotations(annotations);
           getTaskData(taskData);
           LSFRoot(
             rootRef,
@@ -503,6 +509,53 @@ const LabelStudioWrapper = ({
     superCheckerNotesRef,
     taskId,
   ]);
+
+  /* useEffect(() => {
+    const interval = setInterval(() => {
+      if (annotations.length && lsfRef.current?.store?.annotationStore?.selected && taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        //console.log("autoSave", annotation.serializeAnnotation(), annotations);
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            (!annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id) &&
+              !["labeled", "accepted", "accepted_with_major_changes", "accepted_with_minor_changes"].includes(annotations[i].annotation_status)
+          ) {
+            let temp = annotation.serializeAnnotation();
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
+              }
+            }
+            let superChecker = annotations.filter(
+              (value) => value.annotation_type === 3
+            )[0];
+            patchSuperChecker(
+              superChecker.id,
+              load_time.current,
+              superChecker.lead_time,
+              annotations[i].annotation_status,
+              projectType === "SingleSpeakerAudioTranscriptionEditing"
+                ? annotation.serializeAnnotation()
+                : temp,
+              superChecker.parent_annotation,
+              superCheckerNotesRef.current.value
+            ).then((err) => {
+              if (err) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Error in autosaving annotation",
+                  variant: "error",
+                });
+              }
+            });
+          }
+        }
+      }
+    }, AUTO_SAVE_INTERVAL);
+    return () => clearInterval(interval);
+  }, [annotations]); */
 
   useEffect(() => {
     showLoader();
@@ -557,24 +610,33 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
-      {ProjectData.revision_loop_count >
-      taskData?.revision_loop_count?.super_check_count
-        ? false
-        : true && (
-            <div style={{ textAlign: "right", marginBottom: "15px" }}>
-              <Typography variant="body" color="#f5222d">
-                Note: The 'Revision Loop Count' limit has been reached for this
-                task.
-              </Typography>
-            </div>
-          )}
+      <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
+        <div style={{ textAlign: "left", marginBottom: "15px" }}>
+          <Typography variant="body" color="#000000">
+            Auto-save is not available for this scenario. Please save your task manually.
+          </Typography>
+        </div>
+        <div>
+        {ProjectData.revision_loop_count >
+        taskData?.revision_loop_count?.super_check_count
+          ? false
+          : true && (
+              <div style={{ textAlign: "right", marginBottom: "15px" }}>
+                <Typography variant="body" color="#f5222d">
+                  Note: The 'Revision Loop Count' limit has been reached for this
+                  task.
+                </Typography>
+              </div>
+            )}
 
-        { ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
-            <div style={{ textAlign: "right", marginBottom: "15px" }}>
-              <Typography variant="body" color="#f5222d">
-                Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
-              </Typography>
-            </div>)}
+          { ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
+              <div style={{ textAlign: "right", marginBottom: "15px" }}>
+                <Typography variant="body" color="#f5222d">
+                  Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
+                </Typography>
+              </div>)}
+          </div>
+      </div>
 
       {!loader && (
         <div
