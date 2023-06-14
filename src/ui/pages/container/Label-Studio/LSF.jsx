@@ -179,7 +179,8 @@ const LabelStudioWrapper = ({
   });
   const [taskData, setTaskData] = useState(undefined);
   const [annotations, setAnnotations] = useState([]);
-  const [load_time, setLoadTime] = useState();
+  const load_time = useRef();
+  const [autoSave, setAutoSave] = useState(true);
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
@@ -353,7 +354,7 @@ const LabelStudioWrapper = ({
             });
             ls.annotationStore.selectAnnotation(c.id);
           }
-          setLoadTime(new Date());
+          load_time.current = new Date();
         },
         onSubmitAnnotation: function (ls, annotation) {
           showLoader();
@@ -362,7 +363,7 @@ const LabelStudioWrapper = ({
               annotation.serializeAnnotation(),
               taskData.id,
               userData.id,
-              load_time,
+              load_time.current,
               annotation.lead_time,
               annotation_status.current,
               annotationNotesRef.current.value
@@ -396,7 +397,7 @@ const LabelStudioWrapper = ({
             patchAnnotation(
               null,
               annotation.id,
-              load_time,
+              load_time.current,
               annotation.lead_time,
               "skipped",
               annotationNotesRef.current.value
@@ -417,6 +418,7 @@ const LabelStudioWrapper = ({
                 annotation.serializeAnnotation()[0].id ===
                   annotations[i].result[0].id
               ) {
+                setAutoSave(false);
                 showLoader();
                 let temp = annotation.serializeAnnotation();
                 for (let i = 0; i < temp.length; i++) {
@@ -427,7 +429,7 @@ const LabelStudioWrapper = ({
                 patchAnnotation(
                   temp,
                   annotations[i].id,
-                  load_time,
+                  load_time.current,
                   annotations[i].lead_time,
                   annotation_status.current,
                   annotationNotesRef.current.value
@@ -658,48 +660,49 @@ const LabelStudioWrapper = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if(lsfRef.current?.store?.annotationStore?.selected && taskData?.annotation_status !== "freezed") {
-        let annotation = lsfRef.current.store.annotationStore.selected;
-        for (let i = 0; i < annotations.length; i++) {
-          if (
-            !annotations[i].result?.length ||
-            annotation.serializeAnnotation()[0].id ===
-              annotations[i].result[0].id
-          ) {
-              let temp = annotation.serializeAnnotation();
-              for (let i = 0; i < temp.length; i++) {
-                if (temp[i].value.text) {
-                  temp[i].value.text = [temp[i].value.text[0]];
+      if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+        if(taskData?.annotation_status !== "freezed") {
+          let annotation = lsfRef.current.store.annotationStore.selected;
+          for (let i = 0; i < annotations.length; i++) {
+            if (
+              !annotations[i].result?.length ||
+              annotation.serializeAnnotation()[0].id ===
+                annotations[i].result[0].id
+            ) {
+                let temp = annotation.serializeAnnotation();
+                for (let i = 0; i < temp.length; i++) {
+                  if (temp[i].value.text) {
+                    temp[i].value.text = [temp[i].value.text[0]];
+                  }
                 }
+                patchAnnotation(
+                  temp,
+                  annotations[i].id,
+                  load_time.current,
+                  annotations[i].lead_time,
+                  annotations[i].annotation_status,
+                  annotationNotesRef.current.value
+                ).then((err) => {
+                  if (err) {
+                    setSnackbarInfo({
+                      open: true,
+                      message: "Error in autosaving annotation",
+                      variant: "error",
+                    });
+                  }
+                });
               }
-              //console.log("called patch");
-              patchAnnotation(
-                temp,
-                annotations[i].id,
-                load_time,
-                annotations[i].lead_time,
-                annotations[i].annotation_status,
-                annotationNotesRef.current.value
-              ).then((err) => {
-                if (err) {
-                  setSnackbarInfo({
-                    open: true,
-                    message: "Error in autosaving annotation",
-                    variant: "error",
-                  });
-                }
-              });
             }
-          }
         } else
           setSnackbarInfo({
             open: true,
             message: "Task is frozen",
             variant: "error",
           });
-        }, AUTO_SAVE_INTERVAL);
+        }
+      }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
-  }, [taskData]);
+  }, [autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
 
   const handleDraftAnnotationClick = async () => {
     annotation_status.current = "draft";
@@ -731,6 +734,12 @@ const LabelStudioWrapper = ({
   };
   return (
     <div>
+      {annotations.find((a) => a.completed_by === userData.id && !a.parent_annotation) &&
+        <div style={{ textAlign: "left", marginBottom: "15px" }}>
+          <Typography variant="body" color="#000000">
+            Auto-save enabled for this scenario.
+          </Typography>
+        </div>}
       {filterMessage && (
         <Alert severity="info" sx={{ mb: 3 }}>
           {filterMessage}
