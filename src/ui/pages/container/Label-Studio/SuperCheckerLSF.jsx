@@ -611,11 +611,13 @@ const LabelStudioWrapper = ({
   return (
     <div>
       <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
-        <div style={{ textAlign: "left", marginBottom: "15px" }}>
-          <Typography variant="body" color="#000000">
-            Auto-save is not available for this scenario. Please save your task manually.
-          </Typography>
-        </div>
+        {taskData?.super_check_user === userData?.id &&
+          <div style={{ textAlign: "left", marginBottom: "15px" }}>
+            <Typography variant="body" color="#000000">
+              Auto-save is not available for this scenario. Please save your task manually.
+            </Typography>
+          </div>
+        }
         <div>
         {ProjectData.revision_loop_count >
         taskData?.revision_loop_count?.super_check_count
