@@ -558,6 +558,53 @@ const LabelStudioWrapper = ({
   }, [annotations]); */
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      if (annotations.length && lsfRef.current?.store?.annotationStore?.selected && taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        //console.log("autoSave", annotation.serializeAnnotation(), annotations);
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            (!annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id) &&
+              !["labeled", "accepted", "accepted_with_major_changes", "accepted_with_minor_changes"].includes(annotations[i].annotation_status)
+          ) {
+            let temp = annotation.serializeAnnotation();
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
+              }
+            }
+            let superChecker = annotations.filter(
+              (value) => value.annotation_type === 3
+            )[0];
+            patchSuperChecker(
+              superChecker.id,
+              load_time,
+              superChecker.lead_time,
+              annotations[i].annotation_status,
+              projectType === "SingleSpeakerAudioTranscriptionEditing"
+                ? annotation.serializeAnnotation()
+                : temp,
+              superChecker.parent_annotation,
+              superCheckerNotesRef.current.value
+            ).then((err) => {
+              if (err) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Error in autosaving annotation",
+                  variant: "error",
+                });
+              }
+            });
+          }
+        }
+      }
+    }, AUTO_SAVE_INTERVAL);
+    return () => clearInterval(interval);
+  }, [annotations]);
+
+  useEffect(() => {
     showLoader();
   }, [taskId]);
 
