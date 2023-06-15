@@ -564,7 +564,7 @@ const AdvancedOperation = (props) => {
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            {ProjectDetails.sampling_mode == "f" ? (
+            {ProjectDetails.sampling_mode == "f" || ProjectDetails.sampling_mode == "b" ? (
               <CustomButton
                 sx={{
                   inlineSize: "max-content",
