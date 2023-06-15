@@ -433,11 +433,11 @@ const LabelStudioWrapper = ({
                   annotations[i].lead_time,
                   annotation_status.current,
                   annotationNotesRef.current.value
-                ).then((err) => {
-                  if (err) {
+                ).then((res) => {
+                  if (res.status !== 200) {
                     setSnackbarInfo({
                       open: true,
-                      message: "Error in saving annotation",
+                      message: "Error in autosaving annotation",
                       variant: "error",
                     });
                   }
@@ -682,8 +682,8 @@ const LabelStudioWrapper = ({
                   annotations[i].lead_time,
                   annotations[i].annotation_status,
                   annotationNotesRef.current.value
-                ).then((err) => {
-                  if (err) {
+                ).then((res) => {
+                  if (res.status !== 200) {
                     setSnackbarInfo({
                       open: true,
                       message: "Error in autosaving annotation",
