@@ -433,21 +433,20 @@ const LabelStudioWrapper = ({
                   annotations[i].lead_time,
                   annotation_status.current,
                   annotationNotesRef.current.value
-                ).then((err) => {
-                  if (err) {
+                ).then((res) => {
+                  hideLoader();
+                  if (res.status !== 200) {
                     setSnackbarInfo({
                       open: true,
                       message: "Error in saving annotation",
                       variant: "error",
                     });
                   }
-                  if (localStorage.getItem("labelAll"))
+                  else if (localStorage.getItem("labelAll"))
                     getNextProject(projectId, taskData.id).then((res) => {
-                      hideLoader();
                       tasksComplete(res?.id || null);
                     });
                   else {
-                    hideLoader();
                     window.location.reload();
                   }
                 });
@@ -682,8 +681,8 @@ const LabelStudioWrapper = ({
                   annotations[i].lead_time,
                   annotations[i].annotation_status,
                   annotationNotesRef.current.value
-                ).then((err) => {
-                  if (err) {
+                ).then((res) => {
+                  if (res.status !== 200) {
                     setSnackbarInfo({
                       open: true,
                       message: "Error in autosaving annotation",
