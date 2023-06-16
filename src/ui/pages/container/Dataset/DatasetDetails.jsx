@@ -62,7 +62,8 @@ const DatasetDetails = () => {
 
     const handleOpenSettings = () => {
         // navigate(`/projects/${id}/projectsetting`);
-        navigate(`/datasets/${datasetId}/datasetsetting`)
+        navigate(`
+        /datasetsetting`)
     }
 
     return (
