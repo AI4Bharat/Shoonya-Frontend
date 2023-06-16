@@ -29,6 +29,7 @@ const ChangePassword = (props) => {
   const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState("")
   const [currentPassword, setCurrentPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState({
     password: "",
@@ -37,6 +38,10 @@ const ChangePassword = (props) => {
   const [newvalues, setNewValues] = useState({
     newpassword: "",
     showNewPassword: false,
+  });
+  const [confirmvalues, setConfirmValues] = useState({
+    confirmpassword: "",
+    showConfirmPassword: false,
   });
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -65,6 +70,10 @@ const ChangePassword = (props) => {
 const handleClickShowNewPassword = () => {
   setNewValues({ ...newvalues, showNewPassword: !newvalues.showNewPassword });
 };
+const handleClickShowConfirmPassword = () => {
+  setConfirmValues({ ...confirmvalues, showConfirmPassword: !confirmvalues.showConfirmPassword });
+};
+
 
 const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -72,36 +81,52 @@ const handleMouseDownPassword = (event) => {
 const loggedInUserData = useSelector(
   (state) => state.fetchLoggedInUserData.data
 );
-  const handleChangePassword = async() => {
+ 
+  const handleChangePassword = async () => {
     setNewPassword("")
     setCurrentPassword("")
+    setConfirmPassword("")
     const ChangePassword = {
       new_password: newPassword,
       current_password: currentPassword,
-
+      confirm_password: confirmPassword
     }
-  const userObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword);
-  const res = await fetch(userObj.apiEndPoint(), {
-      method: "PATCH",
-      body: JSON.stringify(userObj.getBody()),
-      headers: userObj.getHeaders().headers,
-  });
-  const resp = await res.json();
-  if (res.ok) {
+    if(newPassword!==confirmPassword){
       setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "success",
-      })
-     
-  } else {
-      setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "error",
-      })
+        ...snackbar,
+        open: true,
+        message: "New Password and Confirm Password must match",
+        variant: 'error'
+    })
+    }
+    else{
+      const userObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword);
+      const res = await fetch(userObj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(userObj.getBody()),
+          headers: userObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+          setSnackbarInfo({
+              open: true,
+              message: resp?.message,
+              variant: "success",
+          })
+    
+      } else {
+          setSnackbarInfo({
+              open: true,
+              message: resp?.message,
+              variant: "error",
+          })
+      }
+      }
+
   }
-  }
+
+
+
   const renderSnackBar = () => {
     return (
         <CustomizedSnackbars
@@ -209,6 +234,42 @@ const loggedInUserData = useSelector(
                 />
               </Grid>
 
+              <Grid
+                items
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+                className={classes.projectsettingGrid}
+              >
+                <Typography gutterBottom component="div" label="Required">
+                  Confirm Password
+                </Typography>
+              </Grid>
+              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                <OutlinedTextField
+                  fullWidth
+                  placeholder={translate("newPassword")}
+                  type={confirmvalues.showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                 InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowConfirmPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {confirmvalues.showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
+                />
+              </Grid>
+
             <Grid
               className={classes.projectsettingGrid}
               item
@@ -238,4 +299,3 @@ const loggedInUserData = useSelector(
 };
 
 export default ChangePassword;
-
