@@ -158,7 +158,7 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
-      <Grid container direction="row"  >
+      <Grid container direction="row"  paddingTop={3}>
         <Card className={classes.workspaceCard}>
           <Grid item xs={2} sm={2} md={2} lg={2} xl={2}></Grid>
           <Grid item xs={8} sm={8} md={8} lg={8} xl={8} sx={{ pb: "6rem" }}>
