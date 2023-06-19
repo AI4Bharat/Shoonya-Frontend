@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2bb5d916900ec8d34895d3f608c2e617ae2578b5
 import { Tabs,Tab ,Box} from "@mui/material";
 import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography,Switch } from "@mui/material";
 =======
@@ -25,6 +28,7 @@ const AutomateDatasets = () => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
 
+<<<<<<< HEAD
   const [srcDatasetTypes, setSrcDatasetTypes] = useState([]);
   const [tgtDatasetTypes, setTgtDatasetTypes] = useState([]);
   const [srcDatasetType, setSrcDatasetType] = useState('');
@@ -41,6 +45,9 @@ const AutomateDatasets = () => {
   const [checked, setChecked] = useState(true);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
   //const [apitype, setApitype] = useState("indic-trans");
+=======
+  const [selectedTab, setSelectedTab] = useState(0);
+>>>>>>> 2bb5d916900ec8d34895d3f608c2e617ae2578b5
 
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
   const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
@@ -70,6 +77,7 @@ const AutomateDatasets = () => {
     dispatch(APITransport(instancesObj));
   };
 
+<<<<<<< HEAD
   const handleTransModelChange = (value) => {
     setTranslationModel(value);
     setLanguages([]);
@@ -127,6 +135,10 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
   return (
 <<<<<<< HEAD
 >>>>>>> develop
+=======
+
+  return (
+>>>>>>> 2bb5d916900ec8d34895d3f608c2e617ae2578b5
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <Tabs value={selectedTab} onChange={handleTabChange} centered>
         <Tab label="Inter-Automate Datasets" />
@@ -135,6 +147,7 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
       {selectedTab === 0 && <InterAutomateDataset/>}
       {selectedTab === 1 && <IntraAutomateDataset />}
     </Box>
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 =======
@@ -369,6 +382,8 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
             
 >>>>>>> 56c7912c32bad49f453c9b0fe61d20eb6f3657d5
 >>>>>>> develop
+=======
+>>>>>>> 2bb5d916900ec8d34895d3f608c2e617ae2578b5
 
   );
 };
