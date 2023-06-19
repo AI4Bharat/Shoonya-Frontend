@@ -105,7 +105,7 @@ const patchAnnotation = async (
   notes
 ) => {
   try {
-    await axiosInstance.patch(`/annotation/${annotationID}/`, {
+    const res = await axiosInstance.patch(`/annotation/${annotationID}/`, {
       ...(annotation_status !== "skipped" && { result: result }),
       ...(annotation_status && {
         lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
@@ -113,6 +113,7 @@ const patchAnnotation = async (
       }),
       annotation_notes: notes,
     });
+    return res;
   } catch (err) {
     return err;
   }
