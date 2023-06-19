@@ -13,8 +13,6 @@ const AutomateDatasets = () => {
     setSelectedTab(newValue);
   };
 
-
-
   return (
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <Tabs value={selectedTab} onChange={handleTabChange} centered>
