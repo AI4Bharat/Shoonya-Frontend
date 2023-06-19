@@ -6,34 +6,7 @@ import InterAutomateDataset from "./InterAutomateDataset";
 import IntraAutomateDataset from "./IntraAutomateDataset";
 
 const AutomateDatasets = () => {
-//   const navigate = useNavigate();
-//   const classes = DatasetStyle();
-//   const dispatch = useDispatch();
 
-//   const [srcDatasetTypes, setSrcDatasetTypes] = useState([]);
-//   const [tgtDatasetTypes, setTgtDatasetTypes] = useState([]);
-//   const [srcDatasetType, setSrcDatasetType] = useState('');
-//   const [tgtDatasetType, setTgtDatasetType] = useState('');
-//   const [srcInstances, setSrcInstances] = useState([]);
-//   const [tgtInstances, setTgtInstances] = useState([]);
-//   const [srcInstance, setSrcInstance] = useState('');
-//   const [tgtInstance, setTgtInstance] = useState('');
-//   const [languageChoices, setLanguageChoices] = useState([]);
-//   const [languages, setLanguages] = useState([]);
-//   const [translationModel, setTranslationModel] = useState('');
-//   const [checks, setChecks] = useState('False');
-//   const [loading, setLoading] = useState(false);
-//   const [checked, setChecked] = useState(true);
-//   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
-//   //const [apitype, setApitype] = useState("indic-trans");
-
-//   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
-//   const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
-//   const DatasetTypes = useSelector((state) => state.GetDatasetType.data);
-//   const LanguageChoicesIndicTrans = useSelector((state) => state.getIndicTransLanguages.data);
-//   const LanguageChoicesAll = useSelector((state) => state.getLanguageChoices.data);
-// >>>>>>> 56c7912c32bad49f453c9b0fe61d20eb6f3657d5
-  
   const [selectedTab, setSelectedTab] = useState(0);
 
   const handleTabChange = (event, newValue) => {
