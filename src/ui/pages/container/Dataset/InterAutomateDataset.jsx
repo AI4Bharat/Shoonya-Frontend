@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography,Switch } from "@mui/material";
+=======
+import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography } from "@mui/material";
+>>>>>>> develop
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +40,10 @@ const InterAutomateDataset = () => {
   const [translationModel, setTranslationModel] = useState('');
   const [checks, setChecks] = useState('False');
   const [loading, setLoading] = useState(false);
+<<<<<<< HEAD
   const [checked, setChecked] = useState(true);
+=======
+>>>>>>> develop
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
   //const [apitype, setApitype] = useState("indic-trans");
 
@@ -128,7 +135,11 @@ const InterAutomateDataset = () => {
 
 const apitype = translationModel===1?"indic-trans": translationModel===2?"google":translationModel===3?"azure":"indic-trans-v2";
   const handleConfirm = () => {
+<<<<<<< HEAD
     const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,apitype,checked);
+=======
+    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,apitype);
+>>>>>>> develop
     setLoading(true);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
@@ -151,10 +162,13 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
   //   setApitype(e.target.value)
   // }
 
+<<<<<<< HEAD
   const handleChangeAutomatemissingitems = (event) => {
     setChecked(event.target.checked);
   };
 
+=======
+>>>>>>> develop
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
@@ -362,6 +376,7 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                 value={checks}
               />
             </Grid>
+<<<<<<< HEAD
             <Grid container direction="row">
             <Grid
               className={classes.projectsettingGrid}
@@ -384,6 +399,8 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
              />
             </Grid>
             </Grid>
+=======
+>>>>>>> develop
             
 
             {/* <Grid
@@ -451,4 +468,8 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
   );
 };
 
+<<<<<<< HEAD
 export default InterAutomateDataset;
+=======
+export default InterAutomateDataset;
+>>>>>>> develop

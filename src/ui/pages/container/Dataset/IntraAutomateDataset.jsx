@@ -29,7 +29,11 @@ import { MenuProps } from "../../../../utils/utils";
 import themeDefault from "../../../theme/theme";
 
 
+<<<<<<< HEAD
 const IntraAutomateDataset = () => {
+=======
+const IntraDatasetAutomationForm = () => {
+>>>>>>> develop
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -258,4 +262,8 @@ const IntraAutomateDataset = () => {
   );
 };
 
+<<<<<<< HEAD
 export default IntraAutomateDataset;
+=======
+export default IntraDatasetAutomationForm;
+>>>>>>> develop

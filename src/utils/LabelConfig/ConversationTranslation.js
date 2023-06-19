@@ -27,7 +27,7 @@ const generateLabelConfig = (taskData) => {
                 name="output_${idx}_${idx2}"
                 toName="dialog_${idx}_${idx2}"
                 value= "${outputValue}"
-                rows="${rows}"
+                rows="${rows > 1 ? rows : 2}"
                 transcription="true"
                 maxSubmissions="1"
                 showSubmitButton="false"
