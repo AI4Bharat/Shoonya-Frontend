@@ -321,7 +321,7 @@ const LabelStudioWrapper = ({
       ];
     }
 
-    if(disableLSFControls || disableSkip) setAutoSave(false);
+    if(disableLSFControls) setAutoSave(false);
 
     if (rootRef.current) {
       if (lsfRef.current) {
