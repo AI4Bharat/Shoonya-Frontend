@@ -416,7 +416,7 @@ const LabelStudioWrapper = ({
           if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
               if (
-                !annotations[i].result?.length ||
+                !annotations[i].result?.length || !annotation.serializeAnnotation().length ||
                 annotation.serializeAnnotation()[0].id ===
                   annotations[i].result[0].id
               ) {
