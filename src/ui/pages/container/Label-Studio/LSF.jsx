@@ -151,7 +151,7 @@ const filterAnnotations = (
 
 //used just in postAnnotation to support draft status update.
 
-const AUTO_SAVE_INTERVAL = 60000; //1 minute
+const AUTO_SAVE_INTERVAL = 30000; //1 minute
 
 const LabelStudioWrapper = ({
   annotationNotesRef,
