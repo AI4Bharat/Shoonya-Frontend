@@ -26,6 +26,7 @@ import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/Invi
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
 
+
 const columns = [
   {
     name: "Name",
@@ -417,6 +418,9 @@ const MembersTable = (props) => {
           onClick={handleUserDialogOpen}
         />
       ) : null}
+      <Grid sx={{ mb: 1 }}>
+          <Search />
+      </Grid>
       {props.type === "organization" ? (
         <InviteUsersDialog
           handleDialogClose={handleUserDialogClose}

@@ -10,6 +10,8 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetDatasetProjects from "../../../../redux/actions/api/Dataset/GetDatasetProjects";
 import GetExportProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetExportProject';
 import MUIDataTable from "mui-datatables";
+import Search from "../../component/common/Search";
+
 
 import { Grid, Stack, ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
@@ -23,7 +25,7 @@ const columns = [
 			filter: false,
 			sort: false,
 			align: "center",
-			setCellHeaderProps: sort => ({ style: { height: "70px",  padding: "16px" } }),
+			setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
 		},
 	},
 	{
@@ -73,6 +75,26 @@ const columns = [
 	},
 ];
 
+// const pageSearch = () => {
+//     return dataSource.filter((el) => {
+//       if (SearchWorkspaceMembers == "") {
+//         return el;
+//       } else if (
+//         el.username
+//           ?.toLowerCase()
+//           .includes(SearchWorkspaceMembers?.toLowerCase())
+//       ) {
+//         return el;
+//       } else if (
+//         el.email?.toLowerCase().includes(SearchWorkspaceMembers?.toLowerCase())
+//       ) {
+//         return el;
+//       }
+//     });
+//   };
+
+
+
 const options = {
 	filterType: "checkbox",
 	selectableRows: "none",
@@ -90,7 +112,7 @@ export default function DatasetProjectsTable({ datasetId }) {
 		open: false,
 		message: "",
 		variant: "success",
-	});	
+	});
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
@@ -103,62 +125,62 @@ export default function DatasetProjectsTable({ datasetId }) {
 			new GetExportProjectButtonAPI(project.id, project.dataset_id[0]) : new GetExportProjectButtonAPI(project.id);
 		dispatch(APITransport(projectObj));
 		const res = await fetch(projectObj.apiEndPoint(), {
-				method: "POST",
-				body: JSON.stringify(projectObj.getBody()),
-				headers: projectObj.getHeaders().headers,
+			method: "POST",
+			body: JSON.stringify(projectObj.getBody()),
+			headers: projectObj.getHeaders().headers,
 		});
 		const resp = await res.json();
 		setLoading(false);
 		if (res.ok) {
-				setSnackbarInfo({
-						open: true,
-						message: resp?.message,
-						variant: "success",
-				})
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "success",
+			})
 
 		} else {
-				setSnackbarInfo({
-						open: true,
-						message: resp?.message,
-						variant: "error",
-				})
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "error",
+			})
 		}
 	}
 	const getPullNewDataAPI = async (project) => {
 		const projectObj = new GetPullNewDataAPI(project.id);
 		//dispatch(APITransport(projectObj));
 		const res = await fetch(projectObj.apiEndPoint(), {
-		  method: "POST",
-		  body: JSON.stringify(projectObj.getBody()),
-		  headers: projectObj.getHeaders().headers,
+			method: "POST",
+			body: JSON.stringify(projectObj.getBody()),
+			headers: projectObj.getHeaders().headers,
 		});
 		const resp = await res.json();
 		setLoading(false);
 		if (res.ok) {
-		  setSnackbarInfo({
-			open: true,
-			message: resp?.message,
-			variant: "success",
-		  });
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "success",
+			});
 		} else {
-		  setSnackbarInfo({
-			open: true,
-			message: resp?.message,
-			variant: "error",
-		  });
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "error",
+			});
 		}
-	  };
+	};
 	const renderSnackBar = () => {
 		return (
-				<CustomizedSnackbars
-						open={snackbar.open}
-						handleClose={() =>
-								setSnackbarInfo({ open: false, message: "", variant: "" })
-						}
-						anchorOrigin={{ vertical: "top", horizontal: "right" }}
-						variant={snackbar.variant}
-						message={snackbar.message}
-				/>
+			<CustomizedSnackbars
+				open={snackbar.open}
+				handleClose={() =>
+					setSnackbarInfo({ open: false, message: "", variant: "" })
+				}
+				anchorOrigin={{ vertical: "top", horizontal: "right" }}
+				variant={snackbar.variant}
+				message={snackbar.message}
+			/>
 		);
 	};
 
@@ -173,8 +195,8 @@ export default function DatasetProjectsTable({ datasetId }) {
 					>
 						<CustomButton sx={{ borderRadius: 2 }} label="View" />
 					</Link>
-					<CustomButton sx={{ borderRadius: 2 ,height:37}} onClick={() => getExportProjectButton(project)} label="Export" />
-					<CustomButton sx={{ borderRadius: 2}} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" />
+					<CustomButton sx={{ borderRadius: 2, height: 37 }} onClick={() => getExportProjectButton(project)} label="Export" />
+					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" />
 				</Stack>
 			),
 		}))
@@ -185,7 +207,10 @@ export default function DatasetProjectsTable({ datasetId }) {
 			<ThemeProvider theme={tableTheme}>
 				{loading && <Spinner />}
 				<Grid>
-						{renderSnackBar()}
+					{renderSnackBar()}
+				</Grid>
+				<Grid sx={{ mb: 1 }}>
+					<Search />
 				</Grid>
 				<MUIDataTable
 					columns={columns}
