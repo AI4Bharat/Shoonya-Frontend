@@ -321,7 +321,7 @@ const LabelStudioWrapper = ({
       ];
     }
 
-    if(!interfaces.includes("update") || !interfaces.includes("skip")) setAutoSave(false);
+    if(disableLSFControls) setAutoSave(false);
 
     if (rootRef.current) {
       if (lsfRef.current) {
@@ -670,6 +670,7 @@ const LabelStudioWrapper = ({
               annotations[i].result[0].id
           ) {
               let temp = annotation.serializeAnnotation();
+              if(annotations[i].annotation_type !== 1) continue;
               for (let i = 0; i < temp.length; i++) {
                 if (temp[i].value.text) {
                   temp[i].value.text = [temp[i].value.text[0]];
