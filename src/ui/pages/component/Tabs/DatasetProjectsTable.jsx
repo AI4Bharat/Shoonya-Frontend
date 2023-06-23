@@ -75,25 +75,6 @@ const columns = [
 	},
 ];
 
-// const pageSearch = () => {
-//     return dataSource.filter((el) => {
-//       if (SearchWorkspaceMembers == "") {
-//         return el;
-//       } else if (
-//         el.username
-//           ?.toLowerCase()
-//           .includes(SearchWorkspaceMembers?.toLowerCase())
-//       ) {
-//         return el;
-//       } else if (
-//         el.email?.toLowerCase().includes(SearchWorkspaceMembers?.toLowerCase())
-//       ) {
-//         return el;
-//       }
-//     });
-//   };
-
-
 
 const options = {
 	filterType: "checkbox",
@@ -108,6 +89,9 @@ const options = {
 
 export default function DatasetProjectsTable({ datasetId }) {
 	const dispatch = useDispatch();
+	const datasetProjects = useSelector((state) =>
+		state.getDatasetProjects.data);
+
 	const [snackbar, setSnackbarInfo] = useState({
 		open: false,
 		message: "",
@@ -146,6 +130,31 @@ export default function DatasetProjectsTable({ datasetId }) {
 			})
 		}
 	}
+	const SearchWorkspaceMembers = useSelector(
+		(state) => state.SearchProjectCards.data
+	  );
+  const pageSearch = () => {
+    return datasetProjects.filter((el) => {
+      if (SearchWorkspaceMembers == "") {
+        return el;
+      } else if (
+        el.title
+          ?.toLowerCase()
+          .includes(SearchWorkspaceMembers?.toLowerCase())
+      ) {
+		
+        return el;
+	  }
+    //   } else if (
+    //     el.email?.toLowerCase().includes(SearchWorkspaceMembers?.toLowerCase())
+    //   ) {
+    //     return el;
+    //   }
+    });
+  };
+
+
+
 	const getPullNewDataAPI = async (project) => {
 		const projectObj = new GetPullNewDataAPI(project.id);
 		//dispatch(APITransport(projectObj));
@@ -184,8 +193,7 @@ export default function DatasetProjectsTable({ datasetId }) {
 		);
 	};
 
-	const datasetProjects = useSelector((state) =>
-		state.getDatasetProjects.data.map((project) => ({
+	const data = datasetProjects? pageSearch().map((project) => ({
 			...project,
 			actions: () => (
 				<Stack direction="row" spacing={2}>
@@ -199,8 +207,8 @@ export default function DatasetProjectsTable({ datasetId }) {
 					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" />
 				</Stack>
 			),
-		}))
-	);
+		})):[]
+    // )
 
 	return (
 		<>
@@ -215,7 +223,7 @@ export default function DatasetProjectsTable({ datasetId }) {
 				<MUIDataTable
 					columns={columns}
 					options={options}
-					data={datasetProjects}
+					data={data}
 				/>
 			</ThemeProvider>
 		</>
