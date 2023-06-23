@@ -23,32 +23,36 @@ import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 // import GetDatasetTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetType";
 import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetsByType";
+import GetDataitemsByIdAPI from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import intraAutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/intraAutomateDatasetsAPI";
 import MenuItems from "../../component/common/MenuItems";
 import { MenuProps } from "../../../../utils/utils";
 import themeDefault from "../../../theme/theme";
 
 
-const IntraDatasetAutomationForm = () => {
+const IntraAutomateDataset = () => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+
   const [srcDatasetTypes, setSrcDatasetTypes] = useState([]);
   const [srcDatasetType, setSrcDatasetType] = useState('');
   const [srcInstances, setSrcInstances] = useState([]);
   const [field, setfield] = useState([]);
+  const [Field,setField] = useState([]);
   const [srcInstance, setSrcInstance] = useState('');
   // const [instance, setinstance] = useState("");
   // const [org_id, setorg_id] = useState("");
   const [loading, setLoading] = useState(false);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
 
-  const Fields = ["draft_data_json", "input_language", "output_language", "input_text", "output_text", "machine_translation", "context", "labse_score", "rating", "domain", "parent_data", "instance_id"];
+  // const Fields = ["draft_data_json", "input_language", "output_language", "input_text", "output_text", "machine_translation", "context", "labse_score", "rating", "domain", "parent_data", "instance_id"];
 
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
   const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
   const DatasetTypes = useSelector((state) => state.GetDatasetType.data);
-
+  const dataitemsList = useSelector((state) => state.getDataitemsById.data);
 
 
   useEffect(() => {
@@ -57,8 +61,8 @@ const IntraDatasetAutomationForm = () => {
       DatasetTypes.forEach((element) => {
         temp.push({
           name: element,
-          value: element,
-          disabled: (element !== "SentenceText" && element !== "Conversation")
+          value: element
+          // disabled: (element !== "SentenceText" && element !== "Conversation")
         });
       });
       setSrcDatasetTypes(temp);
@@ -66,8 +70,8 @@ const IntraDatasetAutomationForm = () => {
       DatasetTypes.forEach((element) => {
         temp.push({
           name: element,
-          value: element,
-          disabled: (srcDatasetType === "SentenceText" ? element !== "TranslationPair" : element !== "Conversation")
+          value: element
+          // disabled: (srcDatasetType === "SentenceText" ? element !== "TranslationPair" : element !== "Conversation")
         });
       });
     }
@@ -81,6 +85,14 @@ const IntraDatasetAutomationForm = () => {
       typeof value === 'string' ? value.split(',') : value,
     );
   };
+  useEffect(() => {
+    setLoading(false);
+    if (dataitemsList.results?.length > 0) {
+        let values = Object.keys(dataitemsList.results[0]) 
+        setField(values)
+    }
+  }, [dataitemsList]);
+
 
 
   useEffect(() => {
@@ -91,12 +103,22 @@ const IntraDatasetAutomationForm = () => {
     }
   }, [DatasetInstances]);
 
+  
+
   const handleSrcDatasetTypeChange = (value) => {
     setSrcDatasetType(value);
     setLoading(true);
     const instancesObj = new GetDatasetsByTypeAPI(value);
     dispatch(APITransport(instancesObj));
   };
+
+  const handleField =(value)=>{
+    setSrcInstance(value);
+    setLoading(true);
+    const fieldObj = new GetDataitemsByIdAPI(value,srcDatasetType);
+    dispatch(APITransport(fieldObj));
+  }
+
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -125,7 +147,7 @@ const IntraDatasetAutomationForm = () => {
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
-      <Grid container direction="row" >
+      <Grid container direction="row"  paddingTop={3}>
         <Card className={classes.workspaceCard}>
           <Grid item xs={2} sm={2} md={2} lg={2} xl={2}></Grid>
           <Grid item xs={8} sm={8} md={8} lg={8} xl={8} sx={{ pb: "6rem" }}>
@@ -175,7 +197,7 @@ const IntraDatasetAutomationForm = () => {
                     labelId="project-type-label"
                     id="project-type-select"
                     value={srcInstance}
-                    onChange={(e) => setSrcInstance(e.target.value)}
+                    onChange={(e)=>handleField(e.target.value)}
                     MenuProps={MenuProps}
                   >
                     {srcInstances.map((type, index) => (
@@ -212,7 +234,7 @@ const IntraDatasetAutomationForm = () => {
                   renderValue={(selected) => selected.join(',')}
                   MenuProps={MenuProps}
                 >
-                  {Fields.map((name) => (
+                  {Field.map((name) => (
                     <MenuItem key={name} value={name}>
                       <Checkbox checked={field.indexOf(name) > -1} />
                       <ListItemText primary={name} />
@@ -258,4 +280,4 @@ const IntraDatasetAutomationForm = () => {
   );
 };
 
-export default IntraDatasetAutomationForm;
+export default IntraAutomateDataset;
