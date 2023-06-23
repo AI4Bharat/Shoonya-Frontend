@@ -14,7 +14,7 @@
      this.field = field.map((element,index)=>{
        return element
      });
-     this.endpoint = `http://20.51.211.111:8000/functions/schedule_draft_data_json_population`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}schedule_draft_data_json_population`;
    }
  
    processResponse(res) {
