@@ -151,7 +151,7 @@ const filterAnnotations = (
 
 //used just in postAnnotation to support draft status update.
 
-const AUTO_SAVE_INTERVAL = 60000; //1 minute
+const AUTO_SAVE_INTERVAL = 30000; //1 minute
 
 const LabelStudioWrapper = ({
   annotationNotesRef,
@@ -321,7 +321,7 @@ const LabelStudioWrapper = ({
       ];
     }
 
-    if(!interfaces.includes("update") || !interfaces.includes("skip")) setAutoSave(false);
+    if(disableLSFControls) setAutoSave(false);
 
     if (rootRef.current) {
       if (lsfRef.current) {
@@ -416,7 +416,7 @@ const LabelStudioWrapper = ({
           if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
               if (
-                !annotations[i].result?.length ||
+                !annotations[i].result?.length || !annotation.serializeAnnotation().length ||
                 annotation.serializeAnnotation()[0].id ===
                   annotations[i].result[0].id
               ) {
@@ -670,6 +670,7 @@ const LabelStudioWrapper = ({
               annotations[i].result[0].id
           ) {
               let temp = annotation.serializeAnnotation();
+              if(annotations[i].annotation_type !== 1) continue;
               for (let i = 0; i < temp.length; i++) {
                 if (temp[i].value.text) {
                   temp[i].value.text = [temp[i].value.text[0]];
