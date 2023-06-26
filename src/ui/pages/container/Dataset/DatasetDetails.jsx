@@ -21,6 +21,7 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 const DatasetDetails = () => {
 
     const { datasetId } = useParams();
+    console.log(datasetId)
     const [selectedTab, setSelectedTab] = useState(0);
     const [datasetData, setDatasetData] = useState(
         [
@@ -62,8 +63,7 @@ const DatasetDetails = () => {
 
     const handleOpenSettings = () => {
         // navigate(`/projects/${id}/projectsetting`);
-        navigate(`
-        /datasetsetting`)
+        navigate(`datasetsetting`)
     }
 
     return (
