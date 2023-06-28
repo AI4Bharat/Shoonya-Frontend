@@ -248,6 +248,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
       });
     }
   };
+  // console.log(selectedFilters);
   const labelAllTasks = () => {
     let search_filters = Object?.keys(selectedFilters)
       .filter((key) => key?.startsWith("search_"))
