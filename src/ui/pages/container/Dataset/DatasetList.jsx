@@ -14,6 +14,7 @@ import Spinner from "../../component/common/Spinner";
 import DatasetStyle from "../../../styles/Dataset";
 import themeDefault from "../../../theme/theme";
 import Search from "../../component/common/Search";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 export default function DatasetList() {
   const dispatch = useDispatch();
@@ -32,6 +33,11 @@ export default function DatasetList() {
     const projectObj = new GetDatasetsAPI(selectedFilters);
     dispatch(APITransport(projectObj));
   };
+  
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
+
 
   useEffect(() => {
     getDashboardprojectData();
@@ -120,6 +126,7 @@ export default function DatasetList() {
             ml: 2,
             justifyContent: "flex-end",
           }}
+          disabled = {userRole.Admin === loggedInUserData?.role? false : true}
           onClick={handleAutomateButton}
           label="Automate Datasets"
         />
