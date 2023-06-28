@@ -113,7 +113,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
           "skipped",
           "rejected",
         ]
-    : ["unlabeled", "skipped", "labeled", "draft",""],
+    : ["unlabeled", "skipped", "labeled", "draft"],
     Annotators:
       ProjectDetails?.annotators?.length > 0
         ? ProjectDetails?.annotators?.map((el, i) => {

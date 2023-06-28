@@ -9,3 +9,4 @@ const configs = {
 //http://20.51.211.111:8000
 //https://backend.shoonya.ai4bharat.org/
 // https://backend.dev2.shoonya.ai4bharat.org
+//https://backend.prod2.shoonya.ai4bharat.org
