@@ -17,10 +17,12 @@ import DatasetSettings from './DatasetSettings';
 import DatasetLogs from './DatasetLogs';
 import DatasetDescription from './DatasetDescription';
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import DatasetReports from '../../component/common/DatasetReports';
 
 const DatasetDetails = () => {
 
     const { datasetId } = useParams();
+    console.log(datasetId)
     const [selectedTab, setSelectedTab] = useState(0);
     const [datasetData, setDatasetData] = useState(
         [
@@ -62,7 +64,7 @@ const DatasetDetails = () => {
 
     const handleOpenSettings = () => {
         // navigate(`/projects/${id}/projectsetting`);
-        navigate(`/datasets/${datasetId}/datasetsetting`)
+        navigate(`datasetsetting`)
     }
 
     return (
@@ -162,6 +164,7 @@ const DatasetDetails = () => {
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.logs")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             {/* <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} /> */}
                         </Tabs>
                     </Box>
@@ -176,6 +179,9 @@ const DatasetDetails = () => {
                     </TabPanel>
                     <TabPanel value={selectedTab} index={3}>
                         <DatasetLogs datasetId={datasetId} />
+                    </TabPanel>
+                    <TabPanel value={selectedTab} index={4}>
+                        <DatasetReports datasetId={datasetId} />
                     </TabPanel>
                     {/* <TabPanel value={selectedTab} index={4}>
                         <DatasetSettings datasetId={datasetId} />
