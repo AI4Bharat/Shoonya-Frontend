@@ -292,7 +292,8 @@ function ProgressAnalytics() {
                   let h = secondsToHours(value);
                   let mm = secondsToMinutes(value) % 60;
                   let ss = (value % 3600 % 60);
-                  return h + ((mm < 10) ? ':0' : ':') + mm + ((ss < 10) ? ':0' : ':') + ss;
+                  if(Math.floor(ss) === ss)
+                    return h + ((mm < 10) ? ':0' : ':') + mm + ((ss < 10) ? ':0' : ':') + ss;
                 }
               }
             }
