@@ -19,11 +19,11 @@ import APITransport from "../../../../../redux/actions/apitransport/apitransport
 import Spinner from "../../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { isSameDay, format } from 'date-fns/esm';
+import { isSameDay, format, minutesToSeconds, hoursToSeconds } from 'date-fns/esm';
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { addDays } from 'date-fns';
+import { addDays, secondsToHours, secondsToMinutes } from 'date-fns';
 import colorsData from '../../../../../utils/Colors_JSON/Colors_JSON';
 import axios from "axios";
 import html2canvas from 'html2canvas';
@@ -40,17 +40,27 @@ ChartJS.register(
 );
 ChartJS.register(CategoryScale);
 
-
 const footer = (tooltipItems) => {
   let sum = 0;
-
   tooltipItems.forEach(function (tooltipItem) {
     sum += tooltipItem.parsed.y;
   });
   return 'Sum: ' + sum;
 };
 
-const options = {
+const labelChart = function(context) {
+  let label = context.dataset.label || '';
+  let dataVal = context.parsed.y;
+
+  if(dataVal && dataVal !== 0 && dataVal !== null){
+    label += " : " + new Intl.NumberFormat('en-US').format(dataVal);
+  } else {
+     label = ""
+  }
+  return label;
+};
+
+const defaultOptions = {
   responsive: true,
   scales: {
     x: {
@@ -104,27 +114,18 @@ const options = {
     tooltip: {
       callbacks: {
         footer: footer,
-        label: function(context) {
-          let label = context.dataset.label || '';
-          let dataVal = context.parsed.y;
-
-          if(dataVal && dataVal !== 0 && dataVal !== null){
-            label += " : " + new Intl.NumberFormat('en-US').format(dataVal);
-          } else {
-             label = ""
-          }
-          return label;
-      }
+        label: labelChart
       },
 
     }
   },
 };
+
 const TooltipData = [{ name: "Progress chart based on one data selection" }, { name: "Compares progress of two different data selections" }]
 const ProgressTypedata = [{ title: "Complete progress for annotations done till date" }, { title: "Yearly stacked progress in selected span of years" }, { title: "Monthly stacked progress in selected span of months" }, { title: "Weekly stacked progress in selected span of weeks" }]
 const ChartType = [{ chartTypename: "Individual" }, { chartTypename: "Comparison" }]
 const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "yearly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
-const avilableChartType = { Individual: "Individual", Comparison: "Comparison" }
+const availableChartType = { Individual: "Individual", Comparison: "Comparison" }
 
 function ProgressAnalytics() {
   const dispatch = useDispatch();
@@ -134,6 +135,7 @@ function ProgressAnalytics() {
   const [chartTypes, setChartTypes] = useState("Individual")
   const [baseperiod, setBaseperiod] = useState("Cumulative")
   const [metaInfo, setMetaInfo] = useState(false);
+  const [metaDisabled, setMetaDisabled] = useState(false);
   const [showBarChar, setShowBarChar] = useState(false)
   const [showPicker, setShowPicker] = useState(false);
   const [showPickers, setShowPickers] = useState(false);
@@ -159,6 +161,7 @@ function ProgressAnalytics() {
       key: 'selection'
     }
   ]);
+  const [options, setOptions] = useState(defaultOptions);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
   
@@ -179,7 +182,6 @@ function ProgressAnalytics() {
       }
     }
   }, [PeriodicalTaskssData])
-
 
   useEffect(() => {
     if (ProjectTypes) {
@@ -256,10 +258,67 @@ function ProgressAnalytics() {
     setChartTypes(e.target.value)
   }
   const handleSubmit = async () => {
+    setShowBarChar(false);
+    if(metaInfo) {
+      if(!selectedType.includes("Audio")) {
+        setOptions({
+          ...defaultOptions,
+          scales: {
+            ...defaultOptions.scales,
+            y: {
+              ...defaultOptions.scales.y,
+              title: {
+                ...defaultOptions.scales.y.title,
+                text: '# Words Completed',
+              },
+            }
+          },
+        });
+      }
+      else {
+        setOptions({
+          ...defaultOptions,
+          scales: {
+            ...defaultOptions.scales,
+            y: {
+              ...defaultOptions.scales.y,
+              title: {
+                ...defaultOptions.scales.y.title,
+                text: '# Audio Duration Transcribed',
+              },
+              ticks: {
+                ...defaultOptions.scales.y.ticks,
+                callback: function(value) {
+                  let h = secondsToHours(value);
+                  let mm = secondsToMinutes(value) % 60;
+                  let ss = (value % 3600 % 60);
+                  return h + ((mm < 10) ? ':0' : ':') + mm + ((ss < 10) ? ':0' : ':') + ss;
+                }
+              }
+            }
+          },
+          plugins: {
+            ...defaultOptions.plugins,
+            tooltip: {
+              ...defaultOptions.plugins.tooltip,
+              callbacks: {
+                ...defaultOptions.plugins.tooltip.callbacks,
+                label: function(context) {
+
+                  return 'Duration: ' + context.dataset.time[context.dataIndex];
+                }
+              }
+            }
+          }
+      });
+      }
+    } else {
+      setOptions({...defaultOptions});
+    }
+
     const wsId = workspaceDetails.id
     setShowPicker(false);
     setShowPickers(false);
-    // setLoading(true);
 
     const Cumulativedata = {
       project_type: selectedType,
@@ -274,8 +333,7 @@ function ProgressAnalytics() {
       ...(radiobutton==="Review" && {reviewer_reports:true})
     };
 
-    if (chartTypes === avilableChartType.Individual) {
-
+    if (chartTypes === availableChartType.Individual) {
       if (baseperiod === "Cumulative") {
         await getCumulativeTasksData(Cumulativedata, wsId);
         // const progressObj = new CumulativeTasksAPI(Cumulativedata, wsId);
@@ -286,17 +344,12 @@ function ProgressAnalytics() {
         // const progressObj = new PeriodicalTasks(individualPeriodicaldata, wsId);
         // dispatch(APITransport(progressObj));
       }
-
-
     }
     else {
 
       if (comparisonperiod === "Cumulative" && baseperiod === "Cumulative") {
-
         await getCumulativeTasksData(Cumulativedata, wsId);
-
       } else if (comparisonperiod !== "Cumulative" && baseperiod === "Cumulative") {
-
         const Periodicaldata = {
           project_type: selectedType,
           periodical_type: comparisonperiod,
@@ -338,11 +391,7 @@ function ProgressAnalytics() {
 
       }
     }
-
     await handleSwitchBarChartShow();
-
-    // setLoading(false);
-
   }
 
   const handleSwitchBarChartShow = async () => {
@@ -419,18 +468,37 @@ function ProgressAnalytics() {
     }
   }, [showPicker, showPickers])
 
+  useEffect(() => {
+    if(!(baseperiod === "Cumulative" && chartTypes === availableChartType.Individual) 
+    && !(comparisonperiod === "Cumulative" && baseperiod === "Cumulative")) {
+      setMetaInfo(false);
+      setMetaDisabled(true);
+    } else {
+      setMetaDisabled(false);
+    }
+  }, [metaInfo, baseperiod, comparisonperiod, chartTypes]);
 
   useEffect(() => {
     let chData;
     let svgChData;
-    if (chartTypes === avilableChartType.Individual) {
+    if (chartTypes === availableChartType.Individual) {
       if (baseperiod === "Cumulative") {
         // console.log("CumulativeTasksData - ", CumulativeTasksData);
         // debugger
         svgChData = CumulativeTasksData.map((el, i) => {
+          let val;
+          if(metaInfo) {
+            if(selectedType.includes("Audio")) {
+              let [hours, minutes, seconds] = el.cumulative_aud_duration.split(":");
+              val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
+            } else {
+              val = el.cumulative_word_count;
+            }
+          }
+          else val = el.cumulative_tasks_count;
           return {
             name: el.language,
-            value: el.cumulative_tasks_count,
+            value: val,
             // stack: el.language
           }
         })
@@ -440,7 +508,20 @@ function ProgressAnalytics() {
           datasets: [
             {
               label: baseperiod,
-              data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+              data: CumulativeTasksData.map((e) => {
+                let val;
+                if(metaInfo) {
+                  if(selectedType.includes("Audio")) {
+                    let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
+                    val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
+                  } else {
+                    val = e.cumulative_word_count;
+                  }
+                }
+                else val = e.cumulative_tasks_count;
+                return val;
+              }),
+              time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               stack: "stack 0",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
               borderColor: "white",
@@ -609,7 +690,20 @@ function ProgressAnalytics() {
 
             {
               label: baseperiod,
-              data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+              data: CumulativeTasksData.map((e) => {
+                let val;
+                if(metaInfo) {
+                  if(selectedType.includes("Audio")) {
+                    let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
+                    val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
+                  } else {
+                    val = e.cumulative_word_count;
+                  }
+                }
+                else val = e.cumulative_tasks_count;
+                return val;
+              }),
+              time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
               stack: "stack 0",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
@@ -620,7 +714,20 @@ function ProgressAnalytics() {
             {
             
               label: comparisonperiod,
-              data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+              data: CumulativeTasksData.map((e) => {
+                let val;
+                if(metaInfo) {
+                  if(selectedType.includes("Audio")) {
+                    let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
+                    val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
+                  } else {
+                    val = e.cumulative_word_count;
+                  }
+                }
+                else val = e.cumulative_tasks_count;
+                return val;
+              }),
+              time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.annotations_completed):[],
               stack: "stack 1",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
@@ -720,7 +827,10 @@ function ProgressAnalytics() {
             </Typography>
           </Grid >
           <Grid item xs={1} sm={1} md={1} lg={1} xl={1}  >
-            <Checkbox onChange={(e) => setMetaInfo(e.target.checked)}/>
+            <Checkbox
+              onChange={(e) => setMetaInfo(e.target.checked)} 
+              checked={metaInfo} disabled={metaDisabled}
+            />
           </Grid >
         </Grid>
             <Grid container columnSpacing={3} rowSpacing={2}  mb={1}>
@@ -804,7 +914,7 @@ function ProgressAnalytics() {
             alignItems="center"
           >
             <Grid container columnSpacing={2} rowSpacing={2} mt={1} mb={1}>
-              {(chartTypes === avilableChartType.Individual || chartTypes === avilableChartType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+              {(chartTypes === availableChartType.Individual || chartTypes === availableChartType.Comparison) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px", color: "rgba(243, 156, 18 )" }}>
                     Base period {" "}
@@ -850,7 +960,7 @@ function ProgressAnalytics() {
                  Pick Dates
                 </Button>
               </Grid>}
-              {chartTypes === avilableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+              {chartTypes === availableChartType.Comparison && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl   fullWidth size="small"  >
                   <InputLabel  id="project-type-label" sx={{ fontSize: "16px", color: "rgba(35, 155, 86 )" }}  >
                     Comparison Period {" "}
@@ -883,7 +993,7 @@ function ProgressAnalytics() {
                   </Select>
                 </FormControl>
               </Grid>}
-              {!(comparisonperiod === "Cumulative" || chartTypes === "" || chartTypes === avilableChartType.Individual) && <Grid item xs={2} sm={2} md={2} lg={2} xl={2} >
+              {!(comparisonperiod === "Cumulative" || chartTypes === "" || chartTypes === availableChartType.Individual) && <Grid item xs={2} sm={2} md={2} lg={2} xl={2} >
                 <Button
                   endIcon={showPickers ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
