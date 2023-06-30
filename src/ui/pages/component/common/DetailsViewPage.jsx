@@ -30,6 +30,7 @@ import WorkspaceSetting from "../Tabs/WorkspaceSetting";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import ProgressList from "../../container/Workspace/Progress/ProgressList"
 
 
 function TabPanel(props) {
@@ -175,7 +176,7 @@ const DetailsViewPage = (props) => {
                             {pageType === componentType.Type_Workspace && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {pageType === componentType.Type_Organization && <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />}
 
-
+                            {pageType === componentType.Type_Workspace && <Tab label={"Analytics"} sx={{ fontSize: 16, fontWeight: '700' }} />}
                             {pageType === componentType.Type_Organization && <Tab label={'Organization '+translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />}
                         </Tabs>
                     </Box>
@@ -257,6 +258,7 @@ const DetailsViewPage = (props) => {
                         {pageType === componentType.Type_Workspace && <WorkspaceReports />}
                     </TabPanel>
                     <TabPanel value={value} index={4}>
+                        {pageType === componentType.Type_Workspace && <ProgressList />}
                         {pageType === componentType.Type_Organization && <OrganizationSettings />}
                     </TabPanel>
                 </Card>
