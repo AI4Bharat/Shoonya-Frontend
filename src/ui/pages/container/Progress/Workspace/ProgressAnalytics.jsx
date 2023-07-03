@@ -306,7 +306,16 @@ function ProgressAnalytics() {
                 label: function(context) {
                   return 'Duration: ' + context.dataset.time[context.dataIndex];
                 },
-                footer: () => ''
+                footer: (tooltipItems) => {
+                  let sum = 0;
+                  tooltipItems.forEach(function (tooltipItem) {
+                    sum += tooltipItem.parsed.y;
+                  });
+                  let h = secondsToHours(sum);
+                  let mm = secondsToMinutes(sum) % 60;
+                  let ss = (sum % 3600 % 60);
+                  return 'Sum: ' + h + ((mm < 10) ? ':0' : ':') + mm + ((ss < 10) ? ':0' : ':') + ss;
+                }
               }
             }
           }
