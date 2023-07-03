@@ -16,10 +16,10 @@ export default class GetTasksByProjectIdAPI extends API {
      if (selectedFilters[key] && selectedFilters[key] !== -1) {
     switch (key) {
            case 'annotation_status':
-         queryString +=`&${key}=["${selectedFilters[key]}"]`
+         queryString +=`&${key}=["${selectedFilters[key]}"]&editable=["${selectedFilters.editable}"]`
              break;
              case 'review_status':
-             queryString +=`&${key}=["${selectedFilters[key]}"]`
+             queryString +=`&${key}=["${selectedFilters[key]}"]&editable=["${selectedFilters.editable}"]`
                  break;
              case 'supercheck_status':
                   queryString +=`&${key}=["${selectedFilters[key]}"]`
@@ -29,6 +29,7 @@ export default class GetTasksByProjectIdAPI extends API {
             
          }
      }
+     console.log(queryString);
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks+queryString}`;
   }
 }

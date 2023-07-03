@@ -174,6 +174,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
     );
     dispatch(APITransport(taskObj));
   };
+  
 
   const fetchNewTasks = async () => {
     const batchObj =
@@ -724,7 +725,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
                 }
                 sx={{ fontSize: "16px" }}
               >
-                <MenuItem value={-1}>All</MenuItem>
+                <MenuItem value="">All</MenuItem>
                 {filterData.Reviewers?.map((el, i) => (
                   <MenuItem value={el.value}>{el.label}</MenuItem>
                 ))}
