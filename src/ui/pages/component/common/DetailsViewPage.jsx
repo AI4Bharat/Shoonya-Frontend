@@ -30,7 +30,7 @@ import WorkspaceSetting from "../Tabs/WorkspaceSetting";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import ProgressList from "../../container/Workspace/Progress/ProgressList"
+import ProgressList from "../../container/Progress/Workspace/ProgressList"
 
 
 function TabPanel(props) {
