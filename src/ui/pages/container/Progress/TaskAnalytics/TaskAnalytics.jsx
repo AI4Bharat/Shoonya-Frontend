@@ -13,11 +13,9 @@ import { useEffect, useState } from "react";
 import Spinner from "../../../component/common/Spinner";
 
 
-const Shoonya = (props) => {
+const TaskAnalytics = (props) => {
   const dispatch = useDispatch();
-const {loggedInUserData} = props
-const [loading, setLoading] = useState(true);
-const apiLoading = useSelector((state) => state.apiStatus.loading);
+  const [loading, setLoading] = useState(true);
   const taskAnalyticsData = useSelector(
     (state) => state.getTaskAnalyticsData.data
   );
@@ -40,34 +38,34 @@ const apiLoading = useSelector((state) => state.apiStatus.loading);
   return (
     <>
       {loading && <Spinner />}
-      <Grid style={{marginTop:"15px"}}>
+      {taskAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
         <ContextualTranslationEditing taskAnalyticsData={taskAnalyticsData} />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[3]?.length && <Grid style={{marginTop:"40px"}}>
         <SingleSpeakerAudioTranscriptionEditing
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[4]?.length && <Grid style={{marginTop:"40px"}}>
         <AudioTranscription
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[5]?.length && <Grid style={{marginTop:"40px"}}>
         <AudioSegmentation
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[2]?.length && <Grid style={{marginTop:"40px"}}>
         <SemanticTextualSimilarityChart taskAnalyticsData={taskAnalyticsData} />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[1]?.length && <Grid style={{marginTop:"40px"}}>
         <ContextualSentenceVerificationChart
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
+      </Grid>}
     </>
   );
 };
 
-export default Shoonya;
+export default TaskAnalytics;

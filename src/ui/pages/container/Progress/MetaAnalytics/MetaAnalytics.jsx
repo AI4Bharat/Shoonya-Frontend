@@ -38,22 +38,22 @@ export default function MetaAnalytics(props) {
       }, [metaAnalyticsData]);
   return (
     <div>
-        {loading && <Spinner />}
-      <Grid style={{marginTop:"15px"}}>
-      <ContextualTranslationEditing metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>
-      <Grid style={{marginTop:"15px"}}>
+      {loading && <Spinner />}
+      {metaAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
+        <ContextualTranslationEditing metaAnalyticsData={metaAnalyticsData}/>
+      </Grid>}
+      {metaAnalyticsData[1]?.length && <Grid style={{marginTop:"15px"}}>
       <SemanticTextualSimilarity_Scale5 metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>
-      <Grid style={{marginTop:"15px"}}>
+      </Grid>}
+      {metaAnalyticsData[2]?.length && <Grid style={{marginTop:"15px"}}>
       <SingleSpeakerAudioTranscriptionEditing  metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>
-      <Grid style={{marginTop:"15px"}}>
+      </Grid>}
+      {metaAnalyticsData[3]?.length && <Grid style={{marginTop:"15px"}}>
       <AudioTranscription  metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>
-      <Grid style={{marginTop:"15px"}}>
+      </Grid>}
+      {metaAnalyticsData[4]?.length && <Grid style={{marginTop:"15px"}}>
       <AudioSegmentation  metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>
+      </Grid>}
     </div>
   )
 }
