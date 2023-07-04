@@ -82,6 +82,10 @@ import getMetaAnalyticsData from "./Progress/MetaAnalytics";
 import getDownloadProjectAnnotations from "./ProjectDetails/DownloadProjectAnnotations";
 import getUserDetails from "./Admin/UserDetail";
 import getDatasetProjectReports from "./Dataset/GetDatasetProjectReports";
+import wsCumulativeTasks from "./WorkspaceDetails/GetCumulativeTasks";
+import wsMetaAnalytics from "./WorkspaceDetails/GetMetaAnalytics";
+import wsPeriodicalTasks from "./WorkspaceDetails/GetPeriodicalTasks";
+import wsTaskAnalytics from "./WorkspaceDetails/GetTaskAnalytics";
 
 const index = {
     apiStatus,
@@ -171,6 +175,10 @@ const index = {
     getDownloadProjectAnnotations,
     getUserDetails,
     getDatasetProjectReports,
+    wsCumulativeTasks,
+    wsMetaAnalytics,
+    wsPeriodicalTasks,
+    wsTaskAnalytics,
     
     
 };

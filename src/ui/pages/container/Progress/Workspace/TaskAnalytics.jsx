@@ -1,33 +1,34 @@
 import { Grid } from "@material-ui/core";
 import React from "react";
-import ContextualTranslationEditing from "./ContextualTranslationEditing";
-import SemanticTextualSimilarityChart from "./SemanticTextualSimilarityChart";
-import ContextualSentenceVerificationChart from "./ContextualSentenceVerificationChart";
-import TaskAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/TaskAnalytics";
-import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
-import AudioSegmentation from "./AudioSegmentation";
-import AudioTranscription from "./AudioTranscription";
+import ContextualTranslationEditing from "../TaskAnalytics/ContextualTranslationEditing";
+import SemanticTextualSimilarityChart from "../TaskAnalytics/SemanticTextualSimilarityChart";
+import ContextualSentenceVerificationChart from "../TaskAnalytics/ContextualSentenceVerificationChart";
+import WorkspaceTaskAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetTaskAnalytics";
+import SingleSpeakerAudioTranscriptionEditing from "../TaskAnalytics/SingleSpeakerAudioTranscriptionEditing";
+import AudioSegmentation from "../TaskAnalytics/AudioSegmentation";
+import AudioTranscription from "../TaskAnalytics/AudioTranscription";
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import Spinner from "../../../component/common/Spinner";
 
 
-const TaskAnalytics = (props) => {
+const TaskAnalytics = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
   const taskAnalyticsData = useSelector(
-    (state) => state.getTaskAnalyticsData.data
+    (state) => state.wsTaskAnalytics.data
   );
   const getTaskAnalyticsdata = () => {
-     setLoading(true)
-    const userObj = new TaskAnalyticsDataAPI();
+    setLoading(true)
+    const userObj = new WorkspaceTaskAnalyticsAPI(workspaceDetails?.id);
     dispatch(APITransport(userObj));
   };
 
   useEffect(() => {
     getTaskAnalyticsdata();
-  }, []);
+  }, [workspaceDetails]);
 
   useEffect(() => {
     if(taskAnalyticsData.length > 0){

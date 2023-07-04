@@ -3,18 +3,18 @@
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from "../../../constants";
  
- export default class CumulativeTasksAPI extends API {
-   constructor(progressObj1, OrgId, metaInfo, timeout = 2000) {
+ export default class WorkspaceCumulativeTasksAPI extends API {
+   constructor(wsId, progressObj, metaInfo, timeout = 2000) {
      super("POST", timeout, false);
-     this.progressObj1 = progressObj1;
-     this.type = constants.CUMULATIVE_TASK_DATA;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}${OrgId}/cumulative_tasks_count/${metaInfo ? "?metainfo=true" : ""}`;
+     this.progressObj = progressObj;
+     this.type = constants.WS_CUMULATIVE_TASK;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${wsId}/cumulative_tasks_count/${metaInfo ? "?metainfo=true" : ""}`;
    }
  
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-       this.CumulativeTasks = res;
+       this.wsCumulativeTasks = res;
      }
    }
  
@@ -23,7 +23,7 @@
    }
  
    getBody() {
-     return this.progressObj1;
+     return this.progressObj;
    }
  
    getHeaders() {
@@ -37,7 +37,7 @@
    }
  
    getPayload() {
-     return this.CumulativeTasks;
+     return this.wsCumulativeTasks;
    }
  }
  

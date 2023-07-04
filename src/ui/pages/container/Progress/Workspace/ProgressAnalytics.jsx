@@ -1,34 +1,33 @@
 import { Button, Grid, ThemeProvider, Select, Box, MenuItem,Radio, InputLabel, FormControl, Card, Typography } from "@mui/material";
 import React, { useEffect, useState, useRef } from "react";
-import CustomButton from "../../component/common/Button";
+import CustomButton from "../../../component/common/Button";
 import RadioGroup from '@mui/material/RadioGroup';
-import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from "@mui/material/Checkbox";
 import { useSelector, useDispatch } from "react-redux";
-import themeDefault from "../../../theme/theme";
-import DatasetStyle from "../../../styles/Dataset";
-import PeriodicalTasks from "../../../../redux/actions/api/Progress/PeriodicalTasks";
-import CumulativeTasksAPI from "../../../../redux/actions/api/Progress/CumulativeTasks";
-import LightTooltip from '../../component/common/Tooltip';
-import { translate } from "../../../../config/localisation";
+import themeDefault from "../../../../theme/theme";
+import DatasetStyle from "../../../../styles/Dataset";
+import WorkspacePeriodicalTasksAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetPeriodicalTasks";
+import WorkspaceCumulativeTasksAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetCumulativeTasks";
+import LightTooltip from '../../../component/common/Tooltip';
+import { translate } from "../../../../../config/localisation";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, } from 'chart.js';
 import InfoIcon from '@mui/icons-material/Info';
 import { Bar } from 'react-chartjs-2';
-import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import Spinner from "../../component/common/Spinner";
+import GetProjectDomainsAPI from "../../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
+import APITransport from "../../../../../redux/actions/apitransport/apitransport";
+import Spinner from "../../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { addDays, isSameDay, format, minutesToSeconds, hoursToSeconds, secondsToHours } from 'date-fns/esm';
-import { DateRangePicker, defaultStaticRanges, } from "react-date-range";
-import { useTheme } from "@material-ui/core/styles";
+import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import colorsData from '../../../../utils/Colors_JSON/Colors_JSON';
+import colorsData from '../../../../../utils/Colors_JSON/Colors_JSON';
 import axios from "axios";
 import html2canvas from 'html2canvas';
-import locale, { modifiedStaticRanges } from "../../../../utils/Date_Range/getDateRangeFormat";
-import { MenuProps } from "../../../../utils/utils";
+import { modifiedStaticRanges } from "../../../../../utils/Date_Range/getDateRangeFormat";
+import { MenuProps } from "../../../../../utils/utils";
 import { jsPDF } from "jspdf";
 ChartJS.register(
   CategoryScale,
@@ -127,9 +126,8 @@ const ChartType = [{ chartTypename: "Individual" }, { chartTypename: "Comparison
 const ProgressType = [{ ProgressTypename: "Cumulative" }, { ProgressTypename: "yearly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "weekly" }]
 const availableChartType = { Individual: "Individual", Comparison: "Comparison" }
 
-function ProgressList() {
+function ProgressAnalytics() {
   const dispatch = useDispatch();
-  const classes = DatasetStyle();
   const ref = useRef()
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
@@ -163,7 +161,7 @@ function ProgressList() {
   ]);
   const [options, setOptions] = useState(defaultOptions);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
-  const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
+  const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
   
   const [CumulativeTasksData, setCumulativeTasksData] = useState([]);
   const [PeriodicalTasksData, setPeriodicalTasksData] = useState([]);
@@ -200,16 +198,14 @@ function ProgressList() {
     dispatch(APITransport(typesObj));
   }, []);
 
-  const getCumulativeTasksData = async (payload, OrgId) => {
+  const getCumulativeTasksData = async (payload, wsId) => {
     setLoading(true);
-    console.log("payload, OrgId", payload, OrgId);
-    const cumulativeTasksAPIObj = new CumulativeTasksAPI(payload, OrgId, metaInfo);
+    const cumulativeTasksAPIObj = new WorkspaceCumulativeTasksAPI(wsId, payload, metaInfo);
     await axios.post(cumulativeTasksAPIObj.apiEndPoint(), cumulativeTasksAPIObj.getBody(), cumulativeTasksAPIObj.getHeaders())
       .then(response => {
         if (response.statusText === "OK") {
           setCumulativeTasksData(response.data);
           setLoading(false);
-          console.log("CumulativeTasksData -----", response);
         } else {
           setLoading(false);
         }
@@ -220,16 +216,14 @@ function ProgressList() {
       })
   }
 
-  const getPeriodicalTasksData = async (payload, OrgId) => {
+  const getPeriodicalTasksData = async (payload, wsId) => {
     setLoading(true);
-    console.log("payload, OrgId", payload, OrgId);
-    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId, metaInfo);
+    const periodicalTasksAPIObj = new WorkspacePeriodicalTasksAPI(wsId, payload, metaInfo);
     await axios.post(periodicalTasksAPIObj.apiEndPoint(), periodicalTasksAPIObj.getBody(), periodicalTasksAPIObj.getHeaders())
       .then(response => {
         if (response.statusText === "OK") {
           setPeriodicalTasksData(response.data);
           setLoading(false);
-          console.log("PeriodicalTasksData -----", response);
         } else {
           setLoading(false);
         }
@@ -240,16 +234,14 @@ function ProgressList() {
       })
   }
 
-  const getSecondaryPeriodicalTasksData = async (payload, OrgId) => {
+  const getSecondaryPeriodicalTasksData = async (payload, wsId) => {
     setLoading(true);
-    console.log("payload, OrgId", payload, OrgId);
-    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId, metaInfo);
+    const periodicalTasksAPIObj = new WorkspacePeriodicalTasksAPI(wsId, payload, metaInfo);
     await axios.post(periodicalTasksAPIObj.apiEndPoint(), periodicalTasksAPIObj.getBody(), periodicalTasksAPIObj.getHeaders())
       .then(response => {
         if (response.statusText === "OK") {
           setSecondaryPeriodicalTasksData(response.data);
           setLoading(false);
-          console.log("PeriodicalTasksData -----", response);
         } else {
           setLoading(false);
         }
@@ -323,14 +315,11 @@ function ProgressList() {
           }
       });
       }
-    } else {
-      setOptions({...defaultOptions});
-    }
+    } else setOptions({...defaultOptions});
 
-    const OrgId = userDetails.organization.id
+    const wsId = workspaceDetails.id
     setShowPicker(false);
     setShowPickers(false);
-    // setLoading(true);
 
     const Cumulativedata = {
       project_type: selectedType,
@@ -348,28 +337,22 @@ function ProgressList() {
     };
 
     if (chartTypes === availableChartType.Individual) {
-
       if (baseperiod === "Cumulative") {
-        await getCumulativeTasksData(Cumulativedata, OrgId);
-        // const progressObj = new CumulativeTasksAPI(Cumulativedata, OrgId);
+        await getCumulativeTasksData(Cumulativedata, wsId);
+        // const progressObj = new CumulativeTasksAPI(Cumulativedata, wsId);
         // dispatch(APITransport(progressObj))
       }
       else {
-        await getPeriodicalTasksData(individualPeriodicaldata, OrgId)
-        // const progressObj = new PeriodicalTasks(individualPeriodicaldata, OrgId);
+        await getPeriodicalTasksData(individualPeriodicaldata, wsId)
+        // const progressObj = new PeriodicalTasks(individualPeriodicaldata, wsId);
         // dispatch(APITransport(progressObj));
       }
-
-
     }
     else {
 
       if (comparisonperiod === "Cumulative" && baseperiod === "Cumulative") {
-
-        await getCumulativeTasksData(Cumulativedata, OrgId);
-
+        await getCumulativeTasksData(Cumulativedata, wsId);
       } else if (comparisonperiod !== "Cumulative" && baseperiod === "Cumulative") {
-
         const Periodicaldata = {
           project_type: selectedType,
           periodical_type: comparisonperiod,
@@ -378,8 +361,8 @@ function ProgressList() {
           ...(radiobutton==="Review" && {reviewer_reports:true}),
           ...(radiobutton==="Supercheck" && {supercheck_reports:true})
         };
-        await getPeriodicalTasksData(Periodicaldata, OrgId);
-        await getCumulativeTasksData(Cumulativedata, OrgId);
+        await getPeriodicalTasksData(Periodicaldata, wsId);
+        await getCumulativeTasksData(Cumulativedata, wsId);
 
       } else if (comparisonperiod === "Cumulative" && baseperiod !== "Cumulative") {
         const individualPeriodicaldata = {
@@ -390,16 +373,16 @@ function ProgressList() {
           ...(radiobutton==="Review" && {reviewer_reports:true}),
           ...(radiobutton==="Supercheck" && {supercheck_reports:true})
         };
-        await getPeriodicalTasksData(individualPeriodicaldata, OrgId);
-        await getCumulativeTasksData(Cumulativedata, OrgId);
+        await getPeriodicalTasksData(individualPeriodicaldata, wsId);
+        await getCumulativeTasksData(Cumulativedata, wsId);
       } else {
         const basePeriodicalPayload = {
           project_type: selectedType,
           periodical_type: baseperiod,
           start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'), 
-          ...(radiobutton==="Review" && {reviewer_reports:true})  ,
-          ...(radiobutton==="Supercheck" && {supercheck_reports:true})  
+          ...(radiobutton==="Review" && {reviewer_reports:true})    ,
+          ...(radiobutton==="Supercheck" && {supercheck_reports:true})
         };
         const comparisonPeriodicalPayload = {
           project_type: selectedType,
@@ -410,13 +393,12 @@ function ProgressList() {
           ...(radiobutton==="Supercheck" && {supercheck_reports:true})
         };
 
-        await getPeriodicalTasksData(basePeriodicalPayload, OrgId);
-        await getSecondaryPeriodicalTasksData(comparisonPeriodicalPayload, OrgId);
+        await getPeriodicalTasksData(basePeriodicalPayload, wsId);
+        await getSecondaryPeriodicalTasksData(comparisonPeriodicalPayload, wsId);
 
       }
     }
     await handleSwitchBarChartShow();
-
   }
 
   const handleSwitchBarChartShow = async () => {
@@ -521,7 +503,7 @@ function ProgressList() {
       else val = e.periodical_tasks_count;
       return val;
     };
-    
+
     let chData;
     let svgChData;
     if (chartTypes === availableChartType.Individual) {
@@ -560,14 +542,11 @@ function ProgressList() {
             value: el.data,
           }
         })
-        console.log("PeriodicalTasksData - ", PeriodicalTasksData);
         // debugger
         chData = {
           labels,
           datasets:
             PeriodicalTasksData?.map((el, i) => {
-              console.log("el.date_range ----- ", el.date_range);
-              console.log("splitted date range --- ", el.date_range.split("To"))
               return {
                 label: formatDateRangeChartLabel(el.date_range),
                 data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
@@ -619,8 +598,6 @@ function ProgressList() {
         };
       } else if (baseperiod !== "Cumulative" && comparisonperiod !== "Cumulative" && baseperiod != comparisonperiod) {
         const labels = PeriodicalTasksData[0]?.data && PeriodicalTasksData[0]?.data.map((el, i) => el.language);
-        console.log("baseperiod ----  ", baseperiod);
-        console.log("comparisonperiod ---- ", comparisonperiod);
         const PeriodicalTasksDataset = PeriodicalTasksData?.map((el, i) => {
           return {
             label: formatDateRangeChartLabel(el.date_range),
@@ -727,6 +704,7 @@ function ProgressList() {
               label: baseperiod,
               data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
               time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
+              //data :progressTypes === "monthly" ? monthvalue?.data?.map((e) => e.cumulative_tasks_count):[],
               stack: "stack 0",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
               borderColor: "white",
@@ -738,6 +716,7 @@ function ProgressList() {
               label: comparisonperiod,
               data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
               time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
+              //data :comparisonProgressTypes === "monthly" ? monthvalue?.data?.map((e) => e.cumulative_tasks_count):[],
               stack: "stack 1",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
               borderColor: "white",
@@ -1146,4 +1125,4 @@ function ProgressList() {
     </ThemeProvider>
   )
 }
-export default ProgressList;
+export default ProgressAnalytics;

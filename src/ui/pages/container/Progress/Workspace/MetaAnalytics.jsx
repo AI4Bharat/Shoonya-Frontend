@@ -2,27 +2,26 @@ import React from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Grid ,ThemeProvider} from "@material-ui/core";
-import MetaAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/MetaAnalytics"
+import WorkspaceMetaAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetMetaAnalytics"
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
-import ContextualTranslationEditing from "./ContextualTranslationEditing";
-import SemanticTextualSimilarity_Scale5 from "./SemanticTextualSimilarity_Scale5";
-import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
-import AudioTranscription from "./AudioTranscription";
-import AudioSegmentation from "./AudioSegmentation";
+import ContextualTranslationEditing from "../MetaAnalytics/ContextualTranslationEditing";
+import SemanticTextualSimilarity_Scale5 from "../MetaAnalytics/SemanticTextualSimilarity_Scale5";
+import SingleSpeakerAudioTranscriptionEditing from "../MetaAnalytics/SingleSpeakerAudioTranscriptionEditing";
+import AudioTranscription from "../MetaAnalytics/AudioTranscription";
+import AudioSegmentation from "../MetaAnalytics/AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
-import themeDefault from "../../../../theme/theme";
 
 export default function MetaAnalytics(props) {
     const dispatch = useDispatch();
-    const {loggedInUserData} = props
     const [loading, setLoading] = useState(true);
     const apiLoading = useSelector((state) => state.apiStatus.loading);
+    const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
     const metaAnalyticsData = useSelector(
-        (state) => state.getMetaAnalyticsData.data
+        (state) => state.wsMetaAnalytics.data
       );
       const getMetaAnalyticsdata = () => {
         setLoading(true);
-        const userObj = new MetaAnalyticsDataAPI(loggedInUserData?.organization?.id);
+        const userObj = new WorkspaceMetaAnalyticsAPI(workspaceDetails?.id);
         dispatch(APITransport(userObj));
       };
 
