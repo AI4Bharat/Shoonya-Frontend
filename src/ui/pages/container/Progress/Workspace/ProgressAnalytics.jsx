@@ -19,7 +19,7 @@ import APITransport from "../../../../../redux/actions/apitransport/apitransport
 import Spinner from "../../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { addDays, isSameDay, format, minutesToSeconds, hoursToSeconds } from 'date-fns/esm';
+import { addDays, isSameDay, format, minutesToSeconds, hoursToSeconds, secondsToHours } from 'date-fns/esm';
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -288,7 +288,7 @@ function ProgressAnalytics() {
                 ...defaultOptions.scales.y.ticks,
                 callback: function(value) {
                   if(Math.floor(value) === value)
-                    return new Date(value * 1000).toISOString().substring(11, 19);
+                    return secondsToHours(value) + new Date(value * 1000).toISOString().substring(13, 19);
                 }
               }
             }
@@ -308,7 +308,7 @@ function ProgressAnalytics() {
                   tooltipItems.forEach(function (tooltipItem) {
                     sum += tooltipItem.parsed.y;
                   });
-                  return 'Sum: ' + new Date(sum * 1000).toISOString().substring(11, 19);
+                  return 'Sum: ' + secondsToHours(sum) + new Date(sum * 1000).toISOString().substring(13, 19);
                 }
               }
             }
