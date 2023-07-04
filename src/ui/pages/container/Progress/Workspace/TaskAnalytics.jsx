@@ -1,16 +1,16 @@
 import { Grid } from "@material-ui/core";
 import React from "react";
-import ContextualTranslationEditing from "./ContextualTranslationEditing";
-import SemanticTextualSimilarityChart from "./SemanticTextualSimilarityChart";
-import ContextualSentenceVerificationChart from "./ContextualSentenceVerificationChart";
-import WorkspaceTaskAnalyticsAPI from "../../../../../../redux/actions/api/WorkspaceDetails/GetTaskAnalytics";
-import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
-import AudioSegmentation from "./AudioSegmentation";
-import AudioTranscription from "./AudioTranscription";
-import APITransport from "../../../../../../redux/actions/apitransport/apitransport";
+import ContextualTranslationEditing from "../TaskAnalytics/ContextualTranslationEditing";
+import SemanticTextualSimilarityChart from "../TaskAnalytics/SemanticTextualSimilarityChart";
+import ContextualSentenceVerificationChart from "../TaskAnalytics/ContextualSentenceVerificationChart";
+import WorkspaceTaskAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetTaskAnalytics";
+import SingleSpeakerAudioTranscriptionEditing from "../TaskAnalytics/SingleSpeakerAudioTranscriptionEditing";
+import AudioSegmentation from "../TaskAnalytics/AudioSegmentation";
+import AudioTranscription from "../TaskAnalytics/AudioTranscription";
+import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import Spinner from "../../../../component/common/Spinner";
+import Spinner from "../../../component/common/Spinner";
 
 
 const TaskAnalytics = () => {
@@ -28,7 +28,7 @@ const TaskAnalytics = () => {
 
   useEffect(() => {
     getTaskAnalyticsdata();
-  }, []);
+  }, [workspaceDetails]);
 
   useEffect(() => {
     if(taskAnalyticsData.length > 0){
@@ -39,32 +39,32 @@ const TaskAnalytics = () => {
   return (
     <>
       {loading && <Spinner />}
-      <Grid style={{marginTop:"15px"}}>
+      {taskAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
         <ContextualTranslationEditing taskAnalyticsData={taskAnalyticsData} />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[3]?.length && <Grid style={{marginTop:"40px"}}>
         <SingleSpeakerAudioTranscriptionEditing
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[4]?.length && <Grid style={{marginTop:"40px"}}>
         <AudioTranscription
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[5]?.length && <Grid style={{marginTop:"40px"}}>
         <AudioSegmentation
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[2]?.length && <Grid style={{marginTop:"40px"}}>
         <SemanticTextualSimilarityChart taskAnalyticsData={taskAnalyticsData} />
-      </Grid>
-      <Grid style={{marginTop:"40px"}}>
+      </Grid>}
+      {taskAnalyticsData[1]?.length && <Grid style={{marginTop:"40px"}}>
         <ContextualSentenceVerificationChart
           taskAnalyticsData={taskAnalyticsData}
         />
-      </Grid>
+      </Grid>}
     </>
   );
 };
