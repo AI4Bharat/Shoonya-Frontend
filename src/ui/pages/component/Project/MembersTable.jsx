@@ -418,9 +418,9 @@ const MembersTable = (props) => {
           onClick={handleUserDialogOpen}
         />
       ) : null}
-      <Grid sx={{ mb: 1 }}>
+      {/* <Grid sx={{ mb: 1 }}>
           <Search />
-      </Grid>
+      </Grid> */}
       {props.type === "organization" ? (
         <InviteUsersDialog
           handleDialogClose={handleUserDialogClose}
@@ -441,7 +441,7 @@ const MembersTable = (props) => {
         />
       )}
       {renderSnackBar()}
-      {(props.type === "organization" || hideButton) && (
+      {(props.type === "organization" || props.type === addUserTypes.PROJECT_SUPERCHECKER || props.type === addUserTypes.PROJECT_REVIEWER || props.type === addUserTypes.PROJECT_ANNOTATORS || hideButton) && (
         <Grid sx={{ mb: 1 }}>
           <Search />
         </Grid>
