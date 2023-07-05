@@ -13,7 +13,7 @@ export default class GetTasksByProjectIdAPI extends API {
     const datavalue = []
     this.type = constants.GET_TASK_LIST;
     let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}`;
-    let querystr = pull === "All" ?"": `&editable=["${pullvalue}"]`
+    let querystr = pull === "All" ?"": `&editable=${pullvalue}`
     for (let key in selectedFilters) {
      if (selectedFilters[key] && selectedFilters[key] !== -1) {
     switch (key) {
