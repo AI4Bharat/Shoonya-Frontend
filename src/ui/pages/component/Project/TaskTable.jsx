@@ -134,11 +134,15 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
           })
         : [],
   };
+  const [pull, setpull] = useState("All");
+  const pullvalue = (pull == 'Pulled By reviewer' || pull == 'Pulled By SuperChecker') ? false :
+  (pull == 'Not Pulled By reviewer' || pull == 'Not Pulled By SuperChecker') ? true :
+    ''
   const [selectedFilters, setsSelectedFilters] = useState(
     props.type === "annotation"
       ? TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type
         ? TaskFilter.filters
-        : { annotation_status: filterData.Status[0], req_user: -1 }
+        : { annotation_status: filterData.Status[0] , req_user: -1 }
       : TaskFilter && TaskFilter.id === id && TaskFilter.type === props.type
       ? TaskFilter.filters
       : { review_status: filterData.Status[0], req_user: -1 }
@@ -163,14 +167,16 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columns, setColumns] = useState([]);
   const [labellingStarted, setLabellingStarted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
   const getTaskListData = () => {
     const taskObj = new GetTasksByProjectIdAPI(
       id,
       currentPageNumber,
       currentRowPerPage,
       selectedFilters,
-      props.type
+      props.type,
+      pullvalue,
+      pull
     );
     dispatch(APITransport(taskObj));
   };
@@ -1076,6 +1082,9 @@ ProjectDetails?.annotation_reviewers,
           filterStatusData={filterData}
           updateFilters={setsSelectedFilters}
           currentFilters={selectedFilters}
+          pull={pull}
+          setpull={setpull}
+          pullvalue={pullvalue}
         />
       )}
       {OpenFindAndReplaceDialog && (
