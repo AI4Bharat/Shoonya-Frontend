@@ -26,13 +26,12 @@ import { Stack } from "@mui/material";
 
 const FilterList = (props) => {
   const classes = DatasetStyle();
-  const { filterStatusData, currentFilters, updateFilters } = props;
+  const { filterStatusData, currentFilters, updateFilters,pull,setpull,pullvalue } = props;
   const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status ? currentFilters?.annotation_status : currentFilters.review_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
 
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-  const [pull, setpull] = useState();
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
   // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
   // const handleDatasetChange = (e) => {
@@ -53,14 +52,14 @@ const FilterList = (props) => {
 
   const handleStatusChange = (e) => {
     let statusvalue = !!currentFilters?.annotation_status ? "annotation_status" : "review_status"
-    let pullvalue = (pull == 'Pulled By reviewer' || pull == 'Pulled By SuperChecker') ? false :
-      (pull == 'Not Pulled By reviewer' || pull == 'Not Pulled By SuperChecker') ? true :
-        null
+    // let pullvalue = (pull == 'Pulled By reviewer' || pull == 'Pulled By SuperChecker') ? false :
+    //   (pull == 'Not Pulled By reviewer' || pull == 'Not Pulled By SuperChecker') ? true :
+    //     ''
     console.log(pullvalue);
     updateFilters({
       ...currentFilters,
       [statusvalue]: selectedStatus,
-      ["editable"]: pullvalue
+      // ["editable"]: pullvalue
     })
     props.handleClose();
   };
@@ -96,10 +95,10 @@ const FilterList = (props) => {
       >
         <Box className={classes.filterContainer}>
           <Stack direction="row">
-            <Typography variant="body2" sx={{ mr: 3, fontWeight: "700" }} className={classes.filterTypo}>
-              {translate("label.filter.status")} :
-            </Typography>
             <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography variant="body2" sx={{ ml: 1, fontWeight: "700",fontSize:"16px" }} className={classes.filterTypo}>
+              {translate("label.filter.status")} 
+            </Typography>
               {filterStatusData.Status.map((type) => {
                 return (
                   <FormControlLabel

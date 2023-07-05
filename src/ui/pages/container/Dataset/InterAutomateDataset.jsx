@@ -17,7 +17,7 @@ import GetIndicTransLanguagesAPI from "../../../../redux/actions/api/Dataset/Get
 import roles from "../../../../utils/UserMappedByRole/Roles";
 import { MenuProps } from "../../../../utils/utils";
 
-const APiType = [{ ApiTypename: "indic-trans" }, { ApiTypename: "google" },{ ApiTypename: "azure" }]
+const APi_Type = [{ Api_Typename: "indic-trans" }, { Api_Typename: "google" },{ Api_Typename: "azure" }]
 const InterAutomateDataset = () => {
   const navigate = useNavigate();
   const classes = DatasetStyle();
@@ -38,7 +38,7 @@ const InterAutomateDataset = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(true);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
-  //const [apitype, setApitype] = useState("indic-trans");
+  //const [api_type, setApi_type] = useState("indic-trans");
 
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
   const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
@@ -126,9 +126,9 @@ const InterAutomateDataset = () => {
     }
   };
 
-const apitype = translationModel===1?"indic-trans": translationModel===2?"google":translationModel===3?"azure":"indic-trans-v2";
+const api_type = translationModel===1?"indic-trans": translationModel===2?"google":translationModel===3?"azure":"indic-trans-v2";
   const handleConfirm = () => {
-    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,apitype,checked);
+    const apiObj = new AutomateDatasetsAPI(srcInstance, tgtInstance, languages, loggedInUserData.organization.id,checks,api_type,checked);
     setLoading(true);
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
@@ -147,8 +147,8 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
 
   if (roles?.Annotator === loggedInUserData?.role) return navigate("/projects");
 
-  // const handleAPiType = (e) => {
-  //   setApitype(e.target.value)
+  // const handleAPi_Type = (e) => {
+  //   setApi_type(e.target.value)
   // }
 
   const handleChangeAutomatemissingitems = (event) => {
@@ -407,11 +407,11 @@ const apitype = translationModel===1?"indic-trans": translationModel===2?"google
                   <Select
                     labelId="demo-simple-select-label"
                     id="APi-simple-select"
-                    value={apitype}
-                    onChange={handleAPiType}
+                    value={api_type}
+                    onChange={handleAPi_Type}
                   >
-                   {APiType.map((item, index) => (
-                    <MenuItem value={item.ApiTypename}>{item.ApiTypename}</MenuItem>
+                   {APi_Type.map((item, index) => (
+                    <MenuItem value={item.Api_Typename}>{item.Api_Typename}</MenuItem>
                   ))}
                   </Select>
                 </FormControl>

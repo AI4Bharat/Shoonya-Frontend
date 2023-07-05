@@ -2,8 +2,8 @@ import { Box, Tab, Tabs, Typography } from '@mui/material'
 import React from 'react'
 import { useState } from 'react'
 import ProgressAnalytics from './ProgressAnalytics';
-import TaskAnalytics from "./TaskAnalytics/TaskAnalytics";
-import MetaAnalytics from "./MetaAnalytics/MetaAnalytics";
+import TaskAnalytics from "./TaskAnalytics";
+import MetaAnalytics from "./MetaAnalytics";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;

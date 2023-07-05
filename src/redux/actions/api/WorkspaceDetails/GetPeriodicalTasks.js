@@ -4,11 +4,11 @@
  import constants from "../../../constants";
  
  export default class WorkspacePeriodicalTasksAPI extends API {
-   constructor(wsId, progressObj, timeout = 2000) {
+   constructor(wsId, progressObj, metaInfo, timeout = 2000) {
      super("POST", timeout, false);
      this.progressObj = progressObj;
      this.type = constants.WS_PERODICAL_TASK;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${wsId}/periodical_tasks_count/`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${wsId}/periodical_tasks_count/${metaInfo ? "?metainfo=true" : ""}`;
    }
  
    processResponse(res) {

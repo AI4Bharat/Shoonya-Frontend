@@ -19,12 +19,11 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import Spinner from "../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { isSameDay, format, minutesToSeconds, hoursToSeconds } from 'date-fns/esm';
+import { addDays, isSameDay, format, minutesToSeconds, hoursToSeconds, secondsToHours } from 'date-fns/esm';
 import { DateRangePicker, defaultStaticRanges, } from "react-date-range";
 import { useTheme } from "@material-ui/core/styles";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { addDays, secondsToHours, secondsToMinutes } from 'date-fns';
 import colorsData from '../../../../utils/Colors_JSON/Colors_JSON';
 import axios from "axios";
 import html2canvas from 'html2canvas';
@@ -137,7 +136,6 @@ function ProgressList() {
   const [chartTypes, setChartTypes] = useState("Individual")
   const [baseperiod, setBaseperiod] = useState("Cumulative")
   const [metaInfo, setMetaInfo] = useState(false);
-  const [metaDisabled, setMetaDisabled] = useState(false);
   const [showBarChar, setShowBarChar] = useState(false)
   const [showPicker, setShowPicker] = useState(false);
   const [showPickers, setShowPickers] = useState(false);
@@ -168,22 +166,22 @@ function ProgressList() {
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   
   const [CumulativeTasksData, setCumulativeTasksData] = useState([]);
-  const [PeriodicalTaskssData, setPeriodicalTaskssData] = useState([]);
-  const [SecondaryPeriodicalTaskssData, setSecondaryPeriodicalTaskssData] = useState([]);
+  const [PeriodicalTasksData, setPeriodicalTasksData] = useState([]);
+  const [SecondaryPeriodicalTasksData, setSecondaryPeriodicalTasksData] = useState([]);
 
   useEffect(() => {
-    if (PeriodicalTaskssData.length > 0) {
-      if (PeriodicalTaskssData[0].month_number > 0) {
-        setmonthvalue(PeriodicalTaskssData[0])
+    if (PeriodicalTasksData.length > 0) {
+      if (PeriodicalTasksData[0].month_number > 0) {
+        setmonthvalue(PeriodicalTasksData[0])
       }
-      else if (PeriodicalTaskssData[0].week_number > 0) {
-        setweekvalue(PeriodicalTaskssData[0])
+      else if (PeriodicalTasksData[0].week_number > 0) {
+        setweekvalue(PeriodicalTasksData[0])
       }
-      else if (PeriodicalTaskssData[0].year_number > 0) {
-        setyearvalue(PeriodicalTaskssData[0])
+      else if (PeriodicalTasksData[0].year_number > 0) {
+        setyearvalue(PeriodicalTasksData[0])
       }
     }
-  }, [PeriodicalTaskssData])
+  }, [PeriodicalTasksData])
 
   useEffect(() => {
     if (ProjectTypes) {
@@ -225,13 +223,13 @@ function ProgressList() {
   const getPeriodicalTasksData = async (payload, OrgId) => {
     setLoading(true);
     console.log("payload, OrgId", payload, OrgId);
-    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId);
+    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId, metaInfo);
     await axios.post(periodicalTasksAPIObj.apiEndPoint(), periodicalTasksAPIObj.getBody(), periodicalTasksAPIObj.getHeaders())
       .then(response => {
         if (response.statusText === "OK") {
-          setPeriodicalTaskssData(response.data);
+          setPeriodicalTasksData(response.data);
           setLoading(false);
-          console.log("PeriodicalTaskssData -----", response);
+          console.log("PeriodicalTasksData -----", response);
         } else {
           setLoading(false);
         }
@@ -245,13 +243,13 @@ function ProgressList() {
   const getSecondaryPeriodicalTasksData = async (payload, OrgId) => {
     setLoading(true);
     console.log("payload, OrgId", payload, OrgId);
-    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId);
+    const periodicalTasksAPIObj = new PeriodicalTasks(payload, OrgId, metaInfo);
     await axios.post(periodicalTasksAPIObj.apiEndPoint(), periodicalTasksAPIObj.getBody(), periodicalTasksAPIObj.getHeaders())
       .then(response => {
         if (response.statusText === "OK") {
-          setSecondaryPeriodicalTaskssData(response.data);
+          setSecondaryPeriodicalTasksData(response.data);
           setLoading(false);
-          console.log("PeriodicalTaskssData -----", response);
+          console.log("PeriodicalTasksData -----", response);
         } else {
           setLoading(false);
         }
@@ -267,8 +265,7 @@ function ProgressList() {
   }
   const handleSubmit = async () => {
     setShowBarChar(false);
-    if(((baseperiod === "Cumulative" && chartTypes === availableChartType.Individual) 
-      || (comparisonperiod === "Cumulative" && baseperiod === "Cumulative")) && metaInfo) {
+    if(metaInfo) {
       if(!selectedType.includes("Audio")) {
         setOptions({
           ...defaultOptions,
@@ -298,11 +295,8 @@ function ProgressList() {
               ticks: {
                 ...defaultOptions.scales.y.ticks,
                 callback: function(value) {
-                  let h = secondsToHours(value);
-                  let mm = secondsToMinutes(value) % 60;
-                  let ss = (value % 3600 % 60);
-                  if(Math.floor(ss) === ss)
-                    return h + ((mm < 10) ? ':0' : ':') + mm + ((ss < 10) ? ':0' : ':') + ss;
+                  if(Math.floor(value) === value)
+                    return secondsToHours(value) + new Date(value * 1000).toISOString().substring(13, 19);
                 }
               }
             }
@@ -314,8 +308,15 @@ function ProgressList() {
               callbacks: {
                 ...defaultOptions.plugins.tooltip.callbacks,
                 label: function(context) {
-                  console.log("context - ", context);
-                  return 'Duration: ' + context.dataset.time[context.dataIndex];
+                  let label = context.dataset.label || '';
+                  return label + " : " + context.dataset.time[context.dataIndex];
+                },
+                footer: (tooltipItems) => {
+                  let sum = 0;
+                  tooltipItems.forEach(function (tooltipItem) {
+                    sum += tooltipItem.parsed.y;
+                  });
+                  return 'Sum: ' + secondsToHours(sum) + new Date(sum * 1000).toISOString().substring(13, 19);
                 }
               }
             }
@@ -333,7 +334,8 @@ function ProgressList() {
 
     const Cumulativedata = {
       project_type: selectedType,
-      ...(radiobutton==="Review" && {reviewer_reports:true})
+      ...(radiobutton==="Review" && {reviewer_reports:true}),
+      ...(radiobutton==="Supercheck" && {supercheck_reports:true})
 
     };
     const individualPeriodicaldata = {
@@ -341,7 +343,8 @@ function ProgressList() {
       periodical_type: baseperiod,
       start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
       end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
-      ...(radiobutton==="Review" && {reviewer_reports:true})
+      ...(radiobutton==="Review" && {reviewer_reports:true}),
+      ...(radiobutton==="Supercheck" && {supercheck_reports:true})
     };
 
     if (chartTypes === availableChartType.Individual) {
@@ -372,7 +375,8 @@ function ProgressList() {
           periodical_type: comparisonperiod,
           start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
-          ...(radiobutton==="Review" && {reviewer_reports:true})
+          ...(radiobutton==="Review" && {reviewer_reports:true}),
+          ...(radiobutton==="Supercheck" && {supercheck_reports:true})
         };
         await getPeriodicalTasksData(Periodicaldata, OrgId);
         await getCumulativeTasksData(Cumulativedata, OrgId);
@@ -383,7 +387,8 @@ function ProgressList() {
           periodical_type: baseperiod,
           start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
-          ...(radiobutton==="Review" && {reviewer_reports:true})
+          ...(radiobutton==="Review" && {reviewer_reports:true}),
+          ...(radiobutton==="Supercheck" && {supercheck_reports:true})
         };
         await getPeriodicalTasksData(individualPeriodicaldata, OrgId);
         await getCumulativeTasksData(Cumulativedata, OrgId);
@@ -393,14 +398,16 @@ function ProgressList() {
           periodical_type: baseperiod,
           start_date: format(baseperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(baseperiodDatepicker[0].endDate, 'yyyy-MM-dd'), 
-          ...(radiobutton==="Review" && {reviewer_reports:true})    
+          ...(radiobutton==="Review" && {reviewer_reports:true})  ,
+          ...(radiobutton==="Supercheck" && {supercheck_reports:true})  
         };
         const comparisonPeriodicalPayload = {
           project_type: selectedType,
           periodical_type: comparisonperiod,
           start_date: format(comparisonperiodDatepicker[0].startDate, 'yyyy-MM-dd'),
           end_date: format(comparisonperiodDatepicker[0].endDate, 'yyyy-MM-dd'),
-          ...(radiobutton==="Review" && {reviewer_reports:true})
+          ...(radiobutton==="Review" && {reviewer_reports:true}),
+          ...(radiobutton==="Supercheck" && {supercheck_reports:true})
         };
 
         await getPeriodicalTasksData(basePeriodicalPayload, OrgId);
@@ -487,16 +494,34 @@ function ProgressList() {
   }, [showPicker, showPickers])
 
   useEffect(() => {
-    if(!(baseperiod === "Cumulative" && chartTypes === availableChartType.Individual) 
-    && !(comparisonperiod === "Cumulative" && baseperiod === "Cumulative")) {
-      setMetaInfo(false);
-      setMetaDisabled(true);
-    } else {
-      setMetaDisabled(false);
-    }
-  }, [metaInfo, baseperiod, comparisonperiod, chartTypes]);
+    const getCumulativeMetaInfo = (e) => {
+      let val;
+      if(metaInfo) {
+        if(selectedType.includes("Audio")) {
+          let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
+          val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
+        } else {
+          val = e.cumulative_word_count;
+        }
+      }
+      else val = e.cumulative_tasks_count;
+      return val;
+    };
 
-  useEffect(() => {
+    const getPeriodicalMetaInfo = (e) => {
+      let val;
+      if(metaInfo) {
+        if(selectedType.includes("Audio")) {
+          let [hours, minutes, seconds] = e.periodical_aud_duration.split(":");
+          val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
+        } else {
+          val = e.periodical_word_count;
+        }
+      }
+      else val = e.periodical_tasks_count;
+      return val;
+    };
+    
     let chData;
     let svgChData;
     if (chartTypes === availableChartType.Individual) {
@@ -504,19 +529,9 @@ function ProgressList() {
         // console.log("CumulativeTasksData - ", CumulativeTasksData);
         // debugger
         svgChData = CumulativeTasksData.map((el, i) => {
-          let val;
-          if(metaInfo) {
-            if(selectedType.includes("Audio")) {
-              let [hours, minutes, seconds] = el.cumulative_aud_duration.split(":");
-              val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
-            } else {
-              val = el.cumulative_word_count;
-            }
-          }
-          else val = el.cumulative_tasks_count;
           return {
             name: el.language,
-            value: val,
+            value: getCumulativeMetaInfo(el),
             // stack: el.language
           }
         })
@@ -526,19 +541,7 @@ function ProgressList() {
           datasets: [
             {
               label: baseperiod,
-              data: CumulativeTasksData.map((e) => {
-                let val;
-                if(metaInfo) {
-                  if(selectedType.includes("Audio")) {
-                    let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
-                    val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
-                  } else {
-                    val = e.cumulative_word_count;
-                  }
-                }
-                else val = e.cumulative_tasks_count;
-                return val;
-              }),
+              data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
               time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               stack: "stack 0",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
@@ -550,24 +553,25 @@ function ProgressList() {
 
         };
       } else {
-        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
-        svgChData = PeriodicalTaskssData.map((el, i) => {
+        const labels = PeriodicalTasksData[0]?.data && PeriodicalTasksData[0]?.data.map((el, i) => el.language);
+        svgChData = PeriodicalTasksData.map((el, i) => {
           return {
             name: el.date_range,
             value: el.data,
           }
         })
-        console.log("PeriodicalTaskssData - ", PeriodicalTaskssData);
+        console.log("PeriodicalTasksData - ", PeriodicalTasksData);
         // debugger
         chData = {
           labels,
           datasets:
-            PeriodicalTaskssData?.map((el, i) => {
+            PeriodicalTasksData?.map((el, i) => {
               console.log("el.date_range ----- ", el.date_range);
               console.log("splitted date range --- ", el.date_range.split("To"))
               return {
                 label: formatDateRangeChartLabel(el.date_range),
-                data: el.data?.map((e) => (e.annotations_completed)),
+                data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
+                time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
                 stack: "stack 0",
                 borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
                 borderColor: "white",
@@ -583,11 +587,12 @@ function ProgressList() {
     } else {
      
       if (baseperiod !== "Cumulative" && comparisonperiod !== "Cumulative" && baseperiod === comparisonperiod) {
-        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
-        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
+        const labels = PeriodicalTasksData[0]?.data && PeriodicalTasksData[0]?.data.map((el, i) => el.language);
+        const PeriodicalTasksDataset = PeriodicalTasksData?.map((el, i) => {
           return {
             label: formatDateRangeChartLabel(el.date_range),
-            data: el.data?.map((e) => (e.annotations_completed)),
+            data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
+            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 0",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -596,10 +601,11 @@ function ProgressList() {
           }
         });
 
-        const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
+        const SecondaryPeriodicalTasksDataset = SecondaryPeriodicalTasksData?.map((el, i) => {
           return {
             label: formatDateRangeChartLabel(el.date_range),
-            data: el.data?.map((e) => (e.annotations_completed)),
+            data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
+            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 1",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -609,16 +615,17 @@ function ProgressList() {
         });
         chData = {
           labels,
-          datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
+          datasets: PeriodicalTasksDataset.concat(SecondaryPeriodicalTasksDataset),
         };
       } else if (baseperiod !== "Cumulative" && comparisonperiod !== "Cumulative" && baseperiod != comparisonperiod) {
-        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        const labels = PeriodicalTasksData[0]?.data && PeriodicalTasksData[0]?.data.map((el, i) => el.language);
         console.log("baseperiod ----  ", baseperiod);
         console.log("comparisonperiod ---- ", comparisonperiod);
-        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
+        const PeriodicalTasksDataset = PeriodicalTasksData?.map((el, i) => {
           return {
             label: formatDateRangeChartLabel(el.date_range),
-            data: el.data?.map((e) => (e.annotations_completed)),
+            data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
+            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 0",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -627,10 +634,11 @@ function ProgressList() {
           }
         });
 
-        const SecondaryPeriodicalTaskssDataset = SecondaryPeriodicalTaskssData?.map((el, i) => {
+        const SecondaryPeriodicalTasksDataset = SecondaryPeriodicalTasksData?.map((el, i) => {
           return {
             label: formatDateRangeChartLabel(el.date_range),
-            data: el.data?.map((e) => (e.annotations_completed)),
+            data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
+            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 1",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -640,15 +648,16 @@ function ProgressList() {
         });
         chData = {
           labels,
-          datasets: PeriodicalTaskssDataset.concat(SecondaryPeriodicalTaskssDataset),
+          datasets: PeriodicalTasksDataset.concat(SecondaryPeriodicalTasksDataset),
         };
       
       } else if(baseperiod !== "Cumulative" && comparisonperiod === "Cumulative"){
-        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
-        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
+        const labels = PeriodicalTasksData[0]?.data && PeriodicalTasksData[0]?.data.map((el, i) => el.language);
+        const PeriodicalTasksDataset = PeriodicalTasksData?.map((el, i) => {
           return {
             label: formatDateRangeChartLabel(el.date_range),
-            data: el.data?.map((e) => (e.annotations_completed)),
+            data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
+            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 0",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -659,7 +668,8 @@ function ProgressList() {
 
         const cumulativeTasksDataset = {
           label: comparisonperiod,
-          data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+          data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
+          time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
           stack: "stack 1",
           borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
           borderColor: "white",
@@ -670,15 +680,16 @@ function ProgressList() {
 
         chData = {
           labels,
-          datasets: PeriodicalTaskssDataset.concat(cumulativeTasksDataset),
+          datasets: PeriodicalTasksDataset.concat(cumulativeTasksDataset),
         };
 
       } else if(baseperiod === "Cumulative" && comparisonperiod !== "Cumulative"){
-        const labels = PeriodicalTaskssData[0]?.data && PeriodicalTaskssData[0]?.data.map((el, i) => el.language);
+        const labels = PeriodicalTasksData[0]?.data && PeriodicalTasksData[0]?.data.map((el, i) => el.language);
         
         const cumulativeTasksDataset = [{
           label: baseperiod,
-          data: CumulativeTasksData.map((e) => (e.cumulative_tasks_count)),
+          data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
+          time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
           stack: "stack 0",
           borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
           borderColor: "white",
@@ -686,10 +697,11 @@ function ProgressList() {
           barThickness: 20,
         }]
 
-        const PeriodicalTaskssDataset = PeriodicalTaskssData?.map((el, i) => {
+        const PeriodicalTasksDataset = PeriodicalTasksData?.map((el, i) => {
           return {
             label: formatDateRangeChartLabel(el.date_range),
-            data: el.data?.map((e) => (e.annotations_completed)),
+            data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
+            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 1",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -699,7 +711,7 @@ function ProgressList() {
         });
         chData = {
           labels,
-          datasets: cumulativeTasksDataset.concat(PeriodicalTaskssDataset),
+          datasets: cumulativeTasksDataset.concat(PeriodicalTasksDataset),
         };
       } else {
 
@@ -713,19 +725,7 @@ function ProgressList() {
 
             {
               label: baseperiod,
-              data: CumulativeTasksData.map((e) => {
-                let val;
-                if(metaInfo) {
-                  if(selectedType.includes("Audio")) {
-                    let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
-                    val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
-                  } else {
-                    val = e.cumulative_word_count;
-                  }
-                }
-                else val = e.cumulative_tasks_count;
-                return val;
-              }),
+              data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
               time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               stack: "stack 0",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
@@ -736,19 +736,7 @@ function ProgressList() {
             {
             
               label: comparisonperiod,
-              data: CumulativeTasksData.map((e) => {
-                let val;
-                if(metaInfo) {
-                  if(selectedType.includes("Audio")) {
-                    let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
-                    val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
-                  } else {
-                    val = e.cumulative_word_count;
-                  }
-                }
-                else val = e.cumulative_tasks_count;
-                return val;
-              }),
+              data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
               time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               stack: "stack 1",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
@@ -766,7 +754,7 @@ function ProgressList() {
     }
     setChartData(chData);
     setSVGChartData(svgChData);
-  }, [PeriodicalTaskssData, SecondaryPeriodicalTaskssData, CumulativeTasksData])
+  }, [PeriodicalTasksData, SecondaryPeriodicalTasksData, CumulativeTasksData])
 
 
   var now = new Date()
@@ -839,7 +827,7 @@ function ProgressList() {
               >
                 <FormControlLabel value="Annotation" control={<Radio />} label="Annotation" />
                 <FormControlLabel value="Review" control={<Radio />} label="Review" />
-
+                <FormControlLabel value="Supercheck" control={<Radio />} label="Supercheck" />
               </RadioGroup>
             </FormControl>
           </Grid >
@@ -851,7 +839,7 @@ function ProgressList() {
           <Grid item xs={1} sm={1} md={1} lg={1} xl={1}  >
             <Checkbox
               onChange={(e) => setMetaInfo(e.target.checked)} 
-              checked={metaInfo} disabled={metaDisabled}
+              checked={metaInfo}
             />
           </Grid >
         </Grid>

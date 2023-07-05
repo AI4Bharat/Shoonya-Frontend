@@ -6,7 +6,7 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from '../../../constants';
 
 export default class AutomateDatasetsAPI extends API {
-  constructor(srcInstanceId, tgtInstanceId, languages, organizationId,checks,apitype,checked, timeout = 2000) {
+  constructor(srcInstanceId, tgtInstanceId, languages, organizationId,checks,api_type,checked, timeout = 2000) {
     super("POST", timeout, false);
     this.type = constants.AUTOMATE_DATASETS;
     this.input_dataset_instance_id = srcInstanceId;
@@ -16,7 +16,7 @@ export default class AutomateDatasetsAPI extends API {
     this.output_dataset_instance_id = tgtInstanceId;
     this.organization_id = organizationId;
     this.checks_for_particular_languages = checks;
-     this.apitype = apitype;
+     this.api_type = api_type;
      this.automate_missing_data_items = `${checked}`
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}automated_sentence_text_translation_job`;
   }
@@ -40,7 +40,7 @@ export default class AutomateDatasetsAPI extends API {
       output_dataset_instance_id: this.output_dataset_instance_id,
       organization_id: this.organization_id,
       checks_for_particular_languages: this.checks_for_particular_languages,
-      apitype:this.apitype,
+      api_type:this.api_type,
       automate_missing_data_items : this.automate_missing_data_items
     }
   }
