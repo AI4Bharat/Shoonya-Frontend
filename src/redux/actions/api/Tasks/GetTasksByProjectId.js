@@ -7,19 +7,21 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class GetTasksByProjectIdAPI extends API {
-  constructor(projectId, pageNo, countPerPage, selectedFilters, taskType, timeout = 2000) {
+  constructor(projectId, pageNo, countPerPage, selectedFilters, taskType, pullvalue,pull, timeout = 2000) {
+    console.log(pullvalue,"pullvaluepullvalue")
     super("GET", timeout, false);
     const datavalue = []
     this.type = constants.GET_TASK_LIST;
     let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}`;
+    let querystr = pull === "All" ?"": `&editable=${pullvalue}`
     for (let key in selectedFilters) {
      if (selectedFilters[key] && selectedFilters[key] !== -1) {
     switch (key) {
            case 'annotation_status':
-         queryString +=`&${key}=["${selectedFilters[key]}"]&editable=["${selectedFilters.editable}"]`
+         queryString +=`&${key}=["${selectedFilters[key]}"] ${querystr}`
              break;
              case 'review_status':
-             queryString +=`&${key}=["${selectedFilters[key]}"]&editable=["${selectedFilters.editable}"]`
+             queryString +=`&${key}=["${selectedFilters[key]}"] ${querystr}`
                  break;
              case 'supercheck_status':
                   queryString +=`&${key}=["${selectedFilters[key]}"]`
