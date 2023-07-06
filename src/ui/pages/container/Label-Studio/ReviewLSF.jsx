@@ -11,6 +11,7 @@ import {
   Alert,
   Popover,
   Autocomplete,
+  Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -196,6 +197,8 @@ const filterAnnotations = (
 
 //used just in postAnnotation to support draft status update.
 
+const AUTO_SAVE_INTERVAL = 30000;
+
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -219,6 +222,9 @@ const LabelStudioWrapper = ({
     variant: "success",
   });
   const [taskData, setTaskData] = useState(undefined);
+  const [annotations, setAnnotations] = useState([]);
+  const load_time = useRef();
+  const [autoSave, setAutoSave] = useState(true);
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -293,7 +299,6 @@ const LabelStudioWrapper = ({
     superCheckerNotesRef,
     projectType
   ) {
-    let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
 
@@ -357,6 +362,8 @@ const LabelStudioWrapper = ({
       ];
     }
 
+    if(disableLSFControls) setAutoSave(false);
+
     if (rootRef.current) {
       if (lsfRef.current) {
         lsfRef.current.destroy();
@@ -405,7 +412,7 @@ const LabelStudioWrapper = ({
           //   ls.annotationStore.selectAnnotation(c.id);
           // }
           // }
-          load_time = new Date();
+          load_time.current = new Date();
         },
 
         onSkipTask: function (annotation) {
@@ -415,7 +422,7 @@ const LabelStudioWrapper = ({
             showLoader();
             patchReview(
               review.id,
-              load_time,
+              load_time.current,
               review.lead_time,
               "skipped",
               reviewNotesRef.current.value
@@ -528,6 +535,7 @@ const LabelStudioWrapper = ({
                 annotation.serializeAnnotation()[0].id ===
                   annotations[i].result[0].id
               ) {
+                setAutoSave(false);
                 showLoader();
                 let temp = annotation.serializeAnnotation();
 
@@ -542,7 +550,7 @@ const LabelStudioWrapper = ({
                 )[0];
                 patchReview(
                   review.id,
-                  load_time,
+                  load_time.current,
                   review.lead_time,
                   review_status.current,
                   projectType === "SingleSpeakerAudioTranscriptionEditing"
@@ -668,6 +676,7 @@ const LabelStudioWrapper = ({
               ? conversationVerificationLabelConfig(taskData.data)
               : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
+          setAnnotations(annotations);
           setTaskData(taskData);
           getTaskData(taskData);
           LSFRoot(
@@ -791,6 +800,88 @@ const LabelStudioWrapper = ({
     showLoader();
   }, [taskId]);
 
+  const autoSaveReview = () => {
+    if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+      if(taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            (!annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id) && annotations[i].annotation_type === 2
+          ) {
+              let temp = annotation.serializeAnnotation();
+              for (let i = 0; i < temp.length; i++) {
+                if (temp[i].value.text) {
+                  temp[i].value.text = [temp[i].value.text[0]];
+                }
+              }
+              let review = annotations.filter(
+                (annotation) => annotation.annotation_type === 2
+              )[0];
+              patchReview(
+                review.id,
+                load_time.current,
+                review.lead_time,
+                review_status.current ?? review.annotation_status,
+                labelConfig.project_type === "SingleSpeakerAudioTranscriptionEditing"
+                  ? annotation.serializeAnnotation()
+                  : temp,
+                review.parent_annotation,
+                reviewNotesRef.current.value
+              ).then((res) => {
+                if (res.status !== 200) {
+                  setSnackbarInfo({
+                    open: true,
+                    message: "Error in autosaving annotation",
+                    variant: "error",
+                  });
+                }
+              });
+            }
+          }
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
+  };
+
+  let hidden, visibilityChange;
+  if (typeof document.hidden !== 'undefined') {
+    hidden = 'hidden';
+    visibilityChange = 'visibilitychange';
+  } else if (typeof document.msHidden !== 'undefined') {
+    hidden = 'msHidden';
+    visibilityChange = 'msvisibilitychange';
+  } else if (typeof document.webkitHidden !== 'undefined') {
+    hidden = 'webkitHidden';
+    visibilityChange = 'webkitvisibilitychange';
+  }
+
+  const [visible, setVisibile] = useState(!document[hidden]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => setVisibile(!document[hidden]);
+    document.addEventListener(visibilityChange, handleVisibilityChange);
+    return () => {
+        document.removeEventListener(visibilityChange, handleVisibilityChange);
+    }
+  }, []);
+
+  useEffect(() => {
+    !visible && autoSaveReview();
+  }, [visible]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      visible && autoSaveReview();
+      }, AUTO_SAVE_INTERVAL);
+    return () => clearInterval(interval);
+  }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
+
   const onNextAnnotation = async () => {
     showLoader();
     getNextProject(projectId, taskId, "review").then((res) => {
@@ -837,6 +928,12 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
+      {autoSave &&
+        <div style={{ textAlign: "left", marginBottom: "15px" }}>
+          <Typography variant="body" color="#000000">
+            Auto-save enabled for this scenario.
+          </Typography>
+        </div>}
       {filterMessage && (
         <Alert severity="info" showIcon style={{ marginBottom: "1%" }}>
           {filterMessage}

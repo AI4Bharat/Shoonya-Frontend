@@ -123,7 +123,7 @@ const filterAnnotations = (annotations, user) => {
 
 //used just in postAnnotation to support draft status update.
 
-const AUTO_SAVE_INTERVAL = 20000;
+const AUTO_SAVE_INTERVAL = 30000;
 
 const LabelStudioWrapper = ({
   reviewNotesRef,
@@ -150,6 +150,7 @@ const LabelStudioWrapper = ({
   const [taskData, setTaskData] = useState(undefined);
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
+  const [autoSave, setAutoSave] = useState(true);
   const [projectType, setProjectType] = useState();
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
@@ -357,6 +358,7 @@ const LabelStudioWrapper = ({
                 annotation.serializeAnnotation()[0].id ===
                   annotations[i].result[0].id
               ) {
+                setAutoSave(false);
                 showLoader();
                 let temp = annotation.serializeAnnotation();
 
@@ -477,9 +479,9 @@ const LabelStudioWrapper = ({
               : labelConfig.project_type === "ConversationVerification"
               ? conversationVerificationLabelConfig(taskData.data)
               : labelConfig.label_config;
+          setAnnotations(annotations);
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
-          setAnnotations(annotations);
           getTaskData(taskData);
           LSFRoot(
             rootRef,
@@ -561,6 +563,88 @@ const LabelStudioWrapper = ({
     showLoader();
   }, [taskId]);
 
+  const autoSaveSuperCheck = () => {
+    if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+      if(taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            (!annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id) && annotations[i].annotation_type === 3
+          ) {
+              let temp = annotation.serializeAnnotation();
+              for (let i = 0; i < temp.length; i++) {
+                if (temp[i].value.text) {
+                  temp[i].value.text = [temp[i].value.text[0]];
+                }
+              }
+              let superChecker = annotations.filter(
+                (value) => value.annotation_type === 3
+              )[0];
+              patchSuperChecker(
+                superChecker.id,
+                load_time.current,
+                superChecker.lead_time,
+                review_status.current ?? superChecker.annotation_status,
+                projectType === "SingleSpeakerAudioTranscriptionEditing"
+                  ? annotation.serializeAnnotation()
+                  : temp,
+                superChecker.parent_annotation,
+                superCheckerNotesRef.current.value
+              ).then((res) => {
+                if (res.status !== 200) {
+                  setSnackbarInfo({
+                    open: true,
+                    message: "Error in autosaving annotation",
+                    variant: "error",
+                  });
+                }
+              });
+            }
+          }
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
+  };
+
+  let hidden, visibilityChange;
+  if (typeof document.hidden !== 'undefined') {
+    hidden = 'hidden';
+    visibilityChange = 'visibilitychange';
+  } else if (typeof document.msHidden !== 'undefined') {
+    hidden = 'msHidden';
+    visibilityChange = 'msvisibilitychange';
+  } else if (typeof document.webkitHidden !== 'undefined') {
+    hidden = 'webkitHidden';
+    visibilityChange = 'webkitvisibilitychange';
+  }
+
+  const [visible, setVisibile] = useState(!document[hidden]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => setVisibile(!document[hidden]);
+    document.addEventListener(visibilityChange, handleVisibilityChange);
+    return () => {
+        document.removeEventListener(visibilityChange, handleVisibilityChange);
+    }
+  }, []);
+
+  useEffect(() => {
+    !visible && autoSaveSuperCheck();
+  }, [visible]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      visible && autoSaveSuperCheck();
+      }, AUTO_SAVE_INTERVAL);
+    return () => clearInterval(interval);
+  }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
+
   const onNextAnnotation = async () => {
     showLoader();
     getNextProject(projectId, taskId, "supercheck").then((res) => {
@@ -613,9 +697,12 @@ const LabelStudioWrapper = ({
       <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
         {taskData?.super_check_user === userData?.id &&
           <div style={{ textAlign: "left", marginBottom: "15px" }}>
-            <Typography variant="body" color="#000000">
-              Auto-save is not available for this scenario. Please save your task manually.
-            </Typography>
+            {autoSave ? <Typography variant="body" color="#000000">
+                Auto-save is enabled for this scenario.
+              </Typography> :
+              <Typography variant="body" color="#000000">
+                Auto-save is not available for this scenario. Please save your task manually.
+              </Typography>}
           </div>
         }
         <div>
