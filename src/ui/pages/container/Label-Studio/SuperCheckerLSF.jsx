@@ -120,7 +120,7 @@ const filterAnnotations = (annotations, user) => {
 
 //used just in postAnnotation to support draft status update.
 
-const AUTO_SAVE_INTERVAL = 30000;
+const AUTO_SAVE_INTERVAL = 60000;
 
 const LabelStudioWrapper = ({
   reviewNotesRef,
