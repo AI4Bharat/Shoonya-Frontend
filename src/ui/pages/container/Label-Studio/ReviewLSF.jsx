@@ -106,13 +106,10 @@ const filterAnnotations = (
   );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
-      filteredAnnotations =
-        userAnnotation.result.length > 0
-          ? annotations.filter(
-              (annotation) => annotation.id === userAnnotation.parent_annotation
-            )
-          : annotations.filter((value) => value.annotation_type === 1);
-    }else if (
+      filteredAnnotations = userAnnotation.result.length > 0
+        ? [userAnnotation]
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation);
+    } else if (
       userAnnotation &&
       [
         "rejected"
@@ -816,18 +813,15 @@ const LabelStudioWrapper = ({
                   temp[i].value.text = [temp[i].value.text[0]];
                 }
               }
-              let review = annotations.filter(
-                (annotation) => annotation.annotation_type === 2
-              )[0];
               patchReview(
-                review.id,
+                annotations[i].id,
                 load_time.current,
-                review.lead_time,
-                review_status.current ?? review.annotation_status,
+                annotations[i].lead_time,
+                annotations[i].annotation_status,
                 labelConfig.project_type === "SingleSpeakerAudioTranscriptionEditing"
                   ? annotation.serializeAnnotation()
                   : temp,
-                review.parent_annotation,
+                annotations[i].parent_annotation,
                 reviewNotesRef.current.value
               ).then((res) => {
                 if (res.status !== 200) {

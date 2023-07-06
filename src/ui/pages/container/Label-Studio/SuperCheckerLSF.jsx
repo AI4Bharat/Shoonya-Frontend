@@ -94,12 +94,9 @@ const filterAnnotations = (annotations, user) => {
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unvalidated") {
-      filteredAnnotations =
-        userAnnotation.result.length > 0
-          ? annotations.filter(
-              (annotation) => annotation.id === userAnnotation.parent_annotation
-            )
-          : annotations.filter((value) => value.annotation_type === 2);
+      filteredAnnotations = userAnnotation.result.length > 0
+        ? [userAnnotation]
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation);
     } else if (
       ["validated", "validated_with_changes", "draft"].includes(
         userAnnotation.annotation_status
@@ -579,18 +576,15 @@ const LabelStudioWrapper = ({
                   temp[i].value.text = [temp[i].value.text[0]];
                 }
               }
-              let superChecker = annotations.filter(
-                (value) => value.annotation_type === 3
-              )[0];
               patchSuperChecker(
-                superChecker.id,
+                annotations[i].id,
                 load_time.current,
-                superChecker.lead_time,
-                review_status.current ?? superChecker.annotation_status,
+                annotations[i].lead_time,
+                annotations[i].annotation_status,
                 projectType === "SingleSpeakerAudioTranscriptionEditing"
                   ? annotation.serializeAnnotation()
                   : temp,
-                superChecker.parent_annotation,
+                annotations[i].parent_annotation,
                 superCheckerNotesRef.current.value
               ).then((res) => {
                 if (res.status !== 200) {
