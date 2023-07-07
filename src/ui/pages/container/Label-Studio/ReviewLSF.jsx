@@ -27,6 +27,9 @@ import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSug
 import InfoIcon from "@mui/icons-material/Info";
 import getCaretCoordinates from "textarea-caret";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+
 
 import {
   getProjectsandTasks,
@@ -41,7 +44,7 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from "./lsf.module.css";
 import "./lsf.css";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 
 const StyledMenu = styled((props) => (
@@ -211,6 +214,7 @@ const LabelStudioWrapper = ({
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
   const [snackbar, setSnackbarInfo] = useState({
@@ -647,6 +651,12 @@ const LabelStudioWrapper = ({
   };
 
   // we're running an effect on component mount and rendering LSF inside rootRef node
+
+  useEffect(()=>{
+    const projectObj = new GetProjectDetailsAPI(projectId);
+    dispatch(APITransport(projectObj));
+  },[])
+
   useEffect(() => {
     if (localStorage.getItem("rtl") === "true") {
       var style = document.createElement("style");
@@ -1124,6 +1134,7 @@ export default function LSF() {
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
+
 
   // useEffect(() => {
   //   fetchAnnotation(taskId).then((data) => {
