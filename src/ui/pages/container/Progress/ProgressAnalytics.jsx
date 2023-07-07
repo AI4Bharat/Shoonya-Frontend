@@ -805,7 +805,7 @@ function ProgressList() {
           container
           direction="row"
           spacing={0}
-          sx={{ mb:3, ml: 1 }}
+          sx={{ mb:1, ml: 1 }}
         >
 
           <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
@@ -813,7 +813,7 @@ function ProgressList() {
               Select Report Type :
             </Typography>
           </Grid >
-          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}  >
+          <Grid item xs={12} sm={12} md={10} lg={10} xl={10}  >
             <FormControl >
 
               <RadioGroup
@@ -831,18 +831,19 @@ function ProgressList() {
               </RadioGroup>
             </FormControl>
           </Grid >
-          <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
-            <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
+        </Grid>
+        <Grid  container   mb={4} >
+        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}  sx={{display:"flex",ml:1}} >
+            <Typography gutterBottom component="div" sx={{fontSize: "16px",mt:1, }}>
               Meta-info based stats:
             </Typography>
-          </Grid >
-          <Grid item xs={1} sm={1} md={1} lg={1} xl={1}  >
             <Checkbox
+            sx={{ml:3}}
               onChange={(e) => setMetaInfo(e.target.checked)} 
               checked={metaInfo}
             />
           </Grid >
-        </Grid>
+          </Grid>
             <Grid container columnSpacing={3} rowSpacing={2}  mb={1}>
 
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
