@@ -11,6 +11,7 @@ import {
   Alert,
   Popover,
   Autocomplete,
+  Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -26,6 +27,9 @@ import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSug
 import InfoIcon from "@mui/icons-material/Info";
 import getCaretCoordinates from "textarea-caret";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+
 
 import {
   getProjectsandTasks,
@@ -40,7 +44,7 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from "./lsf.module.css";
 import "./lsf.css";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 
 const StyledMenu = styled((props) => (
@@ -105,13 +109,10 @@ const filterAnnotations = (
   );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
-      filteredAnnotations =
-        userAnnotation.result.length > 0
-          ? annotations.filter(
-              (annotation) => annotation.id === userAnnotation.parent_annotation
-            )
-          : annotations.filter((value) => value.annotation_type === 1);
-    }else if (
+      filteredAnnotations = userAnnotation.result.length > 0
+        ? [userAnnotation]
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation);
+    } else if (
       userAnnotation &&
       [
         "rejected"
@@ -196,6 +197,8 @@ const filterAnnotations = (
 
 //used just in postAnnotation to support draft status update.
 
+const AUTO_SAVE_INTERVAL = 60000;
+
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -211,6 +214,7 @@ const LabelStudioWrapper = ({
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
   const [snackbar, setSnackbarInfo] = useState({
@@ -219,6 +223,9 @@ const LabelStudioWrapper = ({
     variant: "success",
   });
   const [taskData, setTaskData] = useState(undefined);
+  const [annotations, setAnnotations] = useState([]);
+  const load_time = useRef();
+  const [autoSave, setAutoSave] = useState(true);
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -293,7 +300,6 @@ const LabelStudioWrapper = ({
     superCheckerNotesRef,
     projectType
   ) {
-    let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
 
@@ -357,6 +363,8 @@ const LabelStudioWrapper = ({
       ];
     }
 
+    if(disableLSFControls) setAutoSave(false);
+
     if (rootRef.current) {
       if (lsfRef.current) {
         lsfRef.current.destroy();
@@ -405,7 +413,7 @@ const LabelStudioWrapper = ({
           //   ls.annotationStore.selectAnnotation(c.id);
           // }
           // }
-          load_time = new Date();
+          load_time.current = new Date();
         },
 
         onSkipTask: function (annotation) {
@@ -415,7 +423,7 @@ const LabelStudioWrapper = ({
             showLoader();
             patchReview(
               review.id,
-              load_time,
+              load_time.current,
               review.lead_time,
               "skipped",
               reviewNotesRef.current.value
@@ -528,6 +536,7 @@ const LabelStudioWrapper = ({
                 annotation.serializeAnnotation()[0].id ===
                   annotations[i].result[0].id
               ) {
+                setAutoSave(false);
                 showLoader();
                 let temp = annotation.serializeAnnotation();
 
@@ -542,7 +551,7 @@ const LabelStudioWrapper = ({
                 )[0];
                 patchReview(
                   review.id,
-                  load_time,
+                  load_time.current,
                   review.lead_time,
                   review_status.current,
                   projectType === "SingleSpeakerAudioTranscriptionEditing"
@@ -642,6 +651,12 @@ const LabelStudioWrapper = ({
   };
 
   // we're running an effect on component mount and rendering LSF inside rootRef node
+
+  useEffect(()=>{
+    const projectObj = new GetProjectDetailsAPI(projectId);
+    dispatch(APITransport(projectObj));
+  },[])
+
   useEffect(() => {
     if (localStorage.getItem("rtl") === "true") {
       var style = document.createElement("style");
@@ -668,6 +683,7 @@ const LabelStudioWrapper = ({
               ? conversationVerificationLabelConfig(taskData.data)
               : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
+          setAnnotations(annotations);
           setTaskData(taskData);
           getTaskData(taskData);
           LSFRoot(
@@ -791,6 +807,85 @@ const LabelStudioWrapper = ({
     showLoader();
   }, [taskId]);
 
+  const autoSaveReview = () => {
+    if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+      if(taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            (!annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id) && annotations[i].annotation_type === 2
+          ) {
+              let temp = annotation.serializeAnnotation();
+              for (let i = 0; i < temp.length; i++) {
+                if (temp[i].value.text) {
+                  temp[i].value.text = [temp[i].value.text[0]];
+                }
+              }
+              patchReview(
+                annotations[i].id,
+                load_time.current,
+                annotations[i].lead_time,
+                annotations[i].annotation_status,
+                labelConfig.project_type === "SingleSpeakerAudioTranscriptionEditing"
+                  ? annotation.serializeAnnotation()
+                  : temp,
+                annotations[i].parent_annotation,
+                reviewNotesRef.current.value
+              ).then((res) => {
+                if (res.status !== 200) {
+                  setSnackbarInfo({
+                    open: true,
+                    message: "Error in autosaving annotation",
+                    variant: "error",
+                  });
+                }
+              });
+            }
+          }
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
+  };
+
+  let hidden, visibilityChange;
+  if (typeof document.hidden !== 'undefined') {
+    hidden = 'hidden';
+    visibilityChange = 'visibilitychange';
+  } else if (typeof document.msHidden !== 'undefined') {
+    hidden = 'msHidden';
+    visibilityChange = 'msvisibilitychange';
+  } else if (typeof document.webkitHidden !== 'undefined') {
+    hidden = 'webkitHidden';
+    visibilityChange = 'webkitvisibilitychange';
+  }
+
+  const [visible, setVisibile] = useState(!document[hidden]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => setVisibile(!document[hidden]);
+    document.addEventListener(visibilityChange, handleVisibilityChange);
+    return () => {
+        document.removeEventListener(visibilityChange, handleVisibilityChange);
+    }
+  }, []);
+
+  useEffect(() => {
+    !visible && autoSaveReview();
+  }, [visible]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      visible && autoSaveReview();
+      }, AUTO_SAVE_INTERVAL);
+    return () => clearInterval(interval);
+  }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
+
   const onNextAnnotation = async () => {
     showLoader();
     getNextProject(projectId, taskId, "review").then((res) => {
@@ -837,6 +932,12 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
+      {autoSave &&
+        <div style={{ textAlign: "left", marginBottom: "15px" }}>
+          <Typography variant="body" color="#000000">
+            Auto-save enabled for this scenario.
+          </Typography>
+        </div>}
       {filterMessage && (
         <Alert severity="info" showIcon style={{ marginBottom: "1%" }}>
           {filterMessage}
@@ -1033,6 +1134,7 @@ export default function LSF() {
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
+
 
   // useEffect(() => {
   //   fetchAnnotation(taskId).then((data) => {
