@@ -196,7 +196,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
     case addUserTypes.MANAGER:
       const addManagerObj = new AssignManagerToWorkspaceAPI(
         id,
-        [users.id],
+        users.map((user) => user.id),
       );
       const assignManagerRes = await fetch(addManagerObj.apiEndPoint(), {
         method: "POST",
@@ -224,7 +224,7 @@ const AddUsersDialog = ({
   id,
 }) => {
   const [availableUsers, setAvailableUsers] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState(userType === addUserTypes.MANAGER ? null : []);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const projectDetails = useSelector((state) => state.getProjectDetails?.data);
   const workspaceAnnotators = useSelector((state) => state.getWorkspacesAnnotatorsData?.data);
@@ -250,7 +250,7 @@ const AddUsersDialog = ({
     }
     if (id) fetchAllUsers(userType, id, dispatch);
   }, [userType, id, projectDetails])
-
+ console.log(selectedUsers);
   useEffect(() => {
     setAvailableUsers(getAvailableUsers(userType, projectDetails, workspaceAnnotators, workspaceDetails?.managers, orgUsers));
     console.log(getAvailableUsers(userType, projectDetails, workspaceAnnotators, orgUsers));
@@ -267,7 +267,6 @@ const AddUsersDialog = ({
   };
 
   const dialogCloseHandler = () => {
-    setSelectedUsers(userType === addUserTypes.MANAGER ? null : []);
     handleDialogClose();
   };
 
@@ -279,7 +278,7 @@ const AddUsersDialog = ({
           Select users to be added.
         </DialogContentText>
         <Autocomplete
-          multiple={userType !== addUserTypes.MANAGER}
+          multiple
           limitTags={3}
           onChange={(e, newVal) => setSelectedUsers(newVal)}
           options={availableUsers}
