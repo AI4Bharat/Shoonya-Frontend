@@ -107,6 +107,7 @@ export default function DatasetSettings() {
     UploadFile.append("dataset", file);
     UploadFile.append("filetype", filetype);
     UploadFile.append("deduplicate", switchs);
+    setLoading(true);
     const projectObj = new UploaddataAPI(datasetId,UploadFile);
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
@@ -159,7 +160,7 @@ export default function DatasetSettings() {
           padding: 4,
         }}
       >
-        <Grid container direction="row" columnSpacing={1} rowSpacing={2}>
+        <Grid container direction="row" columnSpacing={1} rowSpacing={2} justifyContent="center" alignItems="center">
           {loading ? (
             <CircularProgress />
           ) : (
