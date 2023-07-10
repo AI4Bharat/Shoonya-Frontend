@@ -418,9 +418,7 @@ const MembersTable = (props) => {
           onClick={handleUserDialogOpen}
         />
       ) : null}
-      {/* <Grid sx={{ mb: 1 }}>
-          <Search />
-      </Grid> */}
+  
       {props.type === "organization" ? (
         <InviteUsersDialog
           handleDialogClose={handleUserDialogClose}
@@ -441,11 +439,9 @@ const MembersTable = (props) => {
         />
       )}
       {renderSnackBar()}
-      {(props.type === "organization" || props.type === addUserTypes.PROJECT_SUPERCHECKER || props.type === addUserTypes.PROJECT_REVIEWER || props.type === addUserTypes.PROJECT_ANNOTATORS || hideButton) && (
         <Grid sx={{ mb: 1 }}>
           <Search />
         </Grid>
-      )}
 
       <ThemeProvider theme={tableTheme} sx={{ marginTop: "20px" }}>
         <MUIDataTable
