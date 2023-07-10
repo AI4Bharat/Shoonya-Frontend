@@ -441,11 +441,11 @@ const MembersTable = (props) => {
         />
       )}
       {renderSnackBar()}
-      {(props.type === "organization" || hideButton) && (
+      {/* {(props.type === "organization" || hideButton) && (
         <Grid sx={{ mb: 1 }}>
           <Search />
         </Grid>
-      )}
+      )} */}
 
       <ThemeProvider theme={tableTheme} sx={{ marginTop: "20px" }}>
         <MUIDataTable
