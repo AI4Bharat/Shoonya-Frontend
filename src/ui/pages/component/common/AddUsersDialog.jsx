@@ -233,7 +233,6 @@ const AddUsersDialog = ({
   const orgUsers = useSelector((state) => state.getOrganizationUsers?.data);
   const dispatch = useDispatch();
 
-  console.log(workspaceAnnotators,"workspaceAnnotatorsworkspaceAnnotators", projectDetails?.annotation_reviewers?.id === workspaceAnnotators?.id)
 
   useEffect(() => {
     let id = '';
@@ -255,7 +254,6 @@ const AddUsersDialog = ({
 
   useEffect(() => {
     setAvailableUsers(getAvailableUsers(userType, projectDetails, workspaceAnnotators, workspaceDetails?.managers, orgUsers));
-    console.log(getAvailableUsers(userType, projectDetails, workspaceAnnotators, orgUsers),"setAvailableUserssetAvailableUsers");
   }, [projectDetails, workspaceAnnotators, workspaceDetails, orgUsers])
 
   const addBtnClickHandler = async () => {
