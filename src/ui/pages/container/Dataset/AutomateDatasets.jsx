@@ -22,8 +22,8 @@ const AutomateDatasets = () => {
     <ThemeProvider theme={themeDefault}>
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <Tabs value={selectedTab} onChange={handleTabChange} >
-        <Tab label="Inter-Automate Datasets" />
-        <Tab label="Intra-Automate Datasets" />
+        <Tab label="Inter-Automate Datasets" sx={{ fontSize: 16, fontWeight: '700' }}/>
+        <Tab label="Intra-Automate Datasets" sx={{ fontSize: 16, fontWeight: '700' }} />
       </Tabs>
       {selectedTab === 0 && <InterAutomateDataset/>}
       {selectedTab === 1 && <IntraAutomateDataset />}

@@ -227,7 +227,7 @@ const Login = () => {
   };
   const renderCardContent = () => (
     <CustomCard title={"Sign in to Shoonya"} cardContent={TextFields()}>
-      <Grid container spacing={2} style={{ width: "100%" }}>
+      <Grid container spacing={2} style={{ width: "100%" ,cursor: "pointer"}}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} textAlign={"right"}>
           <Link onClick={() => navigate("/forgot-password")}>
             {translate("forgotPassword")}
