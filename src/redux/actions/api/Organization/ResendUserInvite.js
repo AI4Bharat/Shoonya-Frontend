@@ -7,7 +7,7 @@ export default class ResendUserInviteAPI extends API {
    constructor(email, timeout = 2000) {
      super("POST", timeout, false);
      this.email = email
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.authUsers}invite/regenerate/`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}invite/regenerate/`;
    }  
  
    processResponse(res) {
@@ -23,7 +23,7 @@ export default class ResendUserInviteAPI extends API {
 
    getBody() {
     return {
-      email : this.email
+      emails : this.email
     } 
 }
 

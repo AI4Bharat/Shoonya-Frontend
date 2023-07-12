@@ -213,13 +213,13 @@ const MembersTable = (props) => {
     if (res.ok) {
       setSnackbarInfo({
         open: true,
-        message: resp?.email,
+        message: resp?.message,
         variant: "success",
       });
     } else {
       setSnackbarInfo({
         open: true,
-        message: resp?.email,
+        message: resp?.message,
         variant: "error",
       });
     }

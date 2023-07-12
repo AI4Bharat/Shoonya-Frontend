@@ -107,10 +107,9 @@ const DetailsViewPage = (props) => {
     // getDashboardWorkspaceData();
   }, []);
   const getWorkspaceDetails = () => {
-    const workspaceObj = new GetWorkspacesDetailsAPI(id);
+    const workspaceObj = new GetWorkspacesDetailsAPI(orgId);
     dispatch(APITransport(workspaceObj));
   };
-
   useEffect(() => {
     getWorkspaceDetails();
   }, []);
