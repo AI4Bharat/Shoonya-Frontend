@@ -84,6 +84,7 @@ const addLabel = {
   [addUserTypes.PROJECT_SUPERCHECKER]: "Add SuperChecker to Project",
 };
 
+
 const MembersTable = (props) => {
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const { orgId, id } = useParams();
@@ -213,13 +214,13 @@ const MembersTable = (props) => {
     if (res.ok) {
       setSnackbarInfo({
         open: true,
-        message: resp?.email,
+        message: resp?.message,
         variant: "success",
       });
     } else {
       setSnackbarInfo({
         open: true,
-        message: resp?.email,
+        message: resp?.message,
         variant: "error",
       });
     }
