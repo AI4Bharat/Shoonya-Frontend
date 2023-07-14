@@ -765,15 +765,15 @@ function ProgressAnalytics() {
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
-      <Card
+      {/* <Card
         sx={{
           width: "100%",
           minHeight: 500,
           padding: 3
         }}
-      >
+      > */}
 
-        <Box >
+        {/* <Box > */}
           <Grid
             container
             direction="row"
@@ -1120,8 +1120,8 @@ function ProgressAnalytics() {
             </>
           }
 
-        </Box>
-      </Card>
+        {/* </Box> */}
+      {/* </Card> */}
     </ThemeProvider>
   )
 }

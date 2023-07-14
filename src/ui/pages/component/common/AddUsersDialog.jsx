@@ -80,7 +80,7 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
           return workspaceAnnotators
             .filter(
               (workspaceAnnotator) =>
-                projectDetails?.annotation_reviewers.findIndex(
+                projectDetails?.review_supercheckers.findIndex(
                   (projectUser) => projectUser?.id === workspaceAnnotator?.id
                 ) === -1   && (workspaceAnnotator?.role != 1 && workspaceAnnotator?.role != 2 ) 
             ) 
@@ -233,6 +233,7 @@ const AddUsersDialog = ({
   const orgUsers = useSelector((state) => state.getOrganizationUsers?.data);
   const dispatch = useDispatch();
 
+
   useEffect(() => {
     let id = '';
     switch (userType) {
@@ -253,7 +254,6 @@ const AddUsersDialog = ({
  console.log(selectedUsers);
   useEffect(() => {
     setAvailableUsers(getAvailableUsers(userType, projectDetails, workspaceAnnotators, workspaceDetails?.managers, orgUsers));
-    console.log(getAvailableUsers(userType, projectDetails, workspaceAnnotators, orgUsers));
   }, [projectDetails, workspaceAnnotators, workspaceDetails, orgUsers])
 
   const addBtnClickHandler = async () => {
