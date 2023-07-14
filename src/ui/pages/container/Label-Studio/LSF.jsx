@@ -683,7 +683,6 @@ const LabelStudioWrapper = ({
                 annotations[i].lead_time,
                 annotations[i].annotation_status,
                 annotationNotesRef.current.value,
-                annotations[i].updated_at,
                 true
               ).then((res) => {
                 if (res.status !== 200) {

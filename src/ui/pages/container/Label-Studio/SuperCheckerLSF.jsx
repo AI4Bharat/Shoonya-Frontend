@@ -586,7 +586,6 @@ const LabelStudioWrapper = ({
                   : temp,
                 annotations[i].parent_annotation,
                 superCheckerNotesRef.current.value,
-                annotations[i].updated_at,
                 true
               ).then((res) => {
                 if (res.status !== 200) {

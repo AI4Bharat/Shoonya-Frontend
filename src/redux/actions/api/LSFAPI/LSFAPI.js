@@ -103,7 +103,6 @@ const patchAnnotation = async (
   lead_time,
   annotation_status,
   notes,
-  updated_at,
   autoSave=false
 ) => {
   try {
@@ -114,7 +113,7 @@ const patchAnnotation = async (
         annotation_status: annotation_status,
       }),
       annotation_notes: notes,
-      ...(autoSave && { updated_at: updated_at }),
+      ...(autoSave && { auto_save: true }),
     });
     return res;
   } catch (err) {
@@ -130,7 +129,6 @@ const patchReview = async (
   result,
   parentAnnotation,
   reviewnotes,
-  updated_at,
   autoSave=false
 ) => {
   try {
@@ -149,7 +147,7 @@ const patchReview = async (
         parent_annotation: parentAnnotation,
         review_notes: reviewnotes,
       }),
-      ...(autoSave && { updated_at: updated_at }),
+      ...(autoSave && { auto_save: true }),
     });
     // if (review_status === "to_be_revised") {
     //   await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
@@ -170,7 +168,6 @@ const patchSuperChecker = async (
   result,
   parentAnnotation,
   superchecknotes,
-  updated_at,
   autoSave=false
 ) => {
   console.log(superchecknotes,"superchecknotes")
@@ -181,7 +178,7 @@ const patchSuperChecker = async (
       result: result,
       parent_annotation: parentAnnotation,
       supercheck_notes:superchecknotes,
-      ...(autoSave && { updated_at: updated_at }),
+      ...(autoSave && { auto_save: true }),
     });
    
   } catch (err) {
