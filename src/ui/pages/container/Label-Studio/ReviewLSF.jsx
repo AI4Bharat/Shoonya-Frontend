@@ -832,7 +832,9 @@ const LabelStudioWrapper = ({
                   ? annotation.serializeAnnotation()
                   : temp,
                 annotations[i].parent_annotation,
-                reviewNotesRef.current.value
+                reviewNotesRef.current.value,
+                annotations[i].updated_at,
+                true
               ).then((res) => {
                 if (res.status !== 200) {
                   setSnackbarInfo({

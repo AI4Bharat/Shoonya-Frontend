@@ -682,7 +682,9 @@ const LabelStudioWrapper = ({
                 load_time.current,
                 annotations[i].lead_time,
                 annotations[i].annotation_status,
-                annotationNotesRef.current.value
+                annotationNotesRef.current.value,
+                annotations[i].updated_at,
+                true
               ).then((res) => {
                 if (res.status !== 200) {
                   setSnackbarInfo({
