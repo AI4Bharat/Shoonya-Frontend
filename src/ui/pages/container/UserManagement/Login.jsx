@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector,useDispatch} from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import CustomButton from "../../component/common/Button";
@@ -56,7 +56,7 @@ const Login = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
     dispatch(APITransport(loggedInUserObj));
   };
-  
+
   const keyPress = (e) => {
     if (e.code === "Enter") {
       if (!isPressed) {
@@ -69,7 +69,7 @@ const Login = () => {
   const keyRelease = () => {
     setIsPressed(false);
   };
-  console.log(userRole.Annotator === loggedInUserData?.role,"userroles")
+  console.log(userRole.Annotator === loggedInUserData?.role, "userroles")
   useEffect(() => {
     window.addEventListener("keydown", keyPress);
     window.addEventListener("keyup", keyRelease);
@@ -88,10 +88,10 @@ const Login = () => {
   //     console.log("projects","projectsprojectsprojectsprojects")
   //   }
   // }, [loggedInUserData]);
-  
+
   useEffect(() => {
     if (loggedInUserData && accessToken && refreshToken) {
-        navigate("/projects");
+      navigate("/projects");
     }
   }, [loggedInUserData]);
 
@@ -125,7 +125,7 @@ const Login = () => {
   //         }else{
   //           navigate("/projects");
   //         }
-         
+
   //       }
   //     })
   //     .catch((error) => {
@@ -149,18 +149,19 @@ const Login = () => {
     if (res.ok) {
       // localStorage.setItem("token", resp.access);
       // localStorage.setItem("user_id", rsp_data.user_id);
-     localStorage.setItem("shoonya_access_token", rsp_data.access);
-     localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
+      localStorage.setItem("shoonya_access_token", rsp_data.access);
+      localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
       getLoggedInUserData();
       // setLoading(false);
-    } else {
+    } else{
       setSnackbarInfo({
         open: true,
-        message: rsp_data?.detail,
+        message: rsp_data?.message,
         variant: "error",
-      });
-      // setLoading(false);
+      })
     }
+
+    // setLoading(false);
   };
 
   const handleFieldChange = (event) => {
@@ -254,7 +255,7 @@ const Login = () => {
     </CustomCard>
   );
 
-  
+
 
   const renderSnackBar = () => {
     return (
@@ -289,7 +290,7 @@ const Login = () => {
           </form>
         </Grid>
         {renderSnackBar()}
-       
+
       </Grid>
     </ThemeProvider>
   );
