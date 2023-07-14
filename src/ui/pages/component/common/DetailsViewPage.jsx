@@ -110,8 +110,12 @@ const DetailsViewPage = (props) => {
     const workspaceObj = new GetWorkspacesDetailsAPI(orgId);
     dispatch(APITransport(workspaceObj));
   };
-  useEffect(() => {
-    getWorkspaceDetails();
+
+   useEffect(() => {
+    if( pageType === "organization"){
+      getWorkspaceDetails();
+    }
+    
   }, []);
 
   let navigate = useNavigate();
