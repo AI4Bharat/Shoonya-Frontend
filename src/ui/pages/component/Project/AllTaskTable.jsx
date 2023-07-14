@@ -33,7 +33,9 @@ const excludeCols = [
   "speakers_json",
   "language",
   "unverified_conversation_json",
+  "ocr_prediction_json",
 ];
+
 const excludeSearch = ["status", "actions"];
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
