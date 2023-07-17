@@ -96,7 +96,7 @@ const filterAnnotations = (annotations, user) => {
     if (userAnnotation.annotation_status === "unvalidated") {
       filteredAnnotations = userAnnotation.result.length > 0
         ? [userAnnotation]
-        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation);
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 2);
     } else if (
       ["validated", "validated_with_changes", "draft"].includes(
         userAnnotation.annotation_status

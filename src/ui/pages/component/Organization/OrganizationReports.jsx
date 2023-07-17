@@ -289,8 +289,6 @@ const OrganizationReports = () => {
       const projectReportObj = new GetOrganizationProjectReportsAPI(
         orgId,
         selectedType,
-        format(selectRange[0].startDate, 'yyyy-MM-dd'),
-        format(selectRange[0].endDate, 'yyyy-MM-dd'),
         targetLanguage,
       );
       dispatch(APITransport(projectReportObj));
@@ -442,18 +440,20 @@ const OrganizationReports = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <Button
-            endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-            variant="contained"
-            color="primary"
-            onClick={() => setShowPicker(!showPicker)}
-            sx={{width:"130px"}}
-          >
-            Pick Dates
-          </Button>
-        </Grid>
-
+        {radiobutton == "UsersReports" &&
+         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+         <Button
+           endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+           variant="contained"
+           color="primary"
+           onClick={() => setShowPicker(!showPicker)}
+           sx={{width:"130px"}}
+         >
+           Pick Dates
+         </Button>
+       </Grid>
+        }
+       
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
           <Button
             fullWidth
