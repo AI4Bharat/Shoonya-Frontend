@@ -96,6 +96,7 @@ const filterAnnotations = (
   setDisableBtns,
   setFilterMessage,
   setDisableButton,
+  taskData,
 ) => {
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
@@ -109,7 +110,7 @@ const filterAnnotations = (
   );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
-      filteredAnnotations = userAnnotation.result.length > 0
+      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.review_count
         ? [userAnnotation]
         : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 1);
     } else if (
@@ -308,7 +309,8 @@ const LabelStudioWrapper = ({
       userData,
       setDisableBtns,
       setFilterMessage,
-      setDisableButton
+      setDisableButton,
+      taskData
     );
     if (taskData.task_status === "freezed") {
       interfaces = [
