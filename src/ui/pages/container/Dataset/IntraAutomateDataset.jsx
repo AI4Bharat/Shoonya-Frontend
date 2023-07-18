@@ -222,7 +222,7 @@ const IntraAutomateDataset = () => {
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-              <FormControl sx={{ m: 1, width: 300 }}>
+              <FormControl fullWidth>
                 <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
                 <Select
                   labelId="demo-multiple-checkbox-label"
