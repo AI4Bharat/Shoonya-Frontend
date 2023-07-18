@@ -111,7 +111,7 @@ const filterAnnotations = (
     if (userAnnotation.annotation_status === "unreviewed") {
       filteredAnnotations = userAnnotation.result.length > 0
         ? [userAnnotation]
-        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation);
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 1);
     } else if (
       userAnnotation &&
       [
