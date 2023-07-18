@@ -324,7 +324,8 @@ const LabelStudioWrapper = ({
       ];
     }
 
-    if(disableLSFControls) setAutoSave(false);
+    if(disableLSFControls || !taskData?.annotation_users?.some(
+      (user) => user === userData.id)) setAutoSave(false);
 
     if (rootRef.current) {
       if (lsfRef.current) {
