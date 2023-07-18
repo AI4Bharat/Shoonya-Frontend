@@ -320,7 +320,8 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -346,7 +347,8 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
