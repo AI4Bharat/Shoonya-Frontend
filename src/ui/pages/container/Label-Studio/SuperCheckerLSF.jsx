@@ -89,7 +89,7 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-const filterAnnotations = (annotations, user) => {
+const filterAnnotations = (annotations, user, taskData) => {
   let disableSkip = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
@@ -97,7 +97,7 @@ const filterAnnotations = (annotations, user) => {
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unvalidated") {
-      filteredAnnotations = userAnnotation.result.length > 0
+      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.super_check_count
         ? [userAnnotation]
         : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 2);
     } else if (
@@ -224,7 +224,7 @@ const LabelStudioWrapper = ({
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData);
+    const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData, taskData);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -596,7 +596,8 @@ const LabelStudioWrapper = ({
                   ? annotation.serializeAnnotation()
                   : temp,
                 annotations[i].parent_annotation,
-                superCheckerNotesRef.current.value
+                superCheckerNotesRef.current.value,
+                true
               ).then((res) => {
                 if (res.status !== 200) {
                   setSnackbarInfo({
