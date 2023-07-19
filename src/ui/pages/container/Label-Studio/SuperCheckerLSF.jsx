@@ -225,6 +225,7 @@ const LabelStudioWrapper = ({
     let interfaces = [];
     if (predictions == null) predictions = [];
     const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData, taskData);
+    if(disableSkip) setAutoSave(false);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
