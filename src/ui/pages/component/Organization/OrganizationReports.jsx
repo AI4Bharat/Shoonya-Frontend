@@ -423,7 +423,7 @@ const OrganizationReports = () => {
             >
               <MenuItem value={1}>Full-time</MenuItem>
               <MenuItem value={2}>Part-time</MenuItem>
-              <MenuItem value={3}>Contract-Basis</MenuItem>
+              <MenuItem value={4}>Contract-Basis</MenuItem>
             </Select>
           </FormControl>
         </Grid>}
