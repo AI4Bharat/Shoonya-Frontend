@@ -22,6 +22,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import GetWorkspaceUserReportsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceUserReports";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetWorkspaceProjectReportAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProjectReports";
+import SendWorkspaceUserReportsAPI from "../../../../redux/actions/api/WorkspaceDetails/SendWorkspaceUserReports";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
@@ -31,16 +32,18 @@ import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { MenuProps } from "../../../../utils/utils";
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
 const WorkspaceReports = () => {
   const WorkspaceDetails = useSelector(
     (state) => state.getWorkspaceDetails.data
   );
+  const UserDetails = useSelector(state => state.fetchLoggedInUserData.data);
   const [selectRange, setSelectRange] = useState([{
     startDate: new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
     endDate: new Date(),
     key: "selection"
-}]);
+  }]);
   // const [rangeValue, setRangeValue] = useState([
   //   format(
   //     Date.parse(WorkspaceDetails?.created_at, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
@@ -51,6 +54,7 @@ const WorkspaceReports = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
+  const [participationTypes, setParticipationTypes] = useState([]);
   const [reportType, setReportType] = useState("project");
   const [language, setLanguage] = useState("all");
   const [columns, setColumns] = useState([]);
@@ -60,6 +64,11 @@ const WorkspaceReports = () => {
   const [reportRequested, setReportRequested] = useState(false);
   const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
   const classes = DatasetStyle();
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
 
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -81,16 +90,24 @@ const WorkspaceReports = () => {
   }, []);
 
   useEffect(() => {
-    if (ProjectTypes) {
+    if(reportType === "payment") {
+      setProjectTypes([
+        "AudioTranscription",
+        "AudioTranscriptionEditing",
+        "ConversationTranslation",
+        "ConversationTranslationEditing"
+      ]);
+      setSelectedType("AudioTranscription");
+    } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
         let subTypes = Object.keys(ProjectTypes[key]["project_types"]);
         types.push(...subTypes);
       });
       setProjectTypes(types);
-      setSelectedType(types[0]);
+      setSelectedType(types[3]);
     }
-  }, [ProjectTypes]);
+  }, [ProjectTypes, reportType]);
 
   useEffect(() => {
     if (reportRequested && UserReports?.length) {
@@ -189,34 +206,65 @@ const WorkspaceReports = () => {
     console.log(selection, "selection"); 
   };
   const handleDateSubmit = () => {
-    setShowPicker(false);
-    setReportRequested(true);
-    if (reportType === "user") {
-      const userReportObj = new GetWorkspaceUserReportsAPI(
+    if(reportType === "payment") {
+      const userReportObj = new SendWorkspaceUserReportsAPI(
         id,
+        UserDetails.id,
         selectedType,
-        format(selectRange[0].startDate, 'yyyy-MM-dd'),
-        format(selectRange[0].endDate, 'yyyy-MM-dd'),
-        language,
-        radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
+        participationTypes,
       );
       dispatch(APITransport(userReportObj));
-      setShowSpinner(true);
-    } else if (reportType === "project") {
-      const projectReportObj = new GetWorkspaceProjectReportAPI(
-        id,
-        selectedType,
-       
-        language,
-        radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
-      );
-      dispatch(APITransport(projectReportObj));
-      setShowSpinner(true);
+      setSnackbarInfo({
+        open: true,
+        message: "Report will be e-mailed to you shortly",
+        variant: "success",
+      })
     }
+    else {
+      setShowPicker(false);
+      setReportRequested(true);
+      if (reportType === "user") {
+        const userReportObj = new GetWorkspaceUserReportsAPI(
+          id,
+          selectedType,
+          format(selectRange[0].startDate, 'yyyy-MM-dd'),
+          format(selectRange[0].endDate, 'yyyy-MM-dd'),
+          language,
+          radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
+        );
+        dispatch(APITransport(userReportObj));
+        setShowSpinner(true);
+      } else if (reportType === "project") {
+        const projectReportObj = new GetWorkspaceProjectReportAPI(
+          id,
+          selectedType,
+        
+          language,
+          radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
+        );
+        dispatch(APITransport(projectReportObj));
+        setShowSpinner(true);
+      }
+    }
+  };
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
   };
 
   return (
     <React.Fragment>
+      {renderSnackBar()}
       <Grid
         container
         direction="row"
@@ -238,7 +286,7 @@ const WorkspaceReports = () => {
           </Typography>
         </Grid >
         <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
-          <FormControl >
+          <FormControl disabled={reportType === "payment"}>
 
             <RadioGroup
               row
@@ -257,6 +305,32 @@ const WorkspaceReports = () => {
           </FormControl>
         </Grid >
         </Grid >
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={3}
+          lg={3}
+          xl={3}
+        >
+          <FormControl fullWidth size="small">
+            <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>
+              Report Type
+            </InputLabel>
+            <Select
+              labelId="report-type-label"
+              id="report-select"
+              value={reportType}
+              label="Report Type"
+              onChange={(e) => setReportType(e.target.value)}
+              MenuProps={MenuProps}
+            >
+              <MenuItem value={"user"}>User Reports</MenuItem>
+              <MenuItem value={"project"}>Project Reports</MenuItem>
+              <MenuItem value={"payment"}>Payment Reports (E-mail)</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
         <Grid
           item
           xs={12}
@@ -285,32 +359,7 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={12}
-          md={3}
-          lg={3}
-          xl={3}
-        >
-          <FormControl fullWidth size="small">
-            <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}>
-              Report Type
-            </InputLabel>
-            <Select
-              labelId="report-type-label"
-              id="report-select"
-              value={reportType}
-              label="Report Type"
-              onChange={(e) => setReportType(e.target.value)}
-              MenuProps={MenuProps}
-            >
-              <MenuItem value={"user"}>User Reports</MenuItem>
-              <MenuItem value={"project"}>Project Reports</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {reportType !== "payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>
               Target Language
@@ -331,7 +380,27 @@ const WorkspaceReports = () => {
               ))}
             </Select>
           </FormControl>
-        </Grid>
+        </Grid>}
+        {reportType === "payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="participation-type-label" sx={{ fontSize: "16px" }}>Participation Types</InputLabel>
+            <Select
+             style={{ zIndex: "0" }}
+             inputProps={{ "aria-label": "Without label" }}
+             MenuProps={MenuProps}
+              labelId="participation-type-label"
+              id="participation-select"
+              value={participationTypes}
+              label="Participation Type"
+              onChange={(e) => setParticipationTypes(e.target.value)}
+              multiple
+            >
+              <MenuItem value={1}>Full-time</MenuItem>
+              <MenuItem value={2}>Part-time</MenuItem>
+              <MenuItem value={4}>Contract-Basis</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>}
         {reportType === "user" && 
          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
          <Button 
@@ -353,7 +422,7 @@ const WorkspaceReports = () => {
             onClick={handleDateSubmit}
             sx={{width:"130px"}}
           >
-            Submit
+            {reportType === "payment" ? "E-mail CSV" : "Submit"}
           </Button>
         </Grid>
       </Grid>
