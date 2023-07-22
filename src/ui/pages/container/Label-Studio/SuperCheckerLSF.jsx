@@ -26,6 +26,9 @@ import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSug
 import InfoIcon from "@mui/icons-material/Info";
 import getCaretCoordinates from "textarea-caret";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+
 
 import {
   getProjectsandTasks,
@@ -40,7 +43,7 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from "./lsf.module.css";
 import "./lsf.css";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 
 const StyledMenu = styled((props) => (
@@ -86,7 +89,7 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-const filterAnnotations = (annotations, user) => {
+const filterAnnotations = (annotations, user, taskData) => {
   let disableSkip = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
@@ -94,9 +97,9 @@ const filterAnnotations = (annotations, user) => {
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unvalidated") {
-      filteredAnnotations = userAnnotation.result.length > 0
+      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.super_check_count
         ? [userAnnotation]
-        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation);
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 2);
     } else if (
       ["validated", "validated_with_changes", "draft"].includes(
         userAnnotation.annotation_status
@@ -137,6 +140,7 @@ const LabelStudioWrapper = ({
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
   const [snackbar, setSnackbarInfo] = useState({
@@ -220,7 +224,8 @@ const LabelStudioWrapper = ({
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData);
+    const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData, taskData);
+    if(disableSkip) setAutoSave(false);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -232,7 +237,8 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -257,7 +263,8 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -556,6 +563,11 @@ const LabelStudioWrapper = ({
     return () => clearInterval(interval);
   }, [annotations]); */
 
+  useEffect(()=>{
+    const projectObj = new GetProjectDetailsAPI(projectId);
+    dispatch(APITransport(projectObj));
+  },[])
+
   useEffect(() => {
     showLoader();
   }, [taskId]);
@@ -585,7 +597,8 @@ const LabelStudioWrapper = ({
                   ? annotation.serializeAnnotation()
                   : temp,
                 annotations[i].parent_annotation,
-                superCheckerNotesRef.current.value
+                superCheckerNotesRef.current.value,
+                true
               ).then((res) => {
                 if (res.status !== 200) {
                   setSnackbarInfo({
@@ -893,6 +906,7 @@ export default function LSF() {
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
       setSelectedTag(value);

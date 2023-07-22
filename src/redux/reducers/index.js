@@ -86,6 +86,7 @@ import wsCumulativeTasks from "./WorkspaceDetails/GetCumulativeTasks";
 import wsMetaAnalytics from "./WorkspaceDetails/GetMetaAnalytics";
 import wsPeriodicalTasks from "./WorkspaceDetails/GetPeriodicalTasks";
 import wsTaskAnalytics from "./WorkspaceDetails/GetTaskAnalytics";
+import sendOrganizationUserReports from "./Organization/SendOrganizationUserReports";
 
 const index = {
     apiStatus,
@@ -179,7 +180,7 @@ const index = {
     wsMetaAnalytics,
     wsPeriodicalTasks,
     wsTaskAnalytics,
-    
+    sendOrganizationUserReports,
     
 };
 

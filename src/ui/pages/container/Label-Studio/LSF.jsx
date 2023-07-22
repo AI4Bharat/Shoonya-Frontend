@@ -145,6 +145,9 @@ const filterAnnotations = (
     }
   } else if([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 1);
+    disable = true;
+    setDisableBtns(true);
+    disableSkip = true;
   }
   return [filteredAnnotations, disable, disableSkip];
 };
@@ -321,7 +324,8 @@ const LabelStudioWrapper = ({
       ];
     }
 
-    if(disableLSFControls) setAutoSave(false);
+    if(disableLSFControls || !taskData?.annotation_users?.some(
+      (user) => user === userData.id)) setAutoSave(false);
 
     if (rootRef.current) {
       if (lsfRef.current) {
@@ -682,7 +686,8 @@ const LabelStudioWrapper = ({
                 load_time.current,
                 annotations[i].lead_time,
                 annotations[i].annotation_status,
-                annotationNotesRef.current.value
+                annotationNotesRef.current.value,
+                true
               ).then((res) => {
                 if (res.status !== 200) {
                   setSnackbarInfo({

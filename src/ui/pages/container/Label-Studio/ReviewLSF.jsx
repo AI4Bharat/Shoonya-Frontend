@@ -96,6 +96,7 @@ const filterAnnotations = (
   setDisableBtns,
   setFilterMessage,
   setDisableButton,
+  taskData,
 ) => {
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
@@ -109,9 +110,9 @@ const filterAnnotations = (
   );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
-      filteredAnnotations = userAnnotation.result.length > 0
+      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.review_count
         ? [userAnnotation]
-        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation);
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 1);
     } else if (
       userAnnotation &&
       [
@@ -190,6 +191,8 @@ const filterAnnotations = (
     }
   } else if([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 2);
+    disable = true;
+    setDisableBtns(true);
     disableSkip = true;
   }
   return [filteredAnnotations, disable, disableSkip];
@@ -308,7 +311,8 @@ const LabelStudioWrapper = ({
       userData,
       setDisableBtns,
       setFilterMessage,
-      setDisableButton
+      setDisableButton,
+      taskData
     );
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -320,7 +324,8 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -346,7 +351,8 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "SingleSpeakerAudioTranscriptionEditing"
+        ...(projectType === "AudioTranscription" ||
+        projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -832,7 +838,8 @@ const LabelStudioWrapper = ({
                   ? annotation.serializeAnnotation()
                   : temp,
                 annotations[i].parent_annotation,
-                reviewNotesRef.current.value
+                reviewNotesRef.current.value,
+                true
               ).then((res) => {
                 if (res.status !== 200) {
                   setSnackbarInfo({
