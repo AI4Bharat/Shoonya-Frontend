@@ -34,6 +34,8 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { MenuProps } from "../../../../utils/utils";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 
+const ProgressType = [{name:"Annotation Stage",value: 1 }, {name:"Review Stage",value: 2} ,{name:"Super Check Stage",value: 3},{name:"All Stage", value : "AllStage"}]
+
 const WorkspaceReports = () => {
   const WorkspaceDetails = useSelector(
     (state) => state.getWorkspaceDetails.data
@@ -63,6 +65,8 @@ const WorkspaceReports = () => {
   const [reportData, setReportData] = useState([]);
   const [reportRequested, setReportRequested] = useState(false);
   const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
+  const [reportfilter, setReportfilter] = useState("AllStage");
+
   const classes = DatasetStyle();
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -81,6 +85,10 @@ const WorkspaceReports = () => {
   );
   
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
+
+  let ProgressTypeValue = "Annotation Stage"
+  const filterdata = ProgressType.filter(item => item.name !== ProgressTypeValue)
+  const FilterProgressType = radiobutton === "ReviewerReports" ?  filterdata : ProgressType
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -231,6 +239,7 @@ const WorkspaceReports = () => {
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           language,
           radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
+          reportfilter, 
         );
         dispatch(APITransport(userReportObj));
         setShowSpinner(true);
@@ -247,6 +256,11 @@ const WorkspaceReports = () => {
       }
     }
   };
+
+  const handleChangeprojectFilter = (event) => {
+    const value = event.target.value;
+    setReportfilter(value);
+  }
 
   const renderSnackBar = () => {
     return (
@@ -359,6 +373,27 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>
+        {reportType === "user" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small" disabled={radiobutton === "SuperCheckerReports"} >
+            <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Projects Filter</InputLabel>
+            <Select
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
+              labelId="project-type-label"
+              id="project-type-select"
+              value={reportfilter}
+              label="Projects Filter"
+              onChange={handleChangeprojectFilter}
+            >
+              {FilterProgressType.map((type, index) => (
+                <MenuItem value={type. value} key={index}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>}
         {reportType !== "payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>
