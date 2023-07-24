@@ -1,5 +1,5 @@
 
-import { Grid, ThemeProvider, Typography, Autocomplete, TextField } from "@mui/material";
+import { Grid, ThemeProvider, Typography, Autocomplete, TextField, FormControlLabel, Switch } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -34,15 +34,22 @@ const BasicWorkspaceSettings = (props) => {
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    
+    const [publicanalytics,setpublicanalytics] = useState(true)
    
-    const workspaceDetails = useSelector(state=>state.getWorkspaceDetails.data);
+
+
+    const handlepublicanalytics = async () => {
+        // setLoading(true);
+        setpublicanalytics((publicanalytics)=>!publicanalytics)
+      };
+
+    const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
     console.log('test')
     console.log(workspaceDetails)
-    const getWorkspaceDetails = ()=>{
+    const getWorkspaceDetails = () => {
         const workspaceObj = new GetWorkspacesDetailsAPI(id);
         dispatch(APITransport(workspaceObj));
-      }
+    }
 
     useEffect(() => {
         getWorkspaceDetails();
@@ -59,7 +66,8 @@ const BasicWorkspaceSettings = (props) => {
         const sendData = {
             workspace_name: newDetails.workspace_name,
             organization: workspaceDetails.organization,
-            is_archived: workspaceDetails.is_archived
+            is_archived: workspaceDetails.is_archived,
+            public_analytics: publicanalytics
         }
         const workspaceObj = new GetWorkspaceSaveButtonAPI(id, sendData);
         dispatch(APITransport(workspaceObj));
@@ -170,6 +178,33 @@ const BasicWorkspaceSettings = (props) => {
                             // value={ProjectDetails.title}
                             value={newDetails?.workspace_name}
                             onChange={handleWorkspaceName} />
+                    </Grid>
+                    <Grid
+                        items
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={2}
+                        xl={2}
+                    >
+                        <Typography variant="body2" fontWeight='700' label="Required">
+                            Public Analytics
+                        </Typography>
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        md={12}
+                        lg={9}
+                        xl={9}
+                        sm={12}
+                    >
+                        <FormControlLabel
+                            control={<Switch color="primary" />}
+                            labelPlacement="start"
+                            checked={publicanalytics}
+                            onChange={handlepublicanalytics}
+                        />
                     </Grid>
                 </Grid>
                 <Grid
