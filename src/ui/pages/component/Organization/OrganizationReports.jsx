@@ -80,7 +80,7 @@ const OrganizationReports = () => {
   const [reportRequested, setReportRequested] = useState(false);
   const [reportTypes, setReportTypes] = useState("Annotator");
   const [radiobutton, setRadiobutton] = useState("ProjectReports");
-  const [reportfilter, setReportfilter] = useState(["Review Stage"]);
+  const [reportfilter, setReportfilter] = useState(["All Stage"]);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
