@@ -1,5 +1,5 @@
 const apiendpoint =  {
-  login: "/users/auth/jwt/create",
+  login:"/users/auth/jwt/create",
   getProjects:"/projects/",
   getWorkspaces:"/workspaces/",
   fetch:"/users/account/",

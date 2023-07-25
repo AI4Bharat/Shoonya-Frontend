@@ -191,6 +191,8 @@ const filterAnnotations = (
     }
   } else if([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 2);
+    disable = true;
+    setDisableBtns(true);
     disableSkip = true;
   }
   return [filteredAnnotations, disable, disableSkip];
