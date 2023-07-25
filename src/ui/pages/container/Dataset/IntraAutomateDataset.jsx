@@ -1,283 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  FormControlLabel,
-  ListItemText,
-  OutlinedInput,
-  Checkbox,
-  Grid,
-  Card,
-  ThemeProvider,
-  Typography,
-  Item
-} from '@mui/material';
-import Spinner from "../../component/common/Spinner";
-import Snackbar from "../../component/common/Snackbar";
-import DatasetStyle from "../../../styles/Dataset";
-import Button from "../../component/common/Button";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
-// import GetDatasetTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetType";
-import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetsByType";
-import GetDataitemsByIdAPI from "../../../../redux/actions/api/Dataset/GetDataitemsById";
-import intraAutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/intraAutomateDatasetsAPI";
-import MenuItems from "../../component/common/MenuItems";
-import { MenuProps } from "../../../../utils/utils";
+import React, { useEffect, useState } from "react";
+
 import themeDefault from "../../../theme/theme";
+import DatasetStyle from "../../../styles/Dataset";
+import { Card, FormControl, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, ThemeProvider, Typography } from '@mui/material';
+import DraftDataPopulation from "./DraftDataPopulation";
+import PopulateAiModel from "./PopulateAiModel";
+import { FormControlLabel } from "@mui/material";
 
-
-const IntraAutomateDataset = () => {
+export default function ControlledRadioButtonsGroup() {
   const classes = DatasetStyle();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-
-  const [srcDatasetTypes, setSrcDatasetTypes] = useState([]);
-  const [srcDatasetType, setSrcDatasetType] = useState('');
-  const [srcInstances, setSrcInstances] = useState([]);
-  const [field, setfield] = useState([]);
-  const [Field,setField] = useState([]);
-  const [srcInstance, setSrcInstance] = useState('');
-  // const [instance, setinstance] = useState("");
-  // const [org_id, setorg_id] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
-
-  // const Fields = ["draft_data_json", "input_language", "output_language", "input_text", "output_text", "machine_translation", "context", "labse_score", "rating", "domain", "parent_data", "instance_id"];
-
-  const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
-  const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
-  const DatasetTypes = useSelector((state) => state.GetDatasetType.data);
-  const dataitemsList = useSelector((state) => state.getDataitemsById.data);
-
-
-  useEffect(() => {
-    if (DatasetTypes && DatasetTypes.length > 0) {
-      let temp = [];
-      DatasetTypes.forEach((element) => {
-        temp.push({
-          name: element,
-          value: element
-          // disabled: (element !== "SentenceText" && element !== "Conversation")
-        });
-      });
-      setSrcDatasetTypes(temp);
-      temp = [];
-      DatasetTypes.forEach((element) => {
-        temp.push({
-          name: element,
-          value: element
-          // disabled: (srcDatasetType === "SentenceText" ? element !== "TranslationPair" : element !== "Conversation")
-        });
-      });
-    }
-  }, [DatasetTypes, srcDatasetType]);
-
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setfield(
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
-  useEffect(() => {
-    setLoading(false);
-    if (dataitemsList.results?.length > 0) {
-        let values = Object.keys(dataitemsList.results[0]) 
-        setField(values)
-    }
-  }, [dataitemsList]);
-
-
-
-  useEffect(() => {
-    setLoading(false);
-    if (DatasetInstances?.length > 0) {
-      if (DatasetInstances[0].dataset_type === srcDatasetType)
-        setSrcInstances(DatasetInstances)
-    }
-  }, [DatasetInstances]);
-
-  
-
-  const handleSrcDatasetTypeChange = (value) => {
-    setSrcDatasetType(value);
-    setLoading(true);
-    const instancesObj = new GetDatasetsByTypeAPI(value);
-    dispatch(APITransport(instancesObj));
-  };
-
-  const handleField =(value)=>{
-    setSrcInstance(value);
-    setLoading(true);
-    const fieldObj = new GetDataitemsByIdAPI(value,srcDatasetType);
-    dispatch(APITransport(fieldObj));
+  const [draftdata,setdraftdata] = useState(false);
+  const [aimodel,setaimodel] = useState(true);
+  const [automation,setautomation] = useState();
+  const handleChange=(value)=>{
+    setautomation(value)
   }
-
-
-  const handleConfirm = async () => {
-    setLoading(true);
-    const org_id = await (DatasetInstances.filter((items) => {
-      return items.instance_id === srcInstance
-    })[0].organisation_id);
-    const apiObj = new intraAutomateDatasetsAPI(srcInstance, org_id, field);
-    fetch(apiObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(apiObj.getBody()),
-      headers: apiObj.getHeaders().headers,
-    }).then(async (res) => {
-      setLoading(false);
-      if (!res.ok) throw await res.json();
-      else return await res.json();
-    }).then((res) => {
-      console.log(res);
-      setSnackbarState({ open: true, message: res.message, variant: "success" });
-    }).catch((err) => {
-      console.log(err);
-      setSnackbarState({ open: true, message: err.message, variant: "error" });
-    });
-
-  }
+ const handledraftdropdown=()=>{
+   setdraftdata(true)
+   setaimodel(false)
+ }
+ const handleaidropdown=()=>{
+  setaimodel(true)
+  setdraftdata(false)
+}
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
       <Grid container direction="row"  paddingTop={3}>
-        <Card className={classes.workspaceCard}>
-          <Grid item xs={2} sm={2} md={2} lg={2} xl={2}></Grid>
-          <Grid item xs={8} sm={8} md={8} lg={8} xl={8} sx={{ pb: "6rem" }}>
-            <Grid xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
+      <Card className={classes.workspaceCard}>
+      <Typography variant="h2" gutterBottom component="div">
+          Intra-Automate Datasets
+      </Typography>
+      <Grid container className={classes.root}>
+      <Grid item style={{ flexGrow: "0" }}>
+          <Typography variant="h6" sx={{ paddingBottom: "7px" }}>
+            Type Of Automation :{" "}
+          </Typography>
+        </Grid>
+      <Grid item style={{ flexGrow: "1", paddingLeft: "5px" }}>
+          <FormControl>
+            <RadioGroup
+              row
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="row-radio-buttons-group"
+              defaultValue="Populate Predictions from AI Model"
             >
-              <Typography variant="h2" gutterBottom component="div">
-                Intra-Automate Datasets
-              </Typography>
-            </Grid>
-            <Grid className={classes.projectsettingGrid}
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}>
-            </Grid>
-            <Typography gutterBottom component="div">
-              Select dataset type:
-            </Typography>
-            <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-              <MenuItems
-                menuOptions={srcDatasetTypes}
-                handleChange={handleSrcDatasetTypeChange}
-                value={srcDatasetType}
+              <FormControlLabel
+                value="Populate Draft Data Json"
+                control={<Radio />}
+                label="Populate Draft Data Json"
+                onClick={handledraftdropdown}
               />
-            </Grid>
-            {srcDatasetType && srcInstances.length > 0 && <>
-              <Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Source dataset instance:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                <FormControl fullWidth >
-                  <Select
-                    labelId="project-type-label"
-                    id="project-type-select"
-                    value={srcInstance}
-                    onChange={(e)=>handleField(e.target.value)}
-                    MenuProps={MenuProps}
-                  >
-                    {srcInstances.map((type, index) => (
-                      <MenuItem value={type.instance_id} key={index}>
-                        {type.instance_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            </>}
-            <Grid
-              className={classes.projectsettingGrid}
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-            >
-              <Typography gutterBottom component="div">
-                Select Field:
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
-                <Select
-                  labelId="demo-multiple-checkbox-label"
-                  id="demo-multiple-checkbox"
-                  multiple
-                  value={field}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Tag" />}
-                  renderValue={(selected) => selected.join(',')}
-                  MenuProps={MenuProps}
-                >
-                  {Field.map((name) => (
-                    <MenuItem key={name} value={name}>
-                      <Checkbox checked={field.indexOf(name) > -1} />
-                      <ListItemText primary={name} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-            </Grid>
-            <Grid
-              style={{}}
-              item
-              xs={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sm={12}
-              sx={{ mt: 3 }}
-            >
-              <Button
-                style={{ margin: "0px 20px 0px 0px" }}
-                label={"Confirm"}
-                onClick={handleConfirm}
-              disabled={(srcInstance=="" || field=="" || srcDatasetType=="") ? true : false}
+              <FormControlLabel
+                value="Populate Predictions from AI Model"
+                control={<Radio />}
+                label="Populate Predictions from AI Model"
+                onClick={handleaidropdown}
               />
-              <Button
-                label={"Cancel"}
-              onClick={() => navigate(`/datasets/`)}
-              />
-            </Grid>
-          </Grid>
-        </Card>
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+      {draftdata?<DraftDataPopulation/>:null}
+      {aimodel?<PopulateAiModel/>:null}
       </Grid>
-      <Snackbar
-        {...snackbarState}
-        handleClose={() => setSnackbarState({ ...snackbarState, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        hide={2000}
-      />
-
+      </Card>
+      </Grid>
     </ThemeProvider>
-
   );
-};
-
-export default IntraAutomateDataset;
+}
