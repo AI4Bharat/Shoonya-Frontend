@@ -80,7 +80,7 @@ const OrganizationReports = () => {
   const [reportRequested, setReportRequested] = useState(false);
   const [reportTypes, setReportTypes] = useState("Annotator");
   const [radiobutton, setRadiobutton] = useState("ProjectReports");
-  const [reportfilter, setReportfilter] = useState(["Review Stage"]);
+  const [reportfilter, setReportfilter] = useState(["All Stage"]);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -423,7 +423,7 @@ const OrganizationReports = () => {
             >
               <MenuItem value={1}>Full-time</MenuItem>
               <MenuItem value={2}>Part-time</MenuItem>
-              <MenuItem value={3}>Contract-Basis</MenuItem>
+              <MenuItem value={4}>Contract-Basis</MenuItem>
             </Select>
           </FormControl>
         </Grid>}
