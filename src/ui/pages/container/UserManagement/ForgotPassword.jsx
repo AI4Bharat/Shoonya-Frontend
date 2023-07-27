@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import CustomCard from "../../component/common/Card";
-import { Grid, Typography, Link, ThemeProvider, } from "@mui/material";
+import { Grid, Typography, Link, ThemeProvider } from "@mui/material";
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import { translate } from "../../../../config/localisation";
 import LoginStyle from "../../../styles/loginStyle";
-import themeDefault from '../../../theme/theme'
+import themeDefault from "../../../theme/theme";
 import { useNavigate } from "react-router-dom";
 import AppInfo from "./AppInfo";
 import ForgotPasswordAPI from "../../../../redux/actions/api/UserManagement/ForgotPassword";
@@ -34,67 +34,59 @@ const ForgotPassword = () => {
     setError({ ...error, [prop]: false });
   };
   const ForgotPassword = {
-    email: values.email
-  }
+    email: values.email,
+  };
   const handleSubmit = () => {
-    let obj = new ForgotPasswordAPI(ForgotPassword)
+    let obj = new ForgotPasswordAPI(ForgotPassword);
     fetch(obj.apiEndPoint(), {
-      method: 'POST',
+      method: "POST",
       headers: obj.getHeaders().headers,
-      body: JSON.stringify(obj.getBody())
+      body: JSON.stringify(obj.getBody()),
     })
       .then((response) => {
-
-        setLoading(false)
+        setLoading(false);
         if (response.status === 204) {
           setSnackbarInfo({
             ...snackbar,
             open: true,
             message: "success",
-            variant: 'success'
-          })
-        }
-        else {
+            variant: "success",
+          });
+        } else {
           setSnackbarInfo({
             ...snackbar,
             open: true,
             message: "Invalid email",
-            variant: 'error'
-          })
-
+            variant: "error",
+          });
         }
-
       })
-      .catch(error => {
-        setLoading(false)
-
-      })
-
-
-  }
+      .catch((error) => {
+        setLoading(false);
+      });
+  };
   const ValidateEmail = (mail) => {
-    if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail)) {
-      return (true)
-    }
-    else {
+    if (
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        mail
+      )
+    ) {
+      return true;
+    } else {
       return false;
     }
-  }
+  };
   const handleforgotPassword = () => {
     if (!ValidateEmail(values.email)) {
-      setError({ ...error, email: true })
-    }
-    else {
-      handleSubmit()
+      setError({ ...error, email: true });
+    } else {
+      handleSubmit();
       setValues({
         email: "",
-      })
+      });
       setLoading(true);
-
     }
-
-
-  }
+  };
 
   const renderSnackBar = () => {
     return (
@@ -110,19 +102,17 @@ const ForgotPassword = () => {
     );
   };
 
-
   const TextFields = () => {
     return (
       <Grid container spacing={2} style={{ marginTop: "2px", width: "40%" }}>
-        <Grid>
-          {renderSnackBar()}
+        <Grid>{renderSnackBar()}</Grid>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Typography variant="h3">Forgot password?</Typography>
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <Typography variant="h3" >Forgot password?</Typography>
-        </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <Typography variant="body2" className={classes.subTypo} >
-            Enter you email address and we will send a link to reset your password.
+          <Typography variant="body2" className={classes.subTypo}>
+            Enter you email address and we will send a link to reset your
+            password.
           </Typography>
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -133,57 +123,47 @@ const ForgotPassword = () => {
             onChange={handleChange("email")}
             error={error.email ? true : false}
             value={values.email}
-            helperText={error.email ? "Invalid email" : ""}
+            helperText={error.email ? "Please enter an email ID" : ""}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} textAlign={"right"}>
-          <Typography >
-            <Link href="/" style={{ fontSize: "14px" }} >
+          <Typography>
+            <Link href="/" style={{ fontSize: "14px" }}>
               {" "}
               Back to Login
             </Link>
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
-          <Button fullWidth label={"Send link"} onClick={handleforgotPassword} />
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Button
+            fullWidth
+            label={"Send link"}
+            onClick={handleforgotPassword}
+          />
         </Grid>
       </Grid>
     );
   };
 
-  // const renderCardContent = () => (
-  //   <CustomCard title={"Forgot password? "} cardContent={<TextFields />}>  
-  //     <Grid container spacing={1} style={{width:"70%" }}>
-  //     <Grid item xs={12} sm={12} md={12} lg={12} xl={12}  textAlign={"right"}>
-  //     <Typography >
-  //           <Link  href="/" style={{fontSize:"14px" }} >
-  //             {" "}
-  //             Back to Login
-  //           </Link>
-  //         </Typography>
-  //         </Grid>
-  //       <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
-  //         <Button fullWidth label={"Send link"} onClick={handleforgotPassword}/>
-  //       </Grid>
-  //     </Grid>
-  //   </CustomCard>
-  // );
-
   return (
     <ThemeProvider theme={themeDefault}>
-
-      <Grid container className={classes.loginGrid} >
-
-        <Grid item xs={12} sm={3} md={3} lg={3} color={"primary"} className={classes.appInfo}>
-
+      <Grid container className={classes.loginGrid}>
+        <Grid
+          item
+          xs={12}
+          sm={3}
+          md={3}
+          lg={3}
+          color={"primary"}
+          className={classes.appInfo}
+        >
           <AppInfo />
         </Grid>
-        <Grid item xs={12} sm={9} md={9} lg={9} className={classes.parent} >
+        <Grid item xs={12} sm={9} md={9} lg={9} className={classes.parent}>
           {TextFields()}
         </Grid>
       </Grid>
     </ThemeProvider>
-
   );
 };
 
