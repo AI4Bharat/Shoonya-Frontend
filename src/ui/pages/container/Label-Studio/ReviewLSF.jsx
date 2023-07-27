@@ -560,9 +560,7 @@ const LabelStudioWrapper = ({
                   load_time.current,
                   review.lead_time,
                   review_status.current,
-                  projectType === "SingleSpeakerAudioTranscriptionEditing"
-                    ? annotation.serializeAnnotation()
-                    : temp,
+                  temp,
                   review.parent_annotation,
                   reviewNotesRef.current.value
                 ).then(() => {
@@ -834,9 +832,7 @@ const LabelStudioWrapper = ({
                 load_time.current,
                 annotations[i].lead_time,
                 annotations[i].annotation_status,
-                labelConfig.project_type === "SingleSpeakerAudioTranscriptionEditing"
-                  ? annotation.serializeAnnotation()
-                  : temp,
+                temp,
                 annotations[i].parent_annotation,
                 reviewNotesRef.current.value,
                 true

@@ -91,6 +91,7 @@ const StyledMenu = styled((props) => (
 
 const filterAnnotations = (annotations, user, taskData) => {
   let disableSkip = false;
+  let disableAutoSave = false;
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
     return annotation.completed_by === user.id && annotation.parent_annotation;
@@ -100,6 +101,7 @@ const filterAnnotations = (annotations, user, taskData) => {
       filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.super_check_count
         ? [userAnnotation]
         : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 2);
+      if(taskData?.revision_loop_count?.super_check_count > 0) disableAutoSave = true;
     } else if (
       ["validated", "validated_with_changes", "draft"].includes(
         userAnnotation.annotation_status
@@ -118,7 +120,7 @@ const filterAnnotations = (annotations, user, taskData) => {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 3);
     disableSkip = true;
   }
-  return [filteredAnnotations, disableSkip];
+  return [filteredAnnotations, disableSkip, disableAutoSave];
 };
 
 //used just in postAnnotation to support draft status update.
@@ -224,8 +226,8 @@ const LabelStudioWrapper = ({
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableSkip] = filterAnnotations(annotations, userData, taskData);
-    if(disableSkip) setAutoSave(false);
+    const [filteredAnnotations, disableSkip, disableAutoSave] = filterAnnotations(annotations, userData, taskData);
+    if(disableSkip || disableAutoSave) setAutoSave(false);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -381,9 +383,7 @@ const LabelStudioWrapper = ({
                   load_time.current,
                   superChecker.lead_time,
                   review_status.current,
-                  projectType === "SingleSpeakerAudioTranscriptionEditing"
-                    ? annotation.serializeAnnotation()
-                    : temp,
+                  temp,
                   superChecker.parent_annotation,
                   superCheckerNotesRef.current.value
                 ).then(() => {
@@ -593,9 +593,7 @@ const LabelStudioWrapper = ({
                 load_time.current,
                 annotations[i].lead_time,
                 annotations[i].annotation_status,
-                projectType === "SingleSpeakerAudioTranscriptionEditing"
-                  ? annotation.serializeAnnotation()
-                  : temp,
+                temp,
                 annotations[i].parent_annotation,
                 superCheckerNotesRef.current.value,
                 true
