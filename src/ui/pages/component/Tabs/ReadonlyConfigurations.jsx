@@ -5,10 +5,23 @@ import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import CustomButton from "../../component/common/Button";
+import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
 const ReadonlyConfigurations = (props) => {
   const classes = DatasetStyle();
+  const dispatch = useDispatch();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const getWorkspaceDetails = () => {
+    const workspaceObj = new GetWorkspacesDetailsAPI(ProjectDetails.workspace_id);
+    dispatch(APITransport(workspaceObj));
+}
+
+useEffect(() => {
+    getWorkspaceDetails();
+}, []);
+
+const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -98,6 +111,36 @@ const ReadonlyConfigurations = (props) => {
                 </Link>
               </Grid>
             ))}
+
+             <Grid
+                item
+                xs={12}
+                md={12}
+                lg={12}
+                xl={12}
+                sm={12}
+                sx={{ mt: 2, display: "flex" }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  style={{ flexDirection: "column" }}
+                >
+                  Workspace Name :
+                </Typography>
+
+                <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+                {workspaceDetails.workspace_name}
+                </Typography>
+                <Link
+                    to={`/workspaces/${ProjectDetails.workspace_id}`}
+                    style={{ textDecoration: "none" }}
+                    >
+                    <CustomButton
+                        sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
+                        label="View Workspace"
+                    />
+                </Link>
+              </Grid>
 
             {ProjectDetails.filter_string && (
               <Grid

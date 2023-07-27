@@ -8,13 +8,13 @@ import Search from "../../component/common/Search";
 import { useDispatch, useSelector } from "react-redux";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
 
 const ProjectCardList = (props) => {
-  const { projectData,selectedFilters,setsSelectedFilters } = props;
+  const { projectData, selectedFilters, setsSelectedFilters } = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
-
 
   const SearchProject = useSelector((state) => state.SearchProjectCards.data);
 
@@ -35,15 +35,28 @@ const ProjectCardList = (props) => {
       ) {
         return el;
       } else if (
-        el.project_mode?.toLowerCase().includes(SearchProject?.toLowerCase())
-      ) {
-        return el;
-      } else if (
         el.title?.toLowerCase().includes(SearchProject?.toLowerCase())
       ) {
         return el;
       } else if (
         el.id.toString()?.toLowerCase()?.includes(SearchProject.toLowerCase())
+      ) {
+        return el;
+      } else if (
+        el.workspace_id
+          .toString()
+          ?.toLowerCase()
+          .includes(SearchProject?.toLowerCase())
+      ) {
+        return el;
+      } else if (
+        el.tgt_language?.toLowerCase().includes(SearchProject?.toLowerCase())
+      ) {
+        return el;
+      } else if (
+        UserMappedByProjectStage(el.project_stage)
+          ?.name?.toLowerCase()
+          .includes(SearchProject?.toLowerCase())
       ) {
         return el;
       }
@@ -88,8 +101,45 @@ const ProjectCardList = (props) => {
       },
     },
     {
-      name: "Project_mode",
+      name: "project_stage",
+      label: "Project Stage",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+        setCellHeaderProps: (sort) => ({
+          style: { height: "70px", fontSize: "16px", padding: "16px" },
+        }),
+      },
+    },
+    {
+      name: "tgt_language",
+      label: "Target Language",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+        setCellHeaderProps: (sort) => ({
+          style: { height: "70px", fontSize: "16px", padding: "16px" },
+        }),
+      },
+    },
+    {
+      name: "project_mode",
       label: "Project Mode",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+        display: 'false', 
+        setCellHeaderProps: (sort) => ({
+          style: { height: "70px", fontSize: "16px", padding: "16px" },
+        }),
+      },
+    },
+    {
+      name: "workspace_id",
+      label: "Workspace Id",
       options: {
         filter: false,
         sort: false,
@@ -116,11 +166,17 @@ const ProjectCardList = (props) => {
   const data =
     projectData && projectData.length > 0
       ? pageSearch().map((el, i) => {
+          const userRole =
+            el.project_stage &&
+            UserMappedByProjectStage(el.project_stage).element;
           return [
             el.id,
             el.title,
             el.project_type,
+            userRole ? userRole : el.project_stage,
+            el.tgt_language == null ? "-" : el.tgt_language,
             el.project_mode,
+            el.workspace_id,
             <Link to={`/projects/${el.id}`} style={{ textDecoration: "none" }}>
               <CustomButton
                 sx={{ borderRadius: 2, marginRight: 2 }}
@@ -179,7 +235,7 @@ const ProjectCardList = (props) => {
 
   return (
     <>
-      <ThemeProvider theme={tableTheme} sx={{mt:4}}>
+      <ThemeProvider theme={tableTheme} sx={{ mt: 4 }}>
         <MUIDataTable
           title={""}
           data={data}
@@ -188,14 +244,13 @@ const ProjectCardList = (props) => {
         />
       </ThemeProvider>
       <ProjectFilterList
-       id={filterId}
-       open={popoverOpen}
-       anchorEl={anchorEl}
-       handleClose={handleClose}
-       updateFilters={setsSelectedFilters}
-       currentFilters={selectedFilters}
- 
-       />
+        id={filterId}
+        open={popoverOpen}
+        anchorEl={anchorEl}
+        handleClose={handleClose}
+        updateFilters={setsSelectedFilters}
+        currentFilters={selectedFilters}
+      />
     </>
   );
 };
