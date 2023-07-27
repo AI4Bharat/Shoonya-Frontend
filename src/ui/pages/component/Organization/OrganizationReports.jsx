@@ -69,7 +69,7 @@ const OrganizationReports = () => {
   // const [rangeValue, setRangeValue] = useState([format(Date.parse(OrganizationDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
-  const [participationTypes, setParticipationTypes] = useState([]);
+  const [participationTypes, setParticipationTypes] = useState([1, 2, 4]);
   const [selectedType, setSelectedType] = useState("");
   const [reportType, setReportType] = useState("project");
   const [targetLanguage, setTargetLanguage] = useState("all");
@@ -112,8 +112,10 @@ const OrganizationReports = () => {
   useEffect(() => {
     if(radiobutton === "PaymentReports") {
       setProjectTypes([
+        "AudioSegmentation",
         "AudioTranscription",
         "AudioTranscriptionEditing",
+        "AudioTranscription + Editing",
         "ConversationTranslation",
         "ConversationTranslationEditing"
       ]);
