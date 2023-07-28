@@ -56,7 +56,7 @@ const WorkspaceReports = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
-  const [participationTypes, setParticipationTypes] = useState([]);
+  const [participationTypes, setParticipationTypes] = useState([1, 2, 4]);
   const [reportType, setReportType] = useState("project");
   const [language, setLanguage] = useState("all");
   const [columns, setColumns] = useState([]);
@@ -100,8 +100,10 @@ const WorkspaceReports = () => {
   useEffect(() => {
     if(reportType === "payment") {
       setProjectTypes([
+        "AudioSegmentation",
         "AudioTranscription",
         "AudioTranscriptionEditing",
+        "AudioTranscription + Editing",
         "ConversationTranslation",
         "ConversationTranslationEditing"
       ]);
