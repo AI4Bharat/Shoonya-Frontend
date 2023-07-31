@@ -36,35 +36,6 @@ const ForgotPassword = () => {
   const ForgotPassword = {
     email: values.email,
   };
-  // const handleSubmit = () => {
-  //   let obj = new ForgotPasswordAPI(ForgotPassword);
-  //   fetch(obj.apiEndPoint(), {
-  //     method: "POST",
-  //     headers: obj.getHeaders().headers,
-  //     body: JSON.stringify(obj.getBody()),
-  //   })
-  //     .then((response) => {
-  //       setLoading(false);
-  //       console.log(response,"response")
-  //         setSnackbarInfo({
-  //           ...snackbar,
-  //           open: true,
-  //           message: "success",
-  //           variant: "success",
-  //         });
-  //         setSnackbarInfo({
-  //           ...snackbar,
-  //           open: true,
-  //           message: response.message,
-  //           variant: "error",
-  //         });
-  //     })
-  //     .catch((error) => {
-  //       setLoading(false);
-  //     });
-  // };
-
-
 
   const handleSubmit = async () => {
     setLoading(true);
