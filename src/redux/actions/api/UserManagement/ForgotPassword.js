@@ -10,7 +10,7 @@
      super("POST", timeout, false);
      this.projectObj = projectObj;
      this.type = constants.FORGOT_PASSWORD;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.authUsers}reset_password/`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.authUser}reset_password/`;
    }
  
    processResponse(res) {

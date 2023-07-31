@@ -36,35 +36,31 @@ const ForgotPassword = () => {
   const ForgotPassword = {
     email: values.email,
   };
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
+    setLoading(true);
     let obj = new ForgotPasswordAPI(ForgotPassword);
-    fetch(obj.apiEndPoint(), {
-      method: "POST",
-      headers: obj.getHeaders().headers,
-      body: JSON.stringify(obj.getBody()),
-    })
-      .then((response) => {
-        setLoading(false);
-        if (response.status === 204) {
-          setSnackbarInfo({
-            ...snackbar,
+    const res = await fetch(obj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(obj.getBody()),
+        headers: obj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    setLoading(false);
+    if (res.ok) {
+        setSnackbarInfo({
             open: true,
-            message: "success",
+            message: resp?.message,
             variant: "success",
-          });
-        } else {
-          setSnackbarInfo({
-            ...snackbar,
+        })
+    } else {
+        setSnackbarInfo({
             open: true,
-            message: "Invalid email",
+            message: resp?.message,
             variant: "error",
-          });
-        }
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
-  };
+        })
+    }
+  }
   const ValidateEmail = (mail) => {
     if (
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(

@@ -49,46 +49,34 @@ const ConfirmForgetPassword = () => {
         event.preventDefault();
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async() => {
         const ConfirmForgetPassword = {
             new_password: values.confirmPassword,
             uid: key,
             token: token
         }
-        let apiObj = new ConfirmForgetPasswordAPI(ConfirmForgetPassword)
 
-        fetch(apiObj.apiEndPoint(), {
-            method: 'POST',
-            body: JSON.stringify(apiObj.getBody()),
-            headers: apiObj.getHeaders().headers
-        }).then((response) => {
-
-            setLoading(false)
-            if (response.status === 204) {
-                setSnackbarInfo({
-                    ...snackbar,
-                    open: true,
-                    message: "success",
-                    variant: 'success'
-                })
-                navigate(`/`)
-            }
-            else {
-                setSnackbarInfo({
-                    ...snackbar,
-                    open: true,
-                    message: "Invalid password / user id or user doesn't exis ",
-                    variant: 'error'
-                })
-
-            }
-
-        })
-            .catch(error => {
-                setLoading(false)
-
+        let obj = new ConfirmForgetPasswordAPI(ConfirmForgetPassword);
+        const res = await fetch(obj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(obj.getBody()),
+            headers: obj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
             })
-
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
 
     }
 

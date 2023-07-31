@@ -11,6 +11,7 @@ const apiendpoint =  {
   getUsers:"/users/",
   changepassword:"/users/account/",
   authUsers:"/users/auth/users/",
+  authUser:"/users/auth/users/",
   functions:"/functions/",
   Glossary:"/v1/",
 };
