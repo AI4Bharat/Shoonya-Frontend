@@ -101,7 +101,6 @@ const filterAnnotations = (annotations, user, taskData) => {
       filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.super_check_count
         ? [userAnnotation]
         : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 2);
-      if(taskData?.revision_loop_count?.super_check_count > 0) disableAutoSave = true;
     } else if (
       ["validated", "validated_with_changes", "draft"].includes(
         userAnnotation.annotation_status
@@ -358,49 +357,41 @@ const LabelStudioWrapper = ({
 
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.annotation_status !== "freezed") {
-            for (let i = 0; i < annotations.length; i++) {
-              if (
-                !annotations[i].result?.length ||
-                annotation.serializeAnnotation()[0].id ===
-                  annotations[i].result[0].id
-              ) {
-                setAutoSave(false);
-                showLoader();
-                let temp = annotation.serializeAnnotation();
+            setAutoSave(false);
+            showLoader();
+            let temp = annotation.serializeAnnotation();
 
-                for (let i = 0; i < temp.length; i++) {
-                  if (temp[i].value.text) {
-                    temp[i].value.text = [temp[i].value.text[0]];
-                  }
-                }
-
-                let superChecker = annotations.filter(
-                  (value) => value.annotation_type === 3
-                )[0];
-
-                patchSuperChecker(
-                  superChecker.id,
-                  load_time.current,
-                  superChecker.lead_time,
-                  review_status.current,
-                  temp,
-                  superChecker.parent_annotation,
-                  superCheckerNotesRef.current.value
-                ).then(() => {
-                  if (localStorage.getItem("labelAll"))
-                    getNextProject(projectId, taskData.id, "supercheck").then(
-                      (res) => {
-                        hideLoader();
-                        tasksComplete(res?.id || null);
-                      }
-                    );
-                  else {
-                    hideLoader();
-                    window.location.reload();
-                  }
-                });
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
               }
             }
+
+            let superChecker = annotations.filter(
+              (value) => value.annotation_type === 3
+            )[0];
+
+            patchSuperChecker(
+              superChecker.id,
+              load_time.current,
+              superChecker.lead_time,
+              review_status.current,
+              temp,
+              superChecker.parent_annotation,
+              superCheckerNotesRef.current.value
+            ).then(() => {
+              if (localStorage.getItem("labelAll"))
+                getNextProject(projectId, taskData.id, "supercheck").then(
+                  (res) => {
+                    hideLoader();
+                    tasksComplete(res?.id || null);
+                  }
+                );
+              else {
+                hideLoader();
+                window.location.reload();
+              }
+            });
           } else
             setSnackbarInfo({
               open: true,
@@ -576,38 +567,33 @@ const LabelStudioWrapper = ({
     if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
       if(taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
-        for (let i = 0; i < annotations.length; i++) {
-          if (
-            (!annotations[i].result?.length ||
-            annotation.serializeAnnotation()[0].id ===
-              annotations[i].result[0].id) && annotations[i].annotation_type === 3
-          ) {
-              let temp = annotation.serializeAnnotation();
-              for (let i = 0; i < temp.length; i++) {
-                if (temp[i].value.text) {
-                  temp[i].value.text = [temp[i].value.text[0]];
-                }
-              }
-              patchSuperChecker(
-                annotations[i].id,
-                load_time.current,
-                annotations[i].lead_time,
-                annotations[i].annotation_status,
-                temp,
-                annotations[i].parent_annotation,
-                superCheckerNotesRef.current.value,
-                true
-              ).then((res) => {
-                if (res.status !== 200) {
-                  setSnackbarInfo({
-                    open: true,
-                    message: "Error in autosaving annotation",
-                    variant: "error",
-                  });
-                }
-              });
-            }
+        let temp = annotation.serializeAnnotation();
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].value.text) {
+            temp[i].value.text = [temp[i].value.text[0]];
           }
+        }
+        let superChecker = annotations.filter(
+          (value) => value.annotation_type === 3
+        )[0];
+        patchSuperChecker(
+          superChecker.id,
+          load_time.current,
+          superChecker.lead_time,
+          superChecker.annotation_status,
+          temp,
+          superChecker.parent_annotation,
+          superCheckerNotesRef.current.value,
+          true
+        ).then((res) => {
+          if (res.status !== 200) {
+            setSnackbarInfo({
+              open: true,
+              message: "Error in autosaving annotation",
+              variant: "error",
+            });
+          }
+        });
       } else
         setSnackbarInfo({
           open: true,
