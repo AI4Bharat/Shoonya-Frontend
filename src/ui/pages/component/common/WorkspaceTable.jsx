@@ -73,6 +73,16 @@ const WorkspaceTable = (props) => {
    
     const columns = [
         {
+            name: "id",
+            label: "Id",
+            options: {
+                filter: false,
+                sort: false,
+                align: "center",
+                setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
+            }
+        },
+        {
             name: "Name",
             label: "Name",
             options: {
@@ -89,7 +99,8 @@ const WorkspaceTable = (props) => {
                 filter: false,
                 sort: false,
                 align: "center",
-                display: showManager ? "true" : "exclude"
+                display: showManager ? "true" : "exclude",
+                setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
             }
         },
         {
@@ -99,7 +110,8 @@ const WorkspaceTable = (props) => {
                 filter: false,
                 sort: false,
                 align: "center",
-                display: showCreatedBy ? "true" : "exclude"
+                display: showCreatedBy ? "true" : "exclude",
+                setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
             }
         },
         {
@@ -111,9 +123,9 @@ const WorkspaceTable = (props) => {
             }
         }];
       
-    
     const data = workspaceData && workspaceData.length > 0 ?pageSearch().map((el, i) => {
         return [
+            el.id,
             el.workspace_name,
             el.managers.map((manager, index) => {
                 return manager.username

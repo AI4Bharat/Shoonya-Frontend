@@ -204,7 +204,7 @@ const ConfirmForgetPassword = () => {
                     {error.confirmPassword && <FormHelperText error={true}>Both password must match.</FormHelperText>}
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
-                    <Button fullWidth label={"Change PassWord"} onClick={handleConfirmForgetPassword} />
+                    <Button fullWidth label={"Change Password"} onClick={handleConfirmForgetPassword} />
                 </Grid>
             </Grid>
         );
