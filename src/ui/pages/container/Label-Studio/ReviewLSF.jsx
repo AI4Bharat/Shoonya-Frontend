@@ -536,50 +536,40 @@ const LabelStudioWrapper = ({
 
         onUpdateAnnotation: function (ls, annotation) {
           if (taskData.annotation_status !== "freezed") {
-            for (let i = 0; i < annotations.length; i++) {
-              if (
-                !annotations[i].result?.length ||
-                annotation.serializeAnnotation()[0].id ===
-                  annotations[i].result[0].id
-              ) {
-                setAutoSave(false);
-                showLoader();
-                let temp = annotation.serializeAnnotation();
+            setAutoSave(false);
+            showLoader();
+            let temp = annotation.serializeAnnotation();
 
-                for (let i = 0; i < temp.length; i++) {
-                  if (temp[i].value.text) {
-                    temp[i].value.text = [temp[i].value.text[0]];
-                  }
-                }
-
-                let review = annotations.filter(
-                  (annotation) => annotation.annotation_type === 2
-                )[0];
-                patchReview(
-                  review.id,
-                  load_time.current,
-                  review.lead_time,
-                  review_status.current,
-                  projectType === "SingleSpeakerAudioTranscriptionEditing"
-                    ? annotation.serializeAnnotation()
-                    : temp,
-                  review.parent_annotation,
-                  reviewNotesRef.current.value
-                ).then(() => {
-                  if (localStorage.getItem("labelAll"))
-                    getNextProject(projectId, taskData.id, "review").then(
-                      (res) => {
-                        hideLoader();
-                        tasksComplete(res?.id || null);
-                      }
-                    );
-                  else {
-                    hideLoader();
-                    window.location.reload();
-                  }
-                });
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
               }
             }
+
+            let review = annotations.filter(
+              (annotation) => annotation.annotation_type === 2
+            )[0];
+            patchReview(
+              review.id,
+              load_time.current,
+              review.lead_time,
+              review_status.current,
+              temp,
+              review.parent_annotation,
+              reviewNotesRef.current.value
+            ).then(() => {
+              if (localStorage.getItem("labelAll"))
+                getNextProject(projectId, taskData.id, "review").then(
+                  (res) => {
+                    hideLoader();
+                    tasksComplete(res?.id || null);
+                  }
+                );
+              else {
+                hideLoader();
+                window.location.reload();
+              }
+            });
           } else
             setSnackbarInfo({
               open: true,
@@ -817,40 +807,33 @@ const LabelStudioWrapper = ({
     if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
       if(taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
-        for (let i = 0; i < annotations.length; i++) {
-          if (
-            (!annotations[i].result?.length ||
-            annotation.serializeAnnotation()[0].id ===
-              annotations[i].result[0].id) && annotations[i].annotation_type === 2
-          ) {
-              let temp = annotation.serializeAnnotation();
-              for (let i = 0; i < temp.length; i++) {
-                if (temp[i].value.text) {
-                  temp[i].value.text = [temp[i].value.text[0]];
-                }
-              }
-              patchReview(
-                annotations[i].id,
-                load_time.current,
-                annotations[i].lead_time,
-                annotations[i].annotation_status,
-                labelConfig.project_type === "SingleSpeakerAudioTranscriptionEditing"
-                  ? annotation.serializeAnnotation()
-                  : temp,
-                annotations[i].parent_annotation,
-                reviewNotesRef.current.value,
-                true
-              ).then((res) => {
-                if (res.status !== 200) {
-                  setSnackbarInfo({
-                    open: true,
-                    message: "Error in autosaving annotation",
-                    variant: "error",
-                  });
-                }
-              });
-            }
+        let temp = annotation.serializeAnnotation();
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].value.text) {
+            temp[i].value.text = [temp[i].value.text[0]];
           }
+        }
+        let review = annotations.filter(
+          (annotation) => annotation.annotation_type === 2
+        )[0];
+        patchReview(
+          review.id,
+          load_time.current,
+          review.lead_time,
+          review.annotation_status,
+          temp,
+          review.parent_annotation,
+          reviewNotesRef.current.value,
+          true
+        ).then((res) => {
+          if (res.status !== 200) {
+            setSnackbarInfo({
+              open: true,
+              message: "Error in autosaving annotation",
+              variant: "error",
+            });
+          }
+        });
       } else
         setSnackbarInfo({
           open: true,

@@ -12,6 +12,8 @@ import Record from "../../../../assets/no-record.svg";
 import { useNavigate } from "react-router-dom";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
+
 
 const Projectcard = (props) => {
   const { projectData, selectedFilters, setsSelectedFilters } = props;
@@ -48,11 +50,7 @@ const Projectcard = (props) => {
         el.project_type?.toLowerCase().includes(SearchProject?.toLowerCase())
       ) {
         return el;
-      } else if (
-        el.project_mode?.toLowerCase().includes(SearchProject?.toLowerCase())
-      ) {
-        return el;
-      } else if (
+      }  else if (
         el.title?.toLowerCase().includes(SearchProject?.toLowerCase())
       ) {
         return el;
@@ -60,7 +58,21 @@ const Projectcard = (props) => {
         el.id.toString()?.toLowerCase()?.includes(SearchProject.toLowerCase())
       ) {
         return el;
-      }
+      }else if (
+        el.workspace_id.toString()?.toLowerCase().includes(SearchProject?.toLowerCase())
+      ) {
+        return el;}
+        else if (
+          el.tgt_language?.toLowerCase().includes(SearchProject?.toLowerCase())
+        ) {
+          return el;}
+          else if (
+            UserMappedByProjectStage(el.project_stage)
+              ?.name?.toLowerCase()
+              .includes(SearchProject?.toLowerCase())
+          ) {
+            return el;
+          }
     });
   };
 

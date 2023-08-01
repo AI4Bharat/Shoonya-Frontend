@@ -24,8 +24,8 @@ import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 const participationTypes = [
   { name: "FULL TIME", value: 1 },
   { name: "PART TIME", value: 2 },
-  { name: "CONTRACT", value: 3 },
-  { name: " NA", value: 4 },
+  { name: "NA", value: 3 },
+  { name: "CONTRACT", value: 4 },
 ];
 
 const EditProfile = (props) => {

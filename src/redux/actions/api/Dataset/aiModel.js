@@ -6,15 +6,16 @@
  import constants from '../../../constants';
  
  export default class aiModel extends API {
-   constructor(srcInstanceId,translationmodel,org_id,checked, timeout = 2000) {
+   constructor(srcInstanceId,translationmodel,org_id,checked,srcDatasetType, timeout = 2000) {
      super("POST", timeout, false);
     //  this.type = constants.AUTOMATE_DATASETS;
      this.input_dataset_instance_id = srcInstanceId;
      this.api_type = translationmodel;
      this.org = org_id;
      this.automate_missing_data_items= checked;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}schedule_ocr_prediction_json_population`;
-   }
+    const queryString  = srcDatasetType === "OCRDocument" ? "schedule_ocr_prediction_json_population" :  "schedule_asr_prediction_json_population";
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.functions}${queryString}`;
+   }  
  
    processResponse(res) {
      super.processResponse(res);
