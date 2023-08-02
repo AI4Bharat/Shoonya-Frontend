@@ -329,7 +329,7 @@ const MembersTable = (props) => {
                   }}
                   label="Remove"
                   onClick={() => handleProjectMember(el.id)}
-                  disabled={projectlist(el.id)}
+                  disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
               {(props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
@@ -342,7 +342,7 @@ const MembersTable = (props) => {
                   }}
                   label="Remove"
                   onClick={() => handleProjectReviewer(el.id)}
-                  disabled={projectlist(el.id)}
+                  disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
 
@@ -351,6 +351,7 @@ const MembersTable = (props) => {
                     sx={{ borderRadius: 2}}
                     label="Add"
                     onClick={() => handleRemoveFrozenUsers(el.id)}
+                    disabled = {ProjectDetails.is_archived}
                   />
                 )} 
 
@@ -417,6 +418,7 @@ const MembersTable = (props) => {
           label={props.type ? addLabel[props.type] : "Add Users"}
           fullWidth
           onClick={handleUserDialogOpen}
+          disabled={props.type === addUserTypes.PROJECT_ANNOTATORS||props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER ?ProjectDetails.is_archived:""}
         />
       ) : null}
   

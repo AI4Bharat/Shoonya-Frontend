@@ -398,6 +398,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
                 }}
+                disabled={ ProjectDetails.is_archived }
                 sx={{ p: 1, borderRadius: 2 }}
                 label={
                   <Typography sx={{ color: "#FFFFFF" }} variant="body2">
@@ -479,7 +480,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
 
   useEffect(() => {
     if (ProjectDetails) {
-      if (props.type === "review" && ProjectDetails.labeled_task_count === 0)
+      if (props.type === "review" && ProjectDetails.labeled_task_count === 0 ||  ProjectDetails.is_archived )
         setPullDisabled("No more unassigned tasks in this project");
       else if (pullDisabled === "No more unassigned tasks in this project")
         setPullDisabled("");
@@ -490,7 +491,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
     if (ProjectDetails) {
       if (
         props.type === "annotation" &&
-        ProjectDetails.unassigned_task_count === 0
+        ProjectDetails.unassigned_task_count === 0 || ProjectDetails.is_archived
       )
         setPullDisabled("No more unassigned tasks in this project");
       else if (pullDisabled === "No more unassigned tasks in this project")
@@ -548,13 +549,13 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
         selectedFilters.annotation_status === "unlabeled") ||
         (props.type === "review" &&
           selectedFilters.review_status === "unreviewed")) &&
-      totalTaskCount === 0
+      totalTaskCount === 0 ||   ProjectDetails.is_archived
     ) {
       setDeallocateDisabled("No more tasks to deallocate");
     } else if (deallocateDisabled === "No more tasks to deallocate") {
       setDeallocateDisabled("");
     }
-  }, [totalTaskCount, selectedFilters]);
+  }, [totalTaskCount, selectedFilters,ProjectDetails]);
 
   useEffect(() => {
     if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
@@ -1021,7 +1022,7 @@ ProjectDetails?.annotation_reviewers,
                           : "Start reviewing now"
                       }
                       onClick={labelAllTasks}
-                      disabled={totalTaskCount === 0 }
+                      disabled={totalTaskCount === 0 ||  ProjectDetails.is_archived }
                     />
                   </Box>
                 </Tooltip>
