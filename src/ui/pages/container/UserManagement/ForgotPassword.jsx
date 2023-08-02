@@ -34,9 +34,8 @@ const ForgotPassword = () => {
     setError({ ...error, [prop]: false });
   };
   const ForgotPassword = {
-    email: values.email,
+    email: values.email.toLowerCase(),
   };
-
   const handleSubmit = async () => {
     setLoading(true);
     let obj = new ForgotPasswordAPI(ForgotPassword);
