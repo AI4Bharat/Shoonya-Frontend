@@ -93,7 +93,7 @@ const PopulateAiModel = () => {
         temp.push({
           name: element,
           value: element,
-          disabled: (element !== "OCRDocument" )
+          disabled: (element !== "OCRDocument" && element !=="SpeechConversation" )
         });
       });
       setSrcDatasetTypes(temp);
@@ -156,7 +156,10 @@ const PopulateAiModel = () => {
     const org_id = await (DatasetInstances.filter((items) => {
       return items.instance_id === srcInstance
     })[0].organisation_id);
-    const apiObj = new aiModel(srcInstance, translationModel, org_id, checked);
+
+    let apiObj;
+    srcDatasetType === "OCRDocument" && ( apiObj = new aiModel(srcInstance, translationModel, org_id, checked,srcDatasetType))
+    srcDatasetType === "SpeechConversation" && (apiObj = new aiModel(srcInstance, translationModel, org_id, checked,srcDatasetType))
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
@@ -176,6 +179,7 @@ const PopulateAiModel = () => {
     setSrcInstance('');
     setTranslationModel('');
   }
+
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -257,10 +261,15 @@ const PopulateAiModel = () => {
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
                 <MenuItems
-                  menuOptions={[{
+                  menuOptions={[srcDatasetType === "OCRDocument" && {
                     name: "Google vision",
                     value: "google"
-                  }]}
+                  }, srcDatasetType === "SpeechConversation" && {
+                    name: "AI4Bharat-Dhruva ASR",
+                    value: "dhruva_asr"
+                  }
+                 
+                ]}
                   handleChange={handleTransModelChange}
                   value={translationModel}
                 />
