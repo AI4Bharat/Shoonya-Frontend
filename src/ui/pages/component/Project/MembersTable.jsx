@@ -103,6 +103,10 @@ const MembersTable = (props) => {
     message: "",
     variant: "success",
   });
+  const [btn,setbtn] = useState(null);
+  const [value,setvalue] = useState();
+  const [selectedEmails, setSelectedEmails] = useState([]);
+  const [csvFile, setCsvFile] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
@@ -257,7 +261,10 @@ const MembersTable = (props) => {
       }
       handleUserDialogClose();
     setLoading(false);
-    setSelectedUsers([ ])
+    setSelectedUsers([ ]);
+    setSelectedEmails([]);
+    setCsvFile(null);
+    setbtn(null)
     setUserType(Object.keys(UserRolesList)[0])
   };
   const handleRemoveFrozenUsers = async (FrozenUserId) => {
@@ -430,6 +437,14 @@ const MembersTable = (props) => {
           setUserType={setUserType}
           addBtnClickHandler={()=>addBtnClickHandler()}
           loading={loading}
+          selectedEmails={selectedEmails}
+          setSelectedEmails={setSelectedEmails}
+          csvFile={csvFile}
+          setCsvFile={setCsvFile}
+          btn={btn}
+          setbtn={setbtn}
+          value={value}
+          setvalue={setvalue}
         />
       ) : (
         <AddUsersDialog
