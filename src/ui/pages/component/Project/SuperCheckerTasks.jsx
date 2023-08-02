@@ -134,17 +134,17 @@ const SuperCheckerTasks = (props) => {
       (
         (props.type === "superChecker" &&
           selectedFilters.supercheck_status === "unvalidated")) &&
-      totalTaskCount === 0
+      totalTaskCount === 0 || ProjectDetails.is_archived
     ) {
       setDeallocateDisabled("No more tasks to deallocate");
     } else if (deallocateDisabled === "No more tasks to deallocate") {
       setDeallocateDisabled("");
     }
-  }, [totalTaskCount, selectedFilters]);
+  }, [totalTaskCount, selectedFilters,ProjectDetails]);
 
   useEffect(() => {
     if (ProjectDetails) {
-      if (props.type === "superChecker" && ProjectDetails.reviewed_task_count === 0)
+      if (props.type === "superChecker" && ProjectDetails.reviewed_task_count === 0 ||  ProjectDetails.is_archived)
         setPullDisabled("No more unassigned tasks in this project");
       else if (pullDisabled === "No more unassigned tasks in this project")
         setPullDisabled("");
@@ -213,6 +213,7 @@ const SuperCheckerTasks = (props) => {
         row.push( <>
           <Link to={`SuperChecker/${el.id}`} className={classes.link}>
           <CustomButton
+            disabled={ProjectDetails.is_archived}
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
@@ -685,7 +686,7 @@ const renderSnackBar = () => {
                       }}
                       label={ "Start validating now"}
                       onClick={labelAllTasks}
-                      disabled={totalTaskCount === 0 }
+                      disabled={totalTaskCount === 0 ||  ProjectDetails.is_archived  }
                     />
                   </Box>
                 </Tooltip>

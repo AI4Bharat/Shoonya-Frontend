@@ -140,11 +140,11 @@ const Projects = () => {
 
   useEffect(() => {
     getProjectDetails();
-    const projectStatus = ProjectDetails.is_published
-      ? "Published"
-      : ProjectDetails.is_archived
-        ? "Archived"
-        : "Draft";
+    const projectStatus = ProjectDetails.is_archived
+      ? "Archived"
+      : ProjectDetails.is_published
+        ? "Published"
+         :"Draft";
     setProjectData([
       {
         name: "Project ID",
