@@ -73,7 +73,7 @@ const Header = () => {
     dispatch(Logout());
     // ExpireSession();
     localStorage.clear();
-    navigate("/");
+    navigate("/login");
   };
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];

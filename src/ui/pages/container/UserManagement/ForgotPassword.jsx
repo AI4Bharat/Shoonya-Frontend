@@ -123,7 +123,7 @@ const ForgotPassword = () => {
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} textAlign={"right"}>
           <Typography>
-            <Link href="/" style={{ fontSize: "14px" }}>
+            <Link href="/login" style={{ fontSize: "14px" }}>
               {" "}
               Back to Login
             </Link>

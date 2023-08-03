@@ -44,12 +44,13 @@ import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
 import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
 import DashBoard from "./ui/pages/container/Admin/DashBoard";
 import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
+import ShoonyaPortal from "./ui/pages/component/Intro/ShoonyaPortal";
 
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
     if (!authenticateUser()) {
-      return <Navigate to="/" />;
+      return <Navigate to="/login" />;
       // return browserhistory.replace("/#/");
     }
     return children;
@@ -136,7 +137,8 @@ const App = () => {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+      <Route path="/"    element={(<Layout component={<ShoonyaPortal />} />)}/>
+        <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
         <Route path="/invite/:inviteCode" element={<SignUp />} />

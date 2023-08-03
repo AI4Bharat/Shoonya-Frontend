@@ -3,7 +3,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 // import { useHistory } from "react-router-dom";
-import {  ThemeProvider,  } from "@mui/material";
+import {  ThemeProvider,Grid  } from "@mui/material";
 // import Header from "./components/common/Header";
 // import Footer from "./components/common/Footer";
 // import Theme from "./theme/theme-default";
@@ -17,6 +17,7 @@ import BackButton from "./pages/component/common/BackButton";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { translate } from "../config/localisation";
 import { authenticateUser } from "../utils/utils";
+import IntroHeader from "./pages/component/Intro/IntroHeader";
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
 
@@ -87,7 +88,16 @@ const Layout= (props) => {
   }, []);
 
   return (
-    <ThemeProvider theme={themeDefault}>
+    <div>
+      {localStorage.getItem("shoonya_access_token") === null ? (
+     <div style={{ textAlign: "center" }}>
+          <IntroHeader />
+          <Grid sx={{ overflowX: "hidden"}}>
+            {component}
+          </Grid>
+        </div>):
+   
+    (<ThemeProvider theme={themeDefault}>
       <div 
       className={classes.root}
       >
@@ -112,7 +122,8 @@ const Layout= (props) => {
         </div>
        
       </div>
-    </ThemeProvider >
+    </ThemeProvider >)}
+    </div>
   );
 }
 export default Layout;
