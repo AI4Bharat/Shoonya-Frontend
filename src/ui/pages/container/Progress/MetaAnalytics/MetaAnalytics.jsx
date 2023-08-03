@@ -12,9 +12,9 @@ import AudioSegmentation from "./AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
 import themeDefault from "../../../../theme/theme";
 
-export default function MetaAnalytics(props) {
+export default function MetaAnalytics() {
     const dispatch = useDispatch();
-    const {loggedInUserData} = props
+    // const {loggedInUserData} = props
     const [loading, setLoading] = useState(true);
     const apiLoading = useSelector((state) => state.apiStatus.loading);
     const metaAnalyticsData = useSelector(

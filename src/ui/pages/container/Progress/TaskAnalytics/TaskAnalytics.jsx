@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import Spinner from "../../../component/common/Spinner";
 
 
-const TaskAnalytics = (props) => {
+const TaskAnalytics = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const taskAnalyticsData = useSelector(

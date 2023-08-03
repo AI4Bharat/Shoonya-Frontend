@@ -34,6 +34,9 @@ function IntroHeader(props) {
   const handleClickUseCases = () => {
     navigate("/useCases");
   };
+  const handleClickAnalytics = () => {
+    navigate("/analytic");
+  }
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", mt: 3 }}>
@@ -97,22 +100,8 @@ function IntroHeader(props) {
               fontFamily: "roboto,sans-serif",
             }}
           >
-           cfgvb
+           use Cases
           </Button>
-        </Grid>
-        <Grid>
-          
-            <Button
-              sx={{
-                color: "#51504f",
-                textTransform: "capitalize",
-                fontSize: "16px",
-                fontFamily: "roboto,sans-serif",
-              }}
-            >
-              Analytics
-            </Button>
-          
         </Grid>
         
       </Grid>
@@ -196,6 +185,19 @@ function IntroHeader(props) {
               >
                 Use Cases
               </Button>
+              <Button
+                onClick={handleClickAnalytics}
+                sx={{
+                  color: "#51504f",
+                  textTransform: "capitalize",
+                  fontSize: "16px",
+                  fontFamily: "roboto,sans-serif",
+                  ml: 3,
+                }}
+              >
+                Analytics
+              </Button>
+
             </Grid>
           </Box>
           <IconButton

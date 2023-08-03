@@ -45,6 +45,7 @@ import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettin
 import DashBoard from "./ui/pages/container/Admin/DashBoard";
 import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
 import ShoonyaPortal from "./ui/pages/component/Intro/ShoonyaPortal";
+import Analytic from "./ui/pages/component/Intro/Analytic";
 
 
 const App = () => {
@@ -273,6 +274,12 @@ const App = () => {
           path="create-Dataset-Instance-Button"
           element={ProtectedRouteWrapper(
             <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="analytic"
+          element={(
+            <Layout component={<Analytic />} />
           )}
         />
         
