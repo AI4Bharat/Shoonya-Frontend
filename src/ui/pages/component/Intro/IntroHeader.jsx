@@ -97,9 +97,24 @@ function IntroHeader(props) {
               fontFamily: "roboto,sans-serif",
             }}
           >
-            Use Cases
+           cfgvb
           </Button>
         </Grid>
+        <Grid>
+          
+            <Button
+              sx={{
+                color: "#51504f",
+                textTransform: "capitalize",
+                fontSize: "16px",
+                fontFamily: "roboto,sans-serif",
+              }}
+            >
+              Analytics
+            </Button>
+          
+        </Grid>
+        
       </Grid>
     </Box>
   );
