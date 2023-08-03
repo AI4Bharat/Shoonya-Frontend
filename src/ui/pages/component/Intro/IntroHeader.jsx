@@ -2,10 +2,10 @@ import * as React from "react";
 import { Routes, Route, useNavigate, Link } from "react-router-dom";
 
 //Styles
-import IntroDatasetStyle  from "../../../styles/introDataset";
+import IntroDatasetStyle from "../../../styles/introDataset";
 //Icons
 import MenuIcon from "@mui/icons-material/Menu";
-import  shoonyalogo from "../../../../assets/img/ai4bharat1.png";
+import shoonyalogo from "../../../../assets/img/ai4bharat1.png";
 
 //Components
 import {
@@ -43,10 +43,7 @@ function IntroHeader(props) {
       <Grid>
         <img src={shoonyalogo} style={{ maxWidth: "90px" }} alt="logo" />
         <Grid>
-          <a
-            target="_blank"
-            href="https://www.youtube.com/@chitralekha-bhashini"
-          >
+          <a target="_blank" href="https://www.youtube.com/@shoonya-bhashini">
             <Button
               sx={{
                 color: "#51504f",
@@ -60,7 +57,7 @@ function IntroHeader(props) {
           </a>
         </Grid>
         <Grid>
-          <a target="_blank" href="https://github.com/AI4Bharat/Chitralekha">
+          <a target="_blank" href="https://github.com/AI4Bharat/Shoonya">
             <Button
               sx={{
                 color: "#51504f",
@@ -74,10 +71,7 @@ function IntroHeader(props) {
           </a>
         </Grid>
         <Grid>
-          <a
-            target="_blank"
-            href="https://github.com/AI4Bharat/Chitralekha/wiki"
-          >
+          <a target="_blank" href="https://github.com/AI4Bharat/Shoonya/wiki">
             <Button
               sx={{
                 color: "#51504f",
@@ -127,7 +121,7 @@ function IntroHeader(props) {
             <Grid>
               <a
                 target="_blank"
-                href="https://www.youtube.com/@chitralekha-bhashini"
+                href="https://www.youtube.com/@shoonya-bhashini"
               >
                 <Button
                   sx={{
@@ -141,10 +135,7 @@ function IntroHeader(props) {
                   Tutorial
                 </Button>
               </a>
-              <a
-                target="_blank"
-                href="https://github.com/AI4Bharat/Chitralekha"
-              >
+              <a target="_blank" href="https://github.com/AI4Bharat/Shoonya">
                 <Button
                   sx={{
                     color: "#51504f",
@@ -159,7 +150,7 @@ function IntroHeader(props) {
               </a>
               <a
                 target="_blank"
-                href="https://github.com/AI4Bharat/Chitralekha/wiki"
+                href="https://github.com/AI4Bharat/Shoonya/wiki"
               >
                 <Button
                   sx={{
@@ -225,16 +216,23 @@ function IntroHeader(props) {
             }}
           >
             <Link to={`/login`}>
-              <Button variant="contained" className={classes.button}>
+              <Button
+                variant="contained"
+                // className={classes.button}
+                sx={{
+                  fontSize: "16px",
+                  fontFamily: "roboto,sans-serif",
+                  height: "35px",
+                  marginTop: "8px",
+                  marginRight: "30px",
+                  padding: "22px",
+                }}
+              >
                 Login
               </Button>
             </Link>
             <Link to={`/`}>
-              <img
-                src={shoonyalogo}
-                style={{ maxWidth: "60px" }}
-                alt="logo"
-              />
+              <img src={shoonyalogo} style={{ maxWidth: "60px" }} alt="logo" />
             </Link>
           </Grid>
         </Toolbar>
