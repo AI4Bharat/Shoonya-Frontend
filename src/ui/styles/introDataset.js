@@ -23,7 +23,7 @@ const IntroDatasetStyle = makeStyles({
     fontSize: "16px",
     fontFamily: "roboto,sans-serif",
   },
-  Chitralekhatitle: {
+  shoonyatitle: {
     fontWeight: "500",
     fontSize: "62px",
     lineHeight: 1.17,
@@ -92,11 +92,7 @@ const IntroDatasetStyle = makeStyles({
       fontSize: "20px",
     },
   },
-  principlesContent: {
-    fontSize: "16px",
-    color: "#707070",
-    lineHeight: "25px",
-  },
+
   featuresContent: {
     textAlign: "left",
     fontSize: "16px",

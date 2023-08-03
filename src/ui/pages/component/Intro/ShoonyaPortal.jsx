@@ -1,13 +1,15 @@
 import React, { useEffect } from "react";
 
 //Styles
-import  IntroDatasetStyle  from "../../../styles/introDataset";
+import IntroDatasetStyle from "../../../styles/introDataset";
 
 //Components
 import { Grid, Typography, Button, Box } from "@mui/material";
-// import { Partners, Features, Principles } from "containers/intro/index";
-// import Footer from "../common/Footer";
-import  Chitralekhaimg  from "../../../../assets/img/shoonya-bg.png";
+import Principles from "../../container/Intro/Principles";
+import Features from "../../container/Intro/Features";
+import Partners from "../../container/Intro/Partners";
+import Footer from "../Intro/Footer";
+import Chitralekhaimg from "../../../../assets/img/shoonya-bg.png";
 
 const ChitralekhaPortal = () => {
   const classes = IntroDatasetStyle();
@@ -23,14 +25,24 @@ const ChitralekhaPortal = () => {
   return (
     <div style={{ backgroundColor: "white" }}>
       <Grid container direction="row" className={classes.section}>
-        <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mt: 20, mb: 20 }}>
-          <Typography variant="h2" className={classes.Chitralekhatitle}>
+        <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mt: 15, mb: 20 }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: "500",
+              fontSize: "62px",
+              lineHeight: 1.17,
+              color: "#3a3a3a",
+              textAlign: "left",
+              margin: "0 35px 25px 45px",
+            }}
+          >
             Shoonya
           </Typography>
           <Typography
             sx={{
               fontSize: "1.25rem",
-              lineHeight: "2rem",
+              lineHeight: "2.2rem",
               margin: "0 35px 25px 45px",
               textAlign: "justify",
             }}
@@ -44,7 +56,16 @@ const ChitralekhaPortal = () => {
           </Typography>
           <Button
             variant="contained"
-            className={classes.buttons}
+            // className={classes.buttons}
+            sx={{
+            borderRadius: "5px",
+            display: "flex",
+            marginLeft: "42px",
+            fontSize: "16px",
+            fontFamily: "roboto,sans-serif",
+            height: "35px",
+            marginTop: "8px",
+            padding: "22px",}}
             onClick={handleWatchDemoVideo}
           >
             Watch Demo Video
@@ -61,10 +82,10 @@ const ChitralekhaPortal = () => {
           </Box>
         </Grid>
       </Grid>
-      {/* <Principles />
+      <Principles />
       <Features />
       <Partners />
-      <Footer /> */}
+      <Footer />
     </div>
   );
 };
