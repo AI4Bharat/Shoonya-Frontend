@@ -3,7 +3,7 @@ import React from "react";
 import ContextualTranslationEditing from "./ContextualTranslationEditing";
 import SemanticTextualSimilarityChart from "./SemanticTextualSimilarityChart";
 import ContextualSentenceVerificationChart from "./ContextualSentenceVerificationChart";
-import TaskAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/TaskAnalytics";
+import TaskAnalyticsDataAPI from "../../../../../redux/actions/api/Intro/TaskAnalytics";
 import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
 import AudioSegmentation from "./AudioSegmentation";
 import AudioTranscription from "./AudioTranscription";
@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import Spinner from "../../../component/common/Spinner";
 
 
-const TaskAnalytics = (props) => {
+const TaskAnalytics = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const taskAnalyticsData = useSelector(
@@ -21,7 +21,7 @@ const TaskAnalytics = (props) => {
   );
   const getTaskAnalyticsdata = () => {
      setLoading(true)
-    const userObj = new TaskAnalyticsDataAPI();
+    const userObj = new TaskAnalyticsDataAPI(1);
     dispatch(APITransport(userObj));
   };
 
@@ -36,7 +36,7 @@ const TaskAnalytics = (props) => {
   }, [taskAnalyticsData]);
 
   return (
-    <>
+    <div >
       {loading && <Spinner />}
       {taskAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
         <ContextualTranslationEditing taskAnalyticsData={taskAnalyticsData} />
@@ -64,7 +64,7 @@ const TaskAnalytics = (props) => {
           taskAnalyticsData={taskAnalyticsData}
         />
       </Grid>}
-    </>
+    </div>
   );
 };
 

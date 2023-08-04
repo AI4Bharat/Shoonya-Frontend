@@ -5,8 +5,8 @@ import { useState } from 'react'
 
 import {useSelector} from "react-redux";
 import introTheme from '../../../theme/introTheme';
-import MetaAnalytics from '../../container/Progress/MetaAnalytics/MetaAnalytics';
-import TaskAnalytics from '../../container/Progress/TaskAnalytics/TaskAnalytics';
+import MetaAnalytics from '../../container/Intro/MetaAnalytics/MetaAnalytics';
+import TaskAnalytics from '../../container/Intro/TaskAnalytics/TaskAnalytics';
 
 
 
@@ -38,10 +38,10 @@ const Analytic = () => {
     
     return (
       
-        <ThemeProvider theme={introTheme}>
-            <Box sx={{mb:2,}} >
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
-                    <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
+        <ThemeProvider theme={introTheme} >
+            <Box sx={{mb:2}} >
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs" sx={{mb:2,mt:11,ml:3}}>
+                    <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700',marginRight: '28px !important' }} />
                     <Tab label="Meta Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                 </Tabs>
             </Box>
@@ -50,7 +50,7 @@ const Analytic = () => {
                 <TaskAnalytics/>  
                 </TabPanel> 
                 <TabPanel value={tabValue} index={1}>
-                {/* <MetaAnalytics/> */}
+                <MetaAnalytics/>
                 </TabPanel>  
             </Box>
         </ThemeProvider>

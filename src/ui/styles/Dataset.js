@@ -1,6 +1,7 @@
 import { makeStyles } from '@mui/styles';
 
-const DatasetStyle = makeStyles({
+const 
+DatasetStyle = makeStyles({
 
   Projectsettingtextarea: {
     width: "100%",
@@ -163,11 +164,12 @@ const DatasetStyle = makeStyles({
   progress: {
     position: 'relative',
     top: '40%',
-    left: '46%'
+   
 
   },
   progressDiv: {
     position: 'fixed',
+    textAlign:"center",
     // backgroundColor: 'rgba(0.5, 0, 0, 0.5)',
     zIndex: 1000,
     width: '100%',

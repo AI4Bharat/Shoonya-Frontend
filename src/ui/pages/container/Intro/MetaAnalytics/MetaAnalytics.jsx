@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Grid ,ThemeProvider} from "@material-ui/core";
-import MetaAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/MetaAnalytics"
+import MetaAnalyticsDataAPI from "../../../../../redux/actions/api/Intro/MetaAnalytics"
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import ContextualTranslationEditing from "./ContextualTranslationEditing";
 import SemanticTextualSimilarity_Scale5 from "./SemanticTextualSimilarity_Scale5";
@@ -12,9 +12,8 @@ import AudioSegmentation from "./AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
 import themeDefault from "../../../../theme/theme";
 
-export default function MetaAnalytics(props) {
+export default function MetaAnalytics() {
     const dispatch = useDispatch();
-    const {loggedInUserData} = props
     const [loading, setLoading] = useState(true);
     const apiLoading = useSelector((state) => state.apiStatus.loading);
     const metaAnalyticsData = useSelector(
@@ -22,7 +21,7 @@ export default function MetaAnalytics(props) {
       );
       const getMetaAnalyticsdata = () => {
         setLoading(true);
-        const userObj = new MetaAnalyticsDataAPI(loggedInUserData?.organization?.id);
+        const userObj = new MetaAnalyticsDataAPI(1);
         dispatch(APITransport(userObj));
       };
 
