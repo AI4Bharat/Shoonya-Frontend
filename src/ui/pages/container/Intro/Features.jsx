@@ -44,7 +44,7 @@ const Features = () => {
               />
               <Typography
                 variant="h4"
-                sx={{ mb: 3, mt: 1}}
+                sx={{ mb: 2, mt: 1,fontSize:"1.999rem"}}
                 className={classes.featuresTitle}
               >
                 Pure Python
@@ -77,7 +77,7 @@ const Features = () => {
 
               <Typography
                 variant="h4"
-                sx={{ mb: 3, mt: 1 }}
+                sx={{ mb: 2, mt: 1,fontSize:"1.999rem" }}
                 className={classes.featuresTitle}
               >
                 Clean & Powerful UI
@@ -113,7 +113,7 @@ const Features = () => {
               />
               <Typography
                 variant="h4"
-                sx={{ mb: 3, mt: 1 }}
+                sx={{ mb: 2, mt: 1,fontSize:"1.999rem" }}
                 className={classes.featuresTitle}
               >
                 Robust Integrations
@@ -145,7 +145,7 @@ const Features = () => {
               <img src={EasytoUse} alt="logo" className={classes.featuresimg} />
               <Typography
                 variant="h4"
-                sx={{ mb: 3, mt: 1 }}
+                sx={{ mb: 2, mt: 1,fontSize:"1.999rem" }}
                 className={classes.featuresTitle}
               >
                 Easy to Use
@@ -181,7 +181,7 @@ const Features = () => {
               />
               <Typography
                 variant="h4"
-                sx={{ mb: 3, mt: 1 }}
+                sx={{ mb: 2, mt: 1,fontSize:"1.999rem" }}
                 className={classes.featuresTitle}
               >
                 Open Source

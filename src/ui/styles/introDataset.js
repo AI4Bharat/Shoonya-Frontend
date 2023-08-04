@@ -72,7 +72,7 @@ const IntroDatasetStyle = makeStyles({
   },
   featuresimg: {
     width: "150px",
-    margin: "20px 50px 12px 0px",
+    margin: "40px 50px 12px 0px",
     float: "left",
   },
   titles: {
@@ -87,6 +87,7 @@ const IntroDatasetStyle = makeStyles({
     lineHeight: "1.17px",
     color: "#51504f",
     letterSpacing: "1px",
+    fontSize: "90px",
     "@media (max-width:990px)": {
       lineHeight: "19px",
       fontSize: "20px",

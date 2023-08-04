@@ -47,6 +47,7 @@ import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
 import ShoonyaPortal from "./ui/pages/component/Intro/ShoonyaPortal";
 import UseCases from "./ui/pages/container/Intro/UseCases";
 import Thanks from "./ui/pages/container/Intro/Thanks";
+import Analytic from "./ui/pages/component/Intro/Analytic";
 
 
 const App = () => {
@@ -289,6 +290,12 @@ const App = () => {
           path="create-Dataset-Instance-Button"
           element={ProtectedRouteWrapper(
             <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="analytic"
+          element={(
+            <Layout component={<Analytic />} />
           )}
         />
         
