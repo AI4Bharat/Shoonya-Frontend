@@ -95,8 +95,7 @@ const Footer = () => {
           <Typography
             variant="caption"
             onClick={handleClickThanks}
-            sx={{ mt: 1 }}
-            className={classes.thanks}
+            sx={{ mt: 1 , color: "white"}}
           >
             Thanks
           </Typography>

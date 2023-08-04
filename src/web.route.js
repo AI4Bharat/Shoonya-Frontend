@@ -45,6 +45,8 @@ import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettin
 import DashBoard from "./ui/pages/container/Admin/DashBoard";
 import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
 import ShoonyaPortal from "./ui/pages/component/Intro/ShoonyaPortal";
+import UseCases from "./ui/pages/container/Intro/UseCases";
+import Thanks from "./ui/pages/container/Intro/Thanks";
 
 
 const App = () => {
@@ -54,6 +56,18 @@ const App = () => {
       // return browserhistory.replace("/#/");
     }
     return children;
+  };
+
+  const PublicRoute = ({user, children}) =>{
+    if (authenticateUser()) {
+     const orgId = JSON.parse(localStorage.getItem("userData"))?.organization.id;
+     return <Navigate to={`/projects`} />;
+    }
+    return children;
+  };
+  
+  const PublicRouteWrapper = (component) => {
+    return <PublicRoute>{component}</PublicRoute>;
   };
 
   const ProtectedRouteWrapper = (component) => {
@@ -137,7 +151,9 @@ const App = () => {
   return (
     <HashRouter>
       <Routes>
-      <Route path="/"    element={(<Layout component={<ShoonyaPortal />} />)}/>
+      <Route path="/"    element={PublicRouteWrapper(<Layout component={<ShoonyaPortal />} />)}/>
+      <Route path="/Thanks" element={<Layout component={<Thanks />} />} />
+        <Route path="/useCases" element={<Layout component={<UseCases />} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />

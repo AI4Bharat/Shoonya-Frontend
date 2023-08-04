@@ -44,7 +44,7 @@ const Features = () => {
               />
               <Typography
                 variant="h4"
-                sx={{ mb: 3, mt: 1 }}
+                sx={{ mb: 3, mt: 1}}
                 className={classes.featuresTitle}
               >
                 Pure Python

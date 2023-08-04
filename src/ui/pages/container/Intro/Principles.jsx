@@ -28,6 +28,7 @@ const Principles = () => {
         >
           <Typography
             variant="h4"
+            className={classes.titles}
             sx={{
               fontSize: "55px",
               lineHeight: 1.17,

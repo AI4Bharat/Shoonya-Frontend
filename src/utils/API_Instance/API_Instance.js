@@ -95,7 +95,7 @@ axiosInstance.interceptors.response.use(
           localStorage.removeItem(REFRESH_TOKEN);
           window.location.pathname = "/login";
         } else {
-          window.location.href = "/";
+          window.location.href = "/login";
         }
       } else {
         // window.location.href = "/";

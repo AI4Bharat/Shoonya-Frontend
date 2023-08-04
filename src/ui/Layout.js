@@ -90,9 +90,9 @@ const Layout= (props) => {
   return (
     <div>
       {localStorage.getItem("shoonya_access_token") === null ? (
-     <div style={{ textAlign: "center" }}>
+     <div style={{ textAlign: "center"}}>
           <IntroHeader />
-          <Grid sx={{ overflowX: "hidden"}}>
+          <Grid sx={{ overflowX: "hidden",}}>
             {component}
           </Grid>
         </div>):
