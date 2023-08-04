@@ -20,6 +20,7 @@ function TabPanel(props) {
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
             {...other}
+            style={{padding:" 0px 140px 0px 140px"}}
         >
             {value === index && (
                 <Box p={2}>
@@ -46,7 +47,7 @@ const Analytic = () => {
                 </Tabs>
             </Box>
             <Box sx={{ p: 1}}>
-                <TabPanel value={tabValue} index={0}>
+                <TabPanel value={tabValue} index={0} >
                 <TaskAnalytics/>  
                 </TabPanel> 
                 <TabPanel value={tabValue} index={1}>

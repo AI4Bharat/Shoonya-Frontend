@@ -38,7 +38,7 @@ const TaskAnalytics = () => {
   }, [taskAnalyticsData]);
 
   return (
-    <ThemeProvider theme={introTheme} >
+    <>
       {loading && <Spinner />}
       {taskAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
         <ContextualTranslationEditing taskAnalyticsData={taskAnalyticsData} />
@@ -66,7 +66,7 @@ const TaskAnalytics = () => {
           taskAnalyticsData={taskAnalyticsData}
         />
       </Grid>}
-    </ThemeProvider>
+    </>
   );
 };
 
