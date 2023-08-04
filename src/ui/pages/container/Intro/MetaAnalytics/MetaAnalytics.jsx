@@ -15,7 +15,7 @@ import themeDefault from "../../../../theme/theme";
 export default function MetaAnalytics() {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
-    const apiLoading = useSelector((state) => state.apiStatus.loading);
+    // const apiLoading = useSelector((state) => state.apiStatus.loading);
     const metaAnalyticsData = useSelector(
         (state) => state.getMetaAnalyticsData.data
       );

@@ -170,7 +170,7 @@ DatasetStyle = makeStyles({
   progressDiv: {
     position: 'fixed',
     textAlign:"center",
-    // backgroundColor: 'rgba(0.5, 0, 0, 0.5)',
+    // backgroundColor: 'white',
     zIndex: 1000,
     width: '100%',
     height: '100%',

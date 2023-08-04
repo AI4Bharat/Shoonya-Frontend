@@ -1,6 +1,23 @@
 import { createTheme } from "@mui/material/styles";
 
 const introTheme = createTheme({
+  palette: {
+    primary: {
+      light: "#60568d",
+      main: "#2C2799",
+      dark: "#271e4f",
+      contrastText: "#FFFFFF",
+    },
+    secondary: {
+      light: "#FFFFFF",
+      main: "#FFFFFF",
+      dark: "#FFFFFF",
+      contrastText: "#000000",
+    },
+    background: {
+      default: "white",
+    },
+  },
   typography: {
     fontFamily: "rubik,sans-serif",
     fontWeight: "500",

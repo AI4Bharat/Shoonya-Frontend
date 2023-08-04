@@ -16,7 +16,7 @@ const themeDefault = createTheme({
       contrastText: "#000000",
     },
     background: {
-      default: "white",
+      // default: "#2C2799",
     },
   },
   typography: {

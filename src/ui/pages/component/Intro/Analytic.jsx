@@ -38,7 +38,7 @@ const Analytic = () => {
     
     return (
       
-        <ThemeProvider theme={introTheme} >
+        <>
             <Box sx={{mb:2}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs" sx={{mb:2,mt:11,ml:3}}>
                     <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700',marginRight: '28px !important' }} />
@@ -53,7 +53,7 @@ const Analytic = () => {
                 <MetaAnalytics/>
                 </TabPanel>  
             </Box>
-        </ThemeProvider>
+        </>
        
     )
 }
