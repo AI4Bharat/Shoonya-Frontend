@@ -22,10 +22,7 @@ useEffect(() => {
 }, []);
 
 const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
-// console.log(ProjectDetails.sampling_parameters_json.batch_number
-//   ,"ProjectDetails.sampling_mode")
-// const data = ProjectDetails.sampling_parameters_json.batch_number
-// console.log(data.split(" "))
+
   return (
     <ThemeProvider theme={themeDefault}>
       <Grid
