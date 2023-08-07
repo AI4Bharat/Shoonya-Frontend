@@ -16,7 +16,7 @@ import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleM
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import MyProfile from "../../container/UserManagement/ProfileDetails"
-
+import ScheduleMails from "../../container/UserManagement/ScheduleMails"
 
 const ProfilePage = () => {
 
@@ -181,6 +181,11 @@ const ProfilePage = () => {
                 }  */}
               <Card sx={{ borderRadius: "5px", mb:2}}>
                 <MyProfile/>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ p: 2 }}>
+              <Card sx={{ borderRadius: "5px", mb:2}}>
+                <ScheduleMails/>
               </Card>
             </Grid></>
           )}
