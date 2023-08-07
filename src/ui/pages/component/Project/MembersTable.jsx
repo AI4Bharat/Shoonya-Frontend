@@ -25,6 +25,7 @@ import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI";
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
+import userRoles from "../../../../utils/UserMappedByRole/Roles";
 
 
 const columns = [
@@ -114,6 +115,9 @@ const MembersTable = (props) => {
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
+  );
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
   );
 
   const pageSearch = () => {
@@ -326,7 +330,7 @@ const MembersTable = (props) => {
                 label={"View"}
               />
 
-              {props.type === addUserTypes.PROJECT_ANNOTATORS && (
+              {(userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && props.type === addUserTypes.PROJECT_ANNOTATORS) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -339,7 +343,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
-              {(props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
+              {userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && (props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
