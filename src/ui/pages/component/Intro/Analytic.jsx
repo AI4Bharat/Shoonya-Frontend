@@ -5,8 +5,8 @@ import { useState } from 'react'
 
 import {useSelector} from "react-redux";
 import introTheme from '../../../theme/introTheme';
-import MetaAnalytics from '../../container/Intro/MetaAnalytics/MetaAnalytics';
-import TaskAnalytics from '../../container/Intro/TaskAnalytics/TaskAnalytics';
+import MetaAnalytics from '../../container/Progress/MetaAnalytics/MetaAnalytics';
+import TaskAnalytics from '../../container/Progress/TaskAnalytics/TaskAnalytics';
 
 
 

@@ -7,7 +7,7 @@ import C from "../../../constants";
      super("GET", timeout, false);
      this.progressObj = progressObj;
      this.type = C.FETCH_META_ANALYTICS_DATA;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}public/${OrgId}/cumulative_tasks_count/?metainfo=true`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}public/1/cumulative_tasks_count/?metainfo=true`;
    }
   
    processResponse(res) {
@@ -29,7 +29,7 @@ import C from "../../../constants";
     this.headers = {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
+        // "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
       },
     };
     return this.headers;
