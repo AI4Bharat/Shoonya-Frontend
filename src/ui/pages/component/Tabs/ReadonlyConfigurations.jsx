@@ -78,7 +78,51 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
                 {ProjectDetails.sampling_mode == "b" && "Batch"}
                 {ProjectDetails.sampling_mode == "r" && "Random"}
               </Typography>
+              
             </Grid>
+            {ProjectDetails && ProjectDetails?.sampling_parameters_json?.batch_size  && ( 
+            <Grid
+              item
+              xs={12}
+              md={12}
+              lg={12}
+              xl={12}
+              sm={12}
+              sx={{ mt: 2, display: "flex" }}
+            >
+              <Typography
+                variant="subtitle1"
+                style={{ flexDirection: "column" }}
+              >
+                Batch Size  :
+              </Typography>
+
+              <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+              {ProjectDetails.sampling_parameters_json?.batch_size}
+              </Typography>
+              
+            </Grid>)}
+            {ProjectDetails && ProjectDetails?.sampling_parameters_json?.batch_size  && ( 
+            <Grid
+              item
+              xs={12}
+              md={12}
+              lg={12}
+              xl={12}
+              sm={12}
+              sx={{ mt: 2, display: "flex" }}
+            >
+              <Typography
+                variant="subtitle1"
+                style={{ flexDirection: "column" }}
+              >
+                 Batch Number  :
+              </Typography>
+
+              <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+              {ProjectDetails.sampling_parameters_json?.batch_number?.join(' , ')}
+              </Typography>
+            </Grid>)}
 
             {ProjectDetails.datasets.map((dataset) => (
               <Grid
