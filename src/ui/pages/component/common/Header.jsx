@@ -128,6 +128,14 @@ const Header = () => {
     }
   };
 
+  const handleTranscriptionFlowChange = (event) => {
+    if (event.target.checked) {
+      localStorage.setItem("enableChitrlekhaTranscription", true);
+    } else {
+      localStorage.setItem("enableChitrlekhaTranscription", false);
+    }
+  }
+
   const handleTagsChange = (event) => {
     if (event.target.checked) {
       localStorage.setItem("enableTags", true);
@@ -565,6 +573,15 @@ const Header = () => {
         <Checkbox
           onChange={handleRTLChange}
           defaultChecked={localStorage.getItem("rtl") === "true"}
+        />
+      ),
+    },
+    {
+      name: "Use Chitralekha Transcription Flow",
+      control: (
+        <Checkbox
+          onChange={handleTranscriptionFlowChange}
+          defaultChecked={localStorage.getItem("enableChitrlekhaTranscription") === "true"}
         />
       ),
     },
