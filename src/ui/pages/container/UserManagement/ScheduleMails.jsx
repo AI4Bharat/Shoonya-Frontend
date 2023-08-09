@@ -17,12 +17,13 @@ import tableTheme from "../../../theme/tableTheme";
 import MUIDataTable from "mui-datatables";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../../component/common/ColumnList";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const ScheduleMails = () => {
   const { id } = useParams();
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
   const [reportLevel, setReportLevel] = useState(0);
-  const [selectedProjectType, setSelectedProjectType] = useState(0);
+  const [selectedProjectType, setSelectedProjectType] = useState("");
   const [projectTypes, setProjectTypes] = useState([
     "AudioSegmentation",
     "AudioTranscription",
@@ -55,10 +56,10 @@ const ScheduleMails = () => {
   };
 
   const createScheduledMail = () => {
-    if (reportLevel == 2 && workspaceId == 0) {
+    if (!reportLevel || !schedule || !selectedProjectType || (reportLevel == 2 && workspaceId == 0)) {
       setSnackbarState({
         open: true,
-        message: "Please select workspace",
+        message: "Invalid input",
         variant: "error",
       });
       return;
@@ -227,7 +228,9 @@ const ScheduleMails = () => {
                   label="Report Level"
                   onChange={(e) => setReportLevel(e.target.value)}
                 >
-                  <MenuItem value={1}>Organization</MenuItem>
+                  {userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role &&
+                    <MenuItem value={1}>Organization</MenuItem>
+                  }
                   <MenuItem value={2}>Workspace</MenuItem>
                 </Select>
               </FormControl>
