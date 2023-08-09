@@ -8,7 +8,7 @@ export default class UpdateScheduledMailsAPI extends API {
     super("PATCH", timeout, false);
     this.type = constants.UPDATE_SCHEDULED_MAILS;
     this.taskId = taskId;
-    this.endpoint = this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/update_scheduled_mail/`;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/update_scheduled_mail/`;
   }
 
   processResponse(res) {
@@ -24,7 +24,7 @@ export default class UpdateScheduledMailsAPI extends API {
 
   getBody() {
     return {
-      id: this.taskId,
+      task_id: this.taskId,
     }
   }
 

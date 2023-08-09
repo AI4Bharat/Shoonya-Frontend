@@ -1,7 +1,6 @@
-import { Button, Card, CircularProgress, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel, InputAdornment } from "@mui/material";
-import OutlinedTextField from "../../component/common/OutlinedTextField";
+import { Card, CircularProgress, Grid, ThemeProvider, Typography, Select, Box, MenuItem, InputLabel } from "@mui/material";
 import themeDefault from "../../../theme/theme";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
@@ -19,10 +18,9 @@ import MUIDataTable from "mui-datatables";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../../component/common/ColumnList";
 
-
 const ScheduleMails = () => {
   const { id } = useParams();
-  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
+  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
   const [reportLevel, setReportLevel] = useState(0);
   const [selectedProjectType, setSelectedProjectType] = useState(0);
   const [projectTypes, setProjectTypes] = useState([
@@ -40,13 +38,12 @@ const ScheduleMails = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
-  const navigate = useNavigate();
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const workspaceData = useSelector(state => state.GetWorkspace.data);
   const scheduledMails = useSelector(state => state.getScheduledMails.data);
-  
+
   const getWorkspaceData = () => {
     const workspaceObj = new GetWorkspaceAPI();
     dispatch(APITransport(workspaceObj));
@@ -56,8 +53,16 @@ const ScheduleMails = () => {
     const scheduledMailsObj = new GetScheduledMailsAPI(id);
     dispatch(APITransport(scheduledMailsObj));
   };
-  
+
   const createScheduledMail = () => {
+    if (reportLevel == 2 && workspaceId == 0) {
+      setSnackbarState({
+        open: true,
+        message: "Please select workspace",
+        variant: "error",
+      });
+      return;
+    }
     const scheduledMailsObj = new CreateScheduledMailsAPI(
       id,
       reportLevel === 1 ? userDetails?.organization?.id : workspaceId,
@@ -66,6 +71,11 @@ const ScheduleMails = () => {
       schedule
     );
     dispatch(APITransport(scheduledMailsObj));
+    setSnackbarState({
+      open: true,
+      message: "Scheduled mail request sent",
+      variant: "success",
+    });
   };
 
   const updateScheduledMail = (mail) => {
@@ -76,7 +86,7 @@ const ScheduleMails = () => {
     dispatch(APITransport(scheduledMailsObj));
     setTimeout(() => {
       getScheduledMails();
-    }, 1000);                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    }, 1000);
   };
 
   const deleteScheduledMail = (mail) => {
@@ -117,12 +127,12 @@ const ScheduleMails = () => {
       });
       tempColumns.push({
         name: "Actions",
-          label: "Actions",
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
+        label: "Actions",
+        options: {
+          filter: false,
+          sort: true,
+          align: "center",
+        },
       });
       tempSelected.push("Actions");
       scheduledMails.map((mail) => {
@@ -130,15 +140,17 @@ const ScheduleMails = () => {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
+              justifyContent: "space-between",
+              gap: 2,
             }}
           >
             <CustomButton
-              label="Play/Pause"
-              onClick={() => updateScheduledMail(mail)}/>
+              label={mail["Status"] === "Enabled" ? "Pause" : "Resume"}
+              onClick={() => updateScheduledMail(mail)} />
             <CustomButton
               label="Delete"
-              onClick={() => deleteScheduledMail(mail)}/>
+              bgColor="red"
+              onClick={() => deleteScheduledMail(mail)} />
           </Box>
         );
       });
@@ -201,8 +213,8 @@ const ScheduleMails = () => {
                 Schedule Emails (Payment Reports)
               </Typography>
             </Grid>
-            
-            <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+
+            <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
                 <InputLabel id="report-level-label" sx={{ fontSize: "16px" }}>Report Level</InputLabel>
                 <Select
@@ -220,8 +232,8 @@ const ScheduleMails = () => {
                 </Select>
               </FormControl>
             </Grid>
-            
-            <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+
+            <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
                 <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>Workspace</InputLabel>
                 <Select
@@ -243,8 +255,8 @@ const ScheduleMails = () => {
                 </Select>
               </FormControl>
             </Grid>
-            
-            <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+
+            <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
                 <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
                 <Select
@@ -266,7 +278,7 @@ const ScheduleMails = () => {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+            <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
                 <InputLabel id="schedule-label" sx={{ fontSize: "16px" }}>Schedule</InputLabel>
                 <Select
@@ -285,37 +297,30 @@ const ScheduleMails = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid 
-                container 
-                direction="row"
-                justifyContent="flex-end"
-                style={{marginTop: 20}}
-            >
-                <Grid item>
-                  <CustomButton
-                    label="+ Add"
-                    onClick={createScheduledMail}
-                  />
-              </Grid>
+            <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+              <CustomButton
+                label="+ Add"
+                onClick={createScheduledMail}
+              />
             </Grid>
             {showSpinner ? <div></div> : tableData && (
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <ThemeProvider theme={tableTheme}>
-                <MUIDataTable
-                  title={""}
-                  data={tableData}
-                  columns={columns.filter((col) => selectedColumns.includes(col.name))}
-                  options={tableOptions}
-                />
-              </ThemeProvider></Grid>)
+                  <MUIDataTable
+                    title={""}
+                    data={tableData}
+                    columns={columns.filter((col) => selectedColumns.includes(col.name))}
+                    options={tableOptions}
+                  />
+                </ThemeProvider></Grid>)
             }
           </Grid>
         </Card>
       </Grid>
-      <Snackbar 
-        {...snackbarState} 
-        handleClose={()=> setSnackbarState({...snackbarState, open: false})} 
-        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+      <Snackbar
+        {...snackbarState}
+        handleClose={() => setSnackbarState({ ...snackbarState, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         hide={2000}
       />
     </ThemeProvider>

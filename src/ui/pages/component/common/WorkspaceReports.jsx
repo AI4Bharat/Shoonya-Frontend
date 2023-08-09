@@ -8,7 +8,7 @@ import {
   Button,
   Grid,
   ThemeProvider,
-  Radio,Typography,
+  Radio, Typography,
 } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import InputLabel from "@mui/material/InputLabel";
@@ -34,7 +34,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { MenuProps } from "../../../../utils/utils";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 
-const ProgressType = [{name:"Annotation Stage",value: 1 }, {name:"Review Stage",value: 2} ,{name:"Super Check Stage",value: 3},{name:"All Stage", value : "AllStage"}]
+const ProgressType = [{ name: "Annotation Stage", value: 1 }, { name: "Review Stage", value: 2 }, { name: "Super Check Stage", value: 3 }, { name: "All Stage", value: "AllStage" }]
 
 const WorkspaceReports = () => {
   const WorkspaceDetails = useSelector(
@@ -83,12 +83,12 @@ const WorkspaceReports = () => {
   const ProjectReports = useSelector(
     (state) => state.getWorkspaceProjectReports.data
   );
-  
+
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
   let ProgressTypeValue = "Annotation Stage"
   const filterdata = ProgressType.filter(item => item.name !== ProgressTypeValue)
-  const FilterProgressType = radiobutton === "ReviewerReports" ?  filterdata : ProgressType
+  const FilterProgressType = radiobutton === "ReviewerReports" ? filterdata : ProgressType
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -98,7 +98,7 @@ const WorkspaceReports = () => {
   }, []);
 
   useEffect(() => {
-    if(reportType === "payment") {
+    if (reportType === "payment") {
       setProjectTypes([
         "AudioSegmentation",
         "AudioTranscription",
@@ -176,9 +176,9 @@ const WorkspaceReports = () => {
   const renderToolBar = () => {
     const buttonSXStyle = { borderRadius: 2, margin: 2 };
     return (
-      <Box 
-      // className={classes.filterToolbarContainer}
-      className={classes.ToolbarContainer}
+      <Box
+        // className={classes.filterToolbarContainer}
+        className={classes.ToolbarContainer}
       >
         <ColumnList
           columns={columns}
@@ -208,20 +208,22 @@ const WorkspaceReports = () => {
 
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value)
-}
+  }
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
-    console.log(selection, "selection"); 
+    console.log(selection, "selection");
   };
   const handleDateSubmit = () => {
-    if(reportType === "payment") {
+    if (reportType === "payment") {
       const userReportObj = new SendWorkspaceUserReportsAPI(
         id,
         UserDetails.id,
         selectedType,
         participationTypes,
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
+        format(selectRange[0].endDate, 'yyyy-MM-dd'),
       );
       dispatch(APITransport(userReportObj));
       setSnackbarInfo({
@@ -240,8 +242,8 @@ const WorkspaceReports = () => {
           format(selectRange[0].startDate, 'yyyy-MM-dd'),
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           language,
-          radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
-          reportfilter, 
+          radiobutton === "AnnotatationReports" ? "annotation" : radiobutton === "ReviewerReports" ? "review" : "supercheck",
+          reportfilter,
         );
         dispatch(APITransport(userReportObj));
         setShowSpinner(true);
@@ -249,9 +251,9 @@ const WorkspaceReports = () => {
         const projectReportObj = new GetWorkspaceProjectReportAPI(
           id,
           selectedType,
-        
+
           language,
-          radiobutton === "AnnotatationReports" ? "annotation" :  radiobutton ==="ReviewerReports" ? "review" :"supercheck",
+          radiobutton === "AnnotatationReports" ? "annotation" : radiobutton === "ReviewerReports" ? "review" : "supercheck",
         );
         dispatch(APITransport(projectReportObj));
         setShowSpinner(true);
@@ -289,37 +291,37 @@ const WorkspaceReports = () => {
           marginBottom: "24px",
         }}
       >
-         <Grid
-        container
-        direction="row"
-        spacing={3}
-       sx={{mt:1,ml:1}}
-      >
+        <Grid
+          container
+          direction="row"
+          spacing={3}
+          sx={{ mt: 1, ml: 1 }}
+        >
 
-        <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
-          <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
-            Select Report Type :
-          </Typography>
-        </Grid >
-        <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
-          <FormControl disabled={reportType === "payment"}>
+          <Grid item xs={12} sm={12} md={3} lg={2} xl={2}  >
+            <Typography gutterBottom component="div" sx={{ marginTop: "10px", fontSize: "16px", }}>
+              Select Report Type :
+            </Typography>
+          </Grid >
+          <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
+            <FormControl disabled={reportType === "payment"}>
 
-            <RadioGroup
-              row
-              aria-labelledby="demo-row-radio-buttons-group-label"
-              name="row-radio-buttons-group"
-              sx={{ marginTop: "5px" }}
-              value={radiobutton}
-              onChange={handleChangeReports}
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+                sx={{ marginTop: "5px" }}
+                value={radiobutton}
+                onChange={handleChangeReports}
 
-            >
-              <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
-              <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
-              <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" />
+              >
+                <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
+                <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
+                <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" />
 
-            </RadioGroup>
-          </FormControl>
-        </Grid >
+              </RadioGroup>
+            </FormControl>
+          </Grid >
         </Grid >
         <Grid
           item
@@ -389,7 +391,7 @@ const WorkspaceReports = () => {
               onChange={handleChangeprojectFilter}
             >
               {FilterProgressType.map((type, index) => (
-                <MenuItem value={type. value} key={index}>
+                <MenuItem value={type.value} key={index}>
                   {type.name}
                 </MenuItem>
               ))}
@@ -422,9 +424,9 @@ const WorkspaceReports = () => {
           <FormControl fullWidth size="small">
             <InputLabel id="participation-type-label" sx={{ fontSize: "16px" }}>Participation Types</InputLabel>
             <Select
-             style={{ zIndex: "0" }}
-             inputProps={{ "aria-label": "Without label" }}
-             MenuProps={MenuProps}
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
               labelId="participation-type-label"
               id="participation-select"
               value={participationTypes}
@@ -438,61 +440,61 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {reportType === "user" && 
-         <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-         <Button 
-             endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />} 
-             variant="contained" 
-             color="primary"
-             sx={{width:"130px"}} 
-             onClick={() => setShowPicker(!showPicker)}
-         >
-            Pick Dates
-         </Button>
-       </Grid>
+        {reportType === "user" || reportType === "payment" &&
+          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+            <Button
+              endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color="primary"
+              sx={{ width: "130px" }}
+              onClick={() => setShowPicker(!showPicker)}
+            >
+              Pick Dates
+            </Button>
+          </Grid>
         }
-       
+
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
           <Button
             fullWidth
             variant="contained"
             onClick={handleDateSubmit}
-            sx={{width:"130px"}}
+            sx={{ width: "130px" }}
           >
             {reportType === "payment" ? "E-mail CSV" : "Submit"}
           </Button>
         </Grid>
       </Grid>
-      {showPicker && <Box sx={{mt: 2, mb:2, display: "flex", justifyContent: "center", width: "100%"}}>
-          <Card>
-              <DateRangePicker
-                  onChange={handleRangeChange}
-                  staticRanges={[
-                      ...defaultStaticRanges,
-                      {
-                          label: "Till Date",
-                          range: () => ({
-                          startDate: new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
-                          endDate: new Date(),
-                          }),
-                          isSelected(range) {
-                          const definedRange = this.range();
-                          return (
-                              isSameDay(range.startDate, definedRange.startDate) &&
-                              isSameDay(range.endDate, definedRange.endDate)
-                          );
-                          }
-                      },
-                  ]}
-                  showSelectionPreview={true}
-                  moveRangeOnFirstSelection={false}
-                  months={2}
-                  ranges={selectRange}
-                  minDate={new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
-                  maxDate={new Date()}
-                  direction="horizontal"
-              />
-          </Card>
+      {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }}>
+        <Card>
+          <DateRangePicker
+            onChange={handleRangeChange}
+            staticRanges={[
+              ...defaultStaticRanges,
+              {
+                label: "Till Date",
+                range: () => ({
+                  startDate: new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+                  endDate: new Date(),
+                }),
+                isSelected(range) {
+                  const definedRange = this.range();
+                  return (
+                    isSameDay(range.startDate, definedRange.startDate) &&
+                    isSameDay(range.endDate, definedRange.endDate)
+                  );
+                }
+              },
+            ]}
+            showSelectionPreview={true}
+            moveRangeOnFirstSelection={false}
+            months={2}
+            ranges={selectRange}
+            minDate={new Date(Date.parse(WorkspaceDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
+            maxDate={new Date()}
+            direction="horizontal"
+          />
+        </Card>
       </Box>}
       {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>

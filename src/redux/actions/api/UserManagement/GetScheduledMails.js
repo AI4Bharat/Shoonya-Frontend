@@ -7,7 +7,7 @@ export default class GetScheduledMailsAPI extends API {
   constructor(userId, timeout = 2000) {
     super("GET", timeout, false);
     this.type = constants.GET_SCHEDULED_MAILS;
-    this.endpoint = this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/get_scheduled_mails/`;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/get_scheduled_mails/`;
   }
 
   processResponse(res) {

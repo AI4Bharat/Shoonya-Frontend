@@ -4,11 +4,11 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class DeleteScheduledMailsAPI extends API {
-  constructor(userId, taskId,  timeout = 2000) {
+  constructor(userId, taskId, timeout = 2000) {
     super("POST", timeout, false);
     this.type = constants.DELETE_SCHEDULED_MAILS;
     this.taskId = taskId;
-    this.endpoint = this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/delete_scheduled_mail/`;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/delete_scheduled_mail/`;
   }
 
   processResponse(res) {
@@ -24,7 +24,7 @@ export default class DeleteScheduledMailsAPI extends API {
 
   getBody() {
     return {
-      id: this.taskId,
+      task_id: this.taskId,
     }
   }
 

@@ -11,7 +11,7 @@ export default class CreateScheduledMailsAPI extends API {
     this.reportLevel = reportLevel;
     this.projectType = projectType;
     this.schedule = schedule;
-    this.endpoint = this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/schedule_mail/`;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/schedule_mail/`;
   }
 
   processResponse(res) {
