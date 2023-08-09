@@ -98,8 +98,8 @@ const Layout= (props) => {
             className={classes.headerContainer}
           />
         </Suspense>
-        <div 
-        className={classes.container}
+        <div
+        className={localStorage.getItem("enableChitrlekhaTranscription") === "true"?"":classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}

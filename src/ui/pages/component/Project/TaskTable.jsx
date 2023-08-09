@@ -392,7 +392,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
 
         props.type === "annotation" &&
           row.push(
-            <Link to={`task/${el.id}`} className={classes.link}>
+            <Link to={localStorage.getItem("enableChitrlekhaTranscription") === "true" ?`AudioTranscriptionLandingPage/${el.id}` :`task/${el.id}`} className={classes.link}>
               <CustomButton
                 onClick={() => {
                   console.log("task id === ", el.id);

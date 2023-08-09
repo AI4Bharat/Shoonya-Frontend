@@ -46,7 +46,8 @@
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "textarea-caret": "^3.1.0",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "wfplayer": "^2.2.6"
   },
   "scripts": {
     "start": "react-scripts start",
