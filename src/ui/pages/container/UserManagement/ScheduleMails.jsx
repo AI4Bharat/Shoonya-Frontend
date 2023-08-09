@@ -228,7 +228,7 @@ const ScheduleMails = () => {
                   label="Report Level"
                   onChange={(e) => setReportLevel(e.target.value)}
                 >
-                  {userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role &&
+                  {userRole.OrganizationOwner === userDetails?.role || userRole.Admin === userDetails?.role &&
                     <MenuItem value={1}>Organization</MenuItem>
                   }
                   <MenuItem value={2}>Workspace</MenuItem>
