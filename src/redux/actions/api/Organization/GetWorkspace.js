@@ -6,10 +6,10 @@
  import constant from '../../../constants';
 
  export default class GetWorkspaceAPI extends API {
-   constructor(pageNo, records, timeout = 2000) {
+   constructor(timeout = 2000) {
      super("GET", timeout, false);
      this.type = constant.GET_WORKSPACE_DATA
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}?page=${pageNo}&records=${records}`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}`;
    }
 
    processResponse(res) {
