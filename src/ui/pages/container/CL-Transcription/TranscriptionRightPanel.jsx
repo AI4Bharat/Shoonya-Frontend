@@ -19,7 +19,31 @@ export default function TranscriptionRightPanel() {
     const classes = AudioTranscriptionLandingStyle();
 const subtitles =[1,2,3,4,5,6];
   return (
-    <div> 
+    <Grid sx={{margin:0}}> 
+         <Box
+        className={classes.rightPanelParentBox}
+        style={{ position: "relative" }}
+      >
+        <Grid className={classes.rightPanelParentGrid}>
+          {/* <SettingsButtonComponent
+            setTransliteration={setTransliteration}
+            enableTransliteration={enableTransliteration}
+            setRTL_Typing={setRTL_Typing}
+            enableRTL_Typing={enableRTL_Typing}
+            setFontSize={setFontSize}
+            fontSize={fontSize}
+            saveTranscriptHandler={saveTranscriptHandler}
+            setOpenConfirmDialog={setOpenConfirmDialog}
+            onUndo={onUndo}
+            onRedo={onRedo}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            onSplitClick={onSplitClick}
+            showPopOver={showPopOver}
+            showSplit={true}
+          /> */}
+        </Grid></Box>
+    
         <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
 {subtitles?.map((item, index) => {
   return (
@@ -150,6 +174,6 @@ const subtitles =[1,2,3,4,5,6];
 </Box> 
          
          
-          </div>
+          </Grid>
   )
 }

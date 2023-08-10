@@ -8,6 +8,13 @@ const GlobalStyles = makeStyles({
     // background: theme.palette.background.default,
     // fontFamily: theme.typography.fontFamily,
   },
+  Audiocontainer: {
+    // maxWidth: "1272px",
+    width: "100%",
+    margin: "-20px auto",
+    // background: theme.palette.background.default,
+    // fontFamily: theme.typography.fontFamily,
+  },
 
   headerContainer: {
     height: "70px",

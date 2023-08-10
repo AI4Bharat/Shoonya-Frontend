@@ -11,7 +11,6 @@ const WaveForm = memo(({ setWaveform, setRender }) => {
     const $waveform = useRef();
   
     const player = useSelector((state) => state.commonReducer.player);
-    console.log(player,"player")
 
     useEffect(() => {
       [...WFPlayer.instances].forEach((item) => item.destroy());
@@ -45,7 +44,7 @@ const WaveForm = memo(({ setWaveform, setRender }) => {
   });
 export default function TimeLine() {
     const classes = AudioTranscriptionLandingStyle();
-    const [waveform, setWaveform] = useState();
+    const [waveform, setWaveform] = useState([]);
 
    
 

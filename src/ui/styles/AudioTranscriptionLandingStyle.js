@@ -2,7 +2,7 @@ import { makeStyles } from "@mui/styles";
 
 const AudioTranscriptionLandingStyle = makeStyles({
   parentGrid: {
-    marginTop: "55px",
+    // marginTop: "55px",
     overflow: "hidden",
   },
 
@@ -23,6 +23,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     flexDirection: "row",
     // backgroundColor: "rgba(254, 191, 44, 0.1)",
     backgroundColor: "#fcf7e9",
+    padding:"16px"
   },
 
   videoName: {
@@ -393,7 +394,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     display: "flex",
     direction: "row",
     flexWrap: "wrap",
-    padding: "26.5px 0",
+    padding: "35.5px 0",
     justifyContent: "center",
     // backgroundColor: "rgba(254, 191, 44, 0.1)",
     backgroundColor: "#fcf7e9",

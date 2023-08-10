@@ -9,6 +9,10 @@ const headerStyle = makeStyles({
       
        
     },
+    parentContainers:{
+        marginBottom : window.innerHeight*0.08,
+        width : window.innerWidth*0.98,
+    },
     appBar: {
         // backgroundColor: "#ffffff", 
         // position: 'inherit',

@@ -99,7 +99,7 @@ const Layout= (props) => {
           />
         </Suspense>
         <div
-        className={localStorage.getItem("enableChitrlekhaTranscription") === "true"?"":classes.container}
+        className={(localStorage.getItem("enableChitrlekhaTranscription") === "true")?"":classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}

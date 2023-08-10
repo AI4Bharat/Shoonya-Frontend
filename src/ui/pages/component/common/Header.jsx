@@ -621,9 +621,10 @@ const Header = () => {
     setShowTransliterationModel(false);
   }
 
+
   return (
     <Grid container direction="row" >
-      <Box className={classes.parentContainer} >
+      <Box className={(localStorage.getItem("enableChitrlekhaTranscription") === "true") ? classes.parentContainers: classes.parentContainer} >
         {isMobile ? (
           <MobileNavbar
             tabs={tabs}

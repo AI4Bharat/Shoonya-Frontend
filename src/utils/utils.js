@@ -32,3 +32,12 @@ export const MenuProps = {
     },
   },
 };
+
+export const isPlaying = (player) => {
+  return !!(
+    player.currentTime > 0 &&
+    !player.paused &&
+    !player.ended &&
+    player.readyState > 2
+  );
+};
