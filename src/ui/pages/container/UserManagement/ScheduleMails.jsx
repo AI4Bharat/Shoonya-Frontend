@@ -56,7 +56,7 @@ const ScheduleMails = () => {
   };
 
   const createScheduledMail = () => {
-    if (!reportLevel || !schedule || !selectedProjectType || (reportLevel == 2 && workspaceId == 0)) {
+    if (!reportLevel || !schedule || !selectedProjectType || (reportLevel === 2 && workspaceId === 0)) {
       setSnackbarState({
         open: true,
         message: "Invalid input",
@@ -154,6 +154,7 @@ const ScheduleMails = () => {
               onClick={() => deleteScheduledMail(mail)} />
           </Box>
         );
+        return mail;
       });
       setColumns(tempColumns);
       setTableData(scheduledMails);
@@ -228,7 +229,7 @@ const ScheduleMails = () => {
                   label="Report Level"
                   onChange={(e) => setReportLevel(e.target.value)}
                 >
-                  {userRole.OrganizationOwner === userDetails?.role || userRole.Admin === userDetails?.role &&
+                  {(userRole.OrganizationOwner === userDetails?.role || userRole.Admin === userDetails?.role) &&
                     <MenuItem value={1}>Organization</MenuItem>
                   }
                   <MenuItem value={2}>Workspace</MenuItem>
