@@ -1,26 +1,66 @@
 // TranscriptionRightPanel
 
-import React from 'react'
-import {
-    Box,
-    CardContent,
-    FormControl,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Select,
-    useMediaQuery,
-  } from "@mui/material";
-  import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
-  import TimeBoxes from "../CL-Transcription/TimeBoxes";
-  import  ButtonComponent from "./ButtonComponent";
+import { useState, useEffect } from "react";
 
-export default function TranscriptionRightPanel() {
-    const classes = AudioTranscriptionLandingStyle();
-const subtitles =[1,2,3,4,5,6];
+import {
+  Box,
+  CardContent,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  useMediaQuery,
+  Pagination,
+} from "@mui/material";
+import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
+import TimeBoxes from "../CL-Transcription/TimeBoxes";
+import ButtonComponent from "./ButtonComponent";
+import {onSubtitleChange} from "../../../../utils/SubTitlesUtils";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setSubtitles,
+} from "../../../../redux/actions/Common";
+import C from "../../../../redux/constants";
+
+
+
+export default function TranscriptionRightPanel({
+  AnnotationsTaskDetails,
+  player,
+}) {
+  const classes = AudioTranscriptionLandingStyle();
+  const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const [newDetails, setNewDetails] = useState();
+  
+
+  const itemsPerPage = 10;
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageData = AnnotationsTaskDetails[0]?.result?.slice(
+    startIndex,
+    endIndex
+  );
+
+  const changeTranscriptHandler = (event, index) => {
+    const {
+      target: { value },
+      currentTarget,
+    } = event;
+console.log(value,"valuevaluevaluevalue")
+    const sub = onSubtitleChange(value, index);
+    dispatch(setSubtitles(sub, C.SUBTITLES));
+  
+}
+
   return (
-    <Grid sx={{margin:0}}> 
-         <Box
+    <Grid sx={{ margin: 0 }}>
+      <Box
         className={classes.rightPanelParentBox}
         style={{ position: "relative" }}
       >
@@ -42,62 +82,59 @@ const subtitles =[1,2,3,4,5,6];
             showPopOver={showPopOver}
             showSplit={true}
           /> */}
-        </Grid></Box>
-    
-        <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
-{subtitles?.map((item, index) => {
-  return (
-    <Box
-      key={index}
-      id={`sub_${index}`}
-      style={{
-        padding: "16px",
-        borderBottom: "1px solid lightgray",
-        backgroundColor:
-          index % 2 === 0
-            ? "rgb(214, 238, 255)"
-            : "rgb(233, 247, 239)",
-      }}
-    >
+        </Grid>
+      </Box>
 
-<Box className={classes.topBox}>
-                  <TimeBoxes
-                    // handleTimeChange={handleTimeChange}
-                    // time={item.start_time}
-                    // index={index}
-                    // type={"startTime"}
-                  />
+      <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
+        {currentPageData?.map((item, index) => {
+          return (
+            <Box
+              key={index}
+              id={`sub_${index}`}
+              style={{
+                padding: "16px",
+                borderBottom: "1px solid lightgray",
+                backgroundColor:
+                  index % 2 === 0 ? "rgb(214, 238, 255)" : "rgb(233, 247, 239)",
+              }}
+            >
+              <Box className={classes.topBox}>
+                <TimeBoxes
+                  // handleTimeChange={handleTimeChange}
+                  time={item.start_time}
+                  index={index}
+                  type={"startTime"}
+                />
 
-                  <ButtonComponent
-                    // index={index}
-                    // lastItem={index < subtitles.length - 1}
-                    // onMergeClick={onMergeClick}
-                    // onDelete={onDelete}
-                    // addNewSubtitleBox={addNewSubtitleBox}
-                  />
+                <ButtonComponent
+                // index={index}
+                // lastItem={index < subtitles.length - 1}
+                // onMergeClick={onMergeClick}
+                // onDelete={onDelete}
+                // addNewSubtitleBox={addNewSubtitleBox}
+                />
 
-                  <TimeBoxes
-                    // handleTimeChange={handleTimeChange}
-                    // time={item.end_time}
-                    // index={index}
-                    // type={"endTime"}
-                  />
-                </Box>
-    
+                <TimeBoxes
+                  // handleTimeChange={handleTimeChange}
+                  time={item.end_time}
+                  index={index}
+                  type={"endTime"}
+                />
+              </Box>
 
-      <CardContent
-        className={classes.cardContent}
-        aria-describedby={"suggestionList"}
-        // onClick={() => {
-        //   if (player) {
-        //     player.pause();
-        //     if (player.duration >= item.startTime) {
-        //       player.currentTime = item.startTime + 0.001;
-        //     }
-        //   }
-        // }}
-      >
-        {/* {taskData?.src_language !== "en" && enableTransliteration ? (
+              <CardContent
+                className={classes.cardContent}
+                aria-describedby={"suggestionList"}
+                // onClick={() => {
+                //   if (player) {
+                //     player.pause();
+                //     if (player.duration >= item.startTime) {
+                //       player.currentTime = item.startTime + 0.001;
+                //     }
+                //   }
+                // }}
+              >
+                {/* {taskData?.src_language !== "en" && enableTransliteration ? (
           <IndicTransliterate
             lang={taskData?.src_language}
             value={item.text}
@@ -137,43 +174,56 @@ const subtitles =[1,2,3,4,5,6];
             )}
           />
         ) : ( */}
-          <div className={classes.relative}>
-            <textarea
-            //   onChange={(event) => {
-            //     changeTranscriptHandler(event, index);
-            //   }}
-            //   onMouseUp={(e) => onMouseUp(e, index)}
-            //   value={item.text}
-            //   dir={enableRTL_Typing ? "rtl" : "ltr"}
-            //   className={`${classes.customTextarea} ${
-            //     currentIndex === index ? classes.boxHighlight : ""
-            //   }`}
-            className={classes.customTextarea}
-              style={{
-                // fontSize: fontSize,
-                height: "120px",
-              }}
-              rows={4}
-              onBlur={() =>
-                setTimeout(() => {
-                //   setShowPopOver(false);
-                }, 200)
-              }
-            />
-            <span id="charNum" className={classes.wordCount}>
-              {/* {targetLength(index)} */}
-            </span>
-          </div>
-        {/* )} */}
-      </CardContent>
-
-    
-    </Box>
+                <div className={classes.relative}>
+                  <textarea
+                      onChange={(event) => {
+                        changeTranscriptHandler(event, index);
+                      }}
+                      // onMouseUp={(e) => onMouseUp(e, index)}
+                    value={item.text}
+                    //   dir={enableRTL_Typing ? "rtl" : "ltr"}
+                    // className={`${classes.customTextarea} ${
+                    //   currentIndex === index ? classes.boxHighlight : ""
+                    // }`}
+                    className={classes.customTextarea}
+                    style={{
+                      // fontSize: fontSize,
+                      height: "120px",
+                    }}
+                    rows={4}
+                    // onBlur={() =>
+                    //   setTimeout(() => {
+                    //       setShowPopOver(false);
+                    //   }, 200)
+                    // }
+                  />
+                  <span id="charNum" className={classes.wordCount}>
+                    {/* {targetLength(index)} */}
+                  </span>
+                </div>
+                {/* )} */}
+              </CardContent>
+            </Box>
+          );
+        })}
+      </Box>
+      <Box
+          className={classes.paginationBox}
+          // style={{
+          //   ...(!xl && {
+          //     bottom: "-11%",
+          //   }),
+          // }}
+        >
+      <Pagination
+      color="primary"
+        count={Math.ceil(
+          AnnotationsTaskDetails[0]?.result?.length / itemsPerPage
+        )}
+        page={page}
+        onChange={handlePageChange}
+      />
+       </Box>
+    </Grid>
   );
- })} 
-</Box> 
-         
-         
-          </Grid>
-  )
 }

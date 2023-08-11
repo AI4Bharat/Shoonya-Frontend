@@ -7,12 +7,43 @@ import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import Timeline from "./TimeLine";
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Spinner from "../../component/common/Spinner";
 
 export default function AudioTranscriptionLandingPage() {
   const classes = AudioTranscriptionLandingStyle();
+  const dispatch = useDispatch();
+  const { taskId } = useParams();
+  const [loading, setLoading] = useState(false);
+
+  const AnnotationsTaskDetails = useSelector(
+    (state) => state.getAnnotationsTask.data
+  );
+  const player = useSelector((state) => state.commonReducer.player);
+
+  const getAnnotationsTaskData = () => {
+    setLoading(true);
+    const userObj = new GetAnnotationsTaskAPI(taskId);
+    dispatch(APITransport(userObj));
+  };
+
+  useEffect(() => {
+    getAnnotationsTaskData();
+  }, []);
+  
+  useEffect(() => {
+    if(AnnotationsTaskDetails.length > 0){
+      setLoading(false);
+    }
+  }, [AnnotationsTaskDetails]);
 
   return (
     <>
+      {loading && <Spinner />}
       <Grid container direction={"row"} className={classes.parentGrid}>
         <Grid md={6} xs={12} id="video" className={classes.videoParent}>
           <Box
@@ -70,7 +101,10 @@ export default function AudioTranscriptionLandingPage() {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
-          <TranscriptionRightPanel />
+          <TranscriptionRightPanel
+            AnnotationsTaskDetails={AnnotationsTaskDetails}
+            player={player}
+          />
         </Grid>
       </Grid>
 

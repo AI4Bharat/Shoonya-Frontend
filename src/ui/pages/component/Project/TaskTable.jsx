@@ -373,9 +373,12 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
     );
   }, [selectedFilters]);
 
+  useEffect(()=>{
+    const projectType = (ProjectDetails?.project_type?.includes("Audio") );
+    localStorage.setItem("audio",projectType);
+  },[ProjectDetails?.project_type])
   useEffect(() => {
-    const projectType =  ProjectDetails?.project_type?.includes("Audio") === "true";
-    localStorage.setItem("Audio",projectType);
+   
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
         const email = props.type === "review" ? el.annotator_mail : "";

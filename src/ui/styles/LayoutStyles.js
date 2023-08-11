@@ -9,11 +9,8 @@ const GlobalStyles = makeStyles({
     // fontFamily: theme.typography.fontFamily,
   },
   Audiocontainer: {
-    // maxWidth: "1272px",
     width: "100%",
-    margin: "-20px auto",
-    // background: theme.palette.background.default,
-    // fontFamily: theme.typography.fontFamily,
+    // margin: "-20px auto", 
   },
 
   headerContainer: {
@@ -30,9 +27,15 @@ const GlobalStyles = makeStyles({
     flexDirection: "column",
     // "@media (max-width:400px)": {
     //  overflow:"hidden",
-    //  },
-   
-   
+    //  }, 
+  },
+  Audioroot:{
+    flexGrow: 1,
+    zIndex: 1,
+    position: "relative",
+    minHeight: "720px",
+    display: "flex",
+    flexDirection: "column",
   },
 //   appBar: {
 //     backgroundColor: theme.palette.primary.dark,

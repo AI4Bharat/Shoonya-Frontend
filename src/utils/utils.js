@@ -1,3 +1,5 @@
+import store from "../redux/store/store";
+
 export function authenticateUser() {
   const access_token = localStorage.getItem("shoonya_access_token");
   if (access_token) {
@@ -40,4 +42,20 @@ export const isPlaying = (player) => {
     !player.ended &&
     player.readyState > 2
   );
+};
+
+
+
+export const onSubtitleChange = (text, index) => {
+  const subtitles = store.getState().commonReducer.subtitles;
+  const copySub = [...subtitles];
+  console.log(copySub,"texttext")
+
+  copySub.forEach((element, i) => {
+    if (index === i) {
+      element.text = text;
+    }
+  });
+
+  return copySub;
 };

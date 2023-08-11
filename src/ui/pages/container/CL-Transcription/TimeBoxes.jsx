@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import  AudioTranscriptionLandingStyle  from "../../../styles/AudioTranscriptionLandingStyle";
+import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import { Box, TextField } from "@mui/material";
 
 const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
@@ -12,12 +12,12 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
         // onChange={(event) =>
         //   handleTimeChange(event.target.value, index, type, "hours")
         // }
-        // value={time.split(":")[0]}
-        // onFocus={(event) => event.target.select()}
+        value={time.split(":")[0]}
+        onFocus={(event) => event.target.select()}
         className={classes.timeInputBox}
         style={{
           paddingLeft: "10px",
-        //   marginLeft: type === "endTime" ? "auto" : "",
+          marginLeft: type === "endTime" ? "auto" : "",
         }}
       />
 
@@ -30,10 +30,10 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
 
       <TextField
         variant="standard"
-        // value={time.split(":")[1]}
+        value={time.split(":")[1]}
         className={classes.timeInputBox}
-        // onFocus={(event) => event.target.select()}
-        // InputProps={{ inputProps: { min: 0, max: 100 } }}
+        onFocus={(event) => event.target.select()}
+        InputProps={{ inputProps: { min: 0, max: 100 } }}
         // onChange={(event) =>
         //   handleTimeChange(event.target.value, index, type, "minutes")
         // }
@@ -48,16 +48,14 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
 
       <TextField
         variant="standard"
-        // value={time.split(":")[2].split(".")[0]}
-        // onFocus={(event) => event.target.select()}
-        // InputProps={{ inputProps: { min: 0, max: 100 } }}
+        value={time.split(":")[2].split(".")[0]}
+        onFocus={(event) => event.target.select()}
+        InputProps={{ inputProps: { min: 0, max: 100 } }}
         className={classes.timeInputBox}
         // onChange={(event) =>
         //   handleTimeChange(event.target.value, index, type, "seconds")
         // }
-        style={{
-          
-        }}
+        style={{}}
       />
 
       <TextField
@@ -69,10 +67,10 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
 
       <TextField
         variant="standard"
-        // value={time.split(":")[2].split(".")[1]}
+        value={time.split(":")[2].split(".")[1]}
         style={{ width: "20%", paddingRight: "10px" }}
-        // onFocus={(event) => event.target.select()}
-        // InputProps={{ inputProps: { min: 0, max: 999 } }}
+        onFocus={(event) => event.target.select()}
+        InputProps={{ inputProps: { min: 0, max: 999 } }}
         className={classes.timeInputBox}
         // onChange={(event) =>
         //   handleTimeChange(event.target.value, index, type, "miliseconds")

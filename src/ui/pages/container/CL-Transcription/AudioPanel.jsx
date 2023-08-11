@@ -12,7 +12,7 @@ import React, {
   import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
   
   //APIs
-  import { setPlayer } from "../../../../redux/actions/CL-Transcription/Common";
+  import { setPlayer } from "../../../../redux/actions/Common";
   
   const AudioPanel = memo(
     () => {
@@ -56,9 +56,13 @@ import React, {
   
       return (
         <div className={classes.videoPlayerParent} style={{ display: "flex" }}>
+
+
+            
           <audio
             // onClick={onClick}
-            src="/build/audios/jingle_bells.ogg" type="audio/ogg"
+            controls
+            src="https://objectstore.e2enetworks.net/indic-asr-public/youtube_cc/pilot_v1/Vendor_Desicrew/kannada_HnbcfJaIhkY.wav" type="audio"
             // style={{
             //   width: videoDetails?.video?.audio_only ? "20%" : "",
             //   margin:

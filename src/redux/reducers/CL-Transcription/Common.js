@@ -2,6 +2,7 @@ import C from "../../constants";
 
 const initialState = {
   player: null,
+  subtitles: [],
 };
 
 const reducer = (state = initialState, action) => {
@@ -10,6 +11,12 @@ const reducer = (state = initialState, action) => {
     case C.PLAYER: {
       let result = state;
       result.player = action.payload;
+      return result;
+    }
+
+    case C.SUBTITLES: {
+      let result = state;
+      result.subtitles = action.payload;
       return result;
     }
 

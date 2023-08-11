@@ -22,6 +22,7 @@
     "axios": "^0.27.2",
     "chart.js": "^3.9.1",
     "date-fns": "^2.28.0",
+    "duration-time-conversion": "^1.0.6",
     "faker": "^5.5.3",
     "history": "^5.3.0",
     "html2canvas": "^1.4.1",
