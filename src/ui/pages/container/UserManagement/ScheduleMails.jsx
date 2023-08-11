@@ -22,8 +22,8 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 const ScheduleMails = () => {
   const { id } = useParams();
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
-  const [reportLevel, setReportLevel] = useState(0);
-  const [selectedProjectType, setSelectedProjectType] = useState("");
+  const [reportLevel, setReportLevel] = useState(1);
+  const [selectedProjectType, setSelectedProjectType] = useState("AudioTranscription + Editing");
   const [projectTypes, setProjectTypes] = useState([
     "AudioSegmentation",
     "AudioTranscription",
@@ -32,7 +32,7 @@ const ScheduleMails = () => {
     "ConversationTranslation",
     "ConversationTranslationEditing"
   ]);
-  const [schedule, setSchedule] = useState(0);
+  const [schedule, setSchedule] = useState("Daily");
   const [workspaceId, setWorkspaceId] = useState(0);
   const [workspaces, setWorkspaces] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -44,6 +44,7 @@ const ScheduleMails = () => {
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const workspaceData = useSelector(state => state.GetWorkspace.data);
   const scheduledMails = useSelector(state => state.getScheduledMails.data);
+  //const [requested, setRequested] = useState({ get: false, create: false, update: false, delete: false });
 
   const getWorkspaceData = () => {
     const workspaceObj = new GetWorkspaceAPI();
@@ -71,12 +72,27 @@ const ScheduleMails = () => {
       selectedProjectType,
       schedule
     );
-    dispatch(APITransport(scheduledMailsObj));
-    setSnackbarState({
-      open: true,
-      message: "Scheduled mail request sent",
-      variant: "success",
-    });
+    fetch(scheduledMailsObj.apiEndPoint(), {
+      method: "POST",
+      headers: scheduledMailsObj.getHeaders().headers,
+      body: JSON.stringify(scheduledMailsObj.getBody()),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw res.status === 500 ? res : await res.json();
+        else return res;
+      })
+      .then((res) => {
+        setSnackbarState({
+          open: true,
+          message: "Scheduled mail request sent",
+          variant: "success",
+        });
+        getScheduledMails();
+      })
+      .catch((err) => {
+        console.log(err, "ERROR2");
+        setSnackbarState({ open: true, message: err.status === 500 ? "Unexpected error occurred" : err.message, variant: "error" });
+      });
   };
 
   const updateScheduledMail = (mail) => {
@@ -84,10 +100,26 @@ const ScheduleMails = () => {
       id,
       mail.id,
     );
-    dispatch(APITransport(scheduledMailsObj));
-    setTimeout(() => {
-      getScheduledMails();
-    }, 1000);
+    fetch(scheduledMailsObj.apiEndPoint(), {
+      method: "PATCH",
+      headers: scheduledMailsObj.getHeaders().headers,
+      body: JSON.stringify(scheduledMailsObj.getBody()),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw await res.json();
+        else return res;
+      })
+      .then((res) => {
+        setSnackbarState({
+          open: true,
+          message: "Mail schedule updated",
+          variant: "success",
+        });
+        getScheduledMails();
+      })
+      .catch((err) => {
+        setSnackbarState({ open: true, message: err.status === 500 ? "Unexpected error occurred" : err.message, variant: "error" });
+      });
   };
 
   const deleteScheduledMail = (mail) => {
@@ -95,10 +127,26 @@ const ScheduleMails = () => {
       id,
       mail.id,
     );
-    dispatch(APITransport(scheduledMailsObj));
-    setTimeout(() => {
-      getScheduledMails();
-    }, 1000);
+    fetch(scheduledMailsObj.apiEndPoint(), {
+      method: "POST",
+      headers: scheduledMailsObj.getHeaders().headers,
+      body: JSON.stringify(scheduledMailsObj.getBody()),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw await res.json();
+        else return res;
+      })
+      .then((res) => {
+        setSnackbarState({
+          open: true,
+          message: "Mail schedule deleted",
+          variant: "success",
+        });
+        getScheduledMails();
+      })
+      .catch((err) => {
+        setSnackbarState({ open: true, message: err.message, variant: "error" });
+      });
   };
 
   useEffect(() => {
