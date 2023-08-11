@@ -197,7 +197,7 @@ const ScheduleMails = () => {
               onClick={() => updateScheduledMail(mail)} />
             <CustomButton
               label="Delete"
-              bgColor="red"
+              sx={{ backgroundColor: "#EC0000" }}
               onClick={() => deleteScheduledMail(mail)} />
           </Box>
         );
