@@ -106,7 +106,7 @@ const ScheduleMails = () => {
       body: JSON.stringify(scheduledMailsObj.getBody()),
     })
       .then(async (res) => {
-        if (!res.ok) throw await res.json();
+        if (!res.ok) throw res.status === 500 ? res : await res.json();
         else return res;
       })
       .then((res) => {
@@ -133,7 +133,7 @@ const ScheduleMails = () => {
       body: JSON.stringify(scheduledMailsObj.getBody()),
     })
       .then(async (res) => {
-        if (!res.ok) throw await res.json();
+        if (!res.ok) throw res.status === 500 ? res : await res.json();
         else return res;
       })
       .then((res) => {
@@ -145,7 +145,7 @@ const ScheduleMails = () => {
         getScheduledMails();
       })
       .catch((err) => {
-        setSnackbarState({ open: true, message: err.message, variant: "error" });
+        setSnackbarState({ open: true, message: err.status === 500 ? "Unexpected error occurred" : err.message, variant: "error" });
       });
   };
 
