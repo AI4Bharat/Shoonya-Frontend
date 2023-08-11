@@ -90,7 +90,6 @@ const ScheduleMails = () => {
         getScheduledMails();
       })
       .catch((err) => {
-        console.log(err, "ERROR2");
         setSnackbarState({ open: true, message: err.status === 500 ? "Unexpected error occurred" : err.message, variant: "error" });
       });
   };
