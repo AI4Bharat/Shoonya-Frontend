@@ -417,6 +417,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
           row.push(
             <Link to={`review/${el.id}`} className={classes.link}>
               <CustomButton
+                disabled={ ProjectDetails.is_archived}
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");

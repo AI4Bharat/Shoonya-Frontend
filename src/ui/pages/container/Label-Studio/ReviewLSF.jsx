@@ -44,7 +44,7 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from "./lsf.module.css";
 import "./lsf.css";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 
 const StyledMenu = styled((props) => (
@@ -123,7 +123,7 @@ const filterAnnotations = (
       disableSkip = true;
       setDisableButton(true);
       setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
-    } 
+    }
     else if (
       userAnnotationData &&
       [
@@ -159,7 +159,7 @@ const filterAnnotations = (
         );
         setDisableBtns(true);
         disable = true;
-      }else if (
+      } else if (
         superCheckedAnnotation &&
         ["draft", "skipped", "unvalidated"].includes(
           superCheckedAnnotation.annotation_status
@@ -189,7 +189,7 @@ const filterAnnotations = (
         (annotation) => annotation.annotation_type === 2
       );
     }
-  } else if([4, 5, 6].includes(user.role)) {
+  } else if ([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 2);
     disable = true;
     setDisableBtns(true);
@@ -201,6 +201,10 @@ const filterAnnotations = (
 //used just in postAnnotation to support draft status update.
 
 const AUTO_SAVE_INTERVAL = 60000;
+const AUDIO_PROJECT_SAVE_CHECK = [
+  "AudioTranscription",
+  "AudioTranscriptionEditing",
+];
 
 const LabelStudioWrapper = ({
   reviewNotesRef,
@@ -306,7 +310,7 @@ const LabelStudioWrapper = ({
     let interfaces = [];
     if (predictions == null) predictions = [];
 
-    const [filteredAnnotations, disableLSFControls,disableSkip] = filterAnnotations(
+    const [filteredAnnotations, disableLSFControls, disableSkip] = filterAnnotations(
       annotations,
       userData,
       setDisableBtns,
@@ -325,7 +329,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -345,14 +349,14 @@ const LabelStudioWrapper = ({
         "panel",
         //"update",
         "submit",
-        ...(!disableSkip ?["skip"] : []),
+        ...(!disableSkip ? ["skip"] : []),
         // "skip",
         ...(disableLSFControls ? [] : ["controls"]),
         "infobar",
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -369,7 +373,7 @@ const LabelStudioWrapper = ({
       ];
     }
 
-    if(disableLSFControls) setAutoSave(false);
+    if (disableLSFControls) setAutoSave(false);
 
     if (rootRef.current) {
       if (lsfRef.current) {
@@ -535,6 +539,29 @@ const LabelStudioWrapper = ({
         // },
 
         onUpdateAnnotation: function (ls, annotation) {
+          if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
+            let temp = annotation.serializeAnnotation();
+            const counter = temp.reduce((acc, curr) => {
+              if (curr.from_name === "labels")
+                acc.labels++;
+              else if (curr.from_name === "transcribed_json") {
+                if (curr.value.text[0] === "")
+                  acc.empty++;
+                acc.textareas++;
+              }
+              return acc;
+            },
+              { labels: 0, textareas: 0, empty: 0 }
+            );
+            if (counter.labels !== counter.textareas || counter.empty) {
+              setSnackbarInfo({
+                open: true,
+                message: "Please fill the annotations for every segment/region",
+                variant: "warning",
+              });
+              return;
+            }
+          }
           if (taskData.annotation_status !== "freezed") {
             setAutoSave(false);
             showLoader();
@@ -648,10 +675,10 @@ const LabelStudioWrapper = ({
 
   // we're running an effect on component mount and rendering LSF inside rootRef node
 
-  useEffect(()=>{
+  useEffect(() => {
     const projectObj = new GetProjectDetailsAPI(projectId);
     dispatch(APITransport(projectObj));
-  },[])
+  }, [])
 
   useEffect(() => {
     if (localStorage.getItem("rtl") === "true") {
@@ -673,11 +700,11 @@ const LabelStudioWrapper = ({
           setNotes(taskData, annotations);
           let tempLabelConfig =
             labelConfig.project_type === "ConversationTranslation" ||
-            labelConfig.project_type === "ConversationTranslationEditing"
+              labelConfig.project_type === "ConversationTranslationEditing"
               ? generateLabelConfig(taskData.data)
               : labelConfig.project_type === "ConversationVerification"
-              ? conversationVerificationLabelConfig(taskData.data)
-              : labelConfig.label_config;
+                ? conversationVerificationLabelConfig(taskData.data)
+                : labelConfig.label_config;
           setLabelConfig(tempLabelConfig);
           setAnnotations(annotations);
           setTaskData(taskData);
@@ -804,8 +831,8 @@ const LabelStudioWrapper = ({
   }, [taskId]);
 
   const autoSaveReview = () => {
-    if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
-      if(taskData?.annotation_status !== "freezed") {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+      if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
@@ -861,7 +888,7 @@ const LabelStudioWrapper = ({
     const handleVisibilityChange = () => setVisibile(!document[hidden]);
     document.addEventListener(visibilityChange, handleVisibilityChange);
     return () => {
-        document.removeEventListener(visibilityChange, handleVisibilityChange);
+      document.removeEventListener(visibilityChange, handleVisibilityChange);
     }
   }, []);
 
@@ -872,7 +899,7 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     const interval = setInterval(() => {
       visible && autoSaveReview();
-      }, AUTO_SAVE_INTERVAL);
+    }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
   }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
 
@@ -957,7 +984,7 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            {!disableBtns  && taskData?.review_user === userData?.id && (
+            {!disableBtns && taskData?.review_user === userData?.id && (
               <Tooltip title="Save task for later">
                 <Button
                   type="default"
@@ -1190,7 +1217,7 @@ export default function LSF() {
               variant="contained"
               color={
                 annotationNotesRef.current?.value !== "" ||
-                superCheckerNotesRef.current?.value !== ""
+                  superCheckerNotesRef.current?.value !== ""
                   ? "success"
                   : "primary"
               }
