@@ -47,7 +47,10 @@ const InviteUsersDialog = ({
   setvalue
 }) => {
 
+
+  
   const classes = DatasetStyle();
+
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -89,26 +92,26 @@ const InviteUsersDialog = ({
   return (
     <Dialog open={isOpen} onClose={dialogCloseHandler} close>
       <DialogTitle style={{ paddingBottom: 0 }}>Invite users to organization</DialogTitle>
-      <DialogContent>
+      <DialogContent >
         <Stack direction="row">
           {btn?<Autocomplete
-            fullWidth
-            multiple
-            id="tags-filled"
-            options={[]}
-            freeSolo
-            value={selectedUsers}
-            onChange={handleFileSelect}
-            renderTags={(values, getTagProps) =>
-              values?.map((option, index) => (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  {...getTagProps({ index })}
-                />
-              ))
-            }
-            sx={{ mt: 3, mb: 3 }}
+                fullWidth
+                multiple
+                id="tags-filled"
+                options={[]}
+                freeSolo
+                value={selectedUsers}
+                onChange={(e, newVal) => setSelectedUsers(newVal)}
+                renderTags={(value, getTagProps) =>
+                value?.map((option, index) => (
+                    <Chip
+                    variant="outlined"
+                    label={option}
+                    {...getTagProps({ index })}
+                    />
+                ))
+                }
+                sx={{mt: 3, mb: 3}}
             renderInput={(values) => (
               <TextField
                 {...values}
@@ -123,14 +126,14 @@ const InviteUsersDialog = ({
             )
             }
           /> :
-          <Autocomplete
+              <Autocomplete
                 fullWidth
                 multiple
                 id="tags-filled"
                 options={[]}
                 freeSolo
                 value={selectedUsers}
-                onChange={handleFileSelect}
+                onChange={(e, newVal) => setSelectedUsers(newVal)}
                 renderTags={(value, getTagProps) =>
                 value?.map((option, index) => (
                     <Chip
@@ -141,17 +144,17 @@ const InviteUsersDialog = ({
                 ))
                 }
                 sx={{mt: 3, mb: 3}}
+                
                 renderInput={(params) => (
-                <TextField
-                    {...params}
-                    variant="outlined"
-                    onChange={handleFileSelect}
-                    label="Enter email ids of users to invite        "
-                    placeholder="Email ids"
-                    value={selectedUsers}
-                />
-                )}
-            />
+                  <TextField
+                      {...params}
+                      variant="outlined"
+                      label="Enter email ids of users to invite"
+                      placeholder="Email ids"
+            
+                  />
+                  )}
+              />
            }
           <label htmlFor="upload-csv">
             <input
@@ -162,7 +165,7 @@ const InviteUsersDialog = ({
               id="upload-csv"
             />
             <Button variant="contained"
-              color="primary" sx={{ mt: 4 }}
+              color="primary" sx={{ mt: 4 ,ml:1}}
               fullwidth
               className={classes.custombtn}
               component="span"
