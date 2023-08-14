@@ -7,18 +7,24 @@ import React, {
   } from "react";
   import { useDispatch, useSelector } from "react-redux";
   import { isPlaying } from "../../../../utils/utils";
+  import { useParams } from "react-router-dom";
+
   
   //Styles
   import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
   
   //APIs
   import { setPlayer } from "../../../../redux/actions/Common";
+  import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails";
+  import APITransport from "../../../../redux/actions/apitransport/apitransport";
+
   
   const AudioPanel = memo(
     () => {
       const classes = AudioTranscriptionLandingStyle();
       const dispatch = useDispatch();
       const $audio = useRef();
+      const { taskId } = useParams();
   
       const [poster, setPoster] = useState("play.png");
       const [currentTime, setCurrentTime] = useState([]);
@@ -27,6 +33,17 @@ import React, {
     //   const fullscreenVideo = useSelector(
     //     (state) => state.commonReducer.fullscreenVideo
     //   );
+      const TaskDetails = useSelector((state) => state.getTaskDetails.data);
+console.log( TaskDetails?.data?.audio_url,"TaskDetailsTaskDetails")
+const getTaskData = () => {
+  // setLoading(true);
+  const userObj = new GetTaskDetailsAPI(taskId);
+  dispatch(APITransport(userObj));
+};
+
+useEffect(() => {
+  getTaskData();
+}, []);
   
       useEffect(() => {
         dispatch(setPlayer($audio.current));
@@ -62,7 +79,7 @@ import React, {
           <audio
             // onClick={onClick}
             controls
-            src="https://objectstore.e2enetworks.net/indic-asr-public/youtube_cc/pilot_v1/Vendor_Desicrew/kannada_HnbcfJaIhkY.wav" type="audio"
+            src={TaskDetails?.data?.audio_url} type="audio"
             // style={{
             //   width: videoDetails?.video?.audio_only ? "20%" : "",
             //   margin:

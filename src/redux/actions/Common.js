@@ -8,7 +8,6 @@ export const setPlayer = (data) => {
 };
 
 export const setSubtitles = (data, type) => {
-  console.log(data,"datadata")
   return {
     type: type,
     payload: data,
