@@ -4,13 +4,14 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class CreateScheduledMailsAPI extends API {
-  constructor(userId, reportLevelId, reportLevel, projectType, schedule, timeout = 2000) {
+  constructor(userId, reportLevelId, reportLevel, projectType, schedule, scheduleDay, timeout = 2000) {
     super("POST", timeout, false);
     this.type = constants.CREATE_SCHEDULED_MAILS;
     this.reportLevelId = reportLevelId;
     this.reportLevel = reportLevel;
     this.projectType = projectType;
     this.schedule = schedule;
+    this.scheduleDay = scheduleDay;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getUsers}${userId}/schedule_mail/`;
   }
 
@@ -30,7 +31,8 @@ export default class CreateScheduledMailsAPI extends API {
       id: this.reportLevelId,
       report_level: this.reportLevel,
       project_type: this.projectType,
-      schedule: this.schedule
+      schedule: this.schedule,
+      schedule_day: this.scheduleDay
     }
   }
 
