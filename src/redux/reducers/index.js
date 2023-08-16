@@ -88,6 +88,10 @@ import wsPeriodicalTasks from "./WorkspaceDetails/GetPeriodicalTasks";
 import wsTaskAnalytics from "./WorkspaceDetails/GetTaskAnalytics";
 import sendOrganizationUserReports from "./Organization/SendOrganizationUserReports";
 import sendWorkspaceUserReports from './WorkspaceDetails/SendWorkspaceUserReports';
+import getScheduledMails from './UserManagement/GetScheduledMails';
+import createScheduledMails from './UserManagement/CreateScheduledMails';
+import updateScheduledMails from './UserManagement/UpdateScheduledMails';
+import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
 
 const index = {
     apiStatus,
@@ -183,6 +187,10 @@ const index = {
     wsTaskAnalytics,
     sendOrganizationUserReports,
     sendWorkspaceUserReports,
+    getScheduledMails,
+    createScheduledMails,
+    updateScheduledMails,
+    deleteScheduledMails
     
 };
 

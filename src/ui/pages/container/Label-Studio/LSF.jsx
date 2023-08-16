@@ -35,17 +35,13 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
-import { snakeToTitleCase } from "../../../../utils/utils";
 
 import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useDispatch, useSelector } from "react-redux";
-import { translate } from "../../../../config/localisation";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 import InfoIcon from "@mui/icons-material/Info";
-import getCaretCoordinates from "textarea-caret";
-import CloseIcon from "@mui/icons-material/Close";
 
 const filterAnnotations = (
   annotations,
@@ -66,7 +62,7 @@ const filterAnnotations = (
   );
 
   if (userAnnotation) {
-    
+
     if (userAnnotation.annotation_status === "labeled") {
       const superCheckedAnnotation = annotations.find(
         (annotation) => annotation.annotation_type === 3
@@ -88,7 +84,7 @@ const filterAnnotations = (
         );
         setDisableBtns(true);
         disable = true;
-      }else if (
+      } else if (
         review &&
         [
           "skipped",
@@ -140,10 +136,10 @@ const filterAnnotations = (
       setFilterMessage("Skip button is disabled, since the task is being reviewed");
     }
 
-     else {
+    else {
       filteredAnnotations = [userAnnotation];
     }
-  } else if([4, 5, 6].includes(user.role)) {
+  } else if ([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 1);
     disable = true;
     setDisableBtns(true);
@@ -155,6 +151,10 @@ const filterAnnotations = (
 //used just in postAnnotation to support draft status update.
 
 const AUTO_SAVE_INTERVAL = 30000; //1 minute
+const AUDIO_PROJECT_SAVE_CHECK = [
+  "AudioTranscription",
+  "AudioTranscriptionEditing",
+];
 
 const LabelStudioWrapper = ({
   annotationNotesRef,
@@ -184,6 +184,7 @@ const LabelStudioWrapper = ({
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
   const [autoSave, setAutoSave] = useState(true);
+  let isAudioProject = useRef();
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
@@ -257,13 +258,14 @@ const LabelStudioWrapper = ({
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableLSFControls,disableSkip] = filterAnnotations(
+    const [filteredAnnotations, disableLSFControls, disableSkip] = filterAnnotations(
       annotations,
       userData,
       setDisableBtns,
       setFilterMessage,
       setDisableButton
     );
+    isAudioProject.current = AUDIO_PROJECT_SAVE_CHECK.includes(projectType);
     //console.log("labelConfig", labelConfig);
 
     if (taskData.task_status === "freezed") {
@@ -276,10 +278,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing"
-          ? ["side-column"]
-          : []),
+        ...(isAudioProject.current ? ["side-column"] : []),
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -297,7 +296,7 @@ const LabelStudioWrapper = ({
         "panel",
         "update",
         "submit",
-        ...(!disableSkip ?["skip"]:[]),
+        ...(!disableSkip ? ["skip"] : []),
         ...(taskData?.annotation_users?.some(
           (user) => user === userData.id && !disableLSFControls
         )
@@ -306,10 +305,7 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing"
-          ? ["side-column"]
-          : []),
+        ...(isAudioProject.current ? ["side-column"] : []),
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -323,8 +319,7 @@ const LabelStudioWrapper = ({
         "edit-history",
       ];
     }
-
-    if(disableLSFControls || !taskData?.annotation_users?.some(
+    if (disableLSFControls || !taskData?.annotation_users?.some(
       (user) => user === userData.id)) setAutoSave(false);
 
     if (rootRef.current) {
@@ -362,7 +357,31 @@ const LabelStudioWrapper = ({
           }
           load_time.current = new Date();
         },
+
         onSubmitAnnotation: function (ls, annotation) {
+          if (isAudioProject.current) {
+            let temp = annotation.serializeAnnotation();
+            const counter = temp.reduce((acc, curr) => {
+              if (curr.from_name === "labels")
+                acc.labels++;
+              else if (curr.from_name === "transcribed_json") {
+                if (curr.value.text[0] === "")
+                  acc.empty++;
+                acc.textareas++;
+              }
+              return acc;
+            },
+              { labels: 0, textareas: 0, empty: 0 }
+            );
+            if (counter.labels !== counter.textareas || counter.empty) {
+              setSnackbarInfo({
+                open: true,
+                message: "Please fill the annotations for every segment/region",
+                variant: "warning",
+              });
+              return;
+            }
+          }
           showLoader();
           if (taskData.annotation_status !== "freezed") {
             postAnnotation(
@@ -417,12 +436,35 @@ const LabelStudioWrapper = ({
         },
 
         onUpdateAnnotation: function (ls, annotation) {
+          if (isAudioProject.current) {
+            let temp = annotation.serializeAnnotation();
+            const counter = temp.reduce((acc, curr) => {
+              if (curr.from_name === "labels")
+                acc.labels++;
+              else if (curr.from_name === "transcribed_json") {
+                if (curr.value.text[0] === "")
+                  acc.empty++;
+                acc.textareas++;
+              }
+              return acc;
+            },
+              { labels: 0, textareas: 0, empty: 0 }
+            );
+            if (counter.labels !== counter.textareas || counter.empty) {
+              setSnackbarInfo({
+                open: true,
+                message: "Please fill the annotations for every segment/region",
+                variant: "warning",
+              });
+              return;
+            }
+          }
           if (taskData.annotation_status !== "freezed") {
             for (let i = 0; i < annotations.length; i++) {
               if (
                 !annotations[i].result?.length || !annotation.serializeAnnotation().length ||
                 annotation.serializeAnnotation()[0].id ===
-                  annotations[i].result[0].id
+                annotations[i].result[0].id
               ) {
                 setAutoSave(false);
                 showLoader();
@@ -500,8 +542,8 @@ const LabelStudioWrapper = ({
         loaded.current = taskId;
         getProjectsandTasks(projectId, taskId).then(
           ([labelConfig, taskData, annotations, predictions]) => {
-            if(annotations.message?.includes("not a part of this project") || annotations.detail?.includes("Not found")){
-              if(annotations.detail?.includes("Not found")) annotations.message = "Task not found";
+            if (annotations.message?.includes("not a part of this project") || annotations.detail?.includes("Not found")) {
+              if (annotations.detail?.includes("Not found")) annotations.message = "Task not found";
               setSnackbarInfo({
                 open: true,
                 message: annotations.message,
@@ -514,11 +556,11 @@ const LabelStudioWrapper = ({
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
-              labelConfig.project_type === "ConversationTranslationEditing"
+                labelConfig.project_type === "ConversationTranslationEditing"
                 ? generateLabelConfig(taskData.data)
                 : labelConfig.project_type === "ConversationVerification"
-                ? conversationVerificationLabelConfig(taskData.data)
-                : labelConfig.label_config;
+                  ? conversationVerificationLabelConfig(taskData.data)
+                  : labelConfig.label_config;
             setAnnotations(annotations);
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
@@ -664,41 +706,41 @@ const LabelStudioWrapper = ({
   }, [taskId]);
 
   const autoSaveAnnotation = () => {
-    if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
-      if(taskData?.annotation_status !== "freezed") {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+      if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         for (let i = 0; i < annotations.length; i++) {
           if (
             !annotations[i].result?.length ||
             annotation.serializeAnnotation()[0].id ===
-              annotations[i].result[0].id
+            annotations[i].result[0].id
           ) {
-              let temp = annotation.serializeAnnotation();
-              if(annotations[i].annotation_type !== 1) continue;
-              for (let i = 0; i < temp.length; i++) {
-                if (temp[i].value.text) {
-                  temp[i].value.text = [temp[i].value.text[0]];
-                }
+            let temp = annotation.serializeAnnotation();
+            if (annotations[i].annotation_type !== 1) continue;
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
               }
-              patchAnnotation(
-                temp,
-                annotations[i].id,
-                load_time.current,
-                annotations[i].lead_time,
-                annotations[i].annotation_status,
-                annotationNotesRef.current.value,
-                true
-              ).then((res) => {
-                if (res.status !== 200) {
-                  setSnackbarInfo({
-                    open: true,
-                    message: "Error in autosaving annotation",
-                    variant: "error",
-                  });
-                }
-              });
             }
+            patchAnnotation(
+              temp,
+              annotations[i].id,
+              load_time.current,
+              annotations[i].lead_time,
+              annotations[i].annotation_status,
+              annotationNotesRef.current.value,
+              true
+            ).then((res) => {
+              if (res.status !== 200) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Error in autosaving annotation",
+                  variant: "error",
+                });
+              }
+            });
           }
+        }
       } else
         setSnackbarInfo({
           open: true,
@@ -726,7 +768,7 @@ const LabelStudioWrapper = ({
     const handleVisibilityChange = () => setVisibile(!document[hidden]);
     document.addEventListener(visibilityChange, handleVisibilityChange);
     return () => {
-        document.removeEventListener(visibilityChange, handleVisibilityChange);
+      document.removeEventListener(visibilityChange, handleVisibilityChange);
     }
   }, []);
 
@@ -737,7 +779,7 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     const interval = setInterval(() => {
       visible && autoSaveAnnotation();
-      }, AUTO_SAVE_INTERVAL);
+    }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
   }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
 
@@ -979,7 +1021,7 @@ export default function LSF() {
                 reviewNotesRef.current?.value !== "" ? "success" : "primary"
               }
               onClick={handleCollapseClick}
-              // style={{ marginBottom: "20px" }}
+            // style={{ marginBottom: "20px" }}
             >
               Notes {reviewNotesRef.current?.value !== "" && "*"}
             </Button>

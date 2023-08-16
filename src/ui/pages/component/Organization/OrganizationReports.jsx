@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography, FormGroup,Checkbox, ListItemText, ListItemIcon, Paper } from "@mui/material";
+import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography, FormGroup, Checkbox, ListItemText, ListItemIcon, Paper } from "@mui/material";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import tableTheme from "../../../theme/tableTheme";
@@ -32,7 +32,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import { snakeToTitleCase } from "../../../../utils/utils";
 
 
-const ProgressType = ["Annotation Stage", "Review Stage","Super Check Stage","All Stage"]
+const ProgressType = ["Annotation Stage", "Review Stage", "Super Check Stage", "All Stage"]
 const ITEM_HEIGHT = 38;
 const ITEM_PADDING_TOP = 0;
 const MenuProps = {
@@ -98,9 +98,7 @@ const OrganizationReports = () => {
 
   let ProgressTypeValue = "Annotation Stage"
   const filterdata = ProgressType.filter(item => item !== ProgressTypeValue)
-  const FilterProgressType = reportTypes === "Reviewer" ?  filterdata :ProgressType
-
-
+  const FilterProgressType = reportTypes === "Reviewer" ? filterdata : ProgressType
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -110,7 +108,7 @@ const OrganizationReports = () => {
   }, []);
 
   useEffect(() => {
-    if(radiobutton === "PaymentReports") {
+    if (radiobutton === "PaymentReports") {
       setProjectTypes([
         "AudioSegmentation",
         "AudioTranscription",
@@ -248,12 +246,14 @@ const OrganizationReports = () => {
   };
 
   const handleSubmit = () => {
-    if(radiobutton === "PaymentReports") {
+    if (radiobutton === "PaymentReports") {
       const userReportObj = new SendOrganizationUserReports(
         orgId,
         UserDetails.id,
         selectedType,
         participationTypes,
+        format(selectRange[0].startDate, 'yyyy-MM-dd'),
+        format(selectRange[0].endDate, 'yyyy-MM-dd'),
       );
       dispatch(APITransport(userReportObj));
       setSnackbarInfo({
@@ -279,13 +279,13 @@ const OrganizationReports = () => {
       }
       let ReviewData = []
 
-      if ((reportTypes === "Annotator" || reportTypes === "Reviewer" ) && reportfilter != "" && radiobutton === "UsersReports") {
+      if ((reportTypes === "Annotator" || reportTypes === "Reviewer") && reportfilter != "" && radiobutton === "UsersReports") {
 
         if (reportfilter.toString() == "Annotation Stage") {
           ReviewData.push(1)
         } else if (reportfilter.toString() == "Review Stage") {
           ReviewData.push(2)
-        }else if (reportfilter.toString() == "Super Check Stage") {
+        } else if (reportfilter.toString() == "Super Check Stage") {
           ReviewData.push(3)
         }
         const userReportObj = new GetOrganizationUserReportsAPI(
@@ -293,14 +293,14 @@ const OrganizationReports = () => {
           selectedType,
           format(selectRange[0].startDate, 'yyyy-MM-dd'),
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
-          reportTypes === "Annotator" ? "annotation" : reportTypes === "Reviewer" ? "review":"supercheck",
+          reportTypes === "Annotator" ? "annotation" : reportTypes === "Reviewer" ? "review" : "supercheck",
           targetLanguage,
           ...ReviewData,
 
         );
         dispatch(APITransport(userReportObj));
 
-      } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" &&radiobutton === "UsersReports")) {
+      } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" && radiobutton === "UsersReports")) {
         const supercheckObj = new GetOrganizationUserReportsAPI(
           orgId,
           selectedType,
@@ -413,9 +413,9 @@ const OrganizationReports = () => {
           <FormControl fullWidth size="small">
             <InputLabel id="participation-type-label" sx={{ fontSize: "16px" }}>Participation Types</InputLabel>
             <Select
-             style={{ zIndex: "0" }}
-             inputProps={{ "aria-label": "Without label" }}
-             MenuProps={MenuProps}
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
               labelId="participation-type-label"
               id="participation-select"
               value={participationTypes}
@@ -433,9 +433,9 @@ const OrganizationReports = () => {
           <FormControl fullWidth size="small">
             <InputLabel id="report-type-label" sx={{ fontSize: "16px" }}> Report Type</InputLabel>
             <Select
-             style={{ zIndex: "0" }}
-             inputProps={{ "aria-label": "Without label" }}
-             MenuProps={MenuProps}
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
               labelId="report-type-label"
               id="report-select"
               value={reportTypes}
@@ -489,26 +489,26 @@ const OrganizationReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {radiobutton == "UsersReports" &&
-         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-         <Button
-           endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-           variant="contained"
-           color="primary"
-           onClick={() => setShowPicker(!showPicker)}
-           sx={{width:"130px"}}
-         >
-           Pick Dates
-         </Button>
-       </Grid>
+        {["UsersReports", "PaymentReports"].includes(radiobutton) &&
+          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+            <Button
+              endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color="primary"
+              onClick={() => setShowPicker(!showPicker)}
+              sx={{ width: "130px" }}
+            >
+              Pick Dates
+            </Button>
+          </Grid>
         }
-       
+
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
           <Button
             fullWidth
             variant="contained"
             onClick={handleSubmit}
-            sx={{width:"130px"}}
+            sx={{ width: "130px" }}
           >
             {radiobutton === "PaymentReports" ? "E-mail CSV" : "Submit"}
           </Button>
