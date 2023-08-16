@@ -33,6 +33,7 @@ const ScheduleMails = () => {
     "ConversationTranslationEditing"
   ]);
   const [schedule, setSchedule] = useState("Daily");
+  const [scheduleDay, setScheduleDay] = useState(1);
   const [workspaceId, setWorkspaceId] = useState(0);
   const [workspaces, setWorkspaces] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -65,12 +66,29 @@ const ScheduleMails = () => {
       });
       return;
     }
+    if (schedule === "Monthly" && (scheduleDay > 28 || scheduleDay < 1)) {
+      setSnackbarState({
+        open: true,
+        message: "Day of month not in range",
+        variant: "error",
+      });
+      return;
+    }
+    if (schedule === "Weekly" && (scheduleDay > 6 || scheduleDay < 0)) {
+      setSnackbarState({
+        open: true,
+        message: "Day of week not in range",
+        variant: "error",
+      });
+      return;
+    }
     const scheduledMailsObj = new CreateScheduledMailsAPI(
       id,
       reportLevel === 1 ? userDetails?.organization?.id : workspaceId,
       reportLevel,
       selectedProjectType,
-      schedule
+      schedule,
+      scheduleDay
     );
     fetch(scheduledMailsObj.apiEndPoint(), {
       method: "POST",
@@ -348,6 +366,50 @@ const ScheduleMails = () => {
                 </Select>
               </FormControl>
             </Grid>
+            {schedule === "Weekly" && <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="weekday-label" sx={{ fontSize: "16px" }}>Day of Week</InputLabel>
+                <Select
+                  style={{ zIndex: "0" }}
+                  inputProps={{ "aria-label": "Without label" }}
+                  MenuProps={MenuProps}
+                  labelId="weekday-label"
+                  id="weekday-select"
+                  value={scheduleDay}
+                  label="Day of Week"
+                  onChange={(e) => setScheduleDay(e.target.value)}
+                >
+                  <MenuItem value={0}>Sunday</MenuItem>
+                  <MenuItem value={1}>Monday</MenuItem>
+                  <MenuItem value={2}>Tuesday</MenuItem>
+                  <MenuItem value={3}>Wednesday</MenuItem>
+                  <MenuItem value={4}>Thursday</MenuItem>
+                  <MenuItem value={5}>Friday</MenuItem>
+                  <MenuItem value={6}>Saturday</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>}
+            {schedule === "Monthly" && <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="month-day-label" sx={{ fontSize: "16px" }}>Day of Month</InputLabel>
+                <Select
+                  style={{ zIndex: "0" }}
+                  inputProps={{ "aria-label": "Without label" }}
+                  MenuProps={MenuProps}
+                  labelId="month-day-label"
+                  id="month-day-select"
+                  value={scheduleDay}
+                  label="Day of Month"
+                  onChange={(e) => setScheduleDay(e.target.value)}
+                >
+                  {Array.from(Array(28).keys()).map((day, index) => (
+                    <MenuItem value={day + 1} key={index}>
+                      {day + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>}
             <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <CustomButton
                 label="+ Add"
