@@ -141,7 +141,7 @@ const ProfilePage = () => {
                   </Typography>
                 )}
                 {/* {LoggedInUserId === userDetails.id && */}
-                {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role) || (LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role))) &&
+                {(userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role || LoggedInUserId === userDetails?.id) &&
                   <Grid container spacing={2} sx={{ mt: 1, alignItems: "center", display: 'inline-flex', justifyContent: 'center' }}>
                     <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
                       <Tooltip title={(userDetails.enable_mail ? "Disable" : "Enable") + " daily mails"}>
