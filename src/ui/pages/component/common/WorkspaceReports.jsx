@@ -440,7 +440,7 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {reportType === "user" || reportType === "payment" &&
+        {(reportType === "user" || reportType === "payment") &&
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
             <Button
               endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
