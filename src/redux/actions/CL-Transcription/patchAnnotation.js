@@ -4,18 +4,18 @@ import API from "../../api";
 import ENDPOINTS from "../../../config/apiendpoint";
 import constants from "../../constants";
  
-export default class SaveTranscriptAPI extends API {
-   constructor(annotationsId,GlossaryObj,timeout = 2000) {
+export default class PatchAnnotationAPI extends API {
+   constructor(annotationsId,userObj,timeout = 2000) {
      super("PATCH", timeout, false);
-     this.GlossaryObj = GlossaryObj;
-     //this.type = constants.Add_GLOSSARY;
+     this.userObj = userObj;
+     this.type = constants.PATCH_ANNOTATION;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.annotations}${annotationsId}/`;
    }
   
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-         this.saveTranscript = res;
+         this.patchAnnotation = res;
      }
  }
  
@@ -24,7 +24,7 @@ export default class SaveTranscriptAPI extends API {
    }
 
    getBody() {
-    return this.GlossaryObj;
+    return this.userObj;
   }
  
    getHeaders() {
@@ -38,7 +38,7 @@ export default class SaveTranscriptAPI extends API {
    }
  
    getPayload() {
-     return this.saveTranscript;
+     return this.patchAnnotation;
    }
  }
  

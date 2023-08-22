@@ -155,8 +155,8 @@ export const onSplit = (
   const targetTextBlock = subtitles[currentIndex];
   const index = hasSub(subtitles[currentIndex], subtitles);
 
-  const text1 = targetTextBlock.text.slice(0, selectionStart).trim();
-  const text2 = targetTextBlock.text.slice(selectionStart).trim();
+  const text1 = targetTextBlock?.text.slice(0, selectionStart).trim();
+  const text2 = targetTextBlock?.text.slice(selectionStart).trim();
   const targetText1 = targetSelectionStart
     ? targetTextBlock.target_text.slice(0, targetSelectionStart).trim()
     : null;
@@ -220,7 +220,6 @@ export const onSplit = (
 
 export const onSubtitleChange = (text, index) => {
   const subtitles = store.getState().commonReducer.subtitles;
-console.log(text,"texttext")
   const copySub = [...subtitles];
 
   copySub.forEach((element, i) => {

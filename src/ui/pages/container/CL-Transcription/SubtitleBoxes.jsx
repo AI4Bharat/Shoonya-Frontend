@@ -72,6 +72,11 @@ import React, {
       const limit = useSelector((state) => state.commonReducer.limit);
       const currentPage = useSelector((state) => state.commonReducer.currentPage);
       const next = useSelector((state) => state.commonReducer.nextPage);
+      const AnnotationsTaskDetails = useSelector(
+        (state) => state.getAnnotationsTask.data
+      );
+
+      console.log(AnnotationsTaskDetails[0]?.annotation_status)
   
       const [currentSubs, setCurrentSubs] = useState([]);
       const [snackbar, setSnackbarInfo] = useState({
@@ -99,9 +104,9 @@ import React, {
           if (next && isPlaying(player) && isLastSub) {
             const payloadObj = new GetAnnotationsTaskAPI(
               taskId,
-              taskDetails.task_type,
-              next,
-              limit
+              AnnotationsTaskDetails[0]?.annotation_status,
+            //   next,
+            //   limit
             );
             dispatch(APITransport(payloadObj));
           }
@@ -120,9 +125,9 @@ import React, {
           },
         };
   
-        const obj = new SaveTranscriptAPI(reqBody, taskType);
+        const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
         const res = await fetch(obj.apiEndPoint(), {
-          method: "POST",
+          method: "PATCH",
           body: JSON.stringify(obj.getBody()),
           headers: obj.getHeaders().headers,
         });

@@ -506,15 +506,15 @@ const AudioTranscriptionLandingStyle = makeStyles({
 
   videoPlayerParent: {
     boxSizing: "border-box",
-    height: "calc(100vh - 310px)",
-    paddingTop:"20%"
+    height: "calc(60vh - 300px)",
+    paddingTop:"9%"
   },
 
   videoPlayer: {
     cursor: "pointer",
     width: "100%",
     objectFit: "fill",
-    maxHeight: "100%",
+    // maxHeight: "100%",
   },
 
   recorder: {

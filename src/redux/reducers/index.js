@@ -90,6 +90,8 @@ import sendOrganizationUserReports from "./Organization/SendOrganizationUserRepo
 import sendWorkspaceUserReports from './WorkspaceDetails/SendWorkspaceUserReports';
 import commonReducer from "./CL-Transcription/Common";
 import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
+import patchAnnotation from "./CL-Transcription/PatchAnnotation"
+
 
 const index = {
     apiStatus,
@@ -186,7 +188,8 @@ const index = {
     sendOrganizationUserReports,
     sendWorkspaceUserReports,
     commonReducer,
-    getAnnotationsTask
+    getAnnotationsTask,
+    patchAnnotation,
 };
 
 export default index;

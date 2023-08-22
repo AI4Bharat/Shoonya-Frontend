@@ -65,9 +65,9 @@ const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
     if (firstLoaded.current && !grabbing) {
       const apiObj = new GetAnnotationsTaskAPI(
         taskId,
-        taskDetails?.task_type,
+        // taskDetails?.task_type,
         DT.d2t(player.currentTime),
-        limit
+        // limit
       );
       dispatch(APITransport(apiObj));
     } else {
@@ -87,9 +87,9 @@ const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
 
       const apiObj = new GetAnnotationsTaskAPI(
         taskId,
-        taskDetails?.task_type,
+        // taskDetails?.task_type,
         DT.d2t(currentTime),
-        limit
+        // limit
       );
       dispatch(APITransport(apiObj));
     },
@@ -312,7 +312,7 @@ const Timeline = ({ currentTime, playing }) => {
   return (
     <Box className={classes.timeLineParent} ref={$footer}>
       {player &&
-        (AnnotationsTaskDetails || AnnotationsTaskDetails) && (
+        (AnnotationsTaskDetails[0]?.result ) && (
           <>
             <Progress waveform={waveform} currentTime={currentTime} taskId={taskId} />
             <Duration currentTime={currentTime} />

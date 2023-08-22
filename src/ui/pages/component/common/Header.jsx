@@ -624,7 +624,7 @@ const Header = () => {
 
   return (
     <Grid container direction="row" >
-      <Box className={(localStorage.getItem("enableChitrlekhaTranscription") === "true"&& localStorage.getItem("enableChitrlekhaTranscription")) ? classes.AudioparentContainers: classes.parentContainer} >
+      <Box className={(localStorage.getItem("enableChitrlekhaTranscription") === "true"&& (localStorage.getItem("enableChitrlekhaUI"))) ? classes.AudioparentContainers: classes.parentContainer} >
         {isMobile ? (
           <MobileNavbar
             tabs={tabs}
