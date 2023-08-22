@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
+import { useQuill } from 'react-quilljs';
+import 'quill/dist/quill.bubble.css'; 
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -671,7 +673,7 @@ const LabelStudioWrapper = ({
       tasksComplete(res?.id || null);
     });
   };
-
+  const [value, setvalue] = useState();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -685,7 +687,7 @@ const LabelStudioWrapper = ({
     review_status.current = "rejected";
     lsfRef.current.store.submitAnnotation();
   };
-
+ 
   const handleAcceptClick = async (status) => {
     review_status.current = status;
     lsfRef.current.store.submitAnnotation();
@@ -914,6 +916,14 @@ export default function LSF() {
   });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
+  const modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+    ],
+  };
+  const theme = 'bubble';
+  const { quill, quillRef } = useQuill({theme,modules});
+  const [value,setvalue] = useState();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -930,7 +940,13 @@ export default function LSF() {
       });
     }
   };
-
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', () => {
+        setvalue(quillRef.current.firstChild.innerHTML);
+      });
+    }
+  }, [quill]);
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
@@ -1029,6 +1045,7 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
+              // ref={quillRef}
             />
 
             <TextField
@@ -1038,12 +1055,16 @@ export default function LSF() {
               // value={notesValue}
               // onChange={event=>setNotesValue(event.target.value)}
               inputRef={superCheckerNotesRef}
+              InputLabelProps={{
+                shrink: true,
+              }}
               rows={2}
               maxRows={4}
               inputProps={{
                 style: { fontSize: "1rem" },
               }}
               style={{ width: "99%", marginTop: "1%" }}
+              ref={quillRef}
             />
           </div>
           <Button

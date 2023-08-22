@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
+import { useQuill } from 'react-quilljs';
+import 'quill/dist/quill.bubble.css'; 
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -180,6 +182,7 @@ const LabelStudioWrapper = ({
     message: "",
     variant: "success",
   });
+
   const [taskData, setTaskData] = useState(undefined);
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
@@ -928,7 +931,14 @@ export default function LSF() {
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-
+  const modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+    ],
+  };
+  const theme = 'bubble';
+  const { quill, quillRef } = useQuill({theme,modules});
+  const [value,setvalue] = useState();
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
       setSelectedTag(value);
@@ -941,6 +951,13 @@ export default function LSF() {
       });
     }
   };
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', () => {
+        setvalue(quillRef.current.firstChild.innerHTML);
+      });
+    }
+  }, [quill]);
 
   useEffect(() => {
     if (
@@ -1032,6 +1049,7 @@ export default function LSF() {
             style={{
               display: showNotes ? "block" : "none",
               paddingBottom: "16px",
+               
             }}
           >
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
@@ -1050,6 +1068,7 @@ export default function LSF() {
                 style: { fontSize: "1rem" },
               }}
               style={{ width: "99%" }}
+              ref={quillRef}
             />
             <TextField
               multiline
@@ -1058,6 +1077,9 @@ export default function LSF() {
               // value={notesValue}
               // onChange={event=>setNotesValue(event.target.value)}
               inputRef={reviewNotesRef}
+              InputLabelProps={{
+                shrink: true,
+              }}
               rows={2}
               maxRows={4}
               inputProps={{
@@ -1065,6 +1087,7 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
+              // ref={quillRef}
             />
           </div>
           <Button

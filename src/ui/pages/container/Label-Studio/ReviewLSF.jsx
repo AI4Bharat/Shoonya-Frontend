@@ -1,5 +1,10 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
+import { useQuill } from 'react-quilljs';
+import Quill from 'quill';
+import 'quill/dist/quill.bubble.css';
+import { createStyles, makeStyles } from '@mui/styles';
+
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -46,6 +51,15 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
+const useStyles = makeStyles(() =>
+  createStyles({
+    quillContainer: {
+      '& .ql-editor': {
+        minHeight: '150px', // Adjust the height as needed
+      },
+    },
+  })
+);
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -1122,10 +1136,22 @@ export default function LSF() {
   });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
+  const classes = useStyles();
+  const [shrink, setShrink] = useState(false);
+
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+    ],
+  };
+  const theme = 'bubble';
+  const placeholder = "Place your remarks here...";
+  const { quill, quillRef } = useQuill({ theme, modules, placeholder });
 
+  const [value, setvalue] = useState();
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
       setSelectedTag(value);
@@ -1138,6 +1164,7 @@ export default function LSF() {
       });
     }
   };
+
 
   useEffect(() => {
     if (
@@ -1167,7 +1194,13 @@ export default function LSF() {
     setShowNotes(false);
     reviewNotesRef.current.value = "";
   };
-
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', () => {
+        setvalue(quillRef.current.firstChild.innerHTML);
+      });
+    }
+  }, [quill]);
   useEffect(() => {
     resetNotes();
   }, [taskId]);
@@ -1252,6 +1285,7 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
+            // ref={quillRef}
             />
             <TextField
               multiline
@@ -1262,10 +1296,14 @@ export default function LSF() {
               inputRef={reviewNotesRef}
               rows={2}
               maxRows={4}
+              onFocus={() => setShrink(true)}
+              onBlur={(e) => setShrink(!!e.target.value)}
+              InputLabelProps={{ shrink }}
               inputProps={{
                 style: { fontSize: "1rem" },
               }}
-              style={{ width: "99%", marginTop: "1%" }}
+              style={{ width: "99%", border: '1px solid lightgray', fontSize: "1rem", placeholder: "Place" }}
+              ref={quillRef}
             />
             <TextField
               multiline
@@ -1281,6 +1319,7 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
+            // ref={quillRef}
             />
           </div>
           <Button
