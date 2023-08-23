@@ -64,7 +64,7 @@ const ButtonComponent = ({
               // backgroundColor: "#fff",
               backgroundColor: "#fcf7e9",
             }, }}
-            // onClick={() => onDelete(index)}
+            onClick={() => onDelete(index)}
           >
             <DeleteIcon />
           </IconButton>
@@ -86,7 +86,7 @@ const ButtonComponent = ({
             backgroundColor: "#fcf7e9",
           },}}
             className={classes.optionIconBtn}
-            // onClick={() => addNewSubtitleBox(index)}
+            onClick={() => addNewSubtitleBox(index)}
           >
             <AddIcon />
           </IconButton>

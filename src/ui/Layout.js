@@ -85,11 +85,10 @@ const Layout= (props) => {
       document.head.appendChild(style);
     }
   }, []);
-console.log(localStorage.getItem("enableChitrlekhaTranscription") === "true" ,localStorage.getItem("audio") === "true","hhhhhhhhhhhhhh")
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
-      className={ (localStorage.getItem("enableChitrlekhaTranscription") === "true" && (localStorage.getItem("audio")))?classes.Audioroot:classes.root}
+      className={ (localStorage.getItem("enableChitrlekhaTranscription")) && (localStorage.getItem("enableChitrlekhaUI"))?classes.Audioroot:classes.root}
       >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
@@ -99,7 +98,7 @@ console.log(localStorage.getItem("enableChitrlekhaTranscription") === "true" ,lo
           />
         </Suspense>
         <div
-        className={(localStorage.getItem("enableChitrlekhaTranscription") === "true" && (localStorage.getItem("audio")))?classes.Audiocontainer:classes.container}
+        className={(localStorage.getItem("enableChitrlekhaTranscription")) && (localStorage.getItem("enableChitrlekhaUI")) ?classes.Audiocontainer:classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}

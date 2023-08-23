@@ -1,5 +1,5 @@
 import Sub from "./Sub";
-// import { getUpdatedTime } from "./utils";
+import { getUpdatedTime } from "./utils";
 import DT from "duration-time-conversion";
 import store from "../redux/store/store";
 // import { noiseTags } from "config";
@@ -58,30 +58,30 @@ export const getKeyCode = (event) => {
   }
 };
 
-// export const timeChange = (value, index, type, time) => {
-//   const subtitles = store.getState().commonReducer.subtitles;
-//   const copySub = [...subtitles];
+export const timeChange = (value, index, type, time) => {
+  const subtitles = store.getState().commonReducer.subtitles;
+  const copySub = [...subtitles];
 
-//   if (type === "startTime") {
-//     copySub[index].start_time = getUpdatedTime(
-//       value,
-//       time,
-//       copySub[index].start_time,
-//       index,
-//       type
-//     );
-//   } else {
-//     copySub[index].end_time = getUpdatedTime(
-//       value,
-//       time,
-//       copySub[index].end_time,
-//       index,
-//       type
-//     );
-//   }
+  if (type === "startTime") {
+    copySub[index].start_time = getUpdatedTime(
+      value,
+      time,
+      copySub[index].start_time,
+      index,
+      type
+    );
+  } else {
+    copySub[index].end_time = getUpdatedTime(
+      value,
+      time,
+      copySub[index].end_time,
+      index,
+      type
+    );
+  }
 
-//   return copySub;
-// };
+  return copySub;
+};
 
 export const addSubtitleBox = (index) => {
   const subtitles = store.getState().commonReducer.subtitles;
@@ -155,8 +155,8 @@ export const onSplit = (
   const targetTextBlock = subtitles[currentIndex];
   const index = hasSub(subtitles[currentIndex], subtitles);
 
-  const text1 = targetTextBlock.text.slice(0, selectionStart).trim();
-  const text2 = targetTextBlock.text.slice(selectionStart).trim();
+  const text1 = targetTextBlock?.text.slice(0, selectionStart).trim();
+  const text2 = targetTextBlock?.text.slice(selectionStart).trim();
   const targetText1 = targetSelectionStart
     ? targetTextBlock.target_text.slice(0, targetSelectionStart).trim()
     : null;
@@ -503,4 +503,14 @@ export const reGenerateTranslation = (index) => {
   copySub[index].retranslate = true;
 
   return copySub;
+};
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+export const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
 };

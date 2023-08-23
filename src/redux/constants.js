@@ -103,6 +103,7 @@ const constants = {
   PLAYER: "PLAYER",
   GET_ANNOTATIONS_TASK:"GET_ANNOTATIONS_TASK",
   SUBTITLES: "SUBTITLES",
+  PATCH_ANNOTATION:"PATCH_ANNOTATION"
 };
 
 export default constants;

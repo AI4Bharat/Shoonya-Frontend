@@ -394,7 +394,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     display: "flex",
     direction: "row",
     flexWrap: "wrap",
-    padding: "35.5px 0",
+    padding: "15.5px 0",
     justifyContent: "center",
     // backgroundColor: "rgba(254, 191, 44, 0.1)",
     backgroundColor: "#fcf7e9",
@@ -506,14 +506,15 @@ const AudioTranscriptionLandingStyle = makeStyles({
 
   videoPlayerParent: {
     boxSizing: "border-box",
-    height: "calc(100vh - 310px)",
+    height: "calc(60vh - 300px)",
+    paddingTop:"9%"
   },
 
   videoPlayer: {
     cursor: "pointer",
     width: "100%",
     objectFit: "fill",
-    maxHeight: "100%",
+    // maxHeight: "100%",
   },
 
   recorder: {
