@@ -128,6 +128,14 @@ const Header = () => {
     }
   };
 
+  const handleTranscriptionFlowChange = (event) => {
+    if (event.target.checked) {
+      localStorage.setItem("enableChitrlekhaTranscription", true);
+    } else {
+      localStorage.setItem("enableChitrlekhaTranscription", false);
+    }
+  }
+
   const handleTagsChange = (event) => {
     if (event.target.checked) {
       localStorage.setItem("enableTags", true);
@@ -568,6 +576,15 @@ const Header = () => {
         />
       ),
     },
+    {
+      name: "Use Chitralekha Transcription Flow",
+      control: (
+        <Checkbox
+          onChange={handleTranscriptionFlowChange}
+          defaultChecked={localStorage.getItem("enableChitrlekhaTranscription") === "true"}
+        />
+      ),
+    },
     // {
     //   name: "Enable Tags Dropdown",
     //   control: (
@@ -604,9 +621,10 @@ const Header = () => {
     setShowTransliterationModel(false);
   }
 
+
   return (
     <Grid container direction="row" >
-      <Box className={classes.parentContainer} >
+      <Box className={(localStorage.getItem("enableChitrlekhaTranscription") === "true"&& (localStorage.getItem("enableChitrlekhaUI"))) ? classes.AudioparentContainers: classes.parentContainer} >
         {isMobile ? (
           <MobileNavbar
             tabs={tabs}

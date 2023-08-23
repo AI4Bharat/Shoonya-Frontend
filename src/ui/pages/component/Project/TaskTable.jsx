@@ -274,6 +274,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
         annotation_status: selectedFilters?.review_status,
       }),
     };
+    
     const getNextTaskObj = new GetNextTaskAPI(id, datavalue, null, props.type);
     dispatch(APITransport(getNextTaskObj));
     setLabellingStarted(true);
@@ -374,6 +375,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
   }, [selectedFilters]);
 
   useEffect(() => {
+   
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
         const email = props.type === "review" ? el.annotator_mail : "";
@@ -392,7 +394,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
 
         props.type === "annotation" &&
           row.push(
-            <Link to={`task/${el.id}`} className={classes.link}>
+            <Link to={(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ) ?`AudioTranscriptionLandingPage/${el.id}` :`task/${el.id}`} className={classes.link}>
               <CustomButton
                 onClick={() => {
                   console.log("task id === ", el.id);

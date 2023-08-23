@@ -85,11 +85,10 @@ const Layout= (props) => {
       document.head.appendChild(style);
     }
   }, []);
-
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
-      className={classes.root}
+      className={ (localStorage.getItem("enableChitrlekhaTranscription")) && (localStorage.getItem("enableChitrlekhaUI"))?classes.Audioroot:classes.root}
       >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
@@ -98,8 +97,8 @@ const Layout= (props) => {
             className={classes.headerContainer}
           />
         </Suspense>
-        <div 
-        className={classes.container}
+        <div
+        className={(localStorage.getItem("enableChitrlekhaTranscription")) && (localStorage.getItem("enableChitrlekhaUI")) ?classes.Audiocontainer:classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}

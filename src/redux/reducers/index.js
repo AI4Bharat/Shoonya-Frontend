@@ -88,10 +88,17 @@ import wsPeriodicalTasks from "./WorkspaceDetails/GetPeriodicalTasks";
 import wsTaskAnalytics from "./WorkspaceDetails/GetTaskAnalytics";
 import sendOrganizationUserReports from "./Organization/SendOrganizationUserReports";
 import sendWorkspaceUserReports from './WorkspaceDetails/SendWorkspaceUserReports';
+<<<<<<< HEAD
 import getScheduledMails from './UserManagement/GetScheduledMails';
 import createScheduledMails from './UserManagement/CreateScheduledMails';
 import updateScheduledMails from './UserManagement/UpdateScheduledMails';
 import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
+=======
+import commonReducer from "./CL-Transcription/Common";
+import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
+import patchAnnotation from "./CL-Transcription/PatchAnnotation"
+
+>>>>>>> CL-type-transcription
 
 const index = {
     apiStatus,
@@ -187,11 +194,17 @@ const index = {
     wsTaskAnalytics,
     sendOrganizationUserReports,
     sendWorkspaceUserReports,
+<<<<<<< HEAD
     getScheduledMails,
     createScheduledMails,
     updateScheduledMails,
     deleteScheduledMails
     
+=======
+    commonReducer,
+    getAnnotationsTask,
+    patchAnnotation,
+>>>>>>> CL-type-transcription
 };
 
 export default index;

@@ -44,6 +44,7 @@ import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
 import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
 import DashBoard from "./ui/pages/container/Admin/DashBoard";
 import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
+import AudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AudioTranscriptionLandingPage"
 
 
 const App = () => {
@@ -279,6 +280,12 @@ const App = () => {
           path="analytics"
           element={ProtectedRouteWrapper(
             <Layout component={<ProgressList />} />
+          )}
+        />
+          <Route
+          path="projects/:projectId/AudioTranscriptionLandingPage/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<AudioTranscriptionLandingPage />} />
           )}
         />
          
