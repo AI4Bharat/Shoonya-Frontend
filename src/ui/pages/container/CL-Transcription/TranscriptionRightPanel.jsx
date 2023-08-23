@@ -100,9 +100,10 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const handlePageChange = (event, value) => {
     setPage(value);
   };
+  console.log(subtitles);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentPageData = AnnotationsTaskDetails[0]?.result?.slice(
+  const currentPageData = subtitles?.slice(
     startIndex,
     endIndex
   );
@@ -179,6 +180,7 @@ console.log( TaskDetails?.data?.speakers_json
     getPayload(currentOffset, limit);
     // eslint-disable-next-line
   }, [limit, currentOffset]);
+  
 
   const onMergeClick = useCallback(
     (index) => {
@@ -511,7 +513,7 @@ console.log( TaskDetails?.data?.speakers_json
                   }
                 }}
               >
-           {ProjectDetails?.src_language !== "en" && enableTransliteration ? (
+           {ProjectDetails?.src_language !== "en" || ProjectDetails?.src_language !== null && enableTransliteration ? (
           <IndicTransliterate
             lang={ProjectDetails?.src_language}
             value={item.text}
@@ -627,7 +629,7 @@ console.log( TaskDetails?.data?.speakers_json
       <Pagination
       color="primary"
         count={Math.ceil(
-          AnnotationsTaskDetails[0]?.result?.length / itemsPerPage
+          subtitles?.length / itemsPerPage
         )}
         page={page}
         onChange={handlePageChange}

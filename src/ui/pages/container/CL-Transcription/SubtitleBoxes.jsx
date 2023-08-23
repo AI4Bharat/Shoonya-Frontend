@@ -169,7 +169,7 @@ import React, {
         // eslint-disable-next-line
         [limit, currentPage]
       );
-  
+    
       const updateSub = useCallback(
         (sub, obj) => {
           const index = hasSub(sub);
@@ -434,10 +434,11 @@ import React, {
                       onMouseDown={(event) => onMouseDown(sub, event)}
                     >
                       <p className={classes.subTextP}>
-                        {taskDetails.task_type.includes("TRANSCRIPTION") ||
-                        taskDetails.task_type.includes("VOICEOVER")
+                        {sub.text}
+                        {/* {!taskDetails.task_type.includes("TRANSCRIPTION") ||
+                        !taskDetails.task_type.includes("VOICEOVER")
                           ? sub.text
-                          : sub.target_text}
+                          : sub.target_text} */}
                       </p>
                     </div>
   
