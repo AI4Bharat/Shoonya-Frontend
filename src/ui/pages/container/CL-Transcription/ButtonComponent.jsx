@@ -42,7 +42,7 @@ const ButtonComponent = ({
               backgroundColor: "#fcf7e9",
             }, }}
             className={classes.optionIconBtn}
-            // onClick={() => onMergeClick(index)}
+            onClick={() => onMergeClick(index)}
           >
             <MergeIcon />
           </IconButton>

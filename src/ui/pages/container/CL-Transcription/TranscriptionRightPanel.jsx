@@ -1,7 +1,22 @@
 // TranscriptionRightPanel
-
-import { useState, useEffect } from "react";
-
+import React, { useCallback, useEffect, useState, useRef, memo } from "react";
+import {
+  addSubtitleBox,
+  // getSubtitleRangeTranscript,
+  onMerge,
+  // onSplit,
+  onSubtitleChange,
+  onSubtitleDelete,
+  // timeChange,
+  // onUndoAction,
+  // onRedoAction,
+  getSelectionStart,
+  getTimings,
+  getItemForDelete,
+  // MenuProps,
+  // assignSpeakerId,
+  // getTagsList,
+} from "../../../../utils/SubTitlesUtils";
 import {
   Box,
   CardContent,
@@ -13,10 +28,10 @@ import {
   useMediaQuery,
   Pagination,
 } from "@mui/material";
+
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import TimeBoxes from "../CL-Transcription/TimeBoxes";
 import ButtonComponent from "./ButtonComponent";
-import {onSubtitleChange} from "../../../../utils/SubTitlesUtils";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setSubtitles,
@@ -33,10 +48,80 @@ export default function TranscriptionRightPanel({
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [newDetails, setNewDetails] = useState();
-  
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const [currentOffset, setCurrentOffset] = useState(1);
+
+  const subtitles = useSelector((state) => state.commonReducer.subtitles);
+  const limit = useSelector((state) => state.commonReducer.limit);
+
 
   const itemsPerPage = 10;
+  const onDelete = useCallback(
+    (index) => {
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: "delete",
+          index: index,
+          data: getItemForDelete(index),
+        },
+      ]);
+      setRedoStack([]);
 
+      const sub = onSubtitleDelete(index);
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+      // saveTranscriptHandler(false, false, sub);
+    },
+    // eslint-disable-next-line
+    [limit, currentOffset]
+  );
+
+  const addNewSubtitleBox = useCallback(
+    (index) => {
+      const sub = addSubtitleBox(index);
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+      // saveTranscriptHandler(false, false, sub);
+
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: "add",
+          index: index,
+        },
+      ]);
+      setRedoStack([]);
+    },
+    // eslint-disable-next-line
+    [limit, currentOffset]
+  );
+
+
+  const onMergeClick = useCallback(
+    (index) => {
+      const selectionStart = getSelectionStart(index);
+      const timings = getTimings(index);
+
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: "merge",
+          index: index,
+          timings,
+          selectionStart,
+        },
+      ]);
+      setRedoStack([]);
+
+      const sub = onMerge(index);
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+      // saveTranscriptHandler(false, true, sub);
+    },
+    // eslint-disable-next-line
+    [limit, currentOffset]
+  );
+
+ 
   const handlePageChange = (event, value) => {
     setPage(value);
   };
@@ -107,11 +192,11 @@ console.log(value,"valuevaluevaluevalue")
                 />
 
                 <ButtonComponent
-                // index={index}
-                // lastItem={index < subtitles.length - 1}
-                // onMergeClick={onMergeClick}
-                // onDelete={onDelete}
-                // addNewSubtitleBox={addNewSubtitleBox}
+                index={index}
+                lastItem={index < subtitles.length - 1}
+                onMergeClick={onMergeClick}
+                onDelete={onDelete}
+                addNewSubtitleBox={addNewSubtitleBox}
                 />
 
                 <TimeBoxes
@@ -149,6 +234,7 @@ console.log(value,"valuevaluevaluevalue")
               setTimeout(() => {
                 setShowPopOver(false);
               }, 200)
+
             }
             renderComponent={(props) => (
               <div className={classes.relative}>
@@ -180,7 +266,7 @@ console.log(value,"valuevaluevaluevalue")
                         changeTranscriptHandler(event, index);
                       }}
                       // onMouseUp={(e) => onMouseUp(e, index)}
-                    value={item.text}
+                    // value={item.text}
                     //   dir={enableRTL_Typing ? "rtl" : "ltr"}
                     // className={`${classes.customTextarea} ${
                     //   currentIndex === index ? classes.boxHighlight : ""
