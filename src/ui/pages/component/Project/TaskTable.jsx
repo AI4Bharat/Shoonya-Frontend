@@ -559,6 +559,15 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
   }, [totalTaskCount, selectedFilters]);
 
   useEffect(() => {
+    if((localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" )){
+      if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
+        navigate(
+          `/projects/${id}/${props.type === "annotation" ? "AudioTranscriptionLandingPage" : "review"}/${
+            NextTask?.id
+          }`
+        );
+      }
+    }else{
     if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
       navigate(
         `/projects/${id}/${props.type === "annotation" ? "task" : "review"}/${
@@ -566,6 +575,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
         }`
       );
     }
+  }
     //TODO: display no more tasks message
   }, [NextTask]);
 

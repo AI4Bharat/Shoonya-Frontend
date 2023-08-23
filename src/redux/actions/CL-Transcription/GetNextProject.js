@@ -6,9 +6,9 @@ import constants from "../../constants";
  
 export default class GetNextProjectAPI extends API {
    constructor(projectID,userObj,timeout = 2000) {
-     super("PATCH", timeout, false);
+     super("POST", timeout, false);
      this.userObj = userObj;
-    //  this.type = constants.PATCH_ANNOTATION;
+     this.type = constants.NEXT_PROJECT;
     let labellingMode = localStorage.getItem("labellingMode");
     let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
     let requestUrl = `${projectID}/next/`;

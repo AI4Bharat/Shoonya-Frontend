@@ -18,7 +18,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
 import AudioName from "./AudioName";
 import Sub from "../../../../utils/Sub";
@@ -28,19 +28,22 @@ import { setSubtitles } from "../../../../redux/actions/Common";
 import PatchAnnotationAPI from "../../../../redux/actions/CL-Transcription/patchAnnotation";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNextProject";
+import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails";
 
- const AudioTranscriptionLandingPage = memo(
-  () => {
+const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  let location = useLocation();
   const { projectId, taskId } = useParams();
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [currentSubs, setCurrentSubs] = useState();
-  const[loadtime,setloadtime] =  useState(new Date())
+  const [loadtime, setloadtime] = useState(new Date());
+
+
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -49,17 +52,17 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
   let labellingMode = localStorage.getItem("labellingMode");
   const subs = useSelector((state) => state.commonReducer.subtitles);
   const subtitles = useSelector((state) => state.commonReducer.subtitles);
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
 
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask.data
-  );  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  );
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const getNextTask = useSelector((state) => state.getnextProject.data);
   const player = useSelector((state) => state.commonReducer.player);
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
   const timeSpentIntervalRef = useRef(null);
   const transcriptPayload = [];
-  console.log(AnnotationsTaskDetails,"taskDatataskData")
   // useEffect(() => {
   //   let intervalId;
 
@@ -84,16 +87,32 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
   //   };
   // }, []);
 
-  useEffect(()=>{
-    localStorage.setItem("enableChitrlekhaUI", true);
-  })
+  useEffect(() => {
+    if (location.pathname === `projects/${projectId}/task/${taskId}`) {
+      localStorage.setItem("enableChitrlekhaUI", false);
+    } else {
+      localStorage.setItem("enableChitrlekhaUI", true);
+    }
+  });
+
+  const getTaskData = () => {
+    // setLoading(true);
+    const userObj = new GetTaskDetailsAPI(taskId);
+    dispatch(APITransport(userObj));
+  };
+
+  useEffect(() => {
+    getTaskData();
+  }, []);
+
+
 
   useEffect(() => {
     const handleAutosave = (id) => {
       const reqBody = {
         task_id: taskId,
-        annotation_status:"labeled",
-        cl_format:true,
+        annotation_status:AnnotationsTaskDetails[0]?.annotation_status,
+        cl_format: true,
         // offset: currentPage,
         // limit: limit,
         payload: {
@@ -104,7 +123,6 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
       dispatch(APITransport(obj));
     };
-
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
@@ -155,7 +173,7 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
     };
 
     // eslint-disable-next-line
-  }, [subs, taskId,AnnotationsTaskDetails]);
+  }, [subs, taskId, AnnotationsTaskDetails]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -237,69 +255,70 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
 
   useEffect(() => {
     if (AnnotationsTaskDetails.length > 0) {
-      setLoading(false);
-    }
+      setLoading(false);    }
   }, [AnnotationsTaskDetails]);
 
 
+  const tasksComplete = (id) => {
+    if (id) {
+      // resetNotes();
+      // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
+      navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${id}`);
+    } else {
+      // navigate(-1);
+      // resetNotes();
+      setSnackbarInfo({
+        open: true,
+        message: "No more tasks to label",
+        variant: "info",
+      });
+      setTimeout(() => {
+        localStorage.removeItem("labelAll");
+        window.location.replace(`/#/projects/${projectId}`);
+        window.location.reload();
+      }, 1000);
+    }
+  };
 
- const tasksComplete = (id) => {
-  if (id) {
-    // resetNotes();
-    // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
-    navigate(`/projects/${projectId}/task/${id}`);
-  } else {
-    // navigate(-1);
-    // resetNotes();
-    setSnackbarInfo({
-      open: true,
-      message: "No more tasks to label",
-      variant: "info",
+  const onNextAnnotation = async (value) => {
+    setLoading(true);
+    const nextAPIData = {
+      id: projectId,
+      current_task_id: taskId,
+      mode: "annotation",
+      annotation_status: labellingMode,
+    };
+    const ProjectObj = new GetNextProjectAPI(projectId, nextAPIData);
+    dispatch(APITransport(ProjectObj));
+    const res = await fetch(ProjectObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(ProjectObj.getBody()),
+      headers: ProjectObj.getHeaders().headers,
     });
-    setTimeout(() => {
-      localStorage.removeItem("labelAll");
-      window.location.replace(`/#/projects/${projectId}`);
-      window.location.reload();
-    }, 1000);
-  }
-};
+    const resp = await res.json();
+    if (res.ok) {
+      tasksComplete(resp?.id || null);
+      // getAnnotationsTaskData();
+      // getTaskData();
+      // window.location.reload();
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+    setLoading(false);
+  };
 
-const onNextAnnotation = async(value) =>{
-const nextAPIData = {
-  id:projectId,
-  current_task_id:taskId,
-  mode: "annotation",
-  annotation_status: labellingMode,
-}
-  const ProjectObj = new GetNextProjectAPI(projectId,nextAPIData);
-  //dispatch(APITransport(GlossaryObj));
-  const res = await fetch(ProjectObj.apiEndPoint(), {
-    method: "POST",
-    body: JSON.stringify(ProjectObj.getBody()),
-    headers: ProjectObj.getHeaders().headers,
-  });
-  const resp = await res.json();
-  if (res.ok) {
-
-    tasksComplete(resp?.id || null);
-  } else {
-    setSnackbarInfo({
-      open: true,
-      message: resp?.message,
-      variant: "error",
-    });
-  }
-
-
-}
-
-  const handleAnnotationClick = async (value,id,lead_time) => {
-    const PatchAPIdata = {
-      annotation_status:value,
-      annotation_notes:"",
-      lead_time: (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result:[ {
-      }],
+  const handleAnnotationClick = async (value, id, lead_time,annotationNotesValue) => {
+    setLoading(true);
+      const PatchAPIdata = {
+      annotation_status: value,
+      annotation_notes: annotationNotesValue,
+      lead_time:
+        (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
+      result: [{}],
     };
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
@@ -310,9 +329,14 @@ const nextAPIData = {
     });
     const resp = await res.json();
     if (res.ok) {
-      if (localStorage.getItem("labelAll") || value === "skipped"){
-        onNextAnnotation()     
-     }
+      if (localStorage.getItem("labelAll") || value === "skipped") {
+        onNextAnnotation();
+      }
+      setSnackbarInfo({
+        open: true,
+        message:"success",
+        variant: "error",
+      });
     } else {
       setSnackbarInfo({
         open: true,
@@ -320,7 +344,7 @@ const nextAPIData = {
         variant: "error",
       });
     }
-    // setAnchorEl(null);
+    setLoading(false);
   };
 
   const renderSnackBar = () => {
@@ -336,7 +360,7 @@ const nextAPIData = {
       />
     );
   };
-
+ 
   return (
     <>
       {loading && <Spinner />}
@@ -385,13 +409,12 @@ const nextAPIData = {
         setCurrentTime={setCurrentTime}
         setPlaying={setPlaying}
       /> */}
-{/* <button onClick={datavalue}>gggggggg</button> */}
+            {/* <button onClick={datavalue}>gggggggg</button> */}
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
               handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
-
             />
           </Box>
         </Grid>
@@ -416,5 +439,5 @@ const nextAPIData = {
       </Grid>
     </>
   );
- })
+};
 export default AudioTranscriptionLandingPage;

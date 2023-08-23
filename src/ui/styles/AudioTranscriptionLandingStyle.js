@@ -506,8 +506,8 @@ const AudioTranscriptionLandingStyle = makeStyles({
 
   videoPlayerParent: {
     boxSizing: "border-box",
-    height: "calc(60vh - 300px)",
-    paddingTop:"9%"
+    height: "calc(60vh - 366px)",
+    // paddingTop:"9%"
   },
 
   videoPlayer: {
@@ -590,6 +590,11 @@ const AudioTranscriptionLandingStyle = makeStyles({
     alignItems: "center",
     borderBottom: "1px solid lightgrey",
   },
+  collapse :{
+    margin: "1%",
+    overflow: "hidden",
+    transition: "height 0.2s ease-in-out",
+},
   timeInputBox: {
     backgroundColor: "#616A6B",
     width: "15%",
