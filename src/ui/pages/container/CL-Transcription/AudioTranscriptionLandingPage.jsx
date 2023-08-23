@@ -54,6 +54,8 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask.data
   );  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  console.log(AnnotationsTaskDetails);
+
   const player = useSelector((state) => state.commonReducer.player);
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
@@ -189,10 +191,11 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
   // }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
-    const sub = transcriptPayload?.payload?.payload.map(
+    const sub = AnnotationsTaskDetails[0]?.result.map(
       (item) => new Sub(item)
     );
 
+    console.log("bhjb");
     // const newSub = cloneDeep(sub);
 
     // dispatch(setCurrentPage(transcriptPayload?.current));
@@ -206,7 +209,7 @@ import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNex
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
     // eslint-disable-next-line
-  }, [transcriptPayload?.payload?.payload]);
+  }, [AnnotationsTaskDetails[0]?.result]);
 
   useMemo(() => {
     const currentIndex = subs?.findIndex(
