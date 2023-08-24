@@ -2,7 +2,7 @@
 
 import MUIDataTable from "mui-datatables";
 import { Fragment, useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate,useLocation } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import CustomButton from "../common/Button";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -47,6 +47,7 @@ import FindAndReplaceDialog from "../../component/common/FindAndReplaceDialog"
 import FindAndReplaceWordsInAnnotationAPI from "../../../../redux/actions/api/ProjectDetails/FindAndReplaceWordsinAnnotation";
 import roles from "../../../../utils/UserMappedByRole/Roles";
 
+
 const excludeSearch = ["status", "actions", "output_text"];
 // const excludeCols = ["context", "input_language", "output_language", "language",
 // "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json"
@@ -74,6 +75,7 @@ const TaskTable = (props) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  let location = useLocation();
   const taskList = useSelector(
     (state) => state.getTasksByProjectId.data.result
   );
@@ -326,6 +328,14 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
     }
   }
 
+  useEffect(() => {
+    if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
+      localStorage.setItem("enableChitrlekhaUI", true);
+    } else {
+      localStorage.setItem("enableChitrlekhaUI", false);
+    }
+  },[]);
+
   const customColumnHead = (col) => {
     return (
       <Box
@@ -561,6 +571,15 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
   }, [totalTaskCount, selectedFilters,ProjectDetails]);
 
   useEffect(() => {
+    if((localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" )){
+      if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
+        navigate(
+          `/projects/${id}/${props.type === "annotation" ? "AudioTranscriptionLandingPage" : "review"}/${
+            NextTask?.id
+          }`
+        );
+      }
+    }else{
     if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
       navigate(
         `/projects/${id}/${props.type === "annotation" ? "task" : "review"}/${
@@ -568,6 +587,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
         }`
       );
     }
+  }
     //TODO: display no more tasks message
   }, [NextTask]);
 

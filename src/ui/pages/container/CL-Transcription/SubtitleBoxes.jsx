@@ -65,7 +65,6 @@ import React, {
   
       const $blockRef = createRef();
       const $subsRef = createRef();
-  
       const taskDetails = useSelector((state) => state.getTaskDetails.data);
       const subtitles = useSelector((state) => state.commonReducer.subtitles);
       const player = useSelector((state) => state.commonReducer.player);
@@ -120,8 +119,7 @@ import React, {
           task_id: taskId,
         //   offset: currentPage,
         //   limit: limit,
-          payload: {
-            payload: subs,
+          payload: { subs
           },
         };
   
@@ -153,7 +151,7 @@ import React, {
           const index = hasSub(sub);
           const res = onSubtitleDelete(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(taskDetails?.task_type, res);
+          saveTranscript(AnnotationsTaskDetails[0]?.annotation_status, res);
         },
         // eslint-disable-next-line
         [limit, currentPage]
@@ -164,12 +162,12 @@ import React, {
           const index = hasSub(sub);
           const res = onMerge(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(taskDetails?.task_type, res);
+          saveTranscript(AnnotationsTaskDetails[0]?.annotation_status, res);
         },
         // eslint-disable-next-line
         [limit, currentPage]
       );
-  
+    
       const updateSub = useCallback(
         (sub, obj) => {
           const index = hasSub(sub);
@@ -181,7 +179,7 @@ import React, {
   
           copySub[index] = sub;
           dispatch(setSubtitles(copySub, C.SUBTITLES));
-          saveTranscript(taskDetails?.task_type, copySub);
+          saveTranscript(AnnotationsTaskDetails[0]?.annotation_status, copySub);
         },
         // eslint-disable-next-line
         [limit, currentPage]
@@ -336,22 +334,22 @@ import React, {
         // eslint-disable-next-line
         [player, removeSub, updateSub]
       );
-  
+      currentSubs?.map((sub, key) => { console.log(sub.text,"subsub",key)})
+ 
       const DynamicMenu = (props) => {
         const { id, trigger } = props;
         return (
           <ContextMenu id={id} className={classes.menuItemNav}>
-            {trigger && !taskDetails.task_type.includes("VOICEOVER") && (
+            {/* {trigger && !taskDetails.task_type.includes("VOICEOVER") && ( */}
               <MenuItem
                 className={classes.menuItem}
                 onClick={() => removeSub(lastSub)}
               >
                 Delete Subtitle
               </MenuItem>
-            )}
+            {/* )} */}
             {trigger &&
-              trigger.parentSub !== subtitles[subtitles.length - 1] &&
-              !taskDetails.task_type.includes("VOICEOVER") && (
+              trigger.parentSub !== subtitles[subtitles.length - 1] && (
                 <MenuItem
                   className={classes.menuItem}
                   onClick={() => mergeSub(lastSub)}
@@ -393,7 +391,7 @@ import React, {
           />
         );
       };
-  
+
       return (
         <div className={classes.parentSubtitleBox} ref={$blockRef}>
           {renderSnackBar()}
@@ -412,6 +410,7 @@ import React, {
                     width: (sub.endTime - sub.startTime) * gridGap * 10,
                   }}
                 >
+                  
                   <ContextMenuTrigger
                     id="contextmenu"
                     holdToDisplay={-1}
@@ -434,11 +433,9 @@ import React, {
                       onMouseDown={(event) => onMouseDown(sub, event)}
                     >
                       <p className={classes.subTextP}>
-                        {taskDetails.task_type.includes("TRANSCRIPTION") ||
-                        taskDetails.task_type.includes("VOICEOVER")
-                          ? sub.text
-                          : sub.target_text}
+                        {sub.text}{console.log(sub.text,"subsubsubsubsubsubgggggggggggggggggggg")}
                       </p>
+                     
                     </div>
   
                     <div

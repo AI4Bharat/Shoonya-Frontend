@@ -26,7 +26,7 @@ export default class Sub {
   }
 
   get startTime() {
-    return DT.t2d(this.start_time);
+    return DT.t2d(this?.start_time);
   }
 
   set startTime(time) {

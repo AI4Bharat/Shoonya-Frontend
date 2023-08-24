@@ -96,6 +96,7 @@ import commonReducer from "./CL-Transcription/Common";
 import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
 import patchAnnotation from "./CL-Transcription/PatchAnnotation"
 
+
 const index = {
     apiStatus,
     getProjects,
@@ -194,6 +195,7 @@ const index = {
     createScheduledMails,
     updateScheduledMails,
     deleteScheduledMails,
+    
     commonReducer,
     getAnnotationsTask,
     patchAnnotation,

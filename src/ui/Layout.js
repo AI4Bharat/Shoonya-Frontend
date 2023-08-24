@@ -88,7 +88,7 @@ const Layout= (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
-      className={ (localStorage.getItem("enableChitrlekhaTranscription")) && (localStorage.getItem("enableChitrlekhaUI"))?classes.Audioroot:classes.root}
+      className={ localStorage.getItem("enableChitrlekhaTranscription") === "true"  && (localStorage.getItem("enableChitrlekhaUI") === "true")?classes.Audioroot:classes.root}
       >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
@@ -98,7 +98,7 @@ const Layout= (props) => {
           />
         </Suspense>
         <div
-        className={(localStorage.getItem("enableChitrlekhaTranscription")) && (localStorage.getItem("enableChitrlekhaUI")) ?classes.Audiocontainer:classes.container}
+        className={localStorage.getItem("enableChitrlekhaTranscription") === "true"  && (localStorage.getItem("enableChitrlekhaUI") === "true") ?classes.Audiocontainer:classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}

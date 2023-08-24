@@ -27,44 +27,45 @@ const VideoName = ({
 //   const videoDetails = useSelector((state) => state.getVideoDetails.data);
 
   return (
-    <Box
-      className={classes.videoNameBox}
-    //   style={fullscreenVideo ? { width: "60%", margin: "auto" } : {}}
-    >
-      <Tooltip  placement="bottom">
-        <Typography
-          variant="h4"
-          className={classes.videoName}
-        //   style={fullscreenVideo ? { color: "white" } : {}}
-        >
-            Audio Name
-        </Typography>
-      </Tooltip>
+    // <Box
+    //   className={classes.videoNameBox}
+    // //   style={fullscreenVideo ? { width: "60%", margin: "auto" } : {}}
+    // >
+    //   <Tooltip  placement="bottom">
+    //     <Typography
+    //       variant="h4"
+    //       className={classes.videoName}
+    //     //   style={fullscreenVideo ? { color: "white" } : {}}
+    //     >
+    //         Audio Name
+    //     </Typography>
+    //   </Tooltip>
 
-      <Tooltip title="Settings" placement="bottom">
-        <IconButton
-          className={classes.settingsIconBtn}
-          style={{
-            backgroundColor: "#2C2799",
-            borderRadius: "50%",
-            color: "#fff",
-            margin: "auto",
-            "&:hover": {
-              backgroundColor: "#271e4f",
-            },
-          }}
-          onClick={(event) => setAnchorElSettings(event.currentTarget)}
-        >
-          <WidgetsOutlinedIcon />
-        </IconButton>
-      </Tooltip>
+    //   <Tooltip title="Settings" placement="bottom">
+    //     <IconButton
+    //       className={classes.settingsIconBtn}
+    //       style={{
+    //         backgroundColor: "#2C2799",
+    //         borderRadius: "50%",
+    //         color: "#fff",
+    //         margin: "auto",
+    //         "&:hover": {
+    //           backgroundColor: "#271e4f",
+    //         },
+    //       }}
+    //       onClick={(event) => setAnchorElSettings(event.currentTarget)}
+    //     >
+    //       <WidgetsOutlinedIcon />
+    //     </IconButton>
+    //   </Tooltip>
 
-      <CustomMenuComponent
-        anchorElSettings={anchorElSettings}
-        handleClose={() => setAnchorElSettings(null)}
-        contianer={document.getElementById("audio")}
-      />
-    </Box>
+    //   <CustomMenuComponent
+    //     anchorElSettings={anchorElSettings}
+    //     handleClose={() => setAnchorElSettings(null)}
+    //     contianer={document.getElementById("audio")}
+    //   />
+    // </Box>
+    <></>
   );
 };
 

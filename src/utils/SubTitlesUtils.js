@@ -2,7 +2,7 @@ import Sub from "./Sub";
 import { getUpdatedTime } from "./utils";
 import DT from "duration-time-conversion";
 import store from "../redux/store/store";
-// import { noiseTags } from "config";
+// import { noiseTags } from "./TabsSuggestionData/NoiseTages";
 
 export const newSub = (item) => {
   return new Sub(item);
@@ -96,7 +96,7 @@ export const addSubtitleBox = (index) => {
     newSub({
       start_time: copySub[index].end_time,
       end_time:
-        index < subtitles.length - 1
+        index < subtitles?.length - 1
           ? copySub[index + 1].start_time
           : DT.d2t(duration + 0.5),
       text: "SUB_TEXT",
