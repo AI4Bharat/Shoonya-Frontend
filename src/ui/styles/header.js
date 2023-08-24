@@ -9,6 +9,10 @@ const headerStyle = makeStyles({
       
        
     },
+    AudioparentContainers:{
+        marginBottom : window.innerHeight*0.1,
+        width : window.innerWidth*0.98,
+    },
     appBar: {
         // backgroundColor: "#ffffff", 
         // position: 'inherit',

@@ -88,6 +88,10 @@ import wsPeriodicalTasks from "./WorkspaceDetails/GetPeriodicalTasks";
 import wsTaskAnalytics from "./WorkspaceDetails/GetTaskAnalytics";
 import sendOrganizationUserReports from "./Organization/SendOrganizationUserReports";
 import sendWorkspaceUserReports from './WorkspaceDetails/SendWorkspaceUserReports';
+import commonReducer from "./CL-Transcription/Common";
+import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
+import patchAnnotation from "./CL-Transcription/PatchAnnotation";
+import getnextProject from "./CL-Transcription/GetNextProject";
 import getScheduledMails from './UserManagement/GetScheduledMails';
 import createScheduledMails from './UserManagement/CreateScheduledMails';
 import updateScheduledMails from './UserManagement/UpdateScheduledMails';
@@ -187,6 +191,10 @@ const index = {
     wsTaskAnalytics,
     sendOrganizationUserReports,
     sendWorkspaceUserReports,
+    commonReducer,
+    getAnnotationsTask,
+    patchAnnotation,
+    getnextProject,
     getScheduledMails,
     createScheduledMails,
     updateScheduledMails,

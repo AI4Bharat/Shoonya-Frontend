@@ -791,6 +791,7 @@ const LabelStudioWrapper = ({
   const onNextAnnotation = async () => {
     showLoader();
     getNextProject(projectId, taskId).then((res) => {
+      console.log(res,"resresresres")
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
       tasksComplete(res?.id || null);
@@ -980,6 +981,7 @@ export default function LSF() {
   const getTaskData = (taskData) => {
     setTaskData(taskData);
   };
+
 
   return (
     <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" }}>

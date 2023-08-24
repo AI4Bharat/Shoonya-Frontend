@@ -22,6 +22,7 @@
     "axios": "^0.27.2",
     "chart.js": "^3.9.1",
     "date-fns": "^2.28.0",
+    "duration-time-conversion": "^1.0.6",
     "faker": "^5.5.3",
     "history": "^5.3.0",
     "html2canvas": "^1.4.1",
@@ -29,9 +30,11 @@
     "material-ui-dropzone": "^3.5.0",
     "moment": "^2.29.4",
     "mui-datatables": "^4.2.2",
+    "mui-rte": "^2.0.1",
     "papaparse": "^5.4.1",
     "react": "^18.1.0",
     "react-chartjs-2": "^4.3.1",
+    "react-contextmenu": "^2.14.0",
     "react-csv": "^2.2.2",
     "react-date-range": "^1.4.0",
     "react-dom": "^18.1.0",
@@ -47,7 +50,8 @@
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "textarea-caret": "^3.1.0",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "wfplayer": "^2.2.6"
   },
   "scripts": {
     "start": "react-scripts start",
