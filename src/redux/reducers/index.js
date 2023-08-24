@@ -92,7 +92,10 @@ import commonReducer from "./CL-Transcription/Common";
 import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
 import patchAnnotation from "./CL-Transcription/PatchAnnotation";
 import getnextProject from "./CL-Transcription/GetNextProject";
-
+import getScheduledMails from './UserManagement/GetScheduledMails';
+import createScheduledMails from './UserManagement/CreateScheduledMails';
+import updateScheduledMails from './UserManagement/UpdateScheduledMails';
+import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
 
 const index = {
     apiStatus,
@@ -191,7 +194,12 @@ const index = {
     commonReducer,
     getAnnotationsTask,
     patchAnnotation,
-    getnextProject
+    getnextProject,
+    getScheduledMails,
+    createScheduledMails,
+    updateScheduledMails,
+    deleteScheduledMails
+    
 };
 
 export default index;

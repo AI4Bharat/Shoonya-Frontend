@@ -10,6 +10,9 @@ const DatasetStyle = makeStyles({
     lineHeight: 1.2,
 
   },
+  custombtn:{
+    borderRadius:0
+  },
   workspaceTables: {
     marginTop: "20px"
   },
@@ -48,6 +51,7 @@ const DatasetStyle = makeStyles({
     columnGap: "10px",
 
   },
+  
   clearAllBtn: {
     float: "right",
     margin: "9px 16px 0px auto",

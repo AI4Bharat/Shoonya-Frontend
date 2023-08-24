@@ -43,7 +43,7 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
 import styles from "./lsf.module.css";
 import "./lsf.css";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 
 const StyledMenu = styled((props) => (
@@ -115,7 +115,7 @@ const filterAnnotations = (annotations, user, taskData) => {
         (value) => value.annotation_type === 2
       );
     }
-  } else if([4, 5, 6].includes(user.role)) {
+  } else if ([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 3);
     disableSkip = true;
   }
@@ -125,6 +125,10 @@ const filterAnnotations = (annotations, user, taskData) => {
 //used just in postAnnotation to support draft status update.
 
 const AUTO_SAVE_INTERVAL = 60000;
+const AUDIO_PROJECT_SAVE_CHECK = [
+  "AudioTranscription",
+  "AudioTranscriptionEditing",
+];
 
 const LabelStudioWrapper = ({
   reviewNotesRef,
@@ -226,7 +230,7 @@ const LabelStudioWrapper = ({
     let interfaces = [];
     if (predictions == null) predictions = [];
     const [filteredAnnotations, disableSkip, disableAutoSave] = filterAnnotations(annotations, userData, taskData);
-    if(disableSkip || disableAutoSave) setAutoSave(false);
+    if (disableSkip || disableAutoSave) setAutoSave(false);
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -239,7 +243,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -259,13 +263,13 @@ const LabelStudioWrapper = ({
         "panel",
         //"update",
         "submit",
-        ...(!disableSkip ?["skip"]:[]),
+        ...(!disableSkip ? ["skip"] : []),
         "controls",
         "infobar",
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing"
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -356,6 +360,29 @@ const LabelStudioWrapper = ({
         },
 
         onUpdateAnnotation: function (ls, annotation) {
+          if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
+            let temp = annotation.serializeAnnotation();
+            const counter = temp.reduce((acc, curr) => {
+              if (curr.from_name === "labels")
+                acc.labels++;
+              else if (curr.from_name === "transcribed_json") {
+                if (curr.value.text[0] === "")
+                  acc.empty++;
+                acc.textareas++;
+              }
+              return acc;
+            },
+              { labels: 0, textareas: 0, empty: 0 }
+            );
+            if (counter.labels !== counter.textareas || counter.empty) {
+              setSnackbarInfo({
+                open: true,
+                message: "Please fill the annotations for every segment/region",
+                variant: "warning",
+              });
+              return;
+            }
+          }
           if (taskData.annotation_status !== "freezed") {
             setAutoSave(false);
             showLoader();
@@ -469,11 +496,11 @@ const LabelStudioWrapper = ({
           setNotes(taskData, annotations);
           let tempLabelConfig =
             labelConfig.project_type === "ConversationTranslation" ||
-            labelConfig.project_type === "ConversationTranslationEditing"
+              labelConfig.project_type === "ConversationTranslationEditing"
               ? generateLabelConfig(taskData.data)
               : labelConfig.project_type === "ConversationVerification"
-              ? conversationVerificationLabelConfig(taskData.data)
-              : labelConfig.label_config;
+                ? conversationVerificationLabelConfig(taskData.data)
+                : labelConfig.label_config;
           setAnnotations(annotations);
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
@@ -554,18 +581,18 @@ const LabelStudioWrapper = ({
     return () => clearInterval(interval);
   }, [annotations]); */
 
-  useEffect(()=>{
+  useEffect(() => {
     const projectObj = new GetProjectDetailsAPI(projectId);
     dispatch(APITransport(projectObj));
-  },[])
+  }, [])
 
   useEffect(() => {
     showLoader();
   }, [taskId]);
 
   const autoSaveSuperCheck = () => {
-    if(autoSave && lsfRef.current?.store?.annotationStore?.selected) {
-      if(taskData?.annotation_status !== "freezed") {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+      if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
@@ -621,7 +648,7 @@ const LabelStudioWrapper = ({
     const handleVisibilityChange = () => setVisibile(!document[hidden]);
     document.addEventListener(visibilityChange, handleVisibilityChange);
     return () => {
-        document.removeEventListener(visibilityChange, handleVisibilityChange);
+      document.removeEventListener(visibilityChange, handleVisibilityChange);
     }
   }, []);
 
@@ -632,7 +659,7 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     const interval = setInterval(() => {
       visible && autoSaveSuperCheck();
-      }, AUTO_SAVE_INTERVAL);
+    }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
   }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
 
@@ -685,22 +712,22 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
-      <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
         {taskData?.super_check_user === userData?.id &&
           <div style={{ textAlign: "left", marginBottom: "15px" }}>
             {autoSave ? <Typography variant="body" color="#000000">
-                Auto-save is enabled for this scenario.
-              </Typography> :
+              Auto-save is enabled for this scenario.
+            </Typography> :
               <Typography variant="body" color="#000000">
                 Auto-save is not available for this scenario. Please save your task manually.
               </Typography>}
           </div>
         }
         <div>
-        {ProjectData.revision_loop_count >
-        taskData?.revision_loop_count?.super_check_count
-          ? false
-          : true && (
+          {ProjectData.revision_loop_count >
+            taskData?.revision_loop_count?.super_check_count
+            ? false
+            : true && (
               <div style={{ textAlign: "right", marginBottom: "15px" }}>
                 <Typography variant="body" color="#f5222d">
                   Note: The 'Revision Loop Count' limit has been reached for this
@@ -709,13 +736,13 @@ const LabelStudioWrapper = ({
               </div>
             )}
 
-          { ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
-              <div style={{ textAlign: "right", marginBottom: "15px" }}>
-                <Typography variant="body" color="#f5222d">
-                  Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
-                </Typography>
-              </div>)}
-          </div>
+          {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
+            <div style={{ textAlign: "right", marginBottom: "15px" }}>
+              <Typography variant="body" color="#f5222d">
+                Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
+              </Typography>
+            </div>)}
+        </div>
       </div>
 
       {!loader && (
@@ -769,7 +796,7 @@ const LabelStudioWrapper = ({
                   onClick={handleRejectClick}
                   disabled={
                     ProjectData.revision_loop_count >
-                    taskData?.revision_loop_count?.super_check_count
+                      taskData?.revision_loop_count?.super_check_count
                       ? false
                       : true
                   }
@@ -778,7 +805,7 @@ const LabelStudioWrapper = ({
                     border: "1px solid #e6e6e6",
                     color: (
                       ProjectData.revision_loop_count >
-                      taskData?.revision_loop_count?.super_check_count
+                        taskData?.revision_loop_count?.super_check_count
                         ? false
                         : true
                     )
@@ -890,7 +917,7 @@ export default function LSF() {
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  
+
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
       setSelectedTag(value);

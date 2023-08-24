@@ -25,6 +25,7 @@ import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI";
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
+import userRoles from "../../../../utils/UserMappedByRole/Roles";
 
 
 const columns = [
@@ -103,6 +104,10 @@ const MembersTable = (props) => {
     message: "",
     variant: "success",
   });
+  const [btn,setbtn] = useState(null);
+  const [value,setvalue] = useState();
+  const [selectedEmails, setSelectedEmails] = useState([]);
+  const [csvFile, setCsvFile] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
@@ -110,6 +115,9 @@ const MembersTable = (props) => {
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const SearchWorkspaceMembers = useSelector(
     (state) => state.SearchProjectCards.data
+  );
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
   );
 
   const pageSearch = () => {
@@ -257,7 +265,10 @@ const MembersTable = (props) => {
       }
       handleUserDialogClose();
     setLoading(false);
-    setSelectedUsers([ ])
+    setSelectedUsers([ ]);
+    setSelectedEmails([]);
+    setCsvFile(null);
+    setbtn(null)
     setUserType(Object.keys(UserRolesList)[0])
   };
   const handleRemoveFrozenUsers = async (FrozenUserId) => {
@@ -319,7 +330,7 @@ const MembersTable = (props) => {
                 label={"View"}
               />
 
-              {props.type === addUserTypes.PROJECT_ANNOTATORS && (
+              {(userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && props.type === addUserTypes.PROJECT_ANNOTATORS) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -329,10 +340,10 @@ const MembersTable = (props) => {
                   }}
                   label="Remove"
                   onClick={() => handleProjectMember(el.id)}
-                  disabled={projectlist(el.id)}
+                  disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
-              {(props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
+              {userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && (props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -342,7 +353,7 @@ const MembersTable = (props) => {
                   }}
                   label="Remove"
                   onClick={() => handleProjectReviewer(el.id)}
-                  disabled={projectlist(el.id)}
+                  disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
 
@@ -351,6 +362,7 @@ const MembersTable = (props) => {
                     sx={{ borderRadius: 2}}
                     label="Add"
                     onClick={() => handleRemoveFrozenUsers(el.id)}
+                    disabled = {ProjectDetails.is_archived}
                   />
                 )} 
 
@@ -417,6 +429,7 @@ const MembersTable = (props) => {
           label={props.type ? addLabel[props.type] : "Add Users"}
           fullWidth
           onClick={handleUserDialogOpen}
+          disabled={props.type === addUserTypes.PROJECT_ANNOTATORS||props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER ?ProjectDetails.is_archived:""}
         />
       ) : null}
   
@@ -430,6 +443,14 @@ const MembersTable = (props) => {
           setUserType={setUserType}
           addBtnClickHandler={()=>addBtnClickHandler()}
           loading={loading}
+          selectedEmails={selectedEmails}
+          setSelectedEmails={setSelectedEmails}
+          csvFile={csvFile}
+          setCsvFile={setCsvFile}
+          btn={btn}
+          setbtn={setbtn}
+          value={value}
+          setvalue={setvalue}
         />
       ) : (
         <AddUsersDialog
