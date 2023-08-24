@@ -286,6 +286,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     height: "100%",
     pointerEvents: "none",
   },
+ 
 
   subItem: {
     position: "absolute",

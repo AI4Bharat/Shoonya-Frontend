@@ -1,7 +1,9 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
 import { useQuill } from 'react-quilljs';
-import 'quill/dist/quill.bubble.css'; 
+import ReactQuill, { Quill } from 'react-quill';
+import "./editor.css"
+import 'quill/dist/quill.snow.css';
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -917,13 +919,23 @@ export default function LSF() {
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const modules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-    ],
+    toolbar:[
+      
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    ]
   };
-  const theme = 'bubble';
-  const { quill, quillRef } = useQuill({theme,modules});
-  const [value,setvalue] = useState();
+
+  const formats = [
+    'size',
+    'bold','italic','underline','strike',
+    'color','background',
+    'script']
+
+
+
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -940,13 +952,7 @@ export default function LSF() {
       });
     }
   };
-  useEffect(() => {
-    if (quill) {
-      quill.on('text-change', () => {
-        setvalue(quillRef.current.firstChild.innerHTML);
-      });
-    }
-  }, [quill]);
+
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
@@ -1031,7 +1037,7 @@ export default function LSF() {
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            <TextField
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Review Notes"
@@ -1065,7 +1071,24 @@ export default function LSF() {
               }}
               style={{ width: "99%", marginTop: "1%" }}
               ref={quillRef}
-            />
+            /> */}
+            <ReactQuill
+              ref={reviewNotesRef}
+              modules={modules}
+              formats={formats}
+              bounds={"#roots"}
+              placeholder="Review Notes"
+              style={{ marginbottom: "1%", minHeight: "2rem" }}
+              readOnly={true}
+            ></ReactQuill>
+            <ReactQuill
+              ref={superCheckerNotesRef}
+              modules={modules}
+              bounds={"#roots"}
+              formats={formats}
+              placeholder="SuperChecker Notes"
+              style={{ marginbottom: "1%", minHeight: "2rem" }}
+            ></ReactQuill>
           </div>
           <Button
             variant="contained"
