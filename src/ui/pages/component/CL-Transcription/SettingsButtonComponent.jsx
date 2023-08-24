@@ -102,30 +102,28 @@ const SettingsButtonComponent = ({
 
   return (
     <>
-      {/* {!taskData?.task_type?.includes("VOICEOVER") && showSplit && ( */}
+      { showSplit && (
       <Tooltip title="Split Subtitle" placement="bottom">
         <IconButton
-          className={classes.rightPanelBtnGrp}
-          style={{
+          // className={classes.rightPanelBtnGrp}
+          sx={{
             backgroundColor: "#2C2799",
             borderRadius: "50%",
-            color: "#fff",
+             color:"#fff",
             marginX: "5px",
+            marginRight: "5px",
+            "&.Mui-disabled": { backgroundColor: "lightgray" },
             "&:hover": {
               backgroundColor: "#271e4f",
             },
           }}
           onClick={onSplitClick}
           // disabled={!showPopOver}
-          sx={{
-            marginRight: "5px",
-            "&.Mui-disabled": { backgroundColor: "lightgray" },
-          }}
         >
           <SplitscreenIcon />
         </IconButton>
       </Tooltip>
-      {/* )} */}
+     )} 
       {/* 
       {(taskData?.task_type?.includes("TRANSLATION_EDIT") ||
         taskData?.task_type?.includes("VOICEOVER")) && (
@@ -350,7 +348,7 @@ const SettingsButtonComponent = ({
       <Tooltip title="Undo" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
-          style={{
+          sx={{
             backgroundColor: "#2C2799",
             borderRadius: "50%",
             color: "#fff",
@@ -360,7 +358,7 @@ const SettingsButtonComponent = ({
             },
           }}
           onClick={onUndo}
-          // disabled={undoStack?.length === 0}
+          disabled={undoStack?.length === 0}
         >
           <UndoIcon />
         </IconButton>
@@ -371,18 +369,19 @@ const SettingsButtonComponent = ({
       <Tooltip title="Redo" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
-          style={{
+          sx={{
             backgroundColor: "#2C2799",
             borderRadius: "50%",
             color: "#fff",
             marginX: "5px",
+            marginLeft: "5px" ,
             "&:hover": {
               backgroundColor: "#271e4f",
             },
           }}
-          sx={{ marginLeft: "5px" }}
+         
           onClick={onRedo}
-          // disabled={redoStack?.length === 0}
+          disabled={redoStack?.length === 0}
         >
           <RedoIcon />
         </IconButton>

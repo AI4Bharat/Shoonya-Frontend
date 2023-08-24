@@ -50,8 +50,8 @@ const AudioTranscriptionLandingPage = () => {
     variant: "success",
   });
   let labellingMode = localStorage.getItem("labellingMode");
-  const subs = useSelector((state) => state.commonReducer.subtitles);
-  const subtitles = useSelector((state) => state.commonReducer.subtitles);
+  // const subs = useSelector((state) => state.commonReducer.subtitles);
+  const result = useSelector((state) => state.commonReducer.subtitles);
 
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask.data
@@ -90,12 +90,8 @@ const AudioTranscriptionLandingPage = () => {
   // }, []);
 
   useEffect(() => {
-    if (location.pathname === `projects/${projectId}/task/${taskId}`) {
-      localStorage.setItem("enableChitrlekhaUI", false);
-    } else {
       localStorage.setItem("enableChitrlekhaUI", true);
-    }
-  });
+  },[]);
 
   const getTaskData = () => {
     // setLoading(true);
@@ -114,12 +110,10 @@ const AudioTranscriptionLandingPage = () => {
       const reqBody = {
         task_id: taskId,
         annotation_status:AnnotationsTaskDetails[0]?.annotation_status,
-        cl_format: true,
+        // cl_format: true,
         // offset: currentPage,
         // limit: limit,
-        payload: {
-          payload: subs,
-        },
+        result,
       };
 
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
@@ -175,7 +169,7 @@ const AudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [subs, taskId, AnnotationsTaskDetails]);
+  }, [result, taskId, AnnotationsTaskDetails]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -230,15 +224,15 @@ const AudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails[0]?.result]);
 
   useMemo(() => {
-    const currentIndex = subs?.findIndex(
+    const currentIndex = result?.findIndex(
       (item) => item.startTime <= currentTime && item.endTime > currentTime
     );
     setCurrentIndex(currentIndex);
-  }, [currentTime, subs]);
+  }, [currentTime, result]);
 
   useMemo(() => {
-    subs && setCurrentSubs(subs[currentIndex]);
-  }, [subs, currentIndex]);
+    result && setCurrentSubs(result[currentIndex]);
+  }, [result, currentIndex]);
 
   const getAnnotationsTaskData = () => {
     setLoading(true);
@@ -257,13 +251,14 @@ const AudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    if (AnnotationsTaskDetails.length > 0) {
+    if (AnnotationsTaskDetails?.length > 0) {
       setLoading(false);    }
   }, [AnnotationsTaskDetails]);
 
 
   const tasksComplete = (id) => {
     if (id) {
+      console.log(id,"resprespresp")
       // resetNotes();
       // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
       navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${id}`);
@@ -283,6 +278,13 @@ const AudioTranscriptionLandingPage = () => {
     }
   };
 
+//   useEffect(()=>{
+// if(getNextTask){
+//   console.log(getNextTask,"getNextTaskgetNextTask")
+//   // tasksComplete(resp?.id || null);
+// }
+//   },[getNextTask])
+
   const onNextAnnotation = async (value) => {
     setLoading(true);
     const nextAPIData = {
@@ -300,10 +302,7 @@ const AudioTranscriptionLandingPage = () => {
     });
     const resp = await res.json();
     if (res.ok) {
-      tasksComplete(resp?.id || null);
-      // getAnnotationsTaskData();
-      // getTaskData();
-      // window.location.reload();
+        tasksComplete(resp?.id || null);    
     } else {
       setSnackbarInfo({
         open: true,
@@ -321,7 +320,7 @@ const AudioTranscriptionLandingPage = () => {
       annotation_notes: annotationNotesValue,
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result: [{}],
+      result: result,
     };
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
@@ -333,17 +332,26 @@ const AudioTranscriptionLandingPage = () => {
     const resp = await res.json();
     if (res.ok) {
       if (localStorage.getItem("labelAll") || value === "skipped") {
-        onNextAnnotation();
+        onNextAnnotation(resp.task);
+      }if(value === "labeled"){
+        setSnackbarInfo({
+          open: true,
+          message:"Task successfully submitted",
+          variant: "success",
+        });
       }
-      setSnackbarInfo({
-        open: true,
-        message:"success",
-        variant: "error",
-      });
+      else if(value === "draft"){
+        setSnackbarInfo({
+          open: true,
+          message:"Task saved as draft",
+          variant: "success",
+        });
+      }
+      
     } else {
       setSnackbarInfo({
         open: true,
-        message: resp?.message,
+        message: "Error in saving annotation",
         variant: "error",
       });
     }
@@ -412,7 +420,6 @@ const AudioTranscriptionLandingPage = () => {
         setCurrentTime={setCurrentTime}
         setPlaying={setPlaying}
       /> */}
-            {/* <button onClick={datavalue}>gggggggg</button> */}
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}

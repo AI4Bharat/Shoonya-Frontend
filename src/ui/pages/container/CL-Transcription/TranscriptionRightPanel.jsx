@@ -23,7 +23,8 @@ import {
 //Styles
 // import "../../../styles/scrollbarStyle.css";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
-
+import LanguageCode from "../../../../utils/LanguageCode";
+import {TabsSuggestionData }from "../../../../utils/TabsSuggestionData/TabsSuggestionData"
 
 //Components
 import {
@@ -48,7 +49,7 @@ import ButtonComponent from "../../component/CL-Transcription/ButtonComponent";
 import TimeBoxes from "./TimeBoxes";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
-
+import TagsSuggestionList from "../../component/CL-Transcription/TagsSuggestionList";
 
 // import SettingsButtonComponent from "./components/SettingsButtonComponent";
 
@@ -86,14 +87,13 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const completedCount = useSelector(
     (state) => state.commonReducer.completedCount
   );
-  console.log(ProjectDetails,"ProjectDetailsProjectDetails")
 
   // const transcriptPayload = useSelector(
   //   (state) => state.getTranscriptPayload.data
   // );
   const limit = useSelector((state) => state.commonReducer.limit);
   // const videoDetails = useSelector((state) => state.getVideoDetails.data);
-
+  const [targetlang, settargetlang] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -126,7 +126,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [showSpeakerIdDropdown, setShowSpeakerIdDropdown] = useState([]);
-  // const [speakerIdList, setSpeakerIdList] = useState([]);
+  const [speakerIdList, setSpeakerIdList] = useState([]);
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState(0);
   const [tagSuggestionsAnchorEl, setTagSuggestionsAnchorEl] = useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState([]);
@@ -135,17 +135,18 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const [enableTransliterationSuggestion, setEnableTransliterationSuggestion] =
     useState(true);
     const TaskDetails = useSelector((state) => state.getTaskDetails.data);
-console.log( TaskDetails?.data?.speakers_json
-  ,"TaskDetailsTaskDetails")
-  // useEffect(() => {
-  //   if (videoDetails.hasOwnProperty("video")) {
-  //     const speakerList = videoDetails?.video?.speaker_info?.map((speaker) => {
-  //       return speaker;
-  //     });
-  //     setSpeakerIdList(speakerList);
-  //     setShowSpeakerIdDropdown(videoDetails?.video?.multiple_speaker);
-  //   }
-  // }, [videoDetails]);
+
+  useEffect(() => {
+    if (TaskDetails) {
+      const speakerList = TaskDetails?.data?.speakers_json?.map((speaker) => {
+        return speaker;
+      });
+      setSpeakerIdList(speakerList);
+      // setShowSpeakerIdDropdown(videoDetails?.video?.multiple_speaker);
+      console.log(ProjectDetails.tgt_language,"TaskDetailsTaskDetails")
+    }
+  }, [TaskDetails]);
+  
 
   useEffect(() => {
     if (currentPage) {
@@ -207,7 +208,7 @@ console.log( TaskDetails?.data?.speakers_json
   );
 
   const onMouseUp = (e, blockIdx) => {
-    if (e.target.selectionStart < e.target.value.length) {
+    if (e.target.selectionStart < e.target.value?.length) {
       e.preventDefault();
       setShowPopOver(true);
       setCurrentIndexToSplitTextBlock(blockIdx);
@@ -238,7 +239,6 @@ console.log( TaskDetails?.data?.speakers_json
       target: { value },
       currentTarget,
     } = event;
-    console.log(value,"eventeventeventevent")
 
     const containsBackslash = value.includes("\\");
 
@@ -248,11 +248,10 @@ console.log( TaskDetails?.data?.speakers_json
       setEnableTransliterationSuggestion(false);
 
       const textBeforeSlash = value.split("\\")[0];
-      const currentTargetWord = value.split("\\")[1].split(" ")[0];
-      const textAfterSlash = value.split("\\")[1].split(" ").slice(1).join(" ");
-
-      // const tags = getTagsList(videoDetails?.video?.language_label);
-
+      const currentTargetWord = value.split("\\")[1].split("")[0];
+      const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
+      
+      // const tags = getTagsList(ProjectDetails.tgt_language);
       // const filteredSuggestionByInput = Object.entries(tags).filter(([tag]) => {
       //   return tag.toLowerCase().includes(currentTargetWord.toLowerCase());
       // });
@@ -264,24 +263,24 @@ console.log( TaskDetails?.data?.speakers_json
       setTextWithoutBackSlash(textBeforeSlash);
       setTextAfterBackSlash(textAfterSlash);
 
-      // if (Object.keys(filteredSuggestions).length) {
-      //   setTagSuggestionList(filteredSuggestions);
+
+
+      // if (TagsSuggestionList?.length > 0) {
+      //   setTagSuggestionList(TagsSuggestionList);
       // } else {
       //   setTagSuggestionList([]);
       // }
     }
-
     const sub = onSubtitleChange(value, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
 
 
-  const saveTranscriptHandler = async (isFinal,   subtitles ,data= AnnotationsTaskDetails[0]?.result ) => {
+  const saveTranscriptHandler = async (isFinal,   subtitles ) => {
     setLoading(true);
   
     const reqBody = {
-      cl_format:true,
       task_id: taskId,
       annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
       // offset: currentOffset,
@@ -386,16 +385,16 @@ console.log( TaskDetails?.data?.speakers_json
   );
 
   const onUndo = useCallback(() => {
-    if (undoStack.length > 0) {
+    if (undoStack?.length > 0) {
       //getting last last action performed by user
-      const lastAction = undoStack[undoStack.length - 1];
+      const lastAction = undoStack[undoStack?.length - 1];
 
       // modifing subtitles based on last action
       const sub = onUndoAction(lastAction);
       dispatch(setSubtitles(sub, C.SUBTITLES));
 
       //removing the last action from undo and putting in redo stack
-      setUndoStack(undoStack.slice(0, undoStack.length - 1));
+      setUndoStack(undoStack.slice(0, undoStack?.length - 1));
       setRedoStack((prevState) => [...prevState, lastAction]);
     }
 
@@ -403,16 +402,16 @@ console.log( TaskDetails?.data?.speakers_json
   }, [undoStack, redoStack]);
 
   const onRedo = useCallback(() => {
-    if (redoStack.length > 0) {
+    if (redoStack?.length > 0) {
       //getting last last action performed by user
-      const lastAction = redoStack[redoStack.length - 1];
+      const lastAction = redoStack[redoStack?.length - 1];
 
       // modifing subtitles based on last action
       const sub = onRedoAction(lastAction);
       dispatch(setSubtitles(sub, C.SUBTITLES));
 
       //removing the last action from redo and putting in undo stack
-      setRedoStack(redoStack.slice(0, redoStack.length - 1));
+      setRedoStack(redoStack.slice(0, redoStack?.length - 1));
       setUndoStack((prevState) => [...prevState, lastAction]);
     }
 
@@ -434,6 +433,17 @@ console.log( TaskDetails?.data?.speakers_json
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
+
+  useEffect(()=>{
+    const language = LanguageCode.languages;
+
+    if (ProjectDetails ) {
+      const filtereddata = language.filter(
+        (el) => el.label === ProjectDetails?.tgt_language
+      );
+      settargetlang(filtereddata[0]?.code);
+    }
+  },[ProjectDetails])
 
   return (
     
@@ -513,9 +523,9 @@ console.log( TaskDetails?.data?.speakers_json
                   }
                 }}
               >
-           {ProjectDetails?.src_language !== "en" || ProjectDetails?.src_language !== null && enableTransliteration ? (
+           {ProjectDetails?.tgt_language !== "en" && enableTransliteration ? (
           <IndicTransliterate
-            lang={ProjectDetails?.src_language}
+            lang={targetlang}
             value={item.text}
             onChange={(event) => {
               changeTranscriptHandler(event, index);
@@ -606,9 +616,9 @@ console.log( TaskDetails?.data?.speakers_json
                       }}
                       MenuProps={MenuProps}
                     >
-                      {TaskDetails?.data?.speakers_json?.map((speaker, index) => (
-                        <MenuItem key={index} value={speaker.id}>
-                          {speaker.name} 
+                      {speakerIdList?.map((speaker, index) => (
+                        <MenuItem key={index} value={speaker.name}>
+                          {speaker.name}  ({speaker.gender})
                         </MenuItem>
                       ))}
                     </Select>
@@ -644,9 +654,25 @@ console.log( TaskDetails?.data?.speakers_json
             loading={loading}
           />
         )}
+         {Boolean(tagSuggestionsAnchorEl) && (
+          <TagsSuggestionList
+          TabsSuggestionData={TabsSuggestionData}
+            tagSuggestionsAnchorEl={tagSuggestionsAnchorEl}
+            setTagSuggestionList={setTagSuggestionList}
+            index={currentSelectedIndex}
+            filteredSuggestionByInput={tagSuggestionList}
+            setTagSuggestionsAnchorEl={setTagSuggestionsAnchorEl}
+            textWithoutBackslash={textWithoutBackSlash}
+            textAfterBackSlash={textAfterBackSlash}
+            // saveTranscriptHandler={saveTranscriptHandler}
+            setEnableTransliterationSuggestion={
+              setEnableTransliterationSuggestion
+            }
+          />
+        )}
     </Grid>
     </>
   );
 };
 
-export default memo(TranscriptionRightPanel);
+export default TranscriptionRightPanel;

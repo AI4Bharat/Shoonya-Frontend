@@ -9,7 +9,7 @@ export default class PatchAnnotationAPI extends API {
      super("PATCH", timeout, false);
      this.userObj = userObj;
      this.type = constants.PATCH_ANNOTATION;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.annotations}${annotationsId}/`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.annotations}${annotationsId}/?cl_format=true`;
    }
   
    processResponse(res) {

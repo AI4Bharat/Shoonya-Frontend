@@ -46,115 +46,16 @@ const AnnotationStageButtons =
     }, []);
 
     useEffect(() => {
-      if (AnnotationsTaskDetails.length > 0)
+      if (AnnotationsTaskDetails?.length > 0)
         setAnnotations(AnnotationsTaskDetails);
     }, [AnnotationsTaskDetails]);
 
 
-    // const filterData = () => {
-    //   let filteredAnnotations = annotations;
-    //   let userAnnotation = annotations.find((annotation) => {
-    //     return (
-    //       annotation.completed_by === user.id && !annotation.parent_annotation
-    //     );
-    //   });
-    //   let userAnnotationData = annotations.find(
-    //     (annotation) => annotation.annotation_type === 2
-    //   );
-
-    //   if (userAnnotation) {
-    //     if (userAnnotation.annotation_status === "labeled") {
-    //       const superCheckedAnnotation = annotations.find(
-    //         (annotation) => annotation.annotation_type === 3
-    //       );
-    //       let review = annotations.find(
-    //         (annotation) =>
-    //           annotation.parent_annotation === userAnnotation.id &&
-    //           annotation.annotation_type === 2
-    //       );
-    //       if (
-    //         superCheckedAnnotation &&
-    //         [
-    //           // "draft",
-    //           // "skipped",
-    //           "validated",
-    //           "validated_with_changes",
-    //         ].includes(superCheckedAnnotation.annotation_status)
-    //       ) {
-    //         filteredAnnotations = [superCheckedAnnotation];
-    //         setFilterMessage(
-    //           "This is the Super Checker's Annotation in read only mode"
-    //         );
-    //         setDisableBtns(true);
-    //         // disable = true;
-    //       } else if (
-    //         review &&
-    //         [ "rejected", "unreviewed"].includes(
-    //           review.annotation_status
-    //         )
-    //       ) {
-    //         filteredAnnotations = [userAnnotation];
-    //         // disable = true;
-    //         setDisableBtns(true);
-    //         setdisableSkip(true);
-    //         setDisableUpdata(true)
-    //         setFilterMessage("This task is being reviewed by the reviewer");
-    //       } else if (
-    //         review &&
-    //         [
-    //           // "draft",
-    //           // "skipped",
-    //           "accepted",
-    //           "accepted_with_minor_changes",
-    //           "accepted_with_major_changes",
-    //         ].includes(review.annotation_status)
-    //       ) {
-    //         filteredAnnotations = [review];
-    //         // disable = true;
-    //         setDisableBtns(true);
-    //         setFilterMessage(
-    //           "This is the Reviewer's Annotation in read only mode"
-    //         );
-    //       } else {
-    //         filteredAnnotations = [userAnnotation];
-    //       }
-    //     } else if (
-    //       userAnnotationData &&
-    //       ["draft"].includes(userAnnotation.annotation_status)
-    //     ) {
-    //       filteredAnnotations = [userAnnotation];
-    //       setdisableSkip(true);
-    //       // setDisableButton(true);
-    //       setFilterMessage(
-    //         "Skip button is disabled, since the task is being reviewed"
-    //       );
-    //     } else if (
-    //       userAnnotation &&
-    //       ["to_be_revised"].includes(userAnnotation.annotation_status)
-    //     ) {
-    //       filteredAnnotations = [userAnnotation];
-    //       setdisableSkip(true);
-    //       // setDisableButton(true);
-    //       setFilterMessage(
-    //         "Skip button is disabled, since the task is being reviewed"
-    //       );
-    //     } else {
-    //       filteredAnnotations = [userAnnotation];
-    //     }
-    //   } else if (([4, 5, 6].includes(user.role) && !TaskDetails?.annotation_users?.some((users) => users === user.id))) {
-    //     filteredAnnotations = annotations.filter(
-    //       (a) => a.annotation_type === 1 
-    //     )
-    //     // disable = true;
-    //     setDisableBtns(true);
-    //     setdisableSkip(true);
-    //     setDisableUpdata(true)
-    //   }
-    // };
-
+   
     useEffect(() => {
       filterAnnotations(annotations, user,setDisableBtns,setDisableUpdata,setdisableSkip,setFilterMessage,TaskDetails);
     }, [annotations, user, disableBtns, filterMessage, disableSkip,disableUpdata,TaskDetails]);
+
 
     const filterAnnotations = (
       annotations, user,setDisableBtns,setDisableUpdata,setdisableSkip,setFilterMessage,TaskDetails
@@ -302,7 +203,7 @@ const AnnotationStageButtons =
               <Button
                 value="Next"
                 type="default"
-                onClick={() => onNextAnnotation("next", getNextTask.id)}
+                onClick={() => onNextAnnotation("next", getNextTask?.id)}
                 style={{
                   minWidth: "120px",
                   border: "1px solid gray",
@@ -317,7 +218,7 @@ const AnnotationStageButtons =
           </Grid>
           {  !disableSkip && (
             <Grid item>
-              <Tooltip>
+              <Tooltip title="skip to next task">
                 <Button
                   value="Skip"
                   type="default"
