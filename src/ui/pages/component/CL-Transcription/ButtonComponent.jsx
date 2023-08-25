@@ -26,8 +26,7 @@ const ButtonComponent = ({
   const $audioFile = useRef(null);
 
   return (
-    <>
-      {/* {!taskData.task_type.includes("VOICEOVER") && lastItem && ( */}
+    <>  { lastItem && ( 
         <Tooltip title="Merge Next" placement="bottom">
           <IconButton
             sx={{ transform: "rotate(180deg)",  backgroundColor: "#fcf7e9",
@@ -47,7 +46,7 @@ const ButtonComponent = ({
             <MergeIcon />
           </IconButton>
         </Tooltip>
-      {/* )} */}
+       )} 
 
       {/* {!taskData.task_type.includes("VOICEOVER") && ( */}
         <Tooltip title="Delete" placement="bottom">

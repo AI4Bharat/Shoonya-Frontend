@@ -92,11 +92,6 @@ const AudioPanel = ({
   //     }
   //   }, [$video]);
 
-  console.log(
-    reviewNotesValue,
-    
-    
-  );
   return (
     <div style={{ padding: "0px 20px 0px 20px" }}>
       <AnnotationStageButtons
