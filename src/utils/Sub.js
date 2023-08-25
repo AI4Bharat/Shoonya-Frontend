@@ -3,16 +3,16 @@ import DT from "duration-time-conversion";
 
 export default class Sub {
   constructor(obj) {
-    this.start_time = obj?.start_time;
-    this.end_time = obj?.end_time;
-    this.text = obj?.text;
-    // this.target_text = obj?.target_text;
-    this.audio = obj?.audio;
-    this.text_changed = obj?.text_changed ?? false;
-    this.time_difference = obj?.time_difference;
-    this.id = obj?.id;
-    this.audio_speed = obj?.audio_speed;
-    this.speaker_id = obj?.speaker_id;
+    this.start_time = obj.start_time;
+    this.end_time = obj.end_time;
+    this.text = obj.text;
+    this.target_text = obj.target_text;
+    this.audio = obj.audio;
+    this.text_changed = obj.text_changed ?? false;
+    this.time_difference = obj.time_difference;
+    this.id = obj.id;
+    this.audio_speed = obj.audio_speed;
+    this.speaker_id = obj.speaker_id;
   }
 
   get check() {
@@ -26,7 +26,7 @@ export default class Sub {
   }
 
   get startTime() {
-    return DT.t2d(this?.start_time);
+    return DT.t2d(this.start_time);
   }
 
   set startTime(time) {

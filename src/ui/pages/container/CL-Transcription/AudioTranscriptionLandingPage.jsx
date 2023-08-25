@@ -42,8 +42,8 @@ const AudioTranscriptionLandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [currentSubs, setCurrentSubs] = useState();
   const [loadtime, setloadtime] = useState(new Date());
-
-
+  const [textBox, settextBox] = useState("");
+  const [NextData, setNextData] = useState("");
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -58,13 +58,11 @@ const AudioTranscriptionLandingPage = () => {
   );
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const getNextTask = useSelector((state) => state.getnextProject.data);
- 
-
+  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
   const player = useSelector((state) => state.commonReducer.player);
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
   const timeSpentIntervalRef = useRef(null);
-  const transcriptPayload = [];
   // useEffect(() => {
   //   let intervalId;
 
@@ -89,18 +87,39 @@ const AudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
-  useEffect(() => {
-      localStorage.setItem("enableChitrlekhaUI", true);
-  },[]);
 
-  const getTaskData = () => {
-    // setLoading(true);
-    const userObj = new GetTaskDetailsAPI(taskId);
-    dispatch(APITransport(userObj));
+useEffect(()=>{
+const hasEmptyText = result?.some((element) => element.text.trim() === ""); 
+settextBox(hasEmptyText )
+},[result])
+
+
+  const getTaskData = async () => {
+    setLoading(true);
+    const ProjectObj = new GetTaskDetailsAPI(taskId);
+    // dispatch(APITransport(ProjectObj));
+    const res = await fetch(ProjectObj.apiEndPoint(), {
+      method: "GET",
+      body: JSON.stringify(ProjectObj.getBody()),
+      headers: ProjectObj.getHeaders().headers,
+    });
+    const resp = await res.json(); 
+    if (!res.ok || resp?.data?.audio_url === "" || resp?.data?.audio_url === null) {
+      setLoading(true);
+      setSnackbarInfo({
+        open: true,
+        message: "Audio Server is down, please try after sometime",
+        variant: "error",
+      });
+    } setLoading(false);
   };
+
+
+  
 
   useEffect(() => {
     getTaskData();
+    localStorage.setItem("enableChitrlekhaUI", true);
   }, []);
 
 
@@ -207,7 +226,6 @@ const AudioTranscriptionLandingPage = () => {
       (item) => new Sub(item)
     );
 
-    console.log("bhjb");
     // const newSub = cloneDeep(sub);
 
     // dispatch(setCurrentPage(transcriptPayload?.current));
@@ -221,7 +239,7 @@ const AudioTranscriptionLandingPage = () => {
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
     // eslint-disable-next-line
-  }, [AnnotationsTaskDetails[0]?.result]);
+  }, [AnnotationsTaskDetails]);
 
   useMemo(() => {
     const currentIndex = result?.findIndex(
@@ -258,7 +276,6 @@ const AudioTranscriptionLandingPage = () => {
 
   const tasksComplete = (id) => {
     if (id) {
-      console.log(id,"resprespresp")
       // resetNotes();
       // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
       navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${id}`);
@@ -294,7 +311,7 @@ const AudioTranscriptionLandingPage = () => {
       annotation_status: labellingMode,
     };
     const ProjectObj = new GetNextProjectAPI(projectId, nextAPIData);
-    dispatch(APITransport(ProjectObj));
+    // dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(ProjectObj.getBody()),
@@ -302,6 +319,7 @@ const AudioTranscriptionLandingPage = () => {
     });
     const resp = await res.json();
     if (res.ok) {
+      setNextData(resp)
         tasksComplete(resp?.id || null);    
     } else {
       setSnackbarInfo({
@@ -312,6 +330,7 @@ const AudioTranscriptionLandingPage = () => {
     }
     setLoading(false);
   };
+
 
   const handleAnnotationClick = async (value, id, lead_time,annotationNotesValue) => {
     setLoading(true);
@@ -333,12 +352,23 @@ const AudioTranscriptionLandingPage = () => {
     if (res.ok) {
       if (localStorage.getItem("labelAll") || value === "skipped") {
         onNextAnnotation(resp.task);
-      }if(value === "labeled"){
-        setSnackbarInfo({
-          open: true,
-          message:"Task successfully submitted",
-          variant: "success",
-        });
+      }
+     
+      if(value === "labeled"){
+        if(textBox){
+          setSnackbarInfo({
+            open: true,
+            message:"Please enter all the transcripts",
+            variant: "error",
+          });
+        }else{
+          setSnackbarInfo({
+            open: true,
+            message:"Task successfully submitted",
+            variant: "success",
+          });
+        }
+       
       }
       else if(value === "draft"){
         setSnackbarInfo({

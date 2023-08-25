@@ -62,7 +62,7 @@ export const onSubtitleChange = (text, index) => {
 };
 export const getUpdatedTime = (value, type, time, index, startEnd) => {
   const subtitles = store.getState().commonReducer.subtitles;
-  const videoDuration = store.getState().getVideoDetails.data.video.duration;
+  const videoDuration = store.getState().getTaskDetails?.data?.audio_duration;
 
   let newValue = "";
 
