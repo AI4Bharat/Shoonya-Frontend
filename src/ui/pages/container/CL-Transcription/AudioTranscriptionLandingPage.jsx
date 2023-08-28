@@ -295,13 +295,6 @@ settextBox(hasEmptyText )
     }
   };
 
-//   useEffect(()=>{
-// if(getNextTask){
-//   console.log(getNextTask,"getNextTaskgetNextTask")
-//   // tasksComplete(resp?.id || null);
-// }
-//   },[getNextTask])
-
   const onNextAnnotation = async (value) => {
     setLoading(true);
     const nextAPIData = {

@@ -75,7 +75,6 @@ import React, {
         (state) => state.getAnnotationsTask.data
       );
 
-      console.log(AnnotationsTaskDetails[0]?.annotation_status)
   
       const [currentSubs, setCurrentSubs] = useState([]);
       const [snackbar, setSnackbarInfo] = useState({
@@ -334,7 +333,6 @@ import React, {
         // eslint-disable-next-line
         [player, removeSub, updateSub]
       );
-      currentSubs?.map((sub, key) => { console.log(sub.text,"subsub",key)})
  
       const DynamicMenu = (props) => {
         const { id, trigger } = props;
@@ -433,7 +431,7 @@ import React, {
                       onMouseDown={(event) => onMouseDown(sub, event)}
                     >
                       <p className={classes.subTextP}>
-                        {sub.text}{console.log(sub.text,"subsubsubsubsubsubgggggggggggggggggggg")}
+                        {sub.text}
                       </p>
                      
                     </div>

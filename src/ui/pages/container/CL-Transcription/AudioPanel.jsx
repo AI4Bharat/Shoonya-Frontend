@@ -26,14 +26,11 @@ const AudioPanel = ({
   const $audio = useRef();
   const { taskId } = useParams();
 
-  const [poster, setPoster] = useState(false);
-  const [disableBtns, setDisableBtns] = useState(false);
-  const [filterMessage, setFilterMessage] = useState("testing");
   const [showNotes, setShowNotes] = useState(false);
   const [annotationNotesValue, setAnnotationNotesValue] = useState("");
   const [reviewNotesValue, setReviewNotesValue] = useState("");
-  const [value, setvalue] = useState("");
-  const AnnotationsTaskDetails = useSelector(
+
+  const AnnotationsTaskDetails = useSelector(  
     (state) => state.getAnnotationsTask.data
   );
 
@@ -62,9 +59,6 @@ const AudioPanel = ({
       setReviewNotesValue(AnnotationsTaskDetails[0]?.review_notes);
   }, [AnnotationsTaskDetails]);
 
-  useEffect(() => {
-    setvalue(annotationNotesValue);
-  }, [annotationNotesValue]);
 
   useEffect(() => {
     dispatch(setPlayer($audio.current));
@@ -97,12 +91,8 @@ const AudioPanel = ({
       <AnnotationStageButtons
         handleAnnotationClick={handleAnnotationClick}
         onNextAnnotation={onNextAnnotation}
-        disableBtns={disableBtns}
-        setDisableBtns={setDisableBtns}
-        filterMessage={filterMessage}
-        setFilterMessage={setFilterMessage}
         annotationNotesValue={annotationNotesValue}
-        value={value}
+        AnnotationsTaskDetails={AnnotationsTaskDetails}
       />
       {/* <Typography variant="h5" sx={{ pb: 1, pl: 2 }}>
           Speaker Details
