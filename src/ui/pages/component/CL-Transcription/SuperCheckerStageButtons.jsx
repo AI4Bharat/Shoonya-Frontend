@@ -60,26 +60,27 @@ import React, {
     },
   }));
 
-  const ReviewStageButtons = ({
-    handleReviewClick,
+  const SuperCheckerStageButtons = ({
+    handleSuperCheckerClick,
     onNextAnnotation,
     reviewNotesValue,
     AnnotationsTaskDetails,
-    disableSkip,disableBtns,filterMessage,disableButton
   }) => {
     // const classes = AudioTranscriptionLandingStyle();
     const [annotations, setAnnotations] = useState([]);
-//     const [disableSkip, setdisableSkip] = useState(false);
-//     const [filterMessage, setFilterMessage] = useState(null);
-//     const [disableBtns, setDisableBtns] = useState(false);
-//     const [disableUpdata, setDisableUpdata] = useState(false);
-//   const[disableButton,setDisableButton]=useState(false)
+    const [disableSkip, setdisableSkip] = useState(false);
+    const [filterMessage, setFilterMessage] = useState(null);
+    const [disableBtns, setDisableBtns] = useState(false);
+    const [disableUpdata, setDisableUpdata] = useState(false);
+    const [disableButton,setDisableButton]=useState(false)
     const dispatch = useDispatch();
     const { taskId } = useParams();
   
     const TaskDetails = useSelector((state) => state.getTaskDetails.data);
     const user = useSelector((state) => state.fetchLoggedInUserData.data);
     const getNextTask = useSelector((state) => state.getnextProject.data);
+    const ProjectsData = localStorage.getItem("projectData");
+    const ProjectData = JSON.parse(ProjectsData);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -91,25 +92,27 @@ import React, {
         setAnchorEl(null);
       };
 
-      let review = AnnotationsTaskDetails.filter(
-        (annotation) => annotation.annotation_type === 2
+      let SuperChecker = AnnotationsTaskDetails.filter(
+        (annotation) => annotation.annotation_type === 3
       )[0]
+
+   
 
     return (
       <>
         <Grid container spacing={1} sx={{ mt: 4, mb: 5,ml:3, }}>
-         {!disableBtns && TaskDetails?.review_user === user?.id && (
               <Grid item>
+                {[4, 5, 6].includes(user.role) && TaskDetails?.super_check_user === user?.id && (
                 <Tooltip title="Save task for later">
                   <Button
                     value="Draft"
                     type="default"
                     variant="outlined"
                     onClick={() =>
-                        handleReviewClick(
+                        handleSuperCheckerClick(
                         "draft",
-                        review.id,
-                        review.lead_time,
+                        SuperChecker.id,
+                        SuperChecker.lead_time,
                         reviewNotesValue
                       )
                     }
@@ -125,8 +128,8 @@ import React, {
                     Draft
                   </Button>
                 </Tooltip>
-                {/* )} */}
-              </Grid>)}
+           )} 
+              </Grid>
            
           <Grid item>
             <Tooltip title="Go to next task">
@@ -149,17 +152,17 @@ import React, {
          
            
               <Grid item>
-              {!disableSkip && TaskDetails?.review_user === user?.id && (
+                {[4, 5, 6].includes(user.role) &&(
                 <Tooltip title="skip to next task">
                   <Button
                     value="Skip"
                     type="default"
                     variant="outlined"
                     onClick={() =>
-                        handleReviewClick(
+                        handleSuperCheckerClick(
                         "skipped",
-                        review.id,
-                        review.lead_time,
+                        SuperChecker.id,
+                        SuperChecker.lead_time,
                         reviewNotesValue
                       )
                     }
@@ -176,21 +179,29 @@ import React, {
                   </Button>
                 </Tooltip>)}
               </Grid>
-             { !disableBtns && !disableButton && TaskDetails?.review_user === user?.id &&  (
               <Grid item>
-                <Tooltip title="Revise Annotation">
+                {[4, 5, 6].includes(user.role) && TaskDetails?.super_check_user === user?.id && (
+                <Tooltip title="Reject">
                   <Button
-                    value="to_be_revised"
+                    value="rejected"
                     type="default"
                     variant="outlined"
                     onClick={() =>
-                        handleReviewClick(
-                        "to_be_revised",
-                        review.id,
-                        review.lead_time,
-                        reviewNotesValue
+                        handleSuperCheckerClick(
+                        "rejected",
+                        SuperChecker.id,
+                        SuperChecker.lead_time,
+                        reviewNotesValue,
+                        SuperChecker.parent_annotation
+
                       )
                     }
+                    // disabled={
+                    //     ProjectData.revision_loop_count >
+                    //     TaskDetails?.revision_loop_count?.super_check_count
+                    //       ? false
+                    //       : true
+                    //   }
                     style={{
                       minWidth: "120px",
                       border: "1px solid gray",
@@ -199,17 +210,16 @@ import React, {
                       pb: 2,
                     }}
                   >
-                    Revise
+                    Reject
                   </Button>
-                </Tooltip>
-              </Grid>)}
+                </Tooltip>)}
+              </Grid>
               <Grid item>
-              {!disableBtns && TaskDetails?.review_user === user?.id && (
-
-              <Tooltip title="Accept Annotation">
+              {[4, 5, 6].includes(user.role) && TaskDetails?.super_check_user === user?.id && (
+              <Tooltip title="Validate">
                 <Button
                   id="accept-button"
-                  value="Accept"
+                  value="Validate"
                   type="default"
                   aria-controls={open ? "accept-menu" : undefined}
                   aria-haspopup="true"
@@ -220,11 +230,12 @@ import React, {
                     color: "#52c41a",
                     pt: 3,
                     pb: 3,
+                   
                   }}
                   onClick={handleClick}
                   endIcon={<KeyboardArrowDownIcon />}
                 >
-                  Accept
+                  Validate
                 </Button>
               </Tooltip>
               )}
@@ -238,28 +249,20 @@ import React, {
               onClose={handleClose}
             >
               <MenuItem
-                onClick={() => handleReviewClick("accepted",review.id,
-                AnnotationsTaskDetails[1]?.lead_time,
-                reviewNotesValue,review.parent_annotation)}
+                onClick={() => handleSuperCheckerClick("validated",SuperChecker.id,
+                SuperChecker.lead_time,
+                reviewNotesValue,SuperChecker.parent_annotation)}
                 disableRipple
               >
-                with No Changes
+                Validated No Changes
               </MenuItem>
               <MenuItem
-                onClick={() => handleReviewClick("accepted_with_minor_changes",review.id,
-                review.lead_time,
-                reviewNotesValue,review.parent_annotation)}
+                onClick={() => handleSuperCheckerClick("validated_with_changes",SuperChecker.id,
+                SuperChecker.lead_time,
+                reviewNotesValue,SuperChecker.parent_annotation)}
                 disableRipple
               >
-                with Minor Changes
-              </MenuItem>
-              <MenuItem
-                onClick={() => handleReviewClick("accepted_with_major_changes",review.id,
-                review.lead_time,
-                reviewNotesValue,review.parent_annotation)}
-                disableRipple
-              >
-                with Major Changes
+                Validated with Changes
               </MenuItem>
             </StyledMenu>
               </Grid>
@@ -273,5 +276,5 @@ import React, {
     );
   };
   
-  export default ReviewStageButtons;
+  export default SuperCheckerStageButtons;
   

@@ -46,6 +46,7 @@ import DashBoard from "./ui/pages/container/Admin/DashBoard";
 import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
 import AudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AudioTranscriptionLandingPage";
 import ReviewAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/ReviewAudioTranscriptionLandingPage";
+import SuperCheckerAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/SuperCheckerAudioTranscriptionLandingPage"
 
 
 const App = () => {
@@ -293,6 +294,12 @@ const App = () => {
           path="projects/:projectId/ReviewAudioTranscriptionLandingPage/:taskId"
           element={ProtectedRouteWrapper(
             <Layout component={<ReviewAudioTranscriptionLandingPage />} />
+          )}
+        />
+         <Route
+          path="projects/:projectId/SuperCheckerAudioTranscriptionLandingPage/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<SuperCheckerAudioTranscriptionLandingPage />} />
           )}
         />
          

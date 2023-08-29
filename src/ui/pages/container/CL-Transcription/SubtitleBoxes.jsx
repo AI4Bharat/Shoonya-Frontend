@@ -95,6 +95,8 @@ import React, {
         (item) => item.startTime <= currentTime && item.endTime > currentTime
       );
      const AnnotationStage = localStorage.getItem("Stage") === "annotation"
+     const SuperCheckerStage = localStorage.getItem("SuperCheckerStage") === "superChecker"
+
 
      useEffect(()=>{
       if(AnnotationStage){
@@ -102,7 +104,12 @@ import React, {
           (annotation) => annotation.annotation_type === 1
         )[0]
         setTaskData(Annotation)
-      }else{
+      }else if(SuperCheckerStage){
+        let superchecker = AnnotationsTaskDetails.filter(
+          (annotation) => annotation.annotation_type === 3
+        )[0]
+        setTaskData(superchecker)
+       } else{
         let review = AnnotationsTaskDetails.filter(
           (annotation) => annotation.annotation_type === 2
         )[0]

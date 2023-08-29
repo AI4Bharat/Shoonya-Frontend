@@ -19,13 +19,14 @@ const AnnotationStageButtons = ({
   onNextAnnotation,
   annotationNotesValue,
   AnnotationsTaskDetails,
+  disableBtns,disableUpdata,disableSkip,filterMessage
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const [annotations, setAnnotations] = useState([]);
-  const [disableSkip, setdisableSkip] = useState(false);
-  const [filterMessage, setFilterMessage] = useState(null);
-  const [disableBtns, setDisableBtns] = useState(false);
-  const [disableUpdata, setDisableUpdata] = useState(false);
+  // const [disableSkip, setdisableSkip] = useState(false);
+  // const [filterMessage, setFilterMessage] = useState(null);
+  // const [disableBtns, setDisableBtns] = useState(false);
+  // const [disableUpdata, setDisableUpdata] = useState(false);
 
   const dispatch = useDispatch();
   const { taskId } = useParams();
@@ -36,90 +37,6 @@ const AnnotationStageButtons = ({
   let Annotation = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 1
   )[0]
-
-  useEffect(() => {
-    const userAnnotation = AnnotationsTaskDetails.find((annotation) => {
-      return (
-        annotation.completed_by === user.id && !annotation.parent_annotation
-      );
-    });
-    
-    const userreview = AnnotationsTaskDetails.find(
-      (annotation) => annotation.annotation_type === 2
-    );
-    if (userAnnotation) {
-      const review = AnnotationsTaskDetails.find(
-        (annotation) => annotation.annotation_type === 2
-      );
-      const superCheckedAnnotation = AnnotationsTaskDetails.find(
-        (annotation) => annotation.annotation_type === 3
-      );
-      console.log(userAnnotation,"userAnnotationuserAnnotation",review,superCheckedAnnotation)
-      if (
-        userAnnotation.annotation_status === "labeled" &&
-        localStorage.getItem("labellingMode") === "labeled"
-      ) {
-        
-        if (
-          superCheckedAnnotation &&
-          ["draft", "skipped", "validated", "validated_with_changes"].includes(
-            superCheckedAnnotation.annotation_status
-          )
-        ) {
-          setDisableBtns(true);
-          setdisableSkip(true);
-          setDisableUpdata(true);
-          setFilterMessage(
-            "This is the Super Checker's Annotation in read only mode"
-          );
-        } else if (
-          review?.annotation_type === 2  &&
-          ["skipped", "draft", "rejected", "unreviewed"].includes(
-            review.annotation_status
-          )
-        ) {
-          setDisableBtns(true);
-          setdisableSkip(true);
-          setDisableUpdata(true);
-          setFilterMessage("This task is being reviewed by the reviewer");
-        } else if (
-          review &&
-          [
-            "accepted",
-            "accepted_with_minor_changes",
-            "accepted_with_major_changes",
-          ].includes(review.annotation_status)
-        ) {
-          setDisableBtns(true);
-          setdisableSkip(true);
-          setDisableUpdata(true);
-          setFilterMessage(
-            "This is the Reviewer's Annotation in read only mode"
-          );
-        }
-      } else if (
-        userreview &&
-        ["draft"].includes(userreview.annotation_status) &&
-        localStorage.getItem("labellingMode") === "draft"
-      ) {
-        setdisableSkip(true);
-        setFilterMessage(
-          "Skip button is disabled, since the task is being reviewed"
-        );
-      } else if (
-        userAnnotation &&
-        ["to_be_revised"].includes(userAnnotation.annotation_status) &&
-        localStorage.getItem("labellingMode") === "to_be_revised"
-      ) {
-        setdisableSkip(true);
-        setFilterMessage(
-          "Skip button is disabled, since the task is being reviewed"
-        );
-      }
-    }
-  }, [AnnotationsTaskDetails, user]);
-
-
 
   return (
     <>

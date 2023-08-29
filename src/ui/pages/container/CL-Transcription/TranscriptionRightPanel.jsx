@@ -137,6 +137,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
     useState(true);
     const [taskData, setTaskData] = useState([]);
     const AnnotationStage = localStorage.getItem("Stage") === "annotation"
+    const SuperCheckerStage = localStorage.getItem("SuperCheckerStage") === "superChecker"
     const TaskDetails = useSelector((state) => state.getTaskDetails.data);
 
     useEffect(()=>{
@@ -145,7 +146,12 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
           (annotation) => annotation.annotation_type === 1
         )[0]
         setTaskData(Annotation)
-      }else{
+      }else if(SuperCheckerStage){
+        let superchecker = AnnotationsTaskDetails.filter(
+          (annotation) => annotation.annotation_type === 3
+        )[0]
+        setTaskData(superchecker)
+       } else{
         let review = AnnotationsTaskDetails.filter(
           (annotation) => annotation.annotation_type === 2
         )[0]

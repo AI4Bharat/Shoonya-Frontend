@@ -59,6 +59,11 @@ const AudioTranscriptionLandingPage = () => {
   const [reviewNotesValue, setReviewNotesValue] = useState(null);
   const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
   const[speakerBox,setSpeakerBox] = useState("");
+  const [annotations, setAnnotations] = useState([]);
+  const [disableSkip, setdisableSkip] = useState(false);
+  const [filterMessage, setFilterMessage] = useState(null);
+  const [disableBtns, setDisableBtns] = useState(false);
+  const [disableUpdata, setDisableUpdata] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -78,7 +83,8 @@ const AudioTranscriptionLandingPage = () => {
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
   const timeSpentIntervalRef = useRef(null);
-console.log(result,"resultresult")
+  const user = useSelector((state) => state.fetchLoggedInUserData.data);
+
   // useEffect(() => {
   //   let intervalId;
 
@@ -102,6 +108,116 @@ console.log(result,"resultresult")
   //     ref.current = 0;
   //   };
   // }, []);
+
+  const filterAnnotations = (
+    annotations,
+    user,
+  ) => {
+    let disableSkip = false; 
+    let disableUpdate = false;
+    let disableDraft = false;
+    let filtereMessage =""
+    let filteredAnnotations = annotations;
+    let userAnnotation = annotations.find((annotation) => {
+      return annotation.completed_by === user.id && !annotation.parent_annotation;
+    });
+    let userAnnotationData = annotations.find(
+      (annotation) =>
+        annotation.annotation_type === 2
+    );
+  
+    if (userAnnotation) {
+  
+      if (userAnnotation.annotation_status === "labeled") {
+        const superCheckedAnnotation = annotations.find(
+          (annotation) => annotation.annotation_type === 3
+        );
+        let review = annotations.find(
+          (annotation) =>
+            annotation.parent_annotation === userAnnotation.id &&
+            annotation.annotation_type === 2
+        );
+        if (
+          superCheckedAnnotation &&
+          ["draft", "skipped", "validated", "validated_with_changes"].includes(
+            superCheckedAnnotation.annotation_status
+          )
+        ) {
+          filteredAnnotations = [superCheckedAnnotation];
+         
+          filtereMessage= "This is the Super Checker's Annotation in read only mode"
+        
+          disableDraft=true;
+           disableSkip = true; 
+           disableUpdate = true;
+        } else if (
+          review &&
+          [
+            "skipped",
+            "draft",
+            "rejected",
+            "unreviewed",
+          ].includes(review.annotation_status)
+        ) {
+          filteredAnnotations = [userAnnotation];
+          disableDraft=true
+          disableSkip = true; 
+          disableUpdate = true;
+          filtereMessage="This task is being reviewed by the reviewer"
+        } else if (
+          review &&
+          [
+            "accepted",
+            "accepted_with_minor_changes",
+            "accepted_with_major_changes",
+          ].includes(review.annotation_status)
+        ) {
+          filteredAnnotations = [review];
+          disableDraft=true
+          disableSkip = true; 
+          disableUpdate = true;
+          filtereMessage="This is the Reviewer's Annotation in read only mode"
+        } else {
+          filteredAnnotations = [userAnnotation];
+        }
+      }
+      else if (
+        userAnnotationData &&
+        [
+          "draft",
+        ].includes(userAnnotation.annotation_status)
+      ) {
+        filteredAnnotations = [userAnnotation];
+        disableSkip = true; 
+      
+        filtereMessage="Skip button is disabled, since the task is being reviewed"
+      }
+      else if (
+        userAnnotation &&
+        [
+          "to_be_revised"
+        ].includes(userAnnotation.annotation_status)
+      ) {
+        filteredAnnotations = [userAnnotation];
+        disableSkip = true; 
+        filtereMessage="Skip button is disabled, since the task is being reviewed"
+      }
+  
+      else {
+        filteredAnnotations = [userAnnotation];
+      }
+    } 
+  
+    setAnnotations(filteredAnnotations)
+    setDisableBtns(disableDraft)
+    setDisableUpdata(disableUpdate)
+    setdisableSkip(disableSkip)
+     setFilterMessage(filtereMessage)
+    return [filteredAnnotations,disableDraft,disableSkip,disableUpdate,filtereMessage];
+  };
+  useEffect(()=>{
+    filterAnnotations(AnnotationsTaskDetails,user)
+  },[AnnotationsTaskDetails,user])
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
@@ -245,8 +361,9 @@ console.log(result,"resultresult")
   //   // eslint-disable-next-line
   // }, [AnnotationsTaskDetails]);
 
+  console.log(annotations[0],"annotations")
   useEffect(() => {
-    const sub = AnnotationsTaskDetails[0]?.result.map((item) => new Sub(item));
+    const sub = annotations[0]?.result.map((item) => new Sub(item));
 
     // const newSub = cloneDeep(sub);
 
@@ -447,6 +564,8 @@ console.log(result,"resultresult")
               onNextAnnotation={onNextAnnotation}
               annotationNotesValue={annotationNotesValue}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
+              disableBtns={disableBtns}disableUpdata={disableUpdata}disableSkip={disableSkip}
+              filterMessage={filterMessage}
             />
             <AudioPanel
               setCurrentTime={setCurrentTime}
