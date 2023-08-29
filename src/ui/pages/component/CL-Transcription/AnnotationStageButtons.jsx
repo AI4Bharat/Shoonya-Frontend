@@ -33,6 +33,9 @@ const AnnotationStageButtons = ({
   const TaskDetails = useSelector((state) => state.getTaskDetails.data);
   const user = useSelector((state) => state.fetchLoggedInUserData.data);
   const getNextTask = useSelector((state) => state.getnextProject.data);
+  let Annotation = AnnotationsTaskDetails.filter(
+    (annotation) => annotation.annotation_type === 1
+  )[0]
 
   useEffect(() => {
     const userAnnotation = AnnotationsTaskDetails.find((annotation) => {
@@ -40,6 +43,7 @@ const AnnotationStageButtons = ({
         annotation.completed_by === user.id && !annotation.parent_annotation
       );
     });
+    
     const userreview = AnnotationsTaskDetails.find(
       (annotation) => annotation.annotation_type === 2
     );
@@ -50,7 +54,7 @@ const AnnotationStageButtons = ({
       const superCheckedAnnotation = AnnotationsTaskDetails.find(
         (annotation) => annotation.annotation_type === 3
       );
-
+      console.log(userAnnotation,"userAnnotationuserAnnotation",review,superCheckedAnnotation)
       if (
         userAnnotation.annotation_status === "labeled" &&
         localStorage.getItem("labellingMode") === "labeled"
@@ -119,7 +123,7 @@ const AnnotationStageButtons = ({
 
   return (
     <>
-      <Grid container spacing={1} sx={{ mt: 4, mb: 5 }}>
+      <Grid container spacing={1} sx={{ mt: 4, mb: 5,ml:3 }}>
         {!disableBtns &&
           [4, 5, 6].includes(user.role) &&
           TaskDetails?.annotation_users?.some((users) => users === user.id) && (
@@ -132,8 +136,8 @@ const AnnotationStageButtons = ({
                   onClick={() =>
                     handleAnnotationClick(
                       "draft",
-                      AnnotationsTaskDetails[0]?.id,
-                      AnnotationsTaskDetails[0]?.lead_time,
+                      Annotation.id,
+                      Annotation.lead_time,
                       annotationNotesValue
                     )
                   }
@@ -182,8 +186,8 @@ const AnnotationStageButtons = ({
                   onClick={() =>
                     handleAnnotationClick(
                       "skipped",
-                      AnnotationsTaskDetails[0]?.id,
-                      AnnotationsTaskDetails[0]?.lead_time,
+                      Annotation.id,
+                      Annotation.lead_time,
                       annotationNotesValue
                     )
                   }
@@ -213,8 +217,8 @@ const AnnotationStageButtons = ({
                   onClick={() =>
                     handleAnnotationClick(
                       "labeled",
-                      AnnotationsTaskDetails[0]?.id,
-                      AnnotationsTaskDetails[0]?.lead_time,
+                      Annotation.id,
+                      Annotation.lead_time,
                       annotationNotesValue
                     )
                   }

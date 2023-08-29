@@ -75,7 +75,7 @@ import React, {
         (state) => state.getAnnotationsTask.data
       );
 
-  
+      const [taskData, setTaskData] = useState([]);
       const [currentSubs, setCurrentSubs] = useState([]);
       const [snackbar, setSnackbarInfo] = useState({
         open: false,
@@ -88,12 +88,29 @@ import React, {
           setCurrentSubs(subtitles);
         }
       }, [subtitles]);
+
   
       const gridGap = document.body.clientWidth / render.gridNum;
       const currentIndex = currentSubs?.findIndex(
         (item) => item.startTime <= currentTime && item.endTime > currentTime
       );
-  
+     const AnnotationStage = localStorage.getItem("Stage") === "annotation"
+
+     useEffect(()=>{
+      if(AnnotationStage){
+        let Annotation = AnnotationsTaskDetails.filter(
+          (annotation) => annotation.annotation_type === 1
+        )[0]
+        setTaskData(Annotation)
+      }else{
+        let review = AnnotationsTaskDetails.filter(
+          (annotation) => annotation.annotation_type === 2
+        )[0]
+        setTaskData(review)
+      }
+     },[AnnotationsTaskDetails])
+
+
       useEffect(() => {
         if (subtitles) {
           const isLastSub =
@@ -102,7 +119,7 @@ import React, {
           if (next && isPlaying(player) && isLastSub) {
             const payloadObj = new GetAnnotationsTaskAPI(
               taskId,
-              AnnotationsTaskDetails[0]?.annotation_status,
+              taskData?.annotation_status
             //   next,
             //   limit
             );
@@ -122,7 +139,7 @@ import React, {
           },
         };
   
-        const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
+        const obj = new SaveTranscriptAPI(taskData?.id,reqBody);
         const res = await fetch(obj.apiEndPoint(), {
           method: "PATCH",
           body: JSON.stringify(obj.getBody()),
@@ -150,7 +167,7 @@ import React, {
           const index = hasSub(sub);
           const res = onSubtitleDelete(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(AnnotationsTaskDetails[0]?.annotation_status, res);
+          saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [limit, currentPage]
@@ -161,7 +178,7 @@ import React, {
           const index = hasSub(sub);
           const res = onMerge(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(AnnotationsTaskDetails[0]?.annotation_status, res);
+          saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [limit, currentPage]
@@ -178,7 +195,7 @@ import React, {
   
           copySub[index] = sub;
           dispatch(setSubtitles(copySub, C.SUBTITLES));
-          saveTranscript(AnnotationsTaskDetails[0]?.annotation_status, copySub);
+          saveTranscript(taskData?.annotation_status,copySub);
         },
         // eslint-disable-next-line
         [limit, currentPage]

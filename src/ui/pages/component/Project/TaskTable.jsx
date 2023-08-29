@@ -334,6 +334,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
     } else {
       localStorage.setItem("enableChitrlekhaUI", false);
     }
+    localStorage.setItem("Stage", props.type);
   },[]);
 
   const customColumnHead = (col) => {
@@ -427,7 +428,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
           );
         props.type === "review" &&
           row.push(
-            <Link to={`review/${el.id}`} className={classes.link}>
+            <Link to={(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ) ?`ReviewAudioTranscriptionLandingPage/${el.id}` :`review/${el.id}`} className={classes.link}>
               <CustomButton
                 disabled={ ProjectDetails.is_archived}
                 onClick={() => {
@@ -574,7 +575,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
     if((localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" )){
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
-          `/projects/${id}/${props.type === "annotation" ? "AudioTranscriptionLandingPage" : "review"}/${
+          `/projects/${id}/${props.type === "annotation" ? "AudioTranscriptionLandingPage" : "ReviewAudioTranscriptionLandingPage"}/${
             NextTask?.id
           }`
         );

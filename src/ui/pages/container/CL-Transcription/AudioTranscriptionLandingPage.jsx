@@ -9,7 +9,15 @@ import React, {
   useRef,
 } from "react";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
-import { Box, IconButton, Tooltip, Typography, Grid } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Typography,
+  Grid,
+  Button,
+  TextField,
+} from "@mui/material";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import Timeline from "./TimeLine";
 import AudioPanel from "./AudioPanel";
@@ -29,6 +37,9 @@ import PatchAnnotationAPI from "../../../../redux/actions/CL-Transcription/patch
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNextProject";
 import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails";
+import AnnotationStageButtons from "../../component/CL-Transcription/AnnotationStageButtons";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -44,6 +55,10 @@ const AudioTranscriptionLandingPage = () => {
   const [loadtime, setloadtime] = useState(new Date());
   const [textBox, settextBox] = useState("");
   const [NextData, setNextData] = useState("");
+  const [showNotes, setShowNotes] = useState(false);
+  const [reviewNotesValue, setReviewNotesValue] = useState(null);
+  const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
+  const[speakerBox,setSpeakerBox] = useState("");
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -63,6 +78,7 @@ const AudioTranscriptionLandingPage = () => {
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
   const timeSpentIntervalRef = useRef(null);
+console.log(result,"resultresult")
   // useEffect(() => {
   //   let intervalId;
 
@@ -87,12 +103,21 @@ const AudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
+  const handleCollapseClick = () => {
+    setShowNotes(!showNotes);
+  };
+  useEffect(() => {
+    if (AnnotationsTaskDetails.length > 0){
+      setReviewNotesValue(AnnotationsTaskDetails[0]?.review_notes);
+    }
+  }, [AnnotationsTaskDetails]);
 
-useEffect(()=>{
-const hasEmptyText = result?.some((element) => element.text.trim() === ""); 
-settextBox(hasEmptyText )
-},[result])
-
+  useEffect(() => {
+    const hasEmptyText = result?.some((element) => element.text.trim() === "");
+    const hasEmptySpeaker = result?.some((element) =>  element.speaker_id.trim() === "")
+    settextBox(hasEmptyText);
+    setSpeakerBox(hasEmptySpeaker);
+  }, [result]);
 
   const getTaskData = async () => {
     setLoading(true);
@@ -103,24 +128,21 @@ settextBox(hasEmptyText )
       body: JSON.stringify(ProjectObj.getBody()),
       headers: ProjectObj.getHeaders().headers,
     });
-    const resp = await res.json(); 
-    if (!res.ok || resp?.data?.audio_url === "" || resp?.data?.audio_url === null) {
+    const resp = await res.json();
+    if (
+      !res.ok ||
+      resp?.data?.audio_url === "" ||
+      resp?.data?.audio_url === null
+    ) {
       setLoading(true);
       setSnackbarInfo({
         open: true,
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
-    } setLoading(false);
+    }
+    setLoading(false);
   };
-
-
-  
-
-  useEffect(() => {
-    getTaskData();
-    localStorage.setItem("enableChitrlekhaUI", true);
-  }, []);
 
 
 
@@ -128,7 +150,7 @@ settextBox(hasEmptyText )
     const handleAutosave = (id) => {
       const reqBody = {
         task_id: taskId,
-        annotation_status:AnnotationsTaskDetails[0]?.annotation_status,
+        annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
         // cl_format: true,
         // offset: currentPage,
         // limit: limit,
@@ -190,6 +212,8 @@ settextBox(hasEmptyText )
     // eslint-disable-next-line
   }, [result, taskId, AnnotationsTaskDetails]);
 
+
+
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
   //   dispatch(APITransport(apiObj));
@@ -222,9 +246,7 @@ settextBox(hasEmptyText )
   // }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
-    const sub = AnnotationsTaskDetails[0]?.result.map(
-      (item) => new Sub(item)
-    );
+    const sub = AnnotationsTaskDetails[0]?.result.map((item) => new Sub(item));
 
     // const newSub = cloneDeep(sub);
 
@@ -261,6 +283,8 @@ settextBox(hasEmptyText )
   useEffect(() => {
     getAnnotationsTaskData();
     getProjectDetails();
+    getTaskData();
+    localStorage.setItem("enableChitrlekhaUI", true);
   }, []);
 
   const getProjectDetails = () => {
@@ -270,9 +294,9 @@ settextBox(hasEmptyText )
 
   useEffect(() => {
     if (AnnotationsTaskDetails?.length > 0) {
-      setLoading(false);    }
+      setLoading(false);
+    }
   }, [AnnotationsTaskDetails]);
-
 
   const tasksComplete = (id) => {
     if (id) {
@@ -312,8 +336,8 @@ settextBox(hasEmptyText )
     });
     const resp = await res.json();
     if (res.ok) {
-      setNextData(resp)
-        tasksComplete(resp?.id || null);    
+      setNextData(resp);
+      tasksComplete(resp?.id || null);
     } else {
       setSnackbarInfo({
         open: true,
@@ -324,59 +348,71 @@ settextBox(hasEmptyText )
     setLoading(false);
   };
 
-
-  const handleAnnotationClick = async (value, id, lead_time,annotationNotesValue) => {
+  const handleAnnotationClick = async (
+    value,
+    id,
+    lead_time,
+    annotationNotesValue
+  ) => {
     setLoading(true);
-      const PatchAPIdata = {
+    const PatchAPIdata = {
       annotation_status: value,
       annotation_notes: annotationNotesValue,
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: result,
     };
-    const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
-    // dispatch(APITransport(GlossaryObj));
-    const res = await fetch(TaskObj.apiEndPoint(), {
-      method: "PATCH",
-      body: JSON.stringify(TaskObj.getBody()),
-      headers: TaskObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    if (res.ok) {
-      if (localStorage.getItem("labelAll") || value === "skipped") {
-        onNextAnnotation(resp.task);
-      }
-     
-      if(value === "labeled"){
-        if(textBox){
+    if(!textBox && !speakerBox){
+      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+      // dispatch(APITransport(GlossaryObj));
+      const res = await fetch(TaskObj.apiEndPoint(), {
+        method: "PATCH",
+        body: JSON.stringify(TaskObj.getBody()),
+        headers: TaskObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        if (localStorage.getItem("labelAll") || value === "skipped") {
+          onNextAnnotation(resp.task);
+        }
+  
+        if (value === "labeled") {
+            setSnackbarInfo({
+              open: true,
+              message: "Task successfully submitted",
+              variant: "success",
+            });
+          
+        } else if (value === "draft") {
           setSnackbarInfo({
             open: true,
-            message:"Please enter all the transcripts",
-            variant: "error",
-          });
-        }else{
-          setSnackbarInfo({
-            open: true,
-            message:"Task successfully submitted",
+            message: "Task saved as draft",
             variant: "success",
           });
         }
-       
-      }
-      else if(value === "draft"){
+      } else {
         setSnackbarInfo({
           open: true,
-          message:"Task saved as draft",
-          variant: "success",
+          message: "Error in saving annotation",
+          variant: "error",
         });
       }
-      
-    } else {
+    
+    }else{
+     if(textBox){
       setSnackbarInfo({
         open: true,
-        message: "Error in saving annotation",
+        message: "Please Enter All The Transcripts",
         variant: "error",
       });
+     }else{
+      setSnackbarInfo({
+        open: true,
+        message: "Please Select The Speaker",
+        variant: "error",
+      });
+     }
+        
     }
     setLoading(false);
   };
@@ -394,7 +430,7 @@ settextBox(hasEmptyText )
       />
     );
   };
- 
+
   return (
     <>
       {loading && <Spinner />}
@@ -405,50 +441,80 @@ settextBox(hasEmptyText )
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
-            {/* <Box
-              className={classes.videoNameBox}
-              // style={fullscreenVideo ? { width: "60%", margin: "auto" } : {}}
-            >
-              <Tooltip placement="bottom">
-                <Typography
-                  variant="h4"
-                  className={classes.videoName}
-                  // style={fullscreenVideo ? { color: "white" } : {}}
-                >
-                  Audio Name
-                </Typography>
-              </Tooltip>
-
-              <Tooltip title="Settings" placement="bottom">
-                <IconButton
-                  style={{
-                    backgroundColor: "#2C2799",
-                    borderRadius: "50%",
-                    color: "#fff",
-                    margin: "auto",
-                    "&:hover": {
-                      backgroundColor: "#271e4f",
-                    },
-                  }}
-                  // className={classes.settingsIconBtn}
-                  // onClick={(event) => setAnchorElSettings(event.currentTarget)}
-                >
-                  <WidgetsOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </Box> */}
             <AudioName />
-
-            {/* <VideoPanel
-        setCurrentTime={setCurrentTime}
-        setPlaying={setPlaying}
-      /> */}
+            <AnnotationStageButtons
+              handleAnnotationClick={handleAnnotationClick}
+              onNextAnnotation={onNextAnnotation}
+              annotationNotesValue={annotationNotesValue}
+              AnnotationsTaskDetails={AnnotationsTaskDetails}
+            />
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
               handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
+              AnnotationsTaskDetails={AnnotationsTaskDetails}
+              setAnnotationNotesValue={setAnnotationNotesValue}
             />
+
+            <Grid sx={{ml:3}}>
+            <Button
+              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              sx={{p:2}}
+              color={
+                reviewNotesValue !== null && reviewNotesValue !== ""
+                  ? "success"
+                  : "primary"
+              }
+              onClick={handleCollapseClick}
+            >
+              Notes
+              {reviewNotesValue !== null && reviewNotesValue !== "" && "*"}
+            </Button>
+            <div
+              className={classes.collapse}
+              style={{
+                display: showNotes ? "block" : "none",
+                paddingBottom: "16px",
+              }}
+            >
+              {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+              {translate("alert.notes")}
+          </Alert> */}
+              <TextField
+                multiline
+                placeholder="Place your remarks here ..."
+                label="Annotation Notes"
+                value={annotationNotesValue}
+                onChange={(event) =>
+                  setAnnotationNotesValue(event.target.value)
+                }
+                // inputRef={annotationNotesRef}
+                rows={1}
+                maxRows={3}
+                inputProps={{
+                  style: { fontSize: "1rem" },
+                }}
+                style={{ width: "99%" }}
+              />
+              <TextField
+                multiline
+                placeholder="Place your remarks here ..."
+                label="Review Notes"
+                value={reviewNotesValue}
+                // onChange={(event) => setReviewNotesValue(event.target.value)}
+                // inputRef={reviewNotesRef}
+                rows={1}
+                maxRows={3}
+                inputProps={{
+                  style: { fontSize: "1rem" },
+                  readOnly: true,
+                }}
+                style={{ width: "99%", marginTop: "2%" }}
+              />
+            </div>
+            </Grid>
           </Box>
         </Grid>
 

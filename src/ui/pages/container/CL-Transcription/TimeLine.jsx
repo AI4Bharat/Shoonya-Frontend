@@ -58,7 +58,6 @@ const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
   const player = useSelector((state) => state.commonReducer.player);
   const limit = useSelector((state) => state.commonReducer.limit);
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
-
   const [grabbing, setGrabbing] = useState(false);
 
   useEffect(() => {
@@ -263,7 +262,7 @@ const Timeline = ({ currentTime, playing }) => {
   const { taskId } = useParams();
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
-
+  const AnnotationStage = localStorage.getItem("Stage") === "annotation"
   const player = useSelector((state) => state.commonReducer.player);
   // const videoDetails = useSelector((state) => state.getVideoDetails.data);
   const AnnotationsTaskDetails = useSelector(
@@ -312,7 +311,7 @@ const Timeline = ({ currentTime, playing }) => {
   return (
     <Box className={classes.timeLineParent} ref={$footer}>
       {player &&
-        (AnnotationsTaskDetails[0]?.result ) && (
+        (AnnotationStage?AnnotationsTaskDetails[0]?.result:AnnotationsTaskDetails[1]?.result ) && (
           <>
             <Progress waveform={waveform} currentTime={currentTime} taskId={taskId} />
             <Duration currentTime={currentTime} />

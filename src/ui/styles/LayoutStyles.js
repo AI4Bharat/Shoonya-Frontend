@@ -33,7 +33,7 @@ const GlobalStyles = makeStyles({
     flexGrow: 1,
     zIndex: 1,
     position: "relative",
-    minHeight: "720px",
+    // minHeight: "720px",
     display: "flex",
     flexDirection: "column",
   },
