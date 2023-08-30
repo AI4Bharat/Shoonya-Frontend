@@ -1,0 +1,85 @@
+
+#root {
+    margin: 1rem 4rem;
+  }
+  
+  #root .ql-container {
+    background: #fefcfc;
+    margin-bottom: 1%;
+  
+  }
+
+  #root .ql-snow.ql-toolbar {
+    display: block;
+  }
+  .quill > .ql-container > .ql-editor.ql-blank::before{
+    font-family: sans-serif;
+    font-style: normal;
+}
+
+  
+  #root .ql-editor {
+    min-height: 4em;
+    font-size: 1rem;
+    font-style: normal;
+  }
+  #root .ql-formats button {
+    position: relative
+  }
+
+  #root .ql-formats button:hover:after,
+  #root .ql-formats button:active:after,
+  #root .ql-formats button:focus:after {
+      position: absolute;
+      background: black;
+      color: white;
+      padding: .2em;
+      border-radius: .5em;
+      left: -50%;
+      top: 100%;
+      width: max-content;
+      z-index: 1;
+      font-size: 0.7rem;
+  }
+
+  #root .ql-bold:hover:after,
+  #root .ql-bold:active:after,
+  #root .ql-bold:focus:after {
+     content: 'Bold Ctrl B';
+  }
+  #root .ql-italic:hover:after,
+  #root .ql-italic:active:after,
+  #root .ql-italic:focus:after {
+     content: 'Italic Ctrl I';
+  }
+  #root .ql-underline:hover:after,
+  #root .ql-underline:active:after,
+  #root .ql-underline:focus:after {
+     content: 'Underline Ctrl U';
+  }
+  #root .ql-strike:hover:after,
+  #root .ql-strike:active:after,
+  #root .ql-strike:focus:after {
+     content: 'StrikeThrough';
+  }
+  #root .ql-size:hover:after,
+  #root .ql-size:active:after,
+  #root .ql-size:focus:after {
+     content: 'Size';
+  }
+  #root .ql-script[value="sub"]:hover:after,
+  #root .ql-script:active:after,
+  #root .ql-script:focus:after {
+     content: 'SubScript';
+  }
+  #root .ql-script[value="super"]:hover:after,
+  #root .ql-script:active:after,
+  #root .ql-script:focus:after {
+     content: 'SuperScript';
+  }
+  #root .ql-color:hover:after,
+  #root .ql-color:active:after,
+  #root .ql-color:focus:after {
+     content: 'Color';
+  }
+  
