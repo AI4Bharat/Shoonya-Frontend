@@ -1,5 +1,9 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
+import { useQuill } from 'react-quilljs';
+import ReactQuill, { Quill } from 'react-quill';
+import "./editor.css"
+import 'quill/dist/quill.snow.css';
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -671,7 +675,7 @@ const LabelStudioWrapper = ({
       tasksComplete(res?.id || null);
     });
   };
-
+  const [value, setvalue] = useState();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -685,7 +689,7 @@ const LabelStudioWrapper = ({
     review_status.current = "rejected";
     lsfRef.current.store.submitAnnotation();
   };
-
+ 
   const handleAcceptClick = async (status) => {
     review_status.current = status;
     lsfRef.current.store.submitAnnotation();
@@ -914,6 +918,24 @@ export default function LSF() {
   });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
+  const modules = {
+    toolbar:[
+      
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    ]
+  };
+
+  const formats = [
+    'size',
+    'bold','italic','underline','strike',
+    'color','background',
+    'script']
+
+
+
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -1015,7 +1037,7 @@ export default function LSF() {
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            <TextField
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Review Notes"
@@ -1029,6 +1051,7 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
+              // ref={quillRef}
             />
 
             <TextField
@@ -1038,13 +1061,34 @@ export default function LSF() {
               // value={notesValue}
               // onChange={event=>setNotesValue(event.target.value)}
               inputRef={superCheckerNotesRef}
+              InputLabelProps={{
+                shrink: true,
+              }}
               rows={2}
               maxRows={4}
               inputProps={{
                 style: { fontSize: "1rem" },
               }}
               style={{ width: "99%", marginTop: "1%" }}
-            />
+              ref={quillRef}
+            /> */}
+            <ReactQuill
+              ref={reviewNotesRef}
+              modules={modules}
+              formats={formats}
+              bounds={"#roots"}
+              placeholder="Review Notes"
+              style={{ marginbottom: "1%", minHeight: "2rem" }}
+              readOnly={true}
+            ></ReactQuill>
+            <ReactQuill
+              ref={superCheckerNotesRef}
+              modules={modules}
+              bounds={"#roots"}
+              formats={formats}
+              placeholder="SuperChecker Notes"
+              style={{ marginbottom: "1%", minHeight: "2rem" }}
+            ></ReactQuill>
           </div>
           <Button
             variant="contained"

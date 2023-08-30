@@ -1,5 +1,9 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
+import { useQuill } from 'react-quilljs';
+import ReactQuill, { Quill } from 'react-quill';
+import "./editor.css"
+import 'quill/dist/quill.bubble.css';
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -46,6 +50,7 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
+
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -1122,10 +1127,29 @@ export default function LSF() {
   });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
+
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+ 
+  const modules = {
+    toolbar:[
+      
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    ]
+  };
 
+  const formats = [
+    'size',
+    'bold','italic','underline','strike',
+    'color',
+    'script']
+
+
+  const [value, setvalue] = useState();
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
       setSelectedTag(value);
@@ -1138,6 +1162,8 @@ export default function LSF() {
       });
     }
   };
+  
+
 
   useEffect(() => {
     if (
@@ -1167,6 +1193,7 @@ export default function LSF() {
     setShowNotes(false);
     reviewNotesRef.current.value = "";
   };
+  
 
   useEffect(() => {
     resetNotes();
@@ -1238,7 +1265,7 @@ export default function LSF() {
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            <TextField
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Annotation Notes"
@@ -1252,11 +1279,11 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
-            />
-            <TextField
+            // ref={quillRef}
+            /> */}
+            {/* <TextField
               multiline
-              placeholder="Place your remarks here ..."
-              label="Review Notes"
+              // placeholder="Review Notes"
               // value={notesValue}
               // onChange={event=>setNotesValue(event.target.value)}
               inputRef={reviewNotesRef}
@@ -1265,9 +1292,35 @@ export default function LSF() {
               inputProps={{
                 style: { fontSize: "1rem" },
               }}
-              style={{ width: "99%", marginTop: "1%" }}
-            />
-            <TextField
+              style={{ width: "100%",fontSize:"1rem"}}
+              ref={quillRef}
+            /> */}
+            <ReactQuill
+              ref={annotationNotesRef}
+              modules={modules}
+              bounds={"#roots"}
+              formats={formats}
+              placeholder="Annotation Notes"
+              readOnly={true}
+            ></ReactQuill>
+            <ReactQuill
+              ref={reviewNotesRef}
+              modules={modules}
+              bounds={"#roots"}
+              formats={formats}
+              placeholder="Review Notes"
+              style={{ marginbottom: "1%", minHeight: "2rem" }}
+            ></ReactQuill>
+            <ReactQuill
+              ref={superCheckerNotesRef}
+              modules={modules}
+              bounds={"#roots"}
+              formats={formats}
+              placeholder="SuperChecker Notes"
+              style={{ marginbottom: "1%", minHeight: "2rem" }}
+              readOnly={true}
+            ></ReactQuill>
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Super Checker Notes"
@@ -1281,7 +1334,8 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
-            />
+            // ref={quillRef}
+            /> */}
           </div>
           <Button
             variant="contained"

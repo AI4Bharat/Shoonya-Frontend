@@ -1,5 +1,9 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
+import { useQuill } from 'react-quilljs';
+import ReactQuill, { Quill } from 'react-quill';
+import "./editor.css"
+import 'quill/dist/quill.snow.css';
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -180,6 +184,7 @@ const LabelStudioWrapper = ({
     message: "",
     variant: "success",
   });
+
   const [taskData, setTaskData] = useState(undefined);
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
@@ -929,6 +934,23 @@ export default function LSF() {
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const modules = {
+    toolbar:[
+      
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    ]
+  };
+
+  const formats = [
+    'size',
+    'bold','italic','underline','strike',
+    'color','background',
+    'script']
+
+
 
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
@@ -942,6 +964,7 @@ export default function LSF() {
       });
     }
   };
+
 
   useEffect(() => {
     if (
@@ -1034,12 +1057,13 @@ export default function LSF() {
             style={{
               display: showNotes ? "block" : "none",
               paddingBottom: "16px",
+               
             }}
           >
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            <TextField
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Annotation Notes"
@@ -1052,8 +1076,10 @@ export default function LSF() {
                 style: { fontSize: "1rem" },
               }}
               style={{ width: "99%" }}
-            />
-            <TextField
+              ref={quillRef}
+            /> */}
+
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Review Notes"
@@ -1067,7 +1093,24 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
-            />
+              // ref={quillRef}
+            /> */}
+            <ReactQuill
+              ref={annotationNotesRef}
+              modules={modules}
+              formats={formats}
+              bounds={"#roots"}
+              placeholder="Annotation Notes"
+            ></ReactQuill>
+            <ReactQuill
+              ref={reviewNotesRef}
+              modules={modules}
+              formats={formats}
+              bounds={"#roots"}
+              placeholder="Review Notes"
+              style={{ marginbottom: "1%", minHeight: "2rem" }}
+              readOnly={true}
+            ></ReactQuill>
           </div>
           <Button
             variant="contained"
