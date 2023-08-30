@@ -12,7 +12,11 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
         onChange={(event) =>
           handleTimeChange(event.target.value, index, type, "hours")
         }
+<<<<<<< HEAD
         value={time.split(":")[0]}
+=======
+        value={time?.split(":")[0]}
+>>>>>>> CL-type-transcription
         onFocus={(event) => event.target.select()}
         className={classes.timeInputBox}
         style={{

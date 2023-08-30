@@ -88,14 +88,24 @@ import wsPeriodicalTasks from "./WorkspaceDetails/GetPeriodicalTasks";
 import wsTaskAnalytics from "./WorkspaceDetails/GetTaskAnalytics";
 import sendOrganizationUserReports from "./Organization/SendOrganizationUserReports";
 import sendWorkspaceUserReports from './WorkspaceDetails/SendWorkspaceUserReports';
+<<<<<<< HEAD
 import getScheduledMails from './UserManagement/GetScheduledMails';
 import createScheduledMails from './UserManagement/CreateScheduledMails';
 import updateScheduledMails from './UserManagement/UpdateScheduledMails';
 import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
+=======
+>>>>>>> CL-type-transcription
 import commonReducer from "./CL-Transcription/Common";
 import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
 import patchAnnotation from "./CL-Transcription/PatchAnnotation"
 
+<<<<<<< HEAD
+=======
+import getScheduledMails from './UserManagement/GetScheduledMails';
+import createScheduledMails from './UserManagement/CreateScheduledMails';
+import updateScheduledMails from './UserManagement/UpdateScheduledMails';
+import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
+>>>>>>> CL-type-transcription
 
 const index = {
     apiStatus,
@@ -191,14 +201,24 @@ const index = {
     wsTaskAnalytics,
     sendOrganizationUserReports,
     sendWorkspaceUserReports,
+<<<<<<< HEAD
+=======
+    commonReducer,
+    getAnnotationsTask,
+    patchAnnotation,
+    getnextProject,
+>>>>>>> CL-type-transcription
     getScheduledMails,
     createScheduledMails,
     updateScheduledMails,
     deleteScheduledMails,
     
+<<<<<<< HEAD
     commonReducer,
     getAnnotationsTask,
     patchAnnotation,
+=======
+>>>>>>> CL-type-transcription
 };
 
 export default index;
