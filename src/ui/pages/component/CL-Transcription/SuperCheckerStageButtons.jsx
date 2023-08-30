@@ -1,11 +1,4 @@
-import React, {
-  useRef,
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+import React from "react";
 import {
   Typography,
   Grid,
@@ -16,11 +9,6 @@ import {
   Menu,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import GetTaskAnnotationsAPI from "../../../../redux/actions/api/Tasks/GetTaskAnnotations";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import { useParams } from "react-router-dom";
-import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNextProject";
-import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { styled, alpha } from "@mui/material/styles";
 
@@ -70,7 +58,6 @@ const StyledMenu = styled((props) => (
 const SuperCheckerStageButtons = ({
   handleSuperCheckerClick,
   onNextAnnotation,
-  superCheckerNotesValue,
   AnnotationsTaskDetails,
   disableSkip,
   anchorEl,
@@ -78,7 +65,7 @@ const SuperCheckerStageButtons = ({
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
-  const { taskId } = useParams();
+ 
 
   const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
@@ -150,7 +137,6 @@ const SuperCheckerStageButtons = ({
                     "draft",
                     SuperChecker.id,
                     SuperChecker.lead_time,
-                    superCheckerNotesValue
                   )
                 }
                 style={{
@@ -199,7 +185,6 @@ const SuperCheckerStageButtons = ({
                     "skipped",
                     SuperChecker.id,
                     SuperChecker.lead_time,
-                    superCheckerNotesValue
                   )
                 }
                 style={{
@@ -228,7 +213,6 @@ const SuperCheckerStageButtons = ({
                     "rejected",
                     SuperChecker.id,
                     SuperChecker.lead_time,
-                    superCheckerNotesValue,
                     SuperChecker.parent_annotation
                   )
                 }
@@ -290,7 +274,6 @@ const SuperCheckerStageButtons = ({
                   "validated",
                   SuperChecker.id,
                   SuperChecker.lead_time,
-                  superCheckerNotesValue,
                   SuperChecker.parent_annotation
                 )
               }
@@ -304,7 +287,6 @@ const SuperCheckerStageButtons = ({
                   "validated_with_changes",
                   SuperChecker.id,
                   SuperChecker.lead_time,
-                  superCheckerNotesValue,
                   SuperChecker.parent_annotation
                 )
               }

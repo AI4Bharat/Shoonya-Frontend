@@ -82,18 +82,8 @@ const TranscriptionRightPanel = ({
     ?.organization?.id;
   const subtitles = useSelector((state) => state.commonReducer.subtitles);
   const player = useSelector((state) => state.commonReducer.player);
-  const totalPages = useSelector((state) => state.commonReducer.totalPages);
   const currentPage = useSelector((state) => state.commonReducer.currentPage);
-  const next = useSelector((state) => state.commonReducer.nextPage);
-  const previous = useSelector((state) => state.commonReducer.previousPage);
-  const completedCount = useSelector(
-    (state) => state.commonReducer.completedCount
-  );
 
-
-  // const transcriptPayload = useSelector(
-  //   (state) => state.getTranscriptPayload.data
-  // );
   const limit = useSelector((state) => state.commonReducer.limit);
   // const videoDetails = useSelector((state) => state.getVideoDetails.data);
   const [targetlang, settargetlang] = useState([]);
@@ -268,26 +258,12 @@ const TranscriptionRightPanel = ({
       setEnableTransliterationSuggestion(false);
 
       const textBeforeSlash = value.split("\\")[0];
-      const currentTargetWord = value.split("\\")[1].split("")[0];
       const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
-
-      // const tags = getTagsList(ProjectDetails.tgt_language);
-      // const filteredSuggestionByInput = Object.entries(tags).filter(([tag]) => {
-      //   return tag.toLowerCase().includes(currentTargetWord.toLowerCase());
-      // });
-
-      // const filteredSuggestions = Object.fromEntries(filteredSuggestionByInput);
 
       setCurrentSelectedIndex(index);
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutBackSlash(textBeforeSlash);
       setTextAfterBackSlash(textAfterSlash);
-
-      // if (TagsSuggestionList?.length > 0) {
-      //   setTagSuggestionList(TagsSuggestionList);
-      // } else {
-      //   setTagSuggestionList([]);
-      // }
     }
     const sub = onSubtitleChange(value, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -320,13 +296,7 @@ const TranscriptionRightPanel = ({
 
       setLoading(false);
 
-      // if (isFinal) {
-      //   setTimeout(() => {
-      //     navigate(
-      //       `/my-organization/${assignedOrgId}/project/${taskData?.project}`
-      //     );
-      //   }, 2000);
-      // }
+      
     } else {
       setLoading(false);
       setSnackbarInfo({

@@ -264,7 +264,6 @@ const Timeline = ({ currentTime, playing }) => {
   const classes = AudioTranscriptionLandingStyle();
   const AnnotationStage = localStorage.getItem("Stage") === "annotation"
   const player = useSelector((state) => state.commonReducer.player);
-  // const videoDetails = useSelector((state) => state.getVideoDetails.data);
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask.data
   );

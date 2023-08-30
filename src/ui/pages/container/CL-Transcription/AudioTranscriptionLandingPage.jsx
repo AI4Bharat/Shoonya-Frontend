@@ -28,7 +28,6 @@ import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
-import AudioName from "./AudioName";
 import Sub from "../../../../utils/Sub";
 import C from "../../../../redux/constants";
 import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
@@ -47,6 +46,8 @@ const AudioTranscriptionLandingPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let location = useLocation();
+  const annotationNotesRef = useRef(null);
+  const reviewNotesRef = useRef(null);
   const { projectId, taskId } = useParams();
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -58,7 +59,6 @@ const AudioTranscriptionLandingPage = () => {
   const [NextData, setNextData] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [reviewNotesValue, setReviewNotesValue] = useState(null);
-  const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
   const [annotations, setAnnotations] = useState([]);
   const [disableSkip, setdisableSkip] = useState(false);
@@ -217,11 +217,7 @@ const AudioTranscriptionLandingPage = () => {
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
-  useEffect(() => {
-    if (AnnotationsTaskDetails.length > 0) {
-      setReviewNotesValue(AnnotationsTaskDetails[0]?.review_notes);
-    }
-  }, [AnnotationsTaskDetails]);
+ 
 
   useEffect(() => {
     const hasEmptyText = result?.some((element) => element.text.trim() === "");
@@ -470,12 +466,11 @@ const AudioTranscriptionLandingPage = () => {
     value,
     id,
     lead_time,
-    annotationNotesValue
   ) => {
     setLoading(true);
     const PatchAPIdata = {
       annotation_status: value,
-      annotation_notes: annotationNotesValue,
+      annotation_notes: annotationNotesRef.current.value,
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: result,
@@ -533,6 +528,24 @@ const AudioTranscriptionLandingPage = () => {
     setShowNotes(false);
   };
 
+
+  useEffect(() => {
+      if (AnnotationsTaskDetails &&  AnnotationsTaskDetails.length > 0) {
+        annotationNotesRef.current.value = AnnotationsTaskDetails[0].annotation_notes ?? "";
+        reviewNotesRef.current.value = AnnotationsTaskDetails[0].review_notes ?? "";
+      }
+  }, [AnnotationsTaskDetails]);
+
+  const resetNotes = () => {
+    setShowNotes(false);
+    annotationNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
+  };
+
+  useEffect(() => {
+    resetNotes();
+  }, [taskId]);
+
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -572,11 +585,9 @@ const AudioTranscriptionLandingPage = () => {
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
-            <AudioName />
             <AnnotationStageButtons
               handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
-              annotationNotesValue={annotationNotesValue}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               disableBtns={disableBtns}
               disableUpdata={disableUpdata}
@@ -589,65 +600,62 @@ const AudioTranscriptionLandingPage = () => {
               handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
-              setAnnotationNotesValue={setAnnotationNotesValue}
             />
 
             <Grid sx={{ ml: 3 }}>
-              <Button
-                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-                variant="contained"
-                sx={{ p: 2 }}
-                color={
-                  reviewNotesValue !== null && reviewNotesValue !== ""
-                    ? "success"
-                    : "primary"
-                }
-                onClick={handleCollapseClick}
-              >
-                Notes
-                {reviewNotesValue !== null && reviewNotesValue !== "" && "*"}
-              </Button>
-              <div
-                className={classes.collapse}
-                style={{
-                  display: showNotes ? "block" : "none",
-                  paddingBottom: "16px",
-                }}
-              >
-                {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
-              {translate("alert.notes")}
-          </Alert> */}
-                <TextField
-                  multiline
-                  placeholder="Place your remarks here ..."
-                  label="Annotation Notes"
-                  value={annotationNotesValue}
-                  onChange={(event) =>
-                    setAnnotationNotesValue(event.target.value)
-                  }
-                  // inputRef={annotationNotesRef}
-                  rows={1}
-                  maxRows={3}
-                  inputProps={{
-                    style: { fontSize: "1rem" },
-                  }}
-                  style={{ width: "99%" }}
-                />
-                <TextField
-                  multiline
-                  placeholder="Place your remarks here ..."
-                  label="Review Notes"
-                  value={reviewNotesValue}
-                  // onChange={(event) => setReviewNotesValue(event.target.value)}
-                  // inputRef={reviewNotesRef}
-                  rows={1}
-                  maxRows={3}
-                  inputProps={{
-                    style: { fontSize: "1rem" },
-                    readOnly: true,
-                  }}
-                  style={{ width: "99%", marginTop: "2%" }}
-                />
+            <Button
+              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color={
+                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+              }
+              onClick={handleCollapseClick}
+            // style={{ marginBottom: "20px" }}
+            >
+              Notes {reviewNotesRef.current?.value !== "" && "*"}
+            </Button>
+          
+
+          <div
+              className={classes.collapse}    
+              style={{
+              display: showNotes ? "block" : "none",
+              paddingBottom: "16px",
+               
+            }}
+          >
+                 <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Annotation Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={annotationNotesRef}
+              rows={1}
+              maxRows={3}
+              inputProps={{
+                style: { fontSize: "1rem" },
+              }}
+              style={{ width: "99%" }}
+              // ref={quillRef}
+            />
+
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Review Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={reviewNotesRef}
+              rows={1}
+              maxRows={3}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+              // ref={quillRef}
+            />
               </div>
             </Grid>
           </Box>

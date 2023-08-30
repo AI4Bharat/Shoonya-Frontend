@@ -64,81 +64,29 @@ const SettingsButtonComponent = ({
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElLimit, setAnchorElLimit] = useState(null);
 
-  //   const taskData = useSelector((state) => state.getTaskDetails.data);
-  //   const transcriptPayload = useSelector(
-  //     (state) => state.getTranscriptPayload.data
-  //   );
-  //   const totalPages = useSelector((state) => state.commonReducer.totalPages);
-  //   const completedCount = useSelector(
-  //     (state) => state.commonReducer.completedCount
-  //   );
-  // const limit = useSelector((state) => state.commonReducer.limit);
-
-  //   const getDisbled = (flag) => {
-  //     if (
-  //       taskData?.task_type?.includes("VOICEOVER") &&
-  //       transcriptPayload?.source_type !== "MACHINE_GENERATED"
-  //     ) {
-  //       if (durationError?.some((item) => item === true)) {
-  //         return true;
-  //       }
-
-  //       if (flag && completedCount !== totalPages + 2) {
-  //         return true;
-  //       }
-  //     }
-
-  //     if (
-  //       !taskData?.task_type?.includes("VOICEOVER") &&
-  //       transcriptPayload?.source_type === "MACHINE_GENERATED"
-  //     ) {
-  //       if (!transcriptPayload?.payload?.payload.length) {
-  //         return true;
-  //       }
-  //     }
-
-  //     return false;
-  //   };
-
   return (
     <>
-      { showSplit && (
-      <Tooltip title="Split Subtitle" placement="bottom">
-        <IconButton
-          // className={classes.rightPanelBtnGrp}
-          sx={{
-            backgroundColor: "#2C2799",
-            borderRadius: "50%",
-             color:"#fff",
-            marginX: "5px",
-            marginRight: "5px",
-            "&.Mui-disabled": { backgroundColor: "lightgray" },
-            "&:hover": {
-              backgroundColor: "#271e4f",
-            },
-          }}
-          onClick={onSplitClick}
-          // disabled={!showPopOver}
-        >
-          <SplitscreenIcon />
-        </IconButton>
-      </Tooltip>
-     )} 
-      {/* 
-      {(taskData?.task_type?.includes("TRANSLATION_EDIT") ||
-        taskData?.task_type?.includes("VOICEOVER")) && (
-        <Tooltip title="Incorrect Subtitles Info" placement="bottom">
+      {showSplit && (
+        <Tooltip title="Split Subtitle" placement="bottom">
           <IconButton
-            className={classes.rightPanelBtnGrp}
-            onClick={handleInfoButtonClick}
             sx={{
+              backgroundColor: "#2C2799",
+              borderRadius: "50%",
+              color: "#fff",
+              marginX: "5px",
               marginRight: "5px",
+              "&.Mui-disabled": { backgroundColor: "lightgray" },
+              "&:hover": {
+                backgroundColor: "#271e4f",
+              },
             }}
+            onClick={onSplitClick}
+            // disabled={!showPopOver}
           >
-            <InfoOutlinedIcon />
+            <SplitscreenIcon />
           </IconButton>
         </Tooltip>
-      )} */}
+      )}
 
       <Tooltip title="Settings" placement="bottom">
         <IconButton
@@ -288,63 +236,11 @@ const SettingsButtonComponent = ({
         ))}
       </Menu>
 
-      {/* <FindAndReplace
-        subtitleDataKey={
-          taskData?.task_type?.includes("TRANSLATION") ? "target_text" : "text"
-        }
-        taskType={taskData?.task_type}
-      /> */}
-
       <Divider
         orientation="vertical"
         style={{ border: "1px solid grey", height: "auto", margin: "0 5px" }}
       />
 
-      {/* <Tooltip title="Save" placement="bottom">
-        <IconButton
-          style={{
-            backgroundColor: "#2C2799",
-            borderRadius: "50%",
-            color: "#fff",
-            marginX: "5px",
-            "&:hover": {
-              backgroundColor: "#271e4f",
-            },
-          }}
-          className={classes.rightPanelBtnGrp}
-          //   disabled={getDisbled()}
-          onClick={() => saveTranscriptHandler(false)}
-        >
-          <SaveIcon />
-        </IconButton>
-      </Tooltip> */}
-
-      {/* <Tooltip title="Complete" placement="bottom">
-        <IconButton
-          style={{
-            backgroundColor: "#2C2799",
-            borderRadius: "50%",
-            color: "#fff",
-            marginX: "5px",
-            "&:hover": {
-              backgroundColor: "#271e4f",
-            },
-          }}
-          className={classes.rightPanelBtnGrp}
-          sx={{ marginLeft: "5px" }}
-          //   disabled={getDisbled("complete")}
-            onClick={() => setOpenConfirmDialog(true)}
-        >
-          <VerifiedIcon />
-        </IconButton>
-      </Tooltip> */}
-
-      {/* <Divider
-        orientation="vertical"
-        style={{ border: "1px solid grey", height: "auto", margin: "0 5px" }}
-      /> */}
-
-      {/* {!taskData?.task_type?.includes("VOICEOVER") && ( */}
       <Tooltip title="Undo" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
@@ -363,9 +259,7 @@ const SettingsButtonComponent = ({
           <UndoIcon />
         </IconButton>
       </Tooltip>
-      {/* )} */}
 
-      {/* {!taskData?.task_type?.includes("VOICEOVER") && ( */}
       <Tooltip title="Redo" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
@@ -374,19 +268,17 @@ const SettingsButtonComponent = ({
             borderRadius: "50%",
             color: "#fff",
             marginX: "5px",
-            marginLeft: "5px" ,
+            marginLeft: "5px",
             "&:hover": {
               backgroundColor: "#271e4f",
             },
           }}
-         
           onClick={onRedo}
           disabled={redoStack?.length === 0}
         >
           <RedoIcon />
         </IconButton>
       </Tooltip>
-      {/* )} */}
     </>
   );
 };

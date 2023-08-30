@@ -1,13 +1,5 @@
-import React, {
-  useRef,
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+import React from "react";
 import {
-  Typography,
   Grid,
   Tooltip,
   Button,
@@ -15,12 +7,8 @@ import {
   MenuItem,
   Menu,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import GetTaskAnnotationsAPI from "../../../../redux/actions/api/Tasks/GetTaskAnnotations";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNextProject";
-import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { styled, alpha } from "@mui/material/styles";
 
@@ -70,7 +58,6 @@ const StyledMenu = styled((props) => (
 const ReviewStageButtons = ({
   handleReviewClick,
   onNextAnnotation,
-  reviewNotesValue,
   AnnotationsTaskDetails,
   disableSkip,
   disableBtns,
@@ -81,9 +68,9 @@ const ReviewStageButtons = ({
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const { taskId } = useParams();
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
-  const user = useSelector((state) => state.fetchLoggedInUserData.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
+  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
+  const user = useSelector((state) => state.fetchLoggedInUserData?.data);
+  const getNextTask = useSelector((state) => state.getnextProject?.data);
 
   const open = Boolean(anchorEl);
 
@@ -97,10 +84,12 @@ const ReviewStageButtons = ({
   let review = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 2
   )[0];
+  console.log(review?.parent_annotation
+    ,"reviewreview")
 
   return (
     <>
-      <Grid container spacing={1} sx={{ mt: 4, mb: 5, ml: 3 }}>
+      <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
         {!disableBtns && TaskDetails?.review_user === user?.id && (
           <Grid item>
             <Tooltip title="Save task for later">
@@ -113,7 +102,6 @@ const ReviewStageButtons = ({
                     "draft",
                     review.id,
                     review.lead_time,
-                    reviewNotesValue
                   )
                 }
                 style={{
@@ -163,7 +151,6 @@ const ReviewStageButtons = ({
                     "skipped",
                     review.id,
                     review.lead_time,
-                    reviewNotesValue
                   )
                 }
                 style={{
@@ -192,10 +179,9 @@ const ReviewStageButtons = ({
                   onClick={() =>
                     handleReviewClick(
                       "to_be_revised",
-                      review.id,
-                      review.lead_time,
-                      reviewNotesValue,
-                      review.parent_annotation
+                      review?.id,
+                      review?.lead_time,
+                      review?.parent_annotation,
                     )
                   }
                   style={{
@@ -250,8 +236,7 @@ const ReviewStageButtons = ({
                   "accepted",
                   review.id,
                   AnnotationsTaskDetails[1]?.lead_time,
-                  reviewNotesValue,
-                  review.parent_annotation
+                  review?.parent_annotation,
                 )
               }
               disableRipple
@@ -264,8 +249,7 @@ const ReviewStageButtons = ({
                   "accepted_with_minor_changes",
                   review.id,
                   review.lead_time,
-                  reviewNotesValue,
-                  review.parent_annotation
+                  review?.parent_annotation
                 )
               }
               disableRipple
@@ -278,8 +262,7 @@ const ReviewStageButtons = ({
                   "accepted_with_major_changes",
                   review.id,
                   review.lead_time,
-                  reviewNotesValue,
-                  review.parent_annotation
+                  review?.parent_annotation,
                 )
               }
               disableRipple
@@ -290,7 +273,7 @@ const ReviewStageButtons = ({
         </Grid>
       </Grid>
       {filterMessage && (
-        <Alert severity="info" sx={{ mb: 3 }}>
+        <Alert severity="info" sx={{ ml:2,mb: 2,width:"95%" }}>
           {filterMessage}
         </Alert>
       )}

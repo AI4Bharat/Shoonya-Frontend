@@ -28,7 +28,6 @@ import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
-import AudioName from "./AudioName";
 import Sub from "../../../../utils/Sub";
 import C from "../../../../redux/constants";
 import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
@@ -59,8 +58,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [annotations, setAnnotations] = useState([]);
   const [disableSkip, setdisableSkip] = useState(false);
-  const [reviewNotesValue, setReviewNotesValue] = useState(null);
-  const [superCheckerNotesValue, setsuperCheckerNotesValue] = useState(null);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -85,15 +82,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const timeSpentIntervalRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
-  const resetNotes = () => {
-    setShowNotes(false);
-    setReviewNotesValue("");
-    setsuperCheckerNotesValue("");
-  };
 
-  useEffect(() => {
-    resetNotes();
-  }, [taskId]);
 
   // useEffect(() => {
   //   let intervalId;
@@ -170,10 +159,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
-  useEffect(() => {
-    if (AnnotationsTaskDetails.length > 0)
-      setReviewNotesValue(AnnotationsTaskDetails[1]?.review_notes);
-  }, [AnnotationsTaskDetails]);
+
 
   useEffect(() => {
     const hasEmptyText = result?.some((element) => element.text.trim() === "");
@@ -366,7 +352,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    getAnnotationsTaskData();
     if (AnnotationsTaskDetails?.length > 0) {
       setLoading(false);
     }
@@ -437,8 +422,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     value,
     id,
     lead_time,
+    parentannotation,
     reviewNotesValue,
-    parentannotation
   ) => {
     setLoading(true);
     const PatchAPIdata = {
@@ -508,6 +493,67 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setAnchorEl(null);
   };
 
+
+  const setNotes = (taskData, annotations) => {
+    if (annotations && annotations.length > 0) {
+      let userAnnotation = annotations.find(
+        (annotation) =>
+          annotation.completed_by === userData.id &&
+          annotation.annotation_type === 3
+      );
+      if (userAnnotation) {
+        let reviewAnnotation = annotations.find(
+          (annotation) => annotation.id === userAnnotation.parent_annotation
+        );
+        reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
+        superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
+      } else {
+        let reviewerAnnotations = annotations.filter(
+          (value) => value.annotation_type === 2
+        );
+        if (reviewerAnnotations.length > 0) {
+          let correctAnnotation = reviewerAnnotations.find(
+            (annotation) => annotation.id === taskData.correct_annotation
+          );
+
+          if (correctAnnotation) {
+            let superCheckerAnnotation = annotations.find(
+              (annotation) =>
+                annotation.parent_annotation === correctAnnotation.id
+            );
+            reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
+            superCheckerNotesRef.current.value =
+              superCheckerAnnotation.supercheck_notes ?? "";
+          } else {
+            let superCheckerAnnotation = annotations.find(
+              (annotation) =>
+                annotation.parent_annotation === reviewerAnnotations[0].id
+            );
+            reviewNotesRef.current.value =
+              reviewerAnnotations[0].review_notes ?? "";
+            superCheckerNotesRef.current.value =
+              superCheckerAnnotation[0].supercheck_notes ?? "";
+          }
+        }
+      }
+    }
+  };
+
+  useEffect(()=>{
+    setNotes(TaskDetails, AnnotationsTaskDetails);
+
+  },[TaskDetails, AnnotationsTaskDetails]);
+
+  const resetNotes = () => {
+    setShowNotes(false);
+    superCheckerNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
+  };
+
+  useEffect(() => {
+    resetNotes();
+  }, [taskId]);
+
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -547,11 +593,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
-            <AudioName />
             <SuperCheckerStageButtons
               handleSuperCheckerClick={handleSuperCheckerClick}
               onNextAnnotation={onNextAnnotation}
-              superCheckerNotesValue={superCheckerNotesValue}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               disableSkip={disableSkip}
               anchorEl={anchorEl}
@@ -565,62 +609,61 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
             />
             <Grid sx={{ ml: 3 }}>
-              <Button
-                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-                variant="contained"
-                color={
-                  reviewNotesValue !== null && reviewNotesValue !== ""
-                    ? "success"
-                    : "primary"
-                }
-                onClick={handleCollapseClick}
-              >
-                Notes{" "}
-                {reviewNotesValue !== null && reviewNotesValue !== "" && "*"}
-              </Button>
-
-              <div
-                className={classes.collapse}
-                style={{
-                  display: showNotes ? "block" : "none",
-                  paddingBottom: "16px",
-                }}
-              >
-                {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+            <Button
+              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color={
+                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+              }
+              onClick={handleCollapseClick}
+            >
+              Notes {reviewNotesRef.current?.value !== "" && "*"}
+            </Button>
+        
+          <div
+            className={classes.collapse}    
+            style={{
+              display: showNotes ? "block" : "none",
+              paddingBottom: "16px",
+            }}
+          >
+            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-                <TextField
-                  multiline
-                  placeholder="Place your remarks here ..."
-                  label="Review Notes"
-                  value={reviewNotesValue}
-                  onChange={(event) => setReviewNotesValue(event.target.value)}
-                  inputRef={reviewNotesRef}
-                  rows={1}
-                  maxRows={3}
-                  inputProps={{
-                    style: { fontSize: "1rem" },
-                    readOnly: true,
-                  }}
-                  style={{ width: "99%", marginTop: "1%" }}
-                />
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Review Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={reviewNotesRef}
+              rows={1}
+              maxRows={3}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+              // ref={quillRef}
+            />
 
-                <TextField
-                  multiline
-                  placeholder="Place your remarks here ..."
-                  label="Super Checker Notes"
-                  value={superCheckerNotesValue}
-                  onChange={(event) =>
-                    setsuperCheckerNotesValue(event.target.value)
-                  }
-                  // inputRef={superCheckerNotesRef}
-                  rows={1}
-                  maxRows={3}
-                  inputProps={{
-                    style: { fontSize: "1rem" },
-                  }}
-                  style={{ width: "99%", marginTop: "1%" }}
-                />
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Super Checker Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={superCheckerNotesRef}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              rows={1}
+              maxRows={3}
+              inputProps={{
+                style: { fontSize: "1rem" },
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            />
               </div>
             </Grid>
           </Box>

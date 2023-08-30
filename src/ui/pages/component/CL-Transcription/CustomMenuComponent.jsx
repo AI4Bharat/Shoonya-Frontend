@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { fontMenu, playbackSpeed, themeMenu, placementMenu } from "../../../../utils/SubTitlesUtils";
+import {
+  fontMenu,
+  playbackSpeed,
+  themeMenu,
+  placementMenu,
+} from "../../../../utils/SubTitlesUtils";
 
 //Components
 import { Menu, MenuItem, Typography } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import CheckIcon from "@mui/icons-material/Check";
 
-const CustomMenuComponent = ({
-  anchorElSettings,
-  handleClose,
-  contianer,
-}) => {
+const CustomMenuComponent = ({ anchorElSettings, handleClose, contianer }) => {
   const player = useSelector((state) => state.commonReducer.player);
 
   const [anchorElFonts, setAnchorElFonts] = useState(null);
@@ -20,12 +21,10 @@ const CustomMenuComponent = ({
   const [anchorElPlacement, setAnchorElPlacement] = useState(null);
 
   const settingsMenu = [
-
     {
       label: "Playback Speed",
       onClick: (event) => setAnchorElPlayback(event.currentTarget),
     },
-    
   ];
 
   return (
@@ -65,7 +64,6 @@ const CustomMenuComponent = ({
         ))}
       </Menu>
 
-     
       <Menu
         id="menu-appbar"
         anchorEl={anchorElPlayback}
@@ -106,10 +104,6 @@ const CustomMenuComponent = ({
           </MenuItem>
         ))}
       </Menu>
-
-    
-
-   
     </>
   );
 };
