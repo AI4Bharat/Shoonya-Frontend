@@ -24,7 +24,7 @@ import {
 // import "../../../styles/scrollbarStyle.css";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import LanguageCode from "../../../../utils/LanguageCode";
-import {TabsSuggestionData }from "../../../../utils/TabsSuggestionData/TabsSuggestionData"
+import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 
 //Components
 import {
@@ -54,13 +54,11 @@ import TagsSuggestionList from "../../component/CL-Transcription/TagsSuggestionL
 // import SettingsButtonComponent from "./components/SettingsButtonComponent";
 
 //APIs
-import {
-  setSubtitles,
-} from "../../../../redux/actions/Common";
+import { setSubtitles } from "../../../../redux/actions/Common";
 import C from "../../../../redux/constants";
 import SettingsButtonComponent from "../../component/CL-Transcription/SettingsButtonComponent";
 import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
 // import {
 //   APITransport,
 //   FetchTranscriptPayloadAPI,
@@ -68,7 +66,11 @@ import CustomizedSnackbars from "../../component/common/Snackbar"
 //   setSubtitles,
 // } from "redux/actions";
 
-const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,ProjectDetails}) => {
+const TranscriptionRightPanel = ({
+  currentIndex,
+  AnnotationsTaskDetails,
+  ProjectDetails,
+}) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
   const navigate = useNavigate();
@@ -88,6 +90,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
     (state) => state.commonReducer.completedCount
   );
 
+
   // const transcriptPayload = useSelector(
   //   (state) => state.getTranscriptPayload.data
   // );
@@ -96,7 +99,6 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const [targetlang, settargetlang] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
-  
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -104,10 +106,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   console.log(subtitles);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentPageData = subtitles?.slice(
-    startIndex,
-    endIndex
-  );
+  const currentPageData = subtitles?.slice(startIndex, endIndex);
 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -135,29 +134,30 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const [textAfterBackSlash, setTextAfterBackSlash] = useState("");
   const [enableTransliterationSuggestion, setEnableTransliterationSuggestion] =
     useState(true);
-    const [taskData, setTaskData] = useState([]);
-    const AnnotationStage = localStorage.getItem("Stage") === "annotation"
-    const SuperCheckerStage = localStorage.getItem("SuperCheckerStage") === "superChecker"
-    const TaskDetails = useSelector((state) => state.getTaskDetails.data);
+  const [taskData, setTaskData] = useState([]);
+  const AnnotationStage = localStorage.getItem("Stage") === "annotation";
+  const SuperCheckerStage =
+    localStorage.getItem("SuperCheckerStage") === "superChecker";
+  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
 
-    useEffect(()=>{
-      if(AnnotationStage){
-        let Annotation = AnnotationsTaskDetails.filter(
-          (annotation) => annotation.annotation_type === 1
-        )[0]
-        setTaskData(Annotation)
-      }else if(SuperCheckerStage){
-        let superchecker = AnnotationsTaskDetails.filter(
-          (annotation) => annotation.annotation_type === 3
-        )[0]
-        setTaskData(superchecker)
-       } else{
-        let review = AnnotationsTaskDetails.filter(
-          (annotation) => annotation.annotation_type === 2
-        )[0]
-        setTaskData(review)
-      }
-     },[AnnotationsTaskDetails])
+  useEffect(() => {
+    if (AnnotationStage) {
+      let Annotation = AnnotationsTaskDetails.filter(
+        (annotation) => annotation.annotation_type === 1
+      )[0];
+      setTaskData(Annotation);
+    } else if (SuperCheckerStage) {
+      let superchecker = AnnotationsTaskDetails.filter(
+        (annotation) => annotation.annotation_type === 3
+      )[0];
+      setTaskData(superchecker);
+    } else {
+      let review = AnnotationsTaskDetails.filter(
+        (annotation) => annotation.annotation_type === 2
+      )[0];
+      setTaskData(review);
+    }
+  }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
     if (TaskDetails) {
@@ -168,7 +168,6 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
       // setShowSpeakerIdDropdown(videoDetails?.video?.multiple_speaker);
     }
   }, [TaskDetails]);
-  
 
   useEffect(() => {
     if (currentPage) {
@@ -185,7 +184,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
 
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
-      taskId,
+      taskId
       // taskData.task_type,
       // offset,
       // lim
@@ -203,7 +202,6 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
     getPayload(currentOffset, limit);
     // eslint-disable-next-line
   }, [limit, currentOffset]);
-  
 
   const onMergeClick = useCallback(
     (index) => {
@@ -272,7 +270,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
       const textBeforeSlash = value.split("\\")[0];
       const currentTargetWord = value.split("\\")[1].split("")[0];
       const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
-      
+
       // const tags = getTagsList(ProjectDetails.tgt_language);
       // const filteredSuggestionByInput = Object.entries(tags).filter(([tag]) => {
       //   return tag.toLowerCase().includes(currentTargetWord.toLowerCase());
@@ -285,8 +283,6 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
       setTextWithoutBackSlash(textBeforeSlash);
       setTextAfterBackSlash(textAfterSlash);
 
-
-
       // if (TagsSuggestionList?.length > 0) {
       //   setTagSuggestionList(TagsSuggestionList);
       // } else {
@@ -298,50 +294,48 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
     // saveTranscriptHandler(false, false, sub);
   };
 
-
-  const saveTranscriptHandler = async (isFinal,   subtitles ) => {
+  const saveTranscriptHandler = async (isFinal, subtitles) => {
     setLoading(true);
-  
+
     const reqBody = {
       task_id: taskId,
-      annotation_status:  taskData?.annotation_status,
+      annotation_status: taskData?.annotation_status,
       // offset: currentOffset,
       // limit: limit,
-      result:[ {subtitles ,
-      }],
+      result: [{ subtitles }],
     };
-  const obj = new SaveTranscriptAPI(taskData?.id,reqBody);
-  const res = await fetch(obj.apiEndPoint(), {
-    method: "PATCH",
-    body: JSON.stringify(obj.getBody()),
-    headers: obj.getHeaders().headers,
-  });
-  const resp = await res.json();
-  if (res.ok) {
-    setSnackbarInfo({
-      open: true,
-      message: resp?.message,
-      variant: "success",
+    const obj = new SaveTranscriptAPI(taskData?.id, reqBody);
+    const res = await fetch(obj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(obj.getBody()),
+      headers: obj.getHeaders().headers,
     });
+    const resp = await res.json();
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    // if (isFinal) {
-    //   setTimeout(() => {
-    //     navigate(
-    //       `/my-organization/${assignedOrgId}/project/${taskData?.project}`
-    //     );
-    //   }, 2000);
-    // }
-  } else {
-    setLoading(false);
-    setSnackbarInfo({
-      open: true,
-      message: "Failed",
-      variant: "error",
-    });
-  }
-};
+      // if (isFinal) {
+      //   setTimeout(() => {
+      //     navigate(
+      //       `/my-organization/${assignedOrgId}/project/${taskData?.project}`
+      //     );
+      //   }, 2000);
+      // }
+    } else {
+      setLoading(false);
+      setSnackbarInfo({
+        open: true,
+        message: "Failed",
+        variant: "error",
+      });
+    }
+  };
 
   const renderSnackBar = () => {
     return (
@@ -456,201 +450,204 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
     // saveTranscriptHandler(false, false, sub);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     const language = LanguageCode.languages;
 
-    if (ProjectDetails ) {
+    if (ProjectDetails) {
       const filtereddata = language.filter(
         (el) => el.label === ProjectDetails?.tgt_language
       );
       settargetlang(filtereddata[0]?.code);
     }
-  },[ProjectDetails])
+  }, [ProjectDetails]);
 
   return (
-    
-    <>  {renderSnackBar()}
-    <Grid sx={{ margin: 0 }}>
-      <Box
-        className={classes.rightPanelParentBox}
-        style={{ position: "relative" }}
-      >
-        <Grid className={classes.rightPanelParentGrid}>
-          <SettingsButtonComponent
-            setTransliteration={setTransliteration}
-            enableTransliteration={enableTransliteration}
-            setRTL_Typing={setRTL_Typing}
-            enableRTL_Typing={enableRTL_Typing}
-            setFontSize={setFontSize}
-            fontSize={fontSize}
-            saveTranscriptHandler={saveTranscriptHandler}
-            setOpenConfirmDialog={setOpenConfirmDialog}
-            onUndo={onUndo}
-            onRedo={onRedo}
-            undoStack={undoStack}
-            redoStack={redoStack}
-            onSplitClick={onSplitClick}
-            showPopOver={showPopOver}
-            showSplit={true}
-          />
-        </Grid>
-      </Box>
+    <>
+      {" "}
+      {renderSnackBar()}
+      <Grid sx={{ margin: 0 }}>
+        <Box
+          className={classes.rightPanelParentBox}
+          style={{ position: "relative" }}
+        >
+          <Grid className={classes.rightPanelParentGrid}>
+            <SettingsButtonComponent
+              setTransliteration={setTransliteration}
+              enableTransliteration={enableTransliteration}
+              setRTL_Typing={setRTL_Typing}
+              enableRTL_Typing={enableRTL_Typing}
+              setFontSize={setFontSize}
+              fontSize={fontSize}
+              saveTranscriptHandler={saveTranscriptHandler}
+              setOpenConfirmDialog={setOpenConfirmDialog}
+              onUndo={onUndo}
+              onRedo={onRedo}
+              undoStack={undoStack}
+              redoStack={redoStack}
+              onSplitClick={onSplitClick}
+              showPopOver={showPopOver}
+              showSplit={true}
+            />
+          </Grid>
+        </Box>
 
-      <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
-        {currentPageData?.map((item, index) => {
-          return (
-            <Box
-              key={index}
-              id={`sub_${index}`}
-              style={{
-                padding: "16px",
-                borderBottom: "1px solid lightgray",
-                backgroundColor:
-                  index % 2 === 0 ? "rgb(214, 238, 255)" : "rgb(233, 247, 239)",
-              }}
-            >
-              <Box className={classes.topBox}>
-                <TimeBoxes
-                  handleTimeChange={handleTimeChange}
-                  time={item.start_time}
-                  index={index}
-                  type={"startTime"}
-                />
-
-                <ButtonComponent
-                index={index}
-                lastItem={index < subtitles?.length - 1}
-                onMergeClick={onMergeClick}
-                onDelete={onDelete}
-                addNewSubtitleBox={addNewSubtitleBox}
-                />
-
-                <TimeBoxes
-                  handleTimeChange={handleTimeChange}
-                  time={item.end_time}
-                  index={index}
-                  type={"endTime"}
-                />
-              </Box>
-
-              <CardContent
-                className={classes.cardContent}
-                aria-describedby={"suggestionList"}
-                onClick={() => {
-                  if (player) {
-                    player.pause();
-                    if (player.duration >= item.startTime) {
-                      player.currentTime = item.startTime + 0.001;
-                    }
-                  }
+        <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
+          {currentPageData?.map((item, index) => {
+            return (
+              <Box
+                key={index}
+                id={`sub_${index}`}
+                style={{
+                  padding: "16px",
+                  borderBottom: "1px solid lightgray",
+                  backgroundColor:
+                    index % 2 === 0
+                      ? "rgb(214, 238, 255)"
+                      : "rgb(233, 247, 239)",
                 }}
               >
-           {ProjectDetails?.tgt_language !== "en" && enableTransliteration ? (
-          <IndicTransliterate
-            lang={targetlang}
-            value={item.text}
-            onChange={(event) => {
-              changeTranscriptHandler(event, index);
-            }}
-            enabled={enableTransliterationSuggestion}
-            onChangeText={() => {}}
-            onMouseUp={(e) => onMouseUp(e, index)}
-            containerStyles={{}}
-            onBlur={() =>
-              setTimeout(() => {
-                setShowPopOver(false);
-              }, 200)
-            }
-            renderComponent={(props) => (
-              <div className={classes.relative}>
-                <textarea
-                  className={`${classes.customTextarea} ${
-                    currentIndex === index ? classes.boxHighlight : ""
-                  }`}
-                  dir={enableRTL_Typing ? "rtl" : "ltr"}
-                  rows={4}
-                  onMouseUp={(e) => onMouseUp(e, index)}
-                  onBlur={() =>
-                    setTimeout(() => {
-                      setShowPopOver(false);
-                    }, 200)
-                  }
-                  style={{ fontSize: fontSize, height: "120px" }}
-                  {...props}
-                />
-                {/* <span id="charNum" className={classes.wordCount}>
-                  {targetLength(index)}
-                </span> */}
-              </div>
-            )}
-          />
-        ) : ( 
-                <div className={classes.relative}>
-                  <textarea
+                <Box className={classes.topBox}>
+                  <TimeBoxes
+                    handleTimeChange={handleTimeChange}
+                    time={item.start_time}
+                    index={index}
+                    type={"startTime"}
+                  />
+
+                  <ButtonComponent
+                    index={index}
+                    lastItem={index < subtitles?.length - 1}
+                    onMergeClick={onMergeClick}
+                    onDelete={onDelete}
+                    addNewSubtitleBox={addNewSubtitleBox}
+                  />
+
+                  <TimeBoxes
+                    handleTimeChange={handleTimeChange}
+                    time={item.end_time}
+                    index={index}
+                    type={"endTime"}
+                  />
+                </Box>
+
+                <CardContent
+                  className={classes.cardContent}
+                  aria-describedby={"suggestionList"}
+                  onClick={() => {
+                    if (player) {
+                      player.pause();
+                      if (player.duration >= item.startTime) {
+                        player.currentTime = item.startTime + 0.001;
+                      }
+                    }
+                  }}
+                >
+                  {ProjectDetails?.tgt_language !== "en" &&
+                  enableTransliteration ? (
+                    <IndicTransliterate
+                      lang={targetlang}
+                      value={item.text}
                       onChange={(event) => {
                         changeTranscriptHandler(event, index);
                       }}
+                      enabled={enableTransliterationSuggestion}
+                      onChangeText={() => {}}
                       onMouseUp={(e) => onMouseUp(e, index)}
-                    value={item.text}
-                      dir={enableRTL_Typing ? "rtl" : "ltr"}
-                    className={`${classes.customTextarea} ${
-                      currentIndex === index ? classes.boxHighlight : ""
-                    }`}
-                    // className={classes.customTextarea}
-                    style={{
-                      fontSize: fontSize,
-                      height: "120px",
-                    }}
-                    rows={4}
-                    onBlur={() =>
-                      setTimeout(() => {
+                      containerStyles={{}}
+                      onBlur={() =>
+                        setTimeout(() => {
                           setShowPopOver(false);
-                      }, 200)
-                    }
-                  />
-                  {/* <span id="charNum" className={classes.wordCount}>
+                        }, 200)
+                      }
+                      renderComponent={(props) => (
+                        <div className={classes.relative}>
+                          <textarea
+                            className={`${classes.customTextarea} ${
+                              currentIndex === index ? classes.boxHighlight : ""
+                            }`}
+                            dir={enableRTL_Typing ? "rtl" : "ltr"}
+                            rows={4}
+                            onMouseUp={(e) => onMouseUp(e, index)}
+                            onBlur={() =>
+                              setTimeout(() => {
+                                setShowPopOver(false);
+                              }, 200)
+                            }
+                            style={{ fontSize: fontSize, height: "120px" }}
+                            {...props}
+                          />
+                          {/* <span id="charNum" className={classes.wordCount}>
+                  {targetLength(index)}
+                </span> */}
+                        </div>
+                      )}
+                    />
+                  ) : (
+                    <div className={classes.relative}>
+                      <textarea
+                        onChange={(event) => {
+                          changeTranscriptHandler(event, index);
+                        }}
+                        onMouseUp={(e) => onMouseUp(e, index)}
+                        value={item.text}
+                        dir={enableRTL_Typing ? "rtl" : "ltr"}
+                        className={`${classes.customTextarea} ${
+                          currentIndex === index ? classes.boxHighlight : ""
+                        }`}
+                        // className={classes.customTextarea}
+                        style={{
+                          fontSize: fontSize,
+                          height: "120px",
+                        }}
+                        rows={4}
+                        onBlur={() =>
+                          setTimeout(() => {
+                            setShowPopOver(false);
+                          }, 200)
+                        }
+                      />
+                      {/* <span id="charNum" className={classes.wordCount}>
                     {targetLength(index)}
                   </span> */}
-                </div>
-                 )} 
-              </CardContent>
+                    </div>
+                  )}
+                </CardContent>
 
-                  <FormControl
-                    sx={{ width: "50%", mr: "auto", float: "left" }}
-                    size="small"
+                <FormControl
+                  sx={{ width: "50%", mr: "auto", float: "left" }}
+                  size="small"
+                >
+                  <InputLabel id="select-speaker">Select Speaker</InputLabel>
+                  <Select
+                    fullWidth
+                    labelId="select-speaker"
+                    label="Select Speaker"
+                    value={item.speaker_id}
+                    onChange={(event) =>
+                      handleSpeakerChange(event.target.value, index)
+                    }
+                    style={{
+                      backgroundColor: "#fff",
+                      textAlign: "left",
+                    }}
+                    inputProps={{
+                      "aria-label": "Without label",
+                      style: { textAlign: "left" },
+                    }}
+                    MenuProps={MenuProps}
                   >
-                    <InputLabel id="select-speaker">Select Speaker</InputLabel>
-                    <Select
-                      fullWidth
-                      labelId="select-speaker"
-                      label="Select Speaker"
-                      value={item.speaker_id}
-                      onChange={(event) =>
-                        handleSpeakerChange(event.target.value, index)
-                      }
-                      style={{
-                        backgroundColor: "#fff",
-                        textAlign: "left",
-                      }}
-                      inputProps={{
-                        "aria-label": "Without label",
-                        style: { textAlign: "left" },
-                      }}
-                      MenuProps={MenuProps}
-                    >
-                      {speakerIdList?.map((speaker, index) => (
-                        <MenuItem key={index} value={speaker.name}>
-                          {speaker.name}  ({speaker.gender})
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-              
-            </Box>
-          );
-        })}
-      </Box>
-      <Box
+                    {speakerIdList?.map((speaker, index) => (
+                      <MenuItem key={index} value={speaker.name}>
+                        {speaker.name} ({speaker.gender})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            );
+          })}
+        </Box>
+        <Box
           className={classes.paginationBox}
           // style={{
           //   ...(!xl && {
@@ -658,16 +655,14 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
           //   }),
           // }}
         >
-      <Pagination
-      color="primary"
-        count={Math.ceil(
-          subtitles?.length / itemsPerPage
-        )}
-        page={page}
-        onChange={handlePageChange}
-      />
-       </Box>
-       {openConfirmDialog && (
+          <Pagination
+            color="primary"
+            count={Math.ceil(subtitles?.length / itemsPerPage)}
+            page={page}
+            onChange={handlePageChange}
+          />
+        </Box>
+        {openConfirmDialog && (
           <ConfirmDialog
             openDialog={openConfirmDialog}
             handleClose={() => setOpenConfirmDialog(false)}
@@ -676,9 +671,9 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
             loading={loading}
           />
         )}
-         {Boolean(tagSuggestionsAnchorEl) && (
+        {Boolean(tagSuggestionsAnchorEl) && (
           <TagsSuggestionList
-          TabsSuggestionData={TabsSuggestionData}
+            TabsSuggestionData={TabsSuggestionData}
             tagSuggestionsAnchorEl={tagSuggestionsAnchorEl}
             setTagSuggestionList={setTagSuggestionList}
             index={currentSelectedIndex}
@@ -692,7 +687,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
             }
           />
         )}
-    </Grid>
+      </Grid>
     </>
   );
 };

@@ -19,15 +19,12 @@ const AnnotationStageButtons = ({
   onNextAnnotation,
   annotationNotesValue,
   AnnotationsTaskDetails,
-  disableBtns,disableUpdata,disableSkip,filterMessage
+  disableBtns,
+  disableUpdata,
+  disableSkip,
+  filterMessage,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
-  const [annotations, setAnnotations] = useState([]);
-  // const [disableSkip, setdisableSkip] = useState(false);
-  // const [filterMessage, setFilterMessage] = useState(null);
-  // const [disableBtns, setDisableBtns] = useState(false);
-  // const [disableUpdata, setDisableUpdata] = useState(false);
-
   const dispatch = useDispatch();
   const { taskId } = useParams();
 
@@ -36,11 +33,11 @@ const AnnotationStageButtons = ({
   const getNextTask = useSelector((state) => state.getnextProject.data);
   let Annotation = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 1
-  )[0]
+  )[0];
 
   return (
     <>
-      <Grid container spacing={1} sx={{ mt: 4, mb: 5,ml:3 }}>
+      <Grid container spacing={1} sx={{ mt: 4, mb: 5, ml: 3 }}>
         {!disableBtns &&
           [4, 5, 6].includes(user.role) &&
           TaskDetails?.annotation_users?.some((users) => users === user.id) && (

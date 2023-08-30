@@ -40,6 +40,8 @@ import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetail
 import ReviewStageButtons from "../../component/CL-Transcription/ReviewStageButtons";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -64,6 +66,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
   const [annotations, setAnnotations] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [speakerBox, setSpeakerBox] = useState("");
+
 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -85,6 +90,17 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
   const timeSpentIntervalRef = useRef(null);
+
+  const resetNotes = () => {
+    setShowNotes(false);
+    setReviewNotesValue("");
+    setAnnotationNotesValue("");
+    setsuperCheckerNotesValue("")
+  };
+
+  useEffect(() => {
+    resetNotes();
+  }, [taskId]);
 
   // useEffect(() => {
   //   let intervalId;
@@ -239,13 +255,22 @@ const ReviewAudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails, user, TaskDetails]);
   console.log(disableSkip, disableBtns, filterMessage, disableButton);
 
+  useEffect(() => {
+    const hasEmptyText = result?.some((element) => element.text.trim() === "");
+    const hasEmptySpeaker = result?.some(
+      (element) => element.speaker_id.trim() === ""
+    );
+    settextBox(hasEmptyText);
+    setSpeakerBox(hasEmptySpeaker);
+  }, [result]);
+
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
   useEffect(() => {
     if (AnnotationsTaskDetails.length > 0)
       setAnnotationNotesValue(AnnotationsTaskDetails[0]?.annotation_notes);
-    setsuperCheckerNotesValue(AnnotationsTaskDetails[1]?.supercheck_notes);
+    setsuperCheckerNotesValue(AnnotationsTaskDetails[2]?.supercheck_notes);
   }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
@@ -283,6 +308,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
+        parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
         // cl_format: true,
         // offset: currentPage,
         // limit: limit,
@@ -402,7 +428,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     // dispatch(setRangeEnd(transcriptPayload?.end));
 
     // eslint-disable-next-line
-  }, [AnnotationsTaskDetails]);
+  }, [annotations]);
 
   useMemo(() => {
     const currentIndex = result?.findIndex(
@@ -415,9 +441,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
     result && setCurrentSubs(result[currentIndex]);
   }, [result, currentIndex]);
 
-  const getAnnotationsTaskData = () => {
+  const getAnnotationsTaskData = (id) => {
     setLoading(true);
-    const userObj = new GetAnnotationsTaskAPI(taskId);
+    const userObj = new GetAnnotationsTaskAPI(id?id:taskId);
     dispatch(APITransport(userObj));
   };
 
@@ -473,26 +499,35 @@ const ReviewAudioTranscriptionLandingPage = () => {
       mode: "review",
       annotation_status: labellingMode,
     };
-    const ProjectObj = new GetNextProjectAPI(projectId, nextAPIData);
-    // dispatch(APITransport(ProjectObj));
-    const res = await fetch(ProjectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(ProjectObj.getBody()),
-      headers: ProjectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    if (res.ok) {
-      setNextData(resp);
-      tasksComplete(resp?.id || null);
-    } else {
+
+    let apiObj = new GetNextProjectAPI(projectId, nextAPIData)
+    var rsp_data = []
+    fetch(apiObj.apiEndPoint(), {
+      method: 'post',
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers
+    }).then(async response => {
+      rsp_data = await response.json();
+      setLoading(false)
+      if (response.ok) {
+        setNextData(rsp_data);
+        tasksComplete(rsp_data?.id || null);
+        getAnnotationsTaskData(rsp_data.id);
+       
+      } 
+    }).catch((error) => {
       setSnackbarInfo({
         open: true,
-        message: resp?.message,
-        variant: "error",
+        message: "No more tasks to label",
+        variant: "info",
       });
-    }
-    setLoading(false);
-  };
+      setTimeout(() => {
+        localStorage.removeItem("labelAll");
+        window.location.replace(`/#/projects/${projectId}`);
+      }, 1000);
+    });
+
+  }
 
   const handleReviewClick = async (
     value,
@@ -504,16 +539,17 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setLoading(true);
     const PatchAPIdata = {
       annotation_status: value,
-      annotation_notes: reviewNotesValue,
+      review_notes: reviewNotesValue,
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result,
-      ...((value === "accepted" ||
+      ...((value === "to_be_revised" ||value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
         parent_annotation: parentannotation,
       }),
     };
+    if (!textBox && !speakerBox) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {
@@ -551,7 +587,24 @@ const ReviewAudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     }
+  }else {
+    if (textBox) {
+      setSnackbarInfo({
+        open: true,
+        message: "Please Enter All The Transcripts",
+        variant: "error",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: "Please Select The Speaker",
+        variant: "error",
+      });
+    }
+  }
     setLoading(false);
+    setShowNotes(false)
+    setAnchorEl(null)
   };
 
   const renderSnackBar = () => {
@@ -567,13 +620,27 @@ const ReviewAudioTranscriptionLandingPage = () => {
       />
     );
   };
-
   return (
     <>
       {loading && <Spinner />}
       {renderSnackBar()}
       <Grid container direction={"row"} className={classes.parentGrid}>
         <Grid md={6} xs={12} id="video" className={classes.videoParent}>
+        <Button
+          value="Back to Project"
+          startIcon={<ArrowBackIcon />}
+          variant="contained"
+          color="primary"
+          sx={{ml:1}}
+          onClick={() => {
+            localStorage.removeItem("labelAll");
+            navigate(`/projects/${projectId}`);
+            //window.location.replace(`/#/projects/${projectId}`);
+            //window.location.reload();
+          }}
+        >
+          Back to Project
+        </Button>
           <Box
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
@@ -588,6 +655,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
               disableSkip={disableSkip}
               disableBtns={disableBtns}
               disableButton={disableButton}
+              anchorEl={anchorEl} setAnchorEl={setAnchorEl}
             />
             <AudioPanel
               setCurrentTime={setCurrentTime}
