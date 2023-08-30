@@ -610,7 +610,7 @@ const AudioTranscriptionLandingPage = () => {
                 reviewNotesRef.current?.value !== "" ? "success" : "primary"
               }
               onClick={handleCollapseClick}
-            // style={{ marginBottom: "20px" }}
+            style={{ marginTop: "3rem" }}
             >
               Notes {reviewNotesRef.current?.value !== "" && "*"}
             </Button>

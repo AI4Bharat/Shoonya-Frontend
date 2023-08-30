@@ -37,6 +37,7 @@ const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElHelp, setAnchorElHelp] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
   const [showTransliterationModel, setShowTransliterationModel] = useState(false);
@@ -129,11 +130,15 @@ const Header = () => {
   };
 
   const handleTranscriptionFlowChange = (event) => {
+    setLoading(true)
     if (event.target.checked) {
       localStorage.setItem("enableChitrlekhaTranscription", true);
+      setLoading(false)
     } else {
       localStorage.setItem("enableChitrlekhaTranscription", false);
+      setLoading(false)
     }
+
   }
 
   const handleTagsChange = (event) => {
