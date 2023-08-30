@@ -80,9 +80,9 @@ const SuperCheckerStageButtons = ({
   const dispatch = useDispatch();
   const { taskId } = useParams();
 
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
-  const user = useSelector((state) => state.fetchLoggedInUserData.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
+  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
+  const user = useSelector((state) => state.fetchLoggedInUserData?.data);
+  const getNextTask = useSelector((state) => state.getnextProject?.data);
   const ProjectsData = localStorage.getItem("projectData");
   const ProjectData = JSON.parse(ProjectsData);
 

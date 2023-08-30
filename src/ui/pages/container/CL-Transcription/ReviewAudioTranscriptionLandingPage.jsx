@@ -82,9 +82,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask.data
   );
-  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
+  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
   const user = useSelector((state) => state.fetchLoggedInUserData.data);
   const player = useSelector((state) => state.commonReducer.player);
   const ref = useRef(0);

@@ -78,8 +78,6 @@ const AudioTranscriptionLandingPage = () => {
     (state) => state.getAnnotationsTask?.data
   );
   const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
   const player = useSelector((state) => state.commonReducer.player);
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);

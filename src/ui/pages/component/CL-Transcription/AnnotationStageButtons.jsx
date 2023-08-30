@@ -28,9 +28,9 @@ const AnnotationStageButtons = ({
   const dispatch = useDispatch();
   const { taskId } = useParams();
 
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
-  const user = useSelector((state) => state.fetchLoggedInUserData.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
+  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
+  const user = useSelector((state) => state.fetchLoggedInUserData?.data);
+  const getNextTask = useSelector((state) => state.getnextProject?.data);
   let Annotation = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 1
   )[0];

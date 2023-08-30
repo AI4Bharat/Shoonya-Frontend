@@ -85,6 +85,8 @@ const Layout= (props) => {
       document.head.appendChild(style);
     }
   }, []);
+
+  console.log(localStorage.getItem("enableChitrlekhaTranscription")   && (localStorage.getItem("enableChitrlekhaUI"),"kkkkkkkkkkkkkkkkkkkkk"))
   return (
     <ThemeProvider theme={themeDefault}>
       <div 

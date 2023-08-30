@@ -76,9 +76,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask.data
   );
-  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
+  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
   const player = useSelector((state) => state.commonReducer.player);
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ref = useRef(0);
