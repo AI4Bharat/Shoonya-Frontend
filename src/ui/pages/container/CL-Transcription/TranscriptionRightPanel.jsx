@@ -96,6 +96,7 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const [targetlang, settargetlang] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -134,7 +135,29 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   const [textAfterBackSlash, setTextAfterBackSlash] = useState("");
   const [enableTransliterationSuggestion, setEnableTransliterationSuggestion] =
     useState(true);
+    const [taskData, setTaskData] = useState([]);
+    const AnnotationStage = localStorage.getItem("Stage") === "annotation"
+    const SuperCheckerStage = localStorage.getItem("SuperCheckerStage") === "superChecker"
     const TaskDetails = useSelector((state) => state.getTaskDetails.data);
+
+    useEffect(()=>{
+      if(AnnotationStage){
+        let Annotation = AnnotationsTaskDetails.filter(
+          (annotation) => annotation.annotation_type === 1
+        )[0]
+        setTaskData(Annotation)
+      }else if(SuperCheckerStage){
+        let superchecker = AnnotationsTaskDetails.filter(
+          (annotation) => annotation.annotation_type === 3
+        )[0]
+        setTaskData(superchecker)
+       } else{
+        let review = AnnotationsTaskDetails.filter(
+          (annotation) => annotation.annotation_type === 2
+        )[0]
+        setTaskData(review)
+      }
+     },[AnnotationsTaskDetails])
 
   useEffect(() => {
     if (TaskDetails) {
@@ -143,7 +166,6 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
       });
       setSpeakerIdList(speakerList);
       // setShowSpeakerIdDropdown(videoDetails?.video?.multiple_speaker);
-      console.log(ProjectDetails.tgt_language,"TaskDetailsTaskDetails")
     }
   }, [TaskDetails]);
   
@@ -282,13 +304,13 @@ const TranscriptionRightPanel = ({ currentIndex , AnnotationsTaskDetails ,Projec
   
     const reqBody = {
       task_id: taskId,
-      annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
+      annotation_status:  taskData?.annotation_status,
       // offset: currentOffset,
       // limit: limit,
       result:[ {subtitles ,
       }],
     };
-  const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
+  const obj = new SaveTranscriptAPI(taskData?.id,reqBody);
   const res = await fetch(obj.apiEndPoint(), {
     method: "PATCH",
     body: JSON.stringify(obj.getBody()),
