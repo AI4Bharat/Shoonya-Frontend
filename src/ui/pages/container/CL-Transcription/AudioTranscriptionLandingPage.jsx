@@ -28,7 +28,6 @@ import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
-import AudioName from "./AudioName";
 import Sub from "../../../../utils/Sub";
 import C from "../../../../redux/constants";
 import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
@@ -40,12 +39,15 @@ import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetail
 import AnnotationStageButtons from "../../component/CL-Transcription/AnnotationStageButtons";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let location = useLocation();
+  const annotationNotesRef = useRef(null);
+  const reviewNotesRef = useRef(null);
   const { projectId, taskId } = useParams();
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -57,8 +59,7 @@ const AudioTranscriptionLandingPage = () => {
   const [NextData, setNextData] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [reviewNotesValue, setReviewNotesValue] = useState(null);
-  const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
-  const[speakerBox,setSpeakerBox] = useState("");
+  const [speakerBox, setSpeakerBox] = useState("");
   const [annotations, setAnnotations] = useState([]);
   const [disableSkip, setdisableSkip] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
@@ -74,11 +75,9 @@ const AudioTranscriptionLandingPage = () => {
   const result = useSelector((state) => state.commonReducer.subtitles);
 
   const AnnotationsTaskDetails = useSelector(
-    (state) => state.getAnnotationsTask.data
+    (state) => state.getAnnotationsTask?.data
   );
-  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
   const player = useSelector((state) => state.commonReducer.player);
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
@@ -109,25 +108,22 @@ const AudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
-  const filterAnnotations = (
-    annotations,
-    user,
-  ) => {
-    let disableSkip = false; 
+  const filterAnnotations = (annotations, user) => {
+    let disableSkip = false;
     let disableUpdate = false;
     let disableDraft = false;
-    let filtereMessage =""
+    let filtereMessage = "";
     let filteredAnnotations = annotations;
     let userAnnotation = annotations.find((annotation) => {
-      return annotation.completed_by === user.id && !annotation.parent_annotation;
+      return (
+        annotation.completed_by === user.id && !annotation.parent_annotation
+      );
     });
     let userAnnotationData = annotations.find(
-      (annotation) =>
-        annotation.annotation_type === 2
+      (annotation) => annotation.annotation_type === 2
     );
-  
+
     if (userAnnotation) {
-  
       if (userAnnotation.annotation_status === "labeled") {
         const superCheckedAnnotation = annotations.find(
           (annotation) => annotation.annotation_type === 3
@@ -144,26 +140,24 @@ const AudioTranscriptionLandingPage = () => {
           )
         ) {
           filteredAnnotations = [superCheckedAnnotation];
-         
-          filtereMessage= "This is the Super Checker's Annotation in read only mode"
-        
-          disableDraft=true;
-           disableSkip = true; 
-           disableUpdate = true;
+
+          filtereMessage =
+            "This is the Super Checker's Annotation in read only mode";
+
+          disableDraft = true;
+          disableSkip = true;
+          disableUpdate = true;
         } else if (
           review &&
-          [
-            "skipped",
-            "draft",
-            "rejected",
-            "unreviewed",
-          ].includes(review.annotation_status)
+          ["skipped", "draft", "rejected", "unreviewed"].includes(
+            review.annotation_status
+          )
         ) {
           filteredAnnotations = [userAnnotation];
-          disableDraft=true
-          disableSkip = true; 
+          disableDraft = true;
+          disableSkip = true;
           disableUpdate = true;
-          filtereMessage="This task is being reviewed by the reviewer"
+          filtereMessage = "This task is being reviewed by the reviewer";
         } else if (
           review &&
           [
@@ -173,64 +167,63 @@ const AudioTranscriptionLandingPage = () => {
           ].includes(review.annotation_status)
         ) {
           filteredAnnotations = [review];
-          disableDraft=true
-          disableSkip = true; 
+          disableDraft = true;
+          disableSkip = true;
           disableUpdate = true;
-          filtereMessage="This is the Reviewer's Annotation in read only mode"
+          filtereMessage =
+            "This is the Reviewer's Annotation in read only mode";
         } else {
           filteredAnnotations = [userAnnotation];
         }
-      }
-      else if (
+      } else if (
         userAnnotationData &&
-        [
-          "draft",
-        ].includes(userAnnotation.annotation_status)
+        ["draft"].includes(userAnnotation.annotation_status)
       ) {
         filteredAnnotations = [userAnnotation];
-        disableSkip = true; 
-      
-        filtereMessage="Skip button is disabled, since the task is being reviewed"
-      }
-      else if (
+        disableSkip = true;
+
+        filtereMessage =
+          "Skip button is disabled, since the task is being reviewed";
+      } else if (
         userAnnotation &&
-        [
-          "to_be_revised"
-        ].includes(userAnnotation.annotation_status)
+        ["to_be_revised"].includes(userAnnotation.annotation_status)
       ) {
         filteredAnnotations = [userAnnotation];
-        disableSkip = true; 
-        filtereMessage="Skip button is disabled, since the task is being reviewed"
-      }
-  
-      else {
+        disableSkip = true;
+        filtereMessage =
+          "Skip button is disabled, since the task is being reviewed";
+      } else {
         filteredAnnotations = [userAnnotation];
       }
-    } 
-  
-    setAnnotations(filteredAnnotations)
-    setDisableBtns(disableDraft)
-    setDisableUpdata(disableUpdate)
-    setdisableSkip(disableSkip)
-     setFilterMessage(filtereMessage)
-    return [filteredAnnotations,disableDraft,disableSkip,disableUpdate,filtereMessage];
+    }
+
+    setAnnotations(filteredAnnotations);
+    setDisableBtns(disableDraft);
+    setDisableUpdata(disableUpdate);
+    setdisableSkip(disableSkip);
+    setFilterMessage(filtereMessage);
+    return [
+      filteredAnnotations,
+      disableDraft,
+      disableSkip,
+      disableUpdate,
+      filtereMessage,
+    ];
   };
-  useEffect(()=>{
-    filterAnnotations(AnnotationsTaskDetails,user)
-  },[AnnotationsTaskDetails,user])
+  useEffect(() => {
+    filterAnnotations(AnnotationsTaskDetails, user);
+  }, [AnnotationsTaskDetails, user]);
 
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
-  useEffect(() => {
-    if (AnnotationsTaskDetails.length > 0){
-      setReviewNotesValue(AnnotationsTaskDetails[0]?.review_notes);
-    }
-  }, [AnnotationsTaskDetails]);
+ 
 
   useEffect(() => {
     const hasEmptyText = result?.some((element) => element.text.trim() === "");
-    const hasEmptySpeaker = result?.some((element) =>  element.speaker_id.trim() === "")
+    const hasEmptySpeaker = result?.some(
+      (element) => element.speaker_id.trim() === ""
+    );
     settextBox(hasEmptyText);
     setSpeakerBox(hasEmptySpeaker);
   }, [result]);
@@ -259,8 +252,6 @@ const AudioTranscriptionLandingPage = () => {
     }
     setLoading(false);
   };
-
-
 
   useEffect(() => {
     const handleAutosave = (id) => {
@@ -328,8 +319,6 @@ const AudioTranscriptionLandingPage = () => {
     // eslint-disable-next-line
   }, [result, taskId, AnnotationsTaskDetails]);
 
-
-
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
   //   dispatch(APITransport(apiObj));
@@ -361,7 +350,6 @@ const AudioTranscriptionLandingPage = () => {
   //   // eslint-disable-next-line
   // }, [AnnotationsTaskDetails]);
 
-  console.log(annotations[0],"annotations")
   useEffect(() => {
     const sub = annotations[0]?.result.map((item) => new Sub(item));
 
@@ -378,7 +366,7 @@ const AudioTranscriptionLandingPage = () => {
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
     // eslint-disable-next-line
-  }, [AnnotationsTaskDetails]);
+  }, [annotations]);
 
   useMemo(() => {
     const currentIndex = result?.findIndex(
@@ -391,9 +379,9 @@ const AudioTranscriptionLandingPage = () => {
     result && setCurrentSubs(result[currentIndex]);
   }, [result, currentIndex]);
 
-  const getAnnotationsTaskData = () => {
+  const getAnnotationsTaskData = (id) => {
     setLoading(true);
-    const userObj = new GetAnnotationsTaskAPI(taskId);
+    const userObj = new GetAnnotationsTaskAPI(id ? id : taskId);
     dispatch(APITransport(userObj));
   };
 
@@ -444,42 +432,50 @@ const AudioTranscriptionLandingPage = () => {
       mode: "annotation",
       annotation_status: labellingMode,
     };
-    const ProjectObj = new GetNextProjectAPI(projectId, nextAPIData);
-    // dispatch(APITransport(ProjectObj));
-    const res = await fetch(ProjectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(ProjectObj.getBody()),
-      headers: ProjectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    if (res.ok) {
-      setNextData(resp);
-      tasksComplete(resp?.id || null);
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
+
+    let apiObj = new GetNextProjectAPI(projectId, nextAPIData);
+    var rsp_data = [];
+    fetch(apiObj.apiEndPoint(), {
+      method: "post",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    })
+      .then(async (response) => {
+        rsp_data = await response.json();
+        setLoading(false);
+        if (response.ok) {
+          setNextData(rsp_data);
+          tasksComplete(rsp_data?.id || null);
+          getAnnotationsTaskData(rsp_data.id);
+        }
+      })
+      .catch((error) => {
+        setSnackbarInfo({
+          open: true,
+          message: "No more tasks to label",
+          variant: "info",
+        });
+        setTimeout(() => {
+          localStorage.removeItem("labelAll");
+          window.location.replace(`/#/projects/${projectId}`);
+        }, 1000);
       });
-    }
-    setLoading(false);
   };
 
   const handleAnnotationClick = async (
     value,
     id,
     lead_time,
-    annotationNotesValue
   ) => {
     setLoading(true);
     const PatchAPIdata = {
       annotation_status: value,
-      annotation_notes: annotationNotesValue,
+      annotation_notes: annotationNotesRef.current.value,
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: result,
     };
-    if(!textBox && !speakerBox){
+    if (!textBox && !speakerBox) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {
@@ -492,14 +488,13 @@ const AudioTranscriptionLandingPage = () => {
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
-  
+
         if (value === "labeled") {
-            setSnackbarInfo({
-              open: true,
-              message: "Task successfully submitted",
-              variant: "success",
-            });
-          
+          setSnackbarInfo({
+            open: true,
+            message: "Task successfully submitted",
+            variant: "success",
+          });
         } else if (value === "draft") {
           setSnackbarInfo({
             open: true,
@@ -514,25 +509,42 @@ const AudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       }
-    
-    }else{
-     if(textBox){
-      setSnackbarInfo({
-        open: true,
-        message: "Please Enter All The Transcripts",
-        variant: "error",
-      });
-     }else{
-      setSnackbarInfo({
-        open: true,
-        message: "Please Select The Speaker",
-        variant: "error",
-      });
-     }
-        
+    } else {
+      if (textBox) {
+        setSnackbarInfo({
+          open: true,
+          message: "Please Enter All The Transcripts",
+          variant: "error",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: "Please Select The Speaker",
+          variant: "error",
+        });
+      }
     }
     setLoading(false);
+    setShowNotes(false);
   };
+
+
+  useEffect(() => {
+      if (AnnotationsTaskDetails &&  AnnotationsTaskDetails.length > 0) {
+        annotationNotesRef.current.value = AnnotationsTaskDetails[0].annotation_notes ?? "";
+        reviewNotesRef.current.value = AnnotationsTaskDetails[0].review_notes ?? "";
+      }
+  }, [AnnotationsTaskDetails]);
+
+  const resetNotes = () => {
+    setShowNotes(false);
+    annotationNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
+  };
+
+  useEffect(() => {
+    resetNotes();
+  }, [taskId]);
 
   const renderSnackBar = () => {
     return (
@@ -554,17 +566,32 @@ const AudioTranscriptionLandingPage = () => {
       {renderSnackBar()}
       <Grid container direction={"row"} className={classes.parentGrid}>
         <Grid md={6} xs={12} id="video" className={classes.videoParent}>
+          <Button
+            value="Back to Project"
+            startIcon={<ArrowBackIcon />}
+            variant="contained"
+            color="primary"
+            sx={{ ml: 1 }}
+            onClick={() => {
+              localStorage.removeItem("labelAll");
+              navigate(`/projects/${projectId}`);
+              //window.location.replace(`/#/projects/${projectId}`);
+              //window.location.reload();
+            }}
+          >
+            Back to Project
+          </Button>
           <Box
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
-            <AudioName />
             <AnnotationStageButtons
               handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
-              annotationNotesValue={annotationNotesValue}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
-              disableBtns={disableBtns}disableUpdata={disableUpdata}disableSkip={disableSkip}
+              disableBtns={disableBtns}
+              disableUpdata={disableUpdata}
+              disableSkip={disableSkip}
               filterMessage={filterMessage}
             />
             <AudioPanel
@@ -573,66 +600,63 @@ const AudioTranscriptionLandingPage = () => {
               handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
-              setAnnotationNotesValue={setAnnotationNotesValue}
             />
 
-            <Grid sx={{ml:3}}>
+            <Grid sx={{ ml: 3 }}>
             <Button
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
-              sx={{p:2}}
               color={
-                reviewNotesValue !== null && reviewNotesValue !== ""
-                  ? "success"
-                  : "primary"
+                reviewNotesRef.current?.value !== "" ? "success" : "primary"
               }
               onClick={handleCollapseClick}
+            // style={{ marginBottom: "20px" }}
             >
-              Notes
-              {reviewNotesValue !== null && reviewNotesValue !== "" && "*"}
+              Notes {reviewNotesRef.current?.value !== "" && "*"}
             </Button>
-            <div
-              className={classes.collapse}
+          
+
+          <div
+              className={classes.collapse}    
               style={{
-                display: showNotes ? "block" : "none",
-                paddingBottom: "16px",
+              display: showNotes ? "block" : "none",
+              paddingBottom: "16px",
+               
+            }}
+          >
+                 <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Annotation Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={annotationNotesRef}
+              rows={1}
+              maxRows={3}
+              inputProps={{
+                style: { fontSize: "1rem" },
               }}
-            >
-              {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
-              {translate("alert.notes")}
-          </Alert> */}
-              <TextField
-                multiline
-                placeholder="Place your remarks here ..."
-                label="Annotation Notes"
-                value={annotationNotesValue}
-                onChange={(event) =>
-                  setAnnotationNotesValue(event.target.value)
-                }
-                // inputRef={annotationNotesRef}
-                rows={1}
-                maxRows={3}
-                inputProps={{
-                  style: { fontSize: "1rem" },
-                }}
-                style={{ width: "99%" }}
-              />
-              <TextField
-                multiline
-                placeholder="Place your remarks here ..."
-                label="Review Notes"
-                value={reviewNotesValue}
-                // onChange={(event) => setReviewNotesValue(event.target.value)}
-                // inputRef={reviewNotesRef}
-                rows={1}
-                maxRows={3}
-                inputProps={{
-                  style: { fontSize: "1rem" },
-                  readOnly: true,
-                }}
-                style={{ width: "99%", marginTop: "2%" }}
-              />
-            </div>
+              style={{ width: "99%" }}
+              // ref={quillRef}
+            />
+
+            <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Review Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={reviewNotesRef}
+              rows={1}
+              maxRows={3}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+              // ref={quillRef}
+            />
+              </div>
             </Grid>
           </Box>
         </Grid>

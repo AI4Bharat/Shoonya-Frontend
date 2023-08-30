@@ -362,14 +362,12 @@ import React, {
         const { id, trigger } = props;
         return (
           <ContextMenu id={id} className={classes.menuItemNav}>
-            {/* {trigger && !taskDetails.task_type.includes("VOICEOVER") && ( */}
               <MenuItem
                 className={classes.menuItem}
                 onClick={() => removeSub(lastSub)}
               >
                 Delete Subtitle
               </MenuItem>
-            {/* )} */}
             {trigger &&
               trigger.parentSub !== subtitles[subtitles.length - 1] && (
                 <MenuItem

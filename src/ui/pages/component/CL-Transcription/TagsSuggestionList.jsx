@@ -13,15 +13,12 @@ import CloseIcon from "@mui/icons-material/Close";
 
 //Redux
 import C from "../../../../redux/constants";
-import {
-    setSubtitles,
-  } from "../../../../redux/actions/Common";
+import { setSubtitles } from "../../../../redux/actions/Common";
 
 const TagsSuggestionList = ({
   tagSuggestionsAnchorEl,
   setTagSuggestionList,
   index,
-  filteredSuggestionByInput,
   setTagSuggestionsAnchorEl,
   textWithoutBackslash,
   textAfterBackSlash,
@@ -32,14 +29,12 @@ const TagsSuggestionList = ({
   const dispatch = useDispatch();
   const classes = AudioTranscriptionLandingStyle();
   const handleTagClick = (suggestion) => {
-
-    const modifiedText =`${textWithoutBackslash}[${suggestion}]${textAfterBackSlash}`;
-    
+    const modifiedText = `${textWithoutBackslash}[${suggestion}]${textAfterBackSlash}`;
 
     const sub = onSubtitleChange(modifiedText, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
-    
+
     setEnableTransliterationSuggestion(true);
     setTagSuggestionsAnchorEl(null);
   };
@@ -48,8 +43,6 @@ const TagsSuggestionList = ({
     setTagSuggestionsAnchorEl(null);
     setTagSuggestionList([]);
   };
- 
-
 
   return (
     <Popover

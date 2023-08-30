@@ -85,6 +85,7 @@ const Layout= (props) => {
       document.head.appendChild(style);
     }
   }, []);
+
   return (
     <ThemeProvider theme={themeDefault}>
       <div 

@@ -1,46 +1,32 @@
-import React, {
-  useRef,
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
-import { Typography, Grid, Tooltip, Button, Alert } from "@mui/material";
+import React from "react";
+import {Grid, Tooltip, Button, Alert } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import GetTaskAnnotationsAPI from "../../../../redux/actions/api/Tasks/GetTaskAnnotations";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useParams } from "react-router-dom";
-import GetNextProjectAPI from "../../../../redux/actions/CL-Transcription/GetNextProject";
-import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
+
 
 const AnnotationStageButtons = ({
   handleAnnotationClick,
   onNextAnnotation,
-  annotationNotesValue,
   AnnotationsTaskDetails,
-  disableBtns,disableUpdata,disableSkip,filterMessage
+  disableBtns,
+  disableUpdata,
+  disableSkip,
+  filterMessage,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
-  const [annotations, setAnnotations] = useState([]);
-  // const [disableSkip, setdisableSkip] = useState(false);
-  // const [filterMessage, setFilterMessage] = useState(null);
-  // const [disableBtns, setDisableBtns] = useState(false);
-  // const [disableUpdata, setDisableUpdata] = useState(false);
-
   const dispatch = useDispatch();
   const { taskId } = useParams();
 
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
-  const user = useSelector((state) => state.fetchLoggedInUserData.data);
-  const getNextTask = useSelector((state) => state.getnextProject.data);
+  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
+  const user = useSelector((state) => state.fetchLoggedInUserData?.data);
+  const getNextTask = useSelector((state) => state.getnextProject?.data);
   let Annotation = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 1
-  )[0]
+  )[0];
 
   return (
     <>
-      <Grid container spacing={1} sx={{ mt: 4, mb: 5,ml:3 }}>
+      <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
         {!disableBtns &&
           [4, 5, 6].includes(user.role) &&
           TaskDetails?.annotation_users?.some((users) => users === user.id) && (
@@ -55,7 +41,6 @@ const AnnotationStageButtons = ({
                       "draft",
                       Annotation.id,
                       Annotation.lead_time,
-                      annotationNotesValue
                     )
                   }
                   style={{
@@ -105,7 +90,6 @@ const AnnotationStageButtons = ({
                       "skipped",
                       Annotation.id,
                       Annotation.lead_time,
-                      annotationNotesValue
                     )
                   }
                   style={{
@@ -136,7 +120,6 @@ const AnnotationStageButtons = ({
                       "labeled",
                       Annotation.id,
                       Annotation.lead_time,
-                      annotationNotesValue
                     )
                   }
                   style={{
@@ -154,7 +137,7 @@ const AnnotationStageButtons = ({
           )}
       </Grid>
       {filterMessage && (
-        <Alert severity="info" sx={{ mb: 3 }}>
+        <Alert severity="info" sx={{ ml:2,mb: 2,width:"95%"}}>
           {filterMessage}
         </Alert>
       )}
