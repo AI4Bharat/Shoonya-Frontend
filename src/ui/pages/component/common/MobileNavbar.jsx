@@ -158,10 +158,22 @@ function MobileNavbar(props) {
                 padding: "0 5%"
             }}
         > 
-            <Grid item>
+            <Grid item sx={{ display: "flex", alignItems: "center" }}>
                 <Link to="/projects">
-                    <img src={Shoonya_Logo} alt="logo" className={classes.headerLogo} style={{marginTop: "5%"}} />
+                    <img src={Shoonya_Logo} alt="logo" className={classes.headerLogo} style={{marginBottom: "5%"}} />
                 </Link>
+                <Typography
+                  variant="h2"
+                  className={classes.headerTitle}
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: "lighter",
+                    fontFamily: 'Rowdies,cursive,Roboto,sans-serif'
+
+                  }}
+                >
+                  shoonya
+                </Typography>
             </Grid>
             <Grid item>
                 <IconButton onClick={() => setOpenDrawer(!openDrawer)}>
