@@ -65,14 +65,10 @@ import React, {
   
       const $blockRef = createRef();
       const $subsRef = createRef();
-      const taskDetails = useSelector((state) => state.getTaskDetails.data);
-      const subtitles = useSelector((state) => state.commonReducer.subtitles);
-      const player = useSelector((state) => state.commonReducer.player);
-      const limit = useSelector((state) => state.commonReducer.limit);
-      const currentPage = useSelector((state) => state.commonReducer.currentPage);
-      const next = useSelector((state) => state.commonReducer.nextPage);
+      const result = useSelector((state) => state.commonReducer?.subtitles);
+      const player = useSelector((state) => state.commonReducer?.player);
       const AnnotationsTaskDetails = useSelector(
-        (state) => state.getAnnotationsTask.data
+        (state) => state.getAnnotationsTask?.data
       );
 
       const [taskData, setTaskData] = useState([]);
@@ -84,10 +80,10 @@ import React, {
       });
   
       useEffect(() => {
-        if (subtitles) {
-          setCurrentSubs(subtitles);
+        if (result) {
+          setCurrentSubs(result);
         }
-      }, [subtitles]);
+      }, [result]);
 
   
       const gridGap = document.body.clientWidth / render.gridNum;
@@ -119,33 +115,29 @@ import React, {
 
 
       useEffect(() => {
-        if (subtitles) {
+        if (result) {
           const isLastSub =
-            player?.currentTime > subtitles[subtitles?.length - 1]?.endTime;
+            player?.currentTime > result[result?.length - 1]?.endTime;
   
-          if (next && isPlaying(player) && isLastSub) {
+          if (isPlaying(player) && isLastSub) {
             const payloadObj = new GetAnnotationsTaskAPI(
               taskId,
               taskData?.annotation_status
-            //   next,
-            //   limit
+           
             );
             dispatch(APITransport(payloadObj));
           }
         }
   
         // eslint-disable-next-line
-      }, [subtitles, currentIndex, isPlaying(player)]);
+      }, [result, currentIndex, isPlaying(player)]);
   
-      const saveTranscript = async (taskType, subs = subtitles) => {
+      const saveTranscript = async (taskType,  result) => {
         const reqBody = {
           task_id: taskId,
-        //   offset: currentPage,
-        //   limit: limit,
-          payload: { subs
-          },
+          annotation_status: taskData?.annotation_status,
+          result
         };
-  
         const obj = new SaveTranscriptAPI(taskData?.id,reqBody);
         const res = await fetch(obj.apiEndPoint(), {
           method: "PATCH",
@@ -154,20 +146,14 @@ import React, {
         });
   
         const resp = await res.json();
-        if (res.ok) {
+        if (!res.ok) {
           setSnackbarInfo({
             open: true,
-            message: resp?.message,
-            variant: "success",
-          });
-        } else {
-          setSnackbarInfo({
-            open: true,
-            message: "Failed",
+            message: "Error in autosaving annotation",
             variant: "error",
           });
-        }
-      };
+        } 
+      }; 
   
       const removeSub = useCallback(
         (sub) => {
@@ -177,7 +163,7 @@ import React, {
           saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
-        [limit, currentPage]
+        [result]
       );
   
       const mergeSub = useCallback(
@@ -188,13 +174,13 @@ import React, {
           saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
-        [limit, currentPage]
+        [result]
       );
     
       const updateSub = useCallback(
         (sub, obj) => {
           const index = hasSub(sub);
-          const copySub = [...subtitles];
+          const copySub = [...result];
   
           if (index < 0) return;
   
@@ -205,7 +191,7 @@ import React, {
           saveTranscript(taskData?.annotation_status,copySub);
         },
         // eslint-disable-next-line
-        [limit, currentPage]
+        [result]
       );
   
       const onMouseDown = (sub, event, type) => {
@@ -214,7 +200,7 @@ import React, {
         isDroging = true;
         lastType = type;
         lastX = event.pageX;
-        lastIndex = subtitles.indexOf(sub);
+        lastIndex = result.indexOf(sub);
         lastTarget = $subsRef.current.children[lastIndex];
         lastWidth = parseFloat(lastTarget.style.width);
       };
@@ -237,8 +223,8 @@ import React, {
         if (isDroging && lastTarget && lastDiffX) {
           const timeDiff = lastDiffX / gridGap / 10;
           const index = hasSub(lastSub);
-          const previou = subtitles[index - 1];
-          const next = subtitles[index + 1];
+          const previou = result[index - 1];
+          const next = result[index + 1];
   
           const startTime = magnetically(
             lastSub.startTime + timeDiff,
@@ -272,7 +258,7 @@ import React, {
                 updateSub(lastSub, { end_time });
               }
   
-              if (index === subtitles.length - 1) {
+              if (index === result.length - 1) {
                 updateSub(lastSub, { end_time });
               }
             } else {
@@ -283,7 +269,7 @@ import React, {
               const start_time = DT.d2t(startTime);
               const end_time = DT.d2t(endTime);
   
-              if (subtitles.length > 1) {
+              if (result.length > 1) {
                 if (
                   index > 0 &&
                   startTime >= DT.t2d(previou.end_time) &&
@@ -320,7 +306,7 @@ import React, {
         lastWidth = 0;
         lastDiffX = 0;
         isDroging = false;
-      }, [gridGap, subtitles, updateSub]);
+      }, [gridGap, result, updateSub]);
   
       const onKeyDown = useCallback(
         (event) => {
@@ -369,7 +355,7 @@ import React, {
                 Delete Subtitle
               </MenuItem>
             {trigger &&
-              trigger.parentSub !== subtitles[subtitles.length - 1] && (
+              trigger.parentSub !== result[result.length - 1] && (
                 <MenuItem
                   className={classes.menuItem}
                   onClick={() => mergeSub(lastSub)}
@@ -478,7 +464,7 @@ import React, {
     },
     (prevProps, nextProps) => {
       return (
-        isEqual(prevProps.subtitles, nextProps.subtitles) &&
+        isEqual(prevProps.result, nextProps.result) &&
         isEqual(prevProps.render, nextProps.render) &&
         prevProps.currentTime === nextProps.currentTime
       );
