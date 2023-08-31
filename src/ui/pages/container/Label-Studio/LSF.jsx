@@ -985,6 +985,7 @@ export default function LSF() {
   useEffect(() => {
     fetchAnnotation(taskId).then((data) => {
       if (data && Array.isArray(data) && data.length > 0) {
+        console.log(annotationNotesRef.current.value,data[0].annotation_notes);
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
       }
@@ -1099,14 +1100,14 @@ export default function LSF() {
               ref={annotationNotesRef}
               modules={modules}
               formats={formats}
-              bounds={"#roots"}
+              bounds={"#notess"}
               placeholder="Annotation Notes"
             ></ReactQuill>
             <ReactQuill
               ref={reviewNotesRef}
               modules={modules}
               formats={formats}
-              bounds={"#roots"}
+              bounds={"#notess"}
               placeholder="Review Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
               readOnly={true}

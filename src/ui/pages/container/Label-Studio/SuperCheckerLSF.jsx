@@ -1076,7 +1076,7 @@ export default function LSF() {
               ref={reviewNotesRef}
               modules={modules}
               formats={formats}
-              bounds={"#roots"}
+              bounds={"#notess"}
               placeholder="Review Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
               readOnly={true}
@@ -1084,7 +1084,7 @@ export default function LSF() {
             <ReactQuill
               ref={superCheckerNotesRef}
               modules={modules}
-              bounds={"#roots"}
+              bounds={"#notess"}
               formats={formats}
               placeholder="SuperChecker Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
