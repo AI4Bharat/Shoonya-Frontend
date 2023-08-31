@@ -1,15 +1,15 @@
 
-#root {
+#notes {
     margin: 1rem 4rem;
   }
   
-  #root .ql-container {
+  #notes .ql-container {
     background: #fefcfc;
     margin-bottom: 1%;
   
   }
 
-  #root .ql-snow.ql-toolbar {
+  #notes .ql-snow.ql-toolbar {
     display: block;
   }
   .quill > .ql-container > .ql-editor.ql-blank::before{
@@ -18,18 +18,18 @@
 }
 
   
-  #root .ql-editor {
+  #notes .ql-editor {
     min-height: 4em;
     font-size: 1rem;
     font-style: normal;
   }
-  #root .ql-formats button {
+  #notes .ql-formats button {
     position: relative
   }
 
-  #root .ql-formats button:hover:after,
-  #root .ql-formats button:active:after,
-  #root .ql-formats button:focus:after {
+  #notes .ql-formats button:hover:after,
+  #notes .ql-formats button:active:after,
+  #notes .ql-formats button:focus:after {
       position: absolute;
       background: black;
       color: white;
@@ -42,44 +42,44 @@
       font-size: 0.7rem;
   }
 
-  #root .ql-bold:hover:after,
-  #root .ql-bold:active:after,
-  #root .ql-bold:focus:after {
+  #notes .ql-bold:hover:after,
+  #notes .ql-bold:active:after,
+  #notes .ql-bold:focus:after {
      content: 'Bold Ctrl B';
   }
-  #root .ql-italic:hover:after,
-  #root .ql-italic:active:after,
-  #root .ql-italic:focus:after {
+  #notes .ql-italic:hover:after,
+  #notes .ql-italic:active:after,
+  #notes .ql-italic:focus:after {
      content: 'Italic Ctrl I';
   }
-  #root .ql-underline:hover:after,
-  #root .ql-underline:active:after,
-  #root .ql-underline:focus:after {
+  #notes .ql-underline:hover:after,
+  #notes .ql-underline:active:after,
+  #notes .ql-underline:focus:after {
      content: 'Underline Ctrl U';
   }
-  #root .ql-strike:hover:after,
-  #root .ql-strike:active:after,
-  #root .ql-strike:focus:after {
+  #notes .ql-strike:hover:after,
+  #notes .ql-strike:active:after,
+  #notes .ql-strike:focus:after {
      content: 'StrikeThrough';
   }
-  #root .ql-size:hover:after,
-  #root .ql-size:active:after,
-  #root .ql-size:focus:after {
+  #notes .ql-size:hover:after,
+  #notes .ql-size:active:after,
+  #notes .ql-size:focus:after {
      content: 'Size';
   }
-  #root .ql-script[value="sub"]:hover:after,
-  #root .ql-script:active:after,
-  #root .ql-script:focus:after {
+  #notes .ql-script[value="sub"]:hover:after,
+  #notes .ql-script:active:after,
+  #notes .ql-script:focus:after {
      content: 'SubScript';
   }
-  #root .ql-script[value="super"]:hover:after,
-  #root .ql-script:active:after,
-  #root .ql-script:focus:after {
+  #notes .ql-script[value="super"]:hover:after,
+  #notes .ql-script:active:after,
+  #notes .ql-script:focus:after {
      content: 'SuperScript';
   }
-  #root .ql-color:hover:after,
-  #root .ql-color:active:after,
-  #root .ql-color:focus:after {
+  #notes .ql-color:hover:after,
+  #notes .ql-color:active:after,
+  #notes .ql-color:focus:after {
      content: 'Color';
   }
   

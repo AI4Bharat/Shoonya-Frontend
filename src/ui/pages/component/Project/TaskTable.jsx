@@ -384,9 +384,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
         : selectedFilters.review_status
     );
   }, [selectedFilters]);
-
   useEffect(() => {
-   
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
         const email = props.type === "review" ? el.annotator_mail : "";
@@ -402,14 +400,19 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
         props.type === "review" &&
           taskList[0].review_status &&
           row.push(el.review_status);
-
         props.type === "annotation" &&
           row.push(
-            <Link to={(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ) ?`AudioTranscriptionLandingPage/${el.id}` :`task/${el.id}`} className={classes.link}>
+            <div  className={classes.link}>
               <CustomButton
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
+                  if(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ){
+                    navigate(`AudioTranscriptionLandingPage/${el.id}`)
+                  }
+                  else{
+                    navigate(`task/${el.id}`)
+                  }
                 }}
                 disabled={ ProjectDetails.is_archived }
                 sx={{ p: 1, borderRadius: 2 }}
@@ -418,22 +421,28 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
                     {(props.type === "annotation" && ProjectDetails?.annotators?.some((a) => a.id === userDetails?.id)) ?
                         (ProjectDetails.project_mode === "Annotation"
                           ? "Annotate"
-                          : "Edit") 
+                          : "Edit")
                         : "View"
                     }
                   </Typography>
                 }
               />
-            </Link>
+            </div>
           );
         props.type === "review" &&
           row.push(
-            <Link to={(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ) ?`ReviewAudioTranscriptionLandingPage/${el.id}` :`review/${el.id}`} className={classes.link}>
+            <div className={classes.link}>
               <CustomButton
                 disabled={ ProjectDetails.is_archived}
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
+                  if(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ){
+                    navigate(`AudioTranscriptionLandingPage/${el.id}`)
+                  }
+                  else{
+                    navigate(`task/${el.id}`)
+                  }
                 }}
                 sx={{ p: 1, borderRadius: 2 }}
                 label={
@@ -442,7 +451,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
                   </Typography>
                 }
               />
-            </Link>
+            </div>
           );
         return row;
       });
