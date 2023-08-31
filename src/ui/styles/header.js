@@ -43,8 +43,14 @@ const headerStyle = makeStyles({
 
     },
     headerLogo: {
-        height: "2rem", 
-        width: "10rem", 
+        height: "40px", 
+        width: "45px", 
+        borderRadius:"50%"
+    },
+    headerTitle:{
+        color:"black",
+        display: "inline-block",
+        letterSpacing:"1px",
     },
     headerMenu : {
         textDecoration : "none",

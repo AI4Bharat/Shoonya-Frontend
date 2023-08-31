@@ -61,13 +61,13 @@ const AudioTranscriptionLandingPage = () => {
   const [reviewNotesValue, setReviewNotesValue] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
   const [annotations, setAnnotations] = useState([]);
-  const [disableSkip, setdisableSkip] = useState(false);
+  const [disableSkipButton, setdisableSkipButton] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
-  const [disableUpdata, setDisableUpdata] = useState(false);
+  const [disableUpdataButton, setDisableUpdataButton] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
-    open: false,
-    message: "",
+    open: false,   
+    message: "",      
     variant: "success",
   });
   let labellingMode = localStorage.getItem("labellingMode");
@@ -112,7 +112,7 @@ const AudioTranscriptionLandingPage = () => {
     let disableSkip = false;
     let disableUpdate = false;
     let disableDraft = false;
-    let filtereMessage = "";
+    let Message = "";
     let filteredAnnotations = annotations;
     let userAnnotation = annotations.find((annotation) => {
       return (
@@ -141,7 +141,7 @@ const AudioTranscriptionLandingPage = () => {
         ) {
           filteredAnnotations = [superCheckedAnnotation];
 
-          filtereMessage =
+          Message =
             "This is the Super Checker's Annotation in read only mode";
 
           disableDraft = true;
@@ -157,7 +157,7 @@ const AudioTranscriptionLandingPage = () => {
           disableDraft = true;
           disableSkip = true;
           disableUpdate = true;
-          filtereMessage = "This task is being reviewed by the reviewer";
+          Message = "This task is being reviewed by the reviewer";
         } else if (
           review &&
           [
@@ -170,7 +170,7 @@ const AudioTranscriptionLandingPage = () => {
           disableDraft = true;
           disableSkip = true;
           disableUpdate = true;
-          filtereMessage =
+          Message =
             "This is the Reviewer's Annotation in read only mode";
         } else {
           filteredAnnotations = [userAnnotation];
@@ -182,7 +182,7 @@ const AudioTranscriptionLandingPage = () => {
         filteredAnnotations = [userAnnotation];
         disableSkip = true;
 
-        filtereMessage =
+        Message =
           "Skip button is disabled, since the task is being reviewed";
       } else if (
         userAnnotation &&
@@ -190,26 +190,33 @@ const AudioTranscriptionLandingPage = () => {
       ) {
         filteredAnnotations = [userAnnotation];
         disableSkip = true;
-        filtereMessage =
+        Message =
           "Skip button is disabled, since the task is being reviewed";
       } else {
         filteredAnnotations = [userAnnotation];
       }
+      
+    }else if ([4, 5, 6].includes(user.role)) {
+      filteredAnnotations = annotations.filter((a) => a.annotation_type === 1);
+      disableDraft = true;
+      disableSkip = true;
+      disableUpdate = true;
     }
 
     setAnnotations(filteredAnnotations);
     setDisableBtns(disableDraft);
-    setDisableUpdata(disableUpdate);
-    setdisableSkip(disableSkip);
-    setFilterMessage(filtereMessage);
+    setDisableUpdataButton(disableUpdate);
+    setdisableSkipButton(disableSkip);
+    setFilterMessage(Message);
     return [
       filteredAnnotations,
       disableDraft,
       disableSkip,
       disableUpdate,
-      filtereMessage,
+      Message,
     ];
   };
+
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, user);
   }, [AnnotationsTaskDetails, user]);
@@ -254,7 +261,7 @@ const AudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    const handleAutosave = (id) => {
+    const handleAutosave = async(id) => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
@@ -264,8 +271,21 @@ const AudioTranscriptionLandingPage = () => {
         result,
       };
 
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
-      dispatch(APITransport(obj));
+      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
+      // dispatch(APITransport(obj));
+     const res = await fetch(obj.apiEndPoint(), {
+        method: "PATCH",
+        body: JSON.stringify(obj.getBody()),
+        headers: obj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (!res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving annotation",
+          variant: "error",
+        });
+      } 
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -590,8 +610,8 @@ const AudioTranscriptionLandingPage = () => {
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               disableBtns={disableBtns}
-              disableUpdata={disableUpdata}
-              disableSkip={disableSkip}
+              disableUpdataButton={disableUpdataButton}
+              disableSkipButton={disableSkipButton}   
               filterMessage={filterMessage}
             />
             <AudioPanel

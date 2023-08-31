@@ -192,7 +192,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    const handleAutosave = (id) => {
+    const handleAutosave = async(id) => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
@@ -204,7 +204,21 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       };
 
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[2]?.id, reqBody);
-      dispatch(APITransport(obj));
+      // dispatch(APITransport(obj));
+      const res = await fetch(obj.apiEndPoint(), {
+        method: "PATCH",
+        body: JSON.stringify(obj.getBody()),
+        headers: obj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (!res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving annotation",
+          variant: "error",
+        });
+      } 
+  
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
