@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import headerStyle from "../../../styles/header";
-import Logo from "../../../../assets/logo.svg";
+import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -636,15 +636,24 @@ const Header = () => {
           <AppBar>
             <Toolbar className={classes.toolbar}>
               <Grid
-                sx={{ flexGrow: 0, display: "inline-grid" }}
+              sx={{display: "flex",
+              alignItems: "center"}}
                 xs={12}
                 sm={12}
                 md={3}
               >
                 <Link to="/projects">
-                  <img src={Logo} alt="logo" className={classes.headerLogo} />
+                  <img src={Shoonya_Logo} alt="logo" className={classes.headerLogo} />
                 </Link>
+                <Typography  className={classes.headerTitle} sx={{ fontSize:"32px",   fontFamily:"Rowdies, cursive, Roboto, sans-serif"
+}}>
+                  shoonya
+                    </Typography>
               </Grid>
+
+
+
+
               {/* <Grid
                 container
                 direction="row"

@@ -9,8 +9,8 @@ const AnnotationStageButtons = ({
   onNextAnnotation,
   AnnotationsTaskDetails,
   disableBtns,
-  disableUpdata,
-  disableSkip,
+  disableUpdataButton,
+  disableSkipButton,
   filterMessage,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
@@ -28,7 +28,6 @@ const AnnotationStageButtons = ({
     <>
       <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
         {!disableBtns &&
-          [4, 5, 6].includes(user.role) &&
           TaskDetails?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
               <Tooltip title="Save task for later">
@@ -76,8 +75,7 @@ const AnnotationStageButtons = ({
             </Button>
           </Tooltip>
         </Grid>
-        {!disableSkip &&
-          [4, 5, 6].includes(user.role) &&
+        {!disableSkipButton &&
           TaskDetails?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
               <Tooltip title="skip to next task">
@@ -106,8 +104,7 @@ const AnnotationStageButtons = ({
               </Tooltip>
             </Grid>
           )}
-        {!disableUpdata &&
-          [4, 5, 6].includes(user.role) &&
+        {!disableUpdataButton &&
           TaskDetails?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
               <Tooltip>
