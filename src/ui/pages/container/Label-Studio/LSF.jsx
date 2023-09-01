@@ -798,7 +798,6 @@ const LabelStudioWrapper = ({
   const onNextAnnotation = async () => {
     showLoader();
     getNextProject(projectId, taskId).then((res) => {
-      console.log(res,"resresresres")
       hideLoader();
       // window.location.href = `/projects/${projectId}/task/${res.id}`;
       tasksComplete(res?.id || null);

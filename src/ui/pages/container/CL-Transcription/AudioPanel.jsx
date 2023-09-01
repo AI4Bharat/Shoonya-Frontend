@@ -61,9 +61,9 @@ const AudioPanel = ({
   //   }, [$video]);
 
   return (
-    <Grid style={{ padding: "0px 20px 0px 20px" }}>
+    <Grid style={{ padding: "0px 20px 15px 20px" }}>
      
-      <div className={classes.videoPlayerParent} style={{ display: "flex" }}>
+      {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio
           controls
           src={TaskDetails?.data?.audio_url}
@@ -77,7 +77,7 @@ const AudioPanel = ({
           ref={$audio}
           className={classes.videoPlayer}
         />
-      </div>
+      {/* </div> */}
     
     </Grid>
   );

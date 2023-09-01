@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import headerStyle from "../../../styles/header";
-import Logo from "../../../../assets/logo.svg";
+import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -26,7 +26,7 @@ import CustomButton from "../common/Button";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@mui/material";
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import Logout from "../../../../redux/actions/UserManagement/Logout";
 import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
@@ -39,7 +39,8 @@ const Header = () => {
   const [anchorElHelp, setAnchorElHelp] = useState(null);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
-  const [showTransliterationModel, setShowTransliterationModel] = useState(false);
+  const [showTransliterationModel, setShowTransliterationModel] =
+    useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -86,9 +87,8 @@ const Header = () => {
     window.addEventListener("keydown", keyPress);
     return () => {
       window.removeEventListener("keydown", keyPress);
-    }
+    };
   }, [keyPress]);
-
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
@@ -134,7 +134,7 @@ const Header = () => {
     } else {
       localStorage.setItem("enableChitrlekhaTranscription", false);
     }
-  }
+  };
 
   const handleTagsChange = (event) => {
     if (event.target.checked) {
@@ -143,12 +143,11 @@ const Header = () => {
         open: true,
         message: "Please type blackslash ( \\ ) to access the tags",
         variant: "info",
-       
       });
     } else {
       localStorage.setItem("enableTags", false);
     }
-  }
+  };
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -162,10 +161,14 @@ const Header = () => {
       />
     );
   };
- 
+
   const renderTabs = () => {
-    if (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role) {
-      return(
+    if (
+      userRole.Annotator === loggedInUserData?.role ||
+      userRole.Reviewer === loggedInUserData?.role ||
+      userRole.SuperChecker === loggedInUserData?.role
+    ) {
+      return (
         <Grid
           container
           direction="row"
@@ -177,7 +180,6 @@ const Header = () => {
           sm={12}
           md={7}
         >
-           
           {/* <Typography variant="body1">
             <NavLink
               hidden={loggedInUserData.role === 1}
@@ -219,7 +221,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/analytics"
+              to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -241,9 +243,10 @@ const Header = () => {
             </NavLink>
           </Typography> */}
         </Grid>
-      )
+      );
     } else if (userRole.WorkspaceManager === loggedInUserData?.role) {
-      return(<Grid
+      return (
+        <Grid
           container
           direction="row"
           // justifyContent="space-evenly"
@@ -304,7 +307,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/analytics"
+              to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -313,9 +316,11 @@ const Header = () => {
               Analytics
             </NavLink>
           </Typography>
-        </Grid>)
+        </Grid>
+      );
     } else if (userRole.OrganizationOwner === loggedInUserData?.role) {
-      return(<Grid
+      return (
+        <Grid
           container
           direction="row"
           // justifyContent="space-evenly"
@@ -365,7 +370,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/analytics"
+              to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -374,10 +379,11 @@ const Header = () => {
               Analytics
             </NavLink>
           </Typography>
-        </Grid>)   
-    } 
-    else if (userRole.Admin === loggedInUserData?.role) {
-      return(<Grid
+        </Grid>
+      );
+    } else if (userRole.Admin === loggedInUserData?.role) {
+      return (
+        <Grid
           container
           direction="row"
           // justifyContent="space-evenly"
@@ -427,7 +433,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/analytics"
+              to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -438,7 +444,7 @@ const Header = () => {
           </Typography>
           <Typography variant="body1">
             <NavLink
-             to="/admin"
+              to="/admin"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
               }
@@ -447,18 +453,22 @@ const Header = () => {
               Admin
             </NavLink>
           </Typography>
-        </Grid>)}
-    else {
-      return(
-        null
-      )
+        </Grid>
+      );
+    } else {
+      return null;
     }
-  }
+  };
 
   const tabs = [
     <Typography variant="body1">
       <NavLink
-        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role ||userRole.WorkspaceManager === loggedInUserData?.role  }
+        hidden={
+          userRole.Annotator === loggedInUserData?.role ||
+          userRole.Reviewer === loggedInUserData?.role ||
+          userRole.SuperChecker === loggedInUserData?.role ||
+          userRole.WorkspaceManager === loggedInUserData?.role
+        }
         to={
           loggedInUserData && loggedInUserData.organization
             ? `/my-organization/${loggedInUserData.organization.id}`
@@ -474,7 +484,7 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={ userRole.WorkspaceManager !== loggedInUserData?.role}
+        hidden={userRole.WorkspaceManager !== loggedInUserData?.role}
         to="/workspaces"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -497,7 +507,11 @@ const Header = () => {
     </Typography>,
     <Typography variant="body1">
       <NavLink
-        hidden={userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role}
+        hidden={
+          userRole.Annotator === loggedInUserData?.role ||
+          userRole.Reviewer === loggedInUserData?.role ||
+          userRole.SuperChecker === loggedInUserData?.role
+        }
         to="/datasets"
         className={({ isActive }) =>
           isActive ? classes.highlightedMenu : classes.headerMenu
@@ -508,29 +522,28 @@ const Header = () => {
       </NavLink>
     </Typography>,
     <Typography variant="body1">
-    <NavLink
-      to="/analytics"
-      className={({ isActive }) =>
-        isActive ? classes.highlightedMenu : classes.headerMenu
-      }
-      activeClassName={classes.highlightedMenu}
-    >
-      Analytics
-    </NavLink>
-  </Typography>,
-  <Typography variant="body1">
-  <NavLink
-    to="/admin"
-    hidden={userRole.Admin !== loggedInUserData?.role }
-
-    className={({ isActive }) =>
-      isActive ? classes.highlightedMenu : classes.headerMenu
-    }
-    activeClassName={classes.highlightedMenu}
-  >
-    Admin
-  </NavLink>
-</Typography>,
+      <NavLink
+        to="/analytics"
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Analytics
+      </NavLink>
+    </Typography>,
+    <Typography variant="body1">
+      <NavLink
+        to="/admin"
+        hidden={userRole.Admin !== loggedInUserData?.role}
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Admin
+      </NavLink>
+    </Typography>,
   ];
 
   const userSettings = [
@@ -563,7 +576,7 @@ const Header = () => {
       name: "Transliteration",
       onclick: () => {
         // navigate("/transliteration");
-        handleCloseSettingsMenu()
+        handleCloseSettingsMenu();
         setShowTransliterationModel(true);
       },
     },
@@ -581,7 +594,9 @@ const Header = () => {
       control: (
         <Checkbox
           onChange={handleTranscriptionFlowChange}
-          defaultChecked={localStorage.getItem("enableChitrlekhaTranscription") === "true"}
+          defaultChecked={
+            localStorage.getItem("enableChitrlekhaTranscription") === "true"
+          }
         />
       ),
     },
@@ -604,10 +619,8 @@ const Header = () => {
     {
       name: "Help",
       onclick: () => {
-
-        const url = 'https://github.com/AI4Bharat/Shoonya/wiki/Shoonya-FAQ'
-        window.open(url, '_blank');
-
+        const url = "https://github.com/AI4Bharat/Shoonya/wiki/Shoonya-FAQ";
+        window.open(url, "_blank");
       },
     },
 
@@ -619,12 +632,18 @@ const Header = () => {
 
   const handleTransliterationModelClose = () => {
     setShowTransliterationModel(false);
-  }
-
+  };
 
   return (
-    <Grid container direction="row" >
-      <Box className={localStorage.getItem("enableChitrlekhaTranscription") === "true"  && (localStorage.getItem("enableChitrlekhaUI") === "true") ? classes.AudioparentContainers: classes.parentContainer} >
+    <Grid container direction="row">
+      <Box
+        className={
+          localStorage.getItem("enableChitrlekhaTranscription") === "true" &&
+          localStorage.getItem("enableChitrlekhaUI") === "true"
+            ? classes.AudioparentContainers
+            : classes.parentContainer
+        }
+      >
         {isMobile ? (
           <MobileNavbar
             tabs={tabs}
@@ -636,15 +655,31 @@ const Header = () => {
           <AppBar>
             <Toolbar className={classes.toolbar}>
               <Grid
-                sx={{ flexGrow: 0, display: "inline-grid" }}
+                sx={{ display: "flex", alignItems: "center" }}
                 xs={12}
                 sm={12}
                 md={3}
               >
                 <Link to="/projects">
-                  <img src={Logo} alt="logo" className={classes.headerLogo} />
+                  <img
+                    src={Shoonya_Logo}
+                    alt="logo"
+                    className={classes.headerLogo}
+                    sx={{marginTop: "5%"}}
+                  />
                 </Link>
+                <Typography
+                  variant="h2"
+                  className={classes.headerTitle}
+                  sx={{
+                    fontSize: "28px",
+                    fontWeight: "lighter",
+                  }}
+                >
+                  shoonya
+                </Typography>
               </Grid>
+
               {/* <Grid
                 container
                 direction="row"
@@ -805,7 +840,6 @@ const Header = () => {
                     </MenuItem>
                   ))}
                 </Menu>
-
               </Box>
             </Toolbar>
           </AppBar>
@@ -814,14 +848,16 @@ const Header = () => {
       <Modal
         open={showTransliterationModel}
         onClose={() => handleTransliterationModelClose}
-        top= {50}
-        left= {50}
+        top={50}
+        left={50}
         topTranslate={"40"}
         leftTranslate={"-50"}
         isTransliteration={true}
         // sx={{width: "400px"}}
       >
-        <Transliteration onCancelTransliteration={()=>handleTransliterationModelClose} />
+        <Transliteration
+          onCancelTransliteration={() => handleTransliterationModelClose}
+        />
       </Modal>
     </Grid>
   );
