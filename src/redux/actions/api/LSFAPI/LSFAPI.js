@@ -1,5 +1,4 @@
 import axiosInstance from "../../../../utils/API_Instance/API_Instance";
-const Parser = require('html-react-parser');
 
 const fetchProject = async (projectID) => {
   try {
