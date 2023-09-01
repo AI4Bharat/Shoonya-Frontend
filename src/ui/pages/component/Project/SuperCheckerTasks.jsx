@@ -187,18 +187,18 @@ const SuperCheckerTasks = (props) => {
             NextTask?.id
           }`
         );
+      }
     }else{
-      if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
-        navigate(
-          `/projects/${id}/SuperChecker/${
-            NextTask?.id
-          }`
-        );
-    }
-    
+    if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
+      navigate(
+        `/projects/${id}/SuperChecker/${
+          NextTask?.id
+        }`
+      );
     }
   }
   }, [NextTask]);
+
   useEffect(() => {
     if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
       localStorage.setItem("enableChitrlekhaUI", true);
@@ -231,15 +231,20 @@ const SuperCheckerTasks = (props) => {
         );
         taskList[0].supercheck_status && row.push(el.supercheck_status);
         row.push( <>
-          <Link to={ (localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription") ?`SuperCheckerAudioTranscriptionLandingPage/${el.id}`:`SuperChecker/${el.id}`} className={classes.link}>
           <CustomButton
             disabled={ProjectDetails.is_archived}
-              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
+              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") 
+              if(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ){
+                navigate(`SuperCheckerAudioTranscriptionLandingPage/${el.id}`)
+              }
+              else{
+                navigate(`SuperChecker/${el.id}`)
+              }
+            }}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
                 Validate
               </Typography>} />
-      </Link>
 
         </>)
         return row;

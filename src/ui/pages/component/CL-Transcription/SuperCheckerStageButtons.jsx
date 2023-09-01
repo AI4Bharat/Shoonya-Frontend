@@ -225,7 +225,14 @@ const SuperCheckerStageButtons = ({
                 style={{
                   minWidth: "120px",
                   border: "1px solid gray",
-                  color: "rgb(245, 34, 45)",
+                  color: (
+                    ProjectData.revision_loop_count >
+                    TaskDetails?.revision_loop_count?.super_check_count
+                      ? false
+                      : true
+                  )
+                    ? "#B2BABB"
+                    : "#f5222d",
                   pt: 2,
                   pb: 2,
                 }}
