@@ -202,9 +202,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
         parent_annotation: AnnotationsTaskDetails[2]?.parent_annotation,
-        // cl_format: true,
-        // offset: currentPage,
-        // limit: limit,
+        auto_save :true,
+        lead_time:
+        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time?.lead_time ?? 0),
         result,
       };
 
@@ -458,7 +458,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox) {
+    if (!textBox && !speakerBox && result?.length>0) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {
@@ -499,10 +499,16 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           message: "Please Enter All The Transcripts",
           variant: "error",
         });
-      } else {
+      } else if(speakerBox) {
         setSnackbarInfo({
           open: true,
           message: "Please Select The Speaker",
+          variant: "error",
+        });
+      }else{
+        setSnackbarInfo({
+          open: true,
+          message: "Error in saving annotation",
           variant: "error",
         });
       }
@@ -696,6 +702,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             AnnotationsTaskDetails={AnnotationsTaskDetails}
             player={player}
             ProjectDetails={ProjectDetails}
+            TaskDetails={taskDetailList}
           />
         </Grid>
       </Grid>
