@@ -1,7 +1,9 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
 import { useQuill } from 'react-quilljs';
+import DOMPurify from 'dompurify';
 import ReactQuill, { Quill } from 'react-quill';
+import Parser from 'html-react-parser';
 import "./editor.css"
 import 'quill/dist/quill.snow.css';
 import LabelStudio from "@heartexlabs/label-studio";
@@ -203,6 +205,7 @@ const LabelStudioWrapper = ({
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
+  
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
@@ -262,6 +265,7 @@ const LabelStudioWrapper = ({
     projectType
   ) {
     let interfaces = [];
+
     if (predictions == null) predictions = [];
     const [filteredAnnotations, disableLSFControls, disableSkip] = filterAnnotations(
       annotations,
@@ -396,7 +400,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               annotation.lead_time,
               annotation_status.current,
-              annotationNotesRef.current.value
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents())
             ).then((res) => {
               if (localStorage.getItem("labelAll"))
                 getNextProject(projectId, taskData.id).then((res) => {
@@ -430,7 +434,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               annotation.lead_time,
               "skipped",
-              annotationNotesRef.current.value
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents())
             ).then(() => {
               getNextProject(projectId, taskData.id).then((res) => {
                 hideLoader();
@@ -485,7 +489,7 @@ const LabelStudioWrapper = ({
                   load_time.current,
                   annotations[i].lead_time,
                   annotation_status.current,
-                  annotationNotesRef.current.value
+                  JSON.stringify(annotationNotesRef.current.getEditor().getContents())
                 ).then((res) => {
                   hideLoader();
                   if (res.status !== 200) {
@@ -733,7 +737,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               annotations[i].lead_time,
               annotations[i].annotation_status,
-              annotationNotesRef.current.value,
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
               true
             ).then((res) => {
               if (res.status !== 200) {
@@ -943,7 +947,9 @@ export default function LSF() {
     [{ 'script': 'sub'}, { 'script': 'super' }],
     ]
   };
-
+// const handleAnnotationNotes=(notes)=>{
+//   annotationNotesRef.current.getEditor().setContents(notes)
+// }
   const formats = [
     'size',
     'bold','italic','underline','strike',
@@ -985,9 +991,14 @@ export default function LSF() {
   useEffect(() => {
     fetchAnnotation(taskId).then((data) => {
       if (data && Array.isArray(data) && data.length > 0) {
-        console.log(annotationNotesRef.current.value,data[0].annotation_notes);
+        console.log(annotationNotesRef);
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
+        const newDelta = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+        // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        annotationNotesRef.current.getEditor().setContents(newDelta);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
       }
     });
   }, [taskId]);
@@ -1005,6 +1016,7 @@ export default function LSF() {
   const getTaskData = (taskData) => {
     setTaskData(taskData);
   };
+
 
 
   return (
@@ -1100,14 +1112,14 @@ export default function LSF() {
               ref={annotationNotesRef}
               modules={modules}
               formats={formats}
-              bounds={"#notess"}
+              bounds={"#note"}
               placeholder="Annotation Notes"
             ></ReactQuill>
             <ReactQuill
               ref={reviewNotesRef}
               modules={modules}
               formats={formats}
-              bounds={"#notess"}
+              bounds={"#note"}
               placeholder="Review Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
               readOnly={true}

@@ -1179,15 +1179,22 @@ export default function LSF() {
   };
 
 
-  // useEffect(() => {
-  //   fetchAnnotation(taskId).then((data) => {
-  //     if (data && Array.isArray(data) && data.length > 0) {
-  //       let correctAnnotation = data.find((item) => item.status === "correct");
-  //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
-  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
-  //     }
-  //   });
-  // }, [taskId]);
+  useEffect(() => {
+    fetchAnnotation(taskId).then((data) => {
+      if (data && Array.isArray(data) && data.length > 0) {
+        let correctAnnotation = data.find((item) => item.status === "correct");
+        console.log(annotationNotesRef);
+        annotationNotesRef.current.value = data[0].annotation_notes ?? "";
+        reviewNotesRef.current.value = data[0].review_notes ?? "";
+        const newDelta = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+        // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        annotationNotesRef.current.getEditor().setContents(newDelta);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+      }
+    });
+  }, [taskId]);
+  
 
   const resetNotes = () => {
     setShowNotes(false);
@@ -1298,7 +1305,7 @@ export default function LSF() {
             <ReactQuill
               ref={annotationNotesRef}
               modules={modules}
-              bounds={"#notess"}
+              bounds={"#note"}
               formats={formats}
               placeholder="Annotation Notes"
               readOnly={true}
@@ -1306,7 +1313,7 @@ export default function LSF() {
             <ReactQuill
               ref={reviewNotesRef}
               modules={modules}
-              bounds={"#notess"}
+              bounds={"#note"}
               formats={formats}
               placeholder="Review Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
@@ -1314,7 +1321,7 @@ export default function LSF() {
             <ReactQuill
               ref={superCheckerNotesRef}
               modules={modules}
-              bounds={"#notess"}
+              bounds={"#note"}
               formats={formats}
               placeholder="SuperChecker Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}

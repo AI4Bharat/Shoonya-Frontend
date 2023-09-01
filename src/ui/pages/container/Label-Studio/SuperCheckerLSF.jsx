@@ -966,6 +966,21 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
+  useEffect(() => {
+    fetchAnnotation(taskId).then((data) => {
+      if (data && Array.isArray(data) && data.length > 0) {
+        let correctAnnotation = data.find((item) => item.status === "correct");
+        superCheckerNotesRef.current.value = data[0].annotation_notes ?? "";
+        reviewNotesRef.current.value = data[0].review_notes ?? "";
+        const newDelta = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        superCheckerNotesRef.current.getEditor().setContents(newDelta);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+      }
+    });
+  }, [taskId]);
+
   const resetNotes = () => {
     setShowNotes(false);
     superCheckerNotesRef.current.value = "";
@@ -1076,7 +1091,7 @@ export default function LSF() {
               ref={reviewNotesRef}
               modules={modules}
               formats={formats}
-              bounds={"#notess"}
+              bounds={"#note"}
               placeholder="Review Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
               readOnly={true}
@@ -1084,7 +1099,7 @@ export default function LSF() {
             <ReactQuill
               ref={superCheckerNotesRef}
               modules={modules}
-              bounds={"#notess"}
+              bounds={"#note"}
               formats={formats}
               placeholder="SuperChecker Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}

@@ -1,15 +1,15 @@
 
-#notes {
-    margin: 1rem 4rem;
+.quill {
+    margin: 1rem;
   }
   
-  #notes .ql-container {
+   .ql-container {
     background: #fefcfc;
     margin-bottom: 1%;
   
   }
 
-  #notes .ql-snow.ql-toolbar {
+  .quill .ql-snow.ql-toolbar {
     display: block;
   }
   .quill > .ql-container > .ql-editor.ql-blank::before{
@@ -18,18 +18,18 @@
 }
 
   
-  #notes .ql-editor {
+  .quill .ql-editor {
     min-height: 4em;
     font-size: 1rem;
     font-style: normal;
   }
-  #notes .ql-formats button {
+  .quill .ql-formats button {
     position: relative
   }
 
-  #notes .ql-formats button:hover:after,
-  #notes .ql-formats button:active:after,
-  #notes .ql-formats button:focus:after {
+  .quill .ql-formats button:hover:after,
+  .quill .ql-formats button:active:after,
+  .quill .ql-formats button:focus:after {
       position: absolute;
       background: black;
       color: white;
@@ -42,44 +42,44 @@
       font-size: 0.7rem;
   }
 
-  #notes .ql-bold:hover:after,
-  #notes .ql-bold:active:after,
-  #notes .ql-bold:focus:after {
+  .quill .ql-bold:hover:after,
+  .quill .ql-bold:active:after,
+  .quill .ql-bold:focus:after {
      content: 'Bold Ctrl B';
   }
-  #notes .ql-italic:hover:after,
-  #notes .ql-italic:active:after,
-  #notes .ql-italic:focus:after {
+  .quill .ql-italic:hover:after,
+  .quill .ql-italic:active:after,
+  .quill .ql-italic:focus:after {
      content: 'Italic Ctrl I';
   }
-  #notes .ql-underline:hover:after,
-  #notes .ql-underline:active:after,
-  #notes .ql-underline:focus:after {
+  .quill .ql-underline:hover:after,
+  .quill .ql-underline:active:after,
+  .quill .ql-underline:focus:after {
      content: 'Underline Ctrl U';
   }
-  #notes .ql-strike:hover:after,
-  #notes .ql-strike:active:after,
-  #notes .ql-strike:focus:after {
+  .quill .ql-strike:hover:after,
+  .quill .ql-strike:active:after,
+  .quill .ql-strike:focus:after {
      content: 'StrikeThrough';
   }
-  #notes .ql-size:hover:after,
-  #notes .ql-size:active:after,
-  #notes .ql-size:focus:after {
+  .quill .ql-size:hover:after,
+  .quill .ql-size:active:after,
+  .quill .ql-size:focus:after {
      content: 'Size';
   }
-  #notes .ql-script[value="sub"]:hover:after,
-  #notes .ql-script:active:after,
-  #notes .ql-script:focus:after {
+  .quill .ql-script[value="sub"]:hover:after,
+  .quill .ql-script:active:after,
+  .quill .ql-script:focus:after {
      content: 'SubScript';
   }
-  #notes .ql-script[value="super"]:hover:after,
-  #notes .ql-script:active:after,
-  #notes .ql-script:focus:after {
+  .quill .ql-script[value="super"]:hover:after,
+  .quill .ql-script:active:after,
+  .quill .ql-script:focus:after {
      content: 'SuperScript';
   }
-  #notes .ql-color:hover:after,
-  #notes .ql-color:active:after,
-  #notes .ql-color:focus:after {
+  .quill .ql-color:hover:after,
+  .quill .ql-color:active:after,
+  .quill .ql-color:focus:after {
      content: 'Color';
   }
   
