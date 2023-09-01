@@ -930,7 +930,6 @@ export default function LSF() {
     message: "",
     variant: "info",
   });
-  // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
@@ -944,9 +943,7 @@ export default function LSF() {
     [{ 'script': 'sub'}, { 'script': 'super' }],
     ]
   };
-// const handleAnnotationNotes=(notes)=>{
-//   annotationNotesRef.current.getEditor().setContents(notes)
-// }
+
   const formats = [
     'size',
     'bold','italic','underline','strike',
@@ -992,7 +989,6 @@ export default function LSF() {
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
         const newDelta = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
-        // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         annotationNotesRef.current.getEditor().setContents(newDelta);
         reviewNotesRef.current.getEditor().setContents(newDelta1);

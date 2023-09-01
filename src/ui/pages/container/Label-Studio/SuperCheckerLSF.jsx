@@ -351,7 +351,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               review.lead_time,
               "skipped",
-              superCheckerNotesRef.current.value
+              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
             ).then(() => {
               getNextProject(projectId, taskData.id, "supercheck").then(
                 (res) => {
@@ -409,7 +409,7 @@ const LabelStudioWrapper = ({
               review_status.current,
               temp,
               superChecker.parent_annotation,
-              superCheckerNotesRef.current.value
+              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
             ).then(() => {
               if (localStorage.getItem("labelAll"))
                 getNextProject(projectId, taskData.id, "supercheck").then(
@@ -447,6 +447,11 @@ const LabelStudioWrapper = ({
         );
         reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
+        
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
@@ -464,6 +469,11 @@ const LabelStudioWrapper = ({
             reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
+
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -473,6 +483,10 @@ const LabelStudioWrapper = ({
               reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           }
         }
       }
@@ -614,7 +628,7 @@ const LabelStudioWrapper = ({
           superChecker.annotation_status,
           temp,
           superChecker.parent_annotation,
-          superCheckerNotesRef.current.value,
+          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
           true
         ).then((res) => {
           if (res.status !== 200) {
@@ -966,20 +980,7 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
-  // useEffect(() => {
-  //   fetchAnnotation(taskId).then((data) => {
-  //     if (data && Array.isArray(data) && data.length > 0) {
-  //       let correctAnnotation = data.find((item) => item.status === "correct");
-  //       superCheckerNotesRef.current.value = data[0].annotation_notes ?? "";
-  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
-  //       const newDelta = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-  //       // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
-  //       const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-  //       superCheckerNotesRef.current.getEditor().setContents(newDelta);
-  //       reviewNotesRef.current.getEditor().setContents(newDelta1);
-  //     }
-  //   });
-  // }, [taskId]);
+
 
   const resetNotes = () => {
     setShowNotes(false);
