@@ -1,9 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
 import { useQuill } from 'react-quilljs';
-import DOMPurify from 'dompurify';
 import ReactQuill, { Quill } from 'react-quill';
-import Parser from 'html-react-parser';
 import "./editor.css"
 import 'quill/dist/quill.snow.css';
 import LabelStudio from "@heartexlabs/label-studio";

@@ -966,20 +966,20 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
-  useEffect(() => {
-    fetchAnnotation(taskId).then((data) => {
-      if (data && Array.isArray(data) && data.length > 0) {
-        let correctAnnotation = data.find((item) => item.status === "correct");
-        superCheckerNotesRef.current.value = data[0].annotation_notes ?? "";
-        reviewNotesRef.current.value = data[0].review_notes ?? "";
-        const newDelta = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-        // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        superCheckerNotesRef.current.getEditor().setContents(newDelta);
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-      }
-    });
-  }, [taskId]);
+  // useEffect(() => {
+  //   fetchAnnotation(taskId).then((data) => {
+  //     if (data && Array.isArray(data) && data.length > 0) {
+  //       let correctAnnotation = data.find((item) => item.status === "correct");
+  //       superCheckerNotesRef.current.value = data[0].annotation_notes ?? "";
+  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
+  //       const newDelta = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+  //       // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
+  //       const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+  //       superCheckerNotesRef.current.getEditor().setContents(newDelta);
+  //       reviewNotesRef.current.getEditor().setContents(newDelta1);
+  //     }
+  //   });
+  // }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);

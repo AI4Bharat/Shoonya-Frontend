@@ -1179,21 +1179,24 @@ export default function LSF() {
   };
 
 
-  useEffect(() => {
-    fetchAnnotation(taskId).then((data) => {
-      if (data && Array.isArray(data) && data.length > 0) {
-        let correctAnnotation = data.find((item) => item.status === "correct");
-        console.log(annotationNotesRef);
-        annotationNotesRef.current.value = data[0].annotation_notes ?? "";
-        reviewNotesRef.current.value = data[0].review_notes ?? "";
-        const newDelta = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
-        // const editorHTML = annotationNotesRef.current.getEditor().clipboard.convert(newDelta)
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        annotationNotesRef.current.getEditor().setContents(newDelta);
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-      }
-    });
-  }, [taskId]);
+  // useEffect(() => {
+  //   fetchAnnotation(taskId).then((data) => {
+  //     if (data && Array.isArray(data) && data.length > 0) {
+  //       let correctAnnotation = data.find((item) => item.status === "correct");
+  //       console.log(annotationNotesRef);
+  //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
+  //       superCheckerNotesRef.current.value = data[0].annotation_notes ?? "";
+  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
+  //       const newDelta2 = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+  //       const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+  //       const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+  //       annotationNotesRef.current.getEditor().setContents(newDelta2);
+  //       reviewNotesRef.current.getEditor().setContents(newDelta1);
+  //       superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+
+  //     }
+  //   });
+  // }, [taskId]);
   
 
   const resetNotes = () => {
@@ -1316,7 +1319,6 @@ export default function LSF() {
               bounds={"#note"}
               formats={formats}
               placeholder="Review Notes"
-              style={{ marginbottom: "1%", minHeight: "2rem" }}
             ></ReactQuill>
             <ReactQuill
               ref={superCheckerNotesRef}
@@ -1324,7 +1326,6 @@ export default function LSF() {
               bounds={"#note"}
               formats={formats}
               placeholder="SuperChecker Notes"
-              style={{ marginbottom: "1%", minHeight: "2rem" }}
               readOnly={true}
             ></ReactQuill>
             {/* <TextField

@@ -441,7 +441,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
                     navigate(`AudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{
-                    navigate(`task/${el.id}`)
+                    navigate(`review/${el.id}`)
                   }
                 }}
                 sx={{ p: 1, borderRadius: 2 }}
