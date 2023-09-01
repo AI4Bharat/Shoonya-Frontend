@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
-import { useQuill } from 'react-quilljs';
 import ReactQuill, { Quill } from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.snow.css';

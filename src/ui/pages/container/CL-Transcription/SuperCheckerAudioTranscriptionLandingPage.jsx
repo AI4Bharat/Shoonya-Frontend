@@ -1,5 +1,7 @@
 // AudioTranscriptionLandingPage
-
+import ReactQuill, { Quill } from 'react-quill';
+import "../../../../ui/pages/container/Label-Studio/cl_ui.css"
+import 'quill/dist/quill.bubble.css';
 import React, {
   memo,
   useCallback,
@@ -446,7 +448,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setLoading(true);
     const PatchAPIdata = {
       annotation_status: value,
-      supercheck_notes: superCheckerNotesRef.current.value,
+      supercheck_notes: JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result,
@@ -525,6 +527,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         );
         reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
+        const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
+        const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value?.annotation_type === 2
@@ -542,6 +548,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
+        const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
+        const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -551,6 +561,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               reviewerAnnotations[0]?.review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation[0]?.supercheck_notes ?? "";
+        const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
+        const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           }
         }
       }
@@ -567,6 +581,21 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     superCheckerNotesRef.current.value = "";
     reviewNotesRef.current.value = "";
   };
+  const modules = {
+    toolbar: [
+
+      [{ size: [] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+    ]
+  };
+
+  const formats = [
+    'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color',
+    'script']
 
   useEffect(() => {
     resetNotes();
@@ -643,12 +672,14 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             style={{
               display: showNotes ? "block" : "none",
               paddingBottom: "16px",
+              overflow:"auto",
+              height:"178px"
             }}
           >
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            <TextField
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Review Notes"
@@ -681,7 +712,24 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 style: { fontSize: "1rem" },
               }}
               style={{ width: "99%", marginTop: "1%" }}
-            />
+            /> */}
+            <ReactQuill
+                  ref={reviewNotesRef}
+                  modules={modules}
+                  bounds={"#note"}
+                  formats={formats}
+                  theme="bubble"
+                  placeholder="Review Notes"
+                ></ReactQuill>
+                <ReactQuill
+                  ref={superCheckerNotesRef}
+                  modules={modules}
+                  bounds={"#note"}
+                  theme="bubble"
+                  formats={formats}
+                  placeholder="SuperChecker Notes"
+                  readOnly={true}
+                ></ReactQuill>
               </div>
             </Grid>
           </Box>

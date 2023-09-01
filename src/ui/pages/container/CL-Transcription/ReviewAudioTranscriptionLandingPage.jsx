@@ -1,5 +1,7 @@
 // AudioTranscriptionLandingPage
-
+import ReactQuill, { Quill } from 'react-quill';
+import "../../../../ui/pages/container/Label-Studio/cl_ui.css"
+import 'quill/dist/quill.bubble.css';
 import React, {
   memo,
   useCallback,
@@ -89,7 +91,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
 
-  
+
 
   // useEffect(() => {
   //   let intervalId;
@@ -134,13 +136,13 @@ const ReviewAudioTranscriptionLandingPage = () => {
       if (userAnnotation.annotation_status === "unreviewed") {
         filteredAnnotations =
           userAnnotation.result.length > 0 &&
-          !taskData?.revision_loop_count?.review_count
+            !taskData?.revision_loop_count?.review_count
             ? [userAnnotation]
             : annotations.filter(
-                (annotation) =>
-                  annotation.id === userAnnotation.parent_annotation &&
-                  annotation.annotation_type === 1
-              );
+              (annotation) =>
+                annotation.id === userAnnotation.parent_annotation &&
+                annotation.annotation_type === 1
+            );
         console.log(
           filteredAnnotations,
           "filteredAnnotationsfilteredAnnotations"
@@ -289,11 +291,11 @@ const ReviewAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    const handleAutosave = async(id) => {
+    const handleAutosave = async (id) => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
-        parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
+        parent_annotation: AnnotationsTaskDetails[1]?.parent_annotation,
         // cl_format: true,
         // offset: currentPage,
         // limit: limit,
@@ -314,7 +316,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
           message: "Error in autosaving annotation",
           variant: "error",
         });
-      } 
+      }
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -441,7 +443,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   const getAnnotationsTaskData = (id) => {
     setLoading(true);
-    const userObj = new GetAnnotationsTaskAPI(id?id:taskId);
+    const userObj = new GetAnnotationsTaskAPI(id ? id : taskId);
     dispatch(APITransport(userObj));
   };
 
@@ -511,8 +513,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
         setNextData(rsp_data);
         tasksComplete(rsp_data?.id || null);
         getAnnotationsTaskData(rsp_data.id);
-       
-      } 
+
+      }
     }).catch((error) => {
       setSnackbarInfo({
         open: true,
@@ -536,76 +538,76 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setLoading(true);
     const PatchAPIdata = {
       annotation_status: value,
-      review_notes:  reviewNotesRef.current.value,
+      review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result,
-      ...((value === "to_be_revised" ||value === "accepted" ||
+      ...((value === "to_be_revised" || value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
         parent_annotation: parentannotation,
       }),
     };
     if (!textBox && !speakerBox) {
-    const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
-    // dispatch(APITransport(GlossaryObj));
-    const res = await fetch(TaskObj.apiEndPoint(), {
-      method: "PATCH",
-      body: JSON.stringify(TaskObj.getBody()),
-      headers: TaskObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    if (res.ok) {
-      if (localStorage.getItem("labelAll") || value === "skipped") {
-        onNextAnnotation(resp.task);
-      }
+      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+      // dispatch(APITransport(GlossaryObj));
+      const res = await fetch(TaskObj.apiEndPoint(), {
+        method: "PATCH",
+        body: JSON.stringify(TaskObj.getBody()),
+        headers: TaskObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        if (localStorage.getItem("labelAll") || value === "skipped") {
+          onNextAnnotation(resp.task);
+        }
 
-      if (
-        value === "accepted" ||
-        value === "accepted_with_minor_changes" ||
-        value === "accepted_with_major_changes"
-      ) {
+        if (
+          value === "accepted" ||
+          value === "accepted_with_minor_changes" ||
+          value === "accepted_with_major_changes"
+        ) {
+          setSnackbarInfo({
+            open: true,
+            message: "Task successfully submitted",
+            variant: "success",
+          });
+        } else if (value === "draft") {
+          setSnackbarInfo({
+            open: true,
+            message: "Task saved as draft",
+            variant: "success",
+          });
+        }
+      } else {
         setSnackbarInfo({
           open: true,
-          message: "Task successfully submitted",
-          variant: "success",
-        });
-      } else if (value === "draft") {
-        setSnackbarInfo({
-          open: true,
-          message: "Task saved as draft",
-          variant: "success",
+          message: "Error in saving annotation",
+          variant: "error",
         });
       }
     } else {
-      setSnackbarInfo({
-        open: true,
-        message: "Error in saving annotation",
-        variant: "error",
-      });
+      if (textBox) {
+        setSnackbarInfo({
+          open: true,
+          message: "Please Enter All The Transcripts",
+          variant: "error",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: "Please Select The Speaker",
+          variant: "error",
+        });
+      }
     }
-  }else {
-    if (textBox) {
-      setSnackbarInfo({
-        open: true,
-        message: "Please Enter All The Transcripts",
-        variant: "error",
-      });
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: "Please Select The Speaker",
-        variant: "error",
-      });
-    }
-  }
     setLoading(false);
     setShowNotes(false)
     setAnchorEl(null)
   };
 
   const setNotes = (taskData, annotations) => {
-    if (annotations  && annotations.length > 0) {
+    if (annotations && annotations.length > 0) {
       let userAnnotation = annotations.find(
         (annotation) =>
           annotation.completed_by === user.id &&
@@ -621,6 +623,12 @@ const ReviewAudioTranscriptionLandingPage = () => {
         annotationNotesRef.current.value = normalAnnotation?.annotation_notes ?? "";
         reviewNotesRef.current.value = userAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = superCheckerAnnotation?.supercheck_notes ?? "";
+        const newDelta2 = annotationNotesRef.current.value != "" ? JSON.parse(annotationNotesRef.current.value) : "";
+        const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
+        const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
+        annotationNotesRef.current.getEditor().setContents(newDelta2);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -641,6 +649,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 (annotation) =>
                   annotation.parent_annotation === correctAnnotation.id
               )?.supercheck_notes ?? "";
+            const newDelta2 = annotationNotesRef.current.value != "" ? JSON.parse(annotationNotesRef.current.value) : "";
+            const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
+            annotationNotesRef.current.getEditor().setContents(newDelta2);
+            superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -654,6 +666,12 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 (annotation) =>
                   annotation.parent_annotation === reviewerAnnotations[0]?.id
               )?.supercheck_notes ?? "";
+            const newDelta2 = annotationNotesRef.current.value != "" ? JSON.parse(annotationNotesRef.current.value) : "";
+            const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
+            const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
+            annotationNotesRef.current.getEditor().setContents(newDelta2);
+            reviewNotesRef.current.getEditor().setContents(newDelta1);
+            superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           }
         } else {
           let normalAnnotation = annotations.find(
@@ -664,25 +682,46 @@ const ReviewAudioTranscriptionLandingPage = () => {
           reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
           superCheckerNotesRef.current.value =
             normalAnnotation.supercheck_notes ?? "";
+          const newDelta2 = annotationNotesRef.current.value != "" ? JSON.parse(annotationNotesRef.current.value) : "";
+          const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
+          const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
+          annotationNotesRef.current.getEditor().setContents(newDelta2);
+          reviewNotesRef.current.getEditor().setContents(newDelta1);
+          superCheckerNotesRef.current.getEditor().setContents(newDelta3);
         }
       }
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     setNotes(TaskDetails, AnnotationsTaskDetails);
 
-  },[TaskDetails,AnnotationsTaskDetails]);
+  }, [TaskDetails, AnnotationsTaskDetails]);
 
   const resetNotes = () => {
     setShowNotes(false);
     reviewNotesRef.current.value = "";
   };
-  
+
 
   useEffect(() => {
     resetNotes();
   }, [taskId]);
+  const modules = {
+    toolbar: [
+
+      [{ size: [] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+    ]
+  };
+
+  const formats = [
+    'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color',
+    'script']
 
   const renderSnackBar = () => {
     return (
@@ -703,21 +742,22 @@ const ReviewAudioTranscriptionLandingPage = () => {
       {renderSnackBar()}
       <Grid container direction={"row"} className={classes.parentGrid}>
         <Grid md={6} xs={12} id="video" className={classes.videoParent}>
-        <Button
-          value="Back to Project"
-          startIcon={<ArrowBackIcon />}
-          variant="contained"
-          color="primary"
-          sx={{ml:1}}
-          onClick={() => {
-            localStorage.removeItem("labelAll");
-            navigate(`/projects/${projectId}`);
-            //window.location.replace(`/#/projects/${projectId}`);
-            //window.location.reload();
-          }}
-        >
-          Back to Project
-        </Button>
+          <Button
+            value="Back to Project"
+            startIcon={<ArrowBackIcon />}
+            variant="contained"
+            color="primary"
+            sx={{ ml: 1 }}
+            onClick={() => {
+              localStorage.removeItem("labelAll");
+              navigate(`/projects/${projectId}`);
+              //window.location.replace(`/#/projects/${projectId}`);
+              //window.location.reload();
+            }}
+          >
+            Back to Project
+          </Button>
+
           <Box
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
@@ -739,33 +779,33 @@ const ReviewAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
             />
             <Grid sx={{ ml: 3 }}>
-            <Button
-              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-              variant="contained"
-              color={
-                annotationNotesRef.current?.value !== "" ||
-                  superCheckerNotesRef.current?.value !== ""
-                  ? "success"
-                  : "primary"
-              }
-              onClick={handleCollapseClick}
-            >
-              Notes{" "}
-              {annotationNotesRef.current?.value !== "" ||
-                (superCheckerNotesRef.current?.value !== "" && "*")}
-            </Button>
-          <div
-              className={classes.collapse}    
-              style={{
-              display: showNotes ? "block" : "none",
-              paddingBottom: "16px",
-              height: "178px", overflow: "auto"
-            }}
-          >
-            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+              <Button
+                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                variant="contained"
+                color={
+                  annotationNotesRef.current?.value !== "" ||
+                    superCheckerNotesRef.current?.value !== ""
+                    ? "success"
+                    : "primary"
+                }
+                onClick={handleCollapseClick}
+              >
+                Notes{" "}
+                {annotationNotesRef.current?.value !== "" ||
+                  (superCheckerNotesRef.current?.value !== "" && "*")}
+              </Button>
+              <div
+                className={classes.collapse}
+                style={{
+                  display: showNotes ? "block" : "none",
+                  paddingBottom: "16px",
+                  height: "178px", overflow: "auto"
+                }}
+              >
+                {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            <TextField
+                {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Annotation Notes"
@@ -813,7 +853,34 @@ const ReviewAudioTranscriptionLandingPage = () => {
               }}
               style={{ width: "99%", marginTop: "1%" }}
             // ref={quillRef}
-            />
+            /> */}
+                <ReactQuill
+                  ref={annotationNotesRef}
+                  modules={modules}
+                  bounds={"#note"}
+                  theme="bubble"
+                  formats={formats}
+                  placeholder="Annotation Notes"
+                  readOnly={true}
+                ></ReactQuill>
+                <ReactQuill
+                  ref={reviewNotesRef}
+                  modules={modules}
+                  bounds={"#note"}
+                  theme="bubble"
+                  formats={formats}
+                  placeholder="Review Notes"
+                ></ReactQuill>
+                <ReactQuill
+                  ref={superCheckerNotesRef}
+                  modules={modules}
+                  bounds={"#note"}
+                  theme="bubble"
+                  formats={formats}
+                  placeholder="SuperChecker Notes"
+                  readOnly={true}
+                ></ReactQuill>
+
               </div>
             </Grid>
           </Box>
@@ -833,7 +900,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         width={"100%"}
         position="fixed"
         bottom={1}
-        // style={fullscreen ? { visibility: "hidden" } : {}}
+      // style={fullscreen ? { visibility: "hidden" } : {}}
       >
         <Timeline currentTime={currentTime} playing={playing} />
       </Grid>
