@@ -65,6 +65,7 @@ const AudioTranscriptionLandingPage = () => {
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
+  const[taskData,setTaskData] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
     open: false,   
     message: "",      
@@ -73,7 +74,6 @@ const AudioTranscriptionLandingPage = () => {
   let labellingMode = localStorage.getItem("labellingMode");
   // const subs = useSelector((state) => state.commonReducer.subtitles);
   const result = useSelector((state) => state.commonReducer.subtitles);
-
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask?.data
   );
@@ -235,9 +235,9 @@ const AudioTranscriptionLandingPage = () => {
     setSpeakerBox(hasEmptySpeaker);
   }, [result]);
 
-  const getTaskData = async () => {
+  const getTaskData = async (id) => {
     setLoading(true);
-    const ProjectObj = new GetTaskDetailsAPI(taskId);
+    const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
     // dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
@@ -256,6 +256,8 @@ const AudioTranscriptionLandingPage = () => {
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
+    }else{
+      setTaskData(resp)
     }
     setLoading(false);
   };
@@ -467,6 +469,7 @@ const AudioTranscriptionLandingPage = () => {
           setNextData(rsp_data);
           tasksComplete(rsp_data?.id || null);
           getAnnotationsTaskData(rsp_data.id);
+          getTaskData(rsp_data.id)
         }
       })
       .catch((error) => {
@@ -578,7 +581,8 @@ const AudioTranscriptionLandingPage = () => {
         message={snackbar.message}
       />
     );
-  };
+  }
+
 
   return (
     <>
@@ -620,6 +624,7 @@ const AudioTranscriptionLandingPage = () => {
               handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
+              taskData={taskData}
             />
 
             <Grid sx={{ ml: 3 }}>
@@ -697,7 +702,7 @@ const AudioTranscriptionLandingPage = () => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} />
+        <Timeline currentTime={currentTime} playing={playing}   taskData={taskData} />
       </Grid>
     </>
   );

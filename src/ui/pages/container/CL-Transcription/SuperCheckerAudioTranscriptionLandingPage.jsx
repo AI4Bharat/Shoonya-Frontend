@@ -58,6 +58,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [annotations, setAnnotations] = useState([]);
   const [disableSkip, setdisableSkip] = useState(false);
+  const[taskDetailList,setTaskDetailList] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -170,9 +171,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setSpeakerBox(hasEmptySpeaker);
   }, [result]);
 
-  const getTaskData = async () => {
+  const getTaskData = async (id) => {
     setLoading(true);
-    const ProjectObj = new GetTaskDetailsAPI(taskId);
+    const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
     // dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
@@ -191,7 +192,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
-    }
+    }else{setTaskDetailList(resp)}
     setLoading(false);
   };
 
@@ -421,6 +422,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           setNextData(rsp_data);
           tasksComplete(rsp_data?.id || null);
           getAnnotationsTaskData(rsp_data.id);
+          getTaskData(rsp_data.id)
         }
       })
       .catch((error) => {
@@ -625,6 +627,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               // handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
+              taskData={taskDetailList}
             />
             <Grid sx={{ ml: 3 }}>
             <Button
@@ -703,7 +706,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} />
+        <Timeline currentTime={currentTime} playing={playing} taskData={taskDetailList} />
       </Grid>
     </>
   );
