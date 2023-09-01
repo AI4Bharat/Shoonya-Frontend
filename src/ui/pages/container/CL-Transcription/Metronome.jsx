@@ -38,8 +38,8 @@ export default React.memo(
     const [drogEndTime, setDrogEndTime] = useState(0);
     const gridGap = document.body.clientWidth / render.gridNum;
 
-    const subtitles = useSelector((state) => state.commonReducer.subtitles);
-    const player = useSelector((state) => state.commonReducer.player);
+    const subtitles = useSelector((state) => state.commonReducer?.subtitles);
+    const player = useSelector((state) => state.commonReducer?.player);
 
     const getEventTime = useCallback(
       (event) => {
@@ -99,6 +99,7 @@ export default React.memo(
               end_time,
               text: "SUB_TEXT",
               target_text: "SUB_TEXT",
+              speaker_id: "",
             })
           );
 

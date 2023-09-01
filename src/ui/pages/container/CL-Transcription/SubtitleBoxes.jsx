@@ -73,6 +73,8 @@ import React, {
 
       const [taskData, setTaskData] = useState([]);
       const [currentSubs, setCurrentSubs] = useState([]);
+      const [textBox, settextBox] = useState("");
+      const [speakerBox, setSpeakerBox] = useState("");
       const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -93,6 +95,14 @@ import React, {
      const AnnotationStage = localStorage.getItem("Stage") === "annotation"
      const SuperCheckerStage = localStorage.getItem("SuperCheckerStage") === "superChecker"
 
+     useEffect(() => {
+      const hasEmptyText = result?.some((element) => element.text?.trim() === "");
+      const hasEmptySpeaker = result?.some(
+        (element) => element.speaker_id?.trim() === ""
+      );
+      settextBox(hasEmptyText);
+      setSpeakerBox(hasEmptySpeaker);
+    }, [result]);
 
      useEffect(()=>{
       if(AnnotationStage){
@@ -131,13 +141,17 @@ import React, {
   
         // eslint-disable-next-line
       }, [result, currentIndex, isPlaying(player)]);
-  
+
       const saveTranscript = async (taskType,  result) => {
         const reqBody = {
           task_id: taskId,
           annotation_status: taskData?.annotation_status,
-          result
+          result,
+          ...(( !AnnotationStage||SuperCheckerStage) && {
+          parent_annotation: taskData?.parent_annotation,
+        }),
         };
+        if (!textBox && !speakerBox) {
         const obj = new SaveTranscriptAPI(taskData?.id,reqBody);
         const res = await fetch(obj.apiEndPoint(), {
           method: "PATCH",
@@ -153,6 +167,21 @@ import React, {
             variant: "error",
           });
         } 
+      }{
+        if (textBox) {
+          setSnackbarInfo({
+            open: true,
+            message: "Please Enter All The Transcripts",
+            variant: "error",
+          });
+        } else if(speakerBox){
+          setSnackbarInfo({
+            open: true,
+            message: "Please Select The Speaker",
+            variant: "error",
+          });
+        }
+      }
       }; 
   
       const removeSub = useCallback(
@@ -200,9 +229,9 @@ import React, {
         isDroging = true;
         lastType = type;
         lastX = event.pageX;
-        lastIndex = result.indexOf(sub);
+        lastIndex = result?.indexOf(sub);
         lastTarget = $subsRef.current.children[lastIndex];
-        lastWidth = parseFloat(lastTarget.style.width);
+        lastWidth = parseFloat(lastTarget?.style.width);
       };
   
       const onDocumentMouseMove = useCallback((event) => {

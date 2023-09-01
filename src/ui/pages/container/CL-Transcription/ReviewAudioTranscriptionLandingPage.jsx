@@ -66,7 +66,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
 
-
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -246,9 +245,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
   console.log(disableSkip, disableBtns, filterMessage, disableButton);
 
   useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text.trim() === "");
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
     const hasEmptySpeaker = result?.some(
-      (element) => element.speaker_id.trim() === ""
+      (element) => element.speaker_id?.trim() === ""
     );
     settextBox(hasEmptyText);
     setSpeakerBox(hasEmptySpeaker);
@@ -316,7 +315,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       } 
-  
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
