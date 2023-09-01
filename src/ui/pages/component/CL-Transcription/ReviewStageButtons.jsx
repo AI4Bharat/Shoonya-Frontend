@@ -65,10 +65,10 @@ const ReviewStageButtons = ({
   disableButton,
   anchorEl,
   setAnchorEl,
+  taskData,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const { taskId } = useParams();
-  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
 
@@ -90,7 +90,7 @@ const ReviewStageButtons = ({
   return (
     <>
       <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
-        {!disableBtns && TaskDetails?.review_user === user?.id && (
+        {!disableBtns && taskData?.review_user === user?.id && (
           <Grid item>
             <Tooltip title="Save task for later">
               <Button
@@ -140,7 +140,7 @@ const ReviewStageButtons = ({
         </Grid>
 
         <Grid item>
-          {!disableSkip && TaskDetails?.review_user === user?.id && (
+          {!disableSkip && taskData?.review_user === user?.id && (
             <Tooltip title="skip to next task">
               <Button
                 value="Skip"
@@ -169,7 +169,7 @@ const ReviewStageButtons = ({
         </Grid>
         {!disableBtns &&
           !disableButton &&
-          TaskDetails?.review_user === user?.id && (
+          taskData?.review_user === user?.id && (
             <Grid item>
               <Tooltip title="Revise Annotation">
                 <Button
@@ -198,7 +198,7 @@ const ReviewStageButtons = ({
             </Grid>
           )}
         <Grid item>
-          {!disableBtns && TaskDetails?.review_user === user?.id && (
+          {!disableBtns && taskData?.review_user === user?.id && (
             <Tooltip title="Accept Annotation">
               <Button
                 id="accept-button"

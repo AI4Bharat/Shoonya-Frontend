@@ -67,7 +67,7 @@ const AudioTranscriptionLandingPage = () => {
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
   const[taskData,setTaskData] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
-    open: false,   
+    open: false,     
     message: "",      
     variant: "success",
   });
@@ -261,18 +261,18 @@ const AudioTranscriptionLandingPage = () => {
     }
     setLoading(false);
   };
+  
 
   useEffect(() => {
     const handleAutosave = async(id) => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
-        // cl_format: true,
-        // offset: currentPage,
-        // limit: limit,
+        auto_save :true,
+        lead_time:
+        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
         result,
       };
-
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
       // dispatch(APITransport(obj));
      const res = await fetch(obj.apiEndPoint(), {
@@ -484,7 +484,6 @@ const AudioTranscriptionLandingPage = () => {
         }, 1000);
       });
   };
-
   const handleAnnotationClick = async (
     value,
     id,
@@ -498,7 +497,7 @@ const AudioTranscriptionLandingPage = () => {
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: result,
     };
-    if (!textBox && !speakerBox) {
+    if (!textBox && !speakerBox && result?.length>0) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {
@@ -508,7 +507,7 @@ const AudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        if (localStorage.getItem("labelAll") || value === "skipped") {
+        if (localStorage.getItem("labelAll") || value === "skipped" ) {
           onNextAnnotation(resp.task);
         }
 
@@ -539,10 +538,16 @@ const AudioTranscriptionLandingPage = () => {
           message: "Please Enter All The Transcripts",
           variant: "error",
         });
-      } else {
+      } else if(speakerBox) {
         setSnackbarInfo({
           open: true,
           message: "Please Select The Speaker",
+          variant: "error",
+        });
+      }else{
+        setSnackbarInfo({
+          open: true,
+          message: "Error in saving annotation",
           variant: "error",
         });
       }
@@ -617,6 +622,7 @@ const AudioTranscriptionLandingPage = () => {
               disableUpdataButton={disableUpdataButton}
               disableSkipButton={disableSkipButton}   
               filterMessage={filterMessage}
+              taskData={taskData}
             />
             <AudioPanel
               setCurrentTime={setCurrentTime}
@@ -692,6 +698,7 @@ const AudioTranscriptionLandingPage = () => {
             AnnotationsTaskDetails={AnnotationsTaskDetails}
             player={player}
             ProjectDetails={ProjectDetails}
+            TaskDetails={taskData}
           />
         </Grid>
       </Grid>

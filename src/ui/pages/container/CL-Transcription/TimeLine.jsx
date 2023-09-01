@@ -60,21 +60,21 @@ const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
   const [grabbing, setGrabbing] = useState(false);
 
-  useEffect(() => {
-    if (firstLoaded.current && !grabbing) {
-      const apiObj = new GetAnnotationsTaskAPI(
-        taskId,
-        // taskDetails?.task_type,
-        DT.d2t(player.currentTime),
-        // limit
-      );
-      dispatch(APITransport(apiObj));
-    } else {
-      firstLoaded.current = true;
-    }
+  // useEffect(() => {
+  //   if (firstLoaded.current && !grabbing) {
+  //     const apiObj = new GetAnnotationsTaskAPI(
+  //       "98765",
+  //       // taskDetails?.task_type,
+  //       DT.d2t(player.currentTime),
+  //       // limit
+  //     );
+  //     dispatch(APITransport(apiObj));
+  //   } else {
+  //     firstLoaded.current = true;
+  //   }
 
-    // eslint-disable-next-line
-  }, [grabbing]);
+  //   // eslint-disable-next-line
+  // }, [grabbing]);
 
   const onProgressClick = useCallback(
     (event) => {
@@ -186,21 +186,21 @@ const Grab = memo(({ waveform ,taskId}) => {
     [player]
   );
 
-  useEffect(() => {
-    if (firstLoaded.current && !grabbing) {
-      const apiObj = new GetAnnotationsTaskAPI(
-        taskId,
-        taskDetails?.task_type,
-        DT.d2t(player.currentTime),
-        limit
-      );
-      dispatch(APITransport(apiObj));
-    } else {
-      firstLoaded.current = true;
-    }
+  // useEffect(() => {
+  //   if (firstLoaded.current && !grabbing) {
+  //     const apiObj = new GetAnnotationsTaskAPI(
+  //       "11111111",
+  //       taskDetails?.task_type,
+  //       DT.d2t(player.currentTime),
+  //       limit
+  //     );
+  //     dispatch(APITransport(apiObj));
+  //   } else {
+  //     firstLoaded.current = true;
+  //   }
 
-    // eslint-disable-next-line
-  }, [grabbing]);
+  //   // eslint-disable-next-line
+  // }, [grabbing]);
 
   const onGrabUp = () => {
     setGrabStartX(0);
@@ -304,14 +304,15 @@ const Timeline = ({ currentTime, playing ,  taskData}) => {
     window.addEventListener("wheel", onWheelThrottle);
     return () => window.removeEventListener("wheel", onWheelThrottle);
   }, [onWheel]);
+
   return (
     <Box className={classes.timeLineParent} ref={$footer}>
       {player && AnnotationsTaskDetails.length > 0 && (
           <>
-            <Progress waveform={waveform} currentTime={currentTime} taskId={taskData.id} />
+            <Progress waveform={waveform} currentTime={currentTime} taskId={taskData?.id} />
             <Duration currentTime={currentTime} />
             <WaveForm setWaveform={setWaveform} setRender={setRender} />
-            <Grab waveform={waveform} taskId={taskData.id} />
+            <Grab waveform={waveform} taskId={taskData?.id} />
             <Metronome render={render} playing={playing} />
             <SubtitleBoxes
               render={render}

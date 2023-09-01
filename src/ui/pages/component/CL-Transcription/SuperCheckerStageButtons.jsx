@@ -62,12 +62,12 @@ const SuperCheckerStageButtons = ({
   disableSkip,
   anchorEl,
   setAnchorEl,
+  taskData,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
  
 
-  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   const ProjectsData = localStorage.getItem("projectData");
@@ -90,7 +90,7 @@ const SuperCheckerStageButtons = ({
     <>
       <div>
         {ProjectData.revision_loop_count >
-        TaskDetails?.revision_loop_count?.super_check_count
+        taskData?.revision_loop_count?.super_check_count
           ? false
           : true && (
               <div
@@ -109,7 +109,7 @@ const SuperCheckerStageButtons = ({
             )}
 
         {ProjectData.revision_loop_count -
-          TaskDetails?.revision_loop_count?.super_check_count !==
+          taskData?.revision_loop_count?.super_check_count !==
           0 && (
           <div
             style={{ textAlign: "left", marginLeft: "40px", marginTop: "8px" }}
@@ -117,7 +117,7 @@ const SuperCheckerStageButtons = ({
             <Typography variant="body" color="#f5222d">
               Note: This task can be rejected{" "}
               {ProjectData.revision_loop_count -
-                TaskDetails?.revision_loop_count?.super_check_count}{" "}
+                taskData?.revision_loop_count?.super_check_count}{" "}
               more times.
             </Typography>
           </div>
@@ -126,7 +126,7 @@ const SuperCheckerStageButtons = ({
 
       <Grid container spacing={1} sx={{ mt: 2, mb: 5, ml: 3 }}>
         <Grid item>
-          {TaskDetails?.super_check_user === user?.id && (
+          {taskData?.super_check_user === user?.id && (
             <Tooltip title="Save task for later">
               <Button
                 value="Draft"
@@ -174,7 +174,7 @@ const SuperCheckerStageButtons = ({
         </Grid>
 
         <Grid item>
-          {!disableSkip && TaskDetails?.super_check_user === user?.id && (
+          {!disableSkip && taskData?.super_check_user === user?.id && (
             <Tooltip title="skip to next task">
               <Button
                 value="Skip"
@@ -202,7 +202,7 @@ const SuperCheckerStageButtons = ({
           )}
         </Grid>
         <Grid item>
-          {TaskDetails?.super_check_user === user?.id && (
+          {taskData?.super_check_user === user?.id && (
             <Tooltip title="Reject">
               <Button
                 value="rejected"
@@ -218,7 +218,7 @@ const SuperCheckerStageButtons = ({
                 }
                 disabled={
                   ProjectData.revision_loop_count >
-                  TaskDetails?.revision_loop_count?.super_check_count
+                  taskData?.revision_loop_count?.super_check_count
                     ? false
                     : true
                 }
@@ -227,7 +227,7 @@ const SuperCheckerStageButtons = ({
                   border: "1px solid gray",
                   color: (
                     ProjectData.revision_loop_count >
-                    TaskDetails?.revision_loop_count?.super_check_count
+                    taskData?.revision_loop_count?.super_check_count
                       ? false
                       : true
                   )
@@ -243,7 +243,7 @@ const SuperCheckerStageButtons = ({
           )}
         </Grid>
         <Grid item>
-          {TaskDetails?.super_check_user === user?.id && (
+          {taskData?.super_check_user === user?.id && (
             <Tooltip title="Validate">
               <Button
                 id="accept-button"
