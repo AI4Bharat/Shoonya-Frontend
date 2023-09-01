@@ -438,7 +438,7 @@ console.log(ProjectDetails.project_stage == 2 ,ProjectDetails?.annotation_review
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
                   if(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ){
-                    navigate(`AudioTranscriptionLandingPage/${el.id}`)
+                    navigate(`ReviewAudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{
                     navigate(`task/${el.id}`)

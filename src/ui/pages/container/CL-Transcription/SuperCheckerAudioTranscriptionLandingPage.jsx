@@ -161,9 +161,13 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
 
-  useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text.trim() === "");
+   useEffect(() => {
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
+    const hasEmptySpeaker = result?.some(
+      (element) => element.speaker_id?.trim() === ""
+    );
     settextBox(hasEmptyText);
+    setSpeakerBox(hasEmptySpeaker);
   }, [result]);
 
   const getTaskData = async () => {
@@ -512,22 +516,22 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     if (annotations && annotations.length > 0) {
       let userAnnotation = annotations.find(
         (annotation) =>
-          annotation.completed_by === userData.id &&
-          annotation.annotation_type === 3
+          annotation?.completed_by === userData?.id &&
+          annotation?.annotation_type === 3
       );
       if (userAnnotation) {
         let reviewAnnotation = annotations.find(
-          (annotation) => annotation.id === userAnnotation.parent_annotation
+          (annotation) => annotation.id === userAnnotation?.parent_annotation
         );
         reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
       } else {
         let reviewerAnnotations = annotations.filter(
-          (value) => value.annotation_type === 2
+          (value) => value?.annotation_type === 2
         );
         if (reviewerAnnotations.length > 0) {
           let correctAnnotation = reviewerAnnotations.find(
-            (annotation) => annotation.id === taskData.correct_annotation
+            (annotation) => annotation.id === taskData?.correct_annotation
           );
 
           if (correctAnnotation) {
@@ -541,12 +545,12 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
-                annotation.parent_annotation === reviewerAnnotations[0].id
+                annotation.parent_annotation === reviewerAnnotations[0]?.id
             );
             reviewNotesRef.current.value =
-              reviewerAnnotations[0].review_notes ?? "";
+              reviewerAnnotations[0]?.review_notes ?? "";
             superCheckerNotesRef.current.value =
-              superCheckerAnnotation[0].supercheck_notes ?? "";
+              superCheckerAnnotation[0]?.supercheck_notes ?? "";
           }
         }
       }
