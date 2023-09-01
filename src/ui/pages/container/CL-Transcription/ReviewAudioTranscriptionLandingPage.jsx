@@ -65,7 +65,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [annotations, setAnnotations] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
-
+  const[taskDetailList,setTaskDetailList] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -263,9 +263,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
     settextBox(hasEmptyText);
   }, [result]);
 
-  const getTaskData = async () => {
+  const getTaskData = async (id) => {
     setLoading(true);
-    const ProjectObj = new GetTaskDetailsAPI(taskId);
+    const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
     // dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
@@ -284,7 +284,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
-    }
+    }else(setTaskDetailList(resp))
     setLoading(false);
   };
 
@@ -511,7 +511,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         setNextData(rsp_data);
         tasksComplete(rsp_data?.id || null);
         getAnnotationsTaskData(rsp_data.id);
-       
+        getTaskData(rsp_data.id)
       } 
     }).catch((error) => {
       setSnackbarInfo({
@@ -737,6 +737,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
               setPlaying={setPlaying}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
+              taskData={taskDetailList}
             />
             <Grid sx={{ ml: 3 }}>
             <Button
@@ -835,7 +836,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} />
+        <Timeline currentTime={currentTime} playing={playing}  taskData={taskDetailList}/>
       </Grid>
     </>
   );

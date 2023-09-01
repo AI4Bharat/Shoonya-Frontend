@@ -258,7 +258,7 @@ const Duration = memo(({ currentTime }) => {
   );
 });
 
-const Timeline = ({ currentTime, playing }) => {
+const Timeline = ({ currentTime, playing ,  taskData}) => {
   const { taskId } = useParams();
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
@@ -267,7 +267,6 @@ const Timeline = ({ currentTime, playing }) => {
   const AnnotationsTaskDetails = useSelector(
     (state) => state.getAnnotationsTask.data
   );
-
   const [waveform, setWaveform] = useState();
   const [render, setRender] = useState({
     padding: 2,
@@ -276,7 +275,6 @@ const Timeline = ({ currentTime, playing }) => {
     gridNum: 110,
     beginTime: -5,
   });
-
   const onWheel = useCallback(
     (event) => {
       if (
@@ -306,16 +304,14 @@ const Timeline = ({ currentTime, playing }) => {
     window.addEventListener("wheel", onWheelThrottle);
     return () => window.removeEventListener("wheel", onWheelThrottle);
   }, [onWheel]);
-
   return (
     <Box className={classes.timeLineParent} ref={$footer}>
-      {player &&
-        (AnnotationStage?AnnotationsTaskDetails[0]?.result:AnnotationsTaskDetails[1]?.result ) && (
+      {player && AnnotationsTaskDetails.length > 0 && (
           <>
-            <Progress waveform={waveform} currentTime={currentTime} taskId={taskId} />
+            <Progress waveform={waveform} currentTime={currentTime} taskId={taskData.id} />
             <Duration currentTime={currentTime} />
             <WaveForm setWaveform={setWaveform} setRender={setRender} />
-            <Grab waveform={waveform} taskId={taskId} />
+            <Grab waveform={waveform} taskId={taskData.id} />
             <Metronome render={render} playing={playing} />
             <SubtitleBoxes
               render={render}
