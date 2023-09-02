@@ -70,6 +70,7 @@ const TranscriptionRightPanel = ({
   currentIndex,
   AnnotationsTaskDetails,
   ProjectDetails,
+  TaskDetails,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -128,7 +129,6 @@ const TranscriptionRightPanel = ({
   const AnnotationStage = localStorage.getItem("Stage") === "annotation";
   const SuperCheckerStage =
     localStorage.getItem("SuperCheckerStage") === "superChecker";
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -158,7 +158,7 @@ const TranscriptionRightPanel = ({
       // setShowSpeakerIdDropdown(videoDetails?.video?.multiple_speaker);
     }
   }, [TaskDetails]);
-
+console.log(TaskDetails,"TaskDetailsTaskDetails")
   useEffect(() => {
     if (currentPage) {
       setCurrentOffset(currentPage);

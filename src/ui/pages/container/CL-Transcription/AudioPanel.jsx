@@ -15,7 +15,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 const AudioPanel = ({
   setCurrentTime,
   setPlaying,
-  
+  taskData
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
@@ -23,15 +23,7 @@ const AudioPanel = ({
   const { taskId } = useParams();
 
  
-  const TaskDetails = useSelector((state) => state.getTaskDetails.data);
-  const getTaskData = () => {
-    const userObj = new GetTaskDetailsAPI(taskId);
-    dispatch(APITransport(userObj));
-  };
-
-  useEffect(() => {
-    getTaskData();
-  }, []);
+ 
 
 
   useEffect(() => {
@@ -66,7 +58,7 @@ const AudioPanel = ({
       {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio
           controls
-          src={TaskDetails?.data?.audio_url}
+          src={taskData?.data?.audio_url}
           type="audio"
           // style={{
           //   width: videoDetails?.video?.audio_only ? "20%" : "",

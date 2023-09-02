@@ -67,7 +67,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [annotations, setAnnotations] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
-
+  const[taskDetailList,setTaskDetailList] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -265,9 +265,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
     settextBox(hasEmptyText);
   }, [result]);
 
-  const getTaskData = async () => {
+  const getTaskData = async (id) => {
     setLoading(true);
-    const ProjectObj = new GetTaskDetailsAPI(taskId);
+    const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
     // dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
@@ -286,7 +286,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
-    }
+    }else(setTaskDetailList(resp))
     setLoading(false);
   };
 
@@ -295,7 +295,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
-        parent_annotation: AnnotationsTaskDetails[1]?.parent_annotation,
+        parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
         // cl_format: true,
         // offset: currentPage,
         // limit: limit,
@@ -513,8 +513,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
         setNextData(rsp_data);
         tasksComplete(rsp_data?.id || null);
         getAnnotationsTaskData(rsp_data.id);
-
-      }
+       
+      } 
     }).catch((error) => {
       setSnackbarInfo({
         open: true,
@@ -549,58 +549,58 @@ const ReviewAudioTranscriptionLandingPage = () => {
       }),
     };
     if (!textBox && !speakerBox) {
-      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
-      // dispatch(APITransport(GlossaryObj));
-      const res = await fetch(TaskObj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(TaskObj.getBody()),
-        headers: TaskObj.getHeaders().headers,
-      });
-      const resp = await res.json();
-      if (res.ok) {
-        if (localStorage.getItem("labelAll") || value === "skipped") {
-          onNextAnnotation(resp.task);
-        }
+    const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+    // dispatch(APITransport(GlossaryObj));
+    const res = await fetch(TaskObj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(TaskObj.getBody()),
+      headers: TaskObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (res.ok) {
+      if (localStorage.getItem("labelAll") || value === "skipped") {
+        onNextAnnotation(resp.task);
+      }
 
-        if (
-          value === "accepted" ||
-          value === "accepted_with_minor_changes" ||
-          value === "accepted_with_major_changes"
-        ) {
-          setSnackbarInfo({
-            open: true,
-            message: "Task successfully submitted",
-            variant: "success",
-          });
-        } else if (value === "draft") {
-          setSnackbarInfo({
-            open: true,
-            message: "Task saved as draft",
-            variant: "success",
-          });
-        }
-      } else {
+      if (
+        value === "accepted" ||
+        value === "accepted_with_minor_changes" ||
+        value === "accepted_with_major_changes"
+      ) {
         setSnackbarInfo({
           open: true,
-          message: "Error in saving annotation",
-          variant: "error",
+          message: "Task successfully submitted",
+          variant: "success",
+        });
+      } else if (value === "draft") {
+        setSnackbarInfo({
+          open: true,
+          message: "Task saved as draft",
+          variant: "success",
         });
       }
     } else {
-      if (textBox) {
-        setSnackbarInfo({
-          open: true,
-          message: "Please Enter All The Transcripts",
-          variant: "error",
-        });
-      } else {
-        setSnackbarInfo({
-          open: true,
-          message: "Please Select The Speaker",
-          variant: "error",
-        });
-      }
+      setSnackbarInfo({
+        open: true,
+        message: "Error in saving annotation",
+        variant: "error",
+      });
     }
+  }else {
+    if (textBox) {
+      setSnackbarInfo({
+        open: true,
+        message: "Please Enter All The Transcripts",
+        variant: "error",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: "Please Select The Speaker",
+        variant: "error",
+      });
+    }
+  }
     setLoading(false);
     setShowNotes(false)
     setAnchorEl(null)
@@ -777,6 +777,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
               setPlaying={setPlaying}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
+              taskData={taskDetailList}
             />
             <Grid sx={{ ml: 3 }}>
               <Button
@@ -892,6 +893,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
             AnnotationsTaskDetails={AnnotationsTaskDetails}
             player={player}
             ProjectDetails={ProjectDetails}
+            TaskDetails={taskDetailList}
           />
         </Grid>
       </Grid>
@@ -902,7 +904,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} />
+        <Timeline currentTime={currentTime} playing={playing}  taskData={taskDetailList}/>
       </Grid>
     </>
   );

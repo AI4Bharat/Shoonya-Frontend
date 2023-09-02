@@ -12,23 +12,25 @@ const AnnotationStageButtons = ({
   disableUpdataButton,
   disableSkipButton,
   filterMessage,
+  taskData
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
   const { taskId } = useParams();
 
-  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
+ 
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   let Annotation = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 1
   )[0];
 
+
   return (
     <>
       <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
         {!disableBtns &&
-          TaskDetails?.annotation_users?.some((users) => users === user.id) && (
+          taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
               <Tooltip title="Save task for later">
                 <Button
@@ -76,7 +78,7 @@ const AnnotationStageButtons = ({
           </Tooltip>
         </Grid>
         {!disableSkipButton &&
-          TaskDetails?.annotation_users?.some((users) => users === user.id) && (
+          taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
               <Tooltip title="skip to next task">
                 <Button
@@ -105,7 +107,7 @@ const AnnotationStageButtons = ({
             </Grid>
           )}
         {!disableUpdataButton &&
-          TaskDetails?.annotation_users?.some((users) => users === user.id) && (
+          taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
               <Tooltip>
                 <Button

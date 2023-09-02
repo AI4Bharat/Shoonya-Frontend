@@ -60,6 +60,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [annotations, setAnnotations] = useState([]);
   const [disableSkip, setdisableSkip] = useState(false);
+  const[taskDetailList,setTaskDetailList] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -172,9 +173,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setSpeakerBox(hasEmptySpeaker);
   }, [result]);
 
-  const getTaskData = async () => {
+  const getTaskData = async (id) => {
     setLoading(true);
-    const ProjectObj = new GetTaskDetailsAPI(taskId);
+    const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
     // dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
@@ -193,7 +194,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
-    }
+    }else{setTaskDetailList(resp)}
     setLoading(false);
   };
 
@@ -203,9 +204,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
         parent_annotation: AnnotationsTaskDetails[2]?.parent_annotation,
-        // cl_format: true,
-        // offset: currentPage,
-        // limit: limit,
+        auto_save :true,
+        lead_time:
+        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time?.lead_time ?? 0),
         result,
       };
 
@@ -423,6 +424,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           setNextData(rsp_data);
           tasksComplete(rsp_data?.id || null);
           getAnnotationsTaskData(rsp_data.id);
+          getTaskData(rsp_data.id)
         }
       })
       .catch((error) => {
@@ -458,7 +460,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox) {
+    if (!textBox && !speakerBox && result?.length>0) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {
@@ -499,10 +501,16 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           message: "Please Enter All The Transcripts",
           variant: "error",
         });
-      } else {
+      } else if(speakerBox) {
         setSnackbarInfo({
           open: true,
           message: "Please Select The Speaker",
+          variant: "error",
+        });
+      }else{
+        setSnackbarInfo({
+          open: true,
+          message: "Error in saving annotation",
           variant: "error",
         });
       }
@@ -654,6 +662,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               // handleAnnotationClick={handleAnnotationClick}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
+              taskData={taskDetailList}
             />
             <Grid sx={{ ml: 3 }}>
             <Button
@@ -741,6 +750,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             AnnotationsTaskDetails={AnnotationsTaskDetails}
             player={player}
             ProjectDetails={ProjectDetails}
+            TaskDetails={taskDetailList}
           />
         </Grid>
       </Grid>
@@ -751,7 +761,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} />
+        <Timeline currentTime={currentTime} playing={playing} taskData={taskDetailList} />
       </Grid>
     </>
   );
