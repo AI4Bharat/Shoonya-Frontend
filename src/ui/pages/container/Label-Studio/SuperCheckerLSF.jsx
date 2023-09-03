@@ -351,7 +351,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               review.lead_time,
               "skipped",
-              superCheckerNotesRef.current.value
+              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
             ).then(() => {
               getNextProject(projectId, taskData.id, "supercheck").then(
                 (res) => {
@@ -409,7 +409,7 @@ const LabelStudioWrapper = ({
               review_status.current,
               temp,
               superChecker.parent_annotation,
-              superCheckerNotesRef.current.value
+              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
             ).then(() => {
               if (localStorage.getItem("labelAll"))
                 getNextProject(projectId, taskData.id, "supercheck").then(
@@ -447,6 +447,11 @@ const LabelStudioWrapper = ({
         );
         reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
+        
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
@@ -464,6 +469,11 @@ const LabelStudioWrapper = ({
             reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
+
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -473,6 +483,10 @@ const LabelStudioWrapper = ({
               reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           }
         }
       }
@@ -614,7 +628,7 @@ const LabelStudioWrapper = ({
           superChecker.annotation_status,
           temp,
           superChecker.parent_annotation,
-          superCheckerNotesRef.current.value,
+          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
           true
         ).then((res) => {
           if (res.status !== 200) {
@@ -966,6 +980,8 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
+
+
   const resetNotes = () => {
     setShowNotes(false);
     superCheckerNotesRef.current.value = "";
@@ -1076,7 +1092,7 @@ export default function LSF() {
               ref={reviewNotesRef}
               modules={modules}
               formats={formats}
-              bounds={"#notess"}
+              bounds={"#note"}
               placeholder="Review Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
               readOnly={true}
@@ -1084,7 +1100,7 @@ export default function LSF() {
             <ReactQuill
               ref={superCheckerNotesRef}
               modules={modules}
-              bounds={"#notess"}
+              bounds={"#note"}
               formats={formats}
               placeholder="SuperChecker Notes"
               style={{ marginbottom: "1%", minHeight: "2rem" }}
