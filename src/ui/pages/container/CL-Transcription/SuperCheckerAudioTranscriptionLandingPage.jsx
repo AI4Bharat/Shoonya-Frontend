@@ -729,6 +729,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                   formats={formats}
                   theme="bubble"
                   placeholder="Review Notes"
+                  readOnly={true}
                 ></ReactQuill>
                 <ReactQuill
                   ref={superCheckerNotesRef}
@@ -737,7 +738,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                   theme="bubble"
                   formats={formats}
                   placeholder="SuperChecker Notes"
-                  readOnly={true}
                 ></ReactQuill>
               </div>
             </Grid>
