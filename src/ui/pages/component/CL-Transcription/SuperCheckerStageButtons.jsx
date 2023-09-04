@@ -62,7 +62,7 @@ const SuperCheckerStageButtons = ({
   disableSkip,
   anchorEl,
   setAnchorEl,
-  taskData,
+  // taskData,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
@@ -72,6 +72,8 @@ const SuperCheckerStageButtons = ({
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   const ProjectsData = localStorage.getItem("projectData");
   const ProjectData = JSON.parse(ProjectsData);
+  const taskData = useSelector((state) => state.getTaskDetails?.data);
+
 
   const open = Boolean(anchorEl);
 

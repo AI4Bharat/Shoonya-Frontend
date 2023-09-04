@@ -65,7 +65,7 @@ const AudioTranscriptionLandingPage = () => {
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
-  const[taskData,setTaskData] = useState("")
+  const[taskData,setTaskData] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,     
     message: "",      
@@ -237,8 +237,8 @@ const AudioTranscriptionLandingPage = () => {
 
   const getTaskData = async (id) => {
     setLoading(true);
-    const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
-    // dispatch(APITransport(ProjectObj));
+    const ProjectObj = new GetTaskDetailsAPI(id);
+    dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
       body: JSON.stringify(ProjectObj.getBody()),
@@ -392,7 +392,7 @@ const AudioTranscriptionLandingPage = () => {
 
   useMemo(() => {
     const currentIndex = result?.findIndex(
-      (item) => item.startTime <= currentTime && item.endTime > currentTime
+      (item) => item?.startTime <= currentTime && item?.endTime > currentTime
     );
     setCurrentIndex(currentIndex);
   }, [currentTime, result]);
@@ -403,14 +403,14 @@ const AudioTranscriptionLandingPage = () => {
 
   const getAnnotationsTaskData = (id) => {
     setLoading(true);
-    const userObj = new GetAnnotationsTaskAPI(id ? id : taskId);
+    const userObj = new GetAnnotationsTaskAPI(id);
     dispatch(APITransport(userObj));
   };
 
   useEffect(() => {
-    getAnnotationsTaskData();
+    getAnnotationsTaskData(taskId);
     getProjectDetails();
-    getTaskData();
+    getTaskData(taskId);
     localStorage.setItem("enableChitrlekhaUI", true);
   }, []);
 
@@ -468,8 +468,8 @@ const AudioTranscriptionLandingPage = () => {
         if (response.ok) {
           setNextData(rsp_data);
           tasksComplete(rsp_data?.id || null);
-          getAnnotationsTaskData(rsp_data.id);
-          getTaskData(rsp_data.id)
+          getAnnotationsTaskData(rsp_data?.id);
+          getTaskData(rsp_data?.id)
         }
       })
       .catch((error) => {
@@ -555,7 +555,6 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(false);
     setShowNotes(false);
   };
-
 
   useEffect(() => {
       if (AnnotationsTaskDetails &&  AnnotationsTaskDetails.length > 0) {
@@ -709,7 +708,7 @@ const AudioTranscriptionLandingPage = () => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing}   taskData={taskData} />
+        <Timeline currentTime={currentTime} playing={playing}   taskID={taskData?.id} />
       </Grid>
     </>
   );

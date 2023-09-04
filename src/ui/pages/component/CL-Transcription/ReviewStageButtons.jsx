@@ -65,12 +65,14 @@ const ReviewStageButtons = ({
   disableButton,
   anchorEl,
   setAnchorEl,
-  taskData,
+  // taskData,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const { taskId } = useParams();
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
+  const taskData = useSelector((state) => state.getTaskDetails?.data);
+
 
   const open = Boolean(anchorEl);
 
@@ -84,8 +86,7 @@ const ReviewStageButtons = ({
   let review = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 2
   )[0];
-  console.log(review?.parent_annotation
-    ,"reviewreview")
+ 
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState ,memo} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isPlaying } from "../../../../utils/utils";
 import { useParams } from "react-router-dom";
@@ -12,7 +12,7 @@ import { setPlayer } from "../../../../redux/actions/Common";
 import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
-const AudioPanel = ({
+const AudioPanel = memo( ({
   setCurrentTime,
   setPlaying,
   taskData
@@ -21,9 +21,7 @@ const AudioPanel = ({
   const dispatch = useDispatch();
   const $audio = useRef();
   const { taskId } = useParams();
-
- 
- 
+  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
 
 
   useEffect(() => {
@@ -52,20 +50,21 @@ const AudioPanel = ({
   //     }
   //   }, [$video]);
 
+console.log(TaskDetails?.data?.audio_url,"TaskDetailsTaskDetailsTaskDetails")
   return (
     <Grid style={{ padding: "0px 20px 15px 20px" }}>
      
       {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio
           controls
-          src={taskData?.data?.audio_url}
+          src={TaskDetails?.data?.audio_url}
           type="audio"
           // style={{
           //   width: videoDetails?.video?.audio_only ? "20%" : "",
           //   margin:
           //     videoDetails?.video?.audio_only || fullscreenVideo ? "auto" : "",
           // }}
-          // poster={videoDetails?.video?.audio_only ? poster : ""}
+          // poster={taskData ? poster : ""}
           ref={$audio}
           className={classes.videoPlayer}
         />
@@ -73,6 +72,9 @@ const AudioPanel = ({
     
     </Grid>
   );
-};
+  
+}, 
+() => true
+)
 
 export default AudioPanel;
