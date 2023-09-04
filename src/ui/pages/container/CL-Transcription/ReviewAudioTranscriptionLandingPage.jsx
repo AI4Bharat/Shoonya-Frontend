@@ -893,6 +893,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
             player={player}
             ProjectDetails={ProjectDetails}
             TaskDetails={taskDetailList}
+            stage={2}
           />
         </Grid>
       </Grid>

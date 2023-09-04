@@ -737,6 +737,7 @@ const AudioTranscriptionLandingPage = () => {
             player={player}
             ProjectDetails={ProjectDetails}
             TaskDetails={taskData}
+            stage={1}
           />
         </Grid>
       </Grid>

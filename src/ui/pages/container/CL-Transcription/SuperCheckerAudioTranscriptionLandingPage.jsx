@@ -751,6 +751,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             player={player}
             ProjectDetails={ProjectDetails}
             TaskDetails={taskDetailList}
+            stage={3}
           />
         </Grid>
       </Grid>
