@@ -1,5 +1,7 @@
 // AudioTranscriptionLandingPage
-
+import ReactQuill, { Quill } from 'react-quill';
+import "../../../../ui/pages/container/Label-Studio/cl_ui.css"
+import 'quill/dist/quill.bubble.css';
 import React, {
   memo,
   useCallback,
@@ -67,7 +69,7 @@ const AudioTranscriptionLandingPage = () => {
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
   const[taskData,setTaskData] = useState()
   const [snackbar, setSnackbarInfo] = useState({
-    open: false,     
+    open: false,   
     message: "",      
     variant: "success",
   });
@@ -195,8 +197,8 @@ const AudioTranscriptionLandingPage = () => {
       } else {
         filteredAnnotations = [userAnnotation];
       }
-      
-    }else if ([4, 5, 6].includes(user.role)) {
+
+    } else if ([4, 5, 6].includes(user.role)) {
       filteredAnnotations = annotations.filter((a) => a.annotation_type === 1);
       disableDraft = true;
       disableSkip = true;
@@ -224,7 +226,7 @@ const AudioTranscriptionLandingPage = () => {
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
- 
+
 
   useEffect(() => {
     const hasEmptyText = result?.some((element) => element.text?.trim() === "");
@@ -264,7 +266,7 @@ const AudioTranscriptionLandingPage = () => {
   
 
   useEffect(() => {
-    const handleAutosave = async(id) => {
+    const handleAutosave = async (id) => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
@@ -273,9 +275,10 @@ const AudioTranscriptionLandingPage = () => {
         (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
         result,
       };
+
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
       // dispatch(APITransport(obj));
-     const res = await fetch(obj.apiEndPoint(), {
+      const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
         headers: obj.getHeaders().headers,
@@ -287,7 +290,7 @@ const AudioTranscriptionLandingPage = () => {
           message: "Error in autosaving annotation",
           variant: "error",
         });
-      } 
+      }
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -492,7 +495,7 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(true);
     const PatchAPIdata = {
       annotation_status: value,
-      annotation_notes: annotationNotesRef.current.value,
+      annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: result,
@@ -557,10 +560,14 @@ const AudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-      if (AnnotationsTaskDetails &&  AnnotationsTaskDetails.length > 0) {
-        annotationNotesRef.current.value = AnnotationsTaskDetails[0].annotation_notes ?? "";
-        reviewNotesRef.current.value = AnnotationsTaskDetails[0].review_notes ?? "";
-      }
+    if (AnnotationsTaskDetails && AnnotationsTaskDetails.length > 0) {
+      annotationNotesRef.current.value = AnnotationsTaskDetails[0].annotation_notes ?? "";
+      reviewNotesRef.current.value = AnnotationsTaskDetails[0].review_notes ?? "";
+      const newDelta2 = annotationNotesRef.current.value != "" ? JSON.parse(annotationNotesRef.current.value) : "";
+      const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
+      annotationNotesRef.current.getEditor().setContents(newDelta2);
+      reviewNotesRef.current.getEditor().setContents(newDelta1);
+    }
   }, [AnnotationsTaskDetails]);
 
   const resetNotes = () => {
@@ -572,6 +579,20 @@ const AudioTranscriptionLandingPage = () => {
   useEffect(() => {
     resetNotes();
   }, [taskId]);
+
+
+  const modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      // [{ 'color': [] }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+    ]
+  };
+
+  const formats = [
+    'bold', 'italic', 'underline', 'strike',
+    'script']
+
 
   const renderSnackBar = () => {
     return (
@@ -619,7 +640,7 @@ const AudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               disableBtns={disableBtns}
               disableUpdataButton={disableUpdataButton}
-              disableSkipButton={disableSkipButton}   
+              disableSkipButton={disableSkipButton}
               filterMessage={filterMessage}
               taskData={taskData}
             />
@@ -633,28 +654,29 @@ const AudioTranscriptionLandingPage = () => {
             />
 
             <Grid sx={{ ml: 3 }}>
-            <Button
-              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-              variant="contained"
-              color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
-              }
-              onClick={handleCollapseClick}
-            // style={{ marginBottom: "20px" }}
-            >
-              Notes {reviewNotesRef.current?.value !== "" && "*"}
-            </Button>
-          
+              <Button
+                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                variant="contained"
+                color={
+                  reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                }
+                onClick={handleCollapseClick}
+              // style={{ marginBottom: "20px" }}
+              >
+                Notes {reviewNotesRef.current?.value !== "" && "*"}
+              </Button>
 
-          <div
-              className={classes.collapse}    
-              style={{
-              display: showNotes ? "block" : "none",
-              paddingBottom: "16px",
-               
-            }}
-          >
-                 <TextField
+
+              <div
+                className={classes.collapse}
+                style={{
+                  display: showNotes ? "block" : "none",
+                  paddingBottom: "16px",
+                  overflow:"auto",
+                  height: "100px"
+                }}
+              >
+                {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Annotation Notes"
@@ -668,9 +690,9 @@ const AudioTranscriptionLandingPage = () => {
               }}
               style={{ width: "99%" }}
               // ref={quillRef}
-            />
+            /> */}
 
-            <TextField
+                {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Review Notes"
@@ -685,7 +707,24 @@ const AudioTranscriptionLandingPage = () => {
               }}
               style={{ width: "99%", marginTop: "1%" }}
               // ref={quillRef}
-            />
+            /> */}
+                <ReactQuill
+                  ref={annotationNotesRef}
+                  modules={modules}
+                  bounds={"#note"}
+                  theme="bubble"
+                  formats={formats}
+                  placeholder="Annotation Notes"
+                ></ReactQuill>
+                <ReactQuill
+                  ref={reviewNotesRef}
+                  modules={modules}
+                  theme="bubble"
+                  bounds={"#note"}
+                  readOnly={true}
+                  formats={formats}
+                  placeholder="Review Notes"
+                ></ReactQuill>
               </div>
             </Grid>
           </Box>
@@ -706,7 +745,7 @@ const AudioTranscriptionLandingPage = () => {
         width={"100%"}
         position="fixed"
         bottom={1}
-        // style={fullscreen ? { visibility: "hidden" } : {}}
+      // style={fullscreen ? { visibility: "hidden" } : {}}
       >
         <Timeline currentTime={currentTime} playing={playing}   taskID={taskData?.id} />
       </Grid>
