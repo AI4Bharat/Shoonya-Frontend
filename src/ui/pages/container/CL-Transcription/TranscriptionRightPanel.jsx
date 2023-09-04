@@ -25,6 +25,7 @@ import {
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import LanguageCode from "../../../../utils/LanguageCode";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
+import Spinner from "../../component/common/Spinner";
 
 //Components
 import {
@@ -158,7 +159,7 @@ const TranscriptionRightPanel = ({
       // setShowSpeakerIdDropdown(videoDetails?.video?.multiple_speaker);
     }
   }, [TaskDetails]);
-console.log(TaskDetails,"TaskDetailsTaskDetails")
+
   useEffect(() => {
     if (currentPage) {
       setCurrentOffset(currentPage);
@@ -430,10 +431,17 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
       settargetlang(filtereddata[0]?.code);
     }
   }, [ProjectDetails]);
+ 
+  useEffect(() => {
+    if (taskData?.result?.length > 0) {
+      setLoading(false);
+    }
+  }, [taskData]);
 
   return (
     <>
       {" "}
+      {loading && <Spinner />}
       {renderSnackBar()}
       <Grid sx={{ margin: 0 }}>
         <Box

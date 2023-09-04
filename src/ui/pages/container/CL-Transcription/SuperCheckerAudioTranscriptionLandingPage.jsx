@@ -86,7 +86,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
 
-
   // useEffect(() => {
   //   let intervalId;
 
@@ -155,8 +154,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    filterAnnotations(AnnotationsTaskDetails, userData, TaskDetails);
-  }, [AnnotationsTaskDetails, userData, TaskDetails]);
+    filterAnnotations(AnnotationsTaskDetails, userData, taskDetailList);
+  }, [AnnotationsTaskDetails, userData, taskDetailList]);
   console.log(disableSkip);
 
   const handleCollapseClick = () => {
@@ -176,7 +175,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const getTaskData = async (id) => {
     setLoading(true);
     const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
-    // dispatch(APITransport(ProjectObj));
+    dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
       body: JSON.stringify(ProjectObj.getBody()),
@@ -359,8 +358,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
+    getAnnotationsTaskData(taskId);
     getProjectDetails();
-    getTaskData();
+    getTaskData(taskId);
     localStorage.setItem("enableChitrlekhaUI", true);
     console.log(
       localStorage.getItem("Stage") === "review",
@@ -580,9 +580,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(()=>{
-    setNotes(TaskDetails, AnnotationsTaskDetails);
+    setNotes(taskDetailList, AnnotationsTaskDetails);
 
-  },[TaskDetails, AnnotationsTaskDetails]);
+  },[taskDetailList, AnnotationsTaskDetails]);
 
   const resetNotes = () => {
     setShowNotes(false);
@@ -729,6 +729,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                   formats={formats}
                   theme="bubble"
                   placeholder="Review Notes"
+                  readOnly={true}
                 ></ReactQuill>
                 <ReactQuill
                   ref={superCheckerNotesRef}
@@ -737,7 +738,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                   theme="bubble"
                   formats={formats}
                   placeholder="SuperChecker Notes"
-                  readOnly={true}
                 ></ReactQuill>
               </div>
             </Grid>
@@ -761,7 +761,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} taskData={taskDetailList} />
+        <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} />
       </Grid>
     </>
   );

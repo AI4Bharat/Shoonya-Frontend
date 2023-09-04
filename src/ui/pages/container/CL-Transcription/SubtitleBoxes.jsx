@@ -123,24 +123,23 @@ import React, {
       }
      },[AnnotationsTaskDetails])
 
-
-      useEffect(() => {
-        if (result) {
-          const isLastSub =
-            player?.currentTime > result[result?.length - 1]?.endTime;
+      // useEffect(() => {
+      //   if (result) {
+      //     const isLastSub =
+      //       player?.currentTime > result[result?.length - 1]?.endTime;
   
-          if (isPlaying(player) && isLastSub) {
-            const payloadObj = new GetAnnotationsTaskAPI(
-              taskId,
-              taskData?.annotation_status
+      //     if (isPlaying(player) && isLastSub) {
+      //       const payloadObj = new GetAnnotationsTaskAPI(
+      //         taskId,
+      //         taskData?.annotation_status
            
-            );
-            dispatch(APITransport(payloadObj));
-          }
-        }
+      //       );
+      //       dispatch(APITransport(payloadObj));
+      //     }
+      //   }
   
-        // eslint-disable-next-line
-      }, [result, currentIndex, isPlaying(player)]);
+      //   // eslint-disable-next-line
+      // }, [result, currentIndex, isPlaying(player)]);
 
       const saveTranscript = async (taskType,  result) => {
         const reqBody = {
@@ -254,7 +253,7 @@ import React, {
           const index = hasSub(lastSub);
           const previou = result[index - 1];
           const next = result[index + 1];
-  
+  console.log(lastSub,"lastSublastSub")
           const startTime = magnetically(
             lastSub.startTime + timeDiff,
             previou ? previou.endTime : null
@@ -266,10 +265,10 @@ import React, {
           const width = (endTime - startTime) * 10 * gridGap;
   
           if (lastType === "left") {
-            if (startTime >= 0 && lastSub.endTime - startTime >= 0.2) {
+            if (startTime >= 0 && lastSub?.endTime - startTime >= 0.2) {
               const start_time = DT.d2t(startTime);
   
-              if (index > 0 && startTime >= DT.t2d(previou.end_time)) {
+              if (index > 0 && startTime >= DT.t2d(previou?.end_time)) {
                 updateSub(lastSub, { start_time });
               }
   
@@ -280,14 +279,14 @@ import React, {
               lastTarget.style.width = `${width}px`;
             }
           } else if (lastType === "right") {
-            if (endTime >= 0 && endTime - lastSub.startTime >= 0.2) {
+            if (endTime >= 0 && endTime - lastSub?.startTime >= 0.2) {
               const end_time = DT.d2t(endTime);
   
-              if (index >= 0 && endTime <= DT.t2d(next.start_time)) {
+              if (index >= 0 && endTime <= DT.t2d(lastSub?.start_time)) {
                 updateSub(lastSub, { end_time });
               }
   
-              if (index === result.length - 1) {
+              if (index === result?.length - 1) {
                 updateSub(lastSub, { end_time });
               }
             } else {
@@ -298,11 +297,11 @@ import React, {
               const start_time = DT.d2t(startTime);
               const end_time = DT.d2t(endTime);
   
-              if (result.length > 1) {
+              if (result?.length > 1) {
                 if (
                   index > 0 &&
-                  startTime >= DT.t2d(previou.end_time) &&
-                  endTime <= DT.t2d(next.start_time)
+                  startTime >= DT.t2d(previou?.end_time) &&
+                  endTime <= DT.t2d(next?.start_time)
                 ) {
                   updateSub(lastSub, {
                     start_time,
@@ -310,7 +309,7 @@ import React, {
                   });
                 }
   
-                if (index === 0 && endTime <= DT.t2d(next.start_time)) {
+                if (index === 0 && endTime <= DT.t2d(next?.start_time)) {
                   updateSub(lastSub, {
                     start_time,
                     end_time,
@@ -348,15 +347,15 @@ import React, {
             switch (keyCode) {
               case 37:
                 updateSub(sub, {
-                  start_time: DT.d2t(sub.startTime - 0.1),
-                  end_time: DT.d2t(sub.endTime - 0.1),
+                  start_time: DT.d2t(sub?.startTime - 0.1),
+                  end_time: DT.d2t(sub?.endTime - 0.1),
                 });
                 // player.currentTime = sub.startTime - 0.1;
                 break;
               case 39:
                 updateSub(sub, {
-                  start_time: DT.d2t(sub.startTime + 0.1),
-                  end_time: DT.d2t(sub.endTime + 0.1),
+                  start_time: DT.d2t(sub?.startTime + 0.1),
+                  end_time: DT.d2t(sub?.endTime + 0.1),
                 });
                 // player.currentTime = sub.startTime + 0.1;
                 break;

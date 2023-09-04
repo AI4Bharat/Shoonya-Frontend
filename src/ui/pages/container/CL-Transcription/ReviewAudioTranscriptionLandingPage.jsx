@@ -242,9 +242,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    filterAnnotations(AnnotationsTaskDetails, user, TaskDetails);
-  }, [AnnotationsTaskDetails, user, TaskDetails]);
-  console.log(disableSkip, disableBtns, filterMessage, disableButton);
+    filterAnnotations(AnnotationsTaskDetails, user, taskDetailList);
+  }, [AnnotationsTaskDetails, user, taskDetailList]);
 
   useEffect(() => {
     const hasEmptyText = result?.some((element) => element.text?.trim() === "");
@@ -267,8 +266,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   const getTaskData = async (id) => {
     setLoading(true);
-    const ProjectObj = new GetTaskDetailsAPI(id?id:taskId);
-    // dispatch(APITransport(ProjectObj));
+    const ProjectObj = new GetTaskDetailsAPI(id);
+    dispatch(APITransport(ProjectObj));
     const res = await fetch(ProjectObj.apiEndPoint(), {
       method: "GET",
       body: JSON.stringify(ProjectObj.getBody()),
@@ -443,14 +442,14 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   const getAnnotationsTaskData = (id) => {
     setLoading(true);
-    const userObj = new GetAnnotationsTaskAPI(id ? id : taskId);
+    const userObj = new GetAnnotationsTaskAPI(id);
     dispatch(APITransport(userObj));
   };
 
   useEffect(() => {
-    getAnnotationsTaskData();
+    getAnnotationsTaskData(taskId);
     getProjectDetails();
-    getTaskData();
+    getTaskData(taskId);
     localStorage.setItem("enableChitrlekhaUI", true);
     console.log(
       localStorage.getItem("Stage") === "review",
@@ -693,10 +692,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
     }
   };
 
-  useEffect(() => {
-    setNotes(TaskDetails, AnnotationsTaskDetails);
+  useEffect(()=>{
+    setNotes(taskDetailList, AnnotationsTaskDetails);
 
-  }, [TaskDetails, AnnotationsTaskDetails]);
+  },[taskDetailList,AnnotationsTaskDetails]);
 
   const resetNotes = () => {
     setShowNotes(false);
@@ -904,7 +903,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing}  taskData={taskDetailList}/>
+        <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList}/>
       </Grid>
     </>
   );
