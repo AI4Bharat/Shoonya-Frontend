@@ -168,7 +168,7 @@ const Grab = memo(({ waveform , taskId,}) => {
   const player = useSelector((state) => state.commonReducer.player);
   const limit = useSelector((state) => state.commonReducer.limit);
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
-console.log(taskDetails.id,"taskDetailstaskDetails")
+// console.log(taskDetails.id,"taskDetailstaskDetails")
 
   const [grabStartX, setGrabStartX] = useState(0);
   const [grabStartTime, setGrabStartTime] = useState(0);
