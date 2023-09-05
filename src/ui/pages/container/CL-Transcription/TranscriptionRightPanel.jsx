@@ -38,6 +38,7 @@ import {
   Select,
   useMediaQuery,
   Pagination,
+  Typography
 } from "@mui/material";
 // import {
 //   ConfirmDialog,
@@ -473,7 +474,25 @@ const TranscriptionRightPanel = ({
               showSplit={true}
             />
           </Grid>
-        </Box>
+          {showAcousticText && <Grid
+            style={{
+              display: "flex",
+              direction: "row",
+              flexWrap: "wrap",
+              justifyContent: "space-around",
+              backgroundColor: "rgb(44, 39, 153, 0.2)"}}>
+            <Typography
+              variant="caption"
+              sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
+                Verbatim Transcription
+              </Typography>
+            <Typography
+              variant="caption"
+              sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
+              Acoustic Transcription
+            </Typography>
+          </Grid>}
+          </Box>
 
         <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
           {currentPageData?.map((item, index) => {
@@ -590,11 +609,12 @@ const TranscriptionRightPanel = ({
                           height: "120px",
                         }}
                         rows={4}
-                        onBlur={() =>
+                        onBlur={() => {
                           setTimeout(() => {
                             setShowPopOver(false);
-                          }, 200)
-                        }
+                          }, 200);
+                          showAcousticText && populateAcoustic(index);
+                        }}
                       />
                       {/* <span id="charNum" className={classes.wordCount}>
                     {targetLength(index)}

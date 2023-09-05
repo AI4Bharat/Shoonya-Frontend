@@ -99,9 +99,9 @@ export const addSubtitleBox = (index) => {
         index < subtitles?.length - 1
           ? copySub[index + 1].start_time
           : DT.d2t(duration + 0.5),
-      text: "SUB_TEXT",
+      text: "",
       speaker_id: "",
-      target_text: "SUB_TEXT",
+      target_text: "",
     })
   );
 
