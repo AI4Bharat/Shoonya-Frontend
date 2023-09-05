@@ -139,7 +139,7 @@ const AllTaskTable = (props) => {
       return col;
     });
     setColumns(newCols);
-    console.log("columnss", newCols);
+    // console.log("columnss", newCols);
   }, [selectedColumns]);
 
 
