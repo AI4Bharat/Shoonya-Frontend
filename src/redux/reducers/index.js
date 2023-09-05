@@ -95,6 +95,7 @@ import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
 import commonReducer from "./CL-Transcription/Common";
 import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
 import patchAnnotation from "./CL-Transcription/PatchAnnotation"
+import updateUIPrefs from "./UserManagement/UpdateUIPrefs";
 
 
 const index = {
@@ -110,9 +111,9 @@ const index = {
     getWorkspacesAnnotatorsData,
     getWorkspacesManagersData,
     getWorkspaceDetails,
-    getTaskPrediction,    
+    getTaskPrediction,
     fetchLanguages,
-    getOrganizationUsers, 
+    getOrganizationUsers,
     getDatasetList,
     getTaskDetails,
     getDatasetList,
@@ -195,10 +196,11 @@ const index = {
     createScheduledMails,
     updateScheduledMails,
     deleteScheduledMails,
-    
     commonReducer,
     getAnnotationsTask,
     patchAnnotation,
+    updateUIPrefs,
+
 };
 
 export default index;

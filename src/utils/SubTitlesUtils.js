@@ -120,12 +120,12 @@ export const onMerge = (index) => {
       id: existingsourceData[index].id,
       start_time: existingsourceData[index].start_time,
       end_time: existingsourceData[index + 1].end_time,
-      text: `${existingsourceData[index].text} ${
-        existingsourceData[index + 1].text
-      }`,
-      target_text: `${existingsourceData[index].target_text} ${
-        existingsourceData[index + 1].target_text
-      }`,
+      text: `${existingsourceData[index].text} ${existingsourceData[index + 1].text
+        }`,
+      target_text: `${existingsourceData[index].target_text} ${existingsourceData[index + 1].target_text
+        }`,
+      acoustic_normalised_text: `${existingsourceData[index].acoustic_normalised_text} ${existingsourceData[index + 1].acoustic_normalised_text
+        }`,
       speaker_id: "",
     })
   );
@@ -195,6 +195,7 @@ export const onSplit = (
         : timings[0].start,
       end_time: middleTime ?? timings[0].end,
       text: text1,
+      acoustic_normalised_text: targetTextBlock?.acoustic_normalised_text,
       ...(targetSelectionStart && { target_text: targetText1 }),
       speaker_id: "",
     })
@@ -210,6 +211,7 @@ export const onSplit = (
           ? subtitles[currentIndex].end_time
           : timings[1].end,
       text: text2,
+      acoustic_normalised_text: "",
       ...(targetSelectionStart && { target_text: targetText2 }),
       speaker_id: "",
     })
@@ -218,15 +220,23 @@ export const onSplit = (
   return copySub;
 };
 
-export const onSubtitleChange = (text, index) => {
+export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic) => {
   const subtitles = store.getState().commonReducer.subtitles;
   const copySub = [...subtitles];
+  const sub = copySub[index];
 
-  copySub.forEach((element, i) => {
+  if (updateAcoustic)
+    sub.acoustic_normalised_text = text;
+  else if (populateAcoustic) {
+    if (!sub.acoustic_normalised_text) sub.acoustic_normalised_text = sub.text;
+  }
+  else sub.text = text;
+
+  /* copySub.forEach((element, i) => {
     if (index === i) {
       element.text = text;
     }
-  });
+  }); */
 
   return copySub;
 };
