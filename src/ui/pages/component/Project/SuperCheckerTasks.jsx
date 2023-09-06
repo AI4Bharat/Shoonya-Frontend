@@ -180,7 +180,7 @@ const SuperCheckerTasks = (props) => {
   ]);
 
   useEffect(() => {
-    if((localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" )){
+    if((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic")){
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
           `/projects/${id}/SuperCheckerAudioTranscriptionLandingPage/${
@@ -234,7 +234,7 @@ const SuperCheckerTasks = (props) => {
           <CustomButton
             disabled={ProjectDetails.is_archived}
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") 
-              if(localStorage.getItem("enableChitrlekhaTranscription") === "true" &&  ProjectDetails?.project_type === "AudioTranscriptionEditing"||ProjectDetails?.project_type === "AudioTranscription" ){
+              if((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic") ){
                 navigate(`SuperCheckerAudioTranscriptionLandingPage/${el.id}`)
               }
               else{

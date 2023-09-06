@@ -85,6 +85,8 @@ const AudioTranscriptionLandingPage = () => {
   const saveIntervalRef = useRef(null);
   const timeSpentIntervalRef = useRef(null);
   const user = useSelector((state) => state.fetchLoggedInUserData.data);
+  const taskDetails = useSelector((state) => state.getTaskDetails?.data);
+
 
   // useEffect(() => {
   //   let intervalId;
@@ -264,7 +266,6 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
   
-
   useEffect(() => {
     const handleAutosave = async (id) => {
       const reqBody = {
@@ -275,7 +276,7 @@ const AudioTranscriptionLandingPage = () => {
         (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
         result,
       };
-
+    if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
       // dispatch(APITransport(obj));
       const res = await fetch(obj.apiEndPoint(), {
@@ -291,6 +292,7 @@ const AudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       }
+    }
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -513,24 +515,15 @@ const AudioTranscriptionLandingPage = () => {
         if (localStorage.getItem("labelAll") || value === "skipped" ) {
           onNextAnnotation(resp.task);
         }
-
-        if (value === "labeled") {
           setSnackbarInfo({
             open: true,
-            message: "Task successfully submitted",
+            message: resp?.message,
             variant: "success",
           });
-        } else if (value === "draft") {
-          setSnackbarInfo({
-            open: true,
-            message: "Task saved as draft",
-            variant: "success",
-          });
-        }
       } else {
         setSnackbarInfo({
           open: true,
-          message: "Error in saving annotation",
+          message: resp?.message,
           variant: "error",
         });
       }
