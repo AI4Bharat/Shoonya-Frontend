@@ -10,6 +10,7 @@ import React, {
   useState,
   useRef,
 } from "react";
+import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
 import {
   Box,
@@ -63,14 +64,24 @@ const AudioTranscriptionLandingPage = () => {
   const [reviewNotesValue, setReviewNotesValue] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
   const [annotations, setAnnotations] = useState([]);
+  const [stdTranscription, setStdTranscription] = useState("");
+  const [showStdTranscript, setShowStdTranscript] = useState(false);
+  const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
+    enable: false,
+    rtl: false,
+    enableTransliteration: false,
+    enableTransliterationSuggestion: false,
+    targetlang: "en",
+    fontSize: "Normal"
+  });
   const [disableSkipButton, setdisableSkipButton] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
-  const[taskData,setTaskData] = useState()
+  const [taskData, setTaskData] = useState()
   const [snackbar, setSnackbarInfo] = useState({
-    open: false,   
-    message: "",      
+    open: false,
+    message: "",
     variant: "success",
   });
   let labellingMode = localStorage.getItem("labellingMode");
@@ -226,6 +237,7 @@ const AudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails, user]);
 
   const handleCollapseClick = () => {
+    !showNotes && setShowStdTranscript(false);
     setShowNotes(!showNotes);
   };
 
@@ -260,39 +272,39 @@ const AudioTranscriptionLandingPage = () => {
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
-    }else{
+    } else {
       setTaskData(resp)
     }
     setLoading(false);
   };
-  
+
   useEffect(() => {
-    const handleAutosave = async (id) => {
+    const handleAutosave = async () => {
       const reqBody = {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
-        auto_save :true,
+        auto_save: true,
         lead_time:
-        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
-        result,
+          (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       };
-    if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id,reqBody);
-      // dispatch(APITransport(obj));
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
-      });
-      const resp = await res.json();
-      if (!res.ok) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving annotation",
-          variant: "error",
+      if (result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+        const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
+        // dispatch(APITransport(obj));
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
         });
+        const resp = await res.json();
+        if (!res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: "Error in autosaving annotation",
+            variant: "error",
+          });
+        }
       }
-    }
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -344,7 +356,7 @@ const AudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -378,7 +390,16 @@ const AudioTranscriptionLandingPage = () => {
   // }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
-    const sub = annotations[0]?.result.map((item) => new Sub(item));
+    let standardisedTranscription = "";
+
+    const sub = annotations[0]?.result.filter((item) => {
+      if ("standardised_transcription" in item) {
+        standardisedTranscription = item.standardised_transcription;
+        return false;
+      } else return true;
+    }).map((item) => new Sub(item));
+
+    setStdTranscription(standardisedTranscription);
 
     // const newSub = cloneDeep(sub);
 
@@ -502,7 +523,7 @@ const AudioTranscriptionLandingPage = () => {
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: result,
     };
-    if (!textBox && !speakerBox && result?.length>0) {
+    if (!textBox && !speakerBox && result?.length > 0) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {
@@ -512,14 +533,14 @@ const AudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        if (localStorage.getItem("labelAll") || value === "skipped" ) {
+        if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
-          setSnackbarInfo({
-            open: true,
-            message: resp?.message,
-            variant: "success",
-          });
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
       } else {
         setSnackbarInfo({
           open: true,
@@ -534,13 +555,13 @@ const AudioTranscriptionLandingPage = () => {
           message: "Please Enter All The Transcripts",
           variant: "error",
         });
-      } else if(speakerBox) {
+      } else if (speakerBox) {
         setSnackbarInfo({
           open: true,
           message: "Please Select The Speaker",
           variant: "error",
         });
-      }else{
+      } else {
         setSnackbarInfo({
           open: true,
           message: "Error in saving annotation",
@@ -645,81 +666,157 @@ const AudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskData}
             />
+            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+              <Grid item>
+                <Button
+                  endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                  variant="contained"
+                  color={
+                    reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                  }
+                  onClick={handleCollapseClick}
+                // style={{ marginBottom: "20px" }}
+                >
+                  Notes {reviewNotesRef.current?.value !== "" && "*"}
+                </Button>
 
-            <Grid sx={{ ml: 3 }}>
-              <Button
-                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-                variant="contained"
-                color={
-                  reviewNotesRef.current?.value !== "" ? "success" : "primary"
-                }
-                onClick={handleCollapseClick}
-              // style={{ marginBottom: "20px" }}
-              >
-                Notes {reviewNotesRef.current?.value !== "" && "*"}
-              </Button>
 
-
-              <div
-                className={classes.collapse}
-                style={{
-                  display: showNotes ? "block" : "none",
-                  paddingBottom: "16px",
-                  overflow:"auto",
-                  height: "100px"
+                {/*<div
+                  className={classes.collapse}
+                  style={{
+                    display: showNotes ? "block" : "none",
+                    paddingBottom: "16px",
+                    overflow:"auto",
+                    height: "100px"
+                  }}
+                >
+                   <TextField
+                multiline
+                placeholder="Place your remarks here ..."
+                label="Annotation Notes"
+                // value={notesValue}
+                // onChange={event=>setNotesValue(event.target.value)}
+                inputRef={annotationNotesRef}
+                rows={1}
+                maxRows={3}
+                inputProps={{
+                  style: { fontSize: "1rem" },
                 }}
-              >
-                {/* <TextField
-              multiline
-              placeholder="Place your remarks here ..."
-              label="Annotation Notes"
-              // value={notesValue}
-              // onChange={event=>setNotesValue(event.target.value)}
-              inputRef={annotationNotesRef}
-              rows={1}
-              maxRows={3}
-              inputProps={{
-                style: { fontSize: "1rem" },
-              }}
-              style={{ width: "99%" }}
-              // ref={quillRef}
-            /> */}
+                style={{ width: "99%" }}
+                // ref={quillRef}
+              /> */}
 
                 {/* <TextField
-              multiline
-              placeholder="Place your remarks here ..."
-              label="Review Notes"
-              // value={notesValue}
-              // onChange={event=>setNotesValue(event.target.value)}
-              inputRef={reviewNotesRef}
-              rows={1}
-              maxRows={3}
-              inputProps={{
-                style: { fontSize: "1rem" },
-                readOnly: true,
-              }}
-              style={{ width: "99%", marginTop: "1%" }}
-              // ref={quillRef}
-            /> */}
-                <ReactQuill
-                  ref={annotationNotesRef}
-                  modules={modules}
-                  bounds={"#note"}
-                  theme="bubble"
-                  formats={formats}
-                  placeholder="Annotation Notes"
-                ></ReactQuill>
-                <ReactQuill
-                  ref={reviewNotesRef}
-                  modules={modules}
-                  theme="bubble"
-                  bounds={"#note"}
-                  readOnly={true}
-                  formats={formats}
-                  placeholder="Review Notes"
-                ></ReactQuill>
-              </div>
+                multiline
+                placeholder="Place your remarks here ..."
+                label="Review Notes"
+                // value={notesValue}
+                // onChange={event=>setNotesValue(event.target.value)}
+                inputRef={reviewNotesRef}
+                rows={1}
+                maxRows={3}
+                inputProps={{
+                  style: { fontSize: "1rem" },
+                  readOnly: true,
+                }}
+                style={{ width: "99%", marginTop: "1%" }}
+                // ref={quillRef}
+              /> 
+                  
+                </div>*/}
+              </Grid>
+              {stdTranscriptionSettings.enable &&
+                <Grid item>
+                  <Button
+                    endIcon={showStdTranscript ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setShowStdTranscript(!showStdTranscript);
+                      setShowNotes(false);
+                    }}
+                  // style={{ marginBottom: "20px" }}
+                  >
+                    Standardised Transcription
+                  </Button>
+                </Grid>}
             </Grid>
+            <div
+              className={classes.collapse}
+              style={{
+                display: showNotes ? "block" : "none",
+                paddingBottom: "16px",
+                overflow: "auto",
+                height: "max-content"
+              }}
+            >
+              <ReactQuill
+                ref={annotationNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                theme="bubble"
+                formats={formats}
+                placeholder="Annotation Notes" />
+              <ReactQuill
+                ref={reviewNotesRef}
+                modules={modules}
+                theme="bubble"
+                bounds={"#note"}
+                readOnly={true}
+                formats={formats}
+                placeholder="Review Notes" />
+            </div>
+            <div
+              className={classes.collapse}
+              style={{
+                display: showStdTranscript ? "block" : "none",
+                paddingBottom: "16px",
+                overflow: "auto",
+                height: "max-content"
+              }}
+            >
+              {stdTranscriptionSettings.enableTransliteration ? (
+                <IndicTransliterate
+                  lang={stdTranscriptionSettings.targetlang}
+                  value={stdTranscription}
+                  onChange={(e) => {
+                    setStdTranscription(e.target.value);
+                  }}
+                  onChangeText={() => { }}
+                  enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
+                  containerStyles={{
+                    width: "100%",
+                  }}
+                  renderComponent={(props) => (
+                    <div className={classes.relative} style={{ width: "100%" }}>
+                      <textarea
+                        className={classes.customTextarea}
+                        dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                        rows={4}
+                        style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px" }}
+                        {...props}
+                      />
+                    </div>
+                  )}
+                />
+              ) : (
+                <div className={classes.relative} style={{ width: "100%" }}>
+                  <textarea
+                    onChange={(e) => {
+                      setStdTranscription(e.target.value);
+                    }}
+                    value={stdTranscription}
+                    dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                    className={classes.customTextarea}
+                    style={{
+                      fontSize: stdTranscriptionSettings.fontSize,
+                      height: "120px",
+                    }}
+                    rows={4}
+                  />
+                </div>
+              )}
+            </div>
           </Box>
         </Grid>
 
@@ -731,6 +828,7 @@ const AudioTranscriptionLandingPage = () => {
             ProjectDetails={ProjectDetails}
             TaskDetails={taskData}
             stage={1}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
           />
         </Grid>
       </Grid>
@@ -741,7 +839,7 @@ const AudioTranscriptionLandingPage = () => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing}   taskID={taskData?.id} />
+        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} />
       </Grid>
     </>
   );

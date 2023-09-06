@@ -74,6 +74,7 @@ const TranscriptionRightPanel = ({
   ProjectDetails,
   TaskDetails,
   stage,
+  handleStdTranscriptionSettings,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -177,6 +178,19 @@ const TranscriptionRightPanel = ({
         ?.scrollIntoView(true, { block: "start" });
     }
   }, [currentIndex]);
+
+  useEffect(() => {
+    if(showAcousticText) {
+      handleStdTranscriptionSettings({
+        enable: true,
+        rtl: enableRTL_Typing,
+        enableTransliteration: ProjectDetails?.tgt_language !== "en" && enableTransliteration,
+        enableTransliterationSuggestion,
+        targetlang,
+        fontSize,
+      });
+    }
+  }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize])
 
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(

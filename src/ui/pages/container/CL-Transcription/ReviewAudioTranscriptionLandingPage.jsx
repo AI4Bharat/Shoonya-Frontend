@@ -10,6 +10,7 @@ import React, {
   useState,
   useRef,
 } from "react";
+import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
 import {
   Box,
@@ -65,6 +66,16 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
   const [annotations, setAnnotations] = useState([]);
+  const [stdTranscription, setStdTranscription] = useState("");
+  const [showStdTranscript, setShowStdTranscript] = useState(false);
+  const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
+    enable: false,
+    rtl: false,
+    enableTransliteration: false,
+    enableTransliterationSuggestion: false,
+    targetlang: "en",
+    fontSize: "Normal"
+  });
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
   const[taskDetailList,setTaskDetailList] = useState("")
@@ -255,6 +266,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   }, [result]);
 
   const handleCollapseClick = () => {
+    !showNotes && setShowStdTranscript(false);
     setShowNotes(!showNotes);
   };
 
@@ -295,10 +307,11 @@ const ReviewAudioTranscriptionLandingPage = () => {
         task_id: taskId,
         annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
         parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
+        auto_save: true,
         // cl_format: true,
         // offset: currentPage,
         // limit: limit,
-        result,
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       };
       if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
 
@@ -368,7 +381,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -402,6 +415,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
   // }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
+
+    let standardisedTranscription = "";
     if (
       AnnotationsTaskDetails.some((obj) =>
         obj.result.every((item) => Object.keys(item).length === 0)
@@ -410,12 +425,24 @@ const ReviewAudioTranscriptionLandingPage = () => {
       const filteredArray = AnnotationsTaskDetails.filter((obj) =>
         obj?.result.some((item) => Object.keys(item).length > 0)
       );
-      const sub = filteredArray[0]?.result?.map((item) => new Sub(item));
+      const sub = filteredArray[0]?.result?.filter((item) => {
+        if ("standardised_transcription" in item) {
+          standardisedTranscription = item.standardised_transcription;
+          return false;
+        } else return true;
+      }).map((item) => new Sub(item));
       dispatch(setSubtitles(sub, C.SUBTITLES));
     } else {
-      const sub = annotations[0]?.result?.map((item) => new Sub(item));
+      const sub = annotations[0]?.result?.filter((item) => {
+        if ("standardised_transcription" in item) {
+          standardisedTranscription = item.standardised_transcription;
+          return false;
+        } else return true;
+      }).map((item) => new Sub(item));
       dispatch(setSubtitles(sub, C.SUBTITLES));
     }
+
+    setStdTranscription(standardisedTranscription);
 
     // const newSub = cloneDeep(sub);
 
@@ -769,7 +796,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid sx={{ ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+              <Grid item>
               <Button
                 endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                 variant="contained"
@@ -785,18 +813,11 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 {annotationNotesRef.current?.value !== "" ||
                   (superCheckerNotesRef.current?.value !== "" && "*")}
               </Button>
-              <div
-                className={classes.collapse}
-                style={{
-                  display: showNotes ? "block" : "none",
-                  paddingBottom: "16px",
-                  height: "178px", overflow: "auto"
-                }}
-              >
-                {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+              
+                {/*  <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
-          </Alert> */}
-                {/* <TextField
+          </Alert> 
+                <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Annotation Notes"
@@ -845,6 +866,32 @@ const ReviewAudioTranscriptionLandingPage = () => {
               style={{ width: "99%", marginTop: "1%" }}
             // ref={quillRef}
             /> */}
+                
+              </Grid>
+              {stdTranscriptionSettings.enable &&
+                <Grid item>
+                  <Button
+                    endIcon={showStdTranscript ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setShowStdTranscript(!showStdTranscript);
+                      setShowNotes(false);
+                    }}
+                  // style={{ marginBottom: "20px" }}
+                  >
+                    Standardised Transcription
+                  </Button>
+                </Grid>}
+            </Grid>
+            <div
+                className={classes.collapse}
+                style={{
+                  display: showNotes ? "block" : "none",
+                  paddingBottom: "16px",
+                  height: "max-content", overflow: "auto"
+                }}
+              >
                 <ReactQuill
                   ref={annotationNotesRef}
                   modules={modules}
@@ -871,9 +918,58 @@ const ReviewAudioTranscriptionLandingPage = () => {
                   placeholder="SuperChecker Notes"
                   readOnly={true}
                 ></ReactQuill>
-
-              </div>
-            </Grid>
+            </div>
+            <div
+              className={classes.collapse}
+              style={{
+                display: showStdTranscript ? "block" : "none",
+                paddingBottom: "16px",
+                overflow: "auto",
+                height: "max-content"
+              }}
+            >
+              {stdTranscriptionSettings.enableTransliteration ? (
+                <IndicTransliterate
+                  lang={stdTranscriptionSettings.targetlang}
+                  value={stdTranscription}
+                  onChange={(e) => {
+                    setStdTranscription(e.target.value);
+                  }}
+                  onChangeText={() => { }}
+                  enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
+                  containerStyles={{
+                    width: "100%",
+                  }}
+                  renderComponent={(props) => (
+                    <div className={classes.relative} style={{ width: "100%" }}>
+                      <textarea
+                        className={classes.customTextarea}
+                        dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                        rows={4}
+                        style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px" }}
+                        {...props}
+                      />
+                    </div>
+                  )}
+                />
+              ) : (
+                <div className={classes.relative} style={{ width: "100%" }}>
+                  <textarea
+                    onChange={(e) => {
+                      setStdTranscription(e.target.value);
+                    }}
+                    value={stdTranscription}
+                    dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                    className={classes.customTextarea}
+                    style={{
+                      fontSize: stdTranscriptionSettings.fontSize,
+                      height: "120px",
+                    }}
+                    rows={4}
+                  />
+                </div>
+              )}
+            </div>
           </Box>
         </Grid>
 
@@ -885,6 +981,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
             ProjectDetails={ProjectDetails}
             TaskDetails={taskDetailList}
             stage={2}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
           />
         </Grid>
       </Grid>
