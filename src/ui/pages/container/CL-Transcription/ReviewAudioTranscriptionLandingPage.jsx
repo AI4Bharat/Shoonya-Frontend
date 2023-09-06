@@ -81,7 +81,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     (state) => state.getAnnotationsTask.data
   );
   const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
-  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
+  const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   const user = useSelector((state) => state.fetchLoggedInUserData.data);
   const player = useSelector((state) => state.commonReducer.player);
   const ref = useRef(0);
@@ -300,6 +300,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         // limit: limit,
         result,
       };
+      if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
 
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
       // dispatch(APITransport(obj));
@@ -315,7 +316,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
           message: "Error in autosaving annotation",
           variant: "error",
         });
-      }
+      }}
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -561,27 +562,17 @@ const ReviewAudioTranscriptionLandingPage = () => {
         onNextAnnotation(resp.task);
       }
 
-      if (
-        value === "accepted" ||
-        value === "accepted_with_minor_changes" ||
-        value === "accepted_with_major_changes"
-      ) {
+     
         setSnackbarInfo({
           open: true,
-          message: "Task successfully submitted",
+          message: resp?.message,
           variant: "success",
         });
-      } else if (value === "draft") {
-        setSnackbarInfo({
-          open: true,
-          message: "Task saved as draft",
-          variant: "success",
-        });
-      }
+      
     } else {
       setSnackbarInfo({
         open: true,
-        message: "Error in saving annotation",
+        message: resp?.message,
         variant: "error",
       });
     }

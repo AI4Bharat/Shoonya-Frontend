@@ -77,7 +77,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     (state) => state.getAnnotationsTask.data
   );
   const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
-  const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
+  const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   const player = useSelector((state) => state.commonReducer.player);
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ref = useRef(0);
@@ -208,6 +208,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time?.lead_time ?? 0),
         result,
       };
+      if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === userData.id)){
 
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[2]?.id, reqBody);
       // dispatch(APITransport(obj));
@@ -224,7 +225,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       } 
-  
+    }
     };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -473,24 +474,16 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       if (localStorage.getItem("labelAll") || value === "skipped") {
         onNextAnnotation(resp.task);
       }
-
-      if (value === "validated" || value === "validated_with_changes") {
-        setSnackbarInfo({
+      setSnackbarInfo({
           open: true,
-          message: "Task successfully submitted",
+          message: resp?.message,
           variant: "success",
         });
-      } else if (value === "draft") {
-        setSnackbarInfo({
-          open: true,
-          message: "Task saved as draft",
-          variant: "success",
-        });
-      }
+     
     } else {
       setSnackbarInfo({
         open: true,
-        message: "Error in saving annotation",
+        message: resp?.message,
         variant: "error",
       });
     }
