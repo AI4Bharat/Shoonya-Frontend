@@ -101,7 +101,7 @@ const TranscriptionRightPanel = ({
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles?.slice(startIndex, endIndex);
-  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscription" && ProjectDetails?.metadata_json?.acoustic_enabled_stage >= stage;
+  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscription" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -567,7 +567,6 @@ const TranscriptionRightPanel = ({
                         setTimeout(() => {
                           setShowPopOver(false);
                         }, 200);
-                        showAcousticText && populateAcoustic(index);
                       }}
                       renderComponent={(props) => (
                         <div className={classes.relative} style={{ width: "100%" }}>
@@ -581,7 +580,6 @@ const TranscriptionRightPanel = ({
                               setTimeout(() => {
                                 setShowPopOver(false);
                               }, 200);
-                              showAcousticText && populateAcoustic(index);
                             }}
                             style={{ fontSize: fontSize, height: "120px" }}
                             {...props}
@@ -613,7 +611,6 @@ const TranscriptionRightPanel = ({
                           setTimeout(() => {
                             setShowPopOver(false);
                           }, 200);
-                          showAcousticText && populateAcoustic(index);
                         }}
                       />
                       {/* <span id="charNum" className={classes.wordCount}>
@@ -642,6 +639,7 @@ const TranscriptionRightPanel = ({
                                 }`}
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
                               rows={4}
+                              onFocus={() => showAcousticText && populateAcoustic(index)}
                               style={{ fontSize: fontSize, height: "120px" }}
                               {...props}
                             />
@@ -654,7 +652,7 @@ const TranscriptionRightPanel = ({
                           onChange={(event) => {
                             changeTranscriptHandler(event, index, true);
                           }}
-
+                          onFocus={() => showAcousticText && populateAcoustic(index)}
                           value={item.acoustic_normalised_text}
                           dir={enableRTL_Typing ? "rtl" : "ltr"}
                           className={`${classes.customTextarea} ${currentIndex === index ? classes.boxHighlight : ""
