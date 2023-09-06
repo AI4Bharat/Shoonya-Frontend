@@ -101,6 +101,7 @@ const TranscriptionRightPanel = ({
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles?.slice(startIndex, endIndex);
+  const idxOffset = (itemsPerPage * (page - 1));
   const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscription" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -200,6 +201,7 @@ const TranscriptionRightPanel = ({
 
   const onMergeClick = useCallback(
     (index) => {
+      index = index + idxOffset;
       const selectionStart = getSelectionStart(index);
       const timings = getTimings(index);
 
@@ -226,7 +228,7 @@ const TranscriptionRightPanel = ({
     if (e.target.selectionStart < e.target.value?.length) {
       e.preventDefault();
       setShowPopOver(true);
-      setCurrentIndexToSplitTextBlock(blockIdx);
+      setCurrentIndexToSplitTextBlock(blockIdx + idxOffset);
       setSelectionStart(e.target.selectionStart);
     }
   };
@@ -254,7 +256,7 @@ const TranscriptionRightPanel = ({
       target: { value },
       currentTarget,
     } = event;
-    const realIdx = (itemsPerPage * (page - 1)) + index;
+    index = index + idxOffset;
 
     const containsBackslash = value.includes("\\");
 
@@ -265,19 +267,19 @@ const TranscriptionRightPanel = ({
 
       const textBeforeSlash = value.split("\\")[0];
       const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
-      setCurrentSelectedIndex(realIdx);
+      setCurrentSelectedIndex(index);
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutBackSlash(textBeforeSlash);
       setTextAfterBackSlash(textAfterSlash);
     }
-    const sub = onSubtitleChange(value, realIdx, updateAcoustic, false);
+    const sub = onSubtitleChange(value, index, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
 
   const populateAcoustic = (index) => {
-    const realIdx = (itemsPerPage * (page - 1)) + index;
-    const sub = onSubtitleChange("", realIdx, false, true);
+    index = index + idxOffset;
+    const sub = onSubtitleChange("", index, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
 
@@ -334,7 +336,7 @@ const TranscriptionRightPanel = ({
 
   const handleTimeChange = useCallback(
     (value, index, type, time) => {
-      const sub = timeChange(value, index, type, time);
+      const sub = timeChange(value, index + idxOffset, type, time);
       dispatch(setSubtitles(sub, C.SUBTITLES));
       // saveTranscriptHandler(false, true, sub);
     },
@@ -344,6 +346,7 @@ const TranscriptionRightPanel = ({
 
   const onDelete = useCallback(
     (index) => {
+      index = index + idxOffset;
       setUndoStack((prevState) => [
         ...prevState,
         {
@@ -364,6 +367,7 @@ const TranscriptionRightPanel = ({
 
   const addNewSubtitleBox = useCallback(
     (index) => {
+      index = index + idxOffset;
       const sub = addSubtitleBox(index);
       dispatch(setSubtitles(sub, C.SUBTITLES));
       // saveTranscriptHandler(false, false, sub);
@@ -415,18 +419,18 @@ const TranscriptionRightPanel = ({
     // eslint-disable-next-line
   }, [undoStack, redoStack]);
 
-  const targetLength = (index) => {
+  /* const targetLength = (index) => {
     if (subtitles[index]?.text?.trim() !== "")
       return subtitles[index]?.text?.trim()?.split(" ")?.length;
     return 0;
-  };
+  }; */
 
   const onNavigationClick = (value) => {
     getPayload(value, limit);
   };
 
   const handleSpeakerChange = (id, index) => {
-    const sub = assignSpeakerId(id, index);
+    const sub = assignSpeakerId(id, index + idxOffset);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
@@ -574,7 +578,7 @@ const TranscriptionRightPanel = ({
                       renderComponent={(props) => (
                         <div className={classes.relative} style={{ width: "100%" }}>
                           <textarea
-                            className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
+                            className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                               }`}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
                             rows={4}
@@ -602,7 +606,7 @@ const TranscriptionRightPanel = ({
                         onMouseUp={(e) => onMouseUp(e, index)}
                         value={item.text}
                         dir={enableRTL_Typing ? "rtl" : "ltr"}
-                        className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
+                        className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                           }`}
                         // className={classes.customTextarea}
                         style={{
@@ -638,7 +642,7 @@ const TranscriptionRightPanel = ({
                         renderComponent={(props) => (
                           <div className={classes.relative} style={{ width: "100%" }}>
                             <textarea
-                              className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
+                              className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                                 }`}
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
                               rows={4}
@@ -658,7 +662,7 @@ const TranscriptionRightPanel = ({
                           onFocus={() => showAcousticText && populateAcoustic(index)}
                           value={item.acoustic_normalised_text}
                           dir={enableRTL_Typing ? "rtl" : "ltr"}
-                          className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
+                          className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                             }`}
                           style={{
                             fontSize: fontSize,

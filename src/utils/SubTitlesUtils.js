@@ -169,7 +169,7 @@ export const onSplit = (
     !text2 ||
     (targetSelectionStart && (!targetText1 || !targetText2))
   )
-    return;
+    return copySub;
 
   copySub.splice(currentIndex, 1);
   let middleTime = null;
