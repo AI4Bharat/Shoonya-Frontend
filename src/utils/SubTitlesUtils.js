@@ -12,7 +12,7 @@ export const formatSub = (sub) => {
   if (Array.isArray(sub)) {
     return sub.map((item) => newSub(item));
   }
-  return newSub(sub);
+  return [];
 };
 
 export const hasSub = (sub, type) => {
@@ -181,7 +181,7 @@ export const onSplit = (
     ).toFixed(3);
 
     if (splitDuration < 0.2 || targetTextBlock.duration - splitDuration < 0.2)
-      return;
+      return copySub;
 
     middleTime = DT.d2t(targetTextBlock.startTime + parseFloat(splitDuration));
   }
