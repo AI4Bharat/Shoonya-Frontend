@@ -228,7 +228,7 @@ export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic) 
   if (updateAcoustic)
     sub.acoustic_normalised_text = text;
   else if (populateAcoustic) {
-    if (!sub.acoustic_normalised_text) sub.acoustic_normalised_text = sub.text;
+    sub.acoustic_normalised_text = sub.text;
   }
   else sub.text = text;
 

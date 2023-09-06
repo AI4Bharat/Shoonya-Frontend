@@ -407,7 +407,7 @@ const TaskTable = (props) => {
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type.includes("AudioTranscription")) || ProjectDetails?.project_type.includes("Acoustic")) {
+                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("Acoustic")) {
                     navigate(`AudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{

@@ -649,7 +649,7 @@ const TranscriptionRightPanel = ({
                         )}
                       />
                     ) : (
-                      <div className={classes.relative}>
+                      <div className={classes.relative} style={{ width: "100%" }}>
                         <textarea
                           onChange={(event) => {
                             changeTranscriptHandler(event, index, true);
