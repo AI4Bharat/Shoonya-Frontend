@@ -1,9 +1,5 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
-import { useQuill } from 'react-quilljs';
-import ReactQuill, { Quill } from 'react-quill';
-import "./editor.css"
-import 'quill/dist/quill.snow.css';
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -351,7 +347,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               review.lead_time,
               "skipped",
-              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
+              superCheckerNotesRef.current.value
             ).then(() => {
               getNextProject(projectId, taskData.id, "supercheck").then(
                 (res) => {
@@ -409,7 +405,7 @@ const LabelStudioWrapper = ({
               review_status.current,
               temp,
               superChecker.parent_annotation,
-              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
+              superCheckerNotesRef.current.value
             ).then(() => {
               if (localStorage.getItem("labelAll"))
                 getNextProject(projectId, taskData.id, "supercheck").then(
@@ -447,11 +443,6 @@ const LabelStudioWrapper = ({
         );
         reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
-        
-        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
@@ -469,11 +460,6 @@ const LabelStudioWrapper = ({
             reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
-
-        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -483,10 +469,6 @@ const LabelStudioWrapper = ({
               reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
-        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           }
         }
       }
@@ -628,7 +610,7 @@ const LabelStudioWrapper = ({
           superChecker.annotation_status,
           temp,
           superChecker.parent_annotation,
-          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+          superCheckerNotesRef.current.value,
           true
         ).then((res) => {
           if (res.status !== 200) {
@@ -689,7 +671,7 @@ const LabelStudioWrapper = ({
       tasksComplete(res?.id || null);
     });
   };
-  const [value, setvalue] = useState();
+
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -703,7 +685,7 @@ const LabelStudioWrapper = ({
     review_status.current = "rejected";
     lsfRef.current.store.submitAnnotation();
   };
- 
+
   const handleAcceptClick = async (status) => {
     review_status.current = status;
     lsfRef.current.store.submitAnnotation();
@@ -932,24 +914,6 @@ export default function LSF() {
   });
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
-  const modules = {
-    toolbar:[
-      
-    [{ size: [] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'color': [] }],
-    [{ 'script': 'sub'}, { 'script': 'super' }],
-    ]
-  };
-
-  const formats = [
-    'size',
-    'bold','italic','underline','strike',
-    'color','background',
-    'script']
-
-
-
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -979,8 +943,6 @@ export default function LSF() {
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
-
-
 
   const resetNotes = () => {
     setShowNotes(false);
@@ -1053,7 +1015,7 @@ export default function LSF() {
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            {/* <TextField
+            <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Review Notes"
@@ -1067,7 +1029,6 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
-              // ref={quillRef}
             />
 
             <TextField
@@ -1077,34 +1038,13 @@ export default function LSF() {
               // value={notesValue}
               // onChange={event=>setNotesValue(event.target.value)}
               inputRef={superCheckerNotesRef}
-              InputLabelProps={{
-                shrink: true,
-              }}
               rows={2}
               maxRows={4}
               inputProps={{
                 style: { fontSize: "1rem" },
               }}
               style={{ width: "99%", marginTop: "1%" }}
-              ref={quillRef}
-            /> */}
-            <ReactQuill
-              ref={reviewNotesRef}
-              modules={modules}
-              formats={formats}
-              bounds={"#note"}
-              placeholder="Review Notes"
-              style={{ marginbottom: "1%", minHeight: "2rem" }}
-              readOnly={true}
-            ></ReactQuill>
-            <ReactQuill
-              ref={superCheckerNotesRef}
-              modules={modules}
-              bounds={"#note"}
-              formats={formats}
-              placeholder="SuperChecker Notes"
-              style={{ marginbottom: "1%", minHeight: "2rem" }}
-            ></ReactQuill>
+            />
           </div>
           <Button
             variant="contained"

@@ -92,11 +92,6 @@ import getScheduledMails from './UserManagement/GetScheduledMails';
 import createScheduledMails from './UserManagement/CreateScheduledMails';
 import updateScheduledMails from './UserManagement/UpdateScheduledMails';
 import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
-import commonReducer from "./CL-Transcription/Common";
-import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
-import patchAnnotation from "./CL-Transcription/PatchAnnotation"
-import updateUIPrefs from "./UserManagement/UpdateUIPrefs";
-
 
 const index = {
     apiStatus,
@@ -111,9 +106,9 @@ const index = {
     getWorkspacesAnnotatorsData,
     getWorkspacesManagersData,
     getWorkspaceDetails,
-    getTaskPrediction,
+    getTaskPrediction,    
     fetchLanguages,
-    getOrganizationUsers,
+    getOrganizationUsers, 
     getDatasetList,
     getTaskDetails,
     getDatasetList,
@@ -195,12 +190,8 @@ const index = {
     getScheduledMails,
     createScheduledMails,
     updateScheduledMails,
-    deleteScheduledMails,
-    commonReducer,
-    getAnnotationsTask,
-    patchAnnotation,
-    updateUIPrefs,
-
+    deleteScheduledMails
+    
 };
 
 export default index;

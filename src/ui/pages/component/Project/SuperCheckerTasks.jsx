@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams,useLocation } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
 import GetAllTasksAPI from "../../../../redux/actions/api/Tasks/GetAllTasks";
@@ -60,8 +60,6 @@ const SuperCheckerTasks = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
   const navigate = useNavigate();
-  let location = useLocation();
-
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const [snackbar, setSnackbarInfo] = useState({
@@ -180,15 +178,6 @@ const SuperCheckerTasks = (props) => {
   ]);
 
   useEffect(() => {
-    if((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic")){
-      if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
-        navigate(
-          `/projects/${id}/SuperCheckerAudioTranscriptionLandingPage/${
-            NextTask?.id
-          }`
-        );
-      }
-    }else{
     if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
       navigate(
         `/projects/${id}/SuperChecker/${
@@ -196,18 +185,9 @@ const SuperCheckerTasks = (props) => {
         }`
       );
     }
-  }
+   
   }, [NextTask]);
 
-  useEffect(() => {
-    if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
-      localStorage.setItem("enableChitrlekhaUI", true);
-    } else {
-      localStorage.setItem("enableChitrlekhaUI", false);
-    }
-    localStorage.setItem("SuperCheckerStage", props.type);
-  },[]);
-  
   useEffect(() => {
     dispatch(SetTaskFilter(id, selectedFilters, props.type));
     if (currentPageNumber !== 1) {
@@ -231,20 +211,15 @@ const SuperCheckerTasks = (props) => {
         );
         taskList[0].supercheck_status && row.push(el.supercheck_status);
         row.push( <>
+          <Link to={`SuperChecker/${el.id}`} className={classes.link}>
           <CustomButton
             disabled={ProjectDetails.is_archived}
-              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") 
-              if((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic") ){
-                navigate(`SuperCheckerAudioTranscriptionLandingPage/${el.id}`)
-              }
-              else{
-                navigate(`SuperChecker/${el.id}`)
-              }
-            }}
+              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
                 Validate
               </Typography>} />
+      </Link>
 
         </>)
         return row;
