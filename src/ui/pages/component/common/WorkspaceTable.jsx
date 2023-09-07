@@ -32,7 +32,7 @@ const WorkspaceTable = (props) => {
 
     useEffect(() => {
         getWorkspaceData();
-        // console.log("fired now")
+        console.log("fired now")
     }, [currentPageNumber]);
 
     // useEffect(() => {

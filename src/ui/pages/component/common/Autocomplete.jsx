@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
 export default function Autocompletes(props) {
-    // console.log(props,"aaaaaaaaaaa")
+    console.log(props,"aaaaaaaaaaa")
     const [selectAutocomplete, setselectAutocomplete] = React.useState("");
 
     useEffect(() => {

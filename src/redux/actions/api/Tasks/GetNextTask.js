@@ -8,7 +8,7 @@ import constants from "../../../constants";
 export default class GetNextTaskAPI extends API {
   constructor(projectId,projectObj, mode="annotation", timeout = 2000) {
 
-    // console.log(projectObj,"projectObjprojectObj")
+    console.log(projectObj,"projectObjprojectObj")
     super("POST", timeout, false);
     let queryStr = "";
     this.projectId = projectId;

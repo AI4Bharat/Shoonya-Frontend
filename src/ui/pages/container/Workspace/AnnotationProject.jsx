@@ -49,14 +49,14 @@ const isNum = (str) => {
 const projectStage = [
   { name: "Annotation Stage", value: 1 },
   { name: "Review Stage", value: 2 },
-  { name: "Super-Check Stage", value: 3 }
+  {name:"Super Check Stage",value: 3}
 ];
 
 const CreateAnnotationsAutomatically = [
   { name: "None", value: "none" },
   { name: "Annotation", value: "annotation" },
   { name: "Review", value: "review" },
-  { name: "Supercheck", value: "supercheck" }
+  {name:"Supercheck",value: "supercheck"}
 ];
 
 const AnnotationProject = (props) => {
@@ -75,7 +75,7 @@ const AnnotationProject = (props) => {
   const filterdataitemsList = useSelector(
     (state) => state.datasetSearchPopup.data
   );
-
+ 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
   const [datasetTypes, setDatasetTypes] = useState(null);
@@ -115,7 +115,6 @@ const AnnotationProject = (props) => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [createannotationsAutomatically, setsCreateannotationsAutomatically] = useState("none");
-  const [acousticEnabledStage, setAcousticEnabledStage] = useState(null);
 
   const searchOpen = Boolean(searchAnchor);
   const excludeKeys = [
@@ -135,11 +134,11 @@ const AnnotationProject = (props) => {
     // "transcribed_json",
     "conversation_json",
     // "prediction_json",
-    "machine_transcribed_json",
-    "unverified_conversation_json",
-    "annotation_bboxes",
-    "annotation_labels",
-    "annotation_transcripts",
+    "machine_transcribed_json", 
+   "unverified_conversation_json",
+   "annotation_bboxes",
+   "annotation_labels",
+   "annotation_transcripts",
   ];
   const renderToolBar = () => {
     return (
@@ -270,28 +269,28 @@ const AnnotationProject = (props) => {
 
           if (
             ProjectDomains[domain]["project_types"][project_type][
-            "input_dataset"
+              "input_dataset"
             ]
           ) {
             tempDatasetTypes[project_type] =
               ProjectDomains[domain]["project_types"][project_type][
-              "input_dataset"
+                "input_dataset"
               ]["class"];
             tempColumnFields[project_type] =
               ProjectDomains[domain]["project_types"][project_type][
-              "input_dataset"
+                "input_dataset"
               ]["fields"];
           }
           let temp =
             ProjectDomains[domain]["project_types"][project_type][
-            "output_dataset"
+              "output_dataset"
             ]["fields"]["variable_parameters"];
           if (temp) {
             tempVariableParameters[project_type] = {
               variable_parameters: temp,
               output_dataset:
                 ProjectDomains[domain]["project_types"][project_type][
-                "output_dataset"
+                  "output_dataset"
                 ]["class"],
             };
           }
@@ -369,9 +368,9 @@ const AnnotationProject = (props) => {
               align: "center",
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
-                if ((keys == "metadata_json" || keys == "prediction_json" || keys == "ocr_prediction_json" || keys == "transcribed_json" || keys == "draft_data_json" || keys == "ocr_transcribed_json") && value !== null) {
-                  const data = JSON.stringify(value)
-                  const metadata = data.replace(/\\/g, "");
+                if ((keys == "metadata_json" || keys == "prediction_json"|| keys == "ocr_prediction_json"|| keys == "transcribed_json"|| keys == "draft_data_json" || keys == "ocr_transcribed_json") && value !== null ) {
+                 const data = JSON.stringify(value)
+                 const metadata = data.replace(/\\/g, "");
                   return metadata;
                 } else {
                   return value;
@@ -430,7 +429,7 @@ const AnnotationProject = (props) => {
     if (batchSize && batchNumber) {
       setSamplingParameters({
         batch_size: batchSize,
-        batch_number: new Function("return [" + [batchNumber] + "]")(),
+        batch_number:new Function( "return [" + [batchNumber ]+ "]")(),
       });
     } else {
       setSamplingParameters(null);
@@ -530,7 +529,7 @@ const AnnotationProject = (props) => {
   };
 
 
-
+  
 
   const handleCreateProject = () => {
     let temp = {};
@@ -558,7 +557,7 @@ const AnnotationProject = (props) => {
       required_annotators_per_task: selectedAnnotatorsNum,
       project_stage: taskReviews,
       ...(createannotationsAutomatically !== "none" && { automatic_annotation_creation_mode: createannotationsAutomatically }),
-      acoustic_enabled_stage: acousticEnabledStage,
+
     };
 
     if (sourceLanguage) newProject["src_language"] = sourceLanguage;
@@ -575,7 +574,7 @@ const AnnotationProject = (props) => {
     setTaskReviews(e.target.value);
   };
 
-  const handleChangeCreateAnnotationsAutomatically = (e) => {
+  const handleChangeCreateAnnotationsAutomatically = (e)=>{
     setsCreateannotationsAutomatically(e.target.value)
   }
 
@@ -713,7 +712,7 @@ const AnnotationProject = (props) => {
 
             {selectedType &&
               variableParameters?.[selectedType]?.variable_parameters !==
-              undefined && (
+                undefined && (
                 <>
                   <Grid
                     className={classes.projectsettingGrid}
@@ -821,8 +820,7 @@ const AnnotationProject = (props) => {
                 selectedType === "SingleSpeakerAudioTranscriptionEditing" ||
                 selectedType === "AudioTranscription" ||
                 selectedType === "AudioSegmentation" ||
-                selectedType === "AudioTranscriptionEditing" ||
-                selectedType === "AcousticNormalisedTranscription") && (
+                selectedType === "AudioTranscriptionEditing") && (
                 <>
                   <Grid
                     className={classes.projectsettingGrid}
@@ -918,7 +916,7 @@ const AnnotationProject = (props) => {
                       ) : (
                         <>
                           {parameter.data["name"] === "DecimalField" ||
-                            parameter.data["name"] === "IntegerField" ? (
+                          parameter.data["name"] === "IntegerField" ? (
                             <OutlinedTextField
                               fullWidth
                               defaultValue={
@@ -1008,12 +1006,12 @@ const AnnotationProject = (props) => {
                                     confirmed
                                       ? undefined
                                       : () => {
-                                        setSelectedInstances(
-                                          selectedInstances.filter(
-                                            (instance) => instance !== key
-                                          )
-                                        );
-                                      }
+                                          setSelectedInstances(
+                                            selectedInstances.filter(
+                                              (instance) => instance !== key
+                                            )
+                                          );
+                                        }
                                   }
                                 />
                               ))}
@@ -1085,7 +1083,7 @@ const AnnotationProject = (props) => {
                       data={tableData}
                       columns={columns.filter((column) =>
                         selectedColumns.includes(column.name)
-
+                       
                       )}
                       options={options}
                     />
@@ -1278,7 +1276,7 @@ const AnnotationProject = (props) => {
                   className={classes.projectsettingGrid}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Create Annotations Automatically:
+                  Create Annotations Automatically:
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -1297,36 +1295,6 @@ const AnnotationProject = (props) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                {selectedType === "AcousticNormalisedTranscription" && <>
-                  <Grid
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                    className={classes.projectsettingGrid}
-                  >
-                    <Typography gutterBottom component="div" label="Required">
-                      Acoustic Enabled Stage:
-                    </Typography>
-                  </Grid>
-                  <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                    <FormControl fullWidth className={classes.formControl}>
-                      <Select
-                        labelId="acoustic-label"
-                        id="acoustic-select"
-                        value={acousticEnabledStage}
-                        onChange={(e) => setAcousticEnabledStage(e.target.value)}
-                      >
-                        {projectStage.map((type, index) => (
-                          <MenuItem value={type.value} key={index}>
-                            {type.name.split(/(?<=^\S+)\s/)[0]}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </>}
               </>
             )}
 
@@ -1360,13 +1328,13 @@ const AnnotationProject = (props) => {
                 onClick={handleCreateProject}
                 disabled={
                   title &&
-                    description &&
-                    selectedDomain &&
-                    selectedType &&
-                    selectedInstances &&
-                    domains &&
-                    samplingMode &&
-                    selectedVariableParameters
+                  description &&
+                  selectedDomain &&
+                  selectedType &&
+                  selectedInstances &&
+                  domains &&
+                  samplingMode &&
+                  selectedVariableParameters
                     ? false
                     : true
                 }
