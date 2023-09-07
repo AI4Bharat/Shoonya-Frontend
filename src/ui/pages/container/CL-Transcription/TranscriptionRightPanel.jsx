@@ -515,7 +515,9 @@ const TranscriptionRightPanel = ({
           </Grid>}
           </Box>
 
-        <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
+        <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
+          height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
+        }}>
           {currentPageData?.map((item, index) => {
             return (
               <Box
