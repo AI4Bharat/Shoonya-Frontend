@@ -172,7 +172,7 @@ function MobileNavbar(props) {
 
                   }}
                 >
-                  shoonya
+                  Shoonya
                 </Typography>
             </Grid>
             <Grid item>
