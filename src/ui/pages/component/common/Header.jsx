@@ -690,14 +690,14 @@ const Header = () => {
                   />
                 </Link>
                 <Typography
-                  variant="h2"
+                  variant="h4"
                   className={classes.headerTitle}
                   sx={{
                     fontSize: "28px",
                     fontWeight: "lighter",
                   }}
                 >
-                  shoonya
+                  Shoonya
                 </Typography>
               </Grid>
 
