@@ -188,7 +188,7 @@ import React, {
           const index = hasSub(sub);
           const res = onSubtitleDelete(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(taskData?.annotation_status, res);
+          //saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [result]
@@ -199,7 +199,7 @@ import React, {
           const index = hasSub(sub);
           const res = onMerge(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(taskData?.annotation_status, res);
+          //saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [result]
@@ -216,7 +216,7 @@ import React, {
   
           copySub[index] = sub;
           dispatch(setSubtitles(copySub, C.SUBTITLES));
-          saveTranscript(taskData?.annotation_status,copySub);
+          //saveTranscript(taskData?.annotation_status,copySub);
         },
         // eslint-disable-next-line
         [result]

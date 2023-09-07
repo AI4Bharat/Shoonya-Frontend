@@ -10,6 +10,7 @@ import React, {
   useState,
   useRef,
 } from "react";
+import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
 import {
   Box,
@@ -59,6 +60,16 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [NextData, setNextData] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [annotations, setAnnotations] = useState([]);
+  const [stdTranscription, setStdTranscription] = useState("");
+  const [showStdTranscript, setShowStdTranscript] = useState(false);
+  const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
+    enable: false,
+    rtl: false,
+    enableTransliteration: false,
+    enableTransliterationSuggestion: false,
+    targetlang: "en",
+    fontSize: "Normal"
+  });
   const [disableSkip, setdisableSkip] = useState(false);
   const[taskDetailList,setTaskDetailList] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
@@ -159,6 +170,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   console.log(disableSkip);
 
   const handleCollapseClick = () => {
+    !showNotes && setShowStdTranscript(false);
     setShowNotes(!showNotes);
   };
 
@@ -206,7 +218,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         auto_save :true,
         lead_time:
         (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time?.lead_time ?? 0),
-        result,
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       };
       if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === userData.id)){
 
@@ -277,7 +289,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -311,6 +323,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   // }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
+    let standardisedTranscription = "";
     if (
       AnnotationsTaskDetails.some((obj) =>
         obj.result.every((item) => Object.keys(item).length === 0)
@@ -319,15 +332,27 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       const filteredArray = AnnotationsTaskDetails.filter((obj) =>
         obj?.result.some((item) => Object.keys(item).length > 0)
       );
-      const sub = filteredArray[1]?.result?.map((item) => new Sub(item));
+      const sub = filteredArray[1]?.result?.filter((item) => {
+        if ("standardised_transcription" in item) {
+          standardisedTranscription = item.standardised_transcription;
+          return false;
+        } else return true;
+      }).map((item) => new Sub(item));
       dispatch(setSubtitles(sub, C.SUBTITLES));
     } else {
       const filteredArray = AnnotationsTaskDetails?.filter(
         (annotation) => annotation?.annotation_type === 3
       );
-      const sub = annotations[0]?.result?.map((item) => new Sub(item));
+      const sub = annotations[0]?.result?.filter((item) => {
+        if ("standardised_transcription" in item) {
+          standardisedTranscription = item.standardised_transcription;
+          return false;
+        } else return true;
+      }).map((item) => new Sub(item));
       dispatch(setSubtitles(sub, C.SUBTITLES));
     }
+
+    setStdTranscription(standardisedTranscription);
     // const newSub = cloneDeep(sub);
 
     // dispatch(setCurrentPage(transcriptPayload?.current));
@@ -657,83 +682,152 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid sx={{ ml: 3 }}>
-            <Button
-              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-              variant="contained"
-              color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
-              }
-              onClick={handleCollapseClick}
-            >
-              Notes {reviewNotesRef.current?.value !== "" && "*"}
-            </Button>
+            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+              <Grid item>
+                <Button
+                  endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                  variant="contained"
+                  color={
+                    reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                  }
+                  onClick={handleCollapseClick}
+                >
+                  Notes {reviewNotesRef.current?.value !== "" && "*"}
+                </Button>
         
-          <div
-            className={classes.collapse}    
-            style={{
-              display: showNotes ? "block" : "none",
-              paddingBottom: "16px",
-              overflow:"auto",
-              height:"178px"
-            }}
-          >
-            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
-              {translate("alert.notes")}
-          </Alert> */}
-            {/* <TextField
-              multiline
-              placeholder="Place your remarks here ..."
-              label="Review Notes"
-              // value={notesValue}
-              // onChange={event=>setNotesValue(event.target.value)}
-              inputRef={reviewNotesRef}
-              rows={1}
-              maxRows={3}
-              inputProps={{
-                style: { fontSize: "1rem" },
-                readOnly: true,
-              }}
-              style={{ width: "99%", marginTop: "1%" }}
-              // ref={quillRef}
-            />
-
-            <TextField
-              multiline
-              placeholder="Place your remarks here ..."
-              label="Super Checker Notes"
-              // value={notesValue}
-              // onChange={event=>setNotesValue(event.target.value)}
-              inputRef={superCheckerNotesRef}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              rows={1}
-              maxRows={3}
-              inputProps={{
-                style: { fontSize: "1rem" },
-              }}
-              style={{ width: "99%", marginTop: "1%" }}
-            /> */}
-            <ReactQuill
-                  ref={reviewNotesRef}
-                  modules={modules}
-                  bounds={"#note"}
-                  formats={formats}
-                  theme="bubble"
-                  placeholder="Review Notes"
-                  readOnly={true}
-                ></ReactQuill>
-                <ReactQuill
-                  ref={superCheckerNotesRef}
-                  modules={modules}
-                  bounds={"#note"}
-                  theme="bubble"
-                  formats={formats}
-                  placeholder="SuperChecker Notes"
-                ></ReactQuill>
-              </div>
+          
+              </Grid>
+              {stdTranscriptionSettings.enable &&
+                <Grid item>
+                  <Button
+                    endIcon={showStdTranscript ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setShowStdTranscript(!showStdTranscript);
+                      setShowNotes(false);
+                    }}
+                  // style={{ marginBottom: "20px" }}
+                  >
+                    Standardised Transcription
+                  </Button>
+                </Grid>}
             </Grid>
+            <div
+              className={classes.collapse}    
+              style={{
+                display: showNotes ? "block" : "none",
+                paddingBottom: "16px",
+                overflow:"auto",
+                height:"max-content"
+              }}
+            >
+              {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+                {translate("alert.notes")}
+            </Alert> */}
+              {/* <TextField
+                multiline
+                placeholder="Place your remarks here ..."
+                label="Review Notes"
+                // value={notesValue}
+                // onChange={event=>setNotesValue(event.target.value)}
+                inputRef={reviewNotesRef}
+                rows={1}
+                maxRows={3}
+                inputProps={{
+                  style: { fontSize: "1rem" },
+                  readOnly: true,
+                }}
+                style={{ width: "99%", marginTop: "1%" }}
+                // ref={quillRef}
+              />
+
+              <TextField
+                multiline
+                placeholder="Place your remarks here ..."
+                label="Super Checker Notes"
+                // value={notesValue}
+                // onChange={event=>setNotesValue(event.target.value)}
+                inputRef={superCheckerNotesRef}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                rows={1}
+                maxRows={3}
+                inputProps={{
+                  style: { fontSize: "1rem" },
+                }}
+                style={{ width: "99%", marginTop: "1%" }}
+              /> */}
+              <ReactQuill
+                ref={reviewNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                formats={formats}
+                theme="bubble"
+                placeholder="Review Notes"
+                readOnly={true}
+              ></ReactQuill>
+              <ReactQuill
+                ref={superCheckerNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                theme="bubble"
+                formats={formats}
+                placeholder="SuperChecker Notes"
+              ></ReactQuill>
+            </div>
+            <div
+              className={classes.collapse}
+              style={{
+                display: showStdTranscript ? "block" : "none",
+                paddingBottom: "16px",
+                overflow: "auto",
+                height: "max-content"
+              }}
+            >
+              {stdTranscriptionSettings.enableTransliteration ? (
+                <IndicTransliterate
+                  lang={stdTranscriptionSettings.targetlang}
+                  value={stdTranscription}
+                  onChange={(e) => {
+                    setStdTranscription(e.target.value);
+                  }}
+                  onChangeText={() => { }}
+                  enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
+                  containerStyles={{
+                    width: "100%",
+                  }}
+                  renderComponent={(props) => (
+                    <div className={classes.relative} style={{ width: "100%" }}>
+                      <textarea
+                        className={classes.customTextarea}
+                        dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                        rows={4}
+                        style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px" }}
+                        {...props}
+                      />
+                    </div>
+                  )}
+                />
+              ) : (
+                <div className={classes.relative} style={{ width: "100%" }}>
+                  <textarea
+                    onChange={(e) => {
+                      setStdTranscription(e.target.value);
+                    }}
+                    value={stdTranscription}
+                    dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                    className={classes.customTextarea}
+                    style={{
+                      fontSize: stdTranscriptionSettings.fontSize,
+                      height: "120px",
+                    }}
+                    rows={4}
+                  />
+                </div>
+              )}
+            </div>
           </Box>
         </Grid>
 
