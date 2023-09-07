@@ -9,7 +9,7 @@ export default class GetTaskAnnotationsAPI extends API {
   constructor(taskId, timeout = 2000) {
     super("GET", timeout, false);
     this.type = constants.GET_TASK_ANNOTATIONS;
-    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks}/${taskId}/annotations/`;
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks}${taskId}/annotations/`;
   }
 
   processResponse(res) {

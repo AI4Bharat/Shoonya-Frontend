@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import { NavLink } from "react-router-dom";
-import Logo from "../../../../assets/logo.svg";
+import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
 import headerStyle from "../../../styles/header";
 
 const useStyles = makeStyles(() => ({
@@ -158,10 +158,22 @@ function MobileNavbar(props) {
                 padding: "0 5%"
             }}
         > 
-            <Grid item>
+            <Grid item sx={{ display: "flex", alignItems: "center" }}>
                 <Link to="/projects">
-                    <img src={Logo} alt="logo" className={classes.headerLogo} style={{marginTop: "5%"}} />
+                    <img src={Shoonya_Logo} alt="logo" className={classes.headerLogo} style={{marginBottom: "5%"}} />
                 </Link>
+                <Typography
+                  variant="h4"
+                  className={classes.headerTitle}
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: "lighter",
+                    fontFamily: 'Rowdies,cursive,Roboto,sans-serif'
+
+                  }}
+                >
+                  Shoonya
+                </Typography>
             </Grid>
             <Grid item>
                 <IconButton onClick={() => setOpenDrawer(!openDrawer)}>
