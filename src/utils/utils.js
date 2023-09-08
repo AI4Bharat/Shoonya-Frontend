@@ -60,9 +60,15 @@ export const onSubtitleChange = (text, index) => {
 
   return copySub;
 };
-export const getUpdatedTime = (value, type, time, index, startEnd) => {
+
+export const getUpdatedTime = (value, type, time, index, startEnd,page) => {
   const subtitles = store.getState().commonReducer.subtitles;
-  const videoDuration = store.getState().getTaskDetails?.data?.audio_duration;
+  const Duration = store.getState().getTaskDetails?.data?.data?.audio_duration;
+  const hours = Math.floor(Duration / 3600);
+  const minutes = Math.floor((Duration % 3600) / 60);
+  const seconds = Duration % 60;
+  const milliseconds = 0;
+  const convertedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
 
   let newValue = "";
 
@@ -151,12 +157,11 @@ export const getUpdatedTime = (value, type, time, index, startEnd) => {
   }
 
   if (startEnd === "endTime" && index === subtitles.length - 1) {
-    const durationOfVideo = DT.t2d(videoDuration);
+    const durationOfVideo = DT.t2d(convertedTime);
     const durationOfCurrent = DT.t2d(newTime);
     const durationOfStartTime = DT.t2d(subtitles[index].start_time);
-
     if (durationOfCurrent > durationOfVideo) {
-      newTime = videoDuration;
+      newTime = convertedTime;
     }
 
     if (durationOfCurrent <= durationOfStartTime) {
