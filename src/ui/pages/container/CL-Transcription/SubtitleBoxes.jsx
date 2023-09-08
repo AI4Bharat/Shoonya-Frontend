@@ -233,6 +233,7 @@ import React, {
         lastWidth = parseFloat(lastTarget?.style.width);
       };
   
+  
       const onDocumentMouseMove = useCallback((event) => {
         if (isDroging && lastTarget) {
           lastDiffX = event.pageX - lastX;
@@ -253,7 +254,7 @@ import React, {
           const index = hasSub(lastSub);
           const previou = result[index - 1];
           const next = result[index + 1];
-  console.log(lastSub,"lastSublastSub")
+  
           const startTime = magnetically(
             lastSub.startTime + timeDiff,
             previou ? previou.endTime : null
@@ -265,10 +266,10 @@ import React, {
           const width = (endTime - startTime) * 10 * gridGap;
   
           if (lastType === "left") {
-            if (startTime >= 0 && lastSub?.endTime - startTime >= 0.2) {
+            if (startTime >= 0 && lastSub.endTime - startTime >= 0.2) {
               const start_time = DT.d2t(startTime);
   
-              if (index > 0 && startTime >= DT.t2d(previou?.end_time)) {
+              if (index > 0 && startTime >= DT.t2d(previou.end_time)) {
                 updateSub(lastSub, { start_time });
               }
   
@@ -279,14 +280,14 @@ import React, {
               lastTarget.style.width = `${width}px`;
             }
           } else if (lastType === "right") {
-            if (endTime >= 0 && endTime - lastSub?.startTime >= 0.2) {
+            if (endTime >= 0 && endTime - lastSub.startTime >= 0.2) {
               const end_time = DT.d2t(endTime);
   
-              if (index >= 0 && endTime <= DT.t2d(lastSub?.start_time)) {
+              if (index >= 0 && index !== result.length - 1 && endTime <= DT.t2d(next.start_time)) {
                 updateSub(lastSub, { end_time });
               }
   
-              if (index === result?.length - 1) {
+              if(index === result.length - 1 && endTime < lastSub.endTime) {
                 updateSub(lastSub, { end_time });
               }
             } else {
@@ -297,11 +298,11 @@ import React, {
               const start_time = DT.d2t(startTime);
               const end_time = DT.d2t(endTime);
   
-              if (result?.length > 1) {
+              if (result.length > 1) {
                 if (
                   index > 0 &&
-                  startTime >= DT.t2d(previou?.end_time) &&
-                  endTime <= DT.t2d(next?.start_time)
+                  startTime >= DT.t2d(previou.end_time) &&
+                  endTime <= DT.t2d(next.start_time)
                 ) {
                   updateSub(lastSub, {
                     start_time,
@@ -309,7 +310,7 @@ import React, {
                   });
                 }
   
-                if (index === 0 && endTime <= DT.t2d(next?.start_time)) {
+                if (index === 0 && endTime <= DT.t2d(next.start_time)) {
                   updateSub(lastSub, {
                     start_time,
                     end_time,

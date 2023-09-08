@@ -74,7 +74,6 @@ const TranscriptionRightPanel = ({
   ProjectDetails,
   TaskDetails,
   stage,
-  handleStdTranscriptionSettings,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -102,7 +101,6 @@ const TranscriptionRightPanel = ({
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles?.slice(startIndex, endIndex);
-  const idxOffset = (itemsPerPage * (page - 1));
   const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscription" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -179,19 +177,6 @@ const TranscriptionRightPanel = ({
     }
   }, [currentIndex]);
 
-  useEffect(() => {
-    if(showAcousticText) {
-      handleStdTranscriptionSettings({
-        enable: true,
-        rtl: enableRTL_Typing,
-        enableTransliteration: ProjectDetails?.tgt_language !== "en" && enableTransliteration,
-        enableTransliterationSuggestion,
-        targetlang,
-        fontSize,
-      });
-    }
-  }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize])
-
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
       taskId
@@ -215,7 +200,6 @@ const TranscriptionRightPanel = ({
 
   const onMergeClick = useCallback(
     (index) => {
-      index = index + idxOffset;
       const selectionStart = getSelectionStart(index);
       const timings = getTimings(index);
 
@@ -242,7 +226,7 @@ const TranscriptionRightPanel = ({
     if (e.target.selectionStart < e.target.value?.length) {
       e.preventDefault();
       setShowPopOver(true);
-      setCurrentIndexToSplitTextBlock(blockIdx + idxOffset);
+      setCurrentIndexToSplitTextBlock(blockIdx);
       setSelectionStart(e.target.selectionStart);
     }
   };
@@ -270,7 +254,7 @@ const TranscriptionRightPanel = ({
       target: { value },
       currentTarget,
     } = event;
-    index = index + idxOffset;
+    const realIdx = (itemsPerPage * (page - 1)) + index;
 
     const containsBackslash = value.includes("\\");
 
@@ -281,19 +265,19 @@ const TranscriptionRightPanel = ({
 
       const textBeforeSlash = value.split("\\")[0];
       const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
-      setCurrentSelectedIndex(index);
+      setCurrentSelectedIndex(realIdx);
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutBackSlash(textBeforeSlash);
       setTextAfterBackSlash(textAfterSlash);
     }
-    const sub = onSubtitleChange(value, index, updateAcoustic, false);
+    const sub = onSubtitleChange(value, realIdx, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
 
   const populateAcoustic = (index) => {
-    index = index + idxOffset;
-    const sub = onSubtitleChange("", index, false, true);
+    const realIdx = (itemsPerPage * (page - 1)) + index;
+    const sub = onSubtitleChange("", realIdx, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
 
@@ -350,7 +334,7 @@ const TranscriptionRightPanel = ({
 
   const handleTimeChange = useCallback(
     (value, index, type, time) => {
-      const sub = timeChange(value, index + idxOffset, type, time);
+      const sub = timeChange(value, index, type, time);
       dispatch(setSubtitles(sub, C.SUBTITLES));
       // saveTranscriptHandler(false, true, sub);
     },
@@ -360,7 +344,6 @@ const TranscriptionRightPanel = ({
 
   const onDelete = useCallback(
     (index) => {
-      index = index + idxOffset;
       setUndoStack((prevState) => [
         ...prevState,
         {
@@ -381,7 +364,6 @@ const TranscriptionRightPanel = ({
 
   const addNewSubtitleBox = useCallback(
     (index) => {
-      index = index + idxOffset;
       const sub = addSubtitleBox(index);
       dispatch(setSubtitles(sub, C.SUBTITLES));
       // saveTranscriptHandler(false, false, sub);
@@ -433,18 +415,18 @@ const TranscriptionRightPanel = ({
     // eslint-disable-next-line
   }, [undoStack, redoStack]);
 
-  /* const targetLength = (index) => {
+  const targetLength = (index) => {
     if (subtitles[index]?.text?.trim() !== "")
       return subtitles[index]?.text?.trim()?.split(" ")?.length;
     return 0;
-  }; */
+  };
 
   const onNavigationClick = (value) => {
     getPayload(value, limit);
   };
 
   const handleSpeakerChange = (id, index) => {
-    const sub = assignSpeakerId(id, index + idxOffset);
+    const sub = assignSpeakerId(id, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
@@ -515,9 +497,7 @@ const TranscriptionRightPanel = ({
           </Grid>}
           </Box>
 
-        <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
-          height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
-        }}>
+        <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
           {currentPageData?.map((item, index) => {
             return (
               <Box
@@ -536,8 +516,9 @@ const TranscriptionRightPanel = ({
                   <TimeBoxes
                     handleTimeChange={handleTimeChange}
                     time={item.start_time}
-                    index={index}
+                    index={((itemsPerPage * (page - 1)) + index)}
                     type={"startTime"}
+                    page={page}
                   />
 
                   <ButtonComponent
@@ -551,8 +532,9 @@ const TranscriptionRightPanel = ({
                   <TimeBoxes
                     handleTimeChange={handleTimeChange}
                     time={item.end_time}
-                    index={index}
+                    index={((itemsPerPage * (page - 1)) + index)}
                     type={"endTime"}
+                    page={page}
                   />
                 </Box>
 
@@ -594,7 +576,7 @@ const TranscriptionRightPanel = ({
                       renderComponent={(props) => (
                         <div className={classes.relative} style={{ width: "100%" }}>
                           <textarea
-                            className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                            className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
                               }`}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
                             rows={4}
@@ -622,7 +604,7 @@ const TranscriptionRightPanel = ({
                         onMouseUp={(e) => onMouseUp(e, index)}
                         value={item.text}
                         dir={enableRTL_Typing ? "rtl" : "ltr"}
-                        className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                        className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
                           }`}
                         // className={classes.customTextarea}
                         style={{
@@ -658,7 +640,7 @@ const TranscriptionRightPanel = ({
                         renderComponent={(props) => (
                           <div className={classes.relative} style={{ width: "100%" }}>
                             <textarea
-                              className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                              className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
                                 }`}
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
                               rows={4}
@@ -678,7 +660,7 @@ const TranscriptionRightPanel = ({
                           onFocus={() => showAcousticText && populateAcoustic(index)}
                           value={item.acoustic_normalised_text}
                           dir={enableRTL_Typing ? "rtl" : "ltr"}
-                          className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                          className={`${classes.customTextarea} ${currentIndex === ((itemsPerPage * (page - 1)) + index) ? classes.boxHighlight : ""
                             }`}
                           style={{
                             fontSize: fontSize,
