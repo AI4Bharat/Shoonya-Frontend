@@ -922,6 +922,8 @@ export default function LSF() {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -948,6 +950,11 @@ export default function LSF() {
     'color','background',
     'script']
 
+    useEffect(()=>{
+      setreviewtext(reviewNotesRef.current.getEditor().getText())
+      setsupercheckertext(reviewNotesRef.current.getEditor().getText())},[])
+    
+      
 
 
   const navigate = useNavigate();
@@ -984,8 +991,8 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
-    superCheckerNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    superCheckerNotesRef.current.getEditor().setContents([]);
+    reviewNotesRef.current.getEditor().setContents([]);
   };
 
   useEffect(() => {
@@ -1036,11 +1043,11 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                reviewtext.trim().length === 0 ? "primary" : "success"
               }
               onClick={handleCollapseClick}
             >
-              Notes {reviewNotesRef.current?.value !== "" && "*"}
+              Notes {reviewtext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
           <div

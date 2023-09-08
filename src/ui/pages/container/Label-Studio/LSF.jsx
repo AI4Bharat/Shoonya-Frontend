@@ -919,6 +919,8 @@ export default function LSF() {
   const [showNotes, setShowNotes] = useState(false);
   const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
@@ -991,14 +993,23 @@ export default function LSF() {
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         annotationNotesRef.current.getEditor().setContents(newDelta);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
+        setannotationtext(annotationNotesRef.current.getEditor().getText());
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        console.log(reviewNotesRef.current.getEditor().getContents());
+        if(reviewtext.length===0|| reviewtext.trim() === ''){
+          console.log(reviewNotesRef.current.getEditor().getText().trim().length);
+        }
+        else{
+          console.log("primary");
+        }
       }
     });
   }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    annotationNotesRef.current.getEditor().setContents([]);
+    reviewNotesRef.current.getEditor().setContents([]);
   };
 
   useEffect(() => {
@@ -1048,12 +1059,12 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                reviewtext.trim().length === 0 ? "primary" : "success"
               }
               onClick={handleCollapseClick}
             // style={{ marginBottom: "20px" }}
             >
-              Notes {reviewNotesRef.current?.value !== "" && "*"}
+              Notes{reviewtext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
 
