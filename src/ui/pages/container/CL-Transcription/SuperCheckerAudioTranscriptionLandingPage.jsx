@@ -482,7 +482,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       result,
       ...((value === "rejected" ||
         value === "validated" ||
-        value === "avalidated_with_changes") && {
+        value === "validated_with_changes") && {
         parent_annotation: parentannotation,
       }),
     };
