@@ -238,10 +238,12 @@ const TranscriptionRightPanel = ({
   );
 
   const onMouseUp = (e, blockIdx) => {
+    const index =(itemsPerPage * (page - 1)) + blockIdx
+
     if (e.target.selectionStart < e.target.value?.length) {
       e.preventDefault();
       setShowPopOver(true);
-      setCurrentIndexToSplitTextBlock(blockIdx);
+      setCurrentIndexToSplitTextBlock(index);
       setSelectionStart(e.target.selectionStart);
     }
   };
@@ -256,7 +258,6 @@ const TranscriptionRightPanel = ({
       },
     ]);
     setRedoStack([]);
-
     const sub = onSplit(currentIndexToSplitTextBlock, selectionStart);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, true, sub);
@@ -650,6 +651,7 @@ const TranscriptionRightPanel = ({
                         containerStyles={{
                           width: "100%",
                         }}
+                        style={{ fontSize: fontSize, height: "120px" }}
                         renderComponent={(props) => (
                           <div className={classes.relative} style={{ width: "100%" }}>
                             <textarea

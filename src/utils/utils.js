@@ -69,7 +69,6 @@ export const getUpdatedTime = (value, type, time, index, startEnd,page) => {
   const seconds = Duration % 60;
   const milliseconds = 0;
   const convertedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
-
   let newValue = "";
 
   const [hh, mm, sec] = time.split(":");
@@ -167,7 +166,8 @@ export const getUpdatedTime = (value, type, time, index, startEnd,page) => {
     if (durationOfCurrent <= durationOfStartTime) {
       let modifiedDuration = DT.t2d(subtitles[index].start_time);
       modifiedDuration = modifiedDuration + 1;
-      newTime = DT.t2d(modifiedDuration);
+      newTime = DT.d2t(modifiedDuration);
+      
     }
   }
 
