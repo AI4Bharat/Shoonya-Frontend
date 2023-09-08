@@ -238,12 +238,10 @@ const TranscriptionRightPanel = ({
   );
 
   const onMouseUp = (e, blockIdx) => {
-    const index =(itemsPerPage * (page - 1)) + blockIdx
-
     if (e.target.selectionStart < e.target.value?.length) {
       e.preventDefault();
       setShowPopOver(true);
-      setCurrentIndexToSplitTextBlock(index);
+      setCurrentIndexToSplitTextBlock(blockIdx);
       setSelectionStart(e.target.selectionStart);
     }
   };
