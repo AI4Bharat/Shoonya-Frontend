@@ -437,7 +437,6 @@ const AudioTranscriptionLandingPage = () => {
     getAnnotationsTaskData(taskId);
     getProjectDetails();
     getTaskData(taskId);
-    localStorage.setItem("enableChitrlekhaUI", true);
   }, []);
 
   const getProjectDetails = () => {
