@@ -328,15 +328,6 @@ const TaskTable = (props) => {
     }
   }
 
-  useEffect(() => {
-    if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
-      localStorage.setItem("enableChitrlekhaUI", true);
-    } else {
-      localStorage.setItem("enableChitrlekhaUI", false);
-    }
-    localStorage.setItem("Stage", props.type);
-  },[]);
-
   const customColumnHead = (col) => {
     return (
       <Box
