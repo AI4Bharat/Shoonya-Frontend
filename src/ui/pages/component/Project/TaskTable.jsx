@@ -488,7 +488,7 @@ const TaskTable = (props) => {
     } else {
       setTasks([]);
     }
-  }, [taskList, ProjectDetails.project_mode]);
+  }, [taskList, ProjectDetails.project_mode, userDetails?.prefer_cl_ui]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {
