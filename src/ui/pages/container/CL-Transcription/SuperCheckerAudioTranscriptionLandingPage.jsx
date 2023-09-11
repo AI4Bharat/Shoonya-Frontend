@@ -387,7 +387,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     getAnnotationsTaskData(taskId);
     getProjectDetails();
     getTaskData(taskId);
-    localStorage.setItem("enableChitrlekhaUI", true);
     console.log(
       localStorage.getItem("Stage") === "review",
       "StageStageStageStage"
