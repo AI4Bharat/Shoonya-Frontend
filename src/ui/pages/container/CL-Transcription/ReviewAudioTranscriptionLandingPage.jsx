@@ -902,7 +902,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 style={{
                   display: showNotes ? "block" : "none",
                   paddingBottom: "16px",
-                  height: "max-content", overflow: "auto"
+                  height: "100px", overflow: "auto"
                 }}
               >
                 <ReactQuill

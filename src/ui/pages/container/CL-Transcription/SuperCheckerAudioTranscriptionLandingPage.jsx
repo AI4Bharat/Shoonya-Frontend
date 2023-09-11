@@ -655,7 +655,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   return (
-    <>
+<>
       {loading && <Spinner />}
       {renderSnackBar()}
       <Grid container direction={"row"} className={classes.parentGrid}>
@@ -695,32 +695,18 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-<<<<<<< HEAD
-            <Grid sx={{ ml: 3 }}>
-            <Button
-              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-              variant="contained"
-              color={
-                reviewtext.trim().length === 0 ? "primary" : "success"
-              }
-              onClick={handleCollapseClick}
-            >
-              Notes { reviewtext.trim().length === 0 ? "" : "*"}
-            </Button>
-=======
             <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color={
-                    reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                    reviewtext.trim().length === 0 ? "primary" : "success"
                   }
                   onClick={handleCollapseClick}
                 >
-                  Notes {reviewNotesRef.current?.value !== "" && "*"}
+                  Notes {reviewtext.trim().length === 0 ? "" : "*"}
                 </Button>
->>>>>>> develop
         
           
               </Grid>
@@ -746,7 +732,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
                 overflow:"auto",
-                height:"max-content"
+                height:"178px"
               }}
             >
               {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
@@ -810,7 +796,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showStdTranscript ? "block" : "none",
                 paddingBottom: "16px",
                 overflow: "auto",
-                height: "max-content"
+                height: "178px"
               }}
             >
               {stdTranscriptionSettings.enableTransliteration ? (
