@@ -123,24 +123,23 @@ import React, {
       }
      },[AnnotationsTaskDetails])
 
-
-      useEffect(() => {
-        if (result) {
-          const isLastSub =
-            player?.currentTime > result[result?.length - 1]?.endTime;
+      // useEffect(() => {
+      //   if (result) {
+      //     const isLastSub =
+      //       player?.currentTime > result[result?.length - 1]?.endTime;
   
-          if (isPlaying(player) && isLastSub) {
-            const payloadObj = new GetAnnotationsTaskAPI(
-              taskId,
-              taskData?.annotation_status
+      //     if (isPlaying(player) && isLastSub) {
+      //       const payloadObj = new GetAnnotationsTaskAPI(
+      //         taskId,
+      //         taskData?.annotation_status
            
-            );
-            dispatch(APITransport(payloadObj));
-          }
-        }
+      //       );
+      //       dispatch(APITransport(payloadObj));
+      //     }
+      //   }
   
-        // eslint-disable-next-line
-      }, [result, currentIndex, isPlaying(player)]);
+      //   // eslint-disable-next-line
+      // }, [result, currentIndex, isPlaying(player)]);
 
       const saveTranscript = async (taskType,  result) => {
         const reqBody = {
@@ -189,7 +188,7 @@ import React, {
           const index = hasSub(sub);
           const res = onSubtitleDelete(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(taskData?.annotation_status, res);
+          //saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [result]
@@ -200,7 +199,7 @@ import React, {
           const index = hasSub(sub);
           const res = onMerge(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          saveTranscript(taskData?.annotation_status, res);
+          //saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [result]
@@ -217,7 +216,7 @@ import React, {
   
           copySub[index] = sub;
           dispatch(setSubtitles(copySub, C.SUBTITLES));
-          saveTranscript(taskData?.annotation_status,copySub);
+          //saveTranscript(taskData?.annotation_status,copySub);
         },
         // eslint-disable-next-line
         [result]
@@ -233,6 +232,7 @@ import React, {
         lastTarget = $subsRef.current.children[lastIndex];
         lastWidth = parseFloat(lastTarget?.style.width);
       };
+  
   
       const onDocumentMouseMove = useCallback((event) => {
         if (isDroging && lastTarget) {
@@ -283,11 +283,11 @@ import React, {
             if (endTime >= 0 && endTime - lastSub.startTime >= 0.2) {
               const end_time = DT.d2t(endTime);
   
-              if (index >= 0 && endTime <= DT.t2d(next.start_time)) {
+              if (index >= 0 && index !== result.length - 1 && endTime <= DT.t2d(next.start_time)) {
                 updateSub(lastSub, { end_time });
               }
   
-              if (index === result.length - 1) {
+              if(index === result.length - 1 && endTime < lastSub.endTime) {
                 updateSub(lastSub, { end_time });
               }
             } else {
@@ -348,15 +348,15 @@ import React, {
             switch (keyCode) {
               case 37:
                 updateSub(sub, {
-                  start_time: DT.d2t(sub.startTime - 0.1),
-                  end_time: DT.d2t(sub.endTime - 0.1),
+                  start_time: DT.d2t(sub?.startTime - 0.1),
+                  end_time: DT.d2t(sub?.endTime - 0.1),
                 });
                 // player.currentTime = sub.startTime - 0.1;
                 break;
               case 39:
                 updateSub(sub, {
-                  start_time: DT.d2t(sub.startTime + 0.1),
-                  end_time: DT.d2t(sub.endTime + 0.1),
+                  start_time: DT.d2t(sub?.startTime + 0.1),
+                  end_time: DT.d2t(sub?.endTime + 0.1),
                 });
                 // player.currentTime = sub.startTime + 0.1;
                 break;

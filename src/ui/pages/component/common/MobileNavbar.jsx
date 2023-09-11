@@ -163,7 +163,7 @@ function MobileNavbar(props) {
                     <img src={Shoonya_Logo} alt="logo" className={classes.headerLogo} style={{marginBottom: "5%"}} />
                 </Link>
                 <Typography
-                  variant="h2"
+                  variant="h4"
                   className={classes.headerTitle}
                   style={{
                     fontSize: "28px",
@@ -172,7 +172,7 @@ function MobileNavbar(props) {
 
                   }}
                 >
-                  shoonya
+                  Shoonya
                 </Typography>
             </Grid>
             <Grid item>

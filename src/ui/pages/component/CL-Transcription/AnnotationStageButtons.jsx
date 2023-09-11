@@ -12,7 +12,7 @@ const AnnotationStageButtons = ({
   disableUpdataButton,
   disableSkipButton,
   filterMessage,
-  taskData
+  // taskData
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
@@ -21,6 +21,8 @@ const AnnotationStageButtons = ({
  
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
+  const taskData = useSelector((state) => state.getTaskDetails?.data);
+
   let Annotation = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 1
   )[0];

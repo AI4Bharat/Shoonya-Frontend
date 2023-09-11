@@ -14,10 +14,10 @@ import { useParams } from "react-router-dom";
 
 
 const WaveForm = memo(({ setWaveform, setRender }) => {
-    const classes = AudioTranscriptionLandingStyle();
-    const $waveform = useRef();
-  
-    const player = useSelector((state) => state.commonReducer.player);
+  const classes = AudioTranscriptionLandingStyle();
+  const $waveform = useRef();
+
+  const player = useSelector((state) => state.commonReducer?.player);
 
   useEffect(() => {
     [...WFPlayer.instances].forEach((item) => item.destroy());
@@ -41,16 +41,15 @@ const WaveForm = memo(({ setWaveform, setRender }) => {
 
     setWaveform(waveform);
     waveform.on("update", setRender);
-
-    if (player.src !== "") {
-      waveform.load(encodeURIComponent(player.src.replace(/&amp;/g, "&")));
-    }
+   
+      waveform.load(encodeURIComponent(player?.attributes?.nodeValue?.replace(/&amp;/g, "&")));
+  
   }, [player, $waveform, setWaveform, setRender, player.src]);
 
   return <div className={classes.waveform} ref={$waveform} />;
 });
 
-const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
+const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
   const classes = AudioTranscriptionLandingStyle();
   const firstLoaded = useRef(false);
   const dispatch = useDispatch();
@@ -58,15 +57,13 @@ const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
   const player = useSelector((state) => state.commonReducer.player);
   const limit = useSelector((state) => state.commonReducer.limit);
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
-  const [grabbing, setGrabbing] = useState(false);
 
+  const [grabbing, setGrabbing] = useState(false);
+console.log(taskId,"taskIdtaskIdtaskId")
   // useEffect(() => {
   //   if (firstLoaded.current && !grabbing) {
   //     const apiObj = new GetAnnotationsTaskAPI(
-  //       "98765",
-  //       // taskDetails?.task_type,
-  //       DT.d2t(player.currentTime),
-  //       // limit
+  //       taskDetails.id,
   //     );
   //     dispatch(APITransport(apiObj));
   //   } else {
@@ -85,9 +82,9 @@ const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
       waveform.seek(currentTime);
 
       const apiObj = new GetAnnotationsTaskAPI(
-        taskId,
+        taskDetails.id,
         // taskDetails?.task_type,
-        DT.d2t(currentTime),
+        // DT.d2t(currentTime),
         // limit
       );
       dispatch(APITransport(apiObj));
@@ -163,7 +160,7 @@ const Progress = memo(({ waveform, currentTime, subtitle = [], taskId}) => {
   );
 });
 
-const Grab = memo(({ waveform ,taskId}) => {
+const Grab = memo(({ waveform , taskId,}) => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
   const firstLoaded = useRef(false);
@@ -171,6 +168,7 @@ const Grab = memo(({ waveform ,taskId}) => {
   const player = useSelector((state) => state.commonReducer.player);
   const limit = useSelector((state) => state.commonReducer.limit);
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
+// console.log(taskDetails.id,"taskDetailstaskDetails")
 
   const [grabStartX, setGrabStartX] = useState(0);
   const [grabStartTime, setGrabStartTime] = useState(0);
@@ -189,10 +187,11 @@ const Grab = memo(({ waveform ,taskId}) => {
   // useEffect(() => {
   //   if (firstLoaded.current && !grabbing) {
   //     const apiObj = new GetAnnotationsTaskAPI(
-  //       "11111111",
-  //       taskDetails?.task_type,
-  //       DT.d2t(player.currentTime),
-  //       limit
+  //       taskDetails.id,
+        
+  //       // taskDetails?.task_type,
+  //       // DT.d2t(player.currentTime),
+  //       // limit
   //     );
   //     dispatch(APITransport(apiObj));
   //   } else {
@@ -258,15 +257,12 @@ const Duration = memo(({ currentTime }) => {
   );
 });
 
-const Timeline = ({ currentTime, playing ,  taskData}) => {
-  const { taskId } = useParams();
+const Timeline = ({ currentTime, playing ,taskID }) => {
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
-  const AnnotationStage = localStorage.getItem("Stage") === "annotation"
+console.log(taskID,"taskDatataskData")
   const player = useSelector((state) => state.commonReducer.player);
-  const AnnotationsTaskDetails = useSelector(
-    (state) => state.getAnnotationsTask.data
-  );
+
   const [waveform, setWaveform] = useState();
   const [render, setRender] = useState({
     padding: 2,
@@ -275,6 +271,7 @@ const Timeline = ({ currentTime, playing ,  taskData}) => {
     gridNum: 110,
     beginTime: -5,
   });
+
   const onWheel = useCallback(
     (event) => {
       if (
@@ -307,12 +304,13 @@ const Timeline = ({ currentTime, playing ,  taskData}) => {
 
   return (
     <Box className={classes.timeLineParent} ref={$footer}>
-      {player && AnnotationsTaskDetails.length > 0 && (
+      {player &&
+          (
           <>
-            <Progress waveform={waveform} currentTime={currentTime} taskId={taskData?.id} />
+            <Progress waveform={waveform} currentTime={currentTime} taskId={taskID}/>
             <Duration currentTime={currentTime} />
             <WaveForm setWaveform={setWaveform} setRender={setRender} />
-            <Grab waveform={waveform} taskId={taskData?.id} />
+            <Grab waveform={waveform} />
             <Metronome render={render} playing={playing} />
             <SubtitleBoxes
               render={render}

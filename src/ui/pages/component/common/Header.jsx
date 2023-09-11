@@ -32,6 +32,7 @@ import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import UpdateUIPrefsAPI from "../../../../redux/actions/api/UserManagement/UpdateUIPrefs";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -46,6 +47,11 @@ const Header = () => {
     message: "",
     variant: "success",
   });
+  const[checkClUI,setCheckClUI]=useState(null)
+
+  const loggedInUserData = useSelector(
+    (state) => state?.fetchLoggedInUserData?.data
+  );
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -54,19 +60,25 @@ const Header = () => {
   let navigate = useNavigate();
   const classes = headerStyle();
 
-  const loggedInUserData = useSelector(
-    (state) => state.fetchLoggedInUserData.data
-  );
+ 
 
   const getLoggedInUserData = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
-    dispatch(APITransport(loggedInUserObj));
+    dispatch(APITransport(loggedInUserObj)); 
   };
+
+ 
 
   useEffect(() => {
     getLoggedInUserData();
-    console.log("loggedInUserData", loggedInUserData);
+   
   }, []);
+
+  useEffect(()=>{
+    if(loggedInUserData?.prefer_cl_ui !== undefined){
+      setCheckClUI(loggedInUserData?.prefer_cl_ui)
+    }
+  },[loggedInUserData])
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
   const onLogoutClick = () => {
@@ -128,12 +140,23 @@ const Header = () => {
     }
   };
 
-  const handleTranscriptionFlowChange = (event) => {
-    if (event.target.checked) {
-      localStorage.setItem("enableChitrlekhaTranscription", true);
-    } else {
-      localStorage.setItem("enableChitrlekhaTranscription", false);
-    }
+  const handleTranscriptionFlowChange = async(event) => {
+      const obj = new UpdateUIPrefsAPI(event.target.checked);
+      // dispatch(APITransport(loggedInUserObj));
+      const res = await fetch(obj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(obj.getBody()),
+        headers: obj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        getLoggedInUserData();
+        setSnackbarInfo({
+          open: true,
+          message:resp.message,
+          variant: "success",
+        });
+      }
   };
 
   const handleTagsChange = (event) => {
@@ -594,9 +617,7 @@ const Header = () => {
       control: (
         <Checkbox
           onChange={handleTranscriptionFlowChange}
-          defaultChecked={
-            localStorage.getItem("enableChitrlekhaTranscription") === "true"
-          }
+          checked={checkClUI} 
         />
       ),
     },
@@ -638,7 +659,7 @@ const Header = () => {
     <Grid container direction="row">
       <Box
         className={
-          localStorage.getItem("enableChitrlekhaTranscription") === "true" &&
+          loggedInUserData?.prefer_cl_ui=== true &&
           localStorage.getItem("enableChitrlekhaUI") === "true"
             ? classes.AudioparentContainers
             : classes.parentContainer
@@ -669,14 +690,14 @@ const Header = () => {
                   />
                 </Link>
                 <Typography
-                  variant="h2"
+                  variant="h4"
                   className={classes.headerTitle}
                   sx={{
                     fontSize: "28px",
                     fontWeight: "lighter",
                   }}
                 >
-                  shoonya
+                  Shoonya
                 </Typography>
               </Grid>
 

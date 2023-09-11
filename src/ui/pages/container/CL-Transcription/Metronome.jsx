@@ -97,8 +97,8 @@ export default React.memo(
             newSub({
               start_time,
               end_time,
-              text: "SUB_TEXT",
-              target_text: "SUB_TEXT",
+              text: "",
+              target_text: "",
               speaker_id: "",
             })
           );

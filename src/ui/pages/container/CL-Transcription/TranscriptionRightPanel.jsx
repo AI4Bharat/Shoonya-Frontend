@@ -25,6 +25,7 @@ import {
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import LanguageCode from "../../../../utils/LanguageCode";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
+import Spinner from "../../component/common/Spinner";
 
 //Components
 import {
@@ -37,6 +38,7 @@ import {
   Select,
   useMediaQuery,
   Pagination,
+  Typography
 } from "@mui/material";
 // import {
 //   ConfirmDialog,
@@ -71,6 +73,8 @@ const TranscriptionRightPanel = ({
   AnnotationsTaskDetails,
   ProjectDetails,
   TaskDetails,
+  stage,
+  handleStdTranscriptionSettings,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -98,7 +102,8 @@ const TranscriptionRightPanel = ({
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles?.slice(startIndex, endIndex);
-
+  const idxOffset = (itemsPerPage * (page - 1));
+  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscription" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -158,7 +163,7 @@ const TranscriptionRightPanel = ({
       // setShowSpeakerIdDropdown(videoDetails?.video?.multiple_speaker);
     }
   }, [TaskDetails]);
-console.log(TaskDetails,"TaskDetailsTaskDetails")
+
   useEffect(() => {
     if (currentPage) {
       setCurrentOffset(currentPage);
@@ -166,11 +171,26 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
   }, [currentPage]);
 
   useEffect(() => {
-    const subtitleScrollEle = document.getElementById("subTitleContainer");
-    subtitleScrollEle
-      .querySelector(`#sub_${currentIndex}`)
-      ?.scrollIntoView(true, { block: "start" });
+    if(currentIndex >= startIndex && currentIndex <= endIndex) {
+      const subtitleScrollEle = document.getElementById("subTitleContainer");
+      subtitleScrollEle
+        .querySelector(`#sub_${currentIndex}`)
+        ?.scrollIntoView(true, { block: "start" });
+    }
   }, [currentIndex]);
+
+  useEffect(() => {
+    if(showAcousticText) {
+      handleStdTranscriptionSettings({
+        enable: true,
+        rtl: enableRTL_Typing,
+        enableTransliteration: ProjectDetails?.tgt_language !== "en" && enableTransliteration,
+        enableTransliterationSuggestion,
+        targetlang,
+        fontSize,
+      });
+    }
+  }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize]);
 
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
@@ -236,7 +256,6 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
       },
     ]);
     setRedoStack([]);
-
     const sub = onSplit(currentIndexToSplitTextBlock, selectionStart);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, true, sub);
@@ -244,7 +263,7 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
-  const changeTranscriptHandler = (event, index) => {
+  const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const {
       target: { value },
       currentTarget,
@@ -254,23 +273,27 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
 
     setEnableTransliterationSuggestion(true);
 
-    if (containsBackslash) {
+    if (containsBackslash && !updateAcoustic) {
       setEnableTransliterationSuggestion(false);
 
       const textBeforeSlash = value.split("\\")[0];
       const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
-
       setCurrentSelectedIndex(index);
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutBackSlash(textBeforeSlash);
       setTextAfterBackSlash(textAfterSlash);
     }
-    const sub = onSubtitleChange(value, index);
+    const sub = onSubtitleChange(value, index, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
 
-  const saveTranscriptHandler = async (isFinal, subtitles) => {
+  const populateAcoustic = (index) => {
+    const sub = onSubtitleChange("", index, false, true);
+    dispatch(setSubtitles(sub, C.SUBTITLES));
+  };
+
+  const saveTranscriptHandler = async (isFinal) => {
     setLoading(true);
 
     const reqBody = {
@@ -296,7 +319,7 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
 
       setLoading(false);
 
-      
+
     } else {
       setLoading(false);
       setSnackbarInfo({
@@ -431,9 +454,16 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
     }
   }, [ProjectDetails]);
 
+  useEffect(() => {
+    if (taskData?.result?.length > 0) {
+      setLoading(false);
+    }
+  }, [taskData]);
+
   return (
     <>
       {" "}
+      {loading && <Spinner />}
       {renderSnackBar()}
       <Grid sx={{ margin: 0 }}>
         <Box
@@ -459,9 +489,29 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
               showSplit={true}
             />
           </Grid>
-        </Box>
+          {showAcousticText && <Grid
+            style={{
+              display: "flex",
+              direction: "row",
+              flexWrap: "wrap",
+              justifyContent: "space-around",
+              backgroundColor: "rgb(44, 39, 153, 0.2)"}}>
+            <Typography
+              variant="caption"
+              sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
+                Verbatim Transcription
+              </Typography>
+            <Typography
+              variant="caption"
+              sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
+              Acoustic Transcription
+            </Typography>
+          </Grid>}
+          </Box>
 
-        <Box id={"subTitleContainer"} className={classes.subTitleContainer}>
+          <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
+            height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
+          }}>
           {currentPageData?.map((item, index) => {
             return (
               <Box
@@ -480,13 +530,13 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
                   <TimeBoxes
                     handleTimeChange={handleTimeChange}
                     time={item.start_time}
-                    index={index}
+                    index={index + idxOffset}
                     type={"startTime"}
                   />
 
                   <ButtonComponent
-                    index={index}
-                    lastItem={index < subtitles?.length - 1}
+                    index={index + idxOffset}
+                    lastItem={(index + idxOffset) < subtitles?.length - 1}
                     onMergeClick={onMergeClick}
                     onDelete={onDelete}
                     addNewSubtitleBox={addNewSubtitleBox}
@@ -495,12 +545,16 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
                   <TimeBoxes
                     handleTimeChange={handleTimeChange}
                     time={item.end_time}
-                    index={index}
+                    index={index + idxOffset}
                     type={"endTime"}
                   />
                 </Box>
 
                 <CardContent
+                  sx={{
+                    display: "flex",
+                    padding: "5px 0",
+                  }}
                   className={classes.cardContent}
                   aria-describedby={"suggestionList"}
                   onClick={() => {
@@ -513,36 +567,37 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
                   }}
                 >
                   {ProjectDetails?.tgt_language !== "en" &&
-                  enableTransliteration ? (
+                    enableTransliteration ? (
                     <IndicTransliterate
                       lang={targetlang}
                       value={item.text}
                       onChange={(event) => {
-                        changeTranscriptHandler(event, index);
+                        changeTranscriptHandler(event, index + idxOffset);
                       }}
                       enabled={enableTransliterationSuggestion}
-                      onChangeText={() => {}}
-                      onMouseUp={(e) => onMouseUp(e, index)}
-                      containerStyles={{}}
-                      onBlur={() =>
+                      onChangeText={() => { }}
+                      onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                      containerStyles={{
+                        width: "100%",
+                      }}
+                      onBlur={() => {
                         setTimeout(() => {
                           setShowPopOver(false);
-                        }, 200)
-                      }
+                        }, 200);
+                      }}
                       renderComponent={(props) => (
-                        <div className={classes.relative}>
+                        <div className={classes.relative} style={{ width: "100%" }}>
                           <textarea
-                            className={`${classes.customTextarea} ${
-                              currentIndex === index ? classes.boxHighlight : ""
-                            }`}
+                            className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                              }`}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
                             rows={4}
-                            onMouseUp={(e) => onMouseUp(e, index)}
-                            onBlur={() =>
+                            onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                            onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
-                              }, 200)
-                            }
+                              }, 200);
+                            }}
                             style={{ fontSize: fontSize, height: "120px" }}
                             {...props}
                           />
@@ -553,34 +608,81 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
                       )}
                     />
                   ) : (
-                    <div className={classes.relative}>
+                    <div className={classes.relative} style={{ width: "100%" }}>
                       <textarea
                         onChange={(event) => {
-                          changeTranscriptHandler(event, index);
+                          changeTranscriptHandler(event, index + idxOffset);
                         }}
-                        onMouseUp={(e) => onMouseUp(e, index)}
+                        onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                         value={item.text}
                         dir={enableRTL_Typing ? "rtl" : "ltr"}
-                        className={`${classes.customTextarea} ${
-                          currentIndex === index ? classes.boxHighlight : ""
-                        }`}
+                        className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                          }`}
                         // className={classes.customTextarea}
                         style={{
                           fontSize: fontSize,
                           height: "120px",
                         }}
                         rows={4}
-                        onBlur={() =>
+                        onBlur={() => {
                           setTimeout(() => {
                             setShowPopOver(false);
-                          }, 200)
-                        }
+                          }, 200);
+                        }}
                       />
                       {/* <span id="charNum" className={classes.wordCount}>
                     {targetLength(index)}
                   </span> */}
                     </div>
                   )}
+                  {showAcousticText &&
+                    (ProjectDetails?.tgt_language !== "en" &&
+                      enableTransliteration ? (
+                      <IndicTransliterate
+                        lang={targetlang}
+                        value={item.acoustic_normalised_text}
+                        onChange={(event) => {
+                          changeTranscriptHandler(event, index + idxOffset, true);
+                        }}
+                        enabled={enableTransliterationSuggestion}
+                        onChangeText={() => { }}
+                        containerStyles={{
+                          width: "100%",
+                        }}
+                        style={{ fontSize: fontSize, height: "120px" }}
+                        renderComponent={(props) => (
+                          <div className={classes.relative} style={{ width: "100%" }}>
+                            <textarea
+                              className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                }`}
+                              dir={enableRTL_Typing ? "rtl" : "ltr"}
+                              rows={4}
+                              onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
+                              style={{ fontSize: fontSize, height: "120px" }}
+                              {...props}
+                            />
+                          </div>
+                        )}
+                      />
+                    ) : (
+                      <div className={classes.relative} style={{ width: "100%" }}>
+                        <textarea
+                          onChange={(event) => {
+                            changeTranscriptHandler(event, index + idxOffset, true);
+                          }}
+                          onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
+                          value={item.acoustic_normalised_text}
+                          dir={enableRTL_Typing ? "rtl" : "ltr"}
+                          className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                            }`}
+                          style={{
+                            fontSize: fontSize,
+                            height: "120px",
+                          }}
+                          rows={4}
+                        />
+                      </div>
+                    ))}
                 </CardContent>
 
                 <FormControl
@@ -594,7 +696,7 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
                     label="Select Speaker"
                     value={item.speaker_id}
                     onChange={(event) =>
-                      handleSpeakerChange(event.target.value, index)
+                      handleSpeakerChange(event.target.value, index + idxOffset)
                     }
                     style={{
                       backgroundColor: "#fff",
@@ -619,11 +721,11 @@ console.log(TaskDetails,"TaskDetailsTaskDetails")
         </Box>
         <Box
           className={classes.paginationBox}
-          // style={{
-          //   ...(!xl && {
-          //     bottom: "-11%",
-          //   }),
-          // }}
+        // style={{
+        //   ...(!xl && {
+        //     bottom: "-11%",
+        //   }),
+        // }}
         >
           <Pagination
             color="primary"
