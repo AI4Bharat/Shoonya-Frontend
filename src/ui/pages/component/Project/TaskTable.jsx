@@ -328,6 +328,10 @@ const TaskTable = (props) => {
     }
   }
 
+  useEffect(() => {
+    localStorage.setItem("Stage", props.type);
+  },[]);
+  
   const customColumnHead = (col) => {
     return (
       <Box
