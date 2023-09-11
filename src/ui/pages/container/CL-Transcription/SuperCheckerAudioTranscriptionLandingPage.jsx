@@ -736,7 +736,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
                 overflow:"auto",
-                height:"max-content"
+                height:"178px"
               }}
             >
               {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>

@@ -751,7 +751,7 @@ const AudioTranscriptionLandingPage = () => {
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
                 overflow: "auto",
-                height: "max-content"
+                height: "178px"
               }}
             >
               <ReactQuill
