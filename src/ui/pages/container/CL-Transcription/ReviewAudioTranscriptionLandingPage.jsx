@@ -101,6 +101,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
 
 
 
@@ -654,6 +657,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -678,6 +685,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
             const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
             annotationNotesRef.current.getEditor().setContents(newDelta2);
             superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            setannotationtext(annotationNotesRef.current.getEditor().getText())
+            setreviewtext(reviewNotesRef.current.getEditor().getText())
+            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+    
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -697,6 +708,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
             annotationNotesRef.current.getEditor().setContents(newDelta2);
             reviewNotesRef.current.getEditor().setContents(newDelta1);
             superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            setannotationtext(annotationNotesRef.current.getEditor().getText())
+            setreviewtext(reviewNotesRef.current.getEditor().getText())
+            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+    
           }
         } else {
           let normalAnnotation = annotations.find(
@@ -713,6 +728,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
           annotationNotesRef.current.getEditor().setContents(newDelta2);
           reviewNotesRef.current.getEditor().setContents(newDelta1);
           superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+          setannotationtext(annotationNotesRef.current.getEditor().getText())
+          setreviewtext(reviewNotesRef.current.getEditor().getText())
+          setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+  
         }
       }
     }
@@ -725,7 +744,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   const resetNotes = () => {
     setShowNotes(false);
-    reviewNotesRef.current.value = "";
+    reviewNotesRef.current.getEditor().setContents([]);
   };
 
 
@@ -810,16 +829,15 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                 variant="contained"
                 color={
-                  annotationNotesRef.current?.value !== "" ||
-                    superCheckerNotesRef.current?.value !== ""
-                    ? "success"
-                    : "primary"
+                  annotationtext.trim().length === 0 || supercheckertext.trim().length === 0  ?
+            
+                     "primary"
+                    : "success"
                 }
                 onClick={handleCollapseClick}
               >
-                Notes{" "}
-                {annotationNotesRef.current?.value !== "" ||
-                  (superCheckerNotesRef.current?.value !== "" && "*")}
+                Notes{ annotationtext.trim().length === 0 ||
+                  (supercheckertext.trim().length === 0 ? "" : "*")}
               </Button>
               
                 {/*  <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>

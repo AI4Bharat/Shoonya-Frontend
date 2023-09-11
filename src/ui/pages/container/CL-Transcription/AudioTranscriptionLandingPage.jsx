@@ -78,8 +78,8 @@ const AudioTranscriptionLandingPage = () => {
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
-  const [annotationtext,setannotationtext] = useState('')
-  const [reviewtext,setreviewtext] = useState('')
+  const [annotationtext, setannotationtext] = useState('')
+  const [reviewtext, setreviewtext] = useState('')
   const [taskData, setTaskData] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -584,7 +584,7 @@ const AudioTranscriptionLandingPage = () => {
       annotationNotesRef.current.getEditor().setContents(newDelta2);
       reviewNotesRef.current.getEditor().setContents(newDelta1);
       setannotationtext(annotationNotesRef.current.getEditor().getText())
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
+      setreviewtext(reviewNotesRef.current.getEditor().getText())
     }
   }, [AnnotationsTaskDetails]);
 
@@ -670,31 +670,18 @@ const AudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskData}
             />
-
-            <Grid sx={{ ml: 3 }}>
-              <Button
-                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-                variant="contained"
-                color={
-                  reviewtext.trim().length === 0 ? "primary" : "success"
-                }
-                onClick={handleCollapseClick}
-              // style={{ marginBottom: "20px" }}
-              >
-               Notes {reviewtext.trim().length === 0 ? "" : "*"}
-              </Button>
             <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color={
-                    reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                    reviewtext.trim().length === 0 ? "primary" : "success"
                   }
                   onClick={handleCollapseClick}
                 // style={{ marginBottom: "20px" }}
                 >
-                  Notes {reviewNotesRef.current?.value !== "" && "*"}
+                  Notes {reviewtext.trim().length === 0 ? "" : "*"}
                 </Button>
 
 
