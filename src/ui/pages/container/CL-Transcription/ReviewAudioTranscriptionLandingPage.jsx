@@ -328,6 +328,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         message: "Error in autosaving annotation",
         variant: "error",
       });
+      return res;
     }}
   };
 
@@ -498,8 +499,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
-      handleAutosave();
-      navigate(`/projects/${projectId}/review/${taskId}`)
+      const changeUI = async() => {
+        handleAutosave().then(navigate(`/projects/${projectId}/review/${taskId}`))
+      };
+      changeUI();
     }
   }, [user]);
 

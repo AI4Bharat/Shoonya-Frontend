@@ -303,6 +303,7 @@ const AudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       }
+      return res;
     }
   };
 
@@ -453,8 +454,10 @@ const AudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
-      handleAutosave();
-      navigate(`/projects/${projectId}/task/${taskId}`)
+      const changeUI = async() => {
+        handleAutosave().then(navigate(`/projects/${projectId}/task/${taskId}`))
+      };
+      changeUI();
     }
   }, [user]);
 
