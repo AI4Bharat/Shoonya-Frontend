@@ -236,6 +236,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       } 
+      return res;
     }
   };
   
@@ -407,8 +408,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     if(Object.keys(userData).includes("prefer_cl_ui") && !(userData.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
-      handleAutosave();
-      navigate(`/projects/${projectId}/SuperChecker/${taskId}`)
+      const changeUI = async() => {
+        handleAutosave().then(navigate(`/projects/${projectId}/SuperChecker/${taskId}`))
+      };
+      changeUI();
     }
   }, [userData]);
   
