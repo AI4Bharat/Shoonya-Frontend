@@ -78,6 +78,8 @@ const AudioTranscriptionLandingPage = () => {
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const [taskData, setTaskData] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -278,35 +280,34 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  const handleAutosave = async () => {
-    const reqBody = {
-      task_id: taskId,
-      annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
-      auto_save: true,
-      lead_time:
-        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-    };
-    if (result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
-      // dispatch(APITransport(obj));
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
-      });
-      const resp = await res.json();
-      if (!res.ok) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving annotation",
-          variant: "error",
-        });
-      }
-    }
-  };
-
   useEffect(() => {
+    const handleAutosave = async () => {
+      const reqBody = {
+        task_id: taskId,
+        annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
+        auto_save: true,
+        lead_time:
+          (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      };
+      if (result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+        const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
+        // dispatch(APITransport(obj));
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        if (!res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: "Error in autosaving annotation",
+            variant: "error",
+          });
+        }
+      }
+    };
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
@@ -438,6 +439,7 @@ const AudioTranscriptionLandingPage = () => {
     getAnnotationsTaskData(taskId);
     getProjectDetails();
     getTaskData(taskId);
+    localStorage.setItem("enableChitrlekhaUI", true);
   }, []);
 
   const getProjectDetails = () => {
@@ -450,13 +452,6 @@ const AudioTranscriptionLandingPage = () => {
       setLoading(false);
     }
   }, [AnnotationsTaskDetails]);
-
-  useEffect(() => {
-    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
-      handleAutosave();
-      navigate(`/projects/${projectId}/task/${taskId}`)
-    }
-  }, [user]);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -588,13 +583,15 @@ const AudioTranscriptionLandingPage = () => {
       const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
       annotationNotesRef.current.getEditor().setContents(newDelta2);
       reviewNotesRef.current.getEditor().setContents(newDelta1);
+      setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
     }
   }, [AnnotationsTaskDetails]);
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    annotationNotesRef.current.getEditor().setContents([]);
+    reviewNotesRef.current.getEditor().setContents([]);
   };
 
   useEffect(() => {
@@ -673,6 +670,19 @@ const AudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskData}
             />
+
+            <Grid sx={{ ml: 3 }}>
+              <Button
+                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                variant="contained"
+                color={
+                  reviewtext.trim().length === 0 ? "primary" : "success"
+                }
+                onClick={handleCollapseClick}
+              // style={{ marginBottom: "20px" }}
+              >
+               Notes {reviewtext.trim().length === 0 ? "" : "*"}
+              </Button>
             <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
               <Grid item>
                 <Button
