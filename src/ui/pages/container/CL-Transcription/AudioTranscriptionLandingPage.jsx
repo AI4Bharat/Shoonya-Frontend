@@ -63,6 +63,8 @@ const AudioTranscriptionLandingPage = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [reviewNotesValue, setReviewNotesValue] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const [annotations, setAnnotations] = useState([]);
   const [stdTranscription, setStdTranscription] = useState("");
   const [showStdTranscript, setShowStdTranscript] = useState(false);
@@ -589,6 +591,8 @@ const AudioTranscriptionLandingPage = () => {
       const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
       annotationNotesRef.current.getEditor().setContents(newDelta2);
       reviewNotesRef.current.getEditor().setContents(newDelta1);
+      setannotationtext(annotationNotesRef.current.getEditor().getText())
+      setreviewtext(reviewNotesRef.current.getEditor().getText())
     }
   }, [AnnotationsTaskDetails]);
 

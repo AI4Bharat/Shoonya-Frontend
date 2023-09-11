@@ -571,6 +571,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value?.annotation_type === 2
@@ -592,6 +594,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -605,6 +609,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }
         }
       }
@@ -618,8 +624,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   const resetNotes = () => {
     setShowNotes(false);
-    superCheckerNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    reviewNotesRef.current.getEditor().setContents([]);
+    superCheckerNotesRef.current.getEditor().setContents([]);
   };
   const modules = {
     toolbar: [
@@ -733,7 +739,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
                 overflow:"auto",
-                height:"178px"
+                height:"100px"
               }}
             >
               {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
@@ -797,7 +803,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showStdTranscript ? "block" : "none",
                 paddingBottom: "16px",
                 overflow: "auto",
-                height: "178px"
+                height: "100px"
               }}
             >
               {stdTranscriptionSettings.enableTransliteration ? (
