@@ -253,6 +253,13 @@ const LabelStudioWrapper = ({
   // debugger
 
   useEffect(() => {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui)) {
+      autoSaveReview();
+      navigate(`/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]);
+  
+  useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({

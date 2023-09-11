@@ -200,14 +200,9 @@ const SuperCheckerTasks = (props) => {
   }, [NextTask]);
 
   useEffect(() => {
-    if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
-      localStorage.setItem("enableChitrlekhaUI", true);
-    } else {
-      localStorage.setItem("enableChitrlekhaUI", false);
-    }
     localStorage.setItem("SuperCheckerStage", props.type);
   },[]);
-  
+
   useEffect(() => {
     dispatch(SetTaskFilter(id, selectedFilters, props.type));
     if (currentPageNumber !== 1) {
@@ -277,7 +272,7 @@ const SuperCheckerTasks = (props) => {
     } else {
       setTasks([]);
     }
-  }, [taskList]);
+  }, [taskList, userDetails?.prefer_cl_ui]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {

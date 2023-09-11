@@ -78,9 +78,7 @@ const AudioTranscriptionLandingPage = () => {
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
-  const [annotationtext,setannotationtext] = useState('')
-  const [reviewtext,setreviewtext] = useState('')
-  const[taskData,setTaskData] = useState("")
+  const [taskData, setTaskData] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -280,34 +278,35 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const handleAutosave = async () => {
-      const reqBody = {
-        task_id: taskId,
-        annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
-        auto_save: true,
-        lead_time:
-          (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
-        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      };
-      if (result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
-        const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
-        // dispatch(APITransport(obj));
-        const res = await fetch(obj.apiEndPoint(), {
-          method: "PATCH",
-          body: JSON.stringify(obj.getBody()),
-          headers: obj.getHeaders().headers,
-        });
-        const resp = await res.json();
-        if (!res.ok) {
-          setSnackbarInfo({
-            open: true,
-            message: "Error in autosaving annotation",
-            variant: "error",
-          });
-        }
-      }
+  const handleAutosave = async () => {
+    const reqBody = {
+      task_id: taskId,
+      annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
+      auto_save: true,
+      lead_time:
+        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
+    if (result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
+      // dispatch(APITransport(obj));
+      const res = await fetch(obj.apiEndPoint(), {
+        method: "PATCH",
+        body: JSON.stringify(obj.getBody()),
+        headers: obj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (!res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving annotation",
+          variant: "error",
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
@@ -453,6 +452,13 @@ const AudioTranscriptionLandingPage = () => {
     }
   }, [AnnotationsTaskDetails]);
 
+  useEffect(() => {
+    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
+      handleAutosave();
+      navigate(`/projects/${projectId}/task/${taskId}`)
+    }
+  }, [user]);
+
   const tasksComplete = (id) => {
     if (id) {
       // resetNotes();
@@ -583,8 +589,6 @@ const AudioTranscriptionLandingPage = () => {
       const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
       annotationNotesRef.current.getEditor().setContents(newDelta2);
       reviewNotesRef.current.getEditor().setContents(newDelta1);
-      setannotationtext(annotationNotesRef.current.getEditor().getText())
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
     }
   }, [AnnotationsTaskDetails]);
 
@@ -710,119 +714,119 @@ const AudioTranscriptionLandingPage = () => {
               // ref={quillRef}
             /> */}
 
-              {/* <TextField
-              multiline
-              placeholder="Place your remarks here ..."
-              label="Review Notes"
-              // value={notesValue}
-              // onChange={event=>setNotesValue(event.target.value)}
-              inputRef={reviewNotesRef}
-              rows={1}
-              maxRows={3}
-              inputProps={{
-                style: { fontSize: "1rem" },
-                readOnly: true,
-              }}
-              style={{ width: "99%", marginTop: "1%" }}
-              // ref={quillRef}
-            /> 
-                
-              </div>*/}
+                {/* <TextField
+                multiline
+                placeholder="Place your remarks here ..."
+                label="Review Notes"
+                // value={notesValue}
+                // onChange={event=>setNotesValue(event.target.value)}
+                inputRef={reviewNotesRef}
+                rows={1}
+                maxRows={3}
+                inputProps={{
+                  style: { fontSize: "1rem" },
+                  readOnly: true,
+                }}
+                style={{ width: "99%", marginTop: "1%" }}
+                // ref={quillRef}
+              /> 
+                  
+                </div>*/}
+              </Grid>
+              {stdTranscriptionSettings.enable &&
+                <Grid item>
+                  <Button
+                    endIcon={showStdTranscript ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setShowStdTranscript(!showStdTranscript);
+                      setShowNotes(false);
+                    }}
+                  // style={{ marginBottom: "20px" }}
+                  >
+                    Standardised Transcription
+                  </Button>
+                </Grid>}
             </Grid>
-            {stdTranscriptionSettings.enable &&
-              <Grid item>
-                <Button
-                  endIcon={showStdTranscript ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    setShowStdTranscript(!showStdTranscript);
-                    setShowNotes(false);
-                  }}
-                // style={{ marginBottom: "20px" }}
-                >
-                  Standardised Transcription
-                </Button>
-              </Grid>}
-          </Grid>
-          <div
-            className={classes.collapse}
-            style={{
-              display: showNotes ? "block" : "none",
-              paddingBottom: "16px",
-              overflow: "auto",
-              height: "178px"
-            }}
-          >
-            <ReactQuill
-              ref={annotationNotesRef}
-              modules={modules}
-              bounds={"#note"}
-              theme="bubble"
-              formats={formats}
-              placeholder="Annotation Notes" />
-            <ReactQuill
-              ref={reviewNotesRef}
-              modules={modules}
-              theme="bubble"
-              bounds={"#note"}
-              readOnly={true}
-              formats={formats}
-              placeholder="Review Notes" />
-          </div>
-          <div
-            className={classes.collapse}
-            style={{
-              display: showStdTranscript ? "block" : "none",
-              paddingBottom: "16px",
-              overflow: "auto",
-              height: "max-content"
-            }}
-          >
-            {stdTranscriptionSettings.enableTransliteration ? (
-              <IndicTransliterate
-                lang={stdTranscriptionSettings.targetlang}
-                value={stdTranscription}
-                onChange={(e) => {
-                  setStdTranscription(e.target.value);
-                }}
-                onChangeText={() => { }}
-                enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
-                containerStyles={{
-                  width: "100%",
-                }}
-                renderComponent={(props) => (
-                  <div className={classes.relative} style={{ width: "100%" }}>
-                    <textarea
-                      className={classes.customTextarea}
-                      dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
-                      rows={4}
-                      style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px" }}
-                      {...props}
-                    />
-                  </div>
-                )}
-              />
-            ) : (
-              <div className={classes.relative} style={{ width: "100%" }}>
-                <textarea
+            <div
+              className={classes.collapse}
+              style={{
+                display: showNotes ? "block" : "none",
+                paddingBottom: "16px",
+                overflow: "auto",
+                height: "max-content"
+              }}
+            >
+              <ReactQuill
+                ref={annotationNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                theme="bubble"
+                formats={formats}
+                placeholder="Annotation Notes" />
+              <ReactQuill
+                ref={reviewNotesRef}
+                modules={modules}
+                theme="bubble"
+                bounds={"#note"}
+                readOnly={true}
+                formats={formats}
+                placeholder="Review Notes" />
+            </div>
+            <div
+              className={classes.collapse}
+              style={{
+                display: showStdTranscript ? "block" : "none",
+                paddingBottom: "16px",
+                overflow: "auto",
+                height: "max-content"
+              }}
+            >
+              {stdTranscriptionSettings.enableTransliteration ? (
+                <IndicTransliterate
+                  lang={stdTranscriptionSettings.targetlang}
+                  value={stdTranscription}
                   onChange={(e) => {
                     setStdTranscription(e.target.value);
                   }}
-                  value={stdTranscription}
-                  dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
-                  className={classes.customTextarea}
-                  style={{
-                    fontSize: stdTranscriptionSettings.fontSize,
-                    height: "120px",
+                  onChangeText={() => { }}
+                  enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
+                  containerStyles={{
+                    width: "100%",
                   }}
-                  rows={4}
+                  renderComponent={(props) => (
+                    <div className={classes.relative} style={{ width: "100%" }}>
+                      <textarea
+                        className={classes.customTextarea}
+                        dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                        rows={4}
+                        style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px" }}
+                        {...props}
+                      />
+                    </div>
+                  )}
                 />
-              </div>
-            )}
-          </div>
-        </Box>
-      </Grid>
+              ) : (
+                <div className={classes.relative} style={{ width: "100%" }}>
+                  <textarea
+                    onChange={(e) => {
+                      setStdTranscription(e.target.value);
+                    }}
+                    value={stdTranscription}
+                    dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                    className={classes.customTextarea}
+                    style={{
+                      fontSize: stdTranscriptionSettings.fontSize,
+                      height: "120px",
+                    }}
+                    rows={4}
+                  />
+                </div>
+              )}
+            </div>
+          </Box>
+        </Grid>
 
       <Grid md={6} xs={12} sx={{ width: "100%" }}>
         <TranscriptionRightPanel
