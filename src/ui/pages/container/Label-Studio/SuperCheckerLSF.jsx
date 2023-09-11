@@ -173,6 +173,13 @@ const LabelStudioWrapper = ({
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   useEffect(() => {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui)) {
+      autoSaveSuperCheck();
+      navigate(`/projects/${projectId}/SuperCheckerAudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]);
+  
+  useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({

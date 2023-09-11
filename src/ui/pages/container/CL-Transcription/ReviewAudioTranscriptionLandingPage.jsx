@@ -301,36 +301,38 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const handleAutosave = async (id) => {
-      const reqBody = {
-        task_id: taskId,
-        annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
-        parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
-        auto_save: true,
-        // cl_format: true,
-        // offset: currentPage,
-        // limit: limit,
-        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      };
-      if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
-
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
-      // dispatch(APITransport(obj));
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
-      });
-      const resp = await res.json();
-      if (!res.ok) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving annotation",
-          variant: "error",
-        });
-      }}
+  const handleAutosave = async (id) => {
+    const reqBody = {
+      task_id: taskId,
+      annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
+      parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
+      auto_save: true,
+      // cl_format: true,
+      // offset: currentPage,
+      // limit: limit,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
+    if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
+
+    const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
+    // dispatch(APITransport(obj));
+    const res = await fetch(obj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(obj.getBody()),
+      headers: obj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (!res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: "Error in autosaving annotation",
+        variant: "error",
+      });
+    }}
+  };
+
+  useEffect(() => {
+    
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
@@ -493,6 +495,13 @@ const ReviewAudioTranscriptionLandingPage = () => {
       setLoading(false);
     }
   }, [AnnotationsTaskDetails]);
+
+  useEffect(() => {
+    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
+      handleAutosave();
+      navigate(`/projects/${projectId}/review/${taskId}`)
+    }
+  }, [user]);
 
   const tasksComplete = (id) => {
     if (id) {

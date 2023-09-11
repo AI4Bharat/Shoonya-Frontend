@@ -329,14 +329,9 @@ const TaskTable = (props) => {
   }
 
   useEffect(() => {
-    if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
-      localStorage.setItem("enableChitrlekhaUI", true);
-    } else {
-      localStorage.setItem("enableChitrlekhaUI", false);
-    }
     localStorage.setItem("Stage", props.type);
   },[]);
-
+  
   const customColumnHead = (col) => {
     return (
       <Box
@@ -437,7 +432,7 @@ const TaskTable = (props) => {
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic")) {
+                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("Acoustic")) {
                     navigate(`ReviewAudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{
