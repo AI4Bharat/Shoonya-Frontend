@@ -582,7 +582,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       ...((value === "to_be_revised" || value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
@@ -829,7 +829,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
               <Grid item>
               <Button
                 endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -923,7 +923,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 style={{
                   display: showNotes ? "block" : "none",
                   paddingBottom: "16px",
-                  height: "100px", overflow: "auto"
+                  height: "max-content", overflow: "auto"
                 }}
               >
                 <ReactQuill

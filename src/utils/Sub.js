@@ -8,12 +8,12 @@ export default class Sub {
     this.text = obj.text;
     this.target_text = obj.target_text;
     this.audio = obj.audio;
-    this.text_changed = obj.text_changed ?? false;
+    this.text_changed = obj.text_changed;
     this.time_difference = obj.time_difference;
     this.id = obj.id;
     this.audio_speed = obj.audio_speed;
     this.speaker_id = obj.speaker_id;
-    this.acoustic_normalised_text = obj.acoustic_normalised_text;
+    this.acoustic_normalised_text = obj.acoustic_normalised_text ?? "";
   }
 
   get check() {

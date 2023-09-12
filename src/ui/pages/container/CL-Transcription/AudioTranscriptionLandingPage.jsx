@@ -533,7 +533,7 @@ const AudioTranscriptionLandingPage = () => {
       annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result: result,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if (!textBox && !speakerBox && result?.length > 0) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
@@ -682,7 +682,7 @@ const AudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskData}
             />
-            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
