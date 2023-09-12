@@ -54,6 +54,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [annotationtext,setannotationtext] = useState('');
   const [currentSubs, setCurrentSubs] = useState();
   const [loadtime, setloadtime] = useState(new Date());
   const [textBox, settextBox] = useState("");
@@ -493,7 +494,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       supercheck_notes: JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       ...((value === "rejected" ||
         value === "validated" ||
         value === "validated_with_changes") && {
@@ -702,7 +703,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}

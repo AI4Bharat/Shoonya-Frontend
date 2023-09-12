@@ -250,6 +250,9 @@ const LabelStudioWrapper = ({
   const [disableBtns, setDisableBtns] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
 
 
   //console.log("projectId, taskId", projectId, taskId);
@@ -646,10 +649,6 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-        setannotationtext(annotationNotesRef.current.getEditor().getText())
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
-        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-        
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -1305,8 +1304,8 @@ export default function LSF() {
               onClick={handleCollapseClick}
             >
               Notes{" "}
-              {annotationtext.trim().length === 0 &&
-                supercheckertext.trim().length === 0 ? "" : "*"}
+              {annotationNotesRef.current?.value !== "" &&
+                superCheckerNotesRef.current?.value !== "" && "*"}
             </Button>
           )}
           <div

@@ -103,7 +103,7 @@ const TranscriptionRightPanel = ({
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles?.slice(startIndex, endIndex);
   const idxOffset = (itemsPerPage * (page - 1));
-  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscription" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
+  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -179,7 +179,8 @@ const TranscriptionRightPanel = ({
     }
   }, [currentIndex]);
 
-  useEffect(() => {
+  //Uncomment this block to enable standardised_transcription in future
+  /* useEffect(() => {
     if(showAcousticText) {
       handleStdTranscriptionSettings({
         enable: true,
@@ -191,6 +192,7 @@ const TranscriptionRightPanel = ({
       });
     }
   }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize]);
+   */
 
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
@@ -585,6 +587,7 @@ const TranscriptionRightPanel = ({
                           setShowPopOver(false);
                         }, 200);
                       }}
+                      style={{ fontSize: fontSize, height: "120px" }}
                       renderComponent={(props) => (
                         <div className={classes.relative} style={{ width: "100%" }}>
                           <textarea
@@ -598,7 +601,6 @@ const TranscriptionRightPanel = ({
                                 setShowPopOver(false);
                               }, 200);
                             }}
-                            style={{ fontSize: fontSize, height: "120px" }}
                             {...props}
                           />
                           {/* <span id="charNum" className={classes.wordCount}>

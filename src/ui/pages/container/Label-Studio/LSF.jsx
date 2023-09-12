@@ -926,11 +926,11 @@ export default function LSF() {
   const [showNotes, setShowNotes] = useState(false);
   const [showGlossary, setShowGlossary] = useState(false);
   const annotationNotesRef = useRef(null);
-  const [annotationtext,setannotationtext] = useState('')
-  const [reviewtext,setreviewtext] = useState('')
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
   const [alertData, setAlertData] = useState({
@@ -1000,17 +1000,14 @@ export default function LSF() {
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         annotationNotesRef.current.getEditor().setContents(newDelta);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
-        setannotationtext(annotationNotesRef.current.getEditor().getText());
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
-     
       }
     });
   }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.getEditor().setContents([]);
-    reviewNotesRef.current.getEditor().setContents([]);
+    annotationNotesRef.current.value = "";
+    reviewNotesRef.current.value = "";
   };
 
   useEffect(() => {
@@ -1065,7 +1062,7 @@ export default function LSF() {
               onClick={handleCollapseClick}
             // style={{ marginBottom: "20px" }}
             >
-              Notes{reviewtext.trim().length === 0 ? "" : "*"}
+              Notes {reviewNotesRef.current?.value !== "" && "*"}
             </Button>
           )}
 
