@@ -587,6 +587,7 @@ const TranscriptionRightPanel = ({
                           setShowPopOver(false);
                         }, 200);
                       }}
+                      style={{ fontSize: fontSize, height: "120px" }}
                       renderComponent={(props) => (
                         <div className={classes.relative} style={{ width: "100%" }}>
                           <textarea
@@ -600,7 +601,6 @@ const TranscriptionRightPanel = ({
                                 setShowPopOver(false);
                               }, 200);
                             }}
-                            style={{ fontSize: fontSize, height: "120px" }}
                             {...props}
                           />
                           {/* <span id="charNum" className={classes.wordCount}>

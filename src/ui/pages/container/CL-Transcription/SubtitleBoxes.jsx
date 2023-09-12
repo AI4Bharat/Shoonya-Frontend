@@ -297,12 +297,11 @@ import React, {
             if (startTime > 0 && endTime > 0 && endTime - startTime >= 0.2) {
               const start_time = DT.d2t(startTime);
               const end_time = DT.d2t(endTime);
-  
-              if (result.length > 1) {
+              if (result.length > 1 ) {
                 if (
-                  index > 0 &&
-                  startTime >= DT.t2d(previou.end_time) &&
-                  endTime <= DT.t2d(next.start_time)
+                  index > 0  && index !== result.length- 1 &&
+                  startTime >= DT.t2d(previou?.end_time) &&
+                  endTime <= DT.t2d(next?.start_time) 
                 ) {
                   updateSub(lastSub, {
                     start_time,
@@ -316,15 +315,20 @@ import React, {
                     end_time,
                   });
                 }
-              } else {
+                if (index === result.length- 1 && startTime >= DT.t2d(previou?.end_time) ) {
+                  updateSub(lastSub, {
+                    start_time,
+                    end_time,
+                  });
+                }
+              } 
+              else {
                 updateSub(lastSub, {
                   start_time,
                   end_time,
                 });
               }
-            } else {
-              lastTarget.style.width = `${width}px`;
-            }
+            } 
           }
           lastTarget.style.transform = `translate(0)`;
           lastTarget.style.width = `${width}px`;
