@@ -1002,13 +1002,7 @@ export default function LSF() {
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         setannotationtext(annotationNotesRef.current.getEditor().getText());
         setreviewtext(reviewNotesRef.current.getEditor().getText())
-        console.log(reviewNotesRef.current.getEditor().getContents());
-        if(reviewtext.length===0|| reviewtext.trim() === ''){
-          console.log(reviewNotesRef.current.getEditor().getText().trim().length);
-        }
-        else{
-          console.log("primary");
-        }
+     
       }
     });
   }, [taskId]);

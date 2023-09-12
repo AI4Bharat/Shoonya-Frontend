@@ -141,6 +141,8 @@ const LabelStudioWrapper = ({
   loader,
   showLoader,
   hideLoader,
+  setreviewtext,
+  setsupercheckertext,
   resetNotes,
   getTaskData,
 }) => {
@@ -459,6 +461,9 @@ const LabelStudioWrapper = ({
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
@@ -481,6 +486,9 @@ const LabelStudioWrapper = ({
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -494,6 +502,9 @@ const LabelStudioWrapper = ({
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
           }
         }
       }
@@ -957,13 +968,6 @@ export default function LSF() {
     'color','background',
     'script']
 
-    useEffect(()=>{
-      setreviewtext(reviewNotesRef.current.getEditor().getText())
-      setsupercheckertext(reviewNotesRef.current.getEditor().getText())},[])
-    
-      
-
-
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -1198,6 +1202,9 @@ export default function LSF() {
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}
+          setreviewtext = {setreviewtext}
+          setsupercheckertext={setsupercheckertext}
+
         />
       </Card>
     </div>

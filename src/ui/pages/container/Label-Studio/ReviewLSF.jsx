@@ -218,6 +218,9 @@ const LabelStudioWrapper = ({
   showLoader,
   hideLoader,
   resetNotes,
+  setannotationtext,
+  setreviewtext,
+  setsupercheckertext,
   getTaskData,
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
@@ -643,6 +646,10 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+        
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -669,6 +676,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -688,6 +698,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }
         } else {
           let normalAnnotation = annotations.find(
@@ -703,6 +716,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
         }
       }
     }
@@ -1208,12 +1224,25 @@ export default function LSF() {
   const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
-useEffect(()=>{setannotationtext(annotationNotesRef.current.getEditor().getText())
-  setreviewtext(reviewNotesRef.current.getEditor().getText())
-  setsupercheckertext(reviewNotesRef.current.getEditor().getText())},[])
+
+// useEffect(() => {
+//   fetchAnnotation(taskId).then((data) => {
+//     if (data && Array.isArray(data) && data.length > 0) {
+//       console.log(annotationNotesRef);
+//       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
+//       reviewNotesRef.current.value = data[0].review_notes ?? "";
+//       const newDelta = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+//       const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+//       annotationNotesRef.current.getEditor().setContents(newDelta);
+//       reviewNotesRef.current.getEditor().setContents(newDelta1);
+      // setannotationtext(annotationNotesRef.current.getEditor().getText())
+      // setreviewtext(reviewNotesRef.current.getEditor().getText())
+      // setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+//     }
+//   });
+// }, [taskId]);
 
   
-
   const resetNotes = () => {
     setShowNotes(false);
     reviewNotesRef.current.getEditor().setContents([]);
@@ -1268,7 +1297,7 @@ useEffect(()=>{setannotationtext(annotationNotesRef.current.getEditor().getText(
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                annotationtext.trim().length === 0 ||
+                annotationtext.trim().length === 0 &&
                 supercheckertext.trim().length === 0
                   ? "primary"
                   : "success"
@@ -1276,8 +1305,8 @@ useEffect(()=>{setannotationtext(annotationNotesRef.current.getEditor().getText(
               onClick={handleCollapseClick}
             >
               Notes{" "}
-              {annotationtext.trim().length === 0 ||
-                (supercheckertext.trim().length === 0 ? "" : "*")}
+              {annotationtext.trim().length === 0 &&
+                supercheckertext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
           <div
@@ -1438,6 +1467,9 @@ useEffect(()=>{setannotationtext(annotationNotesRef.current.getEditor().getText(
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}
+          setannotationtext={setannotationtext}
+          setreviewtext = {setreviewtext}
+          setsupercheckertext={setsupercheckertext}
         />
       </Card>
     </div>
