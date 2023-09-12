@@ -929,6 +929,8 @@ export default function LSF() {
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
   const [alertData, setAlertData] = useState({
@@ -998,15 +1000,16 @@ export default function LSF() {
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         annotationNotesRef.current.getEditor().setContents(newDelta);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+  setreviewtext(reviewNotesRef.current.getEditor().getText())
       }
     });
   }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
-  };
+    reviewNotesRef.current.getEditor().setContents([]);
+    annotationNotesRef.current.getEditor().setContents([]);  };
 
   useEffect(() => {
     resetNotes();
@@ -1055,12 +1058,12 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                reviewtext.trim().length === 0 ? "primary" : "success"
               }
               onClick={handleCollapseClick}
             // style={{ marginBottom: "20px" }}
             >
-              Notes {reviewNotesRef.current?.value !== "" && "*"}
+              Notes {reviewtext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
 

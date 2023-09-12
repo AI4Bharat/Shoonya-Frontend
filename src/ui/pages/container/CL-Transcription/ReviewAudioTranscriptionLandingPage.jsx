@@ -62,6 +62,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
   const [disableSkip, setdisableSkip] = useState(false);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
@@ -101,9 +104,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
-  const [annotationtext,setannotationtext] = useState('')
-  const [reviewtext,setreviewtext] = useState('')
-  const [supercheckertext,setsupercheckertext] = useState('')
 
 
 
@@ -661,9 +661,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
         setannotationtext(annotationNotesRef.current.getEditor().getText())
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
-        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-
+  setreviewtext(reviewNotesRef.current.getEditor().getText())
+  setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -689,9 +688,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
             annotationNotesRef.current.getEditor().setContents(newDelta2);
             superCheckerNotesRef.current.getEditor().setContents(newDelta3);
             setannotationtext(annotationNotesRef.current.getEditor().getText())
-            setreviewtext(reviewNotesRef.current.getEditor().getText())
-            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-    
+  setreviewtext(reviewNotesRef.current.getEditor().getText())
+  setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+  console.log(annotationNotesRef.current.getEditor().getText().trim());
+
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -712,9 +712,12 @@ const ReviewAudioTranscriptionLandingPage = () => {
             reviewNotesRef.current.getEditor().setContents(newDelta1);
             superCheckerNotesRef.current.getEditor().setContents(newDelta3);
             setannotationtext(annotationNotesRef.current.getEditor().getText())
-            setreviewtext(reviewNotesRef.current.getEditor().getText())
-            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-    
+  setreviewtext(reviewNotesRef.current.getEditor().getText())
+  setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+  console.log("ssssssssss",annotationNotesRef.current.getEditor().getText().trim().length);
+  console.log("ssssssssss",superCheckerNotesRef.current.getEditor().getText().trim().length);
+
+
           }
         } else {
           let normalAnnotation = annotations.find(
@@ -732,9 +735,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
           reviewNotesRef.current.getEditor().setContents(newDelta1);
           superCheckerNotesRef.current.getEditor().setContents(newDelta3);
           setannotationtext(annotationNotesRef.current.getEditor().getText())
-          setreviewtext(reviewNotesRef.current.getEditor().getText())
-          setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-  
+  setreviewtext(reviewNotesRef.current.getEditor().getText())
+  setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+  console.log(annotationNotesRef.current.getEditor().getText().trim());
+
         }
       }
     }
@@ -749,7 +753,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setShowNotes(false);
     reviewNotesRef.current.getEditor().setContents([]);
   };
-
 
   useEffect(() => {
     resetNotes();
@@ -832,15 +835,17 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                 variant="contained"
                 color={
-                  annotationtext.trim().length === 0 || supercheckertext.trim().length === 0  ?
-            
-                     "primary"
+                  annotationtext.trim().length === 0 &&
+                  supercheckertext.trim().length === 0
+                    ? "primary"
                     : "success"
                 }
                 onClick={handleCollapseClick}
               >
-                Notes{ annotationtext.trim().length === 0 ||
-                  (supercheckertext.trim().length === 0 ? "" : "*")}
+                Notes{" "}
+                {annotationtext.trim().length === 0 &&
+                supercheckertext.trim().length === 0 ? "" : "*"}
+
               </Button>
               
                 {/*  <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>

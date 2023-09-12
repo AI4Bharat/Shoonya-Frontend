@@ -247,6 +247,9 @@ const LabelStudioWrapper = ({
   const [disableBtns, setDisableBtns] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
 
 
   //console.log("projectId, taskId", projectId, taskId);
@@ -643,6 +646,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -669,6 +675,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -688,6 +697,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }
         } else {
           let normalAnnotation = annotations.find(
@@ -708,6 +720,9 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
         }
       }
     }
@@ -1217,7 +1232,7 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
-    reviewNotesRef.current.value = "";
+    reviewNotesRef.current.getEditor().setContents([]);
   };
   
 
@@ -1269,16 +1284,16 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                annotationNotesRef.current?.value !== "" ||
-                  superCheckerNotesRef.current?.value !== ""
-                  ? "success"
-                  : "primary"
+                annotationtext.trim().length === 0 &&
+                supercheckertext.trim().length === 0
+                  ? "primary"
+                  : "success"
               }
               onClick={handleCollapseClick}
             >
               Notes{" "}
-              {annotationNotesRef.current?.value !== "" ||
-                (superCheckerNotesRef.current?.value !== "" && "*")}
+                {annotationtext.trim().length === 0 &&
+                supercheckertext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
           <div

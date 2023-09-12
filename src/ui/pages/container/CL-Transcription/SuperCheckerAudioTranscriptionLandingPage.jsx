@@ -54,6 +54,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
   const [currentSubs, setCurrentSubs] = useState();
   const [loadtime, setloadtime] = useState(new Date());
   const [textBox, settextBox] = useState("");
