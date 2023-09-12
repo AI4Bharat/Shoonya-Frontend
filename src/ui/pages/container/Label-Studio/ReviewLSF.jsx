@@ -250,9 +250,7 @@ const LabelStudioWrapper = ({
   const [disableBtns, setDisableBtns] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
-  const [annotationtext,setannotationtext] = useState('')
-  const [reviewtext,setreviewtext] = useState('')
-  const [supercheckertext,setsupercheckertext] = useState('')
+ 
 
 
   //console.log("projectId, taskId", projectId, taskId);
@@ -649,6 +647,10 @@ const LabelStudioWrapper = ({
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -1224,23 +1226,8 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
-// useEffect(() => {
-//   fetchAnnotation(taskId).then((data) => {
-//     if (data && Array.isArray(data) && data.length > 0) {
-//       console.log(annotationNotesRef);
-//       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
-//       reviewNotesRef.current.value = data[0].review_notes ?? "";
-//       const newDelta = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
-//       const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-//       annotationNotesRef.current.getEditor().setContents(newDelta);
-//       reviewNotesRef.current.getEditor().setContents(newDelta1);
-      // setannotationtext(annotationNotesRef.current.getEditor().getText())
-      // setreviewtext(reviewNotesRef.current.getEditor().getText())
-      // setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-//     }
-//   });
-// }, [taskId]);
 
+console.log(reviewtext,annotationtext);
   
   const resetNotes = () => {
     setShowNotes(false);
@@ -1304,8 +1291,8 @@ export default function LSF() {
               onClick={handleCollapseClick}
             >
               Notes{" "}
-              {annotationNotesRef.current?.value !== "" &&
-                superCheckerNotesRef.current?.value !== "" && "*"}
+              {annotationtext.trim().length === 0  &&
+                supercheckertext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
           <div
