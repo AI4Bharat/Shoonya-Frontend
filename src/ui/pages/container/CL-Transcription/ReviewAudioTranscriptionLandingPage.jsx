@@ -807,7 +807,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
               <Grid item>
               <Button
                 endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -900,7 +900,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 style={{
                   display: showNotes ? "block" : "none",
                   paddingBottom: "16px",
-                  height: "max-content", overflow: "auto"
+                  height:  filterMessage === ""?"max-content":"175px", overflow: "auto"
                 }}
               >
                 <ReactQuill

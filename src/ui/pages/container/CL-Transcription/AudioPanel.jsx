@@ -52,7 +52,7 @@ const AudioPanel = memo( ({
 
 console.log(TaskDetails?.data?.audio_url,"TaskDetailsTaskDetailsTaskDetails")
   return (
-    <Grid style={{ padding: "0px 20px 15px 20px" }}>
+    <Grid style={{ padding: "0px 20px 0px 20px" }}>
      
       {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio

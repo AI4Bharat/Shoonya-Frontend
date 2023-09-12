@@ -676,7 +676,7 @@ const AudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskData}
             />
-            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
