@@ -579,7 +579,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       ...((value === "to_be_revised" || value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
