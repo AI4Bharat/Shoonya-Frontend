@@ -200,6 +200,10 @@ const SuperCheckerTasks = (props) => {
   }, [NextTask]);
 
   useEffect(() => {
+    localStorage.setItem("SuperCheckerStage", props.type);
+  },[]);
+
+  useEffect(() => {
     dispatch(SetTaskFilter(id, selectedFilters, props.type));
     if (currentPageNumber !== 1) {
       setCurrentPageNumber(1);
