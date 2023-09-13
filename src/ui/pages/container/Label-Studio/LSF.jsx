@@ -930,6 +930,8 @@ export default function LSF() {
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
   const [alertData, setAlertData] = useState({
@@ -1056,7 +1058,7 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                reviewtext.trim().length === 0 ? "primary" : "success"
               }
               onClick={handleCollapseClick}
             // style={{ marginBottom: "20px" }}

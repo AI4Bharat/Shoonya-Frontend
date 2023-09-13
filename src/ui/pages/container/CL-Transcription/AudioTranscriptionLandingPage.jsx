@@ -62,6 +62,8 @@ const AudioTranscriptionLandingPage = () => {
   const [NextData, setNextData] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [reviewNotesValue, setReviewNotesValue] = useState(null);
+  // const [annotationtext,setannotationtext] = useState('')
+  // const [reviewtext,setreviewtext] = useState('')
   const [speakerBox, setSpeakerBox] = useState("");
   const [annotations, setAnnotations] = useState([]);
   const [stdTranscription, setStdTranscription] = useState("");
@@ -79,6 +81,8 @@ const AudioTranscriptionLandingPage = () => {
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdataButton, setDisableUpdataButton] = useState(false);
+  const [annotationtext, setannotationtext] = useState('')
+  const [reviewtext, setreviewtext] = useState('')
   const [taskData, setTaskData] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -592,13 +596,15 @@ const AudioTranscriptionLandingPage = () => {
       const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
       annotationNotesRef.current.getEditor().setContents(newDelta2);
       reviewNotesRef.current.getEditor().setContents(newDelta1);
+      setannotationtext(annotationNotesRef.current.getEditor().getText())
+      setreviewtext(reviewNotesRef.current.getEditor().getText())
     }
   }, [AnnotationsTaskDetails]);
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    annotationNotesRef.current.getEditor().setContents([]);
+    reviewNotesRef.current.getEditor().setContents([]);
   };
 
   useEffect(() => {
@@ -683,12 +689,12 @@ const AudioTranscriptionLandingPage = () => {
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color={
-                    reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                    reviewtext.trim().length === 0 ? "primary" : "success"
                   }
                   onClick={handleCollapseClick}
                 // style={{ marginBottom: "20px" }}
                 >
-                  Notes {reviewNotesRef.current?.value !== "" && "*"}
+                  Notes {reviewtext.trim().length === 0 ? "" : "*"}
                 </Button>
 
 
@@ -758,7 +764,7 @@ const AudioTranscriptionLandingPage = () => {
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
                 overflow: "auto",
-                height: "max-content"
+                height: "178px"
               }}
             >
               <ReactQuill

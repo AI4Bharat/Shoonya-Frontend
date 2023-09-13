@@ -54,6 +54,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [annotationtext,setannotationtext] = useState('');
   const [currentSubs, setCurrentSubs] = useState();
   const [loadtime, setloadtime] = useState(new Date());
   const [textBox, settextBox] = useState("");
@@ -72,6 +73,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     fontSize: "Normal"
   });
   const [disableSkip, setdisableSkip] = useState(false);
+  const [reviewtext,setreviewtext] = useState('');
+  const [supercheckertext,setsupercheckertext] = useState('');
   const[taskDetailList,setTaskDetailList] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -97,6 +100,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const timeSpentIntervalRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
+ 
 
   // useEffect(() => {
   //   let intervalId;
@@ -569,6 +573,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value?.annotation_type === 2
@@ -590,6 +596,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -603,6 +611,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }
         }
       }
@@ -616,8 +626,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   const resetNotes = () => {
     setShowNotes(false);
-    superCheckerNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    reviewNotesRef.current.getEditor().setContents([]);
+    superCheckerNotesRef.current.getEditor().setContents([]);
   };
   const modules = {
     toolbar: [
@@ -654,7 +664,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   return (
-    <>
+<>
       {loading && <Spinner />}
       {renderSnackBar()}
       <Grid container direction={"row"} className={classes.parentGrid}>
@@ -700,11 +710,11 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color={
-                    reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                    reviewtext.trim().length === 0 ? "primary" : "success"
                   }
                   onClick={handleCollapseClick}
                 >
-                  Notes {reviewNotesRef.current?.value !== "" && "*"}
+                  Notes {reviewtext.trim().length === 0 ? "" : "*"}
                 </Button>
         
           
@@ -731,7 +741,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
                 overflow:"auto",
-                height:"max-content"
+                height:"100px"
               }}
             >
               {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
@@ -795,7 +805,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showStdTranscript ? "block" : "none",
                 paddingBottom: "16px",
                 overflow: "auto",
-                height: "max-content"
+                height: "100px"
               }}
             >
               {stdTranscriptionSettings.enableTransliteration ? (
