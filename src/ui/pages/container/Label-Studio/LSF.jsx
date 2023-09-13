@@ -378,7 +378,7 @@ const LabelStudioWrapper = ({
             const counter = temp.reduce((acc, curr) => {
               if (curr.from_name === "labels")
                 acc.labels++;
-              else if (curr.from_name === "transcribed_json") {
+              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
                 if (curr.value.text[0] === "")
                   acc.empty++;
                 acc.textareas++;
@@ -455,7 +455,7 @@ const LabelStudioWrapper = ({
             const counter = temp.reduce((acc, curr) => {
               if (curr.from_name === "labels")
                 acc.labels++;
-              else if (curr.from_name === "transcribed_json") {
+              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
                 if (curr.value.text[0] === "")
                   acc.empty++;
                 acc.textareas++;
