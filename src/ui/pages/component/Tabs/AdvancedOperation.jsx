@@ -376,6 +376,7 @@ const AdvancedOperation = (props) => {
 
   const handleok = () => {
     getArchiveProjectAPI();
+    getProjectDetails()
     setIsArchived(!isArchived);
     setOpen(false);
   };

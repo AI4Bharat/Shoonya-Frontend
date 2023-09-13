@@ -1,5 +1,8 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
+import ReactQuill, { Quill } from 'react-quill';
+import "./editor.css"
+import 'quill/dist/quill.bubble.css';
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -46,6 +49,7 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
+
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -204,6 +208,7 @@ const AUTO_SAVE_INTERVAL = 60000;
 const AUDIO_PROJECT_SAVE_CHECK = [
   "AudioTranscription",
   "AudioTranscriptionEditing",
+  "AcousticNormalisedTranscriptionEditing",
 ];
 
 const LabelStudioWrapper = ({
@@ -214,6 +219,9 @@ const LabelStudioWrapper = ({
   showLoader,
   hideLoader,
   resetNotes,
+  setannotationtext,
+  setreviewtext,
+  setsupercheckertext,
   getTaskData,
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
@@ -243,18 +251,26 @@ const LabelStudioWrapper = ({
   const [disableBtns, setDisableBtns] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
+ 
 
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
 
   useEffect(() => {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
+      autoSaveReview();
+      navigate(`/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]);
+  
+  useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
-          ? false
-          : true,
+        bottomSidePanel:
+          !(ProjectDetails?.project_type?.includes("Audio")
+          || ProjectDetails?.project_type?.includes("Acoustic")),
         continuousLabeling: false,
         enableAutoSave: false,
         enableHotkeys: true,
@@ -436,8 +452,8 @@ const LabelStudioWrapper = ({
               load_time.current,
               review.lead_time,
               "skipped",
-              reviewNotesRef.current.value
-            ).then(() => {
+              JSON.stringify(reviewNotesRef.current.getEditor().getContents())
+              ).then(() => {
               getNextProject(projectId, taskData.id, "review").then((res) => {
                 hideLoader();
                 tasksComplete(res?.id || null);
@@ -544,7 +560,7 @@ const LabelStudioWrapper = ({
             const counter = temp.reduce((acc, curr) => {
               if (curr.from_name === "labels")
                 acc.labels++;
-              else if (curr.from_name === "transcribed_json") {
+              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
                 if (curr.value.text[0] === "")
                   acc.empty++;
                 acc.textareas++;
@@ -583,7 +599,7 @@ const LabelStudioWrapper = ({
               review_status.current,
               temp,
               review.parent_annotation,
-              reviewNotesRef.current.value
+              JSON.stringify(reviewNotesRef.current.getEditor().getContents())
             ).then(() => {
               if (localStorage.getItem("labelAll"))
                 getNextProject(projectId, taskData.id, "review").then(
@@ -623,8 +639,19 @@ const LabelStudioWrapper = ({
           (annotation) => annotation.parent_annotation === userAnnotation.id
         );
         annotationNotesRef.current.value = normalAnnotation?.annotation_notes ?? "";
-        reviewNotesRef.current.value = userAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = superCheckerAnnotation?.supercheck_notes ?? "";
+        reviewNotesRef.current.value =  userAnnotation?.review_notes ?? "";
+        console.log(userAnnotation?.review_notes ?? "",reviewNotesRef);
+        const newDelta2 = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        annotationNotesRef.current.getEditor().setContents(newDelta2);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -645,6 +672,15 @@ const LabelStudioWrapper = ({
                 (annotation) =>
                   annotation.parent_annotation === correctAnnotation.id
               )?.supercheck_notes ?? "";
+              const newDelta2 = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        annotationNotesRef.current.getEditor().setContents(newDelta2);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -658,16 +694,33 @@ const LabelStudioWrapper = ({
                 (annotation) =>
                   annotation.parent_annotation === reviewerAnnotations[0].id
               )?.supercheck_notes ?? "";
+              const newDelta2 = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        annotationNotesRef.current.getEditor().setContents(newDelta2);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }
         } else {
           let normalAnnotation = annotations.find(
             (annotation) => annotation.annotation_type === 1
           );
-          annotationNotesRef.current.value =
-            normalAnnotation.annotation_notes ?? "";
-          reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
-          superCheckerNotesRef.current.value =
-            normalAnnotation.supercheck_notes ?? "";
+          annotationNotesRef.current.value = normalAnnotation.annotation_notes ?? "";
+        superCheckerNotesRef.current.value = normalAnnotation.supercheck_notes ?? "";
+        reviewNotesRef.current.value =  normalAnnotation.review_notes ?? "";
+        console.log(userAnnotation?.review_notes ?? "",reviewNotesRef);
+        const newDelta2 = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
+        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        annotationNotesRef.current.getEditor().setContents(newDelta2);
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
         }
       }
     }
@@ -850,7 +903,7 @@ const LabelStudioWrapper = ({
           review.annotation_status,
           temp,
           review.parent_annotation,
-          reviewNotesRef.current.value,
+          JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
           true
         ).then((res) => {
           if (res.status !== 200) {
@@ -1112,6 +1165,9 @@ export default function LSF() {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -1120,12 +1176,29 @@ export default function LSF() {
     message: "",
     variant: "info",
   });
-  // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
+
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+ 
+  const modules = {
+    toolbar:[
+      
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    ]
+  };
 
+  const formats = [
+    'size',
+    'bold','italic','underline','strike',
+    'color',
+    'script']
+
+  const [value, setvalue] = useState();
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
       setSelectedTag(value);
@@ -1138,11 +1211,13 @@ export default function LSF() {
       });
     }
   };
+  
+
 
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
-      ProjectDetails?.project_type.toLowerCase().includes("audio")
+      (ProjectDetails?.project_type.toLowerCase().includes("audio") || ProjectDetails?.project_type?.includes("Acoustic"))
     ) {
       setShowTagsInput(true);
     }
@@ -1153,20 +1228,13 @@ export default function LSF() {
   };
 
 
-  // useEffect(() => {
-  //   fetchAnnotation(taskId).then((data) => {
-  //     if (data && Array.isArray(data) && data.length > 0) {
-  //       let correctAnnotation = data.find((item) => item.status === "correct");
-  //       annotationNotesRef.current.value = data[0].annotation_notes ?? "";
-  //       reviewNotesRef.current.value = data[0].review_notes ?? "";
-  //     }
-  //   });
-  // }, [taskId]);
-
+console.log(reviewtext,annotationtext);
+  
   const resetNotes = () => {
     setShowNotes(false);
-    reviewNotesRef.current.value = "";
+    reviewNotesRef.current.getEditor().setContents([]);
   };
+  
 
   useEffect(() => {
     resetNotes();
@@ -1216,16 +1284,16 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                annotationNotesRef.current?.value !== "" ||
-                  superCheckerNotesRef.current?.value !== ""
-                  ? "success"
-                  : "primary"
+                annotationtext.trim().length === 0 &&
+                supercheckertext.trim().length === 0
+                  ? "primary"
+                  : "success"
               }
               onClick={handleCollapseClick}
             >
               Notes{" "}
-              {annotationNotesRef.current?.value !== "" ||
-                (superCheckerNotesRef.current?.value !== "" && "*")}
+              {annotationtext.trim().length === 0  &&
+                supercheckertext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
           <div
@@ -1238,7 +1306,7 @@ export default function LSF() {
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> */}
-            <TextField
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Annotation Notes"
@@ -1252,11 +1320,11 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
-            />
-            <TextField
+            // ref={quillRef}
+            /> */}
+            {/* <TextField
               multiline
-              placeholder="Place your remarks here ..."
-              label="Review Notes"
+              // placeholder="Review Notes"
               // value={notesValue}
               // onChange={event=>setNotesValue(event.target.value)}
               inputRef={reviewNotesRef}
@@ -1265,9 +1333,33 @@ export default function LSF() {
               inputProps={{
                 style: { fontSize: "1rem" },
               }}
-              style={{ width: "99%", marginTop: "1%" }}
-            />
-            <TextField
+              style={{ width: "100%",fontSize:"1rem"}}
+              ref={quillRef}
+            /> */}
+            <ReactQuill
+              ref={annotationNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              formats={formats}
+              placeholder="Annotation Notes"
+              readOnly={true}
+            ></ReactQuill>
+            <ReactQuill
+              ref={reviewNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              formats={formats}
+              placeholder="Review Notes"
+            ></ReactQuill>
+            <ReactQuill
+              ref={superCheckerNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              formats={formats}
+              placeholder="SuperChecker Notes"
+              readOnly={true}
+            ></ReactQuill>
+            {/* <TextField
               multiline
               placeholder="Place your remarks here ..."
               label="Super Checker Notes"
@@ -1281,7 +1373,8 @@ export default function LSF() {
                 readOnly: true,
               }}
               style={{ width: "99%", marginTop: "1%" }}
-            />
+            // ref={quillRef}
+            /> */}
           </div>
           <Button
             variant="contained"
@@ -1361,6 +1454,9 @@ export default function LSF() {
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}
+          setannotationtext={setannotationtext}
+          setreviewtext = {setreviewtext}
+          setsupercheckertext={setsupercheckertext}
         />
       </Card>
     </div>
