@@ -39,6 +39,9 @@ const Layout= (props) => {
   const handleClose = () => {
     setPopup(false);
   };
+  const loggedInUserData = useSelector(
+    (state) => state?.fetchLoggedInUserData?.data
+  );
 
   // const renderError = () => {
   //   if (apiStatus.unauthrized) {
@@ -89,7 +92,7 @@ const Layout= (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
-      className={classes.root}
+      className={  loggedInUserData?.prefer_cl_ui=== true  && (localStorage.getItem("enableChitrlekhaUI") === "true")?classes.Audioroot:classes.root}
       >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
@@ -98,8 +101,8 @@ const Layout= (props) => {
             className={classes.headerContainer}
           />
         </Suspense>
-        <div 
-        className={classes.container}
+        <div
+        className={ loggedInUserData?.prefer_cl_ui=== true  && (localStorage.getItem("enableChitrlekhaUI") === "true") ?classes.Audiocontainer:classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}
