@@ -453,7 +453,7 @@ const AudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
-    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
+    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.metadata_json?.acoustic_enabled_stage > 1) {
       const changeUI = async() => {
         handleAutosave().then(navigate(`/projects/${projectId}/task/${taskId}`))
       };

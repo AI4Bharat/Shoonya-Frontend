@@ -253,7 +253,7 @@ const LabelStudioWrapper = ({
   // debugger
 
   useEffect(() => {
-    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui)) {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
       autoSaveReview();
       navigate(`/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${taskId}`);
     }
