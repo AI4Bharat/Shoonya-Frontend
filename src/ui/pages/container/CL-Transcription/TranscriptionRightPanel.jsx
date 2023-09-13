@@ -179,11 +179,12 @@ const TranscriptionRightPanel = ({
     }
   }, [currentIndex]);
 
-  //Uncomment this block to enable standardised_transcription in future
-  /* useEffect(() => {
+  useEffect(() => {
     if(showAcousticText) {
       handleStdTranscriptionSettings({
-        enable: true,
+        //set enable:true to enable standardised_transcription
+        enable: false,
+        showAcoustic: true,
         rtl: enableRTL_Typing,
         enableTransliteration: ProjectDetails?.tgt_language !== "en" && enableTransliteration,
         enableTransliterationSuggestion,
@@ -192,7 +193,7 @@ const TranscriptionRightPanel = ({
       });
     }
   }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize]);
-   */
+  
 
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
