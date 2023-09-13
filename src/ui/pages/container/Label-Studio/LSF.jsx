@@ -157,6 +157,7 @@ const AUTO_SAVE_INTERVAL = 30000; //1 minute
 const AUDIO_PROJECT_SAVE_CHECK = [
   "AudioTranscription",
   "AudioTranscriptionEditing",
+  "AcousticNormalisedTranscriptionEditing"
 ];
 
 const LabelStudioWrapper = ({
@@ -204,12 +205,19 @@ const LabelStudioWrapper = ({
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
   
   useEffect(() => {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
+      autoSaveAnnotation();
+      navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]);
+  
+  useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
-          ? false
-          : true,
+        bottomSidePanel:
+          !(ProjectDetails?.project_type?.includes("Audio")
+          || ProjectDetails?.project_type?.includes("Acoustic")),
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
@@ -370,7 +378,7 @@ const LabelStudioWrapper = ({
             const counter = temp.reduce((acc, curr) => {
               if (curr.from_name === "labels")
                 acc.labels++;
-              else if (curr.from_name === "transcribed_json") {
+              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
                 if (curr.value.text[0] === "")
                   acc.empty++;
                 acc.textareas++;
@@ -447,7 +455,7 @@ const LabelStudioWrapper = ({
             const counter = temp.reduce((acc, curr) => {
               if (curr.from_name === "labels")
                 acc.labels++;
-              else if (curr.from_name === "transcribed_json") {
+              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
                 if (curr.value.text[0] === "")
                   acc.empty++;
                 acc.textareas++;
@@ -922,6 +930,8 @@ export default function LSF() {
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
   const [alertData, setAlertData] = useState({
@@ -968,7 +978,7 @@ export default function LSF() {
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
-      ProjectDetails?.project_type.toLowerCase().includes("audio")
+      (ProjectDetails?.project_type.toLowerCase().includes("audio") || ProjectDetails?.project_type?.includes("Acoustic"))
     ) {
       setShowTagsInput(true);
     }
@@ -1048,7 +1058,7 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                reviewtext.trim().length === 0 ? "primary" : "success"
               }
               onClick={handleCollapseClick}
             // style={{ marginBottom: "20px" }}

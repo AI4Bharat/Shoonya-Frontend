@@ -151,7 +151,6 @@ export const onSplit = (
   const subtitles = store.getState().commonReducer.subtitles;
 
   const copySub = [...subtitles];
-
   const targetTextBlock = subtitles[currentIndex];
   const index = hasSub(subtitles[currentIndex], subtitles);
 
@@ -171,21 +170,19 @@ export const onSplit = (
   )
     return copySub;
 
-  copySub.splice(currentIndex, 1);
+ 
   let middleTime = null;
-
   if (!timings) {
     const splitDuration = (
       targetTextBlock.duration *
       (selectionStart / targetTextBlock.text.length)
     ).toFixed(3);
-
     if (splitDuration < 0.2 || targetTextBlock.duration - splitDuration < 0.2)
       return copySub;
 
     middleTime = DT.d2t(targetTextBlock.startTime + parseFloat(splitDuration));
   }
-
+  copySub.splice(currentIndex, 1);
   copySub.splice(
     index,
     0,
@@ -201,6 +198,7 @@ export const onSplit = (
     })
   );
 
+  
   copySub.splice(
     index + 1,
     0,

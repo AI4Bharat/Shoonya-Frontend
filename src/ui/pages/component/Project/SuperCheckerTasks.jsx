@@ -180,7 +180,7 @@ const SuperCheckerTasks = (props) => {
   ]);
 
   useEffect(() => {
-    if((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic")){
+    if (ProjectDetails?.project_type?.includes("Acoustic")) {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
           `/projects/${id}/SuperCheckerAudioTranscriptionLandingPage/${
@@ -200,14 +200,9 @@ const SuperCheckerTasks = (props) => {
   }, [NextTask]);
 
   useEffect(() => {
-    if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
-      localStorage.setItem("enableChitrlekhaUI", true);
-    } else {
-      localStorage.setItem("enableChitrlekhaUI", false);
-    }
     localStorage.setItem("SuperCheckerStage", props.type);
   },[]);
-  
+
   useEffect(() => {
     dispatch(SetTaskFilter(id, selectedFilters, props.type));
     if (currentPageNumber !== 1) {
@@ -234,7 +229,7 @@ const SuperCheckerTasks = (props) => {
           <CustomButton
             disabled={ProjectDetails.is_archived}
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") 
-              if((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic") ){
+              if(ProjectDetails?.project_type?.includes("Acoustic")){
                 navigate(`SuperCheckerAudioTranscriptionLandingPage/${el.id}`)
               }
               else{
@@ -277,7 +272,7 @@ const SuperCheckerTasks = (props) => {
     } else {
       setTasks([]);
     }
-  }, [taskList]);
+  }, [taskList, userDetails?.prefer_cl_ui]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {

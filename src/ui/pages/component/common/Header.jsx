@@ -21,7 +21,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CustomButton from "../common/Button";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
@@ -58,6 +58,7 @@ const Header = () => {
 
   const dispatch = useDispatch();
   let navigate = useNavigate();
+  const location = useLocation();
   const classes = headerStyle();
 
  
@@ -658,10 +659,7 @@ const Header = () => {
   return (
     <Grid container direction="row">
       <Box
-        className={
-          loggedInUserData?.prefer_cl_ui=== true &&
-          localStorage.getItem("enableChitrlekhaUI") === "true"
-            ? classes.AudioparentContainers
+        className={location.pathname.includes("AudioTranscriptionLandingPage") ? classes.AudioparentContainers
             : classes.parentContainer
         }
       >

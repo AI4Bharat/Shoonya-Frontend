@@ -54,6 +54,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [annotationtext,setannotationtext] = useState('');
   const [currentSubs, setCurrentSubs] = useState();
   const [loadtime, setloadtime] = useState(new Date());
   const [textBox, settextBox] = useState("");
@@ -64,6 +65,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [showStdTranscript, setShowStdTranscript] = useState(false);
   const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
     enable: false,
+    showAcoustic: false,
     rtl: false,
     enableTransliteration: false,
     enableTransliterationSuggestion: false,
@@ -71,6 +73,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     fontSize: "Normal"
   });
   const [disableSkip, setdisableSkip] = useState(false);
+  const [reviewtext,setreviewtext] = useState('');
+  const [supercheckertext,setsupercheckertext] = useState('');
   const[taskDetailList,setTaskDetailList] = useState("")
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -96,6 +100,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const timeSpentIntervalRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
+ 
 
   // useEffect(() => {
   //   let intervalId;
@@ -176,7 +181,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
 
    useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "") || (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""))
     const hasEmptySpeaker = result?.some(
       (element) => element.speaker_id?.trim() === ""
     );
@@ -209,18 +214,17 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const handleAutosave = async(id) => {
-      const reqBody = {
-        task_id: taskId,
-        annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
-        parent_annotation: AnnotationsTaskDetails[2]?.parent_annotation,
-        auto_save :true,
-        lead_time:
-        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time?.lead_time ?? 0),
-        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      };
-      if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === userData.id)){
+  const handleAutosave = async(id) => {
+    const reqBody = {
+      task_id: taskId,
+      annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
+      parent_annotation: AnnotationsTaskDetails[2]?.parent_annotation,
+      auto_save :true,
+      lead_time:
+      (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time?.lead_time ?? 0),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+    };
+    if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === userData.id)){
 
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[2]?.id, reqBody);
       // dispatch(APITransport(obj));
@@ -237,8 +241,12 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       } 
+      return res;
     }
-    };
+  };
+  
+  useEffect(() => {
+    
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
@@ -387,7 +395,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     getAnnotationsTaskData(taskId);
     getProjectDetails();
     getTaskData(taskId);
-    localStorage.setItem("enableChitrlekhaUI", true);
     console.log(
       localStorage.getItem("Stage") === "review",
       "StageStageStageStage"
@@ -404,6 +411,15 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }
   }, [AnnotationsTaskDetails]);
 
+  /* useEffect(() => {
+    if(Object.keys(userData).includes("prefer_cl_ui") && !(userData.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
+      const changeUI = async() => {
+        handleAutosave().then(navigate(`/projects/${projectId}/SuperChecker/${taskId}`))
+      };
+      changeUI();
+    }
+  }, [userData]); */
+  
   const tasksComplete = (id) => {
     if (id) {
       // resetNotes();
@@ -479,14 +495,14 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       supercheck_notes: JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       ...((value === "rejected" ||
         value === "validated" ||
-        value === "avalidated_with_changes") && {
+        value === "validated_with_changes") && {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox && result?.length>0) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {
@@ -557,6 +573,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value?.annotation_type === 2
@@ -578,6 +596,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -591,6 +611,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }
         }
       }
@@ -604,8 +626,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   const resetNotes = () => {
     setShowNotes(false);
-    superCheckerNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    reviewNotesRef.current.getEditor().setContents([]);
+    superCheckerNotesRef.current.getEditor().setContents([]);
   };
   const modules = {
     toolbar: [
@@ -642,7 +664,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   return (
-    <>
+<>
       {loading && <Spinner />}
       {renderSnackBar()}
       <Grid container direction={"row"} className={classes.parentGrid}>
@@ -682,17 +704,17 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                   variant="contained"
                   color={
-                    reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                    reviewtext.trim().length === 0 ? "primary" : "success"
                   }
                   onClick={handleCollapseClick}
                 >
-                  Notes {reviewNotesRef.current?.value !== "" && "*"}
+                  Notes {reviewtext.trim().length === 0 ? "" : "*"}
                 </Button>
         
           
@@ -719,7 +741,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
                 overflow:"auto",
-                height:"max-content"
+                height:"100px"
               }}
             >
               {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
@@ -783,7 +805,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
                 display: showStdTranscript ? "block" : "none",
                 paddingBottom: "16px",
                 overflow: "auto",
-                height: "max-content"
+                height: "100px"
               }}
             >
               {stdTranscriptionSettings.enableTransliteration ? (

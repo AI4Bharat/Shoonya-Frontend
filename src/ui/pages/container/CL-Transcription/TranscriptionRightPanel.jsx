@@ -103,7 +103,7 @@ const TranscriptionRightPanel = ({
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles?.slice(startIndex, endIndex);
   const idxOffset = (itemsPerPage * (page - 1));
-  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscription" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
+  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -182,7 +182,9 @@ const TranscriptionRightPanel = ({
   useEffect(() => {
     if(showAcousticText) {
       handleStdTranscriptionSettings({
-        enable: true,
+        //set enable:true to enable standardised_transcription
+        enable: false,
+        showAcoustic: true,
         rtl: enableRTL_Typing,
         enableTransliteration: ProjectDetails?.tgt_language !== "en" && enableTransliteration,
         enableTransliterationSuggestion,
@@ -190,7 +192,8 @@ const TranscriptionRightPanel = ({
         fontSize,
       });
     }
-  }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize])
+  }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize]);
+  
 
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
@@ -215,7 +218,6 @@ const TranscriptionRightPanel = ({
 
   const onMergeClick = useCallback(
     (index) => {
-      index = index + idxOffset;
       const selectionStart = getSelectionStart(index);
       const timings = getTimings(index);
 
@@ -242,7 +244,7 @@ const TranscriptionRightPanel = ({
     if (e.target.selectionStart < e.target.value?.length) {
       e.preventDefault();
       setShowPopOver(true);
-      setCurrentIndexToSplitTextBlock(blockIdx + idxOffset);
+      setCurrentIndexToSplitTextBlock(blockIdx);
       setSelectionStart(e.target.selectionStart);
     }
   };
@@ -257,7 +259,6 @@ const TranscriptionRightPanel = ({
       },
     ]);
     setRedoStack([]);
-
     const sub = onSplit(currentIndexToSplitTextBlock, selectionStart);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, true, sub);
@@ -270,7 +271,6 @@ const TranscriptionRightPanel = ({
       target: { value },
       currentTarget,
     } = event;
-    index = index + idxOffset;
 
     const containsBackslash = value.includes("\\");
 
@@ -292,7 +292,6 @@ const TranscriptionRightPanel = ({
   };
 
   const populateAcoustic = (index) => {
-    index = index + idxOffset;
     const sub = onSubtitleChange("", index, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
@@ -350,7 +349,7 @@ const TranscriptionRightPanel = ({
 
   const handleTimeChange = useCallback(
     (value, index, type, time) => {
-      const sub = timeChange(value, index + idxOffset, type, time);
+      const sub = timeChange(value, index, type, time);
       dispatch(setSubtitles(sub, C.SUBTITLES));
       // saveTranscriptHandler(false, true, sub);
     },
@@ -360,7 +359,6 @@ const TranscriptionRightPanel = ({
 
   const onDelete = useCallback(
     (index) => {
-      index = index + idxOffset;
       setUndoStack((prevState) => [
         ...prevState,
         {
@@ -381,7 +379,6 @@ const TranscriptionRightPanel = ({
 
   const addNewSubtitleBox = useCallback(
     (index) => {
-      index = index + idxOffset;
       const sub = addSubtitleBox(index);
       dispatch(setSubtitles(sub, C.SUBTITLES));
       // saveTranscriptHandler(false, false, sub);
@@ -433,18 +430,18 @@ const TranscriptionRightPanel = ({
     // eslint-disable-next-line
   }, [undoStack, redoStack]);
 
-  /* const targetLength = (index) => {
+  const targetLength = (index) => {
     if (subtitles[index]?.text?.trim() !== "")
       return subtitles[index]?.text?.trim()?.split(" ")?.length;
     return 0;
-  }; */
+  };
 
   const onNavigationClick = (value) => {
     getPayload(value, limit);
   };
 
   const handleSpeakerChange = (id, index) => {
-    const sub = assignSpeakerId(id, index + idxOffset);
+    const sub = assignSpeakerId(id, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
@@ -515,9 +512,9 @@ const TranscriptionRightPanel = ({
           </Grid>}
           </Box>
 
-        <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
-          height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
-        }}>
+          <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
+            height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
+          }}>
           {currentPageData?.map((item, index) => {
             return (
               <Box
@@ -536,13 +533,13 @@ const TranscriptionRightPanel = ({
                   <TimeBoxes
                     handleTimeChange={handleTimeChange}
                     time={item.start_time}
-                    index={index}
+                    index={index + idxOffset}
                     type={"startTime"}
                   />
 
                   <ButtonComponent
-                    index={index}
-                    lastItem={index < subtitles?.length - 1}
+                    index={index + idxOffset}
+                    lastItem={(index + idxOffset) < subtitles?.length - 1}
                     onMergeClick={onMergeClick}
                     onDelete={onDelete}
                     addNewSubtitleBox={addNewSubtitleBox}
@@ -551,7 +548,7 @@ const TranscriptionRightPanel = ({
                   <TimeBoxes
                     handleTimeChange={handleTimeChange}
                     time={item.end_time}
-                    index={index}
+                    index={index + idxOffset}
                     type={"endTime"}
                   />
                 </Box>
@@ -578,11 +575,11 @@ const TranscriptionRightPanel = ({
                       lang={targetlang}
                       value={item.text}
                       onChange={(event) => {
-                        changeTranscriptHandler(event, index);
+                        changeTranscriptHandler(event, index + idxOffset);
                       }}
                       enabled={enableTransliterationSuggestion}
                       onChangeText={() => { }}
-                      onMouseUp={(e) => onMouseUp(e, index)}
+                      onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                       containerStyles={{
                         width: "100%",
                       }}
@@ -591,6 +588,7 @@ const TranscriptionRightPanel = ({
                           setShowPopOver(false);
                         }, 200);
                       }}
+                      style={{ fontSize: fontSize, height: "120px" }}
                       renderComponent={(props) => (
                         <div className={classes.relative} style={{ width: "100%" }}>
                           <textarea
@@ -598,13 +596,12 @@ const TranscriptionRightPanel = ({
                               }`}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
                             rows={4}
-                            onMouseUp={(e) => onMouseUp(e, index)}
+                            onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
                               }, 200);
                             }}
-                            style={{ fontSize: fontSize, height: "120px" }}
                             {...props}
                           />
                           {/* <span id="charNum" className={classes.wordCount}>
@@ -617,9 +614,9 @@ const TranscriptionRightPanel = ({
                     <div className={classes.relative} style={{ width: "100%" }}>
                       <textarea
                         onChange={(event) => {
-                          changeTranscriptHandler(event, index);
+                          changeTranscriptHandler(event, index + idxOffset);
                         }}
-                        onMouseUp={(e) => onMouseUp(e, index)}
+                        onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                         value={item.text}
                         dir={enableRTL_Typing ? "rtl" : "ltr"}
                         className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
@@ -648,13 +645,14 @@ const TranscriptionRightPanel = ({
                         lang={targetlang}
                         value={item.acoustic_normalised_text}
                         onChange={(event) => {
-                          changeTranscriptHandler(event, index, true);
+                          changeTranscriptHandler(event, index + idxOffset, true);
                         }}
                         enabled={enableTransliterationSuggestion}
                         onChangeText={() => { }}
                         containerStyles={{
                           width: "100%",
                         }}
+                        style={{ fontSize: fontSize, height: "120px" }}
                         renderComponent={(props) => (
                           <div className={classes.relative} style={{ width: "100%" }}>
                             <textarea
@@ -662,7 +660,7 @@ const TranscriptionRightPanel = ({
                                 }`}
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
                               rows={4}
-                              onFocus={() => showAcousticText && populateAcoustic(index)}
+                              onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
                               style={{ fontSize: fontSize, height: "120px" }}
                               {...props}
                             />
@@ -673,9 +671,9 @@ const TranscriptionRightPanel = ({
                       <div className={classes.relative} style={{ width: "100%" }}>
                         <textarea
                           onChange={(event) => {
-                            changeTranscriptHandler(event, index, true);
+                            changeTranscriptHandler(event, index + idxOffset, true);
                           }}
-                          onFocus={() => showAcousticText && populateAcoustic(index)}
+                          onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
                           value={item.acoustic_normalised_text}
                           dir={enableRTL_Typing ? "rtl" : "ltr"}
                           className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
@@ -701,7 +699,7 @@ const TranscriptionRightPanel = ({
                     label="Select Speaker"
                     value={item.speaker_id}
                     onChange={(event) =>
-                      handleSpeakerChange(event.target.value, index)
+                      handleSpeakerChange(event.target.value, index + idxOffset)
                     }
                     style={{
                       backgroundColor: "#fff",

@@ -141,6 +141,8 @@ const LabelStudioWrapper = ({
   loader,
   showLoader,
   hideLoader,
+  setreviewtext,
+  setsupercheckertext,
   resetNotes,
   getTaskData,
 }) => {
@@ -172,6 +174,13 @@ const LabelStudioWrapper = ({
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
+  useEffect(() => {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
+      autoSaveSuperCheck();
+      navigate(`/projects/${projectId}/SuperCheckerAudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]);
+  
   useEffect(() => {
     localStorage.setItem(
       "labelStudio:settings",
@@ -452,6 +461,9 @@ const LabelStudioWrapper = ({
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
@@ -474,6 +486,9 @@ const LabelStudioWrapper = ({
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -487,6 +502,9 @@ const LabelStudioWrapper = ({
         const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
           }
         }
       }
@@ -922,6 +940,8 @@ export default function LSF() {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -947,8 +967,6 @@ export default function LSF() {
     'bold','italic','underline','strike',
     'color','background',
     'script']
-
-
 
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
@@ -984,8 +1002,8 @@ export default function LSF() {
 
   const resetNotes = () => {
     setShowNotes(false);
-    superCheckerNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    superCheckerNotesRef.current.getEditor().setContents([]);
+    reviewNotesRef.current.getEditor().setContents([]);
   };
 
   useEffect(() => {
@@ -1036,11 +1054,11 @@ export default function LSF() {
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color={
-                reviewNotesRef.current?.value !== "" ? "success" : "primary"
+                reviewtext.trim().length === 0 ? "primary" : "success"
               }
               onClick={handleCollapseClick}
             >
-              Notes {reviewNotesRef.current?.value !== "" && "*"}
+              Notes {reviewtext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
           <div
@@ -1184,6 +1202,9 @@ export default function LSF() {
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}
+          setreviewtext = {setreviewtext}
+          setsupercheckertext={setsupercheckertext}
+
         />
       </Card>
     </div>

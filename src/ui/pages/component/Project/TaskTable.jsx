@@ -329,14 +329,9 @@ const TaskTable = (props) => {
   }
 
   useEffect(() => {
-    if (location.pathname === `projects/${id}/task/${NextTask?.id}`) {
-      localStorage.setItem("enableChitrlekhaUI", true);
-    } else {
-      localStorage.setItem("enableChitrlekhaUI", false);
-    }
     localStorage.setItem("Stage", props.type);
   },[]);
-
+  
   const customColumnHead = (col) => {
     return (
       <Box
@@ -407,7 +402,7 @@ const TaskTable = (props) => {
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("Acoustic")) {
+                  if ((ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage === 1))) {
                     navigate(`AudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{
@@ -437,7 +432,7 @@ const TaskTable = (props) => {
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("AudioTranscriptionEditing") || ProjectDetails?.project_type?.includes("Acoustic")) {
+                  if ((ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage <= 2))) {
                     navigate(`ReviewAudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{
@@ -488,7 +483,7 @@ const TaskTable = (props) => {
     } else {
       setTasks([]);
     }
-  }, [taskList, ProjectDetails.project_mode]);
+  }, [taskList, ProjectDetails, userDetails?.prefer_cl_ui]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {

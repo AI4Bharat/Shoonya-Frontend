@@ -62,6 +62,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
   const [disableSkip, setdisableSkip] = useState(false);
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
@@ -70,6 +73,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [showStdTranscript, setShowStdTranscript] = useState(false);
   const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
     enable: false,
+    showAcoustic: false,
     rtl: false,
     enableTransliteration: false,
     enableTransliterationSuggestion: false,
@@ -257,7 +261,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails, user, taskDetailList]);
 
   useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "") || (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""))
     const hasEmptySpeaker = result?.some(
       (element) => element.speaker_id?.trim() === ""
     );
@@ -301,36 +305,39 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const handleAutosave = async (id) => {
-      const reqBody = {
-        task_id: taskId,
-        annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
-        parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
-        auto_save: true,
-        // cl_format: true,
-        // offset: currentPage,
-        // limit: limit,
-        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      };
-      if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
-
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
-      // dispatch(APITransport(obj));
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
-      });
-      const resp = await res.json();
-      if (!res.ok) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving annotation",
-          variant: "error",
-        });
-      }}
+  const handleAutosave = async (id) => {
+    const reqBody = {
+      task_id: taskId,
+      annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
+      parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
+      auto_save: true,
+      // cl_format: true,
+      // offset: currentPage,
+      // limit: limit,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
+    if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
+
+    const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
+    // dispatch(APITransport(obj));
+    const res = await fetch(obj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(obj.getBody()),
+      headers: obj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (!res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: "Error in autosaving annotation",
+        variant: "error",
+      });
+      return res;
+    }}
+  };
+
+  useEffect(() => {
+    
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
@@ -478,7 +485,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
     getAnnotationsTaskData(taskId);
     getProjectDetails();
     getTaskData(taskId);
-    localStorage.setItem("enableChitrlekhaUI", true);
     console.log(
       localStorage.getItem("Stage") === "review",
       "StageStageStageStage"
@@ -494,6 +500,15 @@ const ReviewAudioTranscriptionLandingPage = () => {
       setLoading(false);
     }
   }, [AnnotationsTaskDetails]);
+
+  useEffect(() => {
+    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.metadata_json?.acoustic_enabled_stage > 2) {
+      const changeUI = async() => {
+        handleAutosave().then(navigate(`/projects/${projectId}/review/${taskId}`))
+      };
+      changeUI();
+    }
+  }, [user]);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -568,14 +583,14 @@ const ReviewAudioTranscriptionLandingPage = () => {
       review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result,
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       ...((value === "to_be_revised" || value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox)) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {
@@ -646,6 +661,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
         annotationNotesRef.current.getEditor().setContents(newDelta2);
         reviewNotesRef.current.getEditor().setContents(newDelta1);
         superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -666,10 +685,16 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 (annotation) =>
                   annotation.parent_annotation === correctAnnotation.id
               )?.supercheck_notes ?? "";
+              const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
             const newDelta2 = annotationNotesRef.current.value != "" ? JSON.parse(annotationNotesRef.current.value) : "";
             const newDelta3 = superCheckerNotesRef.current.value != "" ? JSON.parse(superCheckerNotesRef.current.value) : "";
             annotationNotesRef.current.getEditor().setContents(newDelta2);
             superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            reviewNotesRef.current.getEditor().setContents(newDelta1);
+            setannotationtext(annotationNotesRef.current.getEditor().getText())
+            setreviewtext(reviewNotesRef.current.getEditor().getText())
+            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+    
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -689,6 +714,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
             annotationNotesRef.current.getEditor().setContents(newDelta2);
             reviewNotesRef.current.getEditor().setContents(newDelta1);
             superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            setannotationtext(annotationNotesRef.current.getEditor().getText())
+            setreviewtext(reviewNotesRef.current.getEditor().getText())
+            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+    
           }
         } else {
           let normalAnnotation = annotations.find(
@@ -705,6 +734,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
           annotationNotesRef.current.getEditor().setContents(newDelta2);
           reviewNotesRef.current.getEditor().setContents(newDelta1);
           superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+          setannotationtext(annotationNotesRef.current.getEditor().getText())
+          setreviewtext(reviewNotesRef.current.getEditor().getText())
+          setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+  
         }
       }
     }
@@ -717,9 +750,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   const resetNotes = () => {
     setShowNotes(false);
-    reviewNotesRef.current.value = "";
+    reviewNotesRef.current.getEditor().setContents([]);
   };
-
 
   useEffect(() => {
     resetNotes();
@@ -796,22 +828,23 @@ const ReviewAudioTranscriptionLandingPage = () => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
               <Grid item>
               <Button
                 endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
                 variant="contained"
                 color={
-                  annotationNotesRef.current?.value !== "" ||
-                    superCheckerNotesRef.current?.value !== ""
-                    ? "success"
-                    : "primary"
+                  annotationtext.trim().length === 0 &&
+                  supercheckertext.trim().length === 0
+                    ? "primary"
+                    : "success"
                 }
                 onClick={handleCollapseClick}
               >
                 Notes{" "}
-                {annotationNotesRef.current?.value !== "" ||
-                  (superCheckerNotesRef.current?.value !== "" && "*")}
+                {annotationtext.trim().length === 0 &&
+                supercheckertext.trim().length === 0 ? "" : "*"}
+
               </Button>
               
                 {/*  <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
