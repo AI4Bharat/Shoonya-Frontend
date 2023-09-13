@@ -157,6 +157,7 @@ const AUTO_SAVE_INTERVAL = 30000; //1 minute
 const AUDIO_PROJECT_SAVE_CHECK = [
   "AudioTranscription",
   "AudioTranscriptionEditing",
+  "AcousticNormalisedTranscriptionEditing"
 ];
 
 const LabelStudioWrapper = ({
@@ -214,9 +215,9 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
-          ? false
-          : true,
+        bottomSidePanel:
+          !(ProjectDetails?.project_type?.includes("Audio")
+          || ProjectDetails?.project_type?.includes("Acoustic")),
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,
@@ -975,7 +976,7 @@ export default function LSF() {
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
-      ProjectDetails?.project_type.toLowerCase().includes("audio")
+      (ProjectDetails?.project_type.toLowerCase().includes("audio") || ProjectDetails?.project_type?.includes("Acoustic"))
     ) {
       setShowTagsInput(true);
     }

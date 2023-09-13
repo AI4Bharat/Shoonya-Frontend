@@ -534,7 +534,7 @@ const AudioTranscriptionLandingPage = () => {
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
-    if (!textBox && !speakerBox && result?.length > 0) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {
