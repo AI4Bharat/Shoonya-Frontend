@@ -860,6 +860,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             player={player}
             ProjectDetails={ProjectDetails}
             TaskDetails={taskDetailList}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
             stage={3}
           />
         </Grid>
