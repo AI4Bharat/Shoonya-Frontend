@@ -498,7 +498,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox && result?.length>0) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {

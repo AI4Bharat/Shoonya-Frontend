@@ -587,7 +587,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox)) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {
