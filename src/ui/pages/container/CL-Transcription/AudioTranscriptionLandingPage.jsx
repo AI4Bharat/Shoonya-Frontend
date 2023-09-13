@@ -70,6 +70,7 @@ const AudioTranscriptionLandingPage = () => {
   const [showStdTranscript, setShowStdTranscript] = useState(false);
   const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
     enable: false,
+    showAcoustic: false,
     rtl: false,
     enableTransliteration: false,
     enableTransliterationSuggestion: false,
@@ -247,7 +248,7 @@ const AudioTranscriptionLandingPage = () => {
 
 
   useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "") || (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""))
     const hasEmptySpeaker = result?.some(
       (element) => element.speaker_id?.trim() === ""
     );
@@ -458,8 +459,10 @@ const AudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
-      handleAutosave();
-      navigate(`/projects/${projectId}/task/${taskId}`)
+      const changeUI = async() => {
+        handleAutosave().then(navigate(`/projects/${projectId}/task/${taskId}`))
+      };
+      changeUI();
     }
   }, [user]);
 
@@ -535,7 +538,7 @@ const AudioTranscriptionLandingPage = () => {
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
-    if (!textBox && !speakerBox && result?.length > 0) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {

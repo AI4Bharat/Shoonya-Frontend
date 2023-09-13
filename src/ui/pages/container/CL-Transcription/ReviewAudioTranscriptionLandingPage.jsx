@@ -73,6 +73,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [showStdTranscript, setShowStdTranscript] = useState(false);
   const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
     enable: false,
+    showAcoustic: false,
     rtl: false,
     enableTransliteration: false,
     enableTransliterationSuggestion: false,
@@ -260,7 +261,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails, user, taskDetailList]);
 
   useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "") || (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""))
     const hasEmptySpeaker = result?.some(
       (element) => element.speaker_id?.trim() === ""
     );
@@ -501,7 +502,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
-    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
+    if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.metadata_json?.acoustic_enabled_stage > 2) {
       const changeUI = async() => {
         handleAutosave().then(navigate(`/projects/${projectId}/review/${taskId}`))
       };
@@ -589,7 +590,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox)) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {

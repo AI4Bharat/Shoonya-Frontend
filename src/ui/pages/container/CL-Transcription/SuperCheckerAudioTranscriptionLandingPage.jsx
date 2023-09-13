@@ -65,6 +65,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [showStdTranscript, setShowStdTranscript] = useState(false);
   const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
     enable: false,
+    showAcoustic: false,
     rtl: false,
     enableTransliteration: false,
     enableTransliterationSuggestion: false,
@@ -180,7 +181,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
 
    useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "") || (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""))
     const hasEmptySpeaker = result?.some(
       (element) => element.speaker_id?.trim() === ""
     );
@@ -410,14 +411,14 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }
   }, [AnnotationsTaskDetails]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if(Object.keys(userData).includes("prefer_cl_ui") && !(userData.prefer_cl_ui) && ProjectDetails?.project_type.includes("AudioTranscription")) {
       const changeUI = async() => {
         handleAutosave().then(navigate(`/projects/${projectId}/SuperChecker/${taskId}`))
       };
       changeUI();
     }
-  }, [userData]);
+  }, [userData]); */
   
   const tasksComplete = (id) => {
     if (id) {
@@ -501,7 +502,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         parent_annotation: parentannotation,
       }),
     };
-    if (!textBox && !speakerBox && result?.length>0) {
+    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
     const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
     // dispatch(APITransport(GlossaryObj));
     const res = await fetch(TaskObj.apiEndPoint(), {

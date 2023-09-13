@@ -208,6 +208,7 @@ const AUTO_SAVE_INTERVAL = 60000;
 const AUDIO_PROJECT_SAVE_CHECK = [
   "AudioTranscription",
   "AudioTranscriptionEditing",
+  "AcousticNormalisedTranscriptionEditing",
 ];
 
 const LabelStudioWrapper = ({
@@ -257,7 +258,7 @@ const LabelStudioWrapper = ({
   // debugger
 
   useEffect(() => {
-    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui)) {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
       autoSaveReview();
       navigate(`/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${taskId}`);
     }
@@ -267,9 +268,9 @@ const LabelStudioWrapper = ({
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
-          ? false
-          : true,
+        bottomSidePanel:
+          !(ProjectDetails?.project_type?.includes("Audio")
+          || ProjectDetails?.project_type?.includes("Acoustic")),
         continuousLabeling: false,
         enableAutoSave: false,
         enableHotkeys: true,
@@ -1216,7 +1217,7 @@ export default function LSF() {
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
-      ProjectDetails?.project_type.toLowerCase().includes("audio")
+      (ProjectDetails?.project_type.toLowerCase().includes("audio") || ProjectDetails?.project_type?.includes("Acoustic"))
     ) {
       setShowTagsInput(true);
     }

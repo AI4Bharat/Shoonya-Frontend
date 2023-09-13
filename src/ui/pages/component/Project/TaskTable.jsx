@@ -402,7 +402,7 @@ const TaskTable = (props) => {
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("Acoustic")) {
+                  if ((ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage === 1))) {
                     navigate(`AudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{
@@ -432,7 +432,7 @@ const TaskTable = (props) => {
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("Acoustic")) {
+                  if ((ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage <= 2))) {
                     navigate(`ReviewAudioTranscriptionLandingPage/${el.id}`)
                   }
                   else{
@@ -483,7 +483,7 @@ const TaskTable = (props) => {
     } else {
       setTasks([]);
     }
-  }, [taskList, ProjectDetails.project_mode, userDetails?.prefer_cl_ui]);
+  }, [taskList, ProjectDetails, userDetails?.prefer_cl_ui]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {
