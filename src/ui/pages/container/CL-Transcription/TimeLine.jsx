@@ -13,7 +13,7 @@ import SubtitleBoxes from "./SubtitleBoxes";
 import { useParams } from "react-router-dom";
 
 
-const WaveForm = memo(({ setWaveform, setRender }) => {
+const WaveForm = (({ setWaveform, setRender }) => {
   const classes = AudioTranscriptionLandingStyle();
   const $waveform = useRef();
 
@@ -23,9 +23,13 @@ const WaveForm = memo(({ setWaveform, setRender }) => {
     [...WFPlayer.instances].forEach((item) => item.destroy());
 
     const waveform = new WFPlayer({
+      grid: false,
       scrollable: true,
       useWorker: false,
-      duration: 10,
+      progress: true,
+      waveScale: 1.1,
+      waveSize: 1,
+      duration: 8,
       padding: 1,
       wave: true,
       pixelRatio: 2,
@@ -36,13 +40,21 @@ const WaveForm = memo(({ setWaveform, setRender }) => {
       progressColor: "rgb(255, 255, 255, 0.5)",
       gridColor: "rgba(255, 255, 255, 0.05)",
       rulerColor: "rgba(255, 255, 255, 0.5)",
-      paddingColor: "rgba(0, 0, 0, 0)",
+      paddingColor: "rgba(0, 0, 0, 0)"
     });
 
     setWaveform(waveform);
     waveform.on("update", setRender);
-   
-      waveform.load(encodeURIComponent(player?.attributes?.nodeValue?.replace(/&amp;/g, "&")));
+    
+    fetch(player.src)
+      .then((res) => res.arrayBuffer())
+      .then((arrayBuffer) => {
+        const uint8 = new Uint8Array(arrayBuffer);
+        waveform.load(uint8);
+    });
+    
+    
+      // waveform.load(encodeURIComponent(player?.attributes?.nodeValue?.replace(/&amp;/g, "&")));
   
   }, [player, $waveform, setWaveform, setRender, player.src]);
 
