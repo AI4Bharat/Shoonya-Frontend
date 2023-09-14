@@ -997,18 +997,40 @@ export default function LSF() {
         console.log(annotationNotesRef);
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
-        const newDelta = annotationNotesRef.current.value!=""?JSON.parse(annotationNotesRef.current.value):"";
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        annotationNotesRef.current.getEditor().setContents(newDelta);
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
+        try {
+          const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+          annotationNotesRef.current.getEditor().setContents(newDelta2);
+        } catch (err) {
+          if(err){
+            const newDelta2 = annotationNotesRef.current.value;
+            const currentContents = annotationNotesRef.current.getEditor().getContents();
+            currentContents.ops.unshift({ insert: newDelta2 });
+            annotationNotesRef.current.getEditor().setContents(currentContents);  
+          }
+        }
+        
+        try {
+          const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+          reviewNotesRef.current.getEditor().setContents(newDelta1);
+        } catch (err) {
+          if(err){
+            const newDelta1 = reviewNotesRef.current.value;
+            const currentContents = reviewNotesRef.current.getEditor().getContents();
+            currentContents.ops.unshift({ insert: newDelta1 });
+            reviewNotesRef.current.getEditor().setContents(currentContents);  
+          }
+        }
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+
       }
     });
   }, [taskId]);
 
   const resetNotes = () => {
     setShowNotes(false);
-    annotationNotesRef.current.value = "";
-    reviewNotesRef.current.value = "";
+    annotationNotesRef.current.getEditor().setContents([]);
+    reviewNotesRef.current.getEditor().setContents([]);
   };
 
   useEffect(() => {
@@ -1063,7 +1085,7 @@ export default function LSF() {
               onClick={handleCollapseClick}
             // style={{ marginBottom: "20px" }}
             >
-              Notes {reviewNotesRef.current?.value !== "" && "*"}
+              Notes {reviewtext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
 

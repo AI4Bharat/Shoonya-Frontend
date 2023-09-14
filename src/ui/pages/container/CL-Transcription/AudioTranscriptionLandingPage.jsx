@@ -592,10 +592,29 @@ const AudioTranscriptionLandingPage = () => {
     if (AnnotationsTaskDetails && AnnotationsTaskDetails.length > 0) {
       annotationNotesRef.current.value = AnnotationsTaskDetails[0].annotation_notes ?? "";
       reviewNotesRef.current.value = AnnotationsTaskDetails[0].review_notes ?? "";
-      const newDelta2 = annotationNotesRef.current.value != "" ? JSON.parse(annotationNotesRef.current.value) : "";
-      const newDelta1 = reviewNotesRef.current.value != "" ? JSON.parse(reviewNotesRef.current.value) : "";
-      annotationNotesRef.current.getEditor().setContents(newDelta2);
-      reviewNotesRef.current.getEditor().setContents(newDelta1);
+      try {
+        const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+        annotationNotesRef.current.getEditor().setContents(newDelta2);
+      } catch (err) {
+        if(err){
+          const newDelta2 = annotationNotesRef.current.value;
+          const currentContents = annotationNotesRef.current.getEditor().getContents();
+          currentContents.ops.unshift({ insert: newDelta2 });
+          annotationNotesRef.current.getEditor().setContents(currentContents);  
+        }
+      }
+      
+      try {
+        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+        reviewNotesRef.current.getEditor().setContents(newDelta1);
+      } catch (err) {
+        if(err){
+          const newDelta1 = reviewNotesRef.current.value;
+          const currentContents = reviewNotesRef.current.getEditor().getContents();
+          currentContents.ops.unshift({ insert: newDelta1 });
+          reviewNotesRef.current.getEditor().setContents(currentContents);  
+        }
+      }
       setannotationtext(annotationNotesRef.current.getEditor().getText())
       setreviewtext(reviewNotesRef.current.getEditor().getText())
     }
