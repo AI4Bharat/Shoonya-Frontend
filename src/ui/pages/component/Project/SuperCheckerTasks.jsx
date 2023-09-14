@@ -225,23 +225,18 @@ const SuperCheckerTasks = (props) => {
             .map((key) => el.data[key])
         );
         taskList[0].supercheck_status && row.push(el.supercheck_status);
-        row.push( <>
-          <CustomButton
-            disabled={ProjectDetails.is_archived}
-              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") 
-              if(ProjectDetails?.project_type?.includes("Acoustic")){
-                navigate(`SuperCheckerAudioTranscriptionLandingPage/${el.id}`)
-              }
-              else{
-                navigate(`SuperChecker/${el.id}`)
-              }
-            }}
+        row.push(
+          <Link
+            to={(ProjectDetails?.project_type?.includes("Acoustic"))
+            ? `SuperCheckerAudioTranscriptionLandingPage/${el.id}` : `SuperChecker/${el.id}`} className={classes.link}>
+            <CustomButton
+              disabled={ProjectDetails.is_archived}
+              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
                 Validate
-              </Typography>} />
-
-        </>)
+                </Typography>} />
+          </Link>)
         return row;
         
       });

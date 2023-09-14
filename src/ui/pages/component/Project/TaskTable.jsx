@@ -397,17 +397,13 @@ const TaskTable = (props) => {
           row.push(el.review_status);
         props.type === "annotation" &&
           row.push(
-            <div  className={classes.link}>
+            <Link
+              to={(ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage === 1))
+              ? `AudioTranscriptionLandingPage/${el.id}` : `task/${el.id}`} className={classes.link}>
               <CustomButton
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage === 1))) {
-                    navigate(`AudioTranscriptionLandingPage/${el.id}`)
-                  }
-                  else{
-                    navigate(`task/${el.id}`)
-                  }
                 }}
                 disabled={ ProjectDetails.is_archived }
                 sx={{ p: 1, borderRadius: 2 }}
@@ -422,22 +418,18 @@ const TaskTable = (props) => {
                   </Typography>
                 }
               />
-            </div>
+            </Link>
           );
         props.type === "review" &&
           row.push(
-            <div className={classes.link}>
+            <Link
+              to={(ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage <= 2))
+              ? `ReviewAudioTranscriptionLandingPage/${el.id}` : `review/${el.id}`} className={classes.link}>
               <CustomButton
                 disabled={ ProjectDetails.is_archived}
                 onClick={() => {
                   console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
-                  if ((ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage <= 2))) {
-                    navigate(`ReviewAudioTranscriptionLandingPage/${el.id}`)
-                  }
-                  else{
-                    navigate(`review/${el.id}`)
-                  }
                 }}
                 sx={{ p: 1, borderRadius: 2 }}
                 label={
@@ -446,7 +438,7 @@ const TaskTable = (props) => {
                   </Typography>
                 }
               />
-            </div>
+            </Link>
           );
         return row;
       });
