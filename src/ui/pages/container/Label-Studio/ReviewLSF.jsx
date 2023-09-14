@@ -648,9 +648,7 @@ const LabelStudioWrapper = ({
         } catch (err) {
           if(err){
             const newDelta2 = annotationNotesRef.current.value;
-            const currentContents = annotationNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta2 });
-            annotationNotesRef.current.getEditor().setContents(currentContents);  
+            annotationNotesRef.current.getEditor().setText(newDelta2);  
           }
         }
         
@@ -660,9 +658,7 @@ const LabelStudioWrapper = ({
         } catch (err) {
           if(err){
             const newDelta1 = reviewNotesRef.current.value;
-            const currentContents = reviewNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta1 });
-            reviewNotesRef.current.getEditor().setContents(currentContents);  
+            reviewNotesRef.current.getEditor().setText(newDelta1); 
           }
         }
         try {
@@ -671,9 +667,7 @@ const LabelStudioWrapper = ({
         } catch (err) {
           if(err){
             const newDelta3 = superCheckerNotesRef.current.value;
-            const currentContents = superCheckerNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta3 });
-            superCheckerNotesRef.current.getEditor().setContents(currentContents);  
+            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
           }
         }
         setannotationtext(annotationNotesRef.current.getEditor().getText())
@@ -706,10 +700,7 @@ const LabelStudioWrapper = ({
               } catch (err) {
                 if(err){
                   const newDelta2 = annotationNotesRef.current.value;
-                  const currentContents = annotationNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta2 });
-                  annotationNotesRef.current.getEditor().setContents(currentContents);  
-                }
+                  annotationNotesRef.current.getEditor().setText(newDelta2);                 }
               }
               
               try {
@@ -718,9 +709,7 @@ const LabelStudioWrapper = ({
               } catch (err) {
                 if(err){
                   const newDelta1 = reviewNotesRef.current.value;
-                  const currentContents = reviewNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta1 });
-                  reviewNotesRef.current.getEditor().setContents(currentContents);  
+                reviewNotesRef.current.getEditor().setText(newDelta1);  
                 }
               }
               try {
@@ -729,9 +718,7 @@ const LabelStudioWrapper = ({
               } catch (err) {
                 if(err){
                   const newDelta3 = superCheckerNotesRef.current.value;
-                  const currentContents = superCheckerNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta3 });
-                  superCheckerNotesRef.current.getEditor().setContents(currentContents);  
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3);
                 }
               }      
         setannotationtext(annotationNotesRef.current.getEditor().getText())
@@ -756,9 +743,7 @@ const LabelStudioWrapper = ({
               } catch (err) {
                 if(err){
                   const newDelta2 = annotationNotesRef.current.value;
-                  const currentContents = annotationNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta2 });
-                  annotationNotesRef.current.getEditor().setContents(currentContents);  
+                  annotationNotesRef.current.getEditor().setText(newDelta2);   
                 }
               }
               
@@ -768,9 +753,7 @@ const LabelStudioWrapper = ({
               } catch (err) {
                 if(err){
                   const newDelta1 = reviewNotesRef.current.value;
-                  const currentContents = reviewNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta1 });
-                  reviewNotesRef.current.getEditor().setContents(currentContents);  
+                reviewNotesRef.current.getEditor().setText(newDelta1); 
                 }
               }
               try {
@@ -779,9 +762,7 @@ const LabelStudioWrapper = ({
               } catch (err) {
                 if(err){
                   const newDelta3 = superCheckerNotesRef.current.value;
-                  const currentContents = superCheckerNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta3 });
-                  superCheckerNotesRef.current.getEditor().setContents(currentContents);  
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
                 }
               }
               setannotationtext(annotationNotesRef.current.getEditor().getText())
@@ -801,9 +782,7 @@ const LabelStudioWrapper = ({
         } catch (err) {
           if(err){
             const newDelta2 = annotationNotesRef.current.value;
-            const currentContents = annotationNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta2 });
-            annotationNotesRef.current.getEditor().setContents(currentContents);  
+            annotationNotesRef.current.getEditor().setText(newDelta2); 
           }
         }
         
@@ -813,9 +792,7 @@ const LabelStudioWrapper = ({
         } catch (err) {
           if(err){
             const newDelta1 = reviewNotesRef.current.value;
-            const currentContents = reviewNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta1 });
-            reviewNotesRef.current.getEditor().setContents(currentContents);  
+            reviewNotesRef.current.getEditor().setText(newDelta1);   
           }
         }
         try {
@@ -824,9 +801,7 @@ const LabelStudioWrapper = ({
         } catch (err) {
           if(err){
             const newDelta3 = superCheckerNotesRef.current.value;
-            const currentContents = superCheckerNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta3 });
-            superCheckerNotesRef.current.getEditor().setContents(currentContents);  
+            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
           }
         }
         setannotationtext(annotationNotesRef.current.getEditor().getText())

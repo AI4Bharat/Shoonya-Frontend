@@ -999,25 +999,21 @@ export default function LSF() {
         reviewNotesRef.current.value = data[0].review_notes ?? "";
         try {
           const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+          console.log(newDelta2);
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
-          if(err){
+          if(err instanceof SyntaxError){
             const newDelta2 = annotationNotesRef.current.value;
-            const currentContents = annotationNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta2 });
-            annotationNotesRef.current.getEditor().setContents(currentContents);  
+            annotationNotesRef.current.getEditor().setText(newDelta2);
           }
         }
-        
         try {
           const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
           reviewNotesRef.current.getEditor().setContents(newDelta1);
         } catch (err) {
-          if(err){
+          if(err instanceof SyntaxError){
             const newDelta1 = reviewNotesRef.current.value;
-            const currentContents = reviewNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta1 });
-            reviewNotesRef.current.getEditor().setContents(currentContents);  
+            reviewNotesRef.current.getEditor().setText(newDelta1);
           }
         }
         setannotationtext(annotationNotesRef.current.getEditor().getText())

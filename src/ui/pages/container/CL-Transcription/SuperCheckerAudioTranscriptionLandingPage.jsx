@@ -576,9 +576,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         } catch (err) {
           if(err){
             const newDelta1 = reviewNotesRef.current.value;
-            const currentContents = reviewNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta1 });
-            reviewNotesRef.current.getEditor().setContents(currentContents);  
+            reviewNotesRef.current.getEditor().setText(newDelta1); 
           }
         }
         try {
@@ -587,11 +585,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         } catch (err) {
           if(err){
             const newDelta3 = superCheckerNotesRef.current.value;
-            const currentContents = superCheckerNotesRef.current.getEditor().getContents();
-            currentContents.ops.unshift({ insert: newDelta3 });
-            superCheckerNotesRef.current.getEditor().setContents(currentContents);  
+            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
           }
         }
+
         setreviewtext(reviewNotesRef.current.getEditor().getText())
         setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
       } else {
@@ -618,9 +615,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               } catch (err) {
                 if(err){
                   const newDelta1 = reviewNotesRef.current.value;
-                  const currentContents = reviewNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta1 });
-                  reviewNotesRef.current.getEditor().setContents(currentContents);  
+                  reviewNotesRef.current.getEditor().setText(newDelta1); 
                 }
               }
               try {
@@ -629,11 +624,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               } catch (err) {
                 if(err){
                   const newDelta3 = superCheckerNotesRef.current.value;
-                  const currentContents = superCheckerNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta3 });
-                  superCheckerNotesRef.current.getEditor().setContents(currentContents);  
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
                 }
               }
+      
         setreviewtext(reviewNotesRef.current.getEditor().getText())
         setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
@@ -645,16 +639,14 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               reviewerAnnotations[0]?.review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation[0]?.supercheck_notes ?? "";
-             
+
               try {
                 const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
                 reviewNotesRef.current.getEditor().setContents(newDelta1);
               } catch (err) {
                 if(err){
                   const newDelta1 = reviewNotesRef.current.value;
-                  const currentContents = reviewNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta1 });
-                  reviewNotesRef.current.getEditor().setContents(currentContents);  
+                  reviewNotesRef.current.getEditor().setText(newDelta1); 
                 }
               }
               try {
@@ -663,11 +655,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               } catch (err) {
                 if(err){
                   const newDelta3 = superCheckerNotesRef.current.value;
-                  const currentContents = superCheckerNotesRef.current.getEditor().getContents();
-                  currentContents.ops.unshift({ insert: newDelta3 });
-                  superCheckerNotesRef.current.getEditor().setContents(currentContents);  
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
                 }
               }
+      
         setreviewtext(reviewNotesRef.current.getEditor().getText())
         setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }

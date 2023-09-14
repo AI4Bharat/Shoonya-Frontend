@@ -598,9 +598,7 @@ const AudioTranscriptionLandingPage = () => {
       } catch (err) {
         if(err){
           const newDelta2 = annotationNotesRef.current.value;
-          const currentContents = annotationNotesRef.current.getEditor().getContents();
-          currentContents.ops.unshift({ insert: newDelta2 });
-          annotationNotesRef.current.getEditor().setContents(currentContents);  
+          annotationNotesRef.current.getEditor().setText(newDelta2);
         }
       }
       
@@ -610,9 +608,7 @@ const AudioTranscriptionLandingPage = () => {
       } catch (err) {
         if(err){
           const newDelta1 = reviewNotesRef.current.value;
-          const currentContents = reviewNotesRef.current.getEditor().getContents();
-          currentContents.ops.unshift({ insert: newDelta1 });
-          reviewNotesRef.current.getEditor().setContents(currentContents);  
+          reviewNotesRef.current.getEditor().setText(newDelta1);
         }
       }
       setannotationtext(annotationNotesRef.current.getEditor().getText())
