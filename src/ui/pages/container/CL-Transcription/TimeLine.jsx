@@ -328,6 +328,7 @@ console.log(taskID,"taskDatataskData")
               render={render}
               playing={playing}
               currentTime={currentTime}
+              duration={player.duration}
             />
           </>
         )}
