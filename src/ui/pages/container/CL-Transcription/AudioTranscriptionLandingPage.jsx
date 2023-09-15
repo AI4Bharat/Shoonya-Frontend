@@ -102,6 +102,7 @@ const AudioTranscriptionLandingPage = () => {
   const timeSpentIntervalRef = useRef(null);
   const user = useSelector((state) => state.fetchLoggedInUserData.data);
   const taskDetails = useSelector((state) => state.getTaskDetails?.data);
+  const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
 
 
   // useEffect(() => {
@@ -654,6 +655,51 @@ const AudioTranscriptionLandingPage = () => {
     );
   }
 
+  const [wave, setWave] = useState(true);
+  const [waveColor, setWaveColor] = useState("#FFFFFF");
+  const [backgroundColor, setBackgroundColor] = useState("#1C2022");
+  const [paddingColor, setPaddingColor] = useState("#FFFFFF");
+  const [cursor, setCursor] = useState(true);
+  const [cursorColor, setCursorColor] = useState("#FF0000");
+  const [progress, setProgress] = useState(true);
+  const [progressColor, setProgressColor] = useState("#FFFFFF");
+  const [grid, setGrid] = useState(true);
+  const [gridColor, setGridColor] = useState("#FFFFFF");
+  const [ruler, setRuler] = useState(true);
+  const [rulerColor, setRulerColor] = useState("#FFFFFF");
+  const [scrollbar, setScrollbar] = useState(true);
+  const [scrollbarColor, setScrollbarColor] = useState("#FFFFFF");
+  const [rulerAtTop, setRulerAtTop] = useState(true);
+  const [scrollable, setScrollable] = useState(true);
+  const [duration, setDuration] = useState(10);
+  const [padding, setPadding] = useState(1);
+  const [pixelRatio, setPixelRatio] = useState(1);
+  const [waveScale, setWaveScale] = useState(1);
+  const [waveSize, setWaveSize] = useState(1);
+  const [waveformSettings, setWaveformSettings] = useState({"wave":wave, "waveColor":waveColor, "backgroundColor":backgroundColor, "paddingColor":paddingColor,
+"cursor":cursor, "cursorColor":cursorColor, "progress":progress, "progressColor":progressColor, "grid":grid, "gridColor":gridColor, "ruler":ruler,
+"rulerColor":rulerColor, "scrollbar":scrollbar, "scrollbarColor":scrollbarColor, "rulerAtTop": rulerAtTop, "scrollable":scrollable, "duration":duration, "padding":padding,
+"pixelRatio":pixelRatio, "waveScale":waveScale, "waveSize":waveSize});
+
+useEffect(() => {
+  setWaveformSettings({"wave":wave, "waveColor":waveColor, "backgroundColor":backgroundColor, "paddingColor":paddingColor,
+  "cursor":cursor, "cursorColor":cursorColor, "progress":progress, "progressColor":progressColor, "grid":grid, "gridColor":gridColor, "ruler":ruler,
+  "rulerColor":rulerColor, "scrollbar":scrollbar, "scrollbarColor":scrollbarColor, "rulerAtTop": rulerAtTop, "scrollable":scrollable, "duration":duration, "padding":padding,
+  "pixelRatio":pixelRatio, "waveScale":waveScale, "waveSize":waveSize})
+}, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize]);
+  
+useEffect(() => {
+  if(showNotes === true){
+    setAdvancedWaveformSettings(false);
+  }
+}, [showNotes]);
+
+
+useEffect(() => {
+  if(advancedWaveformSettings === true){
+    setShowNotes(false);
+  }
+}, [advancedWaveformSettings]);
 
   return (
     <>
@@ -849,6 +895,41 @@ const AudioTranscriptionLandingPage = () => {
                 </div>
               )}
             </div>
+            <div
+              className={classes.collapse}
+              style={{
+                display: advancedWaveformSettings ? "block" : "none",
+                marginTop: "15%",
+                overflow: "auto",
+                height: "max-content"
+              }}
+              >
+                <table style={{width: "100%", textAlign: 'center', fontSize: 'large'}}>
+                  <tr>
+                    <td>Wave:&nbsp;&nbsp;<input type='checkbox' checked={wave} onChange={() => {setWave(!wave)}}></input> <input type='color' value={waveColor} onChange={(e) => {setWaveColor(e.target.value)}}></input></td>
+                    <td>Background:&nbsp;&nbsp;<input type='color' value={backgroundColor} onChange={(e) => {setBackgroundColor(e.target.value)}}></input></td>
+                    <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='color' value={paddingColor} onChange={(e) => {setPaddingColor(e.target.value)}}></input></td>
+                    <td>Cursor:&nbsp;&nbsp;<input type='checkbox' checked={cursor} onChange={() => {setCursor(!cursor)}}></input> <input type='color' value={cursorColor} onChange={(e) => {setCursorColor(e.target.value)}}></input></td>
+                    <td>Progress:&nbsp;&nbsp;<input type='checkbox' checked={progress} onChange={() => {setProgress(!progress)}}></input> <input type='color' value={progressColor} onChange={(e) => {setProgressColor(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Grid:&nbsp;&nbsp;<input type='checkbox' checked={grid} onChange={() => {setGrid(!grid)}}></input> <input type='color' value={gridColor} onChange={(e) => {setGridColor(e.target.value)}}></input></td>
+                    <td>Ruler:&nbsp;&nbsp;<input type='checkbox' checked={ruler} onChange={() => {setRuler(!ruler)}}></input> <input type='color' value={rulerColor} onChange={(e) => {setRulerColor(e.target.value)}}></input></td>
+                    <td colSpan={2}>Scrollbar:&nbsp;&nbsp;<input type='checkbox' checked={scrollbar} onChange={() => {setScrollbar(!scrollbar)}}></input> <input type='color' value={scrollbarColor} onChange={(e) => {setScrollbarColor(e.target.value)}}></input></td>
+                    <td>Ruler At Top:&nbsp;&nbsp;<input type='checkbox' checked={rulerAtTop} onChange={() => {setRulerAtTop(!rulerAtTop)}}></input></td>
+                    <td>Scrollable:&nbsp;&nbsp;<input type='checkbox' checked={scrollable} onChange={() => {setScrollable(!scrollable)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2}>Duration:&nbsp;&nbsp;<input type='range' min={2} max={100} step={2} value={duration} onChange={(e) => {setDuration(e.target.value)}}></input>&nbsp;{duration}</td>
+                    <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='range' min={0} max={20} step={1} value={padding} onChange={(e) => {setPadding(e.target.value)}}></input>&nbsp;{padding}</td>
+                    <td colSpan={2}>Pixel Ratio:&nbsp;&nbsp;<input type='range' min={1} max={2} step={1} value={pixelRatio} onChange={(e) => {setPixelRatio(e.target.value)}}></input>&nbsp;{pixelRatio}</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3}>Wave Scale:&nbsp;&nbsp;<input type='range' min={0.1} max={2} step={0.1} value={waveScale} onChange={(e) => {setWaveScale(e.target.value)}}></input>&nbsp;{waveScale}</td>
+                    <td colSpan={3}>Wave Size:&nbsp;&nbsp;<input type='range' min={1} max={10} step={1} value={waveSize} onChange={(e) => {setWaveSize(e.target.value)}}></input>&nbsp;{waveSize}</td>
+                  </tr>
+                </table>
+            </div>
           </Box>
         </Grid>
 
@@ -861,6 +942,8 @@ const AudioTranscriptionLandingPage = () => {
             TaskDetails={taskData}
             stage={1}
             handleStdTranscriptionSettings={setStdTranscriptionSettings}
+            advancedWaveformSettings={advancedWaveformSettings}
+            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
           />
         </Grid>
       </Grid>
@@ -871,7 +954,7 @@ const AudioTranscriptionLandingPage = () => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} />
+        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>
       </Grid>
     </>
   );

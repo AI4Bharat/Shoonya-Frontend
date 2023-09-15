@@ -75,6 +75,8 @@ const TranscriptionRightPanel = ({
   TaskDetails,
   stage,
   handleStdTranscriptionSettings,
+  advancedWaveformSettings,
+  setAdvancedWaveformSettings,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -113,7 +115,7 @@ const TranscriptionRightPanel = ({
   const [selectionStart, setSelectionStart] = useState();
   const [currentIndexToSplitTextBlock, setCurrentIndexToSplitTextBlock] =
     useState();
-  const [enableTransliteration, setTransliteration] = useState(true);
+  const [enableTransliteration, setTransliteration] = useState(false);
   const [enableRTL_Typing, setRTL_Typing] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -490,6 +492,8 @@ const TranscriptionRightPanel = ({
               onSplitClick={onSplitClick}
               showPopOver={showPopOver}
               showSplit={true}
+              advancedWaveformSettings={advancedWaveformSettings}
+              setAdvancedWaveformSettings={setAdvancedWaveformSettings}
             />
           </Grid>
           {showAcousticText && <Grid
