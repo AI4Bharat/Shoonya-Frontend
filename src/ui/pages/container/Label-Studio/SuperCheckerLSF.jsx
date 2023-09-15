@@ -457,10 +457,26 @@ const LabelStudioWrapper = ({
         reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
         superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
         
-        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        
+        try {
+          const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+          reviewNotesRef.current.getEditor().setContents(newDelta1);
+        } catch (err) {
+          if(err){
+            const newDelta1 = reviewNotesRef.current.value;
+            reviewNotesRef.current.getEditor().setText(newDelta1); 
+          }
+        }
+        try {
+          const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+          superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        } catch (err) {
+          if(err){
+            const newDelta3 = superCheckerNotesRef.current.value;
+            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
+          }
+        }
+
         setreviewtext(reviewNotesRef.current.getEditor().getText())
         setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
 
@@ -482,10 +498,26 @@ const LabelStudioWrapper = ({
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
 
-        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+              
+              try {
+                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+                reviewNotesRef.current.getEditor().setContents(newDelta1);
+              } catch (err) {
+                if(err){
+                  const newDelta1 = reviewNotesRef.current.value;
+                  reviewNotesRef.current.getEditor().setText(newDelta1); 
+                }
+              }
+              try {
+                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+              } catch (err) {
+                if(err){
+                  const newDelta3 = superCheckerNotesRef.current.value;
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
+                }
+              }
+            
         setreviewtext(reviewNotesRef.current.getEditor().getText())
         setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
 
@@ -498,11 +530,27 @@ const LabelStudioWrapper = ({
               reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
-        const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-        const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-        superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
+              
+              try {
+                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+                reviewNotesRef.current.getEditor().setContents(newDelta1);
+              } catch (err) {
+                if(err){
+                  const newDelta1 = reviewNotesRef.current.value;
+                  reviewNotesRef.current.getEditor().setText(newDelta1); 
+                }
+              }
+              try {
+                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+              } catch (err) {
+                if(err){
+                  const newDelta3 = superCheckerNotesRef.current.value;
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
+                }
+              }
+      
+              setreviewtext(reviewNotesRef.current.getEditor().getText())
         setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
 
           }
