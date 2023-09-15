@@ -507,7 +507,7 @@ const TranscriptionRightPanel = ({
             <Typography
               variant="caption"
               sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
-              Acoustic Transcription
+                Semantic (L2) Transcription 
             </Typography>
           </Grid>}
           </Box>
