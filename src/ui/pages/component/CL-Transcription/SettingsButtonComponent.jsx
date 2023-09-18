@@ -56,6 +56,8 @@ const SettingsButtonComponent = ({
   showPopOver,
   showSplit,
   handleInfoButtonClick,
+  advancedWaveformSettings,
+  setAdvancedWaveformSettings,
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   // const dispatch = useDispatch();
@@ -139,6 +141,19 @@ const SettingsButtonComponent = ({
                 onChange={() => {
                   setAnchorElSettings(null);
                   setRTL_Typing(!enableRTL_Typing);
+                }}
+              />
+            }
+          />
+        </MenuItem>
+        <MenuItem>
+          <FormControlLabel
+            label="Advanced Settings"
+            control={
+              <Checkbox
+                checked={advancedWaveformSettings}
+                onChange={() => {
+                  setAdvancedWaveformSettings(!advancedWaveformSettings);
                 }}
               />
             }
