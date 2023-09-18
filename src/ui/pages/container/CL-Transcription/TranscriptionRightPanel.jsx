@@ -567,7 +567,7 @@ const TranscriptionRightPanel = ({
                   onClick={() => {
                     if (player) {
                       player.pause();
-                      if (player.duration >= item.startTime) {
+                      if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
                         player.currentTime = item.startTime + 0.001;
                       }
                     }
