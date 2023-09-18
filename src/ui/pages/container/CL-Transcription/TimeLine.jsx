@@ -13,50 +13,55 @@ import SubtitleBoxes from "./SubtitleBoxes";
 import { useParams } from "react-router-dom";
 
 
-const WaveForm = (({ setWaveform, setRender }) => {
+const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
   const classes = AudioTranscriptionLandingStyle();
   const $waveform = useRef();
 
   const player = useSelector((state) => state.commonReducer?.player);
-
+  console.log(waveformSettings);
   useEffect(() => {
     [...WFPlayer.instances].forEach((item) => item.destroy());
 
     const waveform = new WFPlayer({
-      grid: false,
-      scrollable: true,
+      wave: waveformSettings.wave,
+      waveColor: waveformSettings.waveColor+"1A",
+      backgroundColor: waveformSettings.backgroundColor,
+      paddingColor: waveformSettings.paddingColor+"0D",
+      cursor:waveformSettings.cursor,
+      cursorColor: waveformSettings.cursorColor,
+      progress: waveformSettings.progress,
+      progressColor: waveformSettings.progressColor+'80',
+      grid: waveformSettings.grid,
+      gridColor: waveformSettings.gridColor+'0D',
+      ruler: waveformSettings.ruler,
+      rulerColor: waveformSettings.rulerColor+'80',
+      scrollbar: waveformSettings.scrollbar,
+      scrollbarColor: waveformSettings.scrollbarColor+'40',
+      rulerAtTop: waveformSettings.rulerAtTop,
+      scrollable: waveformSettings.scrollable,
+      duration: Number(waveformSettings.duration),
+      padding: Number(waveformSettings.padding),
+      pixelRatio: Number(waveformSettings.pixelRatio),
+      waveScale: Number(waveformSettings.waveScale),
+      waveSize: Number(waveformSettings.waveSize),
+
       useWorker: false,
-      progress: true,
-      waveScale: 1.1,
-      waveSize: 1,
-      duration: 8,
-      padding: 1,
-      wave: true,
-      pixelRatio: 2,
       container: $waveform.current,
       mediaElement: player,
-      backgroundColor: "rgb(28, 32, 34)",
-      waveColor: "rgb(255, 255, 255, 0.5)",
-      progressColor: "rgb(255, 255, 255, 0.5)",
-      gridColor: "rgba(255, 255, 255, 0.05)",
-      rulerColor: "rgba(255, 255, 255, 0.5)",
-      paddingColor: "rgba(0, 0, 0, 0)"
     });
 
-    setWaveform(waveform);
-    waveform.on("update", setRender);
-    
     fetch(player.src)
       .then((res) => res.arrayBuffer())
       .then((arrayBuffer) => {
         const uint8 = new Uint8Array(arrayBuffer);
         waveform.load(uint8);
+        setWaveform(waveform);
+        waveform.on("update", setRender);
     });
-    
     
       // waveform.load(encodeURIComponent(player?.attributes?.nodeValue?.replace(/&amp;/g, "&")));
   
-  }, [player, $waveform, setWaveform, setRender, player.src]);
+  }, [player, $waveform, setWaveform, setRender, player.src, waveformSettings]);
 
   return <div className={classes.waveform} ref={$waveform} />;
 });
@@ -269,7 +274,7 @@ const Duration = memo(({ currentTime }) => {
   );
 });
 
-const Timeline = ({ currentTime, playing ,taskID }) => {
+const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
 console.log(taskID,"taskDatataskData")
@@ -321,7 +326,7 @@ console.log(taskID,"taskDatataskData")
           <>
             <Progress waveform={waveform} currentTime={currentTime} taskId={taskID}/>
             <Duration currentTime={currentTime} />
-            <WaveForm setWaveform={setWaveform} setRender={setRender} />
+            <WaveForm setWaveform={setWaveform} setRender={setRender} waveformSettings={waveformSettings} />
             <Grab waveform={waveform} />
             <Metronome render={render} playing={playing} />
             <SubtitleBoxes

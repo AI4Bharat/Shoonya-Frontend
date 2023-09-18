@@ -75,6 +75,8 @@ const TranscriptionRightPanel = ({
   TaskDetails,
   stage,
   handleStdTranscriptionSettings,
+  advancedWaveformSettings,
+  setAdvancedWaveformSettings,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -113,7 +115,7 @@ const TranscriptionRightPanel = ({
   const [selectionStart, setSelectionStart] = useState();
   const [currentIndexToSplitTextBlock, setCurrentIndexToSplitTextBlock] =
     useState();
-  const [enableTransliteration, setTransliteration] = useState(true);
+  const [enableTransliteration, setTransliteration] = useState(false);
   const [enableRTL_Typing, setRTL_Typing] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -272,15 +274,15 @@ const TranscriptionRightPanel = ({
       currentTarget,
     } = event;
 
-    const containsBackslash = value.includes("\\");
+    const containsBackslash = value.includes("$$$");
 
     setEnableTransliterationSuggestion(true);
 
     if (containsBackslash && !updateAcoustic) {
       setEnableTransliterationSuggestion(false);
 
-      const textBeforeSlash = value.split("\\")[0];
-      const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
+      const textBeforeSlash = value.split("$$$")[0];
+      const textAfterSlash = value.split("$$$")[1].split("").join("");
       setCurrentSelectedIndex(index);
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutBackSlash(textBeforeSlash);
@@ -490,6 +492,8 @@ const TranscriptionRightPanel = ({
               onSplitClick={onSplitClick}
               showPopOver={showPopOver}
               showSplit={true}
+              advancedWaveformSettings={advancedWaveformSettings}
+              setAdvancedWaveformSettings={setAdvancedWaveformSettings}
             />
           </Grid>
           {showAcousticText && <Grid
