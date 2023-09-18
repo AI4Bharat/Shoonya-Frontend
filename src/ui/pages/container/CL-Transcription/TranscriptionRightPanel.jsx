@@ -274,15 +274,15 @@ const TranscriptionRightPanel = ({
       currentTarget,
     } = event;
 
-    const containsBackslash = value.includes("\\");
+    const containsBackslash = value.includes("$$$");
 
     setEnableTransliterationSuggestion(true);
 
     if (containsBackslash && !updateAcoustic) {
       setEnableTransliterationSuggestion(false);
 
-      const textBeforeSlash = value.split("\\")[0];
-      const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
+      const textBeforeSlash = value.split("$$$")[0];
+      const textAfterSlash = value.split("$$$")[1].split("").join("");
       setCurrentSelectedIndex(index);
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutBackSlash(textBeforeSlash);
