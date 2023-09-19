@@ -75,6 +75,8 @@ const TranscriptionRightPanel = ({
   TaskDetails,
   stage,
   handleStdTranscriptionSettings,
+  advancedWaveformSettings,
+  setAdvancedWaveformSettings,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -113,7 +115,7 @@ const TranscriptionRightPanel = ({
   const [selectionStart, setSelectionStart] = useState();
   const [currentIndexToSplitTextBlock, setCurrentIndexToSplitTextBlock] =
     useState();
-  const [enableTransliteration, setTransliteration] = useState(true);
+  const [enableTransliteration, setTransliteration] = useState(false);
   const [enableRTL_Typing, setRTL_Typing] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -126,8 +128,8 @@ const TranscriptionRightPanel = ({
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState(0);
   const [tagSuggestionsAnchorEl, setTagSuggestionsAnchorEl] = useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState([]);
-  const [textWithoutBackSlash, setTextWithoutBackSlash] = useState("");
-  const [textAfterBackSlash, setTextAfterBackSlash] = useState("");
+  const [textWithouttripleDollar, setTextWithouttripleDollar] = useState("");
+  const [textAftertripleDollar, setTextAftertripleDollar] = useState("");
   const [enableTransliterationSuggestion, setEnableTransliterationSuggestion] =
     useState(true);
   const [taskData, setTaskData] = useState([]);
@@ -272,19 +274,19 @@ const TranscriptionRightPanel = ({
       currentTarget,
     } = event;
 
-    const containsBackslash = value.includes("\\");
+    const containstripleDollar = value.includes("$$$");
 
     setEnableTransliterationSuggestion(true);
 
-    if (containsBackslash && !updateAcoustic) {
+    if (containstripleDollar && !updateAcoustic) {
       setEnableTransliterationSuggestion(false);
 
-      const textBeforeSlash = value.split("\\")[0];
-      const textAfterSlash = value.split("\\")[1].split("").slice(1).join("");
+      const textBeforeTab = value.split("$$$")[0];
+      const textAfterTab = value.split("$$$")[1].split("").join("");
       setCurrentSelectedIndex(index);
       setTagSuggestionsAnchorEl(currentTarget);
-      setTextWithoutBackSlash(textBeforeSlash);
-      setTextAfterBackSlash(textAfterSlash);
+      setTextWithouttripleDollar(textBeforeTab);
+      setTextAftertripleDollar(textAfterTab);
     }
     const sub = onSubtitleChange(value, index, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -490,6 +492,8 @@ const TranscriptionRightPanel = ({
               onSplitClick={onSplitClick}
               showPopOver={showPopOver}
               showSplit={true}
+              advancedWaveformSettings={advancedWaveformSettings}
+              setAdvancedWaveformSettings={setAdvancedWaveformSettings}
             />
           </Grid>
           {showAcousticText && <Grid
@@ -563,7 +567,7 @@ const TranscriptionRightPanel = ({
                   onClick={() => {
                     if (player) {
                       player.pause();
-                      if (player.duration >= item.startTime) {
+                      if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
                         player.currentTime = item.startTime + 0.001;
                       }
                     }
@@ -754,8 +758,8 @@ const TranscriptionRightPanel = ({
             index={currentSelectedIndex}
             filteredSuggestionByInput={tagSuggestionList}
             setTagSuggestionsAnchorEl={setTagSuggestionsAnchorEl}
-            textWithoutBackslash={textWithoutBackSlash}
-            textAfterBackSlash={textAfterBackSlash}
+            textWithouttripleDollar={textWithouttripleDollar}
+            textAftertripleDollar={textAftertripleDollar}
             // saveTranscriptHandler={saveTranscriptHandler}
             setEnableTransliterationSuggestion={
               setEnableTransliterationSuggestion
