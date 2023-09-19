@@ -923,7 +923,7 @@ useEffect(() => {
 
 useEffect(() => {
   const handleKeyDown = (event) => {
-    if (event.ctrlKey && event.key === ' ') {
+    if (event.shiftKey && event.key === ' ') {
       event.preventDefault();
       if(player){
         console.log(isPlaying(player));
@@ -934,13 +934,13 @@ useEffect(() => {
         }
       }
     }
-    if (event.ctrlKey && event.key === 'ArrowLeft') {
+    if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime - 0.05;
       }
     }
-    if (event.ctrlKey && event.key === 'ArrowRight') {
+    if (event.shiftKey && event.key === 'ArrowRight') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime + 0.05;

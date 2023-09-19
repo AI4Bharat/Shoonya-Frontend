@@ -221,8 +221,8 @@ import React, {
           const width = (endTime - startTime) * 10 * gridGap;
   
           if (lastType === "left") {
-            if (startTime >= 0 && lastSub.endTime - startTime >= 0.2) {
-              const start_time = DT.d2t(startTime);
+            if (lastSub.endTime - startTime >= 0.2) {
+              const start_time = DT.d2t(Math.max(0, startTime));
   
               if (index > 0 && startTime >= DT.t2d(previou.end_time)) {
                 updateSub(lastSub, { start_time });
@@ -435,6 +435,13 @@ import React, {
                     <div
                       className={classes.subText}
                       title={sub.text}
+                      style = {{
+                        backgroundColor: sub.speaker_id === "Speaker 0"
+                        ? "rgba(228, 0, 252, 0.42)"
+                        : sub.speaker_id === "Speaker 1"
+                        ? "rgba(245, 252, 0, 0.42)"
+                        : "",
+                      }}
                       onDoubleClick={() => {
                         if (player) {
                           player.play();
