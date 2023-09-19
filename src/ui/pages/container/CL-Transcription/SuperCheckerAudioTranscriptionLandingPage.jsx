@@ -30,7 +30,7 @@ import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/Ge
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import isPlaying from '../../../../utils/utils.js';
+import {isPlaying} from '../../../../utils/utils';
 import Spinner from "../../component/common/Spinner";
 import Sub from "../../../../utils/Sub";
 import C from "../../../../redux/constants";

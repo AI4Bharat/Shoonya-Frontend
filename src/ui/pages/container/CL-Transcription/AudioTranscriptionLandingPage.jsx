@@ -26,7 +26,7 @@ import Timeline from "./TimeLine";
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import isPlaying from '../../../../utils/utils.js';
+import {isPlaying} from '../../../../utils/utils';
 import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import { useDispatch, useSelector } from "react-redux";
