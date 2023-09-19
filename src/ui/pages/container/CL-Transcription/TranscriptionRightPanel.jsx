@@ -737,7 +737,8 @@ const TranscriptionRightPanel = ({
         >
           <Pagination
             color="primary"
-            count={Math.ceil(subtitles?.length / itemsPerPage)}
+            // count={Math.ceil(subtitles?.length / itemsPerPage)}
+            count={1}
             page={page}
             onChange={handlePageChange}
           />
