@@ -138,6 +138,8 @@ const TranscriptionRightPanel = ({
   const AnnotationStage = localStorage.getItem("Stage") === "annotation";
   const SuperCheckerStage =
     localStorage.getItem("SuperCheckerStage") === "superChecker";
+  const parentScrollOffsetX = useRef(0);
+  const parentScrollOffsetY = useRef(0);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -540,6 +542,7 @@ const TranscriptionRightPanel = ({
 
           <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
             height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
+            alignItems: "center",
           }}>
           {currentPageData?.map((item, index) => {
             return (
@@ -550,6 +553,14 @@ const TranscriptionRightPanel = ({
                   minHeight="240px"
                   enable={{ top:false, right:false, bottom:true, left:false, topRight:false, bottomRight:false, bottomLeft:false, topLeft:false }}
                   style={{ alignItems: "center", display: "flex", flexDirection: "column", marginTop: index === 0 ? "0px" : "-16px" }}
+                  onResizeStart={(e, dir, ref) => {
+                    parentScrollOffsetX.current = ref.parentElement?.scrollLeft || 0
+                    parentScrollOffsetY.current = ref.parentElement?.scrollTop || 0
+                  }}
+                  onResize={(e, dir, ref, d) => {
+                    ref.parentElement.scrollTo(parentScrollOffsetX.current, parentScrollOffsetY.current)
+                  }}
+                  handleStyles={{ bottom: {height: "24px"}}}
                 >
                   <Box
                     key={index}
@@ -766,7 +777,7 @@ const TranscriptionRightPanel = ({
                   height: "32px", width: "32px",
                   pointerEvents: "none",
                 }}>
-                  <UnfoldMoreOutlinedIcon sx={{mt: "3px"}}/>
+                  <UnfoldMoreOutlinedIcon sx={{mt: "3px"}}/> 
                 </div>
               </React.Fragment>
             );
