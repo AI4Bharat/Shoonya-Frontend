@@ -197,6 +197,20 @@ const TranscriptionRightPanel = ({
       });
     }
   }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.altKey && event.key === "1") {
+        event.preventDefault();
+        setTransliteration(!enableTransliteration);
+      }
+    };
+  
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [enableTransliteration, setTransliteration]);
   
 
   const getPayload = (offset = currentOffset, lim = limit) => {
