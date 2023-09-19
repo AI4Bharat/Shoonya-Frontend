@@ -20,8 +20,8 @@ const TagsSuggestionList = ({
   setTagSuggestionList,
   index,
   setTagSuggestionsAnchorEl,
-  textWithoutBackslash,
-  textAfterBackSlash,
+  textWithoutTripleDollar,
+  textAfterTripleDollar,
   // saveTranscriptHandler,
   setEnableTransliterationSuggestion,
   TabsSuggestionData,
@@ -29,7 +29,7 @@ const TagsSuggestionList = ({
   const dispatch = useDispatch();
   const classes = AudioTranscriptionLandingStyle();
   const handleTagClick = (suggestion) => {
-    const modifiedText = `${textWithoutBackslash}[${suggestion}]${textAfterBackSlash}`;
+    const modifiedText = `${textWithoutTripleDollar}[${suggestion}]${textAfterTripleDollar}`;
 
     const sub = onSubtitleChange(modifiedText, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));

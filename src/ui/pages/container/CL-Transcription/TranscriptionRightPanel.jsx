@@ -128,8 +128,8 @@ const TranscriptionRightPanel = ({
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState(0);
   const [tagSuggestionsAnchorEl, setTagSuggestionsAnchorEl] = useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState([]);
-  const [textWithouttripleDollar, setTextWithouttripleDollar] = useState("");
-  const [textAftertripleDollar, setTextAftertripleDollar] = useState("");
+  const [textWithoutTripleDollar, setTextWithoutTripleDollar] = useState("");
+  const [textAfterTripleDollar, setTextAfterTripleDollar] = useState("");
   const [enableTransliterationSuggestion, setEnableTransliterationSuggestion] =
     useState(true);
   const [taskData, setTaskData] = useState([]);
@@ -274,19 +274,19 @@ const TranscriptionRightPanel = ({
       currentTarget,
     } = event;
 
-    const containstripleDollar = value.includes("$$$");
+    const containsTripleDollar = value.includes("$$$");
 
     setEnableTransliterationSuggestion(true);
 
-    if (containstripleDollar && !updateAcoustic) {
+    if (containsTripleDollar && !updateAcoustic) {
       setEnableTransliterationSuggestion(false);
 
       const textBeforeTab = value.split("$$$")[0];
       const textAfterTab = value.split("$$$")[1].split("").join("");
       setCurrentSelectedIndex(index);
       setTagSuggestionsAnchorEl(currentTarget);
-      setTextWithouttripleDollar(textBeforeTab);
-      setTextAftertripleDollar(textAfterTab);
+      setTextWithoutTripleDollar(textBeforeTab);
+      setTextAfterTripleDollar(textAfterTab);
     }
     const sub = onSubtitleChange(value, index, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -758,8 +758,8 @@ const TranscriptionRightPanel = ({
             index={currentSelectedIndex}
             filteredSuggestionByInput={tagSuggestionList}
             setTagSuggestionsAnchorEl={setTagSuggestionsAnchorEl}
-            textWithouttripleDollar={textWithouttripleDollar}
-            textAftertripleDollar={textAftertripleDollar}
+            textWithoutTripleDollar={textWithoutTripleDollar}
+            textAfterTripleDollar={textAfterTripleDollar}
             // saveTranscriptHandler={saveTranscriptHandler}
             setEnableTransliterationSuggestion={
               setEnableTransliterationSuggestion
