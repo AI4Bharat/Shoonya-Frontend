@@ -418,12 +418,41 @@ import React, {
                         left: 0,
                         width: 10,
                       }}
+                      onDoubleClick={() => {
+                        if (player) {
+                          player.play();
+                          if (player.duration >= sub.startTime) {
+                            player.currentTime = sub.startTime;
+                            setTimeout(() => {
+                              player.pause();
+                            }, (sub.endTime - sub.startTime) * 1000);
+                          }
+                        }
+                      }}
                       onMouseDown={(event) => onMouseDown(sub, event, "left")}
                     ></div>
   
                     <div
                       className={classes.subText}
                       title={sub.text}
+                      onDoubleClick={() => {
+                        if (player) {
+                          player.play();
+                          if (player.duration >= sub.startTime) {
+                            player.currentTime = sub.startTime;
+                            setTimeout(() => {
+                              player.pause();
+                            }, (sub.endTime - sub.startTime) * 1000);
+                            // const timeUpdateListener = () => {
+                            //   if (player.currentTime >= sub.endTime) {
+                            //     player.pause();
+                            //     player.removeEventListener('timeupdate', timeUpdateListener);
+                            //   }
+                            // };
+                            // player.addEventListener('timeupdate', timeUpdateListener);
+                          }
+                        }
+                      }}
                       onMouseDown={(event) => onMouseDown(sub, event)}
                     >
                       <p className={classes.subTextP}>
@@ -437,6 +466,17 @@ import React, {
                       style={{
                         right: 0,
                         width: 10,
+                      }}
+                      onDoubleClick={() => {
+                        if (player) {
+                          player.play();
+                          if (player.duration >= sub.startTime) {
+                            player.currentTime = sub.startTime;
+                            setTimeout(() => {
+                              player.pause();
+                            }, (sub.endTime - sub.startTime) * 1000);
+                          }
+                        }
                       }}
                       onMouseDown={(event) => onMouseDown(sub, event, "right")}
                     ></div>
