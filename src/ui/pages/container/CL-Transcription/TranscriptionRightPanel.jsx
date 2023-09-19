@@ -276,10 +276,16 @@ const TranscriptionRightPanel = ({
 
     const containsTripleDollar = value.includes("$$$");
 
-    setEnableTransliterationSuggestion(true);
+    // setEnableTransliterationSuggestion(true);
+    if (value.includes("$$")) {
+      setEnableTransliterationSuggestion(false);
+    }
+    else {
+      setEnableTransliterationSuggestion(true);
+    }
 
     if (containsTripleDollar && !updateAcoustic) {
-      setEnableTransliterationSuggestion(false);
+      // setEnableTransliterationSuggestion(false);
 
       const textBeforeTab = value.split("$$$")[0];
       const textAfterTab = value.split("$$$")[1].split("").join("");
