@@ -58,7 +58,7 @@ import React, {
   let isDroging = false;
   
   export default memo(
-    function ({ render, currentTime }) {
+    function ({ render, currentTime, duration }) {
       const { taskId } = useParams();
       const classes = AudioTranscriptionLandingStyle();
       const dispatch = useDispatch();
@@ -141,54 +141,11 @@ import React, {
       //   // eslint-disable-next-line
       // }, [result, currentIndex, isPlaying(player)]);
 
-      const saveTranscript = async (taskType,  result) => {
-        const reqBody = {
-          task_id: taskId,
-          annotation_status: taskData?.annotation_status,
-          result,
-          ...(( !AnnotationStage||SuperCheckerStage) && {
-          parent_annotation: taskData?.parent_annotation,
-        }),
-        };
-        if (!textBox && !speakerBox) {
-        const obj = new SaveTranscriptAPI(taskData?.id,reqBody);
-        const res = await fetch(obj.apiEndPoint(), {
-          method: "PATCH",
-          body: JSON.stringify(obj.getBody()),
-          headers: obj.getHeaders().headers,
-        });
-  
-        const resp = await res.json();
-        if (!res.ok) {
-          setSnackbarInfo({
-            open: true,
-            message: "Error in autosaving annotation",
-            variant: "error",
-          });
-        } 
-      }{
-        if (textBox) {
-          setSnackbarInfo({
-            open: true,
-            message: "Please Enter All The Transcripts",
-            variant: "error",
-          });
-        } else if(speakerBox){
-          setSnackbarInfo({
-            open: true,
-            message: "Please Select The Speaker",
-            variant: "error",
-          });
-        }
-      }
-      }; 
-  
       const removeSub = useCallback(
         (sub) => {
           const index = hasSub(sub);
           const res = onSubtitleDelete(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          //saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [result]
@@ -199,7 +156,6 @@ import React, {
           const index = hasSub(sub);
           const res = onMerge(index);
           dispatch(setSubtitles(res, C.SUBTITLES));
-          //saveTranscript(taskData?.annotation_status, res);
         },
         // eslint-disable-next-line
         [result]
@@ -216,7 +172,6 @@ import React, {
   
           copySub[index] = sub;
           dispatch(setSubtitles(copySub, C.SUBTITLES));
-          //saveTranscript(taskData?.annotation_status,copySub);
         },
         // eslint-disable-next-line
         [result]
@@ -281,13 +236,13 @@ import React, {
             }
           } else if (lastType === "right") {
             if (endTime >= 0 && endTime - lastSub.startTime >= 0.2) {
-              const end_time = DT.d2t(endTime);
+              const end_time = DT.d2t(Math.min(endTime, duration));
   
               if (index >= 0 && index !== result.length - 1 && endTime <= DT.t2d(next.start_time)) {
                 updateSub(lastSub, { end_time });
               }
-  
-              if(index === result.length - 1 && endTime < lastSub.endTime) {
+              
+              if(index === result.length - 1) {
                 updateSub(lastSub, { end_time });
               }
             } else {
@@ -463,12 +418,41 @@ import React, {
                         left: 0,
                         width: 10,
                       }}
+                      onDoubleClick={() => {
+                        if (player) {
+                          player.play();
+                          if (player.duration >= sub.startTime) {
+                            player.currentTime = sub.startTime;
+                            setTimeout(() => {
+                              player.pause();
+                            }, (sub.endTime - sub.startTime) * 1000);
+                          }
+                        }
+                      }}
                       onMouseDown={(event) => onMouseDown(sub, event, "left")}
                     ></div>
   
                     <div
                       className={classes.subText}
                       title={sub.text}
+                      onDoubleClick={() => {
+                        if (player) {
+                          player.play();
+                          if (player.duration >= sub.startTime) {
+                            player.currentTime = sub.startTime;
+                            setTimeout(() => {
+                              player.pause();
+                            }, (sub.endTime - sub.startTime) * 1000);
+                            // const timeUpdateListener = () => {
+                            //   if (player.currentTime >= sub.endTime) {
+                            //     player.pause();
+                            //     player.removeEventListener('timeupdate', timeUpdateListener);
+                            //   }
+                            // };
+                            // player.addEventListener('timeupdate', timeUpdateListener);
+                          }
+                        }
+                      }}
                       onMouseDown={(event) => onMouseDown(sub, event)}
                     >
                       <p className={classes.subTextP}>
@@ -482,6 +466,17 @@ import React, {
                       style={{
                         right: 0,
                         width: 10,
+                      }}
+                      onDoubleClick={() => {
+                        if (player) {
+                          player.play();
+                          if (player.duration >= sub.startTime) {
+                            player.currentTime = sub.startTime;
+                            setTimeout(() => {
+                              player.pause();
+                            }, (sub.endTime - sub.startTime) * 1000);
+                          }
+                        }
                       }}
                       onMouseDown={(event) => onMouseDown(sub, event, "right")}
                     ></div>

@@ -24,7 +24,7 @@ import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/G
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import roles from "../../../../utils/UserMappedByRole/Roles";
 
-const UserType = ["annotator", "reviewer"];
+const UserType = ["annotator", "reviewer","superchecker"];
 const archivedProjects = ["true", "false"];
 const ProjectFilterList = (props) => {
   const classes = DatasetStyle();
