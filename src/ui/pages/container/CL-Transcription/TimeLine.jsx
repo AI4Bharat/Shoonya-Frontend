@@ -98,13 +98,13 @@ console.log(taskId,"taskIdtaskIdtaskId")
       player.currentTime = currentTime;
       waveform.seek(currentTime);
 
-      const apiObj = new GetAnnotationsTaskAPI(
-        taskDetails.id,
-        // taskDetails?.task_type,
-        // DT.d2t(currentTime),
-        // limit
-      );
-      dispatch(APITransport(apiObj));
+      // const apiObj = new GetAnnotationsTaskAPI(
+      //   taskDetails.id,
+      //   // taskDetails?.task_type,
+      //   // DT.d2t(currentTime),
+      //   // limit
+      // );
+      // dispatch(APITransport(apiObj));
     },
 
     // eslint-disable-next-line
