@@ -66,7 +66,7 @@ const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
   return <div className={classes.waveform} ref={$waveform} />;
 });
 
-const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
+const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId, autoSaveBeforeProgressBarChanges, setAutoSaveBeforeProgressBarChanges}) => {
   const classes = AudioTranscriptionLandingStyle();
   const firstLoaded = useRef(false);
   const dispatch = useDispatch();
@@ -96,8 +96,10 @@ console.log(taskId,"taskIdtaskIdtaskId")
       const currentTime =
         (event.pageX / document.body.clientWidth) * player.duration;
       player.currentTime = currentTime;
-      waveform.seek(currentTime);
-
+      setAutoSaveBeforeProgressBarChanges(true);
+      if(autoSaveBeforeProgressBarChanges === false){
+        waveform.seek(currentTime);
+      }
       // const apiObj = new GetAnnotationsTaskAPI(
       //   taskDetails.id,
       //   // taskDetails?.task_type,
@@ -133,7 +135,10 @@ console.log(taskId,"taskIdtaskIdtaskId")
   const onDocumentMouseUp = useCallback(() => {
     if (grabbing) {
       setGrabbing(false);
-      waveform.seek(player.currentTime);
+      setAutoSaveBeforeProgressBarChanges(true);
+      if(autoSaveBeforeProgressBarChanges === false){
+        waveform.seek(currentTime);
+      }
     }
   }, [grabbing, waveform, player.currentTime]);
 
@@ -274,7 +279,7 @@ const Duration = memo(({ currentTime }) => {
   );
 });
 
-const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
+const Timeline = ({ currentTime, playing ,taskID, waveformSettings, autoSaveBeforeProgressBarChanges, setAutoSaveBeforeProgressBarChanges}) => {
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
 console.log(taskID,"taskDatataskData")
@@ -324,7 +329,7 @@ console.log(taskID,"taskDatataskData")
       {player &&
           (
           <>
-            <Progress waveform={waveform} currentTime={currentTime} taskId={taskID}/>
+            <Progress waveform={waveform} currentTime={currentTime} taskId={taskID} autoSaveBeforeProgressBarChanges={autoSaveBeforeProgressBarChanges} setAutoSaveBeforeProgressBarChanges={setAutoSaveBeforeProgressBarChanges}/>
             <Duration currentTime={currentTime} />
             <WaveForm setWaveform={setWaveform} setRender={setRender} waveformSettings={waveformSettings} />
             <Grab waveform={waveform} />

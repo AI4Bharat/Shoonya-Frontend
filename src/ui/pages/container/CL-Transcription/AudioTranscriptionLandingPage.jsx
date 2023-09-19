@@ -44,7 +44,6 @@ import AnnotationStageButtons from "../../component/CL-Transcription/AnnotationS
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import isPlaying from '../../../../utils/utils.js';
 
 const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -105,7 +104,7 @@ const AudioTranscriptionLandingPage = () => {
   const user = useSelector((state) => state.fetchLoggedInUserData.data);
   const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
-
+  const [autoSaveBeforeProgressBarChanges, setAutoSaveBeforeProgressBarChanges] = useState(false);
 
   // useEffect(() => {
   //   let intervalId;
@@ -367,6 +366,13 @@ const AudioTranscriptionLandingPage = () => {
 
     // eslint-disable-next-line
   }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+
+  useEffect(() => {
+    if(autoSaveBeforeProgressBarChanges){
+      handleAutosave();
+      setAutoSaveBeforeProgressBarChanges(false);
+    }
+  }, [autoSaveBeforeProgressBarChanges]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -977,7 +983,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>
+        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} autoSaveBeforeProgressBarChanges={autoSaveBeforeProgressBarChanges} setAutoSaveBeforeProgressBarChanges={setAutoSaveBeforeProgressBarChanges}/>
       </Grid>
     </>
   );

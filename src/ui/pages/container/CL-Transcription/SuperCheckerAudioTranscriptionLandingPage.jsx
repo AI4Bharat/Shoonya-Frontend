@@ -44,7 +44,6 @@ import SuperCheckerStageButtons from "../../component/CL-Transcription/SuperChec
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import isPlaying from '../../../../utils/utils.js';
 
 const SuperCheckerAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -103,6 +102,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
+  const [autoSaveBeforeProgressBarChanges, setAutoSaveBeforeProgressBarChanges] = useState(false);
  
 
   // useEffect(() => {
@@ -301,6 +301,13 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
     // eslint-disable-next-line
   }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+
+  useEffect(() => {
+    if(autoSaveBeforeProgressBarChanges){
+      handleAutosave();
+      setAutoSaveBeforeProgressBarChanges(false);
+    }
+  }, [autoSaveBeforeProgressBarChanges]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -1027,7 +1034,7 @@ useEffect(() => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} />
+        <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} autoSaveBeforeProgressBarChanges={autoSaveBeforeProgressBarChanges} setAutoSaveBeforeProgressBarChanges={setAutoSaveBeforeProgressBarChanges}/>
       </Grid>
     </>
   );
