@@ -45,6 +45,9 @@ import { useDispatch, useSelector } from "react-redux";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 import InfoIcon from "@mui/icons-material/Info";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
+import LightTooltip from "../../component/common/Tooltip";
 
 const filterAnnotations = (
   annotations,
@@ -200,6 +203,7 @@ const LabelStudioWrapper = ({
   const [disableBtns, setDisableBtns] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
+  const [assignedUsers, setAssignedUsers] = useState(null);
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
@@ -719,6 +723,13 @@ const LabelStudioWrapper = ({
     showLoader();
   }, [taskId]);
 
+  useEffect(() => {
+    const showAssignedUsers = async () => {
+      getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
+    }
+    taskData?.id && showAssignedUsers();
+  }, [taskData]);
+
   const autoSaveAnnotation = () => {
     if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
       if (taskData?.annotation_status !== "freezed") {
@@ -845,6 +856,23 @@ const LabelStudioWrapper = ({
         >
           <div />
           <Grid container spacing={0}>
+            <Grid item>
+              <LightTooltip title={assignedUsers ? assignedUsers : ""}>
+                <Button
+                  type="default"
+                  className="lsf-button"
+                  style={{
+                    minWidth: "40px",
+                    border: "1px solid #e6e6e6",
+                    color: "grey",
+                    pt: 1, pl: 1, pr: 1,
+                    borderBottom: "None",
+                  }}
+                  > 
+                    <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
+                </Button>
+              </LightTooltip>
+            </Grid>
             {/* <Grid container spacing={0} sx={{ justifyContent: "end" }}> */}
             <Grid item>
               {taskData?.annotation_users?.some(

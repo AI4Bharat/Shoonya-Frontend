@@ -22,6 +22,7 @@ import {
   TextField,
 } from "@mui/material";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
@@ -44,6 +45,8 @@ import ReviewStageButtons from "../../component/CL-Transcription/ReviewStageButt
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
+import LightTooltip from "../../component/common/Tooltip"
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -106,7 +109,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
-
+  const [assignedUsers, setAssignedUsers] = useState(null);  
 
   // useEffect(() => {
   //   let intervalId;
@@ -494,6 +497,13 @@ const ReviewAudioTranscriptionLandingPage = () => {
     const projectObj = new GetProjectDetailsAPI(projectId);
     dispatch(APITransport(projectObj));
   };
+
+  useEffect(() => {
+    const showAssignedUsers = async () => {
+      getTaskAssignedUsers(taskDetails).then(res => setAssignedUsers(res));
+    }
+    taskDetails?.id && showAssignedUsers();
+  }, [taskDetails]);
 
   useEffect(() => {
     if (AnnotationsTaskDetails?.length > 0) {
@@ -980,6 +990,14 @@ useEffect(() => {
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
+            <Typography sx={{mt: 2, ml: 4, color: "grey"}}>
+              Task #{taskDetails?.id}
+              <LightTooltip
+                title={assignedUsers ? assignedUsers : ""}
+              >
+                <InfoOutlinedIcon sx={{mb: "-4px", ml: "2px", color: "grey"}}/>
+              </LightTooltip>
+            </Typography>
             <ReviewStageButtons
               handleReviewClick={handleReviewClick}
               onNextAnnotation={onNextAnnotation}
