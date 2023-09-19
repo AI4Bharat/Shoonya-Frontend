@@ -702,6 +702,27 @@ useEffect(() => {
   }
 }, [advancedWaveformSettings]);
 
+useEffect(() => {
+  const handleKeyDown = (event) => {
+    if (event.ctrlKey && event.key === ' ') {
+      event.preventDefault();
+      if(player){
+        console.log(isPlaying(player));
+        if(isPlaying(player)){
+          player.pause();
+        }else{
+          player.play();
+        }
+      }
+    }
+  };
+
+  document.addEventListener('keydown', handleKeyDown);
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+  };
+}, [player]);  
+
   return (
     <>
       {loading && <Spinner />}
