@@ -26,11 +26,40 @@ const AnnotationStageButtons = ({
   let Annotation = AnnotationsTaskDetails.filter(
     (annotation) => annotation.annotation_type === 1
   )[0];
-
+console.log(taskData);
 
   return (
     <>
       <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+      {!disableSkipButton &&
+          taskData?.annotation_users?.some((users) => users === user.id) && (
+            <Grid item>
+              <Tooltip title="skip to next task">
+                <Button
+                  value="Skip"
+                  type="default"
+                  variant="outlined"
+                  onClick={() =>
+                    handleAnnotationClick(
+                      "skipped",
+                      Annotation.id,
+                      Annotation.lead_time,
+                    )
+                  }
+                  style={{
+                    minWidth: "120px",
+                    border: "1px solid gray",
+                    color: "#d00",
+                    pt: 2,
+                    pb: 2,
+                  }}
+                  // className="lsf-button"
+                >
+                  Skip
+                </Button>
+              </Tooltip>
+            </Grid>
+          )}
         {!disableBtns &&
           taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
@@ -79,35 +108,6 @@ const AnnotationStageButtons = ({
             </Button>
           </Tooltip>
         </Grid>
-        {!disableSkipButton &&
-          taskData?.annotation_users?.some((users) => users === user.id) && (
-            <Grid item>
-              <Tooltip title="skip to next task">
-                <Button
-                  value="Skip"
-                  type="default"
-                  variant="outlined"
-                  onClick={() =>
-                    handleAnnotationClick(
-                      "skipped",
-                      Annotation.id,
-                      Annotation.lead_time,
-                    )
-                  }
-                  style={{
-                    minWidth: "120px",
-                    border: "1px solid gray",
-                    color: "#d00",
-                    pt: 2,
-                    pb: 2,
-                  }}
-                  // className="lsf-button"
-                >
-                  Skip
-                </Button>
-              </Tooltip>
-            </Grid>
-          )}
         {!disableUpdataButton &&
           taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
