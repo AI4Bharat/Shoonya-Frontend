@@ -32,7 +32,9 @@ import getCaretCoordinates from "textarea-caret";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
+import LightTooltip from "../../component/common/Tooltip";
 
 import {
   getProjectsandTasks,
@@ -171,6 +173,7 @@ const LabelStudioWrapper = ({
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
+  const [assignedUsers, setAssignedUsers] = useState(null);
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -674,6 +677,13 @@ const LabelStudioWrapper = ({
     showLoader();
   }, [taskId]);
 
+  useEffect(() => {
+    const showAssignedUsers = async () => {
+      getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
+    }
+    taskData?.id && showAssignedUsers();
+  }, [taskData]);
+
   const autoSaveSuperCheck = () => {
     if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
       if (taskData?.annotation_status !== "freezed") {
@@ -836,6 +846,21 @@ const LabelStudioWrapper = ({
         >
           <div />
           <div>
+            <LightTooltip title={assignedUsers ? assignedUsers : ""}>
+              <Button
+                type="default"
+                className="lsf-button"
+                style={{
+                  minWidth: "40px",
+                  border: "1px solid #e6e6e6",
+                  color: "grey",
+                  pt: 1, pl: 1, pr: 1,
+                  borderBottom: "None",
+                }}
+                > 
+                  <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
+              </Button>
+            </LightTooltip>
             <Tooltip title="Go to next task">
               <Button
                 type="default"
