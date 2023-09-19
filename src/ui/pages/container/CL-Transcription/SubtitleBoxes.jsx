@@ -435,6 +435,13 @@ import React, {
                     <div
                       className={classes.subText}
                       title={sub.text}
+                      style = {{
+                        backgroundColor: sub.speaker_id === "Speaker 0"
+                        ? "rgba(228, 0, 252, 0.42)"
+                        : sub.speaker_id === "Speaker 1"
+                        ? "rgba(245, 252, 0, 0.42)"
+                        : "",
+                      }}
                       onDoubleClick={() => {
                         if (player) {
                           player.play();
