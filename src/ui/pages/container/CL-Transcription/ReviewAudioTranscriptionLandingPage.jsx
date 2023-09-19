@@ -43,7 +43,7 @@ import ReviewStageButtons from "../../component/CL-Transcription/ReviewStageButt
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
+import isPlaying from '../../../../utils/utils.js';
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
