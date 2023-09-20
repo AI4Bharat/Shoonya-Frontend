@@ -160,7 +160,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     height: "12px",
     userSelect: "none",
     borderTop: "1px solid rgb(255 255 255 / 20%)",
-    backgroundColor: "rgb(0 0 0 / 50%)",
+    backgroundColor: "rgb(0 0 0 / 10%)",
   },
 
   bar: {
@@ -171,7 +171,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     width: "0%",
     height: "100%",
     display: "inline-block",
-    backgroundColor: "#730000",
+    backgroundColor: "rgb(0 0 255 / 60%)",
     overflow: "hidden",
   },
 
@@ -201,7 +201,15 @@ const AudioTranscriptionLandingStyle = makeStyles({
     top: "0",
     bottom: "0",
     height: "100%",
-    backgroundColor: "rgb(255 255 255 / 20%)",
+    backgroundColor: "rgb(255 0 0 / 50%)",
+  },
+
+  item_completed: {
+    position: "absolute",
+    top: "0",
+    bottom: "0",
+    height: "100%",
+    backgroundColor: "rgb(0 255 0 / 50%)",
   },
 
   grab: {

@@ -105,7 +105,8 @@ const TranscriptionRightPanel = ({
   console.log(subtitles);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentPageData = subtitles?.slice(startIndex, endIndex);
+  const currentPageData = subtitles;
+  // const currentPageData = subtitles?.slice(startIndex, endIndex);
   const idxOffset = (itemsPerPage * (page - 1));
   const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
@@ -780,7 +781,8 @@ const TranscriptionRightPanel = ({
         >
           <Pagination
             color="primary"
-            count={Math.ceil(subtitles?.length / itemsPerPage)}
+            // count={Math.ceil(subtitles?.length / itemsPerPage)}
+            count={1}
             page={page}
             onChange={handlePageChange}
           />
