@@ -630,16 +630,13 @@ const TranscriptionRightPanel = ({
                           enabled={enableTransliterationSuggestion}
                           onChangeText={() => { }}
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
-                          containerStyles={{
-                            width: "100%",
-                          }}
+                          containerStyles={{ width: "100%", height: "100%" }}
                           onBlur={() => {
                             setTimeout(() => {
                               setShowPopOver(false);
                             }, 200);
                           }}
-                          style={{ fontSize: fontSize, height: "100%" 
-                        }}
+                          style={{ fontSize: fontSize, height: "100%" }}
                           renderComponent={(props) => (
                             <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                               <textarea
@@ -671,10 +668,7 @@ const TranscriptionRightPanel = ({
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
                             className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                               }`}
-                            style={{
-                              fontSize: fontSize,
-                              height: "100%",
-                            }}
+                            style={{ fontSize: fontSize, height: "100%" }}
                             onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
@@ -697,10 +691,8 @@ const TranscriptionRightPanel = ({
                             }}
                             enabled={enableTransliterationSuggestion}
                             onChangeText={() => { }}
-                            containerStyles={{
-                              width: "100%",
-                            }}
-                            style={{ fontSize: fontSize, height: "100%", }}
+                            containerStyles={{ width: "100%", height: "100%" }}
+                            style={{ fontSize: fontSize, height: "100%" }}
                             renderComponent={(props) => (
                               <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                                 <textarea
@@ -708,8 +700,6 @@ const TranscriptionRightPanel = ({
                                     }`}
                                   dir={enableRTL_Typing ? "rtl" : "ltr"}
                                   onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
-                                  style={{ fontSize: fontSize, height: "100%",
-                                }}
                                   {...props}
                                 />
                               </div>
@@ -726,10 +716,7 @@ const TranscriptionRightPanel = ({
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
                               className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                                 }`}
-                              style={{
-                                fontSize: fontSize,
-                                height: "100%",
-                              }}
+                              style={{ fontSize: fontSize, height: "100%" }}
                             />
                           </div>
                         ))}
