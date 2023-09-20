@@ -85,7 +85,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   });
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
-  const[taskDetailList,setTaskDetailList] = useState("")
+  const[taskDetailList,setTaskDetailList] = useState()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -276,12 +276,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
     !showNotes && setShowStdTranscript(false);
     setShowNotes(!showNotes);
   };
-
-
-  useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text.trim() === "");
-    settextBox(hasEmptyText);
-  }, [result]);
 
   const getTaskData = async (id) => {
     setLoading(true);
@@ -565,7 +559,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         setNextData(rsp_data);
         tasksComplete(rsp_data?.id || null);
         getAnnotationsTaskData(rsp_data.id);
-       
+        getTaskData(rsp_data.id);
       } 
     }).catch((error) => {
       setSnackbarInfo({
