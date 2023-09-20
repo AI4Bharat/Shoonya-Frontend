@@ -75,8 +75,15 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
   const limit = useSelector((state) => state.commonReducer.limit);
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
 
+  const sub = useSelector((state) => state.commonReducer?.subtitles);
+
+  // console.log(sub)
+
   const [grabbing, setGrabbing] = useState(false);
-console.log(taskId,"taskIdtaskIdtaskId")
+  console.log(taskId,"taskIdtaskIdtaskId")
+
+  // console.log('subtitles',state.commonReducer.subtitles)
+  // console.log('subtitles',sub[0])
   // useEffect(() => {
   //   if (firstLoaded.current && !grabbing) {
   //     const apiObj = new GetAnnotationsTaskAPI(
@@ -157,13 +164,23 @@ console.log(taskId,"taskIdtaskIdtaskId")
         <Box className={classes.handle} onMouseDown={onGrabDown}></Box>
       </Box>
       <Box className={classes.timelineSubtitle}>
-        {subtitle.length <= 200
-          ? subtitle.map((item, index) => {
+        {sub != undefined
+          ? sub.map((item, index) => {
               const { duration } = player;
+              console.log(item)
               return (
+                item.text === ''? 
                 <span
                   key={index}
                   className={classes.item}
+                  style={{
+                    left: `${(item.startTime / duration) * 100}%`,
+                    width: `${(item.duration / duration) * 100}%`,
+                  }}
+                /> :
+                <span
+                  key={index}
+                  className={classes.item_completed}
                   style={{
                     left: `${(item.startTime / duration) * 100}%`,
                     width: `${(item.duration / duration) * 100}%`,
