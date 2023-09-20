@@ -85,6 +85,12 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     taskData?.id && showAssignedUsers();
   }, [taskData]);
 
+  useEffect(() => {
+    if (Object.keys(userData).includes("prefer_cl_ui") && userData.prefer_cl_ui) {
+      navigate(`/projects/${projectId}/AllAudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]);
+
   const tasksComplete = (id) => {
     if (id) {
       resetNotes()

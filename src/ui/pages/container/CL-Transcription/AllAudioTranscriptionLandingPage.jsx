@@ -167,8 +167,8 @@ const AllAudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
-    if (Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.metadata_json?.acoustic_enabled_stage > 1) {
-      navigate(`/projects/${projectId}/task/${taskId}`);
+    if (Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui)) {
+      navigate(`/projects/${projectId}/Alltask/${taskId}`);
     }
   }, [user]);
 
