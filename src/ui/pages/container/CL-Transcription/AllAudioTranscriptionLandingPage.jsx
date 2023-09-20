@@ -81,7 +81,6 @@ const AllAudioTranscriptionLandingPage = () => {
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
-  let labellingMode = localStorage.getItem("labellingMode");
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -196,7 +195,6 @@ const AllAudioTranscriptionLandingPage = () => {
       id: projectId,
       current_task_id: taskId,
       mode: "annotation",
-      annotation_status: labellingMode,
     };
 
     let apiObj = new GetNextProjectAPI(projectId, nextAPIData);
