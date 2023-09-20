@@ -77,7 +77,7 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
 
   const sub = useSelector((state) => state.commonReducer?.subtitles);
 
-  // console.log(sub)
+  // console.log(taskDetails)
 
   const [grabbing, setGrabbing] = useState(false);
   console.log(taskId,"taskIdtaskIdtaskId")
@@ -164,7 +164,7 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
         <Box className={classes.handle} onMouseDown={onGrabDown}></Box>
       </Box>
       <Box className={classes.timelineSubtitle}>
-        {sub != undefined
+        {sub != undefined //TODO check if the Semantic (L2) transcription box is empty for Supercheckers/Reviewers of internal language
           ? sub.map((item, index) => {
               const { duration } = player;
               console.log(item)
