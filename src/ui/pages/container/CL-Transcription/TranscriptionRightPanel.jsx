@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useRef, memo } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { Resizable } from 're-resizable';
 import {
   addSubtitleBox,
   getSubtitleRangeTranscript,
@@ -61,6 +62,7 @@ import C from "../../../../redux/constants";
 import SettingsButtonComponent from "../../component/CL-Transcription/SettingsButtonComponent";
 import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 // import {
 //   APITransport,
 //   FetchTranscriptPayloadAPI,
@@ -136,6 +138,8 @@ const TranscriptionRightPanel = ({
   const AnnotationStage = localStorage.getItem("Stage") === "annotation";
   const SuperCheckerStage =
     localStorage.getItem("SuperCheckerStage") === "superChecker";
+  const parentScrollOffsetX = useRef(0);
+  const parentScrollOffsetY = useRef(0);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -195,6 +199,20 @@ const TranscriptionRightPanel = ({
       });
     }
   }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.altKey && event.key === "1") {
+        event.preventDefault();
+        setTransliteration(!enableTransliteration);
+      }
+    };
+  
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [enableTransliteration, setTransliteration]);
   
 
   const getPayload = (offset = currentOffset, lim = limit) => {
@@ -276,10 +294,16 @@ const TranscriptionRightPanel = ({
 
     const containsTripleDollar = value.includes("$$$");
 
-    setEnableTransliterationSuggestion(true);
+    // setEnableTransliterationSuggestion(true);
+    if (value.includes("$$")) {
+      setEnableTransliterationSuggestion(false);
+    }
+    else {
+      setEnableTransliterationSuggestion(true);
+    }
 
     if (containsTripleDollar && !updateAcoustic) {
-      setEnableTransliterationSuggestion(false);
+      // setEnableTransliterationSuggestion(false);
 
       const textBeforeTab = value.split("$$$")[0];
       const textAfterTab = value.split("$$$")[1].split("").join("");
@@ -518,211 +542,244 @@ const TranscriptionRightPanel = ({
 
           <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
             height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
+            alignItems: "center",
           }}>
           {currentPageData?.map((item, index) => {
             return (
-              <Box
-                key={index}
-                id={`sub_${index}`}
-                style={{
-                  padding: "16px",
-                  borderBottom: "1px solid lightgray",
-                  backgroundColor:
-                    index % 2 === 0
-                      ? "rgb(214, 238, 255)"
-                      : "rgb(233, 247, 239)",
-                }}
-              >
-                <Box className={classes.topBox}>
-                  <TimeBoxes
-                    handleTimeChange={handleTimeChange}
-                    time={item.start_time}
-                    index={index + idxOffset}
-                    type={"startTime"}
-                  />
-
-                  <ButtonComponent
-                    index={index + idxOffset}
-                    lastItem={(index + idxOffset) < subtitles?.length - 1}
-                    onMergeClick={onMergeClick}
-                    onDelete={onDelete}
-                    addNewSubtitleBox={addNewSubtitleBox}
-                  />
-
-                  <TimeBoxes
-                    handleTimeChange={handleTimeChange}
-                    time={item.end_time}
-                    index={index + idxOffset}
-                    type={"endTime"}
-                  />
-                </Box>
-
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    padding: "5px 0",
+              <React.Fragment>
+                <Resizable
+                  bounds="parent"
+                  default={{ height: "240px" }}
+                  minHeight="240px"
+                  enable={{ top:false, right:false, bottom:true, left:false, topRight:false, bottomRight:false, bottomLeft:false, topLeft:false }}
+                  style={{ alignItems: "center", display: "flex", flexDirection: "column", marginTop: index === 0 ? "0px" : "-16px" }}
+                  onResizeStart={(e, dir, ref) => {
+                    parentScrollOffsetX.current = ref.parentElement?.scrollLeft || 0
+                    parentScrollOffsetY.current = ref.parentElement?.scrollTop || 0
                   }}
-                  className={classes.cardContent}
-                  aria-describedby={"suggestionList"}
-                  onClick={() => {
-                    if (player) {
-                      player.pause();
-                      if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
-                        player.currentTime = item.startTime + 0.001;
-                      }
-                    }
+                  onResize={(e, dir, ref, d) => {
+                    ref.parentElement.scrollTo(parentScrollOffsetX.current, parentScrollOffsetY.current)
                   }}
+                  handleStyles={{ bottom: {height: "24px"}}}
                 >
-                  {ProjectDetails?.tgt_language !== "en" &&
-                    enableTransliteration ? (
-                    <IndicTransliterate
-                      lang={targetlang}
-                      value={item.text}
-                      onChange={(event) => {
-                        changeTranscriptHandler(event, index + idxOffset);
+                  <Box
+                    key={index}
+                    id={`sub_${index}`}
+                    style={{
+                      padding: "16px",
+                      borderBottom: "1px solid lightgray",
+                      backgroundColor:
+                        index % 2 === 0
+                          ? "rgb(214, 238, 255)"
+                          : "rgb(233, 247, 239)",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      height: "100%",
+                    }}
+                  >
+                    <Box className={classes.topBox}>
+                      <TimeBoxes
+                        handleTimeChange={handleTimeChange}
+                        time={item.start_time}
+                        index={index + idxOffset}
+                        type={"startTime"}
+                      />
+
+                      <ButtonComponent
+                        index={index + idxOffset}
+                        lastItem={(index + idxOffset) < subtitles?.length - 1}
+                        onMergeClick={onMergeClick}
+                        onDelete={onDelete}
+                        addNewSubtitleBox={addNewSubtitleBox}
+                      />
+
+                      <TimeBoxes
+                        handleTimeChange={handleTimeChange}
+                        time={item.end_time}
+                        index={index + idxOffset}
+                        type={"endTime"}
+                      />
+                    </Box>
+
+                    <CardContent
+                      sx={{
+                        display: "flex",
+                        padding: "15px 0",
+                        height: "100%",
                       }}
-                      enabled={enableTransliterationSuggestion}
-                      onChangeText={() => { }}
-                      onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
-                      containerStyles={{
-                        width: "100%",
+                      className={classes.cardContent}
+                      aria-describedby={"suggestionList"}
+                      onClick={() => {
+                        if (player) {
+                          player.pause();
+                          if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
+                            player.currentTime = item.startTime + 0.001;
+                          }
+                        }
                       }}
-                      onBlur={() => {
-                        setTimeout(() => {
-                          setShowPopOver(false);
-                        }, 200);
-                      }}
-                      style={{ fontSize: fontSize, height: "120px" }}
-                      renderComponent={(props) => (
-                        <div className={classes.relative} style={{ width: "100%" }}>
+                    >
+                      {ProjectDetails?.tgt_language !== "en" &&
+                        enableTransliteration ? (
+                        <IndicTransliterate
+                          lang={targetlang}
+                          value={item.text}
+                          onChange={(event) => {
+                            changeTranscriptHandler(event, index + idxOffset);
+                          }}
+                          enabled={enableTransliterationSuggestion}
+                          onChangeText={() => { }}
+                          onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                          containerStyles={{
+                            width: "100%",
+                          }}
+                          onBlur={() => {
+                            setTimeout(() => {
+                              setShowPopOver(false);
+                            }, 200);
+                          }}
+                          style={{ fontSize: fontSize, height: "100%" 
+                        }}
+                          renderComponent={(props) => (
+                            <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                              <textarea
+                                className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                  }`}
+                                dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                                onBlur={() => {
+                                  setTimeout(() => {
+                                    setShowPopOver(false);
+                                  }, 200);
+                                }}
+                                {...props}
+                              />
+                              {/* <span id="charNum" className={classes.wordCount}>
+                      {targetLength(index)}
+                    </span> */}
+                            </div>
+                          )}
+                        />
+                      ) : (
+                        <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
+                            onChange={(event) => {
+                              changeTranscriptHandler(event, index + idxOffset);
+                            }}
+                            onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                            value={item.text}
+                            dir={enableRTL_Typing ? "rtl" : "ltr"}
                             className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                               }`}
-                            dir={enableRTL_Typing ? "rtl" : "ltr"}
-                            rows={4}
-                            onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                            style={{
+                              fontSize: fontSize,
+                              height: "100%",
+                            }}
                             onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
                               }, 200);
                             }}
-                            {...props}
                           />
                           {/* <span id="charNum" className={classes.wordCount}>
-                  {targetLength(index)}
-                </span> */}
+                        {targetLength(index)}
+                      </span> */}
                         </div>
                       )}
-                    />
-                  ) : (
-                    <div className={classes.relative} style={{ width: "100%" }}>
-                      <textarea
-                        onChange={(event) => {
-                          changeTranscriptHandler(event, index + idxOffset);
-                        }}
-                        onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
-                        value={item.text}
-                        dir={enableRTL_Typing ? "rtl" : "ltr"}
-                        className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
-                          }`}
-                        // className={classes.customTextarea}
-                        style={{
-                          fontSize: fontSize,
-                          height: "120px",
-                        }}
-                        rows={4}
-                        onBlur={() => {
-                          setTimeout(() => {
-                            setShowPopOver(false);
-                          }, 200);
-                        }}
-                      />
-                      {/* <span id="charNum" className={classes.wordCount}>
-                    {targetLength(index)}
-                  </span> */}
-                    </div>
-                  )}
-                  {showAcousticText &&
-                    (ProjectDetails?.tgt_language !== "en" &&
-                      enableTransliteration ? (
-                      <IndicTransliterate
-                        lang={targetlang}
-                        value={item.acoustic_normalised_text}
-                        onChange={(event) => {
-                          changeTranscriptHandler(event, index + idxOffset, true);
-                        }}
-                        enabled={enableTransliterationSuggestion}
-                        onChangeText={() => { }}
-                        containerStyles={{
-                          width: "100%",
-                        }}
-                        style={{ fontSize: fontSize, height: "120px" }}
-                        renderComponent={(props) => (
-                          <div className={classes.relative} style={{ width: "100%" }}>
+                      {showAcousticText &&
+                        (ProjectDetails?.tgt_language !== "en" &&
+                          enableTransliteration ? (
+                          <IndicTransliterate
+                            lang={targetlang}
+                            value={item.acoustic_normalised_text}
+                            onChange={(event) => {
+                              changeTranscriptHandler(event, index + idxOffset, true);
+                            }}
+                            enabled={enableTransliterationSuggestion}
+                            onChangeText={() => { }}
+                            containerStyles={{
+                              width: "100%",
+                            }}
+                            style={{ fontSize: fontSize, height: "100%", }}
+                            renderComponent={(props) => (
+                              <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                                <textarea
+                                  className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                    }`}
+                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                  onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
+                                  style={{ fontSize: fontSize, height: "100%",
+                                }}
+                                  {...props}
+                                />
+                              </div>
+                            )}
+                          />
+                        ) : (
+                          <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                             <textarea
+                              onChange={(event) => {
+                                changeTranscriptHandler(event, index + idxOffset, true);
+                              }}
+                              onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
+                              value={item.acoustic_normalised_text}
+                              dir={enableRTL_Typing ? "rtl" : "ltr"}
                               className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                                 }`}
-                              dir={enableRTL_Typing ? "rtl" : "ltr"}
-                              rows={4}
-                              onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
-                              style={{ fontSize: fontSize, height: "120px" }}
-                              {...props}
+                              style={{
+                                fontSize: fontSize,
+                                height: "100%",
+                              }}
                             />
                           </div>
-                        )}
-                      />
-                    ) : (
-                      <div className={classes.relative} style={{ width: "100%" }}>
-                        <textarea
-                          onChange={(event) => {
-                            changeTranscriptHandler(event, index + idxOffset, true);
-                          }}
-                          onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
-                          value={item.acoustic_normalised_text}
-                          dir={enableRTL_Typing ? "rtl" : "ltr"}
-                          className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
-                            }`}
-                          style={{
-                            fontSize: fontSize,
-                            height: "120px",
-                          }}
-                          rows={4}
-                        />
-                      </div>
-                    ))}
-                </CardContent>
+                        ))}
+                    </CardContent>
 
-                <FormControl
-                  sx={{ width: "50%", mr: "auto", float: "left" }}
-                  size="small"
-                >
-                  <InputLabel id="select-speaker">Select Speaker</InputLabel>
-                  <Select
-                    fullWidth
-                    labelId="select-speaker"
-                    label="Select Speaker"
-                    value={item.speaker_id}
-                    onChange={(event) =>
-                      handleSpeakerChange(event.target.value, index + idxOffset)
-                    }
-                    style={{
-                      backgroundColor: "#fff",
-                      textAlign: "left",
-                    }}
-                    inputProps={{
-                      "aria-label": "Without label",
-                      style: { textAlign: "left" },
-                    }}
-                    MenuProps={MenuProps}
-                  >
-                    {speakerIdList?.map((speaker, index) => (
-                      <MenuItem key={index} value={speaker.name}>
-                        {speaker.name} ({speaker.gender})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
+                    <FormControl
+                      sx={{ width: "50%", mr: "auto", float: "left" }}
+                      size="small"
+                    >
+                      <InputLabel id="select-speaker">Select Speaker</InputLabel>
+                      <Select
+                        fullWidth
+                        labelId="select-speaker"
+                        label="Select Speaker"
+                        value={item.speaker_id}
+                        onChange={(event) =>
+                          handleSpeakerChange(event.target.value, index + idxOffset)
+                        }
+                        style={{
+                          backgroundColor: "#fff",
+                          textAlign: "left",
+                        }}
+                        inputProps={{
+                          "aria-label": "Without label",
+                          style: { textAlign: "left" },
+                        }}
+                        MenuProps={MenuProps}
+                      >
+                        {speakerIdList?.map((speaker, index) => (
+                          <MenuItem key={index} value={speaker.name}>
+                            {speaker.name} ({speaker.gender})
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </Resizable>
+                <div style={{
+                  color: "grey",
+                  zIndex: 100,
+                  marginTop: "-16px",
+                  borderRadius: "100%",
+                  border: "1px solid rgba(128, 128, 128, 0.5)",
+                  backgroundColor: "white",
+                  height: "32px", width: "32px",
+                  pointerEvents: "none",
+                }}>
+                  <UnfoldMoreOutlinedIcon sx={{mt: "3px"}}/> 
+                </div>
+              </React.Fragment>
             );
           })}
         </Box>

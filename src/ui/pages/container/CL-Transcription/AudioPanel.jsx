@@ -23,7 +23,6 @@ const AudioPanel = memo( ({
   const { taskId } = useParams();
   const TaskDetails = useSelector((state) => state.getTaskDetails?.data);
 
-
   useEffect(() => {
     dispatch(setPlayer($audio.current));
     (function loop() {
@@ -31,6 +30,7 @@ const AudioPanel = memo( ({
         if ($audio.current) {
           setPlaying(isPlaying($audio.current));
           setCurrentTime($audio.current.currentTime || 0);
+          $audio.current.defaultPlaybackRate = 1.0;
         }
         loop();
       });
