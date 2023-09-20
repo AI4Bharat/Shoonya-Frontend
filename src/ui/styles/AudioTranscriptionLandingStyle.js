@@ -160,7 +160,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     height: "12px",
     userSelect: "none",
     borderTop: "1px solid rgb(255 255 255 / 20%)",
-    backgroundColor: "rgb(0 0 0 / 50%)",
+    backgroundColor: "rgb(171 171 171 / 100%)",
   },
 
   bar: {
@@ -201,7 +201,15 @@ const AudioTranscriptionLandingStyle = makeStyles({
     top: "0",
     bottom: "0",
     height: "100%",
-    backgroundColor: "rgb(255 255 255 / 20%)",
+    backgroundColor: "rgb(0 0 0 / 80%)",
+  },
+
+  item_completed: {
+    position: "absolute",
+    top: "0",
+    bottom: "0",
+    height: "100%",
+    backgroundColor: "rgb(0 255 0 / 80%)",
   },
 
   grab: {
