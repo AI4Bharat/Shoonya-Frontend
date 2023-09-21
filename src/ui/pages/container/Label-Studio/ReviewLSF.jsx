@@ -260,12 +260,12 @@ const LabelStudioWrapper = ({
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
 
-  useEffect(() => {
+  /* useEffect(() => {
     if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
       autoSaveReview();
       navigate(`/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${taskId}`);
     }
-  }, [userData]);
+  }, [userData]); */
   
   useEffect(() => {
     localStorage.setItem(
