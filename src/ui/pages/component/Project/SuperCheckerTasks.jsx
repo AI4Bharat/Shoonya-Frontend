@@ -267,7 +267,7 @@ const SuperCheckerTasks = (props) => {
     } else {
       setTasks([]);
     }
-  }, [taskList, userDetails?.prefer_cl_ui]);
+  }, [taskList]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {

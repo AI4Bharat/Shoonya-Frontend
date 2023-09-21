@@ -208,12 +208,12 @@ const LabelStudioWrapper = ({
   // debugger
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
   
-  useEffect(() => {
+  /* useEffect(() => {
     if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
       autoSaveAnnotation();
       navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${taskId}`);
     }
-  }, [userData]);
+  }, [userData]); */
   
   useEffect(() => {
     localStorage.setItem(

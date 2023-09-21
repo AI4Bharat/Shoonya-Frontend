@@ -91,7 +91,7 @@ const AllTaskTable = (props) => {
         );
         AllTaskData[0].task_status && row.push(el.task_status);
         row.push( <>
-          <Link to={(ProjectDetails?.project_type?.includes("Acoustic") && userDetails?.prefer_cl_ui) ?
+          <Link to={ProjectDetails?.project_type?.includes("Acoustic") ?
           `AllAudioTranscriptionLandingPage/${el.id}` : `Alltask/${el.id}`} className={classes.link}>
           <CustomButton
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
@@ -132,7 +132,7 @@ const AllTaskTable = (props) => {
     } else {
       setTasks([]);
     }
-  }, [AllTaskData, ProjectDetails, userDetails?.prefer_cl_ui]);
+  }, [AllTaskData, ProjectDetails]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {
