@@ -27,6 +27,8 @@ import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 // import { FindAndReplace } from "common";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 // import FormatLineSpacingIcon from "@mui/icons-material/FormatLineSpacingIcon";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 
 const anchorOrigin = {
   vertical: "top",
@@ -158,6 +160,29 @@ const SettingsButtonComponent = ({
               />
             }
           />
+        </MenuItem>
+        <MenuItem>
+        <Popup contentStyle={{
+          width: "300px",
+        }} 
+        trigger={<FormControlLabel
+            label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hotkeys Explorer"
+            control={
+              <div></div>
+            }
+          />} position="left center"
+          on={['hover', 'focus']}>
+          <div style={{padding:"2px"}}>
+            <div style={{fontSize: "large", textAlign: "center", fontWeight: "bold", marginBottom:"4px"}}>Hotkeys</div>
+            <ul style={{fontSize: "medium", paddingLeft: "20px", marginBottom:"1px"}}>
+                <li>Play/Pause - Shift + Space</li>
+                <li>Seek Left - Shift + Left Arrow</li>
+                <li>Seek Right - Shift + Right Arrow</li>
+                <li>Noise Tags - $$$</li>
+                {/* <li>Color Schema set</li> */}
+            </ul>
+          </div>
+        </Popup>
         </MenuItem>
       </Menu>
 
