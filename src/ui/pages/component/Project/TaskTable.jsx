@@ -406,7 +406,7 @@ const TaskTable = (props) => {
         props.type === "annotation" &&
           row.push(
             <Link
-              to={(ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage === 1))
+              to={ProjectDetails?.project_type?.includes("Acoustic")
               ? `AudioTranscriptionLandingPage/${el.id}` : `task/${el.id}`} className={classes.link}>
               <CustomButton
                 onClick={() => {
@@ -431,7 +431,7 @@ const TaskTable = (props) => {
         props.type === "review" &&
           row.push(
             <Link
-              to={(ProjectDetails?.project_type?.includes("Acoustic") && (userDetails?.prefer_cl_ui || ProjectDetails?.metadata_json?.acoustic_enabled_stage <= 2))
+              to={ProjectDetails?.project_type?.includes("Acoustic")
               ? `ReviewAudioTranscriptionLandingPage/${el.id}` : `review/${el.id}`} className={classes.link}>
               <CustomButton
                 disabled={ ProjectDetails.is_archived}
@@ -483,7 +483,7 @@ const TaskTable = (props) => {
     } else {
       setTasks([]);
     }
-  }, [taskList, ProjectDetails, userDetails?.prefer_cl_ui]);
+  }, [taskList, ProjectDetails]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {
@@ -576,7 +576,7 @@ const TaskTable = (props) => {
   }, [totalTaskCount, selectedFilters,ProjectDetails]);
 
   useEffect(() => {
-    if ((userDetails?.prefer_cl_ui && ProjectDetails?.project_type?.includes("AudioTranscription")) || ProjectDetails?.project_type?.includes("Acoustic")) {
+    if (ProjectDetails?.project_type?.includes("Acoustic")) {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
           `/projects/${id}/${props.type === "annotation" ? "AudioTranscriptionLandingPage" : "ReviewAudioTranscriptionLandingPage"}/${

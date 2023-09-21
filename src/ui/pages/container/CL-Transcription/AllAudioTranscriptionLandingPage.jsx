@@ -166,11 +166,11 @@ const AllAudioTranscriptionLandingPage = () => {
     }
   }, [AnnotationsTaskDetails]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui)) {
       navigate(`/projects/${projectId}/Alltask/${taskId}`);
     }
-  }, [user]);
+  }, [user]); */
 
   const tasksComplete = (id) => {
     if (id) {
