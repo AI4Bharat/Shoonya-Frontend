@@ -179,6 +179,7 @@ const SettingsButtonComponent = ({
                 <li>Seek Left - Shift + Left Arrow</li>
                 <li>Seek Right - Shift + Right Arrow</li>
                 <li>Noise Tags - $$$</li>
+                <li>Toggle Transliteration - Alt + 1</li>
                 {/* <li>Color Schema set</li> */}
             </ul>
           </div>
