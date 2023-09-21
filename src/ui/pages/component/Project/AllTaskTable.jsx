@@ -61,6 +61,8 @@ const AllTaskTable = (props) => {
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
   const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed","super_checked","exported"],
   };
@@ -89,7 +91,8 @@ const AllTaskTable = (props) => {
         );
         AllTaskData[0].task_status && row.push(el.task_status);
         row.push( <>
-          <Link to={`Alltask/${el.id}`} className={classes.link}>
+          <Link to={(ProjectDetails?.project_type?.includes("Acoustic") && userDetails?.prefer_cl_ui) ?
+          `AllAudioTranscriptionLandingPage/${el.id}` : `Alltask/${el.id}`} className={classes.link}>
           <CustomButton
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
               sx={{ p: 1, borderRadius: 2 }}
@@ -129,7 +132,7 @@ const AllTaskTable = (props) => {
     } else {
       setTasks([]);
     }
-  }, [AllTaskData]);
+  }, [AllTaskData, ProjectDetails, userDetails?.prefer_cl_ui]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {
