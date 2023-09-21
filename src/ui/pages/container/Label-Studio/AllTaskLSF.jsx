@@ -8,6 +8,9 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from '../../../../utils/LabelConfig/ConversationTranslation';
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification"
+import LightTooltip from "../../component/common/Tooltip";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 
 import {
   getProjectsandTasks,
@@ -49,6 +52,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
+  const [assignedUsers, setAssignedUsers] = useState(null);
   let loaded = useRef();
 
   console.log("projectId, taskId", projectId, taskId);
@@ -73,6 +77,19 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       sidePanelMode: "SIDEPANEL_MODE_REGIONS"
     }))
   }, [])
+
+  useEffect(() => {
+    const showAssignedUsers = async () => {
+      getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
+    }
+    taskData?.id && showAssignedUsers();
+  }, [taskData]);
+
+  /* useEffect(() => {
+    if (Object.keys(userData).includes("prefer_cl_ui") && userData.prefer_cl_ui) {
+      navigate(`/projects/${projectId}/AllAudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]); */
 
   const tasksComplete = (id) => {
     if (id) {
@@ -397,7 +414,24 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             </Button>
           </Tooltip>}
           </Grid> */}
-          <Grid item>
+            <Grid item>
+              <LightTooltip title={assignedUsers ? assignedUsers : ""} >
+                <Button
+                  type="default"
+                  className="lsf-button"
+                  style={{
+                    minWidth: "40px",
+                    border: "1px solid #e6e6e6",
+                    color: "grey",
+                    pt: 1, pl: 1, pr: 1,
+                    borderBottom: "None",
+                  }}
+                  > 
+                    <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
+                </Button>
+              </LightTooltip>
+            </Grid>
+            <Grid item>
 
             <>
             <Tooltip title="Go to next task">

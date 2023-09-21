@@ -505,14 +505,14 @@ const ReviewAudioTranscriptionLandingPage = () => {
     }
   }, [AnnotationsTaskDetails]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.metadata_json?.acoustic_enabled_stage > 2) {
       const changeUI = async() => {
         handleAutosave().then(navigate(`/projects/${projectId}/review/${taskId}`))
       };
       changeUI();
     }
-  }, [user]);
+  }, [user]); */
 
   const tasksComplete = (id) => {
     if (id) {

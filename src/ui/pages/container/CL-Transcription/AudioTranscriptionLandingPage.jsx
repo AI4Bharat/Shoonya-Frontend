@@ -469,14 +469,14 @@ const AudioTranscriptionLandingPage = () => {
     }
   }, [AnnotationsTaskDetails]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if(Object.keys(user).includes("prefer_cl_ui") && !(user.prefer_cl_ui) && ProjectDetails?.metadata_json?.acoustic_enabled_stage > 1) {
       const changeUI = async() => {
         handleAutosave().then(navigate(`/projects/${projectId}/task/${taskId}`))
       };
       changeUI();
     }
-  }, [user]);
+  }, [user]); */
 
   const tasksComplete = (id) => {
     if (id) {
