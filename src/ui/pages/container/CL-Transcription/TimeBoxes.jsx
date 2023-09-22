@@ -19,6 +19,7 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
           paddingLeft: "10px",
           marginLeft: type === "endTime" ? "auto" : "",
         }}
+        type="number"
       />
 
       <TextField
@@ -33,10 +34,11 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
         value={time.split(":")[1]}
         className={classes.timeInputBox}
         onFocus={(event) => event.target.select()}
-        InputProps={{ inputProps: { min: 0, max: 100 } }}
+        InputProps={{ inputProps: { min: 0, max: 59 } }}
         onChange={(event) =>
           handleTimeChange(event.target.value, index, type, "minutes")
         }
+        type="number"
       />
 
       <TextField
@@ -50,14 +52,12 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
         variant="standard"
         value={time.split(":")[2].split(".")[0]}
         onFocus={(event) => event.target.select()}
-        InputProps={{ inputProps: { min: 0, max: 100 } }}
+        InputProps={{ inputProps: { min: 0, max: 59 } }}
         className={classes.timeInputBox}
         onChange={(event) =>
           handleTimeChange(event.target.value, index, type, "seconds")
         }
-        style={{
-          
-        }}
+        type="number"
       />
 
       <TextField
@@ -77,6 +77,7 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
         onChange={(event) =>
           handleTimeChange(event.target.value, index, type, "miliseconds")
         }
+        type="number"
       />
     </Box>
   );
