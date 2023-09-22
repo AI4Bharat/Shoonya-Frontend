@@ -28,9 +28,10 @@ const ScheduleMails = () => {
     "AudioSegmentation",
     "AudioTranscription",
     "AudioTranscriptionEditing",
-    "AudioTranscription + Editing",
     "ConversationTranslation",
-    "ConversationTranslationEditing"
+    "ConversationTranslationEditing",
+    "AcousticNormalisedTranscriptionEditing",
+    "AllAudioProjects"
   ]);
   const [schedule, setSchedule] = useState("Daily");
   const [scheduleDay, setScheduleDay] = useState(1);

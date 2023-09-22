@@ -47,7 +47,7 @@ const Header = () => {
     message: "",
     variant: "success",
   });
-  const[checkClUI,setCheckClUI]=useState(null)
+  //const[checkClUI,setCheckClUI]=useState(null)
 
   const loggedInUserData = useSelector(
     (state) => state?.fetchLoggedInUserData?.data
@@ -75,11 +75,11 @@ const Header = () => {
    
   }, []);
 
-  useEffect(()=>{
+  /* useEffect(()=>{
     if(loggedInUserData?.prefer_cl_ui !== undefined){
       setCheckClUI(loggedInUserData?.prefer_cl_ui)
     }
-  },[loggedInUserData])
+  },[loggedInUserData]) */
 
   // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
   const onLogoutClick = () => {
@@ -613,7 +613,7 @@ const Header = () => {
         />
       ),
     },
-    {
+    /* {
       name: "Use Chitralekha Transcription Flow",
       control: (
         <Checkbox
@@ -621,7 +621,7 @@ const Header = () => {
           checked={checkClUI} 
         />
       ),
-    },
+    }, */
     // {
     //   name: "Enable Tags Dropdown",
     //   control: (
