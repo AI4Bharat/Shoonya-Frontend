@@ -18,25 +18,25 @@ const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
   const $waveform = useRef();
 
   const player = useSelector((state) => state.commonReducer?.player);
-  console.log(waveformSettings);
+  // console.log(waveformSettings);
   useEffect(() => {
     [...WFPlayer.instances].forEach((item) => item.destroy());
 
     const waveform = new WFPlayer({
       wave: waveformSettings.wave,
-      waveColor: waveformSettings.waveColor+"1A",
+      waveColor: waveformSettings.waveColor,
       backgroundColor: waveformSettings.backgroundColor,
-      paddingColor: waveformSettings.paddingColor+"0D",
+      paddingColor: waveformSettings.paddingColor,
       cursor:waveformSettings.cursor,
       cursorColor: waveformSettings.cursorColor,
       progress: waveformSettings.progress,
-      progressColor: waveformSettings.progressColor+'80',
+      progressColor: waveformSettings.progressColor,
       grid: waveformSettings.grid,
-      gridColor: waveformSettings.gridColor+'0D',
+      gridColor: waveformSettings.gridColor,
       ruler: waveformSettings.ruler,
-      rulerColor: waveformSettings.rulerColor+'80',
+      rulerColor: waveformSettings.rulerColor,
       scrollbar: waveformSettings.scrollbar,
-      scrollbarColor: waveformSettings.scrollbarColor+'40',
+      scrollbarColor: waveformSettings.scrollbarColor,
       rulerAtTop: waveformSettings.rulerAtTop,
       scrollable: waveformSettings.scrollable,
       duration: Number(waveformSettings.duration),
@@ -44,21 +44,21 @@ const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
       pixelRatio: Number(waveformSettings.pixelRatio),
       waveScale: Number(waveformSettings.waveScale),
       waveSize: Number(waveformSettings.waveSize),
-
-      useWorker: false,
+      useWorker: true,
       container: $waveform.current,
       mediaElement: player,
     });
 
     if (player.src !== '')
-      {fetch(player.src)
-      .then((res) => res.arrayBuffer())
-      .then((arrayBuffer) => {
-        const uint16 = new Uint16Array(arrayBuffer);
-        waveform.load(uint16);
+      {
+        // fetch(player.src)
+        // .then((res) => res.arrayBuffer())
+        // .then((arrayBuffer) => {
+        // const uint16 = new Uint16Array(arrayBuffer);
+        waveform.load(player.src);
         setWaveform(waveform);
         waveform.on("update", setRender);
-    });
+        // });
   }
     
       // waveform.load(encodeURIComponent(player?.attributes?.nodeValue?.replace(/&amp;/g, "&")));
