@@ -61,6 +61,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [currentSubs, setCurrentSubs] = useState();
   const [loadtime, setloadtime] = useState(new Date());
   const [textBox, settextBox] = useState("");
+  const [L2Check, setL2Check] = useState(true);
   const [NextData, setNextData] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
@@ -264,12 +265,14 @@ const ReviewAudioTranscriptionLandingPage = () => {
   }, [AnnotationsTaskDetails, user, taskDetailList]);
 
   useEffect(() => {
-    const hasEmptyText = result?.some((element) => element.text?.trim() === "") || (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""))
+    const hasEmptyText = result?.some((element) => element.text?.trim() === "");
     const hasEmptySpeaker = result?.some(
       (element) => element.speaker_id?.trim() === ""
     );
+    const hasEmptyTextL2 = (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""));
     settextBox(hasEmptyText);
     setSpeakerBox(hasEmptySpeaker);
+    setL2Check(!hasEmptyTextL2);
   }, [result]);
 
   const handleCollapseClick = () => {
@@ -594,36 +597,37 @@ const ReviewAudioTranscriptionLandingPage = () => {
         parent_annotation: parentannotation,
       }),
     };
-    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox)) {
-    const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
-    // dispatch(APITransport(GlossaryObj));
-    const res = await fetch(TaskObj.apiEndPoint(), {
-      method: "PATCH",
-      body: JSON.stringify(TaskObj.getBody()),
-      headers: TaskObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    if (res.ok) {
-      if (localStorage.getItem("labelAll") || value === "skipped") {
-        onNextAnnotation(resp.task);
-      }
-
-     
+    const L1Check = !textBox && !speakerBox && result?.length > 0;
+    if (
+      ["draft", "skipped"].includes(value) ||
+      (["to_be_revised"].includes(value) && L1Check) ||
+      (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
+    ) {
+      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+      const res = await fetch(TaskObj.apiEndPoint(), {
+        method: "PATCH",
+        body: JSON.stringify(TaskObj.getBody()),
+        headers: TaskObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        if (localStorage.getItem("labelAll") || value === "skipped") {
+          onNextAnnotation(resp.task);
+        }
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "success",
+          });
+      } else {
         setSnackbarInfo({
           open: true,
           message: resp?.message,
-          variant: "success",
+          variant: "error",
         });
-      
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      });
     }
-  }else {
-    if (textBox) {
+  } else {
+    if (textBox || !L2Check) {
       setSnackbarInfo({
         open: true,
         message: "Please Enter All The Transcripts",
