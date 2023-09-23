@@ -50,14 +50,16 @@ const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
       mediaElement: player,
     });
 
-    fetch(player.src)
+    if (player.src !== '')
+      {fetch(player.src)
       .then((res) => res.arrayBuffer())
       .then((arrayBuffer) => {
-        const uint8 = new Uint8Array(arrayBuffer);
-        waveform.load(uint8);
+        const uint16 = new Uint16Array(arrayBuffer);
+        waveform.load(uint16);
         setWaveform(waveform);
         waveform.on("update", setRender);
     });
+  }
     
       // waveform.load(encodeURIComponent(player?.attributes?.nodeValue?.replace(/&amp;/g, "&")));
   
