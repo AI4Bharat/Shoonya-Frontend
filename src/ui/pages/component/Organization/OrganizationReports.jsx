@@ -113,9 +113,10 @@ const OrganizationReports = () => {
         "AudioSegmentation",
         "AudioTranscription",
         "AudioTranscriptionEditing",
-        "AudioTranscription + Editing",
         "ConversationTranslation",
-        "ConversationTranslationEditing"
+        "ConversationTranslationEditing",
+        "AcousticNormalisedTranscriptionEditing",
+        "AllAudioProjects",
       ]);
       setSelectedType("AudioTranscription");
     } else if (ProjectTypes) {

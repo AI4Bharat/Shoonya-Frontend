@@ -66,8 +66,8 @@ export const getUpdatedTime = (value, type, time, index, startEnd,page) => {
   const Duration = store.getState().getTaskDetails?.data?.data?.audio_duration;
   const hours = Math.floor(Duration / 3600);
   const minutes = Math.floor((Duration % 3600) / 60);
-  const seconds = Duration % 60;
-  const milliseconds = 0;
+  const seconds = Math.floor(Duration % 60);
+  const milliseconds = parseFloat(Duration.toString().split(".")[1]);
   const convertedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
   let newValue = "";
 
@@ -75,43 +75,15 @@ export const getUpdatedTime = (value, type, time, index, startEnd,page) => {
   const [ss, SSS] = sec.split(".");
 
   if (type === "hours") {
-    if (value < 0) {
-      newValue = "00";
-    } else {
-      newValue = value;
-    }
+    newValue = Math.max(0, +value).toString().padStart(2, "0");
   }
-
-  if (type === "minutes" || type === "seconds") {
-    if (+value <= 9 && value.length < 2) {
-      localStorage.setItem("value", value);
-      newValue = value.padStart(2, "0");
-    } else {
-      newValue = `${localStorage.getItem("value")}${value[value.length - 1]}`;
-    }
-
-    if (+newValue >= 60) {
-      newValue = "59";
-    }
+  else if (type === "minutes" || type === "seconds") {
+    newValue = Math.max(0, Math.min(+value, 59)).toString().padStart(2, "0");
   }
-
-  if (type === "miliseconds") {
-    if (value) {
-      if (value < 0 || +value > 999) {
-        newValue = "000";
-      } else {
-        newValue = value;
-      }
-
-      if (value.length > 3) {
-        newValue = `${value[value.length - 3]}${value[value.length - 2]}${
-          value[value.length - 1]
-        }`;
-      }
-    } else {
-      newValue = "000";
-    }
+  else if (type === "miliseconds") {
+    newValue = Math.max(0, Math.min(+value, 999)).toString().padStart(3, "0");
   }
+  else return convertedTime;
 
   let newTime = "";
 
@@ -123,6 +95,14 @@ export const getUpdatedTime = (value, type, time, index, startEnd,page) => {
     newTime = `${hh}:${mm}:${newValue}.${SSS}`;
   } else if (type === "miliseconds") {
     newTime = `${hh}:${mm}:${ss}.${newValue}`;
+  }
+
+  if (startEnd == "startTime") {
+    const durationOfVideo = DT.t2d(convertedTime);
+    const durationOfCurrent = DT.t2d(newTime);
+    if (durationOfCurrent > durationOfVideo) {
+      return subtitles[index].start_time;
+    }
   }
 
   if (startEnd === "startTime" && index > 0) {
