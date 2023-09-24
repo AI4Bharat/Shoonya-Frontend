@@ -154,12 +154,12 @@ const AudioTranscriptionLandingStyle = makeStyles({
     position: "absolute",
     left: 0,
     right: 0,
-    top: "-12px",
+    top: "-18px",
     zIndex: 11,
     width: "100%",
-    height: "12px",
+    height: "18px",
     userSelect: "none",
-    borderTop: "1px solid rgb(255 255 255 / 20%)",
+    // borderTop: "1px solid rgb(255 255 255 / 20%)",
     backgroundColor: "rgb(0 0 0 / 10%)",
   },
 
@@ -171,7 +171,8 @@ const AudioTranscriptionLandingStyle = makeStyles({
     width: "0%",
     height: "100%",
     display: "inline-block",
-    backgroundColor: "rgb(0 0 255 / 60%)",
+    border: "1.5px solid #ff9800",
+    // backgroundColor: "rgb(0 0 255 / 60%)",
     overflow: "hidden",
   },
 
@@ -198,29 +199,31 @@ const AudioTranscriptionLandingStyle = makeStyles({
 
   item: {
     position: "absolute",
-    top: "0",
+    top: "5%",
     bottom: "0",
-    height: "100%",
+    height: "90%",
     backgroundColor: "rgb(255 0 0 / 50%)",
+    border: "0.5px solid rgb(255 0 0 / 80%)",
   },
 
   item_completed: {
     position: "absolute",
-    top: "0",
+    top: "5%",
     bottom: "0",
-    height: "100%",
+    height: "90%",
     backgroundColor: "rgb(0 255 0 / 50%)",
+    border: "0.5px solid rgb(0 255 0 / 80%)",
   },
 
   grab: {
     position: "relative",
     zIndex: "11",
     cursor: "grab",
-    height: "25%",
+    height: "10%",
     userSelect: "none",
-    backgroundColor: "rgb(33 150 243 / 20%)",
-    borderTop: "1px solid rgb(33 150 243 / 30%)",
-    borderBottom: "1px solid rgb(33 150 243 / 30%)",
+    backgroundColor: "rgb(0 0 0 / 20%)",
+    borderTop: "0px solid rgb(33 150 243 / 30%)",
+    borderBottom: "0px solid rgb(33 150 243 / 30%)",
   },
 
   grabbing: {
@@ -231,12 +234,12 @@ const AudioTranscriptionLandingStyle = makeStyles({
     position: "absolute",
     left: "0",
     right: "0",
-    top: "-50px",
+    top: "35px",
     zIndex: "12",
     fontSize: "18px",
     color: "rgb(255 255 255 / 75%)",
     textShadow: "0 1px 2px rgb(0 0 0 / 75%)",
-    marginLeft: "20px",
+    marginLeft: "10px",
     userSelect: "none",
     pointerEvents: "none",
   },
@@ -257,6 +260,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     height: "100%",
     cursor: "ew-resize",
     userSelect: "none",
+    borderBottom: "15px solid rgb(0 0 0 / 20%)",
   },
 
   template: {
@@ -298,31 +302,34 @@ const AudioTranscriptionLandingStyle = makeStyles({
 
   subItem: {
     position: "absolute",
-    top: "40%",
+    top: "10%",
     left: "0",
-    height: "40%",
+    height: "80%",
     overflow: "hidden",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
     wordWrap: "break-word",
-    color: "#fff",
+    color: "#000000",
     fontSize: "14px",
     cursor: "move",
     userSelect: "none",
     pointerEvents: "all",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0)",
+    // border: "1px solid rgba(255, 255, 255, 0.2)",
 
     "&:hover": {
-      backgroundColor: " rgba(255, 255, 255, 0.3)",
+      backgroundColor: " rgba(255, 255, 255, 0)",
+      border: "1px solid rgba(255, 191, 0, 1)"
+      // top: '8%',
+      // height: "98%"
     },
   },
 
   subHighlight: {
-    backgroundColor: "rgba(33, 150, 243, 0.5)",
-    border: "1px solid rgba(33, 150, 243, 0.5)",
+    // backgroundColor: "rgba(156, 39, 176, 0.2)",
+    border: "1px solid rgba(255 ,0 , 0)",
   },
 
   subHandle: {
@@ -335,7 +342,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     userSelect: "none",
 
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.1)",
+      backgroundColor: "rgba(255, 255, 255, 0.0)",
     },
   },
 
@@ -346,8 +353,8 @@ const AudioTranscriptionLandingStyle = makeStyles({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    textShadow:
-      "rgb(0 0 0) 1px 0px 1px, rgb(0 0 0) 0px 1px 1px, rgb(0 0 0) -1px 0px 1px, rgb(0 0 0) 0px -1px 1px",
+    // textShadow:
+      // "rgb(0 0 0) 1px 0px 1px, rgb(0 0 0) 0px 1px 1px, rgb(0 0 0) -1px 0px 1px, rgb(0 0 0) 0px -1px 1px",
     height: "100%",
     wordWrap: "break-word",
   },
@@ -358,7 +365,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
   },
 
   subDuration: {
-    opacity: "0.5",
+    opacity: "0",
     position: "absolute",
     left: "0",
     right: "0",

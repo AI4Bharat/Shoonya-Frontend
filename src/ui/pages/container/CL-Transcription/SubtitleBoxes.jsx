@@ -436,12 +436,18 @@ import React, {
                       className={classes.subText}
                       title={sub.text}
                       style = {{
-                        backgroundColor: sub.speaker_id === "Speaker 0"
-                        ? "rgba(228, 0, 252, 0.42)"
-                        : sub.speaker_id === "Speaker 1"
-                        ? "rgba(245, 252, 0, 0.42)"
-                        : "",
-                      }}
+                        backgroundColor: sub.speaker_id === "Speaker 1"
+                        ? "rgb(0, 87, 158, 0.2)"
+                        : sub.speaker_id === "Speaker 0"
+                        ? "rgb(123, 29, 0, 0.2)"
+                        : "rgb(0, 0, 0, 0.6)",
+                        border: sub.speaker_id === "Speaker 1"
+                        ? "0.5px solid rgb(0, 87, 158, 1)"
+                        : sub.speaker_id === "Speaker 0"
+                        ? "0.5px solid rgb(123, 29, 0, 1)"
+                        : "0.5px solid rgb(0, 0, 0, 1)",
+                      }
+                    }
                       onDoubleClick={() => {
                         if (player) {
                           player.play();
