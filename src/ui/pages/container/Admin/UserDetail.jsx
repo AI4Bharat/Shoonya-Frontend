@@ -3,13 +3,14 @@ import MUIDataTable from "mui-datatables";
 import { useNavigate } from "react-router-dom";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { ThemeProvider, Grid, Button } from "@mui/material";
+import { ThemeProvider, Grid, IconButton } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import GetUserDetailAPI from "../../../../redux/actions/api/Admin/UserDetail";
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import UserInfo from "./UserInfo";
 import Spinner from "../../component/common/Spinner";
 import GetUserDetailUpdateAPI from "../../../../redux/actions/api/Admin/EditProfile";
@@ -230,7 +231,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "70px" } }),
+        setCellProps: () => ({ style: { paddingLeft: "40px" , paddingRight: "30px" } }),
       },
     },
     {
@@ -249,7 +250,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+        setCellProps: () => ({ style: { paddingLeft: "30px" , paddingRight: "30px"} }),
       },
     },
     {
@@ -259,7 +260,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+        setCellProps: () => ({ style: {paddingLeft: "10px" , paddingRight: "20px"}} ),
       },
     },
   ];
@@ -281,7 +282,11 @@ const UserDetail = (props) => {
             userRoleFromList ? userRoleFromList : el.role,
             el.is_active==true?"Active":"Not Active",
             <>
-              <Button>
+              <div style={{display:"flex", flexDirection:"row"}}>
+              <IconButton size="small" color="primary">
+                <VisibilityIcon onClick={()=>navigate(`/profile/${el.id}`)} />
+              </IconButton>
+              <IconButton size="small" color="primary">
                 <EditOutlinedIcon
                   onClick={() =>
                     handleEditChange(
@@ -297,7 +302,8 @@ const UserDetail = (props) => {
                     )
                   }
                 />
-              </Button>
+              </IconButton>
+              </div>
             </>,
           ];
         })
