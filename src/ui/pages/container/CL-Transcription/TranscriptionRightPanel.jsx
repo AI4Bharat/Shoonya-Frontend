@@ -503,6 +503,22 @@ const TranscriptionRightPanel = ({
     setShowAdditionalOptions(!showAdditionalOptions);
   };
 
+  useEffect(() => {
+    const autoGrowTextareas = (className) => {
+      const textareas = document.querySelectorAll(`.${className}`);
+      textareas.forEach((textarea, index) => {
+        document.getElementById(`${index}_resizable`).style.height=`${textarea.scrollHeight+99}px`;
+      });
+    };
+
+    const delay = 1000;
+    const timer = setTimeout(() => {
+      autoGrowTextareas('auto-resizable-textarea');
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       {" "}
@@ -564,6 +580,9 @@ const TranscriptionRightPanel = ({
               <React.Fragment>
                 <Resizable
                   bounds="parent"
+                  default={{ height: "240px" }}
+                  minHeight="240px"
+                  id={`${index}_resizable`}
                   enable={{ top:false, right:false, bottom:true, left:false, topRight:false, bottomRight:false, bottomLeft:false, topLeft:false }}
                   style={{ alignItems: "center", display: "flex", flexDirection: "column", marginTop: index === 0 ? "0px" : "-16px" }}
                   onResizeStart={(e, dir, ref) => {
@@ -685,7 +704,7 @@ const TranscriptionRightPanel = ({
                       sx={{
                         display: "flex",
                         padding: "8px 10px",
-                        minHeight: "150px",
+                        height: "100%",
                         gap:"8px"
                       }}
                       className={classes.cardContent}
@@ -746,7 +765,7 @@ const TranscriptionRightPanel = ({
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
-                            className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                            className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                               }`}
                             style={{ fontSize: fontSize, height: "100%"}}
                             onBlur={() => {
