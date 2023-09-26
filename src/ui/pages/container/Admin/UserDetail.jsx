@@ -26,7 +26,9 @@ const UserDetail = (props) => {
   });
   const [openDialog, setOpenDialog] = useState(false);
   const [id, setId] = useState("");
+  const [userName,setUserName] = useState("");
   const [email, setEmail] = useState("");
+  const [availabilityStatus, setAvailabilityStatus] = useState();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [language, setLanguage] = useState([]);
@@ -34,6 +36,7 @@ const UserDetail = (props) => {
   const [Role, setRole] = useState("");
 
   const UserDetail = useSelector((state) => state.getUserDetails.data);
+  console.log(UserDetail);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const SearchUserDetail = useSelector(
     (state) => state.SearchProjectCards.data
@@ -57,20 +60,24 @@ const UserDetail = (props) => {
   const handleEditChange = (
     id,
     email,
+    username,
     first_name,
     last_name,
     languages,
     participation_type,
-    role
+    role,
+    availability_status,
   ) => {
     setOpenDialog(true);
     setId(id);
     setEmail(email);
+    setUserName(username);
     setFirstName(first_name);
     setLastName(last_name);
     setLanguage(languages);
     setParticipationType(participation_type);
     setRole(role);
+    setAvailabilityStatus(availability_status);
   };
 
   const handleCloseDialog = () => {
@@ -80,11 +87,13 @@ const UserDetail = (props) => {
   const handleUpdateEditProfile = async () => {
     const data = {
       email:email,
+      username: userName,
       first_name: firstName,
       last_name: lastName,
       languages: language,
       participation_type: participationType,
       role: Role,
+      availability_status: availabilityStatus,
     };
   
     const UserObj = new GetUserDetailUpdateAPI(id, data);
@@ -121,9 +130,19 @@ const UserDetail = (props) => {
         el.email?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;
+      }else if(
+        el.username?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
+      ){
+        return el;
       } else if (
         el.first_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
+        return el;
+      }else if(
+        el.availability_status?.toString()
+        ?.toLowerCase()
+        .includes(SearchUserDetail?.toLowerCase())
+      ){
         return el;
       } else if (
         el.last_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
@@ -167,6 +186,15 @@ const UserDetail = (props) => {
       },
     },
     {
+      name: "username",
+      label: "UserName",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+      },
+    },
+    {
       name: "first_name",
       label: "First Name",
       options: {
@@ -175,7 +203,6 @@ const UserDetail = (props) => {
         align: "center",
       },
     },
-
     {
       name: "last_name",
       label: "Last Name",
@@ -216,6 +243,16 @@ const UserDetail = (props) => {
       },
     },
     {
+      name: "availability_status",
+      label: "Availability Status",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+      },
+    },
+    {
       name: "Actions",
       label: "Actions",
       options: {
@@ -236,11 +273,13 @@ const UserDetail = (props) => {
           return [
             el.id,
             el.email,
+            el.username,
             el.first_name,
             el.last_name,
             el.languages.join(", "),
             el.participation_type,
             userRoleFromList ? userRoleFromList : el.role,
+            el.availability_status==1?"Available":"Not Available",
             <>
               <Button>
                 <EditOutlinedIcon
@@ -248,11 +287,13 @@ const UserDetail = (props) => {
                     handleEditChange(
                       el.id,
                       el.email,
+                      el.username,
                       el.first_name,
                       el.last_name,
                       el.languages,
                       el.participation_type,
-                      el.role
+                      el.role,
+                      el.availability_status,
                     )
                   }
                 />
@@ -329,6 +370,10 @@ const UserDetail = (props) => {
           submit={() => handleUpdateEditProfile()}
           Email={email}
           FirstName={firstName}
+          userName = {userName}
+          setUserName={setUserName}
+          availabilityStatus={availabilityStatus}
+          setAvailabilityStatus={setAvailabilityStatus}
           setFirstName={setFirstName}
           LastName={lastName}
           setLastName={setLastName}
