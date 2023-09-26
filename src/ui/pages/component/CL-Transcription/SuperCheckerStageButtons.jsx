@@ -62,6 +62,8 @@ const SuperCheckerStageButtons = ({
   disableSkip,
   anchorEl,
   setAnchorEl,
+  filterMessage,
+  disableBtns,
   // taskData,
 }) => {
   // const classes = AudioTranscriptionLandingStyle();
@@ -127,7 +129,7 @@ const SuperCheckerStageButtons = ({
       </div>
 
       <Grid container spacing={1} sx={{ mt: 2, mb: 5, ml: 3 }}>
-        <Grid item>
+       {!disableBtns && <Grid item>
           {taskData?.super_check_user === user?.id && (
             <Tooltip title="Save task for later">
               <Button
@@ -154,7 +156,7 @@ const SuperCheckerStageButtons = ({
               </Button>
             </Tooltip>
           )}
-        </Grid>
+        </Grid>}
 
         <Grid item>
           <Tooltip title="Go to next task">
@@ -175,137 +177,144 @@ const SuperCheckerStageButtons = ({
           </Tooltip>
         </Grid>
 
-        <Grid item>
-          {!disableSkip && taskData?.super_check_user === user?.id && (
-            <Tooltip title="skip to next task">
-              <Button
-                value="Skip"
-                type="default"
-                variant="outlined"
+        {!disableBtns && <>
+          <Grid item>
+            {!disableSkip && taskData?.super_check_user === user?.id && (
+              <Tooltip title="skip to next task">
+                <Button
+                  value="Skip"
+                  type="default"
+                  variant="outlined"
+                  onClick={() =>
+                    handleSuperCheckerClick(
+                      "skipped",
+                      SuperChecker.id,
+                      SuperChecker.lead_time,
+                    )
+                  }
+                  style={{
+                    minWidth: "120px",
+                    border: "1px solid gray",
+                    color: "#d00",
+                    pt: 2,
+                    pb: 2,
+                  }}
+                  // className="lsf-button"
+                >
+                  Skip
+                </Button>
+              </Tooltip>
+            )}
+          </Grid>
+          <Grid item>
+            {taskData?.super_check_user === user?.id && (
+              <Tooltip title="Reject">
+                <Button
+                  value="rejected"
+                  type="default"
+                  variant="outlined"
+                  onClick={() =>
+                    handleSuperCheckerClick(
+                      "rejected",
+                      SuperChecker.id,
+                      SuperChecker.lead_time,
+                      SuperChecker.parent_annotation
+                    )
+                  }
+                  disabled={
+                    ProjectData.revision_loop_count >
+                    taskData?.revision_loop_count?.super_check_count
+                      ? false
+                      : true
+                  }
+                  style={{
+                    minWidth: "120px",
+                    border: "1px solid gray",
+                    color: (
+                      ProjectData.revision_loop_count >
+                      taskData?.revision_loop_count?.super_check_count
+                        ? false
+                        : true
+                    )
+                      ? "#B2BABB"
+                      : "#f5222d",
+                    pt: 2,
+                    pb: 2,
+                  }}
+                >
+                  Reject
+                </Button>
+              </Tooltip>
+            )}
+          </Grid>
+          <Grid item>
+            {taskData?.super_check_user === user?.id && (
+              <Tooltip title="Validate">
+                <Button
+                  id="accept-button"
+                  value="Validate"
+                  type="default"
+                  aria-controls={open ? "accept-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? "true" : undefined}
+                  style={{
+                    minWidth: "120px",
+                    border: "1px solid gray",
+                    color: "#52c41a",
+                    pt: 3,
+                    pb: 3,
+                  }}
+                  onClick={handleClick}
+                  endIcon={<KeyboardArrowDownIcon />}
+                >
+                  Validate
+                </Button>
+              </Tooltip>
+            )}
+            <StyledMenu
+              id="accept-menu"
+              MenuListProps={{
+                "aria-labelledby": "accept-button",
+              }}
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+            >
+              <MenuItem
                 onClick={() =>
                   handleSuperCheckerClick(
-                    "skipped",
-                    SuperChecker.id,
-                    SuperChecker.lead_time,
-                  )
-                }
-                style={{
-                  minWidth: "120px",
-                  border: "1px solid gray",
-                  color: "#d00",
-                  pt: 2,
-                  pb: 2,
-                }}
-                // className="lsf-button"
-              >
-                Skip
-              </Button>
-            </Tooltip>
-          )}
-        </Grid>
-        <Grid item>
-          {taskData?.super_check_user === user?.id && (
-            <Tooltip title="Reject">
-              <Button
-                value="rejected"
-                type="default"
-                variant="outlined"
-                onClick={() =>
-                  handleSuperCheckerClick(
-                    "rejected",
+                    "validated",
                     SuperChecker.id,
                     SuperChecker.lead_time,
                     SuperChecker.parent_annotation
                   )
                 }
-                disabled={
-                  ProjectData.revision_loop_count >
-                  taskData?.revision_loop_count?.super_check_count
-                    ? false
-                    : true
-                }
-                style={{
-                  minWidth: "120px",
-                  border: "1px solid gray",
-                  color: (
-                    ProjectData.revision_loop_count >
-                    taskData?.revision_loop_count?.super_check_count
-                      ? false
-                      : true
+                disableRipple
+              >
+                Validated No Changes
+              </MenuItem>
+              <MenuItem
+                onClick={() =>
+                  handleSuperCheckerClick(
+                    "validated_with_changes",
+                    SuperChecker.id,
+                    SuperChecker.lead_time,
+                    SuperChecker.parent_annotation
                   )
-                    ? "#B2BABB"
-                    : "#f5222d",
-                  pt: 2,
-                  pb: 2,
-                }}
+                }
+                disableRipple
               >
-                Reject
-              </Button>
-            </Tooltip>
-          )}
-        </Grid>
-        <Grid item>
-          {taskData?.super_check_user === user?.id && (
-            <Tooltip title="Validate">
-              <Button
-                id="accept-button"
-                value="Validate"
-                type="default"
-                aria-controls={open ? "accept-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-                style={{
-                  minWidth: "120px",
-                  border: "1px solid gray",
-                  color: "#52c41a",
-                  pt: 3,
-                  pb: 3,
-                }}
-                onClick={handleClick}
-                endIcon={<KeyboardArrowDownIcon />}
-              >
-                Validate
-              </Button>
-            </Tooltip>
-          )}
-          <StyledMenu
-            id="accept-menu"
-            MenuListProps={{
-              "aria-labelledby": "accept-button",
-            }}
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-          >
-            <MenuItem
-              onClick={() =>
-                handleSuperCheckerClick(
-                  "validated",
-                  SuperChecker.id,
-                  SuperChecker.lead_time,
-                  SuperChecker.parent_annotation
-                )
-              }
-              disableRipple
-            >
-              Validated No Changes
-            </MenuItem>
-            <MenuItem
-              onClick={() =>
-                handleSuperCheckerClick(
-                  "validated_with_changes",
-                  SuperChecker.id,
-                  SuperChecker.lead_time,
-                  SuperChecker.parent_annotation
-                )
-              }
-              disableRipple
-            >
-              Validated with Changes
-            </MenuItem>
-          </StyledMenu>
-        </Grid>
+                Validated with Changes
+              </MenuItem>
+            </StyledMenu>
+          </Grid>
+        </>}
       </Grid>
+      {filterMessage && (
+        <Alert severity="info" sx={{ ml:2,mb: 2,width:"95%" }}>
+          {filterMessage}
+        </Alert>
+      )}
     </>
   );
 };

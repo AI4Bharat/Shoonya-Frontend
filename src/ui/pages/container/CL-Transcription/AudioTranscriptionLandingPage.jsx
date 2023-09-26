@@ -45,6 +45,7 @@ import AnnotationStageButtons from "../../component/CL-Transcription/AnnotationS
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 
@@ -84,7 +85,7 @@ const AudioTranscriptionLandingPage = () => {
   const [disableSkipButton, setdisableSkipButton] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
-  const [disableUpdataButton, setDisableUpdataButton] = useState(false);
+  const [disableUpdateButton, setdisableUpdateButton] = useState(false);
   const [annotationtext, setannotationtext] = useState('')
   const [reviewtext, setreviewtext] = useState('')
   const [taskData, setTaskData] = useState()
@@ -108,6 +109,7 @@ const AudioTranscriptionLandingPage = () => {
   const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(-2);
 
   // useEffect(() => {
   //   let intervalId;
@@ -230,7 +232,7 @@ const AudioTranscriptionLandingPage = () => {
 
     setAnnotations(filteredAnnotations);
     setDisableBtns(disableDraft);
-    setDisableUpdataButton(disableUpdate);
+    setdisableUpdateButton(disableUpdate);
     setdisableSkipButton(disableSkip);
     setFilterMessage(Message);
     return [
@@ -289,6 +291,7 @@ const AudioTranscriptionLandingPage = () => {
   };
 
   const handleAutosave = async () => {
+    if(disableUpdateButton) return;
     const reqBody = {
       task_id: taskId,
       annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
@@ -368,7 +371,7 @@ const AudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableUpdateButton]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -452,8 +455,37 @@ const AudioTranscriptionLandingPage = () => {
   }, []);
 
   useEffect(() => {
+    if(selectedUserId === -1) {
+      setFilterMessage("");
+      setDisableBtns(false);
+      setdisableSkipButton(false);
+      setdisableUpdateButton(false);
+      filterAnnotations(AnnotationsTaskDetails, user);
+      return;
+    }
+    const userAnnotations = AnnotationsTaskDetails?.filter((item) => item.completed_by === selectedUserId);
+    if(userAnnotations.length) {
+      setDisableBtns(true);
+      setdisableSkipButton(true);
+      setdisableUpdateButton(true);
+      if(userAnnotations[0].annotation_type === 1) {
+        setFilterMessage("This is the Annotator's Annotation in read only mode");
+      }
+      else if(userAnnotations[0].annotation_type === 2) {
+        setFilterMessage("This is the Reviewer's Annotation in read only mode");
+      }
+      else if(userAnnotations[0].annotation_type === 3) {
+        setFilterMessage("This is the Super Checker's Annotation in read only mode");
+      }
+      setAnnotations(userAnnotations);
+    }
+  }, [selectedUserId]);
+
+  useEffect(() => {
     const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskDetails).then(res => setAssignedUsers(res));
+      getTaskAssignedUsers(taskDetails).then(res => {
+        setAssignedUsers(res);
+      });
     }
     taskDetails?.id && showAssignedUsers();
   }, [taskDetails]);
@@ -815,9 +847,30 @@ useEffect(() => {
             <Typography sx={{mt: 2, ml: 4, color: "grey"}}>
               Task #{taskDetails?.id}
               <LightTooltip
-                title={assignedUsers ? assignedUsers : ""}
+                title={assignedUsers ? 
+                  <div style={{
+                    display: "flex",
+                    padding: "8px 0px",
+                    flexDirection: "column",
+                    gap: "4px",
+                    alignItems: "flex-start"
+                  }}>
+                    <Button
+                      style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === -1 ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
+                      onClick={() => setSelectedUserId(-1)}>
+                      Default (Reset filters)
+                    </Button>
+                    {assignedUsers.map((u, idx) => u && 
+                      <Button
+                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === u.id ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
+                        onClick={() => setSelectedUserId(u.id)}>
+                        {UserMappedByRole(idx + 1).element} {u.email}
+                      </Button>
+                    )}
+                  </div>
+                : ""}
               >
-                <InfoOutlinedIcon sx={{mb: "-4px", ml: "2px", color: "grey"}}/>
+                <InfoOutlinedIcon sx={{ mb: "-4px", ml: "2px", color: "grey" }} />
               </LightTooltip>
             </Typography>
             <AnnotationStageButtons
@@ -825,7 +878,7 @@ useEffect(() => {
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               disableBtns={disableBtns}
-              disableUpdataButton={disableUpdataButton}
+              disableUpdateButton={disableUpdateButton}
               disableSkipButton={disableSkipButton}
               filterMessage={filterMessage}
               taskData={taskData}

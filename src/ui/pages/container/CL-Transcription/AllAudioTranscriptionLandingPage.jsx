@@ -37,6 +37,7 @@ import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetail
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 
@@ -80,7 +81,8 @@ const AllAudioTranscriptionLandingPage = () => {
   const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
-  const [assignedUsers, setAssignedUsers] = useState(null);
+  const [assignedUsers, setAssignedUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(-2);
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -148,11 +150,21 @@ const AllAudioTranscriptionLandingPage = () => {
   }, []);
 
   useEffect(() => {
-    const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskDetails).then(res => setAssignedUsers(res));
+    if (selectedUserId && [4, 5, 6].includes(user?.role)) {
+      const userAnnotations = AnnotationsTaskDetails?.filter((item) => item.completed_by === selectedUserId);
+      userAnnotations.length && setAnnotations(userAnnotations);
     }
-    taskDetails?.id && showAssignedUsers();
-  }, [taskDetails]);
+  }, [selectedUserId]);
+
+  useEffect(() => {
+    const showAssignedUsers = async () => {
+      getTaskAssignedUsers(taskDetails).then(res => {
+        setAssignedUsers(res);
+        setSelectedUserId(res[0]?.id);
+      });
+    }
+    AnnotationsTaskDetails && taskDetails?.id && user?.id && showAssignedUsers();
+  }, [taskDetails, user, AnnotationsTaskDetails]);
 
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(projectId);
@@ -162,7 +174,7 @@ const AllAudioTranscriptionLandingPage = () => {
   useEffect(() => {
     if (AnnotationsTaskDetails?.length > 0) {
       setLoading(false);
-      setAnnotations(AnnotationsTaskDetails);
+      setAnnotations(AnnotationsTaskDetails?.filter((item) => item.annotation_type === 1));
     }
   }, [AnnotationsTaskDetails]);
 
@@ -396,7 +408,24 @@ const AllAudioTranscriptionLandingPage = () => {
             <Typography sx={{ mt: 2, ml: 4, color: "grey" }}>
               Task #{taskDetails?.id}
               <LightTooltip
-                title={assignedUsers ? assignedUsers : ""}
+                disableFocusListener={true}
+                title={assignedUsers ? 
+                  <div style={{
+                    display: "flex",
+                    padding: "8px 0px",
+                    flexDirection: "column",
+                    gap: "4px",
+                    alignItems: "flex-start"
+                  }}>
+                    {assignedUsers.map((u, idx) => u && 
+                      <Button
+                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === u.id ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
+                        onClick={() => setSelectedUserId(u.id)}>
+                        {UserMappedByRole(idx + 1).element} {u.email}
+                      </Button>
+                    )}
+                  </div>
+                : ""}
               >
                 <InfoOutlinedIcon sx={{ mb: "-4px", ml: "2px", color: "grey" }} />
               </LightTooltip>

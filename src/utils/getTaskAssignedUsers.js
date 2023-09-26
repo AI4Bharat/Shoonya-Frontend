@@ -1,5 +1,4 @@
 import FetchUserByIdAPI from "../redux/actions/api/UserManagement/FetchUserById";
-import UserMappedByRole from "./UserMappedByRole/UserMappedByRole";
 
 const getTaskAssignedUsers = async (taskDetails) => {
     const getAnnotator = async () => {
@@ -10,7 +9,7 @@ const getTaskAssignedUsers = async (taskDetails) => {
         return fetch(annotatorObj.apiEndPoint(), {
             method: "GET",
             headers: annotatorObj.getHeaders().headers,
-        }).then(res => res.json()).then(res => res.email);
+        }).then(res => res.json());
     };
 
     const getReviewer = async () => {
@@ -21,7 +20,7 @@ const getTaskAssignedUsers = async (taskDetails) => {
         return fetch(reviewerObj.apiEndPoint(), {
             method: "GET",
             headers: reviewerObj.getHeaders().headers,
-        }).then(res => res.json()).then(res => res.email);
+        }).then(res => res.json());
     }
 
     const getSuperChecker = async () => {
@@ -32,16 +31,10 @@ const getTaskAssignedUsers = async (taskDetails) => {
         return fetch(superCheckerObj.apiEndPoint(), {
             method: "GET",
             headers: superCheckerObj.getHeaders().headers,
-        }).then(res => res.json()).then(res => res.email);
+        }).then(res => res.json());
     };
 
-    return Promise.all([getAnnotator(), getReviewer(), getSuperChecker()]).then(res => 
-        <div style={{display: "flex", padding: "8px 0px", flexDirection: "column", gap: "14px"}}>
-            {res.map((email, idx) => 
-                email && <div style={{display: "inline", fontSize: 12}}>{UserMappedByRole(idx + 1).element} {email}</div>
-            )}
-        </div>
-    )
+    return Promise.all([getAnnotator(), getReviewer(), getSuperChecker()]);
 };
 
 export default getTaskAssignedUsers;

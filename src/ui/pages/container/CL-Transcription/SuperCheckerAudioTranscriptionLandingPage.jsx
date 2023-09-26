@@ -45,6 +45,7 @@ import SuperCheckerStageButtons from "../../component/CL-Transcription/SuperChec
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 
@@ -78,6 +79,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     fontSize: "Normal"
   });
   const [disableSkip, setdisableSkip] = useState(false);
+  const [disableBtns, setDisableBtns] = useState(false);
+  const [filterMessage, setFilterMessage] = useState("");
   const [reviewtext,setreviewtext] = useState('');
   const [supercheckertext,setsupercheckertext] = useState('');
   const[taskDetailList,setTaskDetailList] = useState("")
@@ -107,6 +110,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const superCheckerNotesRef = useRef(null);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(-2); 
 
   // useEffect(() => {
   //   let intervalId;
@@ -222,7 +226,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  const handleAutosave = async(id) => {
+  const handleAutosave = async() => {
+    if(disableBtns) return;
     const reqBody = {
       task_id: taskId,
       annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
@@ -305,7 +310,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableBtns]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -414,8 +419,33 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
+    if(selectedUserId === -1) {
+      setFilterMessage("");
+      setDisableBtns(false);
+      filterAnnotations(AnnotationsTaskDetails, userData, taskDetailList);
+      return;
+    }
+    const userAnnotations = AnnotationsTaskDetails?.filter((item) => item.completed_by === selectedUserId);
+    if(userAnnotations.length) {
+      setDisableBtns(true);
+      if(userAnnotations[0].annotation_type === 1) {
+        setFilterMessage("This is the Annotator's Annotation in read only mode");
+      }
+      else if(userAnnotations[0].annotation_type === 2) {
+        setFilterMessage("This is the Reviewer's Annotation in read only mode");
+      }
+      else if(userAnnotations[0].annotation_type === 3) {
+        setFilterMessage("This is the Super Checker's Annotation in read only mode");
+      }
+      setAnnotations(userAnnotations);
+    }
+  }, [selectedUserId]);
+
+  useEffect(() => {
     const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskDetails).then(res => setAssignedUsers(res));
+      getTaskAssignedUsers(taskDetails).then(res => {
+        setAssignedUsers(res);
+      });
     }
     taskDetails?.id && showAssignedUsers();
   }, [taskDetails]);
@@ -878,9 +908,31 @@ useEffect(() => {
             <Typography sx={{mt: 2, ml: 4, color: "grey"}}>
               Task #{taskDetails?.id}
               <LightTooltip
-                title={assignedUsers ? assignedUsers : ""}
+                disableFocusListener={true}
+                title={assignedUsers ? 
+                  <div style={{
+                    display: "flex",
+                    padding: "8px 0px",
+                    flexDirection: "column",
+                    gap: "4px",
+                    alignItems: "flex-start"
+                  }}>
+                     <Button
+                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === -1 ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
+                        onClick={() => setSelectedUserId(-1)}>
+                        Default (Reset filters)
+                    </Button>
+                    {assignedUsers.map((u, idx) => u && 
+                      <Button
+                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === u.id ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}//, boxSizing: "content-box"}}
+                        onClick={() => setSelectedUserId(u.id)}>
+                        {UserMappedByRole(idx + 1).element} {u.email}
+                      </Button>
+                    )}
+                  </div>
+                : ""}
               >
-                <InfoOutlinedIcon sx={{mb: "-4px", ml: "2px", color: "grey"}}/>
+                <InfoOutlinedIcon sx={{ mb: "-4px", ml: "2px", color: "grey" }} />
               </LightTooltip>
             </Typography>
             <SuperCheckerStageButtons
@@ -890,6 +942,8 @@ useEffect(() => {
               disableSkip={disableSkip}
               anchorEl={anchorEl}
               setAnchorEl={setAnchorEl}
+              filterMessage={filterMessage}
+              disableBtns={disableBtns}
             />
             <AudioPanel
               setCurrentTime={setCurrentTime}

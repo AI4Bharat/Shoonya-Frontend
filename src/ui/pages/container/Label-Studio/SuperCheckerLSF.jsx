@@ -14,7 +14,8 @@ import {
   Grid,
   Typography,
   Popover,
-  Autocomplete,
+  Autocomplete, 
+  Alert,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -33,6 +34,7 @@ import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/C
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 
@@ -174,7 +176,9 @@ const LabelStudioWrapper = ({
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
   const [assignedUsers, setAssignedUsers] = useState(null);
-
+  const [selectedUserId, setSelectedUserId] = useState(-2);
+  const [filterMessage, setFilterMessage] = useState(null);
+  const [disableButtons, setDisableButtons] = useState(false);
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   /* useEffect(() => {
@@ -241,11 +245,12 @@ const LabelStudioWrapper = ({
     annotationNotesRef,
     reviewNotesRef,
     superCheckerNotesRef,
-    projectType
+    projectType,
+    enableFilter=true,
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableSkip, disableAutoSave] = filterAnnotations(annotations, userData, taskData);
+    const [filteredAnnotations, disableSkip, disableAutoSave] = enableFilter ? filterAnnotations(annotations, userData, taskData) : [annotations, true, true];
     if (disableSkip || disableAutoSave) setAutoSave(false);
 
     if (taskData.task_status === "freezed") {
@@ -280,7 +285,7 @@ const LabelStudioWrapper = ({
         //"update",
         "submit",
         ...(!disableSkip ? ["skip"] : []),
-        "controls",
+        ...(!disableAutoSave ? ["controls"] : []),
         "infobar",
         "topbar",
         "instruction",
@@ -590,6 +595,7 @@ const LabelStudioWrapper = ({
                 : labelConfig.label_config;
           setAnnotations(annotations);
           setLabelConfig(tempLabelConfig);
+          setProjectType(labelConfig.project_type);
           setTaskData(taskData);
           getTaskData(taskData);
           LSFRoot(
@@ -678,8 +684,62 @@ const LabelStudioWrapper = ({
   }, [taskId]);
 
   useEffect(() => {
+    if(selectedUserId === -1) {
+      setAutoSave(true);
+      setDisableButtons(false);
+      setFilterMessage(null);
+      LSFRoot(
+        rootRef,
+        lsfRef,
+        userData,
+        projectId,
+        taskData,
+        labelConfig,
+        annotations,
+        [],
+        annotationNotesRef,
+        reviewNotesRef,
+        superCheckerNotesRef,
+        projectType
+      );
+      return;
+    }
+    const userAnnotations = annotations?.filter((item) => item.completed_by === selectedUserId);
+    if(userAnnotations.length) {
+      setDisableButtons(true);
+      setAutoSave(false);
+      if(userAnnotations[0].annotation_type === 1) {
+        setFilterMessage("This is the Annotator's Annotation in read only mode");
+      }
+      if(userAnnotations[0].annotation_type === 3) {
+        setFilterMessage("This is the Super Checker's Annotation in read only mode");
+      }
+      else if(userAnnotations[0].annotation_type === 2) {
+        setFilterMessage("This is the Reviewer's Annotation in read only mode");
+      }
+      LSFRoot(
+        rootRef,
+        lsfRef,
+        userData,
+        projectId,
+        taskData,
+        labelConfig,
+        userAnnotations,
+        [],
+        annotationNotesRef,
+        reviewNotesRef,
+        superCheckerNotesRef,
+        projectType,
+        false
+      );
+    }
+  }, [selectedUserId]);
+
+  useEffect(() => {
     const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
+      getTaskAssignedUsers(taskData).then(res => {
+        setAssignedUsers(res);
+      });
     }
     taskData?.id && showAssignedUsers();
   }, [taskData]);
@@ -817,6 +877,11 @@ const LabelStudioWrapper = ({
               </Typography>}
           </div>
         }
+        {filterMessage && (
+          <Alert severity="info" showIcon style={{ marginBottom: "15px" }}>
+            {filterMessage}
+          </Alert>
+        )}
         <div>
           {ProjectData.revision_loop_count >
             taskData?.revision_loop_count?.super_check_count
@@ -846,21 +911,44 @@ const LabelStudioWrapper = ({
         >
           <div />
           <div>
-            <LightTooltip title={assignedUsers ? assignedUsers : ""}>
-              <Button
-                type="default"
-                className="lsf-button"
-                style={{
-                  minWidth: "40px",
-                  border: "1px solid #e6e6e6",
-                  color: "grey",
-                  pt: 1, pl: 1, pr: 1,
-                  borderBottom: "None",
-                }}
-                > 
-                  <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
-              </Button>
-            </LightTooltip>
+            <LightTooltip
+                title={assignedUsers ? 
+                  <div style={{
+                    display: "flex",
+                    padding: "8px 0px",
+                    flexDirection: "column",
+                    gap: "4px",
+                    alignItems: "flex-start"
+                  }}>
+                    <Button
+                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === -1 ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
+                        onClick={() => setSelectedUserId(-1)}>
+                        Default (Reset filters)
+                    </Button>
+                    {assignedUsers.map((u, idx) => u && 
+                      <Button
+                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === u.id ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
+                        onClick={() => setSelectedUserId(u.id)}>
+                        {UserMappedByRole(idx + 1).element} {u.email}
+                      </Button>
+                    )}
+                  </div>
+                : ""}
+              >
+                <Button
+                  type="default"
+                  className="lsf-button"
+                  style={{
+                    minWidth: "40px",
+                    border: "1px solid #e6e6e6",
+                    color: "grey",
+                    pt: 1, pl: 1, pr: 1,
+                    borderBottom: "None",
+                  }}
+                  > 
+                    <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
+                </Button>
+              </LightTooltip>
             <Tooltip title="Go to next task">
               <Button
                 type="default"
@@ -878,7 +966,7 @@ const LabelStudioWrapper = ({
                 Next
               </Button>
             </Tooltip>
-            {taskData?.super_check_user === userData?.id && (
+            {!disableButtons && <>{taskData?.super_check_user === userData?.id && (
               <Tooltip title="Save task for later">
                 <Button
                   type="default"
@@ -956,7 +1044,7 @@ const LabelStudioWrapper = ({
                   Validate
                 </Button>
               </Tooltip>
-            )}
+            )}</>}
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
