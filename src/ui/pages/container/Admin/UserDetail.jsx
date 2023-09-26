@@ -28,7 +28,7 @@ const UserDetail = (props) => {
   const [id, setId] = useState("");
   const [userName,setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const [availabilityStatus, setAvailabilityStatus] = useState();
+  const [active, setActive] = useState();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [language, setLanguage] = useState([]);
@@ -66,7 +66,7 @@ const UserDetail = (props) => {
     languages,
     participation_type,
     role,
-    availability_status,
+    is_active,
   ) => {
     setOpenDialog(true);
     setId(id);
@@ -77,7 +77,7 @@ const UserDetail = (props) => {
     setLanguage(languages);
     setParticipationType(participation_type);
     setRole(role);
-    setAvailabilityStatus(availability_status);
+    setActive(is_active);
   };
 
   const handleCloseDialog = () => {
@@ -93,7 +93,7 @@ const UserDetail = (props) => {
       languages: language,
       participation_type: participationType,
       role: Role,
-      availability_status: availabilityStatus,
+      is_active: active,
     };
   
     const UserObj = new GetUserDetailUpdateAPI(id, data);
@@ -139,7 +139,7 @@ const UserDetail = (props) => {
       ) {
         return el;
       }else if(
-        el.availability_status?.toString()
+        el.is_active?.toString()
         ?.toLowerCase()
         .includes(SearchUserDetail?.toLowerCase())
       ){
@@ -243,8 +243,8 @@ const UserDetail = (props) => {
       },
     },
     {
-      name: "availability_status",
-      label: "Availability Status",
+      name: "is_active",
+      label: "Active Status",
       options: {
         filter: false,
         sort: false,
@@ -279,7 +279,7 @@ const UserDetail = (props) => {
             el.languages.join(", "),
             el.participation_type,
             userRoleFromList ? userRoleFromList : el.role,
-            el.availability_status==1?"Available":"Not Available",
+            el.is_active==true?"Active":"Not Active",
             <>
               <Button>
                 <EditOutlinedIcon
@@ -293,7 +293,7 @@ const UserDetail = (props) => {
                       el.languages,
                       el.participation_type,
                       el.role,
-                      el.availability_status,
+                      el.is_active,
                     )
                   }
                 />
@@ -372,8 +372,8 @@ const UserDetail = (props) => {
           FirstName={firstName}
           userName = {userName}
           setUserName={setUserName}
-          availabilityStatus={availabilityStatus}
-          setAvailabilityStatus={setAvailabilityStatus}
+          active={active}
+          setActive={setActive}
           setFirstName={setFirstName}
           LastName={lastName}
           setLastName={setLastName}

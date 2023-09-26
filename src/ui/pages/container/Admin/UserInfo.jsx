@@ -52,8 +52,8 @@ const UserInfo = (props) => {
     setRole,
     setUserName,
     userName,
-    setAvailabilityStatus,
-    availabilityStatus,
+    setActive,
+    active,
     setFirstName,
     setLastName,
     setLanguage,
@@ -105,8 +105,8 @@ const UserInfo = (props) => {
                     LastName={LastName}
                     userName = {userName}
                     setUserName={setUserName}
-                    availabilityStatus={availabilityStatus}
-                    setAvailabilityStatus={setAvailabilityStatus}
+                    active={active}
+                    setActive={setActive}
                     setLastName={setLastName}
                     Language={Language}
                     setLanguage={setLanguage}

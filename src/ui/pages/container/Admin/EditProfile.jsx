@@ -41,8 +41,8 @@ const EditProfile = (props) => {
     setRole,
     userName,
     setUserName,
-    setAvailabilityStatus,
-    availabilityStatus,
+    setActive,
+    active,
     setFirstName,
     setLastName,
     setLanguage,
@@ -224,20 +224,20 @@ const EditProfile = (props) => {
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mb: 2 }}>
           <FormControl sx={{ m: 1, minWidth: 210 }}>
-            <InputLabel id="demo-simple-select-helper-label">Availability_Status</InputLabel>
+            <InputLabel id="demo-simple-select-helper-label">Active_status</InputLabel>
             <Select
               labelId="demo-simple-select-helper-label"
               id="demo-simple-select-helper"
-              value={availabilityStatus}
-              label="Availability_Status"
-              onChange={(e) => setAvailabilityStatus(e.target.value)}
+              value={active}
+              label="Active_Status"
+              onChange={(e) => setActive(e.target.value)}
               sx={{
                 textAlign: "left",
               }}
               MenuProps={MenuProps}
             >
-              <MenuItem value={1}>Available</MenuItem>
-              <MenuItem value={2}>Not Available</MenuItem>
+              <MenuItem value={true}>Active</MenuItem>
+              <MenuItem value={false}>Not Active</MenuItem>
             </Select>
           </FormControl>
         </Grid>
