@@ -297,18 +297,16 @@ const AudioTranscriptionLandingPage = () => {
       annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
       auto_save: true,
       lead_time:
-        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time?.lead_time ?? 0),
+        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
-    if (result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+    if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
-      // dispatch(APITransport(obj));
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
         headers: obj.getHeaders().headers,
       });
-      const resp = await res.json();
       if (!res.ok) {
         setSnackbarInfo({
           open: true,
