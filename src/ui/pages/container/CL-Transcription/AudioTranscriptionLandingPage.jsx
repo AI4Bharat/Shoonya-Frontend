@@ -84,7 +84,7 @@ const AudioTranscriptionLandingPage = () => {
   const [disableSkipButton, setdisableSkipButton] = useState(false);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
-  const [disableUpdataButton, setDisableUpdataButton] = useState(false);
+  const [disableUpdateButton, setDisableUpdateButton] = useState(false);
   const [annotationtext, setannotationtext] = useState('')
   const [reviewtext, setreviewtext] = useState('')
   const [taskData, setTaskData] = useState()
@@ -230,7 +230,7 @@ const AudioTranscriptionLandingPage = () => {
 
     setAnnotations(filteredAnnotations);
     setDisableBtns(disableDraft);
-    setDisableUpdataButton(disableUpdate);
+    setDisableUpdateButton(disableUpdate);
     setdisableSkipButton(disableSkip);
     setFilterMessage(Message);
     return [
@@ -289,16 +289,17 @@ const AudioTranscriptionLandingPage = () => {
   };
 
   const handleAutosave = async () => {
+    if(disableUpdateButton) return;
     const reqBody = {
       task_id: taskId,
-      annotation_status: AnnotationsTaskDetails[0]?.annotation_status,
+      annotation_status: annotations[0]?.annotation_status,
       auto_save: true,
       lead_time:
-        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[0]?.lead_time ?? 0),
+        (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[0]?.id, reqBody);
+      const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
@@ -366,7 +367,7 @@ const AudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableUpdateButton]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -549,6 +550,7 @@ const AudioTranscriptionLandingPage = () => {
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
+      clearInterval(saveIntervalRef.current);
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {
@@ -823,7 +825,7 @@ useEffect(() => {
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               disableBtns={disableBtns}
-              disableUpdataButton={disableUpdataButton}
+              disableUpdateButton={disableUpdateButton}
               disableSkipButton={disableSkipButton}
               filterMessage={filterMessage}
               taskData={taskData}

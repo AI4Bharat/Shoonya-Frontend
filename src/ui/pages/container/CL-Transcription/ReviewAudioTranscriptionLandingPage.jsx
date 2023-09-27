@@ -307,17 +307,18 @@ const ReviewAudioTranscriptionLandingPage = () => {
   };
 
   const handleAutosave = async () => {
+    if(disableButton) return;
     const reqBody = {
       task_id: taskId,
-      annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
-      parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
+      annotation_status: annotations[0]?.annotation_status,
+      parent_annotation:annotations[0]?.parent_annotation,
       auto_save: true,
       lead_time:
-        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[1]?.lead_time ?? 0),
+        (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if(result.length && taskDetails?.review_user === user.id) {
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
+      const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
@@ -386,7 +387,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableButton]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -601,6 +602,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       (["to_be_revised"].includes(value) && L1Check) ||
       (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
     ) {
+      clearInterval(saveIntervalRef.current);
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",

@@ -79,6 +79,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     fontSize: "Normal"
   });
   const [disableSkip, setdisableSkip] = useState(false);
+  const [disableBtns, setDisableBtns] = useState(false);
+  const [filterMessage, setFilterMessage] = useState("");
   const [reviewtext,setreviewtext] = useState('');
   const [supercheckertext,setsupercheckertext] = useState('');
   const[taskDetailList,setTaskDetailList] = useState("")
@@ -224,17 +226,18 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   const handleAutosave = async () => {
+    if(disableBtns) return;
     const reqBody = {
       task_id: taskId,
-      annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
-      parent_annotation: AnnotationsTaskDetails[2]?.parent_annotation,
+      annotation_status: annotations[0]?.annotation_status,
+      parent_annotation: annotations[0]?.parent_annotation,
       auto_save :true,
       lead_time:
-      (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time ?? 0),
+      (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if(result.length && taskDetails?.super_check_user === userData.id) {
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[2]?.id, reqBody);
+      const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
@@ -303,7 +306,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableBtns]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -521,6 +524,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       (["rejected"].includes(value) && L1Check) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
+      clearInterval(saveIntervalRef.current);
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
