@@ -82,7 +82,7 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
   // console.log(taskDetails)
 
   const [grabbing, setGrabbing] = useState(false);
-  console.log(taskId,"taskIdtaskIdtaskId")
+  // console.log(taskId,"taskIdtaskIdtaskId")
 
   // console.log('subtitles',state.commonReducer.subtitles)
   // console.log('subtitles',sub[0])
@@ -169,7 +169,7 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
         {sub != undefined //TODO check if the Semantic (L2) transcription box is empty for Supercheckers/Reviewers of internal language
           ? sub.map((item, index) => {
               const { duration } = player;
-              console.log(item)
+              // console.log(item)
               return (
                 item.text === ''? 
                 <span
@@ -296,7 +296,6 @@ const Duration = memo(({ currentTime }) => {
 const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
-console.log(taskID,"taskDatataskData")
   const player = useSelector((state) => state.commonReducer.player);
 
   const [waveform, setWaveform] = useState();

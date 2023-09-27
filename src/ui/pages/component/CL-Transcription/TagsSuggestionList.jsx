@@ -6,7 +6,7 @@ import { onSubtitleChange } from "../../../../utils/SubTitlesUtils";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 
 //Components
-import { Grid, IconButton, Popover, Tooltip, Typography } from "@mui/material";
+import { Grid, IconButton, Popover, Tooltip, Typography, Autocomplete, TextField } from "@mui/material";
 
 //Icons
 import CloseIcon from "@mui/icons-material/Close";
@@ -63,26 +63,27 @@ const TagsSuggestionList = ({
     >
       <Grid width={200}>
         <Grid className={classes.suggestionListHeader}>
-          <Typography variant="body1" sx={{ fontSize: "16px" }}>
-            Select Tag
-          </Typography>
+          <Autocomplete
+            onChange={(event, value) => handleTagClick(value)}
+            id="tags-suggestions-auto"
+            options={TabsSuggestionData}
+            sx={{ width: 300 }}
+            renderInput={(params) => <TextField {...params} label="Select Tag" />}
+            renderOption={(props, option, { selected }) => (
+              <Typography
+                {...props}
+                variant="body2"
+                className={classes.suggestionListTypography}
+              >
+                {option}
+              </Typography>
+            )}
+          />
           <Tooltip title="close suggestions">
             <IconButton onClick={() => setTagSuggestionsAnchorEl(null)}>
               <CloseIcon />
             </IconButton>
           </Tooltip>
-        </Grid>
-
-        <Grid maxHeight={250}>
-          {TabsSuggestionData.map((name, value) => (
-            <Typography
-              onClick={() => handleTagClick(name)}
-              variant="body2"
-              className={classes.suggestionListTypography}
-            >
-              {name}
-            </Typography>
-          ))}
         </Grid>
       </Grid>
     </Popover>

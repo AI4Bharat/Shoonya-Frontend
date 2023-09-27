@@ -104,7 +104,7 @@ const TranscriptionRightPanel = ({
   const handlePageChange = (event, value) => {
     setPage(value);
   };
-  console.log(subtitles);
+  //console.log(subtitles);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles;
@@ -145,6 +145,7 @@ const TranscriptionRightPanel = ({
   const parentScrollOffsetY = useRef(0);
   const [totalSegments, setTotalSegments] = useState(0);
   const [showAdditionalOptions, setShowAdditionalOptions] = useState(false);
+  const [pauseOnType, setPauseOnType] = useState(false);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -549,6 +550,8 @@ const TranscriptionRightPanel = ({
               showSplit={true}
               advancedWaveformSettings={advancedWaveformSettings}
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+              pauseOnType={pauseOnType}
+              setPauseOnType={setPauseOnType}
             />
           </Grid>
           {showAcousticText && <Grid
@@ -710,7 +713,7 @@ const TranscriptionRightPanel = ({
                       className={classes.cardContent}
                       aria-describedby={"suggestionList"}
                       onClick={() => {
-                        if (player) {
+                        if (pauseOnType && player) {
                           player.pause();
                           if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
                             player.currentTime = item.startTime + 0.001;
