@@ -69,6 +69,8 @@ import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 //   SaveTranscriptAPI,
 //   setSubtitles,
 // } from "redux/actions";
+import { IconButton, Tooltip } from "@mui/material";
+import { Add, MoreVert, Remove } from "@material-ui/icons";
 
 const TranscriptionRightPanel = ({
   currentIndex,
@@ -141,6 +143,8 @@ const TranscriptionRightPanel = ({
     localStorage.getItem("SuperCheckerStage") === "superChecker";
   const parentScrollOffsetX = useRef(0);
   const parentScrollOffsetY = useRef(0);
+  const [totalSegments, setTotalSegments] = useState(0);
+  const [showAdditionalOptions, setShowAdditionalOptions] = useState(false);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -490,6 +494,31 @@ const TranscriptionRightPanel = ({
     }
   }, [taskData]);
 
+  useEffect(() => {
+    if(subtitles !== undefined)
+    setTotalSegments(subtitles.length);
+  }, [subtitles]);
+
+  const toggleAdditionalOptions = () => {
+    setShowAdditionalOptions(!showAdditionalOptions);
+  };
+
+  useEffect(() => {
+    const autoGrowTextareas = (className) => {
+      const textareas = document.querySelectorAll(`.${className}`);
+      textareas.forEach((textarea, index) => {
+        document.getElementById(`${index}_resizable`).style.height=`${textarea.scrollHeight+99}px`;
+      });
+    };
+
+    const delay = 1000;
+    const timer = setTimeout(() => {
+      autoGrowTextareas('auto-resizable-textarea');
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       {" "}
@@ -502,6 +531,7 @@ const TranscriptionRightPanel = ({
         >
           <Grid className={classes.rightPanelParentGrid}>
             <SettingsButtonComponent
+              totalSegments={totalSegments}
               setTransliteration={setTransliteration}
               enableTransliteration={enableTransliteration}
               setRTL_Typing={setRTL_Typing}
@@ -542,7 +572,7 @@ const TranscriptionRightPanel = ({
           </Box>
 
           <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
-            height: showAcousticText ? "calc(100vh - 422px)" : "calc(100vh - 385px)",
+            height: showAcousticText ? "calc(100vh - 380px)" : "calc(100vh - 385px)",
             alignItems: "center",
           }}>
           {currentPageData?.map((item, index) => {
@@ -552,6 +582,7 @@ const TranscriptionRightPanel = ({
                   bounds="parent"
                   default={{ height: "240px" }}
                   minHeight="240px"
+                  id={`${index}_resizable`}
                   enable={{ top:false, right:false, bottom:true, left:false, topRight:false, bottomRight:false, bottomLeft:false, topLeft:false }}
                   style={{ alignItems: "center", display: "flex", flexDirection: "column", marginTop: index === 0 ? "0px" : "-16px" }}
                   onResizeStart={(e, dir, ref) => {
@@ -567,7 +598,6 @@ const TranscriptionRightPanel = ({
                     key={index}
                     id={`sub_${index}`}
                     style={{
-                      padding: "16px",
                       borderBottom: "1px solid lightgray",
                       backgroundColor:
                         index % 2 === 0
@@ -579,7 +609,11 @@ const TranscriptionRightPanel = ({
                       height: "100%",
                     }}
                   >
-                    <Box className={classes.topBox}>
+                    <Box className={classes.topBox} style={{paddingLeft: "16px", paddingRight: "16px", paddingTop: "14px", paddingBottom: "10px"}}>
+                      <div style={{display:"block", height:"30px", width:"90px", lineHeight:"30px", borderRadius:"50%", fontSize:"medium", backgroundColor:"#2C2799", color:"white", marginRight:"20px", marginLeft:"5px"}}>
+                        {index+1}
+                      </div>
+
                       <TimeBoxes
                         handleTimeChange={handleTimeChange}
                         time={item.start_time}
@@ -587,13 +621,76 @@ const TranscriptionRightPanel = ({
                         type={"startTime"}
                       />
 
-                      <ButtonComponent
-                        index={index + idxOffset}
-                        lastItem={(index + idxOffset) < subtitles?.length - 1}
-                        onMergeClick={onMergeClick}
-                        onDelete={onDelete}
-                        addNewSubtitleBox={addNewSubtitleBox}
-                      />
+                      <FormControl
+                        sx={{ width: "50%", mr: "auto", float: "left", marginRight:"10px" }}
+                        size="small"
+                      >
+                        <InputLabel id="select-speaker">Select Speaker</InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="select-speaker"
+                          label="Select Speaker"
+                          value={item.speaker_id}
+                          onChange={(event) =>
+                            handleSpeakerChange(event.target.value, index + idxOffset)
+                          }
+                          style={{
+                            backgroundColor: "#fff",
+                            textAlign: "left",
+                            height: "32px"
+                          }}
+                          inputProps={{
+                            "aria-label": "Without label",
+                            style: { textAlign: "left" },
+                          }}
+                          MenuProps={MenuProps}
+                        >
+                          {speakerIdList?.map((speaker, index) => (
+                            <MenuItem key={index} value={speaker.name}>
+                              {speaker.name} ({speaker.gender})
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      {showAdditionalOptions ? <Tooltip title="Hide Additional Options" placement="bottom">
+                        <IconButton
+                          className={classes.optionIconBtn}
+                          style={{
+                            color: "#000",
+                            backgroundColor: "#fff",
+                            borderRadius: "50%",
+                            marginRight: "10px",
+                          }}
+                        onClick={() => {toggleAdditionalOptions()}}
+                        >
+                          <Remove/>
+                        </IconButton>
+                      </Tooltip> :
+                      <Tooltip title="Show Additional Options" placement="bottom">
+                      <IconButton
+                        className={classes.optionIconBtn}
+                        style={{
+                          color: "#000",
+                          backgroundColor: "#fff",
+                          borderRadius: "50%",
+                          marginRight: "10px",
+                        }}
+                        onClick={() => {toggleAdditionalOptions()}}
+                      >
+                        <Add/>
+                      </IconButton>
+                    </Tooltip>}
+                      
+                      {showAdditionalOptions && 
+                        <ButtonComponent
+                          index={index + idxOffset}
+                          lastItem={(index + idxOffset) < subtitles?.length - 1}
+                          onMergeClick={onMergeClick}
+                          onDelete={onDelete}
+                          addNewSubtitleBox={addNewSubtitleBox}
+                        />
+                      }
 
                       <TimeBoxes
                         handleTimeChange={handleTimeChange}
@@ -606,8 +703,9 @@ const TranscriptionRightPanel = ({
                     <CardContent
                       sx={{
                         display: "flex",
-                        padding: "15px 0",
+                        padding: "8px 10px",
                         height: "100%",
+                        gap:"8px"
                       }}
                       className={classes.cardContent}
                       aria-describedby={"suggestionList"}
@@ -667,9 +765,9 @@ const TranscriptionRightPanel = ({
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
-                            className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                            className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
                               }`}
-                            style={{ fontSize: fontSize, height: "100%" }}
+                            style={{ fontSize: fontSize, height: "100%"}}
                             onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
@@ -722,37 +820,6 @@ const TranscriptionRightPanel = ({
                           </div>
                         ))}
                     </CardContent>
-
-                    <FormControl
-                      sx={{ width: "50%", mr: "auto", float: "left" }}
-                      size="small"
-                    >
-                      <InputLabel id="select-speaker">Select Speaker</InputLabel>
-                      <Select
-                        fullWidth
-                        labelId="select-speaker"
-                        label="Select Speaker"
-                        value={item.speaker_id}
-                        onChange={(event) =>
-                          handleSpeakerChange(event.target.value, index + idxOffset)
-                        }
-                        style={{
-                          backgroundColor: "#fff",
-                          textAlign: "left",
-                        }}
-                        inputProps={{
-                          "aria-label": "Without label",
-                          style: { textAlign: "left" },
-                        }}
-                        MenuProps={MenuProps}
-                      >
-                        {speakerIdList?.map((speaker, index) => (
-                          <MenuItem key={index} value={speaker.name}>
-                            {speaker.name} ({speaker.gender})
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
                   </Box>
                 </Resizable>
                 <div style={{
@@ -771,7 +838,7 @@ const TranscriptionRightPanel = ({
             );
           })}
         </Box>
-        <Box
+        {/* <Box
           className={classes.paginationBox}
         // style={{
         //   ...(!xl && {
@@ -786,7 +853,7 @@ const TranscriptionRightPanel = ({
             page={page}
             onChange={handlePageChange}
           />
-        </Box>
+        </Box> */}
         {openConfirmDialog && (
           <ConfirmDialog
             openDialog={openConfirmDialog}

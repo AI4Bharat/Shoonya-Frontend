@@ -458,7 +458,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
   },
 
   cardContent: {
-    padding: "16px 0",
+    padding: "16px 0px",
     alignItems: "center",
   },
 
@@ -467,7 +467,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
   },
 
   customTextarea: {
-    padding: "16.5px 12px",
+    padding: "12px 12px",
     fontSize: "1.25rem",
     fontWeight: "400",
     lineHeight: "1.4375em",
@@ -477,7 +477,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     outlineColor: "#2C2799",
     resize: "none",
     fontFamily: "Roboto, sans-serif",
-    width: "95.5%",
+    width: "100%",
   },
 
   boxHighlight: {

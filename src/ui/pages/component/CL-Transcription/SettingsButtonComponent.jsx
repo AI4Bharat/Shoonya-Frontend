@@ -41,6 +41,7 @@ const transformOrigin = {
 };
 
 const SettingsButtonComponent = ({
+  totalSegments,
   setTransliteration,
   enableTransliteration,
   setRTL_Typing,
@@ -70,6 +71,8 @@ const SettingsButtonComponent = ({
 
   return (
     <>
+      <div style={{marginLeft:"15px", position:"absolute", left:"0", display:"block", height:"40px", width:"40px", lineHeight:"40px", borderRadius:"50%", fontSize:"large", backgroundColor:"#2C2799", color:"white", textAlign:"center"}}>{totalSegments}</div>
+
       {showSplit && (
         <Tooltip title="Split Subtitle" placement="bottom">
           <IconButton
