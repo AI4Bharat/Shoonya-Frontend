@@ -120,7 +120,7 @@ const TranscriptionRightPanel = ({
   const [selectionStart, setSelectionStart] = useState();
   const [currentIndexToSplitTextBlock, setCurrentIndexToSplitTextBlock] =
     useState();
-  const [enableTransliteration, setTransliteration] = useState(false);
+  const [enableTransliteration, setTransliteration] = useState(true);
   const [enableRTL_Typing, setRTL_Typing] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -145,7 +145,14 @@ const TranscriptionRightPanel = ({
   const parentScrollOffsetY = useRef(0);
   const [totalSegments, setTotalSegments] = useState(0);
   const [showAdditionalOptions, setShowAdditionalOptions] = useState(false);
-  const [pauseOnType, setPauseOnType] = useState(false);
+  const [pauseOnType, setPauseOnType] = useState(true);
+  const textRefs = useRef([]);
+  const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
+  const [currentSelection, setCurrentSelection] = useState(null);
+
+  useEffect(() => {
+    currentPageData?.length && (textRefs.current = textRefs.current.slice(0, currentPageData.length));
+  }, [currentPageData]);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -292,7 +299,7 @@ const TranscriptionRightPanel = ({
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
-  const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
+  const changeTranscriptHandler = (event, index, updateAcoustic = false, refIdx) => {
     const {
       target: { value },
       currentTarget,
@@ -317,6 +324,8 @@ const TranscriptionRightPanel = ({
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutTripleDollar(textBeforeTab);
       setTextAfterTripleDollar(textAfterTab);
+      setCurrentTextRefIdx(refIdx);
+      setCurrentSelection(event.target.selectionEnd);
     }
     const sub = onSubtitleChange(value, index, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -727,7 +736,7 @@ const TranscriptionRightPanel = ({
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
-                            changeTranscriptHandler(event, index + idxOffset);
+                            changeTranscriptHandler(event, index + idxOffset, false, index);
                           }}
                           enabled={enableTransliterationSuggestion}
                           onChangeText={() => { }}
@@ -739,31 +748,34 @@ const TranscriptionRightPanel = ({
                             }, 200);
                           }}
                           style={{ fontSize: fontSize, height: "100%" }}
-                          renderComponent={(props) => (
-                            <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
-                              <textarea
-                                className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
-                                  }`}
-                                dir={enableRTL_Typing ? "rtl" : "ltr"}
-                                onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
-                                onBlur={() => {
-                                  setTimeout(() => {
-                                    setShowPopOver(false);
-                                  }, 200);
-                                }}
-                                {...props}
-                              />
-                              {/* <span id="charNum" className={classes.wordCount}>
-                      {targetLength(index)}
-                    </span> */}
-                            </div>
-                          )}
+                          renderComponent={(props) => {
+                            textRefs.current[index] = props.ref.current;
+                            return (
+                              <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                                <textarea
+                                  className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                    }`}
+                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                  onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                                  onBlur={() => {
+                                    setTimeout(() => {
+                                      setShowPopOver(false);
+                                    }, 200);
+                                  }}
+                                  {...props}
+                                />
+                                {/* <span id="charNum" className={classes.wordCount}>
+                        {targetLength(index)}
+                      </span> */}
+                              </div>
+                            )}}
                         />
                       ) : (
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
+                          ref={el => textRefs.current[index] = el}
                             onChange={(event) => {
-                              changeTranscriptHandler(event, index + idxOffset);
+                              changeTranscriptHandler(event, index + idxOffset, false, index);
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
@@ -880,6 +892,8 @@ const TranscriptionRightPanel = ({
             setEnableTransliterationSuggestion={
               setEnableTransliterationSuggestion
             }
+            currentSelection={currentSelection}
+            ref={textRefs.current[currentTextRefIdx]}
           />
         )}
       </Grid>

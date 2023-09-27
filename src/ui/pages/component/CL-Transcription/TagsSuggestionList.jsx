@@ -15,17 +15,21 @@ import CloseIcon from "@mui/icons-material/Close";
 import C from "../../../../redux/constants";
 import { setSubtitles } from "../../../../redux/actions/Common";
 
-const TagsSuggestionList = ({
-  tagSuggestionsAnchorEl,
-  setTagSuggestionList,
-  index,
-  setTagSuggestionsAnchorEl,
-  textWithoutTripleDollar,
-  textAfterTripleDollar,
-  // saveTranscriptHandler,
-  setEnableTransliterationSuggestion,
-  TabsSuggestionData,
-}) => {
+const TagsSuggestionList = React.forwardRef((props, ref) => {
+  
+  const {
+    tagSuggestionsAnchorEl,
+    setTagSuggestionList,
+    index,
+    setTagSuggestionsAnchorEl,
+    textWithoutTripleDollar,
+    textAfterTripleDollar,
+    // saveTranscriptHandler,
+    setEnableTransliterationSuggestion,
+    TabsSuggestionData,
+    currentSelection,
+  } = props;
+
   const dispatch = useDispatch();
   const classes = AudioTranscriptionLandingStyle();
   const handleTagClick = (suggestion) => {
@@ -34,7 +38,7 @@ const TagsSuggestionList = ({
     const sub = onSubtitleChange(modifiedText, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
-
+    setTimeout(() => ref.setSelectionRange(currentSelection + suggestion.length - 1, currentSelection + suggestion.length - 1), 100);
     setEnableTransliterationSuggestion(true);
     setTagSuggestionsAnchorEl(null);
   };
@@ -88,6 +92,6 @@ const TagsSuggestionList = ({
       </Grid>
     </Popover>
   );
-};
+});
 
 export default TagsSuggestionList;
