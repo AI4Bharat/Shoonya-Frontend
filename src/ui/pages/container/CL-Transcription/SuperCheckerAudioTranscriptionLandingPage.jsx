@@ -222,26 +222,23 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  const handleAutosave = async(id) => {
+  const handleAutosave = async () => {
     const reqBody = {
       task_id: taskId,
       annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
       parent_annotation: AnnotationsTaskDetails[2]?.parent_annotation,
       auto_save :true,
       lead_time:
-      (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time?.lead_time ?? 0),
+      (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
-    if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === userData.id)){
-
+    if(result.length && taskDetails?.super_check_user === userData.id) {
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[2]?.id, reqBody);
-      // dispatch(APITransport(obj));
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
         headers: obj.getHeaders().headers,
       });
-      const resp = await res.json();
       if (!res.ok) {
         setSnackbarInfo({
           open: true,
