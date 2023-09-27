@@ -120,7 +120,7 @@ const TranscriptionRightPanel = ({
   const [selectionStart, setSelectionStart] = useState();
   const [currentIndexToSplitTextBlock, setCurrentIndexToSplitTextBlock] =
     useState();
-  const [enableTransliteration, setTransliteration] = useState(true);
+  const [enableTransliteration, setTransliteration] = useState(false);
   const [enableRTL_Typing, setRTL_Typing] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [loading, setLoading] = useState(false);
