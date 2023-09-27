@@ -305,35 +305,32 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  const handleAutosave = async (id) => {
+  const handleAutosave = async () => {
     const reqBody = {
       task_id: taskId,
       annotation_status: AnnotationsTaskDetails[1]?.annotation_status,
       parent_annotation:AnnotationsTaskDetails[1]?.parent_annotation,
       auto_save: true,
-      // cl_format: true,
-      // offset: currentPage,
-      // limit: limit,
+      lead_time:
+        (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[1]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
-    if(result.length > 0 && taskDetails?.annotation_users?.some((users) => users === user.id)){
-
-    const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
-    // dispatch(APITransport(obj));
-    const res = await fetch(obj.apiEndPoint(), {
-      method: "PATCH",
-      body: JSON.stringify(obj.getBody()),
-      headers: obj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    if (!res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: "Error in autosaving annotation",
-        variant: "error",
+    if(result.length && taskDetails?.review_user === user.id) {
+      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[1]?.id, reqBody);
+      const res = await fetch(obj.apiEndPoint(), {
+        method: "PATCH",
+        body: JSON.stringify(obj.getBody()),
+        headers: obj.getHeaders().headers,
       });
-      return res;
-    }}
+      if (!res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving annotation",
+          variant: "error",
+        });
+        return res;
+      }
+    }
   };
 
   useEffect(() => {
