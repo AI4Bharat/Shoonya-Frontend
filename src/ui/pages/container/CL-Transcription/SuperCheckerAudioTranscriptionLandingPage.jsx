@@ -232,7 +232,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
-    if(result.length && taskDetails?.super_check_user === user.id) {
+    if(result.length && taskDetails?.super_check_user === userData.id) {
       const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[2]?.id, reqBody);
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
