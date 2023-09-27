@@ -182,7 +182,8 @@ const TranscriptionRightPanel = ({
   }, [currentPage]);
 
   useEffect(() => {
-    if(currentIndex >= startIndex && currentIndex <= endIndex) {
+    if(currentIndex >= startIndex) {
+      // if(currentIndex >= startIndex && currentIndex <= endIndex) {
       const subtitleScrollEle = document.getElementById("subTitleContainer");
       subtitleScrollEle
         .querySelector(`#sub_${currentIndex}`)
@@ -511,7 +512,7 @@ const TranscriptionRightPanel = ({
       });
     };
 
-    const delay = 1000;
+    const delay = 1500;
     const timer = setTimeout(() => {
       autoGrowTextareas('auto-resizable-textarea');
     }, delay);
