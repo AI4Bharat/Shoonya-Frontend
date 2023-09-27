@@ -38,13 +38,13 @@ const Transliteration = (props) => {
     }else{
       setText("")
     }
-    
   }, [])
 
 
   var data = languageList.filter((e)=>e.DisplayName.includes(ProjectDetails.tgt_language))
   
   const renderTextarea = (props) => {
+    console.log(props)
     return (
       <textarea
         {...props}
@@ -61,6 +61,7 @@ const Transliteration = (props) => {
     getTransliterationLanguages()
       .then(langs => {
         setLanguageList(langs);
+        console.log(langs);
       })
       .catch(err => {
         console.log(err);
