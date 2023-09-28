@@ -984,13 +984,13 @@ useEffect(() => {
         }
       }
     }
-    if (event.shiftKey && event.key === '<') {
+    if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime - 0.05;
       }
     }
-    if (event.shiftKey && event.key === '>') {
+    if (event.shiftKey && event.key === 'ArrowRight') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime + 0.05;

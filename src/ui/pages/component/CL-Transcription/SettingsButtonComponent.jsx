@@ -194,8 +194,8 @@ const SettingsButtonComponent = ({
             <div style={{fontSize: "large", textAlign: "center", fontWeight: "bold", marginBottom:"4px"}}>Hotkeys</div>
             <ul style={{fontSize: "medium", paddingLeft: "20px", marginBottom:"1px"}}>
                 <li>Play/Pause - Shift + Space</li>
-                <li>Seek Left - Shift + &lt;</li>
-                <li>Seek Right - Shift + &gt;</li>
+                <li>Seek Left - Shift + &#8592;</li>
+                <li>Seek Right - Shift + &#8594;</li>
                 <li>Noise Tags - $$$</li>
                 <li>Toggle Transliteration - Alt + 1</li>
                 {/* <li>Color Schema set</li> */}
