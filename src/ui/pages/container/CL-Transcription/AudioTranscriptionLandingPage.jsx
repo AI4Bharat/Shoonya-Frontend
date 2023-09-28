@@ -550,7 +550,6 @@ const AudioTranscriptionLandingPage = () => {
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
-      clearInterval(saveIntervalRef.current);
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {
@@ -560,6 +559,10 @@ const AudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
@@ -767,13 +770,13 @@ useEffect(() => {
         }
       }
     }
-    if (event.shiftKey && event.key === '<') {
+    if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime - 0.05;
       }
     }
-    if (event.shiftKey && event.key === '>') {
+    if (event.shiftKey && event.key === 'ArrowRight') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime + 0.05;

@@ -525,8 +525,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       (["rejected"].includes(value) && L1Check) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
-      clearInterval(saveIntervalRef.current);
-      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+    const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(TaskObj.getBody()),
@@ -534,6 +533,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
@@ -833,13 +836,13 @@ useEffect(() => {
         }
       }
     }
-    if (event.shiftKey && event.key === '<') {
+    if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime - 0.05;
       }
     }
-    if (event.shiftKey && event.key === '>') {
+    if (event.shiftKey && event.key === 'ArrowRight') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime + 0.05;

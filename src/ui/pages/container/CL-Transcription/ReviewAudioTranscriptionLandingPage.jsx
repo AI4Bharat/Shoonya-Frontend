@@ -603,7 +603,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
       (["to_be_revised"].includes(value) && L1Check) ||
       (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
     ) {
-      clearInterval(saveIntervalRef.current);
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
@@ -612,6 +611,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
@@ -984,13 +987,13 @@ useEffect(() => {
         }
       }
     }
-    if (event.shiftKey && event.key === '<') {
+    if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime - 0.05;
       }
     }
-    if (event.shiftKey && event.key === '>') {
+    if (event.shiftKey && event.key === 'ArrowRight') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime + 0.05;
