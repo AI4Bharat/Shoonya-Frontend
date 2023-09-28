@@ -1055,7 +1055,7 @@ useEffect(() => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid container spacing={1} sx={{ p: 2, pr : 3}} justifyContent="flex-end">
+            <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Timeline Scale:
@@ -1093,7 +1093,7 @@ useEffect(() => {
                   }}/>
               </Stack>
             </Grid>
-            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
+            <Grid container spacing={1} sx={{ ml: 3 }}>
               <Grid item>
               <Button
                 endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -1187,7 +1187,7 @@ useEffect(() => {
                 style={{
                   display: showNotes ? "block" : "none",
                   paddingBottom: "16px",
-                  height: "max-content", overflow: "auto"
+                  height: "175px", overflow: "scroll"
                 }}
               >
                 <ReactQuill
