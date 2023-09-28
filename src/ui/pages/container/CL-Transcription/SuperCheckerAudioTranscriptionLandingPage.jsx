@@ -255,48 +255,46 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }
   };
   
-  useEffect(() => {
-    
-    const handleUpdateTimeSpent = (time = 60) => {
-      // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
-      // dispatch(APITransport(apiObj));
-    };
+  const handleUpdateTimeSpent = (time = 60) => {
+    // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
+    // dispatch(APITransport(apiObj));
+  };
 
+  const handleBeforeUnload = (event) => {
+    handleAutosave();
+    handleUpdateTimeSpent(ref.current);
+    event.preventDefault();
+    event.returnValue = "";
+    ref.current = 0;
+  };
+  
+  const handleVisibilityChange = () => {
+    if (!document.hidden) {
+      // Tab is active, restart the autosave interval
+      saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+      timeSpentIntervalRef.current = setInterval(
+        handleUpdateTimeSpent,
+        60 * 1000
+      );
+    } else {
+      handleAutosave();
+      handleUpdateTimeSpent(ref.current);
+      // Tab is inactive, clear the autosave interval
+      clearInterval(saveIntervalRef.current);
+      clearInterval(timeSpentIntervalRef.current);
+      ref.current = 0;
+    }
+  };
+
+
+  useEffect(() => {
     saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
     );
 
-    const handleBeforeUnload = (event) => {
-      handleAutosave();
-      handleUpdateTimeSpent(ref.current);
-      event.preventDefault();
-      event.returnValue = "";
-      ref.current = 0;
-    };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Add event listener for visibility change
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // Tab is active, restart the autosave interval
-        saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
-        timeSpentIntervalRef.current = setInterval(
-          handleUpdateTimeSpent,
-          60 * 1000
-        );
-      } else {
-        handleAutosave();
-        handleUpdateTimeSpent(ref.current);
-        // Tab is inactive, clear the autosave interval
-        clearInterval(saveIntervalRef.current);
-        clearInterval(timeSpentIntervalRef.current);
-        ref.current = 0;
-      }
-    };
-
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
