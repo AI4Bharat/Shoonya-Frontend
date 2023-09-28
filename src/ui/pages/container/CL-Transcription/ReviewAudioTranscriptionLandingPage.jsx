@@ -307,18 +307,19 @@ const ReviewAudioTranscriptionLandingPage = () => {
   };
 
   const handleAutosave = async () => {
-    if(disableButton) return;
+    const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === user.id && a.annotation_type === 2);
+    if(!currentAnnotation || disableButton) return;
     const reqBody = {
       task_id: taskId,
-      annotation_status: annotations[0]?.annotation_status,
-      parent_annotation:annotations[0]?.parent_annotation,
+      annotation_status: currentAnnotation?.annotation_status,
+      parent_annotation: currentAnnotation?.parent_annotation,
       auto_save: true,
       lead_time:
-        (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
+        (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if(result.length && taskDetails?.review_user === user.id) {
-      const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
+      const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
