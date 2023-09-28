@@ -604,6 +604,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
       (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
     ) {
       clearInterval(saveIntervalRef.current);
+      clearInterval(timeSpentIntervalRef.current);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
