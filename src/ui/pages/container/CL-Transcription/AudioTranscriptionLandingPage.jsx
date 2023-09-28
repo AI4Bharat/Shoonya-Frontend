@@ -108,6 +108,7 @@ const AudioTranscriptionLandingPage = () => {
   const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  const [autoSave, setAutoSave] = useState(true);
 
   // useEffect(() => {
   //   let intervalId;
@@ -227,7 +228,7 @@ const AudioTranscriptionLandingPage = () => {
       disableSkip = true;
       disableUpdate = true;
     }
-
+    setAutoSave(!disableUpdate);
     setAnnotations(filteredAnnotations);
     setDisableBtns(disableDraft);
     setDisableUpdateButton(disableUpdate);
@@ -288,72 +289,73 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
-  const handleAutosave = async () => {
-    if(disableUpdateButton) return;
-    const reqBody = {
-      task_id: taskId,
-      annotation_status: annotations[0]?.annotation_status,
-      auto_save: true,
-      lead_time:
-        (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-    };
-    if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
-      const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
-      });
-      if (!res.ok) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving annotation",
-          variant: "error",
-        });
-      }
-      return res;
-    }
-  };
-
-  const handleUpdateTimeSpent = (time = 60) => {
-    // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
-    // dispatch(APITransport(apiObj));
-  };
-  
-  const handleBeforeUnload = (event) => {
-    handleAutosave();
-    handleUpdateTimeSpent(ref.current);
-    event.preventDefault();
-    event.returnValue = "";
-    ref.current = 0;
-  };
-
-  const handleVisibilityChange = () => {
-    if (!document.hidden) {
-      // Tab is active, restart the autosave interval
-      saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
-      timeSpentIntervalRef.current = setInterval(
-        handleUpdateTimeSpent,
-        60 * 1000
-      );
-    } else {
-      handleAutosave();
-      handleUpdateTimeSpent(ref.current);
-      // Tab is inactive, clear the autosave interval
-      clearInterval(saveIntervalRef.current);
-      clearInterval(timeSpentIntervalRef.current);
-      ref.current = 0;
-    }
-  };
-
   useEffect(() => {
+    if(!autoSave) return;
+    const handleAutosave = async () => {
+      const reqBody = {
+        task_id: taskId,
+        annotation_status: annotations[0]?.annotation_status,
+        auto_save: true,
+        lead_time:
+          (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      };
+      if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+        const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        if (!res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: "Error in autosaving annotation",
+            variant: "error",
+          });
+        }
+        return res;
+      }
+    };
+
+    const handleUpdateTimeSpent = (time = 60) => {
+      // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
+      // dispatch(APITransport(apiObj));
+    };
+
     saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
     );
 
+    const handleBeforeUnload = (event) => {
+      handleAutosave();
+      handleUpdateTimeSpent(ref.current);
+      event.preventDefault();
+      event.returnValue = "";
+      ref.current = 0;
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Tab is active, restart the autosave interval
+        saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+        timeSpentIntervalRef.current = setInterval(
+          handleUpdateTimeSpent,
+          60 * 1000
+        );
+      } else {
+        handleAutosave();
+        handleUpdateTimeSpent(ref.current);
+        // Tab is inactive, clear the autosave interval
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        ref.current = 0;
+      }
+  };
+  
+  
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -365,7 +367,7 @@ const AudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableUpdateButton]);
+  }, [autoSave, user, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings, disableUpdateButton]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -557,10 +559,7 @@ const AudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        clearInterval(saveIntervalRef.current);
-        clearInterval(timeSpentIntervalRef.current);
-        window.removeEventListener("beforeunload", handleBeforeUnload);
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        setAutoSave(false);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }

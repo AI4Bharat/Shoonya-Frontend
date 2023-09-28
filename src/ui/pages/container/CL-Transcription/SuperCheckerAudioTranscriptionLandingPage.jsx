@@ -110,6 +110,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const superCheckerNotesRef = useRef(null);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  const [autoSave, setAutoSave] = useState(true);
 
   // useEffect(() => {
   //   let intervalId;
@@ -224,76 +225,77 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }else{setTaskDetailList(resp)}
     setLoading(false);
   };
-
-  const handleAutosave = async () => {
-    const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
-    if(!currentAnnotation || disableBtns) return;
-    const reqBody = {
-      task_id: taskId,
-      annotation_status: currentAnnotation?.annotation_status,
-      parent_annotation: currentAnnotation?.parent_annotation,
-      auto_save :true,
-      lead_time:
-      (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-    };
-    if(result.length && taskDetails?.super_check_user === userData.id) {
-      const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
-      });
-      if (!res.ok) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving annotation",
-          variant: "error",
-        });
-      } 
-      return res;
-    }
-  };
   
-  const handleUpdateTimeSpent = (time = 60) => {
-    // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
-    // dispatch(APITransport(apiObj));
-  };
-
-  const handleBeforeUnload = (event) => {
-    handleAutosave();
-    handleUpdateTimeSpent(ref.current);
-    event.preventDefault();
-    event.returnValue = "";
-    ref.current = 0;
-  };
-  
-  const handleVisibilityChange = () => {
-    if (!document.hidden) {
-      // Tab is active, restart the autosave interval
-      saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
-      timeSpentIntervalRef.current = setInterval(
-        handleUpdateTimeSpent,
-        60 * 1000
-      );
-    } else {
-      handleAutosave();
-      handleUpdateTimeSpent(ref.current);
-      // Tab is inactive, clear the autosave interval
-      clearInterval(saveIntervalRef.current);
-      clearInterval(timeSpentIntervalRef.current);
-      ref.current = 0;
-    }
-  };
-
-
   useEffect(() => {
+    if(!autoSave) return;
+
+    const handleAutosave = async () => {
+      const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
+      if(!currentAnnotation) return;
+      const reqBody = {
+        task_id: taskId,
+        annotation_status: currentAnnotation?.annotation_status,
+        parent_annotation: currentAnnotation?.parent_annotation,
+        auto_save :true,
+        lead_time:
+        (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      };
+      if(result.length && taskDetails?.super_check_user === userData.id) {
+        const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        if (!res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: "Error in autosaving annotation",
+            variant: "error",
+          });
+        } 
+        return res;
+      }
+    };
+    
+    const handleUpdateTimeSpent = (time = 60) => {
+      // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
+      // dispatch(APITransport(apiObj));
+    };
+
     saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
     );
 
+    const handleBeforeUnload = (event) => {
+      handleAutosave();
+      handleUpdateTimeSpent(ref.current);
+      event.preventDefault();
+      event.returnValue = "";
+      ref.current = 0;
+    };
+  
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Tab is active, restart the autosave interval
+        saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+        timeSpentIntervalRef.current = setInterval(
+          handleUpdateTimeSpent,
+          60 * 1000
+        );
+      } else {
+        handleAutosave();
+        handleUpdateTimeSpent(ref.current);
+        // Tab is inactive, clear the autosave interval
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        ref.current = 0;
+      }
+    };
+    
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -305,7 +307,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableBtns]);
+  }, [autoSave, userData, result, taskId, taskDetails, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -523,7 +525,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       (["rejected"].includes(value) && L1Check) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
-    const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(TaskObj.getBody()),
@@ -531,10 +533,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        clearInterval(saveIntervalRef.current);
-        clearInterval(timeSpentIntervalRef.current);
-        window.removeEventListener("beforeunload", handleBeforeUnload);
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        setAutoSave(false);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
