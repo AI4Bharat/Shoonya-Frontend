@@ -61,6 +61,8 @@ const SettingsButtonComponent = ({
   handleInfoButtonClick,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
+  pauseOnType,
+  setPauseOnType,
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   // const dispatch = useDispatch();
@@ -153,6 +155,19 @@ const SettingsButtonComponent = ({
         </MenuItem>
         <MenuItem>
           <FormControlLabel
+            label="Pause when typing"
+            control={
+              <Checkbox
+                checked={pauseOnType}
+                onChange={() => {
+                  setPauseOnType(!pauseOnType);
+                }}
+              />
+            }
+          />
+        </MenuItem>
+        <MenuItem>
+          <FormControlLabel
             label="Advanced Settings"
             control={
               <Checkbox
@@ -179,8 +194,8 @@ const SettingsButtonComponent = ({
             <div style={{fontSize: "large", textAlign: "center", fontWeight: "bold", marginBottom:"4px"}}>Hotkeys</div>
             <ul style={{fontSize: "medium", paddingLeft: "20px", marginBottom:"1px"}}>
                 <li>Play/Pause - Shift + Space</li>
-                <li>Seek Left - Shift + Left Arrow</li>
-                <li>Seek Right - Shift + Right Arrow</li>
+                <li>Seek Left - Shift + &lt;</li>
+                <li>Seek Right - Shift + &gt;</li>
                 <li>Noise Tags - $$$</li>
                 <li>Toggle Transliteration - Alt + 1</li>
                 {/* <li>Color Schema set</li> */}

@@ -104,7 +104,7 @@ const TranscriptionRightPanel = ({
   const handlePageChange = (event, value) => {
     setPage(value);
   };
-  console.log(subtitles);
+  //console.log(subtitles);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles;
@@ -145,6 +145,14 @@ const TranscriptionRightPanel = ({
   const parentScrollOffsetY = useRef(0);
   const [totalSegments, setTotalSegments] = useState(0);
   const [showAdditionalOptions, setShowAdditionalOptions] = useState(false);
+  const [pauseOnType, setPauseOnType] = useState(true);
+  const textRefs = useRef([]);
+  const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
+  const [currentSelection, setCurrentSelection] = useState(null);
+
+  useEffect(() => {
+    currentPageData?.length && (textRefs.current = textRefs.current.slice(0, currentPageData.length));
+  }, [currentPageData]);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -291,7 +299,7 @@ const TranscriptionRightPanel = ({
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
-  const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
+  const changeTranscriptHandler = (event, index, updateAcoustic = false, refIdx) => {
     const {
       target: { value },
       currentTarget,
@@ -316,6 +324,8 @@ const TranscriptionRightPanel = ({
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutTripleDollar(textBeforeTab);
       setTextAfterTripleDollar(textAfterTab);
+      setCurrentTextRefIdx(refIdx);
+      setCurrentSelection(event.target.selectionEnd);
     }
     const sub = onSubtitleChange(value, index, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -549,6 +559,8 @@ const TranscriptionRightPanel = ({
               showSplit={true}
               advancedWaveformSettings={advancedWaveformSettings}
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+              pauseOnType={pauseOnType}
+              setPauseOnType={setPauseOnType}
             />
           </Grid>
           {showAcousticText && <Grid
@@ -710,7 +722,7 @@ const TranscriptionRightPanel = ({
                       className={classes.cardContent}
                       aria-describedby={"suggestionList"}
                       onClick={() => {
-                        if (player) {
+                        if (pauseOnType && player) {
                           player.pause();
                           if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
                             player.currentTime = item.startTime + 0.001;
@@ -724,7 +736,7 @@ const TranscriptionRightPanel = ({
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
-                            changeTranscriptHandler(event, index + idxOffset);
+                            changeTranscriptHandler(event, index + idxOffset, false, index);
                           }}
                           enabled={enableTransliterationSuggestion}
                           onChangeText={() => { }}
@@ -736,31 +748,34 @@ const TranscriptionRightPanel = ({
                             }, 200);
                           }}
                           style={{ fontSize: fontSize, height: "100%" }}
-                          renderComponent={(props) => (
-                            <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
-                              <textarea
-                                className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
-                                  }`}
-                                dir={enableRTL_Typing ? "rtl" : "ltr"}
-                                onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
-                                onBlur={() => {
-                                  setTimeout(() => {
-                                    setShowPopOver(false);
-                                  }, 200);
-                                }}
-                                {...props}
-                              />
-                              {/* <span id="charNum" className={classes.wordCount}>
-                      {targetLength(index)}
-                    </span> */}
-                            </div>
-                          )}
+                          renderComponent={(props) => {
+                            textRefs.current[index] = props.ref.current;
+                            return (
+                              <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                                <textarea
+                                  className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                    }`}
+                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                  onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                                  onBlur={() => {
+                                    setTimeout(() => {
+                                      setShowPopOver(false);
+                                    }, 200);
+                                  }}
+                                  {...props}
+                                />
+                                {/* <span id="charNum" className={classes.wordCount}>
+                        {targetLength(index)}
+                      </span> */}
+                              </div>
+                            )}}
                         />
                       ) : (
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
+                          ref={el => textRefs.current[index] = el}
                             onChange={(event) => {
-                              changeTranscriptHandler(event, index + idxOffset);
+                              changeTranscriptHandler(event, index + idxOffset, false, index);
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
@@ -877,6 +892,8 @@ const TranscriptionRightPanel = ({
             setEnableTransliterationSuggestion={
               setEnableTransliterationSuggestion
             }
+            currentSelection={currentSelection}
+            ref={textRefs.current[currentTextRefIdx]}
           />
         )}
       </Grid>
