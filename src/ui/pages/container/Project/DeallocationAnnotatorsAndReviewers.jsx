@@ -16,7 +16,8 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { snakeToTitleCase } from "../../../../utils/utils";
 import DeallocationAnnotatorsAndReviewersAPI from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import CustomizedSnackbars from "../../component/common/Snackbar";
-
+import TextField from '@mui/material/TextField';
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 
 let AnnotationStatus = [
@@ -187,6 +188,24 @@ const renderSnackBar = () => {
         message={snackbar.message}
       />
     );
+  };
+
+  const UserDetails = useSelector((state) => state.fetchUserById.data);
+  const [password, setPassword] = useState("");
+  const handleConfirm = async () => {
+    const apiObj = new LoginAPI(await UserDetails.email, password);
+    const res = await fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    });
+    const rsp_data = await res.json();
+    if (res.ok) {
+      handleok();
+    }else{
+      window.alert("Invalid credentials, please try again");
+      console.log(rsp_data);
+    }
   };
 
   return (
@@ -518,20 +537,30 @@ const renderSnackBar = () => {
                     <DialogContentText id="alert-dialog-description">
                     Are you sure want to Deallocate User Tasks ? 
                     </DialogContentText>
+                    <TextField
+                            autoFocus
+                            margin="dense"
+                            id="password"
+                            label="Password"
+                            type="password"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}
                         variant="outlined"
-                        color="primary"
+                        color="error"
                         size="small"
-                        className={classes.clearAllBtn} > {" "}
-                        {translate("button.clear")}
+                        className={classes.clearAllBtn} >
+                          Cancel
                     </Button>
-                    <Button onClick={handleok}
+                    <Button onClick={handleConfirm}
                         variant="contained"
-                        color="primary"
+                        color="error"
                         size="small" className={classes.clearAllBtn} autoFocus >
-                        Ok
+                        Confirm
                     </Button>
                 </DialogActions>
             </Dialog>

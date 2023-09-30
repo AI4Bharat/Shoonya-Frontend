@@ -3,6 +3,7 @@ import {
   ThemeProvider,
   Select,
   Box,
+  Button,
   MenuItem,
   InputLabel,
   FormControl,
@@ -15,7 +16,6 @@ import {
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Button from "../../component/common/Button";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
@@ -46,6 +46,8 @@ import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/Proj
 import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
 import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles"
+import TextField from '@mui/material/TextField';
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 
 const ProgressType = [
@@ -409,6 +411,23 @@ const AdvancedOperation = (props) => {
     );
   };
 
+  const UserDetails = useSelector((state) => state.fetchUserById.data);
+  const [password, setPassword] = useState("");
+  const handleConfirm = async () => {
+    const apiObj = new LoginAPI(await UserDetails.email, password);
+    const res = await fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    });
+    const rsp_data = await res.json();
+    if (res.ok) {
+      handleok();
+    }else{
+      window.alert("Invalid credentials, please try again");
+      console.log(rsp_data);
+    }
+  };
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
@@ -695,10 +714,25 @@ const AdvancedOperation = (props) => {
               Are you sure you want to {!isArchived ? "archive" : "unarchive"}{" "}
               this project?
             </DialogContentText>
+            <TextField
+                    autoFocus
+                    margin="dense"
+                    id="password"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} label="Cancel" />
-            <Button onClick={handleok} label="Ok" autoFocus />
+            <Button onClick={handleClose} 
+                    variant="outlined"
+                    color="error">Cancel</Button>
+            <Button onClick={handleConfirm} 
+                    variant="contained"
+                    color="error"
+                    autoFocus>Confirm</Button>
           </DialogActions>
         </Dialog>
         {OpenExportProjectDialog && (

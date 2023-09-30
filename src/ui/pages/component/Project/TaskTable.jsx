@@ -46,6 +46,8 @@ import OutlinedTextField from "../common/OutlinedTextField";
 import FindAndReplaceDialog from "../../component/common/FindAndReplaceDialog"
 import FindAndReplaceWordsInAnnotationAPI from "../../../../redux/actions/api/ProjectDetails/FindAndReplaceWordsinAnnotation";
 import roles from "../../../../utils/UserMappedByRole/Roles";
+import TextField from '@mui/material/TextField';
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 
 const excludeSearch = ["status", "actions", "output_text"];
@@ -844,6 +846,25 @@ const TaskTable = (props) => {
   console.log(props.type === "review" ,
     ProjectDetails?.annotation_reviewers,
     userDetails?.id,"valuesdata")
+
+  const UserDetails = useSelector((state) => state.fetchUserById.data);
+  const [password, setPassword] = useState("");
+  const handleConfirm = async () => {
+    const apiObj = new LoginAPI(UserDetails.email, password);
+    const res = await fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    });
+    const rsp_data = await res.json();
+    if (res.ok) {
+      unassignTasks();
+    }else{
+      window.alert("Invalid credentials, please try again");
+      console.log(rsp_data);
+    }
+  };
+  
   return (
     <div>
       {((props.type === "annotation" &&
@@ -905,6 +926,16 @@ const TaskTable = (props) => {
                     will be de-allocated from this project. Please be careful as
                     this action cannot be undone.
                   </DialogContentText>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="password"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 </DialogContent>
                 <DialogActions>
                   <Button
@@ -915,7 +946,7 @@ const TaskTable = (props) => {
                     Cancel
                   </Button>
                   <Button
-                    onClick={unassignTasks}
+                    onClick={handleConfirm}
                     variant="contained"
                     color="error"
                     autoFocus
