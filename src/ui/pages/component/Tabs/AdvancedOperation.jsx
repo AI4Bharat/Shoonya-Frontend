@@ -45,7 +45,7 @@ import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetai
 import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
 import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
-import userRole from "../../../../utils/UserMappedByRole/Roles"
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 

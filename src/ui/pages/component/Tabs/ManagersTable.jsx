@@ -5,11 +5,19 @@ import GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/Workspac
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
 import CustomButton from "../common/Button";
-import { ThemeProvider,Grid } from "@mui/material";
+import { ThemeProvider, Grid,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    DialogContentText } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveWorkspaceManagerAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceManager";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
+import TextField from '@mui/material/TextField';
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 const ManagersTable = (props) => {
 
@@ -137,7 +145,7 @@ const handleRemoveWorkspaceManager = async(userid)=>{
                  <CustomButton
                  sx={{borderRadius : 2,backgroundColor:"#cf5959"}}
                  label = "Remove"
-                 onClick={()=>handleRemoveWorkspaceManager(el.id)}
+                 onClick={()=>{setElId(el.id); setElEmail(el.email); setConfirmationDialog(true);}}
              />
              </>
                     ]
@@ -184,9 +192,74 @@ const handleRemoveWorkspaceManager = async(userid)=>{
             );
         };
 
+        const [confirmationDialog, setConfirmationDialog] = useState(false);
+        const [elEmail, setElEmail] = useState("");
+        const [elId, setElId] = useState("");
+        const UserDetails = useSelector((state) => state.fetchUserById.data);
+        const [password, setPassword] = useState("");
+        const handleConfirm = async () => {
+          const apiObj = new LoginAPI(await UserDetails.email, password);
+          const res = await fetch(apiObj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(apiObj.getBody()),
+            headers: apiObj.getHeaders().headers,
+          });
+          const rsp_data = await res.json();
+          if (res.ok) {
+            handleRemoveWorkspaceManager(elId);
+            setConfirmationDialog(false);
+          }else{
+            window.alert("Invalid credentials, please try again");
+            console.log(rsp_data);
+          }
+        };
+
     return (
         <div>
             {renderSnackBar()}
+            <Dialog
+                open={confirmationDialog}
+                onClose={() => setConfirmationDialog(false)}
+                aria-labelledby="dialog-title"
+                aria-describedby="dialog-description"
+              >
+                <DialogTitle id="dialog-title">
+                  {"Remove Member from Project?"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    {elEmail} will be removed from this workspace. Please be careful as
+                    this action cannot be undone.
+                  </DialogContentText>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="password"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setConfirmationDialog(false)}
+                    variant="outlined"
+                    color="error"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleConfirm}
+                    variant="contained"
+                    color="error"
+                    autoFocus
+                  >
+                    Confirm
+                  </Button>
+                </DialogActions>
+              </Dialog>
             <Grid sx={{mb:1}}>
                 <Search />
             </Grid>
