@@ -110,6 +110,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const superCheckerNotesRef = useRef(null);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  const [autoSave, setAutoSave] = useState(true);
 
   // useEffect(() => {
   //   let intervalId;
@@ -224,38 +225,39 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }else{setTaskDetailList(resp)}
     setLoading(false);
   };
-
-  const handleAutosave = async () => {
-    const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
-    if(!currentAnnotation || disableBtns) return;
-    const reqBody = {
-      task_id: taskId,
-      annotation_status: currentAnnotation?.annotation_status,
-      parent_annotation: currentAnnotation?.parent_annotation,
-      auto_save :true,
-      lead_time:
-      (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-    };
-    if(result.length && taskDetails?.super_check_user === userData.id) {
-      const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
-      });
-      if (!res.ok) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving annotation",
-          variant: "error",
-        });
-      } 
-      return res;
-    }
-  };
   
   useEffect(() => {
+    if(!autoSave) return;
+
+    const handleAutosave = async () => {
+      const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
+      if(!currentAnnotation) return;
+      const reqBody = {
+        task_id: taskId,
+        annotation_status: currentAnnotation?.annotation_status,
+        parent_annotation: currentAnnotation?.parent_annotation,
+        auto_save :true,
+        lead_time:
+        (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      };
+      if(result.length && taskDetails?.super_check_user === userData.id) {
+        const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        if (!res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: "Error in autosaving annotation",
+            variant: "error",
+          });
+        } 
+        return res;
+      }
+    };
     
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
@@ -275,10 +277,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       event.returnValue = "";
       ref.current = 0;
     };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Add event listener for visibility change
+  
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
@@ -296,7 +295,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         ref.current = 0;
       }
     };
-
+    
+    window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
@@ -307,7 +307,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableBtns]);
+  }, [autoSave, userData, result, taskId, taskDetails, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -525,7 +525,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       (["rejected"].includes(value) && L1Check) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
-      clearInterval(saveIntervalRef.current);
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
@@ -534,6 +533,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
+        setAutoSave(false);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
@@ -833,13 +833,13 @@ useEffect(() => {
         }
       }
     }
-    if (event.shiftKey && event.key === '<') {
+    if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime - 0.05;
       }
     }
-    if (event.shiftKey && event.key === '>') {
+    if (event.shiftKey && event.key === 'ArrowRight') {
       event.preventDefault();
       if(player){
         player.currentTime = player.currentTime + 0.05;
