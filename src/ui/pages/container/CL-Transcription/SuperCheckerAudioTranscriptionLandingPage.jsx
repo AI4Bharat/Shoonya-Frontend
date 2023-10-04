@@ -182,7 +182,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, userData, taskDetailList);
   }, [AnnotationsTaskDetails, userData, taskDetailList]);
-  console.log(disableSkip);
+  //console.log(disableSkip);
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -199,7 +199,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     settextBox(hasEmptyText);
     setSpeakerBox(hasEmptySpeaker);
     setL2Check(!hasEmptyTextL2);
-  }, [result]);
+  }, [result, stdTranscriptionSettings]);
 
   const getTaskData = async (id) => {
     setLoading(true);
@@ -233,10 +233,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
       if(!currentAnnotation) return;
       const reqBody = {
-        task_id: taskId,
-        annotation_status: currentAnnotation?.annotation_status,
-        parent_annotation: currentAnnotation?.parent_annotation,
-        auto_save :true,
+        auto_save: true,
         lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
         result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
@@ -533,7 +530,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        setAutoSave(false);
+        //setAutoSave(false);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
