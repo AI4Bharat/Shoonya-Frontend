@@ -50,6 +50,10 @@ const UserInfo = (props) => {
     ParticipationType,
     Role,
     setRole,
+    setUserName,
+    userName,
+    setActive,
+    active,
     setFirstName,
     setLastName,
     setLanguage,
@@ -99,6 +103,10 @@ const UserInfo = (props) => {
                     FirstName={FirstName}
                     setFirstName={setFirstName}
                     LastName={LastName}
+                    userName = {userName}
+                    setUserName={setUserName}
+                    active={active}
+                    setActive={setActive}
                     setLastName={setLastName}
                     Language={Language}
                     setLanguage={setLanguage}
