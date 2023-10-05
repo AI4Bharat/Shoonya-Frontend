@@ -14,7 +14,13 @@ import AddMembersToProjectAPI from "../../../../redux/actions/api/ProjectDetails
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import addUserTypes from "../../../../constants/addUserTypes";
 import { useNavigate, useParams } from "react-router-dom";
-import { ThemeProvider, Grid } from "@mui/material";
+import { ThemeProvider, Grid,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  DialogContentText } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveProjectMemberAPI from "../../../../redux/actions/api/ProjectDetails/RemoveProjectMember";
 import RemoveProjectReviewerAPI from "../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer";
@@ -26,7 +32,8 @@ import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/Invi
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers";
 import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/RemoveFrozenUser";
 import userRoles from "../../../../utils/UserMappedByRole/Roles";
-
+import TextField from '@mui/material/TextField';
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 const columns = [
   {
@@ -339,7 +346,7 @@ const MembersTable = (props) => {
                     height: "40px",
                   }}
                   label="Remove"
-                  onClick={() => handleProjectMember(el.id)}
+                  onClick={() => {setElId(el.id); setElEmail(el.email); setConfirmationDialog(true); setMemberOrReviewer("member");}}
                   disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
@@ -352,7 +359,7 @@ const MembersTable = (props) => {
                     height: "40px",
                   }}
                   label="Remove"
-                  onClick={() => handleProjectReviewer(el.id)}
+                  onClick={() => {setElId(el.id); setElEmail(el.email); setConfirmationDialog(true); setMemberOrReviewer("reviewer");}}
                   disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
@@ -420,6 +427,32 @@ const MembersTable = (props) => {
     );
   };
 
+  const [confirmationDialog, setConfirmationDialog] = useState(false);
+  const [elEmail, setElEmail] = useState("");
+  const [elId, setElId] = useState("");
+  const emailId = localStorage.getItem("email_id");
+  const [password, setPassword] = useState("");
+  const [memberOrReviewer, setMemberOrReviewer] = useState("");
+  const handleConfirm = async () => {
+    const apiObj = new LoginAPI(emailId, password);
+    const res = await fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    });
+    const rsp_data = await res.json();
+    if (res.ok) {
+      if(memberOrReviewer === "member"){
+      handleProjectMember(elId);
+    }else if(memberOrReviewer === "reviewer"){
+      handleProjectReviewer(elId);
+    }
+      setConfirmationDialog(false);
+    }else{
+      window.alert("Invalid credentials, please try again");
+      console.log(rsp_data);
+    }
+  };
   return (
     <React.Fragment>
       {userRole !== 1 && !hideButton ? (
@@ -432,6 +465,50 @@ const MembersTable = (props) => {
           disabled={props.type === addUserTypes.PROJECT_ANNOTATORS||props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER ?ProjectDetails.is_archived:""}
         />
       ) : null}
+
+              <Dialog
+                open={confirmationDialog}
+                onClose={() => setConfirmationDialog(false)}
+                aria-labelledby="dialog-title"
+                aria-describedby="dialog-description"
+              >
+                <DialogTitle id="dialog-title">
+                  {"Remove Member from Project?"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    {elEmail} will be removed from this project. Please be careful as
+                    this action cannot be undone.
+                  </DialogContentText>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="password"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setConfirmationDialog(false)}
+                    variant="outlined"
+                    color="error"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleConfirm}
+                    variant="contained"
+                    color="error"
+                    autoFocus
+                  >
+                    Confirm
+                  </Button>
+                </DialogActions>
+              </Dialog>
   
       {props.type === "organization" ? (
         <InviteUsersDialog

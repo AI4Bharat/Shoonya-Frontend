@@ -182,7 +182,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, userData, taskDetailList);
   }, [AnnotationsTaskDetails, userData, taskDetailList]);
-  console.log(disableSkip);
+  //console.log(disableSkip);
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -199,7 +199,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     settextBox(hasEmptyText);
     setSpeakerBox(hasEmptySpeaker);
     setL2Check(!hasEmptyTextL2);
-  }, [result]);
+  }, [result, stdTranscriptionSettings]);
 
   const getTaskData = async (id) => {
     setLoading(true);
@@ -225,6 +225,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }else{setTaskDetailList(resp)}
     setLoading(false);
   };
+
+  const [isActive, setIsActive] = useState(true);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
+  const inactivityThreshold = 120000; 
   
   useEffect(() => {
     if(!autoSave) return;
@@ -235,8 +239,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       const reqBody = {
         task_id: taskId,
         annotation_status: currentAnnotation?.annotation_status,
-        parent_annotation: currentAnnotation?.parent_annotation,
-        auto_save :true,
+        auto_save: true,
         lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
         result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
@@ -277,6 +280,29 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       event.returnValue = "";
       ref.current = 0;
     };
+
+    const handleInteraction = () => {
+      setLastInteraction(Date.now());
+      setIsActive(true);
+    };
+
+    const checkInactivity = () => {
+      const currentTime = Date.now();
+      if (currentTime - lastInteraction >= inactivityThreshold) {
+        setIsActive(false);
+      }
+    };
+
+    document.addEventListener('mousemove', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    const interval = setInterval(checkInactivity, 1000);
+
+    if(!isActive){
+      handleUpdateTimeSpent(ref.current);
+      clearInterval(saveIntervalRef.current);
+      clearInterval(timeSpentIntervalRef.current);
+      ref.current = 0;
+    }
   
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -300,6 +326,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      document.removeEventListener('mousemove', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      clearInterval(interval);
       clearInterval(saveIntervalRef.current);
       clearInterval(timeSpentIntervalRef.current);
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -307,7 +336,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [autoSave, userData, result, taskId, taskDetails, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+  }, [autoSave, userData, result, taskId, taskDetails, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, isActive]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -342,33 +371,13 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     let standardisedTranscription = "";
-    if (
-      AnnotationsTaskDetails.some((obj) =>
-        obj.result.every((item) => Object.keys(item).length === 0)
-      )
-    ) {
-      const filteredArray = AnnotationsTaskDetails.filter((obj) =>
-        obj?.result.some((item) => Object.keys(item).length > 0)
-      );
-      const sub = filteredArray[1]?.result?.filter((item) => {
-        if ("standardised_transcription" in item) {
-          standardisedTranscription = item.standardised_transcription;
-          return false;
-        } else return true;
-      }).map((item) => new Sub(item));
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    } else {
-      const filteredArray = AnnotationsTaskDetails?.filter(
-        (annotation) => annotation?.annotation_type === 3
-      );
-      const sub = annotations[0]?.result?.filter((item) => {
-        if ("standardised_transcription" in item) {
-          standardisedTranscription = item.standardised_transcription;
-          return false;
-        } else return true;
-      }).map((item) => new Sub(item));
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    }
+    const sub = annotations[0]?.result?.filter((item) => {
+      if ("standardised_transcription" in item) {
+        standardisedTranscription = item.standardised_transcription;
+        return false;
+      } else return true;
+    }).map((item) => new Sub(item));
+    dispatch(setSubtitles(sub, C.SUBTITLES));
 
     setStdTranscription(standardisedTranscription);
     // const newSub = cloneDeep(sub);
@@ -533,7 +542,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        setAutoSave(false);
+        //setAutoSave(false);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }

@@ -39,6 +39,10 @@ const EditProfile = (props) => {
     Role,
     handleCloseDialog,
     setRole,
+    userName,
+    setUserName,
+    setActive,
+    active,
     setFirstName,
     setLastName,
     setLanguage,
@@ -91,7 +95,18 @@ const EditProfile = (props) => {
             onChange={(e) => setFirstName(e.target.value)}
           />
         </Grid>
-
+        <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mb: 2 }}>
+          <OutlinedTextField
+            label="UserName"
+            placeholder="UserName"
+            sx={{
+              m: 1,
+              input: { color: "rgba(0, 0, 0, 0.6)", fontSize: "16px" },
+            }}
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </Grid>
         <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mb: 2 }}>
           <OutlinedTextField
             label="Last Name"
@@ -204,6 +219,25 @@ const EditProfile = (props) => {
                   {UserRolesList[el]}
                 </MenuItem>
               ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mb: 2 }}>
+          <FormControl sx={{ m: 1, minWidth: 210 }}>
+            <InputLabel id="demo-simple-select-helper-label">Active_status</InputLabel>
+            <Select
+              labelId="demo-simple-select-helper-label"
+              id="demo-simple-select-helper"
+              value={active}
+              label="Active_Status"
+              onChange={(e) => setActive(e.target.value)}
+              sx={{
+                textAlign: "left",
+              }}
+              MenuProps={MenuProps}
+            >
+              <MenuItem value={true}>Active</MenuItem>
+              <MenuItem value={false}>Not Active</MenuItem>
             </Select>
           </FormControl>
         </Grid>

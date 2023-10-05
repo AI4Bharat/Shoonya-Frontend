@@ -3,13 +3,14 @@ import MUIDataTable from "mui-datatables";
 import { useNavigate } from "react-router-dom";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { ThemeProvider, Grid, Button } from "@mui/material";
+import { ThemeProvider, Grid, IconButton } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import GetUserDetailAPI from "../../../../redux/actions/api/Admin/UserDetail";
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import UserInfo from "./UserInfo";
 import Spinner from "../../component/common/Spinner";
 import GetUserDetailUpdateAPI from "../../../../redux/actions/api/Admin/EditProfile";
@@ -26,7 +27,9 @@ const UserDetail = (props) => {
   });
   const [openDialog, setOpenDialog] = useState(false);
   const [id, setId] = useState("");
+  const [userName,setUserName] = useState("");
   const [email, setEmail] = useState("");
+  const [active, setActive] = useState();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [language, setLanguage] = useState([]);
@@ -34,6 +37,7 @@ const UserDetail = (props) => {
   const [Role, setRole] = useState("");
 
   const UserDetail = useSelector((state) => state.getUserDetails.data);
+  console.log(UserDetail);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const SearchUserDetail = useSelector(
     (state) => state.SearchProjectCards.data
@@ -57,20 +61,24 @@ const UserDetail = (props) => {
   const handleEditChange = (
     id,
     email,
+    username,
     first_name,
     last_name,
     languages,
     participation_type,
-    role
+    role,
+    is_active,
   ) => {
     setOpenDialog(true);
     setId(id);
     setEmail(email);
+    setUserName(username);
     setFirstName(first_name);
     setLastName(last_name);
     setLanguage(languages);
     setParticipationType(participation_type);
     setRole(role);
+    setActive(is_active);
   };
 
   const handleCloseDialog = () => {
@@ -80,11 +88,13 @@ const UserDetail = (props) => {
   const handleUpdateEditProfile = async () => {
     const data = {
       email:email,
+      username: userName,
       first_name: firstName,
       last_name: lastName,
       languages: language,
       participation_type: participationType,
       role: Role,
+      is_active: active,
     };
   
     const UserObj = new GetUserDetailUpdateAPI(id, data);
@@ -121,9 +131,19 @@ const UserDetail = (props) => {
         el.email?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;
+      }else if(
+        el.username?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
+      ){
+        return el;
       } else if (
         el.first_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
+        return el;
+      }else if(
+        el.is_active?.toString()
+        ?.toLowerCase()
+        .includes(SearchUserDetail?.toLowerCase())
+      ){
         return el;
       } else if (
         el.last_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
@@ -167,6 +187,15 @@ const UserDetail = (props) => {
       },
     },
     {
+      name: "username",
+      label: "UserName",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+      },
+    },
+    {
       name: "first_name",
       label: "First Name",
       options: {
@@ -175,7 +204,6 @@ const UserDetail = (props) => {
         align: "center",
       },
     },
-
     {
       name: "last_name",
       label: "Last Name",
@@ -203,7 +231,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "70px" } }),
+        setCellProps: () => ({ style: { paddingLeft: "40px" , paddingRight: "30px" } }),
       },
     },
     {
@@ -216,13 +244,23 @@ const UserDetail = (props) => {
       },
     },
     {
+      name: "is_active",
+      label: "Active Status",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+        setCellProps: () => ({ style: { paddingLeft: "30px" , paddingRight: "30px"} }),
+      },
+    },
+    {
       name: "Actions",
       label: "Actions",
       options: {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+        setCellProps: () => ({ style: {paddingLeft: "10px" , paddingRight: "20px"}} ),
       },
     },
   ];
@@ -236,27 +274,36 @@ const UserDetail = (props) => {
           return [
             el.id,
             el.email,
+            el.username,
             el.first_name,
             el.last_name,
             el.languages.join(", "),
             el.participation_type,
             userRoleFromList ? userRoleFromList : el.role,
+            el.is_active==true?"Active":"Not Active",
             <>
-              <Button>
+              <div style={{display:"flex", flexDirection:"row"}}>
+              <IconButton size="small" color="primary">
+                <VisibilityIcon onClick={()=>navigate(`/profile/${el.id}`)} />
+              </IconButton>
+              <IconButton size="small" color="primary">
                 <EditOutlinedIcon
                   onClick={() =>
                     handleEditChange(
                       el.id,
                       el.email,
+                      el.username,
                       el.first_name,
                       el.last_name,
                       el.languages,
                       el.participation_type,
-                      el.role
+                      el.role,
+                      el.is_active,
                     )
                   }
                 />
-              </Button>
+              </IconButton>
+              </div>
             </>,
           ];
         })
@@ -329,6 +376,10 @@ const UserDetail = (props) => {
           submit={() => handleUpdateEditProfile()}
           Email={email}
           FirstName={firstName}
+          userName = {userName}
+          setUserName={setUserName}
+          active={active}
+          setActive={setActive}
           setFirstName={setFirstName}
           LastName={lastName}
           setLastName={setLastName}

@@ -7,6 +7,13 @@ import { useParams } from 'react-router-dom';
 import DatasetStyle from "../../../styles/Dataset";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
+import Dialog from "@mui/material/Dialog";
+import { Button } from "@mui/material";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import TextField from '@mui/material/TextField';
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
  function WorkspaceSetting(props) {
   const{onArchiveWorkspace}=props
@@ -65,13 +72,72 @@ import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspa
           />
       );
   };
+
+  const [open, setOpen] = useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const emailId = localStorage.getItem("email_id");
+  const [password, setPassword] = useState("");
+  const handleConfirm = async () => {
+    const apiObj = new LoginAPI(emailId, password);
+    const res = await fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    });
+    const rsp_data = await res.json();
+    if (res.ok) {
+      handleArchiveWorkspace();
+    }else{
+      window.alert("Invalid credentials, please try again");
+      console.log(rsp_data);
+    }
+  };
+
   return (
     <div>
        {renderSnackBar()}
+       <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to {workspaceDtails?.is_archived ? "unarchive" : "archive"}{" "}
+              this project?
+            </DialogContentText>
+            <TextField
+                    autoFocus
+                    margin="dense"
+                    id="password"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} 
+                    variant="outlined"
+                    color="error">Cancel</Button>
+            <Button onClick={handleConfirm} 
+                    variant="contained"
+                    color="error"
+                    autoFocus>Confirm</Button>
+          </DialogActions>
+        </Dialog>
+
       <CustomButton
       sx={{backgroundColor : "#cf5959", "&:hover" : {backgroundColor : "#cf5959",}}} 
       className={classes.settingsButton} 
-      onClick={handleArchiveWorkspace}
+      onClick={handleClickOpen}
       label={"Archive Workspace"} 
       buttonVariant="contained"
       disabled={workspaceDtails?.is_archived}

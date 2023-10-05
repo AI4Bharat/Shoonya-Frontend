@@ -16,7 +16,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
-
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 export default function DeleteProjectTasks() {
     const classes = DatasetStyle();
@@ -135,6 +135,24 @@ export default function DeleteProjectTasks() {
                 message={snackbar.message}
             />
         );
+    };
+
+    const emailId = localStorage.getItem("email_id");
+    const [password, setPassword] = useState("");
+    const handleConfirm = async () => {
+      const apiObj = new LoginAPI(emailId, password);
+        const res = await fetch(apiObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(apiObj.getBody()),
+        headers: apiObj.getHeaders().headers,
+        });
+        const rsp_data = await res.json();
+        if (res.ok) {
+        handleok();
+        }else{
+        window.alert("Invalid credentials, please try again");
+        console.log(rsp_data);
+        }
     };
 
     return (
@@ -351,20 +369,30 @@ export default function DeleteProjectTasks() {
                     <DialogContentText id="alert-dialog-description">
                     Are you  sure want to delete these tasks? Please note this action cannot be undone.
                     </DialogContentText>
+                    <TextField
+                            autoFocus
+                            margin="dense"
+                            id="password"
+                            label="Password"
+                            type="password"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}
                         variant="outlined"
-                        color="primary"
+                        color="error"
                         size="small"
-                        className={classes.clearAllBtn} > {" "}
-                        {translate("button.clear")}
+                        className={classes.clearAllBtn} >
+                            Cancel
                     </Button>
-                    <Button onClick={handleok}
+                    <Button onClick={handleConfirm}
                         variant="contained"
-                        color="primary"
+                        color="error"
                         size="small" className={classes.clearAllBtn} autoFocus >
-                        Ok
+                        Confirm
                     </Button>
                 </DialogActions>
             </Dialog>
