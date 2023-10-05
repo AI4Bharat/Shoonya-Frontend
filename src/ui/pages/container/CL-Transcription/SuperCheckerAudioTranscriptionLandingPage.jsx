@@ -225,6 +225,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }else{setTaskDetailList(resp)}
     setLoading(false);
   };
+
+  const [isActive, setIsActive] = useState(true);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
+  const inactivityThreshold = 120000; 
   
   useEffect(() => {
     if(!autoSave) return;
@@ -233,6 +237,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
       if(!currentAnnotation) return;
       const reqBody = {
+        task_id: taskId,
+        annotation_status: currentAnnotation?.annotation_status,
         auto_save: true,
         lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
@@ -274,6 +280,29 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       event.returnValue = "";
       ref.current = 0;
     };
+
+    const handleInteraction = () => {
+      setLastInteraction(Date.now());
+      setIsActive(true);
+    };
+
+    const checkInactivity = () => {
+      const currentTime = Date.now();
+      if (currentTime - lastInteraction >= inactivityThreshold) {
+        setIsActive(false);
+      }
+    };
+
+    document.addEventListener('mousemove', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    const interval = setInterval(checkInactivity, 1000);
+
+    if(!isActive){
+      handleUpdateTimeSpent(ref.current);
+      clearInterval(saveIntervalRef.current);
+      clearInterval(timeSpentIntervalRef.current);
+      ref.current = 0;
+    }
   
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -297,6 +326,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      document.removeEventListener('mousemove', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      clearInterval(interval);
       clearInterval(saveIntervalRef.current);
       clearInterval(timeSpentIntervalRef.current);
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -304,7 +336,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [autoSave, userData, result, taskId, taskDetails, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings]);
+  }, [autoSave, userData, result, taskId, taskDetails, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, isActive]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);

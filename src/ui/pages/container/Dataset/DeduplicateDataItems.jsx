@@ -29,7 +29,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { snakeToTitleCase } from "../../../../utils/utils";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar"
-
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -172,6 +172,24 @@ const renderSnackBar = () => {
     );
 };
 
+  const UserDetails = useSelector((state) => state.fetchUserById.data);
+  const [password, setPassword] = useState("");
+  const handleConfirm = async () => {
+    const apiObj = new LoginAPI(await UserDetails.email, password);
+    const res = await fetch(apiObj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    });
+    const rsp_data = await res.json();
+    if (res.ok) {
+      handleok();
+    }else{
+      window.alert("Invalid credentials, please try again");
+      console.log(rsp_data);
+    }
+  };
+
   return (
     <div>
          {renderSnackBar()}
@@ -179,6 +197,7 @@ const renderSnackBar = () => {
         sx={{ width: "200px" }}
         aria-describedby={id}
         variant="contained"
+        color="error"
         onClick={handleClick}
         disabled={
             dataitemsvalues.length < 0
@@ -278,20 +297,30 @@ const renderSnackBar = () => {
                     <DialogContentText id="alert-dialog-description">
                     Are you sure you want to delete the Duplicate Data Items ? Please note this action cannot be undone. 
                     </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="password"
+                        label="Password"
+                        type="password"
+                        fullWidth
+                        variant="standard"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}
                         variant="outlined"
                         color="primary"
                         size="small"
-                        className={classes.clearAllBtn} > {" "}
-                        {translate("button.clear")}
+                        className={classes.clearAllBtn} >
+                          Cancel
                     </Button>
-                    <Button onClick={handleok}
+                    <Button onClick={handleConfirm}
                         variant="contained"
                         color="primary"
                         size="small" className={classes.clearAllBtn} autoFocus >
-                        Ok
+                        Confirm
                     </Button>
                 </DialogActions>
             </Dialog>

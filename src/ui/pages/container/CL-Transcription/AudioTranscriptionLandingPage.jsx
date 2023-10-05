@@ -289,6 +289,10 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
+  const [isActive, setIsActive] = useState(true);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
+  const inactivityThreshold = 120000; 
+
   useEffect(() => {
     if(!autoSave) return;
     const handleAutosave = async () => {
@@ -337,6 +341,29 @@ const AudioTranscriptionLandingPage = () => {
       ref.current = 0;
     };
 
+    const handleInteraction = () => {
+      setLastInteraction(Date.now());
+      setIsActive(true);
+    };
+
+    const checkInactivity = () => {
+      const currentTime = Date.now();
+      if (currentTime - lastInteraction >= inactivityThreshold) {
+        setIsActive(false);
+      }
+    };
+
+    document.addEventListener('mousemove', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    const interval = setInterval(checkInactivity, 1000);
+
+    if(!isActive){
+      handleUpdateTimeSpent(ref.current);
+      clearInterval(saveIntervalRef.current);
+      clearInterval(timeSpentIntervalRef.current);
+      ref.current = 0;
+    }
+
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
@@ -360,6 +387,9 @@ const AudioTranscriptionLandingPage = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      document.removeEventListener('mousemove', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      clearInterval(interval);
       clearInterval(saveIntervalRef.current);
       clearInterval(timeSpentIntervalRef.current);
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -367,7 +397,7 @@ const AudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [autoSave, user, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings, disableUpdateButton]);
+  }, [autoSave, user, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings, disableUpdateButton, isActive]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
