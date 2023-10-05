@@ -80,10 +80,10 @@ import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
   const handleClose = () => {
     setOpen(false);
   };
-  const UserDetails = useSelector((state) => state.fetchUserById.data);
+  const emailId = localStorage.getItem("email_id");
   const [password, setPassword] = useState("");
   const handleConfirm = async () => {
-    const apiObj = new LoginAPI(await UserDetails.email, password);
+    const apiObj = new LoginAPI(emailId, password);
     const res = await fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
