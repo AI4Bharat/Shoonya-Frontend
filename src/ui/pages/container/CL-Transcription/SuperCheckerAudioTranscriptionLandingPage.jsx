@@ -237,6 +237,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
       if(!currentAnnotation) return;
       const reqBody = {
+        task_id: taskId,
+        annotation_status: currentAnnotation?.annotation_status,
         auto_save: true,
         lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
