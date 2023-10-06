@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useRef} from "react";
 import { TextField } from "@mui/material";
 import { Autocomplete, Box, Button, Card, Grid, Typography } from "@mui/material";
 import { IndicTransliterate, getTransliterationLanguages, getTransliterateSuggestions } from "@ai4bharat/indic-transliterate";
@@ -9,7 +9,6 @@ import TransliterationAPI from "../../../../redux/actions/api/Transliteration/Tr
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { debounce,throttle } from "lodash"; 
 const Transliteration = (props) => {
   const { onCancelTransliteration } = props;
   const params = useParams();
@@ -17,8 +16,15 @@ const Transliteration = (props) => {
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
   const [selectedLang, setSelectedLang] = useState("");
-  const [input,setInput] = useState("");
-  const [suggestion, setsuggestion] = useState([]);
+  const [keystrokes, setKeystrokes] = useState([]);
+  const keystrokesRef = useRef([]);
+  const suggestionRef = useRef([]);
+  const newKeystrokesRef = useRef();
+  // const [flag, setflag] = useState(fal);
+  const [debouncedText, setDebouncedText] = useState("");
+  const debouncedTextRef = useRef("");
+  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
+  const sss = {};
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -41,11 +47,6 @@ const Transliteration = (props) => {
     }
   }, []);
 
-  
-
-  const [keystrokes, setKeystrokes] = useState([]);
-  const [debouncedText, setDebouncedText] = useState("");
-  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
 
 
   useEffect(() => {
@@ -71,47 +72,104 @@ const Transliteration = (props) => {
   }, []);
 
   useEffect(() => {
-    if (debouncedText.trim() === "") {
-      return;
+    console.log("nnn","useEffect is running");
+    var flag = false;
+    var newSuggestions=[];
+    // const processConsoleLog = (args) => {
+    //   const msg = JSON.stringify(args);
+    //   if (msg.includes('library data')) {
+    //     const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+    //     console.log("nnn",dataMatch.result);
+    //     flag=true;
+    //     return dataMatch.result;
+    //   }
+    //   return;
+    // };
+    let previousSuggestions = null;
+
+const processConsoleLog = (...args) => {
+  if (args.length === 0) {
+    return previousSuggestions || null;
+  }
+
+  const msg = JSON.stringify(args);
+  if (msg.includes('library data')) {
+    const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+    const newSuggestions = dataMatch.result;
+    
+    if (newSuggestions && newSuggestions.length > 0) {
+      previousSuggestions = newSuggestions;
+      return newSuggestions;
     }
+  }
 
-    const getSuggestions = async () => {
-      try {
-        const newKeystrokes = [];
-        let currentWord='';
-      for (let i = 0; i < debouncedText.length; i++) {
-      const char = debouncedText[i];
-      currentWord += char;
-        if (currentWord.trim() !== "") {
-        var newKeystroke = {
-          keystrokes: currentWord,
-          results: suggestion,
-          opted: suggestion[suggestion.length - 1],
-          created_at: new Date().toISOString(),
-        };
-        newKeystrokes.push(newKeystroke);
-      }
-      setKeystrokes(newKeystrokes);
+  return previousSuggestions || null;
+};
+const originalConsoleLog = console.log;
 
-        const finalJson = {
-          word: currentWord,
-          steps: newKeystrokes,
-        };
-        localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-        }
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
+console.log = (...args) => {
+  const newSuggestions = processConsoleLog(...args);
+  
+  if (newSuggestions !== null) {
+    suggestionRef.current = newSuggestions;
+    if (debouncedTextRef.current.trim() !== "") {
+      const newKeystroke = {
+        keystrokes: debouncedTextRef.current,
+        results: suggestionRef.current,
+        opted:
+          suggestionRef.current.find(
+            (item) => item === debouncedTextRef.current
+          ) || debouncedTextRef.current,
+        created_at: new Date().toISOString(),
+      };
+      newKeystrokesRef.current = newKeystroke;
+      if (newKeystrokesRef.current !== undefined) {
+        keystrokesRef.current = [
+          ...keystrokesRef.current,
+          newKeystrokesRef.current,
+        ];
       }
-      
+      console.log("nnn", keystrokesRef.current, newKeystrokesRef.current);
+      const finalJson = {
+        word: debouncedTextRef.current,
+        steps: keystrokesRef.current,
+      };
+      localStorage.setItem("TransliterateLogging", JSON.stringify(finalJson));
+    }
+  }
+  originalConsoleLog(...args);
+};
+
+    return () => {
+      console.log = originalConsoleLog;
     };
+  }, [debouncedTextRef.current]);
 
-    const timeoutId = setTimeout(() => {
-      getSuggestions();
-    }, 500); 
+  // useEffect(() => {
+  //   // console.log("nnn",debouncedText,suggestionRef.current);
+  //   if (debouncedText.trim()!="") {
+  //     const newKeystroke = {
+  //       keystrokes: debouncedText,
+  //       results: suggestionRef.current,
+  //       opted: suggestionRef.current.find((item) => item === debouncedText) || debouncedText,
+  //       created_at: new Date().toISOString(),
+  //     };
+  //     newKeystrokesRef.current = newKeystroke
+  //   }
+  // }, [suggestionRef.current]);
 
-    return () => clearTimeout(timeoutId);
+  // useEffect(() => {
+  //   if(newKeystrokesRef.current!=undefined){
+  //     keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
+  //   }
+  //   console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+  //   const finalJson = {
+  //     word: debouncedText,
+  //     steps: keystrokesRef.current,
+  //   };
+  //   localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
 
-  }, [debouncedText,selectedLang,isSpaceClicked]);
+  // }, [newKeystrokesRef.current]);
 
 useEffect(()=>{
   if (isSpaceClicked) {
@@ -151,25 +209,6 @@ const json=()=>{
     });
 }
 
-useEffect(() => {
-  const originalConsoleLog = console.log;
-  console.log = (...args) => {
-    const msg = JSON.stringify(args);
-    if (msg.includes('library data')) {
-      const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
-      setsuggestion(dataMatch.result);
-      const inputMatch = msg.match(/"input":"([^"]*)"/);
-      if (inputMatch) {
-        const input = inputMatch[1];
-        setInput(input)
-      }
-  }
-    originalConsoleLog(...args);
-  };
-  return () => {
-    console.log = originalConsoleLog;
-  };
-}, [text]);
 
   useEffect(() => {
     getTransliterationLanguages()
@@ -243,12 +282,16 @@ useEffect(() => {
       <IndicTransliterate
         lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ? data[0]?.LangCode : "hi")}
         value={text}
-        onChangeText={(text) => {
-          setText(text)
-          setDebouncedText(text);
+        onChangeText={(val) => {
+          setText(val)
+          setDebouncedText(val);
+          debouncedTextRef.current=val
+          console.log("nnn",text,debouncedText,debouncedTextRef.current);
+
           setIsSpaceClicked(text.endsWith(" "));
         }}
         renderComponent={(props) => renderTextarea(props)}
+        showCurrentWordAsLastSuggestion={true}
       />
       <Grid
         container
