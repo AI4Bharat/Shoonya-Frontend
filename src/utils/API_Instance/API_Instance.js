@@ -93,6 +93,7 @@ axiosInstance.interceptors.response.use(
         } else if (data.response.status !== 200) {
           localStorage.removeItem(ACCESS_TOKEN);
           localStorage.removeItem(REFRESH_TOKEN);
+          localStorage.removeItem("email_id");
           window.location.pathname = "/login";
         } else {
           window.location.href = "/";
