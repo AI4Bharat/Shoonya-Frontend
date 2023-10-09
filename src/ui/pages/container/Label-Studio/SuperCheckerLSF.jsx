@@ -165,7 +165,6 @@ const LabelStudioWrapper = ({
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
   const [autoSave, setAutoSave] = useState(true);
-  const [projectType, setProjectType] = useState();
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
@@ -259,7 +258,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-          projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -285,7 +284,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-          projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",
