@@ -27,6 +27,7 @@ const TagsSuggestionList = React.forwardRef((props, ref) => {
     // saveTranscriptHandler,
     setEnableTransliterationSuggestion,
     TabsSuggestionData,
+    tagSuggestionsAcoustic,
     currentSelection,
   } = props;
 
@@ -35,7 +36,7 @@ const TagsSuggestionList = React.forwardRef((props, ref) => {
   const handleTagClick = (suggestion) => {
     const modifiedText = `${textWithoutTripleDollar}[${suggestion}]${textAfterTripleDollar}`;
 
-    const sub = onSubtitleChange(modifiedText, index);
+    const sub = onSubtitleChange(modifiedText, index, tagSuggestionsAcoustic);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
     setTimeout(() => ref.setSelectionRange(currentSelection + suggestion.length - 1, currentSelection + suggestion.length - 1), 100);
