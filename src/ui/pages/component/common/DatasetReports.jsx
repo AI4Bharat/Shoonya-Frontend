@@ -22,6 +22,8 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../common/ColumnList";
 import { MenuProps } from "../../../../utils/utils";
+import CustomizedSnackbars from "../../component/common/Snackbar";
+import GetDatasetDetailedReportsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetailedReports";
 
 const DatasetReports = () => {
   
@@ -41,6 +43,13 @@ const DatasetReports = () => {
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const DatasetReports = useSelector((state) => state.getDatasetProjectReports.data);
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
+  const [projectReportType, setProjectReportType] = useState(1);
+  const [statisticsType, setStatisticsType] = useState(1);
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -119,19 +128,51 @@ const DatasetReports = () => {
     },
   };
 
+  const userId = useSelector((state) => state.fetchLoggedInUserData.data.id);
+
   const handleSubmit = () => {
-    setReportRequested(true);
-    const projectReportObj = new GetDatasetProjectReportAPI(
-      datasetId,
-      selectedType,
-      language,
+    if(projectReportType === 1){
+      setReportRequested(true);
+      const projectReportObj = new GetDatasetProjectReportAPI(
+        datasetId,
+        selectedType,
+        language,
+      );
+      dispatch(APITransport(projectReportObj));
+      setShowSpinner(true);
+    }else if(projectReportType === 2){
+      const projectReportObj = new GetDatasetDetailedReportsAPI(
+        Number(datasetId),
+        selectedType,
+        userId,
+        statisticsType
+      );
+      dispatch(APITransport(projectReportObj));
+      setSnackbarInfo({
+        open: true,
+        message: "Detailed Dataset Reports will be e-mailed to you shortly",
+        variant: "success",
+      });
+    }
+  };
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
     );
-    dispatch(APITransport(projectReportObj));
-    setShowSpinner(true);
   };
 
   return (
     <React.Fragment>
+      {renderSnackBar()}
       <Grid
         container
         direction="row"
@@ -140,6 +181,24 @@ const DatasetReports = () => {
           marginBottom: "24px",
         }}
       >
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="project-report-type-label" sx={{ fontSize: "16px" }}>Type</InputLabel>
+            <Select
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
+              labelId="project-report-type-type-label"
+              id="project-report-type-select"
+              value={projectReportType}
+              label="Project Report Type"
+              onChange={(e) => setProjectReportType(e.target.value)}
+            >
+              <MenuItem value={1}>High-Level Reports</MenuItem>
+              <MenuItem value={2}>Detailed Reports</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
         <Grid
           item
           xs={12}
@@ -168,7 +227,7 @@ const DatasetReports = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {projectReportType === 1 && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>
               Target Language
@@ -189,7 +248,24 @@ const DatasetReports = () => {
               ))}
             </Select>
           </FormControl>
-        </Grid>
+        </Grid>}
+        {projectReportType===2 && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="statistics-label" sx={{ fontSize: "16px" }}>Statistics</InputLabel>
+            <Select
+              labelId="statistics-label"
+              id="statistics-select"
+              value={statisticsType}
+              label="Statistics"
+              onChange={(e) => setStatisticsType(e.target.value)}
+              MenuProps={MenuProps}
+            >
+            <MenuItem value={1}>Annotation Statistics</MenuItem>
+            <MenuItem value={2}>Meta-Info Statistics</MenuItem>
+            <MenuItem value={3}>Complete Statistics</MenuItem>
+          </Select>
+          </FormControl>
+        </Grid>}
         <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
           <Button
             fullWidth
