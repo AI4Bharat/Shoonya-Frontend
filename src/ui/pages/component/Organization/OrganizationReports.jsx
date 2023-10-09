@@ -157,32 +157,32 @@ const OrganizationReports = () => {
     setShowSpinner(false);
   }, [UserReports]);
 
-  useEffect(() => {
-    if (reportRequested && ProjectReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(ProjectReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(ProjectReports);
-      setSelectedColumns(tempSelected);
-    } else {
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
-    }
-    setShowSpinner(false);
-  }, [ProjectReports]);
+  // useEffect(() => {
+  //   if (reportRequested && ProjectReports?.length) {
+  //     let tempColumns = [];
+  //     let tempSelected = [];
+  //     Object.keys(ProjectReports[0]).forEach((key) => {
+  //       tempColumns.push({
+  //         name: key,
+  //         label: key,
+  //         options: {
+  //           filter: false,
+  //           sort: true,
+  //           align: "center",
+  //         },
+  //       });
+  //       tempSelected.push(key);
+  //     });
+  //     setColumns(tempColumns);
+  //     setReportData(ProjectReports);
+  //     setSelectedColumns(tempSelected);
+  //   } else {
+  //     setColumns([]);
+  //     setReportData([]);
+  //     setSelectedColumns([]);
+  //   }
+  //   setShowSpinner(false);
+  // }, [ProjectReports]);
 
   // useEffect(() => {
   //   if (reportRequested && SuperCheck?.length) {
@@ -259,7 +259,7 @@ const OrganizationReports = () => {
       dispatch(APITransport(userReportObj));
       setSnackbarInfo({
         open: true,
-        message: "Report will be e-mailed to you shortly",
+        message: "Payment Reports will be e-mailed to you shortly",
         variant: "success",
       })
     }
@@ -321,6 +321,11 @@ const OrganizationReports = () => {
           targetLanguage,
         );
         dispatch(APITransport(projectReportObj));
+        setSnackbarInfo({
+          open: true,
+          message: "Project Reports will be e-mailed to you shortly",
+          variant: "success",
+        })
       }
     }
   };
@@ -511,7 +516,7 @@ const OrganizationReports = () => {
             onClick={handleSubmit}
             sx={{ width: "130px" }}
           >
-            {radiobutton === "PaymentReports" ? "E-mail CSV" : "Submit"}
+            E-mail CSV
           </Button>
         </Grid>
       </Grid>
@@ -546,7 +551,7 @@ const OrganizationReports = () => {
           />
         </Card>
       </Box>}
-      {showSpinner ? <div></div> : reportRequested && (
+      {/* {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={ProjectReports.length > 0 ? "Reports" : ""}
@@ -555,7 +560,7 @@ const OrganizationReports = () => {
             options={options}
           />
         </ThemeProvider>)
-      }
+      } */}
       {/*<Grid
           container
           justifyContent="center"

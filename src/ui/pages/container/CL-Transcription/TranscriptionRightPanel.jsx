@@ -132,6 +132,7 @@ const TranscriptionRightPanel = ({
   const [speakerIdList, setSpeakerIdList] = useState([]);
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState(0);
   const [tagSuggestionsAnchorEl, setTagSuggestionsAnchorEl] = useState(null);
+  const [tagSuggestionsAcoustic, setTagSuggestionsAcoustic] = useState(false);
   const [tagSuggestionList, setTagSuggestionList] = useState([]);
   const [textWithoutTripleDollar, setTextWithoutTripleDollar] = useState("");
   const [textAfterTripleDollar, setTextAfterTripleDollar] = useState("");
@@ -151,8 +152,8 @@ const TranscriptionRightPanel = ({
   const [currentSelection, setCurrentSelection] = useState(null);
 
   useEffect(() => {
-    currentPageData?.length && (textRefs.current = textRefs.current.slice(0, currentPageData.length));
-  }, [currentPageData]);
+    currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
+  }, [showAcousticText, currentPageData]);
 
   useEffect(() => {
     if (AnnotationStage) {
@@ -300,7 +301,7 @@ const TranscriptionRightPanel = ({
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
-  const changeTranscriptHandler = (event, index, updateAcoustic = false, refIdx) => {
+  const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const {
       target: { value },
       currentTarget,
@@ -316,7 +317,7 @@ const TranscriptionRightPanel = ({
       setEnableTransliterationSuggestion(true);
     }
 
-    if (containsTripleDollar && !updateAcoustic) {
+    if (containsTripleDollar) {
       // setEnableTransliterationSuggestion(false);
 
       const textBeforeTab = value.split("$$$")[0];
@@ -325,8 +326,9 @@ const TranscriptionRightPanel = ({
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutTripleDollar(textBeforeTab);
       setTextAfterTripleDollar(textAfterTab);
-      setCurrentTextRefIdx(refIdx);
+      setCurrentTextRefIdx(index + (updateAcoustic ? currentPageData?.length : 0));
       setCurrentSelection(event.target.selectionEnd);
+      setTagSuggestionsAcoustic(updateAcoustic);
     }
     const sub = onSubtitleChange(value, index, updateAcoustic, false);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -737,7 +739,7 @@ const TranscriptionRightPanel = ({
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
-                            changeTranscriptHandler(event, index + idxOffset, false, index);
+                            changeTranscriptHandler(event, index + idxOffset, false);
                           }}
                           enabled={enableTransliterationSuggestion}
                           onChangeText={() => { }}
@@ -774,9 +776,9 @@ const TranscriptionRightPanel = ({
                       ) : (
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
-                          ref={el => textRefs.current[index] = el}
+                            ref={el => textRefs.current[index] = el}
                             onChange={(event) => {
-                              changeTranscriptHandler(event, index + idxOffset, false, index);
+                              changeTranscriptHandler(event, index + idxOffset, false);
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
@@ -808,7 +810,9 @@ const TranscriptionRightPanel = ({
                             onChangeText={() => { }}
                             containerStyles={{ width: "100%", height: "100%" }}
                             style={{ fontSize: fontSize, height: "100%" }}
-                            renderComponent={(props) => (
+                            renderComponent={(props) => {
+                              textRefs.current[index + currentPageData?.length] = props.ref.current;
+                              return (
                               <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                                 <textarea
                                   className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
@@ -818,11 +822,12 @@ const TranscriptionRightPanel = ({
                                   {...props}
                                 />
                               </div>
-                            )}
+                            )}}
                           />
                         ) : (
                           <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                             <textarea
+                              ref={el => textRefs.current[index + currentPageData?.length] = el}
                               onChange={(event) => {
                                 changeTranscriptHandler(event, index + idxOffset, true);
                               }}
@@ -893,6 +898,7 @@ const TranscriptionRightPanel = ({
             setEnableTransliterationSuggestion={
               setEnableTransliterationSuggestion
             }
+            tagSuggestionsAcoustic={tagSuggestionsAcoustic}
             currentSelection={currentSelection}
             ref={textRefs.current[currentTextRefIdx]}
           />
