@@ -16,7 +16,8 @@ const Transliteration = (props) => {
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
   const [selectedLang, setSelectedLang] = useState("");
-  const [prev, setprev] = useState([]);
+  const [prev, setprev] = useState(false);
+  const [pre, setpre] = useState(false);
   const keystrokesRef = useRef([]);
   const suggestionRef = useRef([null]);
   const newKeystrokesRef = useRef();
@@ -25,7 +26,6 @@ const Transliteration = (props) => {
   const [debouncedText, setDebouncedText] = useState("");
   const debouncedTextRef = useRef("");
   const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
-  const sss = {};
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -39,7 +39,7 @@ const Transliteration = (props) => {
   let searchFilters = JSON.parse(localStorage.getItem("TaskData"));
 
   var data = languageList.filter((e) => e.DisplayName.includes(ProjectDetails.tgt_language));
-
+console.log("nnn",data,ProjectDetails,searchFilters);
   useEffect(() => {
     if (params.taskId) {
       setText(searchFilters?.data?.machine_translation);
@@ -73,11 +73,12 @@ const Transliteration = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log("nnn","useEffect is running");
+    console.log("nnn","useEffect is running",prev);
     const processConsoleLog = (args) => {
       const msg = JSON.stringify(args);
       if (msg.includes('library data')) {
         const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+        setflag(dataMatch.result)
         return dataMatch.result;
       }
       return ;
@@ -85,29 +86,28 @@ const Transliteration = (props) => {
     const originalConsoleLog = console.log;
     console.log = (...args) => {
       const newSuggestions = processConsoleLog(args);
-      if (newSuggestions) {
-        suggestionRef.current  = newSuggestions==null?flag: newSuggestions
-        setflag(newSuggestions)
-        if (debouncedTextRef.current.trim()!="" ) {
-          console.log("nnn",suggestionRef.current);
-          console.log("nnn",debouncedTextRef.current,text);
-            const newKeystroke = {
-              keystrokes: debouncedTextRef.current,
-              results: prev?flag:newSuggestions,
-              opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
-              created_at: new Date().toISOString(),
-            };
-            newKeystrokesRef.current = newKeystroke
-            if(newKeystrokesRef.current!=undefined){
-              keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
-            }
-            console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
-            const finalJson = {
-              word: debouncedTextRef.current,
-              steps: keystrokesRef.current,
-            };
-            localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-        }
+      if (newSuggestions!=null) {
+        suggestionRef.current  = prev==true?flag:newSuggestions
+        // if (debouncedTextRef.current.trim()!="") {
+        //   console.log("nnn",suggestionRef.current);
+        //   console.log("nnn",debouncedTextRef.current,text);
+        //     const newKeystroke = {
+        //       keystrokes: debouncedTextRef.current,
+        //       results: suggestionRef.current,
+        //       opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
+        //       created_at: new Date().toISOString(),
+        //     };
+        //     newKeystrokesRef.current = newKeystroke
+        //     if(newKeystrokesRef.current!=undefined){
+        //       keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
+        //     }
+        //     console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+        //     const finalJson = {
+        //       word: debouncedTextRef.current,
+        //       steps: keystrokesRef.current,
+        //     };
+        //     localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+        // }
       }
       originalConsoleLog(...args);
     };
@@ -118,29 +118,35 @@ const Transliteration = (props) => {
   }, [debouncedTextRef.current,prev]);
   
 
-  // useEffect(() => { 
-  //   if (debouncedTextRef.current.trim()!="" || debouncedText!=debouncedTextRef.current) {
-  //     console.log("nnn",suggestionRef.current);
-  //     console.log("nnn",debouncedTextRef.current,text);
-  //       const newKeystroke = {
-  //         keystrokes: debouncedTextRef.current,
-  //         results: suggestionRef.current,
-  //         opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
-  //         created_at: new Date().toISOString(),
-  //       };
-  //       newKeystrokesRef.current = newKeystroke
-  //       if(newKeystrokesRef.current!=undefined){
-  //         keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
-  //       }
-  //       console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
-  //       const finalJson = {
-  //         word: debouncedTextRef.current,
-  //         steps: keystrokesRef.current,
-  //       };
-  //       localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-  //       setflag(false)
-  //   }
-  // }, [suggestionRef.current,debouncedText]);
+  useEffect(() => { 
+    if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
+      console.log("nnn",suggestionRef.current);
+      console.log("nnn",debouncedTextRef.current,text);
+        const newKeystroke = {
+          keystrokes: debouncedTextRef.current,
+          results: suggestionRef.current,
+          opted: prev==true?debouncedText:"",
+          language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
+          created_at: new Date().toISOString(),
+        };
+        newKeystrokesRef.current = newKeystroke
+        if (
+          keystrokesRef.current.length > 0 &&
+          keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
+        ) {
+          // If the current keystrokes are the same as the previous one, replace the last keystroke
+          keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
+        } else {
+          keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
+        }
+        console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+        const finalJson = {
+          word: debouncedTextRef.current,
+          steps: keystrokesRef.current,
+        };
+        localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+    }
+  }, [suggestionRef.current,prev]);
 
 //   async function getTransliterationForWholeText(inputLang, outputLang, text) {
 //     const data = {
@@ -320,16 +326,15 @@ const json=()=>{
         onChangeText={(val) => {
           setText(val)
           setDebouncedText(val);
+          debouncedTextRef.current=val
           if(!debouncedTextRef.current.toString().includes(debouncedText)){
             setprev(true)
           }
           else{
             setprev(false)
           }
-          debouncedTextRef.current=val
           console.log("nnn",text,debouncedText,debouncedTextRef.current);
           setIsSpaceClicked(text.endsWith(" "));
-          
         }}
         renderComponent={(props) => renderTextarea(props)}
         showCurrentWordAsLastSuggestion={true}
