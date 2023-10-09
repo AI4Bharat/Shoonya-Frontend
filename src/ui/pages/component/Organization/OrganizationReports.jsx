@@ -315,12 +315,10 @@ const OrganizationReports = () => {
 
       }
       else if (radiobutton === "ProjectReports") {
-        const emailId = localStorage.getItem("email_id");
         const projectReportObj = new GetOrganizationProjectReportsAPI(
           orgId,
           selectedType,
           targetLanguage,
-          emailId,
         );
         dispatch(APITransport(projectReportObj));
         setSnackbarInfo({
