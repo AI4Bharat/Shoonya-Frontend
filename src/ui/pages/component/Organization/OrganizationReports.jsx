@@ -325,6 +325,7 @@ const OrganizationReports = () => {
           orgId,
           selectedType,
           targetLanguage,
+          userId,
         );
         dispatch(APITransport(projectReportObj));
         setSnackbarInfo({
