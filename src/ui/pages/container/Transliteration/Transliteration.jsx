@@ -17,12 +17,10 @@ const Transliteration = (props) => {
   const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
   const [selectedLang, setSelectedLang] = useState("");
   const [prev, setprev] = useState(false);
-  const [pre, setpre] = useState(false);
   const keystrokesRef = useRef([]);
   const suggestionRef = useRef([null]);
   const newKeystrokesRef = useRef();
   const [flag, setflag] = useState();
-  const [msg,setmsg] = useState("");
   const [debouncedText, setDebouncedText] = useState("");
   const debouncedTextRef = useRef("");
   const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
@@ -115,18 +113,21 @@ console.log("nnn",data,ProjectDetails,searchFilters);
     return () => {
       console.log = originalConsoleLog;
     };
-  }, [debouncedTextRef.current,prev]);
+  }, [debouncedTextRef.current,prev,selectedLang.LangCode]);
   
 
   useEffect(() => { 
     if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
       console.log("nnn",suggestionRef.current);
       console.log("nnn",debouncedTextRef.current,text);
+      const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
+
+        const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
+
         const newKeystroke = {
           keystrokes: debouncedTextRef.current,
           results: suggestionRef.current,
-          opted: prev==true?debouncedText:"",
-          language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
+          opted:optedWord,
           created_at: new Date().toISOString(),
         };
         newKeystrokesRef.current = newKeystroke
@@ -143,73 +144,11 @@ console.log("nnn",data,ProjectDetails,searchFilters);
         const finalJson = {
           word: debouncedTextRef.current,
           steps: keystrokesRef.current,
+          language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
         };
         localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
     }
-  }, [suggestionRef.current,prev]);
-
-//   async function getTransliterationForWholeText(inputLang, outputLang, text) {
-//     const data = {
-//       "input": [
-//         {
-//           "source": text
-//         }
-//       ],
-//       "config": {
-//         "isSentence": true,
-//         "language": {
-//           "sourceLanguage": inputLang,
-//           "targetLanguage": outputLang
-//         }
-//       }
-//     };
-  
-//     const outputData = await fetch("http://xlit-api.ai4bharat.org/transliterate", {
-//       method: 'post',
-//       body: JSON.stringify(data),
-//       headers: new Headers({
-//         'Content-Type': 'application/json'
-//       })
-//     })
-//     .then(response => response.json());
-//     return outputData["output"][0]["target"];
-//   }
-
-
-async function getTransliterationSuggestion(searchTerm) {
-
-  if (searchTerm == '.' || searchTerm == '..') {
-    searchTerm = ' ' + searchTerm;
-  }
-  // searchTerm = encodeURIComponent(searchTerm);
-
-  const url = `https://xlit-api.ai4bharat.org/tl/hi/${searchTerm}`;
-  let response = await fetch(url, {
-    credentials: 'include'
-  });
-  let data = await response.json();
-  return data;
-}
-  
-// useEffect(()=>{
-  // const data = getTransliterationForWholeText("en",`hi`,debouncedTextRef.current)
-  // const datas = getTransliterationSuggestion(debouncedTextRef.current)
-  // console.log("nnn",datas);
-// },[debouncedTextRef.current])
-
-
-  // useEffect(() => {
-  //   if(newKeystrokesRef.current!=undefined){
-  //     keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
-  //   }
-  //   console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
-  //   const finalJson = {
-  //     word: debouncedText,
-  //     steps: keystrokesRef.current,
-  //   };
-  //   localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-
-  // }, [newKeystrokesRef.current]);
+  }, [suggestionRef.current,prev,selectedLang.LangCode]);
 
 useEffect(()=>{
   if (isSpaceClicked) {
@@ -263,6 +202,8 @@ const json=()=>{
 
   const handleLanguageChange = (event, val) => {
     setSelectedLang(val);
+    newKeystrokesRef.current =[];
+    keystrokesRef.current = [];
   };
 
   const onCopyButtonClick = () => {
