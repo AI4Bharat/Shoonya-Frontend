@@ -60,6 +60,7 @@ import TagsSuggestionList from "../../component/CL-Transcription/TagsSuggestionL
 import { setSubtitles } from "../../../../redux/actions/Common";
 import C from "../../../../redux/constants";
 import SettingsButtonComponent from "../../component/CL-Transcription/SettingsButtonComponent";
+import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
@@ -71,7 +72,7 @@ import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 // } from "redux/actions";
 import { IconButton, Tooltip } from "@mui/material";
 import { Add, MoreVert, Remove } from "@material-ui/icons";
-
+import { parse, stringify } from 'flatted';
 const TranscriptionRightPanel = ({
   currentIndex,
   AnnotationsTaskDetails,
@@ -130,6 +131,17 @@ const TranscriptionRightPanel = ({
   const [redoStack, setRedoStack] = useState([]);
   const [showSpeakerIdDropdown, setShowSpeakerIdDropdown] = useState([]);
   const [speakerIdList, setSpeakerIdList] = useState([]);
+  const [text, setText] = useState("");
+  const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
+  const [selectedLang, setSelectedLang] = useState("");
+  const [prev, setprev] = useState(false);
+  const keystrokesRef = useRef([]);
+  const suggestionRef = useRef([null]);
+  const newKeystrokesRef = useRef();
+  const [flag, setflag] = useState();
+  const [debouncedText, setDebouncedText] = useState("");
+  const debouncedTextRef = useRef("");
+  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState(0);
   const [tagSuggestionsAnchorEl, setTagSuggestionsAnchorEl] = useState(null);
   const [tagSuggestionsAcoustic, setTagSuggestionsAcoustic] = useState(false);
@@ -456,7 +468,161 @@ const TranscriptionRightPanel = ({
 
     // eslint-disable-next-line
   }, [undoStack, redoStack]);
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === " ") {
+        setIsSpaceClicked(true);
+      }
+    };
 
+    const handleKeyUp = (event) => {
+      if (event.key === " ") {
+        setIsSpaceClicked(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+  useEffect(() => {
+    console.log("nnn","useEffect is running",prev);
+    const processConsoleLog = (args) => {
+      if (typeof args === 'object' ) {
+      const msg = stringify(args);
+  
+      if (msg.includes('library data')) {
+        const dataMatch = parse(msg.match(/{[^}]*}/));
+        setflag(dataMatch.result);
+        return dataMatch.result;
+      }
+      return;
+    }
+    };
+    // const decircularize = (obj, seen = new WeakSet()) => {
+    //   if (typeof obj === 'object' && obj !== null) {
+    //     if (seen.has(obj)) {
+    //       return '[Circular Reference]';
+    //     }
+    //     seen.add(obj);
+    //   }
+    //   return obj;
+    // };
+  
+    // const processConsoleLog = (args) => {
+    //   // Modify args to remove circular references
+    //   const cleanedArgs = args.map((arg) => decircularize(arg));
+  
+    //   const msg = stringify(cleanedArgs);
+  
+    //   if (msg.includes('library data')) {
+    //     const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+    //     setflag(dataMatch.result);
+    //     return dataMatch.result;
+    //   }
+    //   return;
+    // };
+  
+  
+  
+    const originalConsoleLog = console.log;
+    console.log = (...args) => {
+      const newSuggestions = processConsoleLog(args);
+      if (newSuggestions!=null) {
+        suggestionRef.current  = prev==true?flag:newSuggestions
+        // if (debouncedTextRef.current.trim()!="") {
+        //   console.log("nnn",suggestionRef.current);
+        //   console.log("nnn",debouncedTextRef.current,text);
+        //     const newKeystroke = {
+        //       keystrokes: debouncedTextRef.current,
+        //       results: suggestionRef.current,
+        //       opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
+        //       created_at: new Date().toISOString(),
+        //     };
+        //     newKeystrokesRef.current = newKeystroke
+        //     if(newKeystrokesRef.current!=undefined){
+        //       keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
+        //     }
+        //     console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+        //     const finalJson = {
+        //       word: debouncedTextRef.current,
+        //       steps: keystrokesRef.current,
+        //     };
+        //     localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+        // }
+      }
+      originalConsoleLog(...args);
+    };
+    
+    return () => {
+      console.log = originalConsoleLog;
+    };
+  }, [debouncedTextRef.current,prev]);
+  
+
+  useEffect(() => { 
+    if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
+      console.log("nnn",suggestionRef.current);
+      console.log("nnn",debouncedTextRef.current,text);
+      const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
+
+        const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
+
+        const newKeystroke = {
+          keystrokes: debouncedTextRef.current,
+          results: suggestionRef.current,
+          opted:optedWord,
+          created_at: new Date().toISOString(),
+        };
+        newKeystrokesRef.current = newKeystroke
+        if (
+          keystrokesRef.current.length > 0 &&
+          keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
+        ) {
+          keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
+        } else {
+          keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
+        }
+        console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+        const finalJson = {
+          word: debouncedTextRef.current,
+          steps: keystrokesRef.current,
+          // language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
+        };
+        localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+    }
+  }, [suggestionRef.current,prev]);
+
+useEffect(()=>{
+  if (isSpaceClicked) {
+    json()
+  }
+},[isSpaceClicked])
+const json=()=>{
+  const api = localStorage.getItem('TransliterateLogging');
+  const transliterateObj = new TransliterationAPI(JSON.parse(api));
+  fetch(transliterateObj.apiEndPoint(), {
+    method: "POST",
+    body: JSON.stringify(transliterateObj.getBody()),
+    headers: transliterateObj.getHeaders().headers,
+  })
+    .then(async (res) => {
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    })
+    .then((res) => {
+      // setSnackbarInfo({ open: true, message: res.message, variant: "success" });
+      console.log("success");
+    })
+    .catch((err) => {
+      // setSnackbarInfo({ open: true, message: err.message, variant: "error" });
+      console.log("error", err);
+    });
+}
   const onRedo = useCallback(() => {
     if (redoStack?.length > 0) {
       //getting last last action performed by user
@@ -742,7 +908,19 @@ const TranscriptionRightPanel = ({
                             changeTranscriptHandler(event, index + idxOffset, false);
                           }}
                           enabled={enableTransliterationSuggestion}
-                          onChangeText={() => { }}
+                          // onChangeText={() => { }}
+                          onChangeText={(val) => { setText(val)
+                            setDebouncedText(val);
+                            debouncedTextRef.current=val
+                            if(!debouncedTextRef.current.toString().includes(debouncedText)){
+                              setprev(true)
+                            }
+                            else{
+                              setprev(false)
+                            }
+                            console.log("nnn",text,debouncedText,debouncedTextRef.current);
+                            setIsSpaceClicked(text.endsWith(" ")); 
+                          }}
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                           containerStyles={{ width: "100%", height: "100%" }}
                           onBlur={() => {
@@ -807,7 +985,19 @@ const TranscriptionRightPanel = ({
                               changeTranscriptHandler(event, index + idxOffset, true);
                             }}
                             enabled={enableTransliterationSuggestion}
-                            onChangeText={() => { }}
+                            // onChangeText={() => { }}
+                            onChangeText={(val) => { setText(val)
+                              setDebouncedText(val);
+                              debouncedTextRef.current=val
+                              if(!debouncedTextRef.current.toString().includes(debouncedText)){
+                                setprev(true)
+                              }
+                              else{
+                                setprev(false)
+                              }
+                              console.log("nnn",text,debouncedText,debouncedTextRef.current);
+                              setIsSpaceClicked(text.endsWith(" "));
+                             }}
                             containerStyles={{ width: "100%", height: "100%" }}
                             style={{ fontSize: fontSize, height: "100%" }}
                             renderComponent={(props) => {

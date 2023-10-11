@@ -22,6 +22,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
+import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { isPlaying } from '../../../../utils/utils';
 import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
@@ -50,6 +51,17 @@ const AllAudioTranscriptionLandingPage = () => {
   const { projectId, taskId } = useParams();
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [text, setText] = useState("");
+  const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
+  const [selectedLang, setSelectedLang] = useState("");
+  const [prev, setprev] = useState(false);
+  const keystrokesRef = useRef([]);
+  const suggestionRef = useRef([null]);
+  const newKeystrokesRef = useRef();
+  const [flag, setflag] = useState();
+  const [debouncedText, setDebouncedText] = useState("");
+  const debouncedTextRef = useRef("");
+  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
   const [currentTime, setCurrentTime] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [showNotes, setShowNotes] = useState(false);
@@ -114,6 +126,133 @@ const AllAudioTranscriptionLandingPage = () => {
     }
     setLoading(false);
   };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === " ") {
+        setIsSpaceClicked(true);
+      }
+    };
+
+    const handleKeyUp = (event) => {
+      if (event.key === " ") {
+        setIsSpaceClicked(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+  useEffect(() => {
+    console.log("nnn","useEffect is running",prev);
+    const processConsoleLog = (args) => {
+      const msg = JSON.stringify(args);
+      if (msg.includes('library data')) {
+        const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+        setflag(dataMatch.result)
+        return dataMatch.result;
+      }
+      return ;
+    };
+    const originalConsoleLog = console.log;
+    console.log = (...args) => {
+      const newSuggestions = processConsoleLog(args);
+      if (newSuggestions!=null) {
+        suggestionRef.current  = prev==true?flag:newSuggestions
+        // if (debouncedTextRef.current.trim()!="") {
+        //   console.log("nnn",suggestionRef.current);
+        //   console.log("nnn",debouncedTextRef.current,text);
+        //     const newKeystroke = {
+        //       keystrokes: debouncedTextRef.current,
+        //       results: suggestionRef.current,
+        //       opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
+        //       created_at: new Date().toISOString(),
+        //     };
+        //     newKeystrokesRef.current = newKeystroke
+        //     if(newKeystrokesRef.current!=undefined){
+        //       keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
+        //     }
+        //     console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+        //     const finalJson = {
+        //       word: debouncedTextRef.current,
+        //       steps: keystrokesRef.current,
+        //     };
+        //     localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+        // }
+      }
+      originalConsoleLog(...args);
+    };
+    
+    return () => {
+      console.log = originalConsoleLog;
+    };
+  }, [debouncedTextRef.current,prev,selectedLang.LangCode]);
+  
+
+  useEffect(() => { 
+    if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
+      console.log("nnn",suggestionRef.current);
+      console.log("nnn",debouncedTextRef.current,text);
+      const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
+
+        const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
+
+        const newKeystroke = {
+          keystrokes: debouncedTextRef.current,
+          results: suggestionRef.current,
+          opted:optedWord,
+          created_at: new Date().toISOString(),
+        };
+        newKeystrokesRef.current = newKeystroke
+        if (
+          keystrokesRef.current.length > 0 &&
+          keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
+        ) {
+          keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
+        } else {
+          keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
+        }
+        console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+        const finalJson = {
+          word: debouncedTextRef.current,
+          steps: keystrokesRef.current,
+          language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
+        };
+        localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+    }
+  }, [suggestionRef.current,prev,selectedLang.LangCode]);
+
+useEffect(()=>{
+  if (isSpaceClicked) {
+    json()
+  }
+},[isSpaceClicked])
+const json=()=>{
+  const api = localStorage.getItem('TransliterateLogging');
+  const transliterateObj = new TransliterationAPI(JSON.parse(api));
+  fetch(transliterateObj.apiEndPoint(), {
+    method: "POST",
+    body: JSON.stringify(transliterateObj.getBody()),
+    headers: transliterateObj.getHeaders().headers,
+  })
+    .then(async (res) => {
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    })
+    .then((res) => {
+      setSnackbarInfo({ open: true, message: res.message, variant: "success" });
+      console.log("success");
+    })
+    .catch((err) => {
+      setSnackbarInfo({ open: true, message: err.message, variant: "error" });
+      console.log("error", err);
+    });
+}
+
 
   useEffect(() => {
     let standardisedTranscription = "";
@@ -534,6 +673,16 @@ const AllAudioTranscriptionLandingPage = () => {
                     setStdTranscription(e.target.value);
                   }}
                   onChangeText={() => { }}
+                  //   setDebouncedText(val);
+                  //   debouncedTextRef.current=val
+                  //   if(!debouncedTextRef.current.toString().includes(debouncedText)){
+                  //     setprev(true)
+                  //   }
+                  //   else{
+                  //     setprev(false)
+                  //   }
+                  //   console.log("nnn",text,debouncedText,debouncedTextRef.current);
+                  //   setIsSpaceClicked(text.endsWith(" ")); }}
                   enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
                   containerStyles={{
                     width: "100%",

@@ -133,7 +133,7 @@ const Projects = () => {
   );
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
-
+    console.log(projectObj,"hhh");
     dispatch(APITransport(projectObj));
   };
 

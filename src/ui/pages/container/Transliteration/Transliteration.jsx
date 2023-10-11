@@ -135,7 +135,6 @@ console.log("nnn",data,ProjectDetails,searchFilters);
           keystrokesRef.current.length > 0 &&
           keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
         ) {
-          // If the current keystrokes are the same as the previous one, replace the last keystroke
           keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
         } else {
           keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
