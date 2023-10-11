@@ -305,6 +305,11 @@ const OrganizationReports = () => {
 
         );
         dispatch(APITransport(userReportObj));
+        setSnackbarInfo({
+          open: true,
+          message: "User Reports will be e-mailed to you shortly",
+          variant: "success",
+        })
 
       } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" && radiobutton === "UsersReports")) {
         const supercheckObj = new GetOrganizationUserReportsAPI(
@@ -316,7 +321,11 @@ const OrganizationReports = () => {
           targetLanguage,
         );
         dispatch(APITransport(supercheckObj));
-
+        setSnackbarInfo({
+          open: true,
+          message: "User Reports will be e-mailed to you shortly",
+          variant: "success",
+        })
 
       }
       else if (radiobutton === "ProjectReports") {
@@ -325,6 +334,7 @@ const OrganizationReports = () => {
           orgId,
           selectedType,
           targetLanguage,
+          userId,
         );
         dispatch(APITransport(projectReportObj));
         setSnackbarInfo({
