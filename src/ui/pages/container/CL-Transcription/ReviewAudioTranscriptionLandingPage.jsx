@@ -329,19 +329,28 @@ const ReviewAudioTranscriptionLandingPage = () => {
         result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       };
       if(result.length && taskDetails?.review_user === user.id) {
-        const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
-        const res = await fetch(obj.apiEndPoint(), {
-          method: "PATCH",
-          body: JSON.stringify(obj.getBody()),
-          headers: obj.getHeaders().headers,
-        });
-        if (!res.ok) {
+        try{
+          const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
+          const res = await fetch(obj.apiEndPoint(), {
+            method: "PATCH",
+            body: JSON.stringify(obj.getBody()),
+            headers: obj.getHeaders().headers,
+          });
+          if (!res.ok) {
+            setSnackbarInfo({
+              open: true,
+              message: "Error in autosaving annotation",
+              variant: "error",
+            });
+            return res;
+          }
+        }
+        catch(err) {
           setSnackbarInfo({
             open: true,
-            message: "Error in autosaving annotation",
+            message: "Error in autosaving "+err,
             variant: "error",
           });
-          return res;
         }
       }
     };

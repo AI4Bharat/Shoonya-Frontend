@@ -245,6 +245,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
       };
       if(result.length && taskDetails?.super_check_user === userData.id) {
+      try{ 
         const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
         const res = await fetch(obj.apiEndPoint(), {
           method: "PATCH",
@@ -259,6 +260,14 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           });
         } 
         return res;
+      }
+        catch(err) {
+          setSnackbarInfo({
+            open: true,
+            message: "Error in autosaving "+err,
+            variant: "error",
+          });
+        }
       }
     };
     
