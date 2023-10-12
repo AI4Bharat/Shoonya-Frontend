@@ -4,6 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Resizable } from 're-resizable';
 import {
+  processConsoleLog,
+  logToConsoleWithProcessing,
+  handleSpaceKeyPressed,
+  json,
+} from "../../../../utils/Transliterate";
+import {
   addSubtitleBox,
   getSubtitleRangeTranscript,
   onMerge,
@@ -468,101 +474,119 @@ const TranscriptionRightPanel = ({
 
     // eslint-disable-next-line
   }, [undoStack, redoStack]);
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === " ") {
-        setIsSpaceClicked(true);
-      }
-    };
+//   useEffect(() => {
+//     const handleKeyDown = (event) => {
+//       if (event.key === " ") {
+//         setIsSpaceClicked(true);
+//       }
+//     };
 
-    const handleKeyUp = (event) => {
-      if (event.key === " ") {
-        setIsSpaceClicked(false);
-      }
-    };
+//     const handleKeyUp = (event) => {
+//       if (event.key === " ") {
+//         setIsSpaceClicked(false);
+//       }
+//     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keyup", handleKeyUp);
+//     document.addEventListener("keydown", handleKeyDown);
+//     document.addEventListener("keyup", handleKeyUp);
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
-  useEffect(() => {
-    console.log("nnn","useEffect is running",prev);
-    const processConsoleLog = (args) => {
-      if (typeof args === 'object' ) {
-      const msg = stringify(args);
-  
-      if (msg.includes('library data')) {
-        const dataMatch = parse(msg.match(/{[^}]*}/));
-        setflag(dataMatch.result);
-        return dataMatch.result;
-      }
-      return;
-    }
-    };
-    // const decircularize = (obj, seen = new WeakSet()) => {
-    //   if (typeof obj === 'object' && obj !== null) {
-    //     if (seen.has(obj)) {
-    //       return '[Circular Reference]';
-    //     }
-    //     seen.add(obj);
-    //   }
-    //   return obj;
-    // };
-  
-    // const processConsoleLog = (args) => {
-    //   // Modify args to remove circular references
-    //   const cleanedArgs = args.map((arg) => decircularize(arg));
-  
-    //   const msg = stringify(cleanedArgs);
-  
-    //   if (msg.includes('library data')) {
-    //     const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
-    //     setflag(dataMatch.result);
-    //     return dataMatch.result;
-    //   }
-    //   return;
-    // };
-  
-  
-  
-    const originalConsoleLog = console.log;
-    console.log = (...args) => {
-      const newSuggestions = processConsoleLog(args);
-      if (newSuggestions!=null) {
-        suggestionRef.current  = prev==true?flag:newSuggestions
-        // if (debouncedTextRef.current.trim()!="") {
-        //   console.log("nnn",suggestionRef.current);
-        //   console.log("nnn",debouncedTextRef.current,text);
-        //     const newKeystroke = {
-        //       keystrokes: debouncedTextRef.current,
-        //       results: suggestionRef.current,
-        //       opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
-        //       created_at: new Date().toISOString(),
-        //     };
-        //     newKeystrokesRef.current = newKeystroke
-        //     if(newKeystrokesRef.current!=undefined){
-        //       keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
-        //     }
-        //     console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
-        //     const finalJson = {
-        //       word: debouncedTextRef.current,
-        //       steps: keystrokesRef.current,
-        //     };
-        //     localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-        // }
-      }
-      originalConsoleLog(...args);
-    };
+//     return () => {
+//       document.removeEventListener("keydown", handleKeyDown);
+//       document.removeEventListener("keyup", handleKeyUp);
+//     };
+//   }, []);
+
+//   const processConsoleLog = (args) => {
+//     // if (typeof args === 'object' ) {
+//     const msg = stringify(args);
     
-    return () => {
-      console.log = originalConsoleLog;
-    };
-  }, [debouncedTextRef.current,prev]);
+//     if (msg.includes('library data')) {
+//       const dataMatch = parse(msg.match(/{[^}]*}/));
+//       setflag(dataMatch.result);
+//       return dataMatch.result;
+//     }
+//     return;
+//   // }
+//   };
+
+//   useEffect(() => {
+//     console.log("nnn","useEffect is not running",prev);
+//     // const decircularize = (obj, seen = new WeakSet()) => {
+//     //   if (typeof obj === 'object' && obj !== null) {
+//     //     if (seen.has(obj)) {
+//     //       return '[Circular Reference]';
+//     //     }
+//     //     seen.add(obj);
+//     //   }
+//     //   return obj;
+//     // };
   
+//     // const processConsoleLog = (args) => {
+//     //   // Modify args to remove circular references
+//     //   const cleanedArgs = args.map((arg) => decircularize(arg));
+  
+//     //   const msg = stringify(cleanedArgs);
+  
+//     //   if (msg.includes('library data')) {
+//     //     const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+//     //     setflag(dataMatch.result);
+//     //     return dataMatch.result;
+//     //   }
+//     //   return;
+//     // };
+  
+  
+  
+//     const originalConsoleLog = console.log;
+//     console.log = (...args) => {
+//       const newSuggestions = processConsoleLog(args);
+//       if (newSuggestions!=null) {
+//         suggestionRef.current  = prev==true?flag:newSuggestions
+//         // if (debouncedTextRef.current.trim()!="") {
+//         //   console.log("nnn",suggestionRef.current);
+//         //   console.log("nnn",debouncedTextRef.current,text);
+//         //     const newKeystroke = {
+//         //       keystrokes: debouncedTextRef.current,
+//         //       results: suggestionRef.current,
+//         //       opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
+//         //       created_at: new Date().toISOString(),
+//         //     };
+//         //     newKeystrokesRef.current = newKeystroke
+//         //     if(newKeystrokesRef.current!=undefined){
+//         //       keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
+//         //     }
+//         //     console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+//         //     const finalJson = {
+//         //       word: debouncedTextRef.current,
+//         //       steps: keystrokesRef.current,
+//         //     };
+//         //     localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+//         // }
+//       }
+//       originalConsoleLog(...args);
+//     };
+    
+//     return () => {
+//       console.log = originalConsoleLog;
+//     };
+//   }, [debouncedTextRef.current,prev]);
+  
+useEffect(() => {
+
+  const clearConsoleLog = logToConsoleWithProcessing(
+    debouncedTextRef.current,
+    prev,
+    selectedLang,
+    text,
+    flag,
+    suggestionRef,
+    setflag
+  );
+
+  return () => {
+    clearConsoleLog();
+  };
+}, [debouncedTextRef.current,prev]);
 
   useEffect(() => { 
     if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
@@ -597,32 +621,32 @@ const TranscriptionRightPanel = ({
     }
   }, [suggestionRef.current,prev]);
 
-useEffect(()=>{
-  if (isSpaceClicked) {
-    json()
-  }
-},[isSpaceClicked])
-const json=()=>{
-  const api = localStorage.getItem('TransliterateLogging');
-  const transliterateObj = new TransliterationAPI(JSON.parse(api));
-  fetch(transliterateObj.apiEndPoint(), {
-    method: "POST",
-    body: JSON.stringify(transliterateObj.getBody()),
-    headers: transliterateObj.getHeaders().headers,
-  })
-    .then(async (res) => {
-      if (!res.ok) throw await res.json();
-      else return await res.json();
-    })
-    .then((res) => {
-      // setSnackbarInfo({ open: true, message: res.message, variant: "success" });
-      console.log("success");
-    })
-    .catch((err) => {
-      // setSnackbarInfo({ open: true, message: err.message, variant: "error" });
-      console.log("error", err);
-    });
-}
+// useEffect(()=>{
+//   if (isSpaceClicked) {
+//     json()
+//   }
+// },[isSpaceClicked])
+// const json=()=>{
+//   const api = localStorage.getItem('TransliterateLogging');
+//   const transliterateObj = new TransliterationAPI(JSON.parse(api));
+//   fetch(transliterateObj.apiEndPoint(), {
+//     method: "POST",
+//     body: JSON.stringify(transliterateObj.getBody()),
+//     headers: transliterateObj.getHeaders().headers,
+//   })
+//     .then(async (res) => {
+//       if (!res.ok) throw await res.json();
+//       else return await res.json();
+//     })
+//     .then((res) => {
+//       // setSnackbarInfo({ open: true, message: res.message, variant: "success" });
+//       console.log("success");
+//     })
+//     .catch((err) => {
+//       // setSnackbarInfo({ open: true, message: err.message, variant: "error" });
+//       console.log("error", err);
+//     });
+// }
   const onRedo = useCallback(() => {
     if (redoStack?.length > 0) {
       //getting last last action performed by user
@@ -985,19 +1009,19 @@ const json=()=>{
                               changeTranscriptHandler(event, index + idxOffset, true);
                             }}
                             enabled={enableTransliterationSuggestion}
-                            // onChangeText={() => { }}
-                            onChangeText={(val) => { setText(val)
-                              setDebouncedText(val);
-                              debouncedTextRef.current=val
-                              if(!debouncedTextRef.current.toString().includes(debouncedText)){
-                                setprev(true)
-                              }
-                              else{
-                                setprev(false)
-                              }
-                              console.log("nnn",text,debouncedText,debouncedTextRef.current);
-                              setIsSpaceClicked(text.endsWith(" "));
-                             }}
+                            onChangeText={() => { }}
+                            // onChangeText={(val) => { setText(val)
+                            //   setDebouncedText(val);
+                            //   debouncedTextRef.current=val
+                            //   if(!debouncedTextRef.current.toString().includes(debouncedText)){
+                            //     setprev(true)
+                            //   }
+                            //   else{
+                            //     setprev(false)
+                            //   }
+                            //   console.log("nnn",text,debouncedText,debouncedTextRef.current);
+                            //   setIsSpaceClicked(text.endsWith(" "));
+                            //  }}
                             containerStyles={{ width: "100%", height: "100%" }}
                             style={{ fontSize: fontSize, height: "100%" }}
                             renderComponent={(props) => {

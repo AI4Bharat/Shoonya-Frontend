@@ -1409,17 +1409,17 @@ useEffect(() => {
                   onChange={(e) => {
                     setStdTranscription(e.target.value);
                   }}
-                  onChangeText={(val) => { setText(val)
-                    setDebouncedText(val);
-                    debouncedTextRef.current=val
-                    if(!debouncedTextRef.current.toString().includes(debouncedText)){
-                      setprev(true)
-                    }
-                    else{
-                      setprev(false)
-                    }
-                    console.log("nnn",text,debouncedText,debouncedTextRef.current);
-                    setIsSpaceClicked(text.endsWith(" ")); }}
+                  onChangeText={() => { }}
+                    // setDebouncedText(val);
+                    // debouncedTextRef.current=val
+                    // if(!debouncedTextRef.current.toString().includes(debouncedText)){
+                    //   setprev(true)
+                    // }
+                    // else{
+                    //   setprev(false)
+                    // }
+                    // console.log("nnn",text,debouncedText,debouncedTextRef.current);
+                    // setIsSpaceClicked(text.endsWith(" ")); }}
                   enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
                   containerStyles={{
                     width: "100%",

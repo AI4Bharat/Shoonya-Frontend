@@ -8,6 +8,12 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from "react-redux";
+import {
+  processConsoleLog,
+  logToConsoleWithProcessing,
+  handleSpaceKeyPressed,
+  json,
+} from "../../../../utils/Transliterate";
 import { useParams } from "react-router-dom";
 const Transliteration = (props) => {
   const { onCancelTransliteration } = props;
@@ -30,6 +36,7 @@ const Transliteration = (props) => {
     timeout: 1500,
     visible: false,
   });
+  
   const matches = useMediaQuery('(max-width:768px)');
 
   const ProjectDetails = useSelector(state => state.getProjectDetails.data);
@@ -71,49 +78,22 @@ console.log("nnn",data,ProjectDetails,searchFilters);
   }, []);
 
   useEffect(() => {
-    console.log("nnn","useEffect is running",prev);
-    const processConsoleLog = (args) => {
-      const msg = JSON.stringify(args);
-      if (msg.includes('library data')) {
-        const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
-        setflag(dataMatch.result)
-        return dataMatch.result;
-      }
-      return ;
-    };
-    const originalConsoleLog = console.log;
-    console.log = (...args) => {
-      const newSuggestions = processConsoleLog(args);
-      if (newSuggestions!=null) {
-        suggestionRef.current  = prev==true?flag:newSuggestions
-        // if (debouncedTextRef.current.trim()!="") {
-        //   console.log("nnn",suggestionRef.current);
-        //   console.log("nnn",debouncedTextRef.current,text);
-        //     const newKeystroke = {
-        //       keystrokes: debouncedTextRef.current,
-        //       results: suggestionRef.current,
-        //       opted: suggestionRef.current.find((item) => item === debouncedTextRef.current) || debouncedTextRef.current,
-        //       created_at: new Date().toISOString(),
-        //     };
-        //     newKeystrokesRef.current = newKeystroke
-        //     if(newKeystrokesRef.current!=undefined){
-        //       keystrokesRef.current = [...keystrokesRef.current, newKeystrokesRef.current];
-        //     }
-        //     console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
-        //     const finalJson = {
-        //       word: debouncedTextRef.current,
-        //       steps: keystrokesRef.current,
-        //     };
-        //     localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-        // }
-      }
-      originalConsoleLog(...args);
-    };
-    
+
+    const clearConsoleLog = logToConsoleWithProcessing(
+      debouncedTextRef.current,
+      prev,
+      selectedLang,
+      text,
+      flag,
+      suggestionRef,
+      setflag
+    );
+
     return () => {
-      console.log = originalConsoleLog;
+      clearConsoleLog();
     };
   }, [debouncedTextRef.current,prev,selectedLang.LangCode]);
+
   
 
   useEffect(() => { 
