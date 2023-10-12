@@ -4,7 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import FetchUserByIdAPI from '../../../../redux/actions/api/UserManagement/FetchUserById';
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip, Paper } from '@mui/material';
+import { Avatar, IconButton, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip, Paper } from '@mui/material';
+import { Input, inputClasses } from '@mui/base/Input';
 import MyProgress from '../../component/Tabs/MyProgress';
 import RecentTasks from '../../component/Tabs/RecentTasks';
 import CustomButton from "../../component/common/Button";
@@ -13,10 +14,12 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
+import UpdateProfileImageAPI from '../../../../redux/actions/api/UserManagement/UpdateProfileImage'
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import MyProfile from "../../container/UserManagement/ProfileDetails"
 import ScheduleMails from "../../container/UserManagement/ScheduleMails"
+import axios from 'axios';
 
 const ProfilePage = () => {
 
@@ -75,6 +78,30 @@ const ProfilePage = () => {
     );
   };
 
+  const onImageChangeHandler=async (event)=>{
+    if(event.target.files && event.target.files.length!==0){
+      setLoading(true);
+      let pickedFile=event.target.files[0];
+      const updateProfileImageAPIObj = new UpdateProfileImageAPI(LoggedInUserId,pickedFile);
+      await axios.post(updateProfileImageAPIObj.apiEndPoint(), updateProfileImageAPIObj.getBody(), updateProfileImageAPIObj.getHeaders())
+        .then(response => {
+          console.log(response.status)
+          if (response.status == 200 || response.status == 201) {
+            const userObj = new FetchUserByIdAPI(id);
+            dispatch(APITransport(userObj));
+            setLoading(false);
+            console.log("updateProfileImageData -----", response);
+          } else {
+            setLoading(false);
+          }
+        })
+        .catch(err => {
+          setLoading(false);
+          console.log("err - ", err);
+        })
+      }
+  }
+
   useEffect(() => {
     setLoading(true);
     const userObj = new FetchUserByIdAPI(id);
@@ -105,15 +132,19 @@ const ProfilePage = () => {
             <Card sx={{ borderRadius: "5px", mb: 2 }}>
               <CardContent sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
                 <Card sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', border: "none" }}>
-
-                  <Avatar
-                    alt="user_profile_pic"
-                    variant="contained"
-                    sx={{ color: "#FFFFFF !important", bgcolor: "#2A61AD !important", width: 96, height: 96, mb: 2, alignSelf: 'center' }}
-                  >
-                    {userDetails.username.split("")[0]}
-                  </Avatar>
-
+                  <Input accept="image/*" id="upload-avatar-pic" type="file" hidden onChange={onImageChangeHandler}/>
+                  <label htmlFor="upload-avatar-pic">
+                      <IconButton component="span">
+                          <Avatar
+                            alt="user_profile_pic"
+                            variant="contained"
+                            src={userDetails?.profile_photo?userDetails.profile_photo:''}
+                            sx={{ color: "#FFFFFF !important", bgcolor: "#2A61AD !important", width: 96, height: 96, mb: 2, alignSelf: 'center' }}
+                          >
+                            {userDetails.username.split("")[0]}
+                          </Avatar>
+                      </IconButton>
+                  </label>
                   <Typography variant="h3" sx={{ alignSelf: 'center', mb: 2 }}>
                     {UserMappedByRole(userDetails.role).element}
                   </Typography>
