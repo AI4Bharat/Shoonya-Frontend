@@ -227,10 +227,8 @@ const WorkspaceReports = () => {
         if(projectReportType === 1){
         const projectReportObj = new GetWorkspaceProjectReportAPI(
           id,
-          selectedType,
-
           language,
-          projectType === "AnnotatationReports" ? "annotation" : projectType === "ReviewerReports" ? "review" : "supercheck",
+          selectedType,
         );
         dispatch(APITransport(projectReportObj));
         }else if(projectReportType === 2){
@@ -326,7 +324,7 @@ const WorkspaceReports = () => {
           </FormControl>
         </Grid>}
 
-        {(radioButton !== "project" || projectReportType !==2) && <Grid
+        {(radioButton === "user") && <Grid
           item
           xs={12}
           sm={12}
