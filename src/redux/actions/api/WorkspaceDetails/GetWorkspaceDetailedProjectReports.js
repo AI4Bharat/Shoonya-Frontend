@@ -2,7 +2,7 @@ import API from "../../../api";
 
 export default class GetWorkspaceDetailedProjectReportsAPI extends API {
   constructor(workId, projectType, userId, statistics, timeout = 2000) {
-    super("POST", timeout, false);
+    super("GET", timeout, false);
     this.workId = workId;
     this.projectType = projectType;
     this.userId = userId;
