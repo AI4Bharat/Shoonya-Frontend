@@ -227,8 +227,8 @@ const WorkspaceReports = () => {
         if(projectReportType === 1){
         const projectReportObj = new GetWorkspaceProjectReportAPI(
           id,
-          selectedType,
           language,
+          selectedType,
         );
         dispatch(APITransport(projectReportObj));
         }else if(projectReportType === 2){

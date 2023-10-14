@@ -2,7 +2,7 @@ import API from "../../../api";
 
 export default class GetDatasetDetailedReportsAPI extends API {
   constructor(dataId, projectType, userId, statistics, timeout = 2000) {
-    super("GET", timeout, false);
+    super("POST", timeout, false);
     this.dataId = dataId;
     this.projectType = projectType;
     this.userId = userId;
