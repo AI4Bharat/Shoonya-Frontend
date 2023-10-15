@@ -581,62 +581,71 @@ const AudioTranscriptionLandingPage = () => {
     lead_time,
   ) => {
     setLoading(true);
-    const PatchAPIdata = {
-      annotation_status: value,
-      annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
-      lead_time:
-        (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-    };
-    if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
-      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
-      // dispatch(APITransport(GlossaryObj));
-      const res = await fetch(TaskObj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(TaskObj.getBody()),
-        headers: TaskObj.getHeaders().headers,
-      });
-      const resp = await res.json();
-      if (res.ok) {
-        setAutoSave(false);
-        if (localStorage.getItem("labelAll") || value === "skipped") {
-          onNextAnnotation(resp.task);
+    setAutoSave(false);
+    //wait 200ms for autosave to finish before saving
+    setTimeout(async () => {
+      const PatchAPIdata = {
+        annotation_status: value,
+        annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+        lead_time:
+          (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      };
+      if (["draft", "skipped"].includes(value) || (!textBox && !speakerBox && result?.length > 0)) {
+        const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+        // dispatch(APITransport(GlossaryObj));
+        const res = await fetch(TaskObj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(TaskObj.getBody()),
+          headers: TaskObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        if (res.ok) {
+          setLoading(false);
+          setShowNotes(false);
+          if (localStorage.getItem("labelAll") || value === "skipped") {
+            onNextAnnotation(resp.task);
+          }
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "success",
+          });
+        } else {
+          setAutoSave(true);
+          setLoading(false);
+          setShowNotes(false);
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message,
+            variant: "error",
+          });
         }
-        setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "success",
-        });
       } else {
-        setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "error",
-        });
+        setAutoSave(true);
+        setLoading(false);
+        setShowNotes(false);
+        if (textBox) {
+          setSnackbarInfo({
+            open: true,
+            message: "Please Enter All The Transcripts",
+            variant: "error",
+          });
+        } else if (speakerBox) {
+          setSnackbarInfo({
+            open: true,
+            message: "Please Select The Speaker",
+            variant: "error",
+          });
+        } else {
+          setSnackbarInfo({
+            open: true,
+            message: "Error in saving annotation",
+            variant: "error",
+          });
+        }
       }
-    } else {
-      if (textBox) {
-        setSnackbarInfo({
-          open: true,
-          message: "Please Enter All The Transcripts",
-          variant: "error",
-        });
-      } else if (speakerBox) {
-        setSnackbarInfo({
-          open: true,
-          message: "Please Select The Speaker",
-          variant: "error",
-        });
-      } else {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in saving annotation",
-          variant: "error",
-        });
-      }
-    }
-    setLoading(false);
-    setShowNotes(false);
+    }, 200);
   };
 
   useEffect(() => {

@@ -624,66 +624,76 @@ const ReviewAudioTranscriptionLandingPage = () => {
     parentannotation,
   ) => {
     setLoading(true);
-    const PatchAPIdata = {
-      annotation_status: value,
-      review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
-      lead_time:
-        (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      ...((value === "to_be_revised" || value === "accepted" ||
-        value === "accepted_with_minor_changes" ||
-        value === "accepted_with_major_changes") && {
-        parent_annotation: parentannotation,
-      }),
-    };
-    const L1Check = !textBox && !speakerBox && result?.length > 0;
-    if (
-      ["draft", "skipped"].includes(value) ||
-      (["to_be_revised"].includes(value) && L1Check) ||
-      (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
-    ) {
-      const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
-      const res = await fetch(TaskObj.apiEndPoint(), {
-        method: "PATCH",
-        body: JSON.stringify(TaskObj.getBody()),
-        headers: TaskObj.getHeaders().headers,
-      });
-      const resp = await res.json();
-      if (res.ok) {
-        setAutoSave(false);
-        if (localStorage.getItem("labelAll") || value === "skipped") {
-          onNextAnnotation(resp.task);
-        }
+    setAutoSave(false);
+    setTimeout(async () => {
+      const PatchAPIdata = {
+        annotation_status: value,
+        review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
+        lead_time:
+          (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
+        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+        ...((value === "to_be_revised" || value === "accepted" ||
+          value === "accepted_with_minor_changes" ||
+          value === "accepted_with_major_changes") && {
+          parent_annotation: parentannotation,
+        }),
+      };
+      const L1Check = !textBox && !speakerBox && result?.length > 0;
+      if (
+        ["draft", "skipped"].includes(value) ||
+        (["to_be_revised"].includes(value) && L1Check) ||
+        (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
+      ) {
+        const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
+        const res = await fetch(TaskObj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(TaskObj.getBody()),
+          headers: TaskObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        if (res.ok) {
+          setLoading(false);
+          setShowNotes(false);
+          setAnchorEl(null);
+          if (localStorage.getItem("labelAll") || value === "skipped") {
+            onNextAnnotation(resp.task);
+          }
+            setSnackbarInfo({
+              open: true,
+              message: resp?.message,
+              variant: "success",
+            });
+        } else {
+          setAutoSave(true);
+          setLoading(false);
+          setShowNotes(false);
+          setAnchorEl(null);
           setSnackbarInfo({
             open: true,
             message: resp?.message,
-            variant: "success",
+            variant: "error",
           });
+        }
       } else {
-        setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "error",
-        });
-    }
-  } else {
-    if (textBox || !L2Check) {
-      setSnackbarInfo({
-        open: true,
-        message: "Please Enter All The Transcripts",
-        variant: "error",
-      });
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: "Please Select The Speaker",
-        variant: "error",
-      });
-    }
-  }
-    setLoading(false);
-    setShowNotes(false)
-    setAnchorEl(null)
+        setAutoSave(true);
+        setLoading(false);
+        setShowNotes(false)
+        setAnchorEl(null);
+        if (textBox || !L2Check) {
+          setSnackbarInfo({
+            open: true,
+            message: "Please Enter All The Transcripts",
+            variant: "error",
+          });
+        } else {
+          setSnackbarInfo({
+            open: true,
+            message: "Please Select The Speaker",
+            variant: "error",
+          });
+        }
+      }
+    }, 200);
   };
 
   const setNotes = (taskData, annotations) => {
