@@ -2,7 +2,7 @@ import API from "../../../api";
 
 export default class GetOrganizationDetailedProjectReportsAPI extends API {
   constructor(orgId, projectType, userId, statistics, timeout = 2000) {
-    super("POST", timeout, false);
+    super("GET", timeout, false);
     this.orgId = orgId;
     this.projectType = projectType;
     this.userId = userId;
