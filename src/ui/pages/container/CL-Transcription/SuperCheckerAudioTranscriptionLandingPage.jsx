@@ -127,7 +127,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   //     ref.current = 0;
 
   //     intervalId = setInterval(updateTimer, 1000);
-  //   }, 10 * 1000);
+  //   }, 60 * 1000);
 
   //   return () => {
   //     const apiObj = new UpdateTimeSpentPerTask(taskId, ref.current);
@@ -282,10 +282,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       // dispatch(APITransport(apiObj));
     };
 
-    saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 20 * 1000);
+    saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
-      10 * 1000
+      60 * 1000
     );
 
     const handleBeforeUnload = (event) => {
@@ -322,10 +322,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
-        saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 20 * 1000);
+        saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
         timeSpentIntervalRef.current = setInterval(
           handleUpdateTimeSpent,
-          10 * 1000
+          60 * 1000
         );
       } else {
         setAutoSaveTrigger(true);
