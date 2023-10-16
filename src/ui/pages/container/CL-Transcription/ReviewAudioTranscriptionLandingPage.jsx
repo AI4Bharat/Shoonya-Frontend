@@ -113,6 +113,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);  
   const [autoSave, setAutoSave] = useState(true);
+  const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
   // useEffect(() => {
   //   let intervalId;
@@ -164,10 +165,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 annotation.id === userAnnotation.parent_annotation &&
                 annotation.annotation_type === 1
             );
-        console.log(
-          filteredAnnotations,
-          "filteredAnnotationsfilteredAnnotations"
-        );
       } else if (
         userAnnotation &&
         ["rejected"].includes(userAnnotation.annotation_status)
@@ -312,61 +309,65 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [lastInteraction, setLastInteraction] = useState(Date.now());
   const inactivityThreshold = 120000; 
 
-  useEffect(() => {
+  const handleAutosave = async () => {
+    setAutoSaveTrigger(false);
     if(!autoSave) return;
-
-    const handleAutosave = async () => {
-      const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === user.id && a.annotation_type === 2);
-      if(!currentAnnotation) return;
-      const reqBody = {
-        task_id: taskId,
-        annotation_status: currentAnnotation?.annotation_status,
-        parent_annotation: currentAnnotation?.parent_annotation,
-        auto_save: true,
-        lead_time:
-          (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
-        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      };
-      if(result.length && taskDetails?.review_user === user.id) {
-        try{
-          const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
-          const res = await fetch(obj.apiEndPoint(), {
-            method: "PATCH",
-            body: JSON.stringify(obj.getBody()),
-            headers: obj.getHeaders().headers,
-          });
-          if (!res.ok) {
-            setSnackbarInfo({
-              open: true,
-              message: "Error in autosaving annotation",
-              variant: "error",
-            });
-            return res;
-          }
-        }
-        catch(err) {
+    const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === user.id && a.annotation_type === 2);
+    if(!currentAnnotation) return;
+    const reqBody = {
+      task_id: taskId,
+      auto_save: true,
+      lead_time:
+        (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+    };
+    if(result.length && taskDetails?.review_user === user.id) {
+      try{
+        const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        if (!res.ok) {
           setSnackbarInfo({
             open: true,
-            message: "Error in autosaving "+err,
+            message: "Error in autosaving annotation",
             variant: "error",
           });
+          return res;
         }
       }
-    };
+      catch(err) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving "+err,
+          variant: "error",
+        });
+      }
+    }
+  };
+  
+  useEffect(() => {
+    autoSaveTrigger && handleAutosave();
+  }, [autoSaveTrigger, autoSave, handleAutosave, user, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings]);
+  
+  useEffect(() => {
+    if(!autoSave) return;
 
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
     };
 
-    saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+    saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
     );
 
     const handleBeforeUnload = (event) => {
-      handleAutosave();
+      setAutoSaveTrigger(true);
       handleUpdateTimeSpent(ref.current);
       event.preventDefault();
       event.returnValue = "";
@@ -399,13 +400,13 @@ const ReviewAudioTranscriptionLandingPage = () => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
-        saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+        saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
         timeSpentIntervalRef.current = setInterval(
           handleUpdateTimeSpent,
           60 * 1000
         );
       } else {
-        handleAutosave();
+        setAutoSaveTrigger(true);
         handleUpdateTimeSpent(ref.current);
         // Tab is inactive, clear the autosave interval
         clearInterval(saveIntervalRef.current);
@@ -427,7 +428,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [autoSave, user, result, taskId, AnnotationsTaskDetails, taskDetails, stdTranscription, stdTranscriptionSettings, isActive]);
+  }, [autoSave, user, taskId, annotations, taskDetails, isActive]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -463,30 +464,14 @@ const ReviewAudioTranscriptionLandingPage = () => {
   useEffect(() => {
 
     let standardisedTranscription = "";
-    if (
-      AnnotationsTaskDetails.some((obj) =>
-        obj.result.every((item) => Object.keys(item).length === 0)
-      )
-    ) {
-      const filteredArray = AnnotationsTaskDetails.filter((obj) =>
-        obj?.result.some((item) => Object.keys(item).length > 0)
-      );
-      const sub = filteredArray[0]?.result?.filter((item) => {
-        if ("standardised_transcription" in item) {
-          standardisedTranscription = item.standardised_transcription;
-          return false;
-        } else return true;
-      }).map((item) => new Sub(item));
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    } else {
-      const sub = annotations[0]?.result?.filter((item) => {
-        if ("standardised_transcription" in item) {
-          standardisedTranscription = item.standardised_transcription;
-          return false;
-        } else return true;
-      }).map((item) => new Sub(item));
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    }
+
+    const sub = annotations[0]?.result?.filter((item) => {
+      if ("standardised_transcription" in item) {
+        standardisedTranscription = item.standardised_transcription;
+        return false;
+      } else return true;
+    }).map((item) => new Sub(item));
+    dispatch(setSubtitles(sub, C.SUBTITLES));
 
     setStdTranscription(standardisedTranscription);
 
@@ -624,6 +609,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     parentannotation,
   ) => {
     setLoading(true);
+    setAutoSave(false);
     const PatchAPIdata = {
       annotation_status: value,
       review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
@@ -650,7 +636,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        setAutoSave(false);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
@@ -660,30 +645,32 @@ const ReviewAudioTranscriptionLandingPage = () => {
             variant: "success",
           });
       } else {
+        setAutoSave(true);
         setSnackbarInfo({
           open: true,
           message: resp?.message,
           variant: "error",
         });
-    }
-  } else {
-    if (textBox || !L2Check) {
-      setSnackbarInfo({
-        open: true,
-        message: "Please Enter All The Transcripts",
-        variant: "error",
-      });
+      }
     } else {
-      setSnackbarInfo({
-        open: true,
-        message: "Please Select The Speaker",
-        variant: "error",
-      });
+      setAutoSave(true);
+      if (textBox || !L2Check) {
+        setSnackbarInfo({
+          open: true,
+          message: "Please Enter All The Transcripts",
+          variant: "error",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: "Please Select The Speaker",
+          variant: "error",
+        });
+      }
     }
-  }
     setLoading(false);
-    setShowNotes(false)
-    setAnchorEl(null)
+    setShowNotes(false);
+    setAnchorEl(null);
   };
 
   const setNotes = (taskData, annotations) => {
