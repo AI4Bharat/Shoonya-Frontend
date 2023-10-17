@@ -63,6 +63,7 @@ const SettingsButtonComponent = ({
   setAdvancedWaveformSettings,
   pauseOnType,
   setPauseOnType,
+  annotationId,
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   // const dispatch = useDispatch();
@@ -125,6 +126,11 @@ const SettingsButtonComponent = ({
         open={Boolean(anchorElSettings)}
         onClose={() => setAnchorElSettings(null)}
       >
+        <MenuItem>
+        <Typography sx={{fontSize: 14}}>
+          Annotation ID: {annotationId}
+        </Typography>
+        </MenuItem>
         <MenuItem>
           <FormControlLabel
             label="Transliteration"
