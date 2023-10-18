@@ -750,6 +750,7 @@ const Header = () => {
                         <Avatar
                           alt="user_profile_pic"
                           variant="contained"
+                          src={loggedInUserData?.profile_photo?loggedInUserData.profile_photo:''}
                           className={classes.avatar}
                         >
                           {loggedInUserData &&

@@ -110,8 +110,10 @@ const WorkspaceReports = () => {
         "ConversationTranslationEditing",
         "AcousticNormalisedTranscriptionEditing",
         "AllAudioProjects",
+        "OCRTranscription",
+        "OCRTranscriptionEditing",
       ]);
-      setSelectedType("AudioTranscription");
+      setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -124,56 +126,26 @@ const WorkspaceReports = () => {
   }, [ProjectTypes, radioButton]);
 
   useEffect(() => {
-    if (reportRequested && UserReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(UserReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(UserReports);
-      setSelectedColumns(tempSelected);
-    } else {
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
+    if (reportRequested) {
+      setSnackbarInfo({
+        open: true,
+        message: UserReports.message,
+        variant: "success",
+      })
     }
+    setReportRequested(false);
     setShowSpinner(false);
   }, [UserReports]);
 
   useEffect(() => {
-    if (reportRequested && ProjectReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(ProjectReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(ProjectReports);
-      setSelectedColumns(tempSelected);
-    } else {
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
+    if (reportRequested) {
+      setSnackbarInfo({
+        open: true,
+        message: ProjectReports.message,
+        variant: "success",
+      })
     }
+    setReportRequested(false);
     setShowSpinner(false);
   }, [ProjectReports]);
 
@@ -239,9 +211,10 @@ const WorkspaceReports = () => {
       })
     }
     else {
+      setReportRequested(true);
+      setShowSpinner(true);
       setShowPicker(false);
       if (radioButton === "user") {
-        setReportRequested(true);
         const userReportObj = new GetWorkspaceUserReportsAPI(
           id,
           selectedType,
@@ -252,10 +225,8 @@ const WorkspaceReports = () => {
           reportfilter,
         );
         dispatch(APITransport(userReportObj));
-        setShowSpinner(true);
       } else if (radioButton === "project") {
         if(projectReportType === 1){
-        setReportRequested(true);
         const projectReportObj = new GetWorkspaceProjectReportAPI(
           id,
           selectedType,
@@ -264,7 +235,6 @@ const WorkspaceReports = () => {
           projectType === "AnnotatationReports" ? "annotation" : projectType === "ReviewerReports" ? "review" : "supercheck",
         );
         dispatch(APITransport(projectReportObj));
-        setShowSpinner(true);
         }else if(projectReportType === 2){
           const projectReportObj = new GetWorkspaceDetailedProjectReportsAPI(
             Number(id),
@@ -273,11 +243,6 @@ const WorkspaceReports = () => {
             statisticsType
           );
           dispatch(APITransport(projectReportObj));
-          setSnackbarInfo({
-            open: true,
-            message: "Detailed Project Reports will be e-mailed to you shortly",
-            variant: "success",
-          })
         }
       }
     }
@@ -553,7 +518,7 @@ const WorkspaceReports = () => {
           />
         </Card>
       </Box>}
-      {showSpinner ? <div></div> : reportRequested && (
+      {/* {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={ProjectReports.length > 0 ? "Reports" : ""}
@@ -562,7 +527,7 @@ const WorkspaceReports = () => {
             options={options}
           />
         </ThemeProvider>)
-      }
+      } */}
       {/* <Grid
           container
           justifyContent="center"
