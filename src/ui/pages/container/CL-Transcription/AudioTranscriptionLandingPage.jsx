@@ -109,6 +109,7 @@ const AudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [autoSave, setAutoSave] = useState(true);
+  const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
   // useEffect(() => {
   //   let intervalId;
@@ -293,57 +294,63 @@ const AudioTranscriptionLandingPage = () => {
   const [lastInteraction, setLastInteraction] = useState(Date.now());
   const inactivityThreshold = 120000; 
 
-  useEffect(() => {
+  const handleAutosave = async () => {
+    setAutoSaveTrigger(false);
     if(!autoSave) return;
-    const handleAutosave = async () => {
-      const reqBody = {
-        task_id: taskId,
-        annotation_status: annotations[0]?.annotation_status,
-        auto_save: true,
-        lead_time:
-          (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
-        result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      };
-      if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
-        try{
-          const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
-          const res = await fetch(obj.apiEndPoint(), {
-            method: "PATCH",
-            body: JSON.stringify(obj.getBody()),
-            headers: obj.getHeaders().headers,
-          });
-          if (!res.ok) {
-            setSnackbarInfo({
-              open: true,
-              message: "Error in autosaving annotation",
-              variant: "error",
-            });
-          }
-          return res;
-        }
-        catch(err) {
+    const reqBody = {
+      task_id: taskId,
+      auto_save: true,
+      lead_time:
+        (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+    };
+    if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+      try{
+        const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        if (!res.ok) {
           setSnackbarInfo({
             open: true,
-            message: "Error in autosaving "+err,
+            message: "Error in autosaving annotation",
             variant: "error",
           });
         }
+        return res;
       }
-    };
+      catch(err) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving "+err,
+          variant: "error",
+        });
+      }
+    }
+  };
+  
+  useEffect(() => {
+    autoSaveTrigger && handleAutosave();
+  }, [autoSaveTrigger, autoSave, handleAutosave, user, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings]);
+  
+  useEffect(() => {
+    if(!autoSave) return;
 
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
     };
 
-    saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+    saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
     );
 
     const handleBeforeUnload = (event) => {
-      handleAutosave();
+      setAutoSaveTrigger(true);
       handleUpdateTimeSpent(ref.current);
       event.preventDefault();
       event.returnValue = "";
@@ -376,13 +383,13 @@ const AudioTranscriptionLandingPage = () => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
-        saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+        saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
         timeSpentIntervalRef.current = setInterval(
           handleUpdateTimeSpent,
           60 * 1000
         );
       } else {
-        handleAutosave();
+        setAutoSaveTrigger(true);
         handleUpdateTimeSpent(ref.current);
         // Tab is inactive, clear the autosave interval
         clearInterval(saveIntervalRef.current);
@@ -390,8 +397,7 @@ const AudioTranscriptionLandingPage = () => {
         ref.current = 0;
       }
   };
-  
-  
+
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -406,7 +412,7 @@ const AudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [autoSave, user, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings, disableUpdateButton, isActive]);
+  }, [autoSave, user, taskId, annotations, taskDetails, isActive]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -581,6 +587,7 @@ const AudioTranscriptionLandingPage = () => {
     lead_time,
   ) => {
     setLoading(true);
+    setAutoSave(false);
     const PatchAPIdata = {
       annotation_status: value,
       annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
@@ -598,7 +605,6 @@ const AudioTranscriptionLandingPage = () => {
       });
       const resp = await res.json();
       if (res.ok) {
-        setAutoSave(false);
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
@@ -608,6 +614,7 @@ const AudioTranscriptionLandingPage = () => {
           variant: "success",
         });
       } else {
+        setAutoSave(true);
         setSnackbarInfo({
           open: true,
           message: resp?.message,
@@ -615,6 +622,7 @@ const AudioTranscriptionLandingPage = () => {
         });
       }
     } else {
+      setAutoSave(true);
       if (textBox) {
         setSnackbarInfo({
           open: true,

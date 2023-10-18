@@ -23,7 +23,7 @@ const ScheduleMails = () => {
   const { id } = useParams();
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
   const [reportLevel, setReportLevel] = useState(1);
-  const [selectedProjectType, setSelectedProjectType] = useState("AudioTranscription + Editing");
+  const [selectedProjectType, setSelectedProjectType] = useState("AllAudioProjects");
   const [projectTypes, setProjectTypes] = useState([
     "AudioSegmentation",
     "AudioTranscription",
@@ -31,7 +31,9 @@ const ScheduleMails = () => {
     "ConversationTranslation",
     "ConversationTranslationEditing",
     "AcousticNormalisedTranscriptionEditing",
-    "AllAudioProjects"
+    "AllAudioProjects",
+    "OCRTranscription",
+    "OCRTranscriptionEditing",
   ]);
   const [schedule, setSchedule] = useState("Daily");
   const [scheduleDay, setScheduleDay] = useState(1);

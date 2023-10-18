@@ -120,8 +120,10 @@ const OrganizationReports = () => {
         "ConversationTranslationEditing",
         "AcousticNormalisedTranscriptionEditing",
         "AllAudioProjects",
+        "OCRTranscription",
+        "OCRTranscriptionEditing",
       ]);
-      setSelectedType("AudioTranscription");
+      setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -134,31 +136,55 @@ const OrganizationReports = () => {
   }, [ProjectTypes, radiobutton]);
 
   useEffect(() => {
-    if (reportRequested && UserReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(UserReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(UserReports);
-      setSelectedColumns(tempSelected);
-    } else {
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
+    if (reportRequested) {
+      setSnackbarInfo({
+        open: true,
+        message: UserReports.message,
+        variant: "success",
+      })
     }
+    setReportRequested(false);
     setShowSpinner(false);
   }, [UserReports]);
+
+  useEffect(() => {
+    if (reportRequested) {
+      setSnackbarInfo({
+        open: true,
+        message: ProjectReports.message,
+        variant: "success",
+      })
+    }
+    setReportRequested(false);
+    setShowSpinner(false);
+  }, [ProjectReports]);
+
+  // useEffect(() => {
+  //   if (reportRequested && UserReports?.length) {
+  //     let tempColumns = [];
+  //     let tempSelected = [];
+  //     Object.keys(UserReports[0]).forEach((key) => {
+  //       tempColumns.push({
+  //         name: key,
+  //         label: key,
+  //         options: {
+  //           filter: false,
+  //           sort: true,
+  //           align: "center",
+  //         },
+  //       });
+  //       tempSelected.push(key);
+  //     });
+  //     setColumns(tempColumns);
+  //     setReportData(UserReports);
+  //     setSelectedColumns(tempSelected);
+  //   } else {
+  //     setColumns([]);
+  //     setReportData([]);
+  //     setSelectedColumns([]);
+  //   }
+  //   setShowSpinner(false);
+  // }, [UserReports]);
 
   // useEffect(() => {
   //   if (reportRequested && ProjectReports?.length) {
@@ -272,16 +298,15 @@ const OrganizationReports = () => {
       setReportRequested(true);
       setShowSpinner(true);
       setShowPicker(false);
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
+      // setColumns([]);
+      // setReportData([]);
+      // setSelectedColumns([]);
       if (radiobutton === "UsersReports" && reportTypes === "Annotator" && reportfilter == "") {
         setSnackbarInfo({
           open: true,
           message: "Please fill Report Filter",
           variant: "error",
         })
-
       }
       let ReviewData = []
 
@@ -305,12 +330,6 @@ const OrganizationReports = () => {
 
         );
         dispatch(APITransport(userReportObj));
-        setSnackbarInfo({
-          open: true,
-          message: "User Reports will be e-mailed to you shortly",
-          variant: "success",
-        })
-
       } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" && radiobutton === "UsersReports")) {
         const supercheckObj = new GetOrganizationUserReportsAPI(
           orgId,
@@ -321,12 +340,6 @@ const OrganizationReports = () => {
           targetLanguage,
         );
         dispatch(APITransport(supercheckObj));
-        setSnackbarInfo({
-          open: true,
-          message: "User Reports will be e-mailed to you shortly",
-          variant: "success",
-        })
-
       }
       else if (radiobutton === "ProjectReports") {
         if(projectReportType === 1){
@@ -337,11 +350,6 @@ const OrganizationReports = () => {
           userId,
         );
         dispatch(APITransport(projectReportObj));
-        setSnackbarInfo({
-          open: true,
-          message: "High-Level Project Reports will be e-mailed to you shortly",
-          variant: "success",
-        })
       }else if(projectReportType === 2){
         const projectReportObj = new GetOrganizationDetailedProjectReportsAPI(
           Number(orgId),
@@ -350,11 +358,6 @@ const OrganizationReports = () => {
           statisticsType
         );
         dispatch(APITransport(projectReportObj));
-        setSnackbarInfo({
-          open: true,
-          message: "Detailed Project Reports will be e-mailed to you shortly",
-          variant: "success",
-        })
       }
     }
     }
