@@ -137,7 +137,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
-  const filterAnnotations = (annotations, user, taskData) => {
+  const filterAnnotations = (annotations, user) => {
     let disableSkip = false;
     let disableAutoSave = false;
     let filteredAnnotations = annotations;
@@ -148,15 +148,12 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     });
     if (userAnnotation) {
       if (userAnnotation.annotation_status === "unvalidated") {
-        filteredAnnotations =
-          userAnnotation.result.length > 0 &&
-          !taskData?.revision_loop_count?.super_check_count
-            ? [userAnnotation]
-            : annotations.filter(
-                (annotation) =>
-                  annotation.id === userAnnotation.parent_annotation &&
-                  annotation.annotation_type === 2
-              );
+        filteredAnnotations = userAnnotation.result.length > 0 ?
+          [userAnnotation] : annotations.filter(
+            (annotation) =>
+              annotation.id === userAnnotation.parent_annotation &&
+              annotation.annotation_type === 2
+          );
       } else if (
         ["validated", "validated_with_changes", "draft"].includes(
           userAnnotation.annotation_status
@@ -170,6 +167,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         filteredAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
         );
+        if(filteredAnnotations[0].annotation_status === "rejected")
+          setAutoSave(false);
       }
     } else if ([4, 5, 6].includes(user.role)) {
       filteredAnnotations = annotations.filter((a) => a.annotation_type === 3);
@@ -181,8 +180,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    filterAnnotations(AnnotationsTaskDetails, userData, taskDetailList);
-  }, [AnnotationsTaskDetails, userData, taskDetailList]);
+    filterAnnotations(AnnotationsTaskDetails, userData);
+  }, [AnnotationsTaskDetails, userData]);
   //console.log(disableSkip);
 
   const handleCollapseClick = () => {
@@ -231,6 +230,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [lastInteraction, setLastInteraction] = useState(Date.now());
   const inactivityThreshold = 120000; 
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
     if(!autoSave) return;
@@ -546,10 +546,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
     const L1Check = !textBox && !speakerBox && result?.length > 0;
     if (
-      ["draft", "skipped"].includes(value) ||
-      (["rejected"].includes(value) && L1Check) ||
+      ["draft", "skipped", "rejected"].includes(value) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
+      if(value === "rejected") PatchAPIdata["result"] = [];
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
