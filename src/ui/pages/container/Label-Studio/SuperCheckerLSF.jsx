@@ -104,9 +104,12 @@ const filterAnnotations = (annotations, user, taskData) => {
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unvalidated") {
-      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.super_check_count
-        ? [userAnnotation]
-        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 2);
+      filteredAnnotations = userAnnotation.result.length > 0 ?
+        [userAnnotation] : annotations.filter(
+          (annotation) =>
+            annotation.id === userAnnotation.parent_annotation &&
+            annotation.annotation_type === 2
+        );
     } else if (
       ["validated", "validated_with_changes", "draft"].includes(
         userAnnotation.annotation_status
@@ -120,6 +123,7 @@ const filterAnnotations = (annotations, user, taskData) => {
       filteredAnnotations = annotations.filter(
         (value) => value.annotation_type === 2
       );
+      disableAutoSave = filteredAnnotations[0].annotation_status === "rejected";
     }
   } else if ([4, 5, 6].includes(user.role)) {
     filteredAnnotations = annotations.filter((a) => a.annotation_type === 3);
@@ -244,7 +248,7 @@ const LabelStudioWrapper = ({
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableSkip, disableAutoSave] = filterAnnotations(annotations, userData, taskData);
+    const [filteredAnnotations, disableSkip, disableAutoSave] = filterAnnotations(annotations, userData);
     if (disableSkip || disableAutoSave) setAutoSave(false);
 
     if (taskData.task_status === "freezed") {
@@ -401,7 +405,8 @@ const LabelStudioWrapper = ({
           if (taskData.annotation_status !== "freezed") {
             setAutoSave(false);
             showLoader();
-            let temp = annotation.serializeAnnotation();
+            let temp = review_status.current === "rejected"
+              ? [] : annotation.serializeAnnotation();
 
             for (let i = 0; i < temp.length; i++) {
               if (temp[i].value.text) {
