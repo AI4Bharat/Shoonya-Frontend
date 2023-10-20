@@ -79,6 +79,7 @@ const OrganizationReports = () => {
   const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
+  const [emailRequested, setEmailRequested] = useState(false);
   const [reportTypes, setReportTypes] = useState("Annotator");
   const [radiobutton, setRadiobutton] = useState("ProjectReports");
   const [reportfilter, setReportfilter] = useState(["All Stage"]);
@@ -136,82 +137,74 @@ const OrganizationReports = () => {
   }, [ProjectTypes, radiobutton]);
 
   useEffect(() => {
-    if (reportRequested) {
-      setSnackbarInfo({
-        open: true,
-        message: UserReports.message,
-        variant: "success",
-      })
+    if (reportRequested && UserReports?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(UserReports[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+      setReportData(UserReports);
+      setSelectedColumns(tempSelected);
+    } else {
+      if(emailRequested){
+          setSnackbarInfo({
+            open: true,
+            message: UserReports.message,
+            variant: "success",
+          })
+          setEmailRequested(false);
+        }
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
     }
-    setReportRequested(false);
     setShowSpinner(false);
   }, [UserReports]);
 
   useEffect(() => {
-    if (reportRequested) {
-      setSnackbarInfo({
-        open: true,
-        message: ProjectReports.message,
-        variant: "success",
-      })
+    if (reportRequested && ProjectReports?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(ProjectReports[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+      setReportData(ProjectReports);
+      setSelectedColumns(tempSelected);
+    } else {
+      if(emailRequested){
+        setSnackbarInfo({
+          open: true,
+          message: ProjectReports.message,
+          variant: "success",
+        })
+        setEmailRequested(false);
+      }
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
     }
-    setReportRequested(false);
     setShowSpinner(false);
   }, [ProjectReports]);
-
-  // useEffect(() => {
-  //   if (reportRequested && UserReports?.length) {
-  //     let tempColumns = [];
-  //     let tempSelected = [];
-  //     Object.keys(UserReports[0]).forEach((key) => {
-  //       tempColumns.push({
-  //         name: key,
-  //         label: key,
-  //         options: {
-  //           filter: false,
-  //           sort: true,
-  //           align: "center",
-  //         },
-  //       });
-  //       tempSelected.push(key);
-  //     });
-  //     setColumns(tempColumns);
-  //     setReportData(UserReports);
-  //     setSelectedColumns(tempSelected);
-  //   } else {
-  //     setColumns([]);
-  //     setReportData([]);
-  //     setSelectedColumns([]);
-  //   }
-  //   setShowSpinner(false);
-  // }, [UserReports]);
-
-  // useEffect(() => {
-  //   if (reportRequested && ProjectReports?.length) {
-  //     let tempColumns = [];
-  //     let tempSelected = [];
-  //     Object.keys(ProjectReports[0]).forEach((key) => {
-  //       tempColumns.push({
-  //         name: key,
-  //         label: key,
-  //         options: {
-  //           filter: false,
-  //           sort: true,
-  //           align: "center",
-  //         },
-  //       });
-  //       tempSelected.push(key);
-  //     });
-  //     setColumns(tempColumns);
-  //     setReportData(ProjectReports);
-  //     setSelectedColumns(tempSelected);
-  //   } else {
-  //     setColumns([]);
-  //     setReportData([]);
-  //     setSelectedColumns([]);
-  //   }
-  //   setShowSpinner(false);
-  // }, [ProjectReports]);
 
   // useEffect(() => {
   //   if (reportRequested && SuperCheck?.length) {
@@ -277,7 +270,7 @@ const OrganizationReports = () => {
 
   const userId = useSelector((state) => state.fetchLoggedInUserData.data.id);
 
-  const handleSubmit = () => {
+  const handleSubmit = (sendMail) => {
     if (radiobutton === "PaymentReports") {
       const userReportObj = new SendOrganizationUserReports(
         orgId,
@@ -295,12 +288,17 @@ const OrganizationReports = () => {
       })
     }
     else {
-      setReportRequested(true);
+      if(sendMail){
+        setReportRequested(false);
+        setEmailRequested(true);
+      }else{
+        setReportRequested(true);
+      }
       setShowSpinner(true);
       setShowPicker(false);
-      // setColumns([]);
-      // setReportData([]);
-      // setSelectedColumns([]);
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
       if (radiobutton === "UsersReports" && reportTypes === "Annotator" && reportfilter == "") {
         setSnackbarInfo({
           open: true,
@@ -326,6 +324,7 @@ const OrganizationReports = () => {
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           reportTypes === "Annotator" ? "annotation" : reportTypes === "Reviewer" ? "review" : "supercheck",
           targetLanguage,
+          sendMail,
           ...ReviewData,
 
         );
@@ -338,6 +337,7 @@ const OrganizationReports = () => {
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           "supercheck",
           targetLanguage,
+          sendMail,
         );
         dispatch(APITransport(supercheckObj));
       }
@@ -348,6 +348,7 @@ const OrganizationReports = () => {
           selectedType,
           targetLanguage,
           userId,
+          sendMail
         );
         dispatch(APITransport(projectReportObj));
       }else if(projectReportType === 2){
@@ -597,11 +598,21 @@ const OrganizationReports = () => {
           </Grid>
         }
 
-        <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+        {radiobutton!=="PaymentReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             variant="contained"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit(false)}
+            sx={{ width: "130px" }}
+          >
+            Submit
+          </Button>
+        </Grid>}
+      <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => handleSubmit(true)}
             sx={{ width: "130px" }}
           >
             E-mail CSV
@@ -639,7 +650,7 @@ const OrganizationReports = () => {
           />
         </Card>
       </Box>}
-      {/* {showSpinner ? <div></div> : reportRequested && (
+      {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={ProjectReports.length > 0 ? "Reports" : ""}
@@ -648,7 +659,7 @@ const OrganizationReports = () => {
             options={options}
           />
         </ThemeProvider>)
-      } */}
+      }
       {/*<Grid
           container
           justifyContent="center"

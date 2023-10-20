@@ -6,11 +6,12 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class GetOrganizationProjectReportsAPI extends API {
-  constructor(orgId, projectType, targetLanguage, userId, sortByColumn, descOrder, timeout = 2000) {
+  constructor(orgId, projectType, targetLanguage, userId, sendMail, sortByColumn, descOrder, timeout = 2000) {
     super("POST", timeout, false);
     this.projectType = projectType;
     this.targetLanguage = targetLanguage === "all" ? undefined : targetLanguage;
     this.userId = userId;
+    this.sendMail = sendMail;
     this.sortByColumn = sortByColumn ?? undefined;
     this.descOrder = descOrder ?? undefined;
     this.type = constants.GET_ORGANIZATION_PROJECT_REPORTS;
@@ -35,6 +36,7 @@ export default class GetOrganizationProjectReportsAPI extends API {
       sort_by_column_name: this.sortByColumn,
       descending_order: this.descOrder,
       user_id: this.userId,
+      send_mail: this.sendMail,
     };
   }
 
