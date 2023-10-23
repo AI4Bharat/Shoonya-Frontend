@@ -827,7 +827,19 @@ const TranscriptionRightPanel = ({
                             changeTranscriptHandler(event, index + idxOffset, false);
                           }}
                           enabled={enableTransliterationSuggestion}
-                          onChangeText={() => { }}
+                          // onChangeText={() => { }}
+                          onChangeText={(val) => {
+                            setText(val)
+                            setDebouncedText(val);
+                            debouncedTextRef.current=val
+                            if(!debouncedTextRef.current.toString().includes(debouncedText)){
+                              setprev(true)
+                            }
+                            else{
+                              setprev(false)
+                            }
+                            console.log("nnn",text,debouncedText,debouncedTextRef.current);
+                          }}
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                           containerStyles={{ width: "100%", height: "100%" }}
                           onBlur={() => {
