@@ -182,6 +182,7 @@ const LabelStudioWrapper = ({
   const [selectedUserId, setSelectedUserId] = useState(-2);
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButtons, setDisableButtons] = useState(false);
+  const [projectType, setProjectType] = useState("");
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   /* useEffect(() => {

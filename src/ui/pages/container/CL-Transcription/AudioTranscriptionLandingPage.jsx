@@ -502,7 +502,7 @@ const AudioTranscriptionLandingPage = () => {
       setFilterMessage("");
       setDisableBtns(false);
       setdisableSkipButton(false);
-      setdisableUpdateButton(false);
+      setDisableUpdateButton(false);
       filterAnnotations(AnnotationsTaskDetails, user);
       return;
     }
@@ -510,7 +510,7 @@ const AudioTranscriptionLandingPage = () => {
     if(userAnnotations.length) {
       setDisableBtns(true);
       setdisableSkipButton(true);
-      setdisableUpdateButton(true);
+      setDisableUpdateButton(true);
       if(userAnnotations[0].annotation_type === 1) {
         setFilterMessage("This is the Annotator's Annotation in read only mode");
       }
