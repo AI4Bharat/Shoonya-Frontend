@@ -53,7 +53,7 @@ console.log(isSpaceClicked);
     console.log("nnn","useEffect is running",prev);
     const processConsoleLog = (args) => {
       const msg = JSON.stringify(args);
-      if (msg.includes('library data')) {
+      if (msg.includes('utils library data')) {
         const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
         setflag(dataMatch.result)
         return dataMatch.result;

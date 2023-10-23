@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useRef, memo } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { parse, stringify } from 'flatted';
 import { Resizable } from 're-resizable';
 import {
   addSubtitleBox,
@@ -41,6 +42,13 @@ import {
   Pagination,
   Typography
 } from "@mui/material";
+import {
+  processConsoleLog,
+  logToConsoleWithProcessing,
+  handleSpaceKeyPressed,
+  json,
+} from "../../../../utils/transliteration";
+
 // import {
 //   ConfirmDialog,
 //   CustomizedSnackbars,
@@ -100,6 +108,18 @@ const TranscriptionRightPanel = ({
   const [targetlang, settargetlang] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+
+  const [text, setText] = useState("");
+  const [selectedLang, setSelectedLang] = useState("");
+  const [prev, setprev] = useState(false);
+  const keystrokesRef = useRef([]);
+  const suggestionRef = useRef([null]);
+  const newKeystrokesRef = useRef();
+  const [flag, setflag] = useState();
+  const [debouncedText, setDebouncedText] = useState("");
+  const debouncedTextRef = useRef("");
+  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
+
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -532,6 +552,71 @@ const TranscriptionRightPanel = ({
     return () => clearTimeout(timer);
   }, []);
 
+ 
+
+  useEffect(() => {
+    console.log("nnn","useEffect is running",prev);
+    const processConsoleLog = (args) => {
+      const msg = stringify(args);
+      try {
+        if (msg.includes('utils library data')) {
+          const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+          setflag(dataMatch.result);
+          return dataMatch.result;
+        }
+      } catch (error) {
+        console.error("Error processing log data:", error);
+      }
+      return null;
+    };
+    const originalConsoleLog = console.log;
+    console.log = (...args) => {
+      const newSuggestions = processConsoleLog(args);
+      if (newSuggestions!=null) {
+        suggestionRef.current  = prev==true?flag:newSuggestions
+      }
+      originalConsoleLog(...args);
+    };
+    
+    return () => {
+      console.log = originalConsoleLog;
+    };
+  }, [debouncedTextRef.current,prev]);
+  
+
+  useEffect(() => { 
+    if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
+      console.log("nnn",suggestionRef.current);
+      console.log("nnn",debouncedTextRef.current,text);
+      const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
+
+        const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
+
+        const newKeystroke = {
+          keystrokes: debouncedTextRef.current,
+          results: suggestionRef.current,
+          opted:optedWord,
+          created_at: new Date().toISOString(),
+        };
+        newKeystrokesRef.current = newKeystroke
+        if (
+          keystrokesRef.current.length > 0 &&
+          keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
+        ) {
+          keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
+        } else {
+          keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
+        }
+        console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+        const finalJson = {
+          word: debouncedTextRef.current,
+          steps: keystrokesRef.current,
+          language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
+        };
+        localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+    }
+  }, [suggestionRef.current,prev]);
+
   return (
     <>
       {" "}
@@ -807,7 +892,19 @@ const TranscriptionRightPanel = ({
                               changeTranscriptHandler(event, index + idxOffset, true);
                             }}
                             enabled={enableTransliterationSuggestion}
-                            onChangeText={() => { }}
+                            // onChangeText={() => { }}
+                            onChangeText={(val) => {
+                              setText(val)
+                              setDebouncedText(val);
+                              debouncedTextRef.current=val
+                              if(!debouncedTextRef.current.toString().includes(debouncedText)){
+                                setprev(true)
+                              }
+                              else{
+                                setprev(false)
+                              }
+                              console.log("nnn",text,debouncedText,debouncedTextRef.current);
+                            }}
                             containerStyles={{ width: "100%", height: "100%" }}
                             style={{ fontSize: fontSize, height: "100%" }}
                             renderComponent={(props) => {
