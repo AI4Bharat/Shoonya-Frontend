@@ -32,17 +32,14 @@ import React, {
   
   //APIs
   import C from "../../../../redux/constants";
-  import APITransport from "../../../../redux/actions/apitransport/apitransport";
   import {
     setSubtitles,
   } from "../../../../redux/actions/Common";
-  import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
-  import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
 
   
   function magnetically(time, closeTime) {
     if (!closeTime) return time;
-    if (time > closeTime - 0.1 && closeTime + 0.1 > time) {
+    if (time > closeTime - 0.02 && closeTime + 0.02 > time) {
       return closeTime;
     }
     return time;
@@ -56,6 +53,7 @@ import React, {
   let lastWidth = 0;
   let lastDiffX = 0;
   let isDroging = false;
+  let playUntil = 0;
   
   export default memo(
     function ({ render, currentTime, duration }) {
@@ -371,6 +369,33 @@ import React, {
       const attributes = {
         className: classes.contextMenu,
       };
+
+      const handleDoubleClick = (sub) => {
+        if (!player) return;
+        playUntil = sub.endTime;
+        player.currentTime = sub.startTime;
+        player.play();
+        player.addEventListener("timeupdate", onTimeUpdate);
+        player.addEventListener("pause", onPause);
+        return () => {
+          player.removeEventListener("timeupdate", onTimeUpdate);
+          player.removeEventListener("pause", onPause);
+        };
+      };
+
+      const onTimeUpdate = () => {
+        if(playUntil && player.currentTime >= playUntil) {
+          playUntil = 0;
+          player.pause();
+          player.removeEventListener("timeupdate", onTimeUpdate);
+          player.removeEventListener("pause", onPause);
+        }
+      };
+      const onPause = () => {
+        playUntil = 0;
+        player.removeEventListener("timeupdate", onTimeUpdate);
+        player.removeEventListener("pause", onPause);
+      };
   
       const renderSnackBar = () => {
         return (
@@ -403,6 +428,7 @@ import React, {
                       (sub.startTime - render.beginTime) * gridGap * 10,
                     width: (sub.endTime - sub.startTime) * gridGap * 10,
                   }}
+                  onDoubleClick={() => handleDoubleClick(sub)}
                 >
                   
                   <ContextMenuTrigger
@@ -417,17 +443,6 @@ import React, {
                       style={{
                         left: 0,
                         width: 10,
-                      }}
-                      onDoubleClick={() => {
-                        if (player) {
-                          player.play();
-                          if (player.duration >= sub.startTime) {
-                            player.currentTime = sub.startTime;
-                            setTimeout(() => {
-                              player.pause();
-                            }, (sub.endTime - sub.startTime) * 1000);
-                          }
-                        }
                       }}
                       onMouseDown={(event) => onMouseDown(sub, event, "left")}
                     ></div>
@@ -448,24 +463,6 @@ import React, {
                         : "0.5px solid rgb(0, 0, 0, 1)",
                       }
                     }
-                      onDoubleClick={() => {
-                        if (player) {
-                          player.play();
-                          if (player.duration >= sub.startTime) {
-                            player.currentTime = sub.startTime;
-                            setTimeout(() => {
-                              player.pause();
-                            }, (sub.endTime - sub.startTime) * 1000);
-                            // const timeUpdateListener = () => {
-                            //   if (player.currentTime >= sub.endTime) {
-                            //     player.pause();
-                            //     player.removeEventListener('timeupdate', timeUpdateListener);
-                            //   }
-                            // };
-                            // player.addEventListener('timeupdate', timeUpdateListener);
-                          }
-                        }
-                      }}
                       onMouseDown={(event) => onMouseDown(sub, event)}
                     >
                       <p className={classes.subTextP}>
@@ -479,17 +476,6 @@ import React, {
                       style={{
                         right: 0,
                         width: 10,
-                      }}
-                      onDoubleClick={() => {
-                        if (player) {
-                          player.play();
-                          if (player.duration >= sub.startTime) {
-                            player.currentTime = sub.startTime;
-                            setTimeout(() => {
-                              player.pause();
-                            }, (sub.endTime - sub.startTime) * 1000);
-                          }
-                        }
                       }}
                       onMouseDown={(event) => onMouseDown(sub, event, "right")}
                     ></div>

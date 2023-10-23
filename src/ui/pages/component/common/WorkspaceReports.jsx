@@ -33,6 +33,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { MenuProps } from "../../../../utils/utils";
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import GetWorkspaceDetailedProjectReportsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetailedProjectReports";
 
 const ProgressType = [{ name: "Annotation Stage", value: 1 }, { name: "Review Stage", value: 2 }, { name: "Super Check Stage", value: 3 }, { name: "All Stage", value: "AllStage" }]
 
@@ -57,15 +58,18 @@ const WorkspaceReports = () => {
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [participationTypes, setParticipationTypes] = useState([1, 2, 4]);
-  const [reportType, setReportType] = useState("project");
+  const [radioButton, setRadioButton] = useState("project");
   const [language, setLanguage] = useState("all");
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportData, setReportData] = useState([]);
   const [reportRequested, setReportRequested] = useState(false);
-  const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
+  const [emailRequested, setEmailRequested] = useState(false);
+  const [projectType, setProjectType] = useState("AnnotatationReports");
   const [reportfilter, setReportfilter] = useState("AllStage");
+  const [projectReportType, setProjectReportType] = useState(1);
+  const [statisticsType, setStatisticsType] = useState(1);
 
   const classes = DatasetStyle();
   const [snackbar, setSnackbarInfo] = useState({
@@ -88,7 +92,7 @@ const WorkspaceReports = () => {
 
   let ProgressTypeValue = "Annotation Stage"
   const filterdata = ProgressType.filter(item => item.name !== ProgressTypeValue)
-  const FilterProgressType = radiobutton === "ReviewerReports" ? filterdata : ProgressType
+  const FilterProgressType = projectType === "ReviewerReports" ? filterdata : ProgressType
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -98,7 +102,7 @@ const WorkspaceReports = () => {
   }, []);
 
   useEffect(() => {
-    if (reportType === "payment") {
+    if (radioButton === "payment") {
       setProjectTypes([
         "AudioSegmentation",
         "AudioTranscription",
@@ -107,8 +111,10 @@ const WorkspaceReports = () => {
         "ConversationTranslationEditing",
         "AcousticNormalisedTranscriptionEditing",
         "AllAudioProjects",
+        "OCRTranscription",
+        "OCRTranscriptionEditing",
       ]);
-      setSelectedType("AudioTranscription");
+      setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -118,7 +124,7 @@ const WorkspaceReports = () => {
       setProjectTypes(types);
       setSelectedType(types[3]);
     }
-  }, [ProjectTypes, reportType]);
+  }, [ProjectTypes, radioButton]);
 
   useEffect(() => {
     if (reportRequested && UserReports?.length) {
@@ -140,6 +146,14 @@ const WorkspaceReports = () => {
       setReportData(UserReports);
       setSelectedColumns(tempSelected);
     } else {
+      if(emailRequested){
+        setSnackbarInfo({
+          open: true,
+          message: UserReports.message,
+          variant: "success",
+        })
+        setEmailRequested(false);
+      }
       setColumns([]);
       setReportData([]);
       setSelectedColumns([]);
@@ -167,6 +181,14 @@ const WorkspaceReports = () => {
       setReportData(ProjectReports);
       setSelectedColumns(tempSelected);
     } else {
+      if(emailRequested){
+        setSnackbarInfo({
+          open: true,
+          message: ProjectReports.message,
+          variant: "success",
+        })
+        setEmailRequested(false);
+      }
       setColumns([]);
       setReportData([]);
       setSelectedColumns([]);
@@ -207,8 +229,10 @@ const WorkspaceReports = () => {
     },
   };
 
+  const userId = useSelector((state) => state.fetchLoggedInUserData.data.id);
+
   const handleChangeReports = (e) => {
-    setRadiobutton(e.target.value)
+    setRadioButton(e.target.value)
   }
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
@@ -216,8 +240,8 @@ const WorkspaceReports = () => {
     setSelectRange([selection]);
     console.log(selection, "selection");
   };
-  const handleDateSubmit = () => {
-    if (reportType === "payment") {
+  const handleDateSubmit = (sendMail) => {
+    if (radioButton === "payment") {
       const userReportObj = new SendWorkspaceUserReportsAPI(
         id,
         UserDetails.id,
@@ -234,30 +258,46 @@ const WorkspaceReports = () => {
       })
     }
     else {
+      if(sendMail){
+        setReportRequested(false);
+        setEmailRequested(true);
+      }else{
+        setReportRequested(true);
+      }
+      setShowSpinner(true);
       setShowPicker(false);
-      setReportRequested(true);
-      if (reportType === "user") {
+      if (radioButton === "user") {
         const userReportObj = new GetWorkspaceUserReportsAPI(
           id,
           selectedType,
           format(selectRange[0].startDate, 'yyyy-MM-dd'),
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           language,
-          radiobutton === "AnnotatationReports" ? "annotation" : radiobutton === "ReviewerReports" ? "review" : "supercheck",
+          sendMail,
+          projectType === "AnnotatationReports" ? "annotation" : projectType === "ReviewerReports" ? "review" : "supercheck",
           reportfilter,
         );
         dispatch(APITransport(userReportObj));
-        setShowSpinner(true);
-      } else if (reportType === "project") {
+      } else if (radioButton === "project") {
+        if(projectReportType === 1){
         const projectReportObj = new GetWorkspaceProjectReportAPI(
           id,
           selectedType,
 
           language,
-          radiobutton === "AnnotatationReports" ? "annotation" : radiobutton === "ReviewerReports" ? "review" : "supercheck",
+          sendMail,
+          projectType === "AnnotatationReports" ? "annotation" : projectType === "ReviewerReports" ? "review" : "supercheck",
         );
         dispatch(APITransport(projectReportObj));
-        setShowSpinner(true);
+        }else if(projectReportType === 2){
+          const projectReportObj = new GetWorkspaceDetailedProjectReportsAPI(
+            Number(id),
+            selectedType,
+            userId,
+            statisticsType
+          );
+          dispatch(APITransport(projectReportObj));
+        }
       }
     }
   };
@@ -305,26 +345,44 @@ const WorkspaceReports = () => {
             </Typography>
           </Grid >
           <Grid item xs={12} sm={12} md={5} lg={5} xl={5}  >
-            <FormControl disabled={reportType === "payment"}>
+            <FormControl>
 
               <RadioGroup
                 row
                 aria-labelledby="demo-row-radio-buttons-group-label"
                 name="row-radio-buttons-group"
                 sx={{ marginTop: "5px" }}
-                value={radiobutton}
+                value={radioButton}
                 onChange={handleChangeReports}
 
               >
-                <FormControlLabel value="AnnotatationReports" control={<Radio />} label="Annotator" />
-                <FormControlLabel value="ReviewerReports" control={<Radio />} label="Reviewer" />
-                <FormControlLabel value="SuperCheckerReports" control={<Radio />} label="Super Checker" />
-
+                <FormControlLabel value="user" control={<Radio />} label="Users Reports" />
+                <FormControlLabel value="project" control={<Radio />} label="Project Reports" />
+                <FormControlLabel value="payment" control={<Radio />} label="Payment Reports" />
               </RadioGroup>
             </FormControl>
           </Grid >
         </Grid >
-        <Grid
+        {radioButton === "project" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="project-report-type-label" sx={{ fontSize: "16px" }}>Type</InputLabel>
+            <Select
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
+              labelId="project-report-type-type-label"
+              id="project-report-type-select"
+              value={projectReportType}
+              label="Project Report Type"
+              onChange={(e) => setProjectReportType(e.target.value)}
+            >
+              <MenuItem value={1}>High-Level Reports</MenuItem>
+              <MenuItem value={2}>Detailed Reports</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>}
+
+        {(radioButton !== "project" || projectReportType !==2) && <Grid
           item
           xs={12}
           sm={12}
@@ -339,17 +397,17 @@ const WorkspaceReports = () => {
             <Select
               labelId="report-type-label"
               id="report-select"
-              value={reportType}
+              value={projectType}
               label="Report Type"
-              onChange={(e) => setReportType(e.target.value)}
+              onChange={(e) => setProjectType(e.target.value)}
               MenuProps={MenuProps}
             >
-              <MenuItem value={"user"}>User Reports</MenuItem>
-              <MenuItem value={"project"}>Project Reports</MenuItem>
-              <MenuItem value={"payment"}>Payment Reports (E-mail)</MenuItem>
+              <MenuItem value={"AnnotatationReports"}>Annotator</MenuItem>
+              <MenuItem value={"ReviewerReports"}>Reviewer</MenuItem>
+              <MenuItem value={"SuperCheckerReports"}>Super Checker</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
+        </Grid>}
         <Grid
           item
           xs={12}
@@ -378,8 +436,8 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>
-        {reportType === "user" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small" disabled={radiobutton === "SuperCheckerReports"} >
+        {radioButton === "user" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small" disabled={projectType === "SuperCheckerReports"} >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Projects Filter</InputLabel>
             <Select
               style={{ zIndex: "0" }}
@@ -399,7 +457,7 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {reportType !== "payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {(radioButton !== "payment" && (radioButton !== "project" || projectReportType !== 2))&& <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>
               Target Language
@@ -421,7 +479,24 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {reportType === "payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {(radioButton === "project" && projectReportType === 2) &&  <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="statistics-label" sx={{ fontSize: "16px" }}>Statistics</InputLabel>
+            <Select
+              labelId="statistics-label"
+              id="statistics-select"
+              value={statisticsType}
+              label="Statistics"
+              onChange={(e) => setStatisticsType(e.target.value)}
+              MenuProps={MenuProps}
+            >
+            <MenuItem value={1}>Annotation Statistics</MenuItem>
+            <MenuItem value={2}>Meta-Info Statistics</MenuItem>
+            <MenuItem value={3}>Complete Statistics</MenuItem>
+          </Select>
+          </FormControl>
+        </Grid>}
+        {radioButton === "payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="participation-type-label" sx={{ fontSize: "16px" }}>Participation Types</InputLabel>
             <Select
@@ -441,8 +516,8 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {(reportType === "user" || reportType === "payment") &&
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+        {(radioButton === "user" || radioButton === "payment") &&
+          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
               endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
@@ -455,14 +530,24 @@ const WorkspaceReports = () => {
           </Grid>
         }
 
-        <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+        {radioButton!=="payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             variant="contained"
-            onClick={handleDateSubmit}
+            onClick={() => handleDateSubmit(false)}
             sx={{ width: "130px" }}
           >
-            {reportType === "payment" ? "E-mail CSV" : "Submit"}
+            Submit
+          </Button>
+        </Grid>}
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => handleDateSubmit(true)}
+            sx={{ width: "130px" }}
+          >
+            E-mail CSV
           </Button>
         </Grid>
       </Grid>

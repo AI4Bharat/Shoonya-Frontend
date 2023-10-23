@@ -30,6 +30,7 @@ import { styled } from '@mui/material/styles';
 import { addDays } from 'date-fns';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import { snakeToTitleCase } from "../../../../utils/utils";
+import GetOrganizationDetailedProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationDetailedProjectReports";
 
 
 const ProgressType = ["Annotation Stage", "Review Stage", "Super Check Stage", "All Stage"]
@@ -78,9 +79,12 @@ const OrganizationReports = () => {
   const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
+  const [emailRequested, setEmailRequested] = useState(false);
   const [reportTypes, setReportTypes] = useState("Annotator");
   const [radiobutton, setRadiobutton] = useState("ProjectReports");
   const [reportfilter, setReportfilter] = useState(["All Stage"]);
+  const [projectReportType, setProjectReportType] = useState(1);
+  const [statisticsType, setStatisticsType] = useState(1);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -117,8 +121,10 @@ const OrganizationReports = () => {
         "ConversationTranslationEditing",
         "AcousticNormalisedTranscriptionEditing",
         "AllAudioProjects",
+        "OCRTranscription",
+        "OCRTranscriptionEditing",
       ]);
-      setSelectedType("AudioTranscription");
+      setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -150,6 +156,14 @@ const OrganizationReports = () => {
       setReportData(UserReports);
       setSelectedColumns(tempSelected);
     } else {
+      if(emailRequested){
+          setSnackbarInfo({
+            open: true,
+            message: UserReports.message,
+            variant: "success",
+          })
+          setEmailRequested(false);
+        }
       setColumns([]);
       setReportData([]);
       setSelectedColumns([]);
@@ -177,6 +191,14 @@ const OrganizationReports = () => {
       setReportData(ProjectReports);
       setSelectedColumns(tempSelected);
     } else {
+      if(emailRequested){
+        setSnackbarInfo({
+          open: true,
+          message: ProjectReports.message,
+          variant: "success",
+        })
+        setEmailRequested(false);
+      }
       setColumns([]);
       setReportData([]);
       setSelectedColumns([]);
@@ -246,7 +268,9 @@ const OrganizationReports = () => {
     console.log(selection, "selection");
   };
 
-  const handleSubmit = () => {
+  const userId = useSelector((state) => state.fetchLoggedInUserData.data.id);
+
+  const handleSubmit = (sendMail) => {
     if (radiobutton === "PaymentReports") {
       const userReportObj = new SendOrganizationUserReports(
         orgId,
@@ -259,12 +283,17 @@ const OrganizationReports = () => {
       dispatch(APITransport(userReportObj));
       setSnackbarInfo({
         open: true,
-        message: "Report will be e-mailed to you shortly",
+        message: "Payment Reports will be e-mailed to you shortly",
         variant: "success",
       })
     }
     else {
-      setReportRequested(true);
+      if(sendMail){
+        setReportRequested(false);
+        setEmailRequested(true);
+      }else{
+        setReportRequested(true);
+      }
       setShowSpinner(true);
       setShowPicker(false);
       setColumns([]);
@@ -276,7 +305,6 @@ const OrganizationReports = () => {
           message: "Please fill Report Filter",
           variant: "error",
         })
-
       }
       let ReviewData = []
 
@@ -296,11 +324,11 @@ const OrganizationReports = () => {
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           reportTypes === "Annotator" ? "annotation" : reportTypes === "Reviewer" ? "review" : "supercheck",
           targetLanguage,
+          sendMail,
           ...ReviewData,
 
         );
         dispatch(APITransport(userReportObj));
-
       } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" && radiobutton === "UsersReports")) {
         const supercheckObj = new GetOrganizationUserReportsAPI(
           orgId,
@@ -309,19 +337,30 @@ const OrganizationReports = () => {
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           "supercheck",
           targetLanguage,
+          sendMail,
         );
         dispatch(APITransport(supercheckObj));
-
-
       }
       else if (radiobutton === "ProjectReports") {
+        if(projectReportType === 1){
         const projectReportObj = new GetOrganizationProjectReportsAPI(
           orgId,
           selectedType,
           targetLanguage,
+          userId,
+          sendMail
+        );
+        dispatch(APITransport(projectReportObj));
+      }else if(projectReportType === 2){
+        const projectReportObj = new GetOrganizationDetailedProjectReportsAPI(
+          Number(orgId),
+          selectedType,
+          userId,
+          statisticsType
         );
         dispatch(APITransport(projectReportObj));
       }
+    }
     }
   };
 
@@ -389,6 +428,24 @@ const OrganizationReports = () => {
           </Grid >
         </Grid>
 
+        {radiobutton === "ProjectReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="project-report-type-label" sx={{ fontSize: "16px" }}>Type</InputLabel>
+            <Select
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
+              labelId="project-report-type-type-label"
+              id="project-report-type-select"
+              value={projectReportType}
+              label="Project Report Type"
+              onChange={(e) => setProjectReportType(e.target.value)}
+            >
+              <MenuItem value={1}>High-Level Reports</MenuItem>
+              <MenuItem value={2}>Detailed Reports</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>}
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small" >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
@@ -410,6 +467,42 @@ const OrganizationReports = () => {
             </Select>
           </FormControl>
         </Grid>
+        {(radiobutton === "ProjectReports" && projectReportType === 1) &&  <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
+          <Select
+            labelId="language-label"
+            id="language-select"
+            value={targetLanguage}
+            label="Target Language"
+            onChange={(e) => setTargetLanguage(e.target.value)}
+            MenuProps={MenuProps}
+          >
+            <MenuItem value={"all"}>All languages</MenuItem>
+            {LanguageChoices.language?.map((lang) => (
+              <MenuItem value={lang} key={lang}>
+                {lang}
+              </MenuItem>))}
+          </Select>
+        </FormControl>
+      </Grid>}
+      {(radiobutton === "ProjectReports" && projectReportType === 2) &&  <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="statistics-label" sx={{ fontSize: "16px" }}>Statistics</InputLabel>
+          <Select
+            labelId="statistics-label"
+            id="statistics-select"
+            value={statisticsType}
+            label="Statistics"
+            onChange={(e) => setStatisticsType(e.target.value)}
+            MenuProps={MenuProps}
+          >
+          <MenuItem value={1}>Annotation Statistics</MenuItem>
+          <MenuItem value={2}>Meta-Info Statistics</MenuItem>
+          <MenuItem value={3}>Complete Statistics</MenuItem>
+        </Select>
+        </FormControl>
+      </Grid>}
         {radiobutton === "PaymentReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="participation-type-label" sx={{ fontSize: "16px" }}>Participation Types</InputLabel>
@@ -449,7 +542,7 @@ const OrganizationReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {radiobutton === "UsersReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {radiobutton === "UsersReports" && <><Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small" disabled={reportTypes === "SuperCheck" || radiobutton === "ProjectReports"} >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Projects Filter</InputLabel>
             <Select
@@ -469,27 +562,28 @@ const OrganizationReports = () => {
               ))}
             </Select>
           </FormControl>
-        </Grid>}
+        </Grid>
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
+          <Select
+            labelId="language-label"
+            id="language-select"
+            value={targetLanguage}
+            label="Target Language"
+            onChange={(e) => setTargetLanguage(e.target.value)}
+            MenuProps={MenuProps}
+          >
+            <MenuItem value={"all"}>All languages</MenuItem>
+            {LanguageChoices.language?.map((lang) => (
+              <MenuItem value={lang} key={lang}>
+                {lang}
+              </MenuItem>))}
+          </Select>
+        </FormControl>
+      </Grid>
+      </>}
 
-        {radiobutton !== "PaymentReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
-            <Select
-              labelId="language-label"
-              id="language-select"
-              value={targetLanguage}
-              label="Target Language"
-              onChange={(e) => setTargetLanguage(e.target.value)}
-              MenuProps={MenuProps}
-            >
-              <MenuItem value={"all"}>All languages</MenuItem>
-              {LanguageChoices.language?.map((lang) => (
-                <MenuItem value={lang} key={lang}>
-                  {lang}
-                </MenuItem>))}
-            </Select>
-          </FormControl>
-        </Grid>}
         {["UsersReports", "PaymentReports"].includes(radiobutton) &&
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
@@ -504,14 +598,24 @@ const OrganizationReports = () => {
           </Grid>
         }
 
-        <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+        {radiobutton!=="PaymentReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             variant="contained"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit(false)}
             sx={{ width: "130px" }}
           >
-            {radiobutton === "PaymentReports" ? "E-mail CSV" : "Submit"}
+            Submit
+          </Button>
+        </Grid>}
+      <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => handleSubmit(true)}
+            sx={{ width: "130px" }}
+          >
+            E-mail CSV
           </Button>
         </Grid>
       </Grid>

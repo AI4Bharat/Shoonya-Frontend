@@ -20,6 +20,7 @@ import {
   Grid,
   Button,
   TextField,
+  Slider, Stack
 } from "@mui/material";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -110,6 +111,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const superCheckerNotesRef = useRef(null);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  const [autoSave, setAutoSave] = useState(true);
+  const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(-2); 
 
   // useEffect(() => {
@@ -136,7 +139,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
-  const filterAnnotations = (annotations, user, taskData) => {
+  const filterAnnotations = (annotations, user) => {
     let disableSkip = false;
     let disableAutoSave = false;
     let filteredAnnotations = annotations;
@@ -147,15 +150,12 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     });
     if (userAnnotation) {
       if (userAnnotation.annotation_status === "unvalidated") {
-        filteredAnnotations =
-          userAnnotation.result.length > 0 &&
-          !taskData?.revision_loop_count?.super_check_count
-            ? [userAnnotation]
-            : annotations.filter(
-                (annotation) =>
-                  annotation.id === userAnnotation.parent_annotation &&
-                  annotation.annotation_type === 2
-              );
+        filteredAnnotations = userAnnotation.result.length > 0 ?
+          [userAnnotation] : annotations.filter(
+            (annotation) =>
+              annotation.id === userAnnotation.parent_annotation &&
+              annotation.annotation_type === 2
+          );
       } else if (
         ["validated", "validated_with_changes", "draft"].includes(
           userAnnotation.annotation_status
@@ -169,6 +169,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         filteredAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
         );
+        if(filteredAnnotations[0].annotation_status === "rejected")
+          setAutoSave(false);
       }
     } else if ([4, 5, 6].includes(user.role)) {
       filteredAnnotations = annotations.filter((a) => a.annotation_type === 3);
@@ -180,9 +182,9 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    filterAnnotations(AnnotationsTaskDetails, userData, taskDetailList);
-  }, [AnnotationsTaskDetails, userData, taskDetailList]);
-  console.log(disableSkip);
+    filterAnnotations(AnnotationsTaskDetails, userData);
+  }, [AnnotationsTaskDetails, userData]);
+  //console.log(disableSkip);
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -199,7 +201,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     settextBox(hasEmptyText);
     setSpeakerBox(hasEmptySpeaker);
     setL2Check(!hasEmptyTextL2);
-  }, [result]);
+  }, [result, stdTranscriptionSettings]);
 
   const getTaskData = async (id) => {
     setLoading(true);
@@ -226,19 +228,26 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setLoading(false);
   };
 
+  const [isActive, setIsActive] = useState(true);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
+  const inactivityThreshold = 120000; 
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleAutosave = async () => {
-    if(disableBtns) return;
+    setAutoSaveTrigger(false);
+    if(!autoSave || disableBtns) return;
+    const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
+    if(!currentAnnotation) return;
     const reqBody = {
       task_id: taskId,
-      annotation_status: AnnotationsTaskDetails[2]?.annotation_status,
-      parent_annotation: AnnotationsTaskDetails[2]?.parent_annotation,
-      auto_save :true,
+      auto_save: true,
       lead_time:
-      (new Date() - loadtime) / 1000 + Number(AnnotationsTaskDetails[2]?.lead_time ?? 0),
+      (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
     };
     if(result.length && taskDetails?.super_check_user === userData.id) {
-      const obj = new SaveTranscriptAPI(AnnotationsTaskDetails[2]?.id, reqBody);
+    try{ 
+      const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
       const res = await fetch(obj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(obj.getBody()),
@@ -253,42 +262,75 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       } 
       return res;
     }
+      catch(err) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving "+err,
+          variant: "error",
+        });
+      }
+    }
   };
   
   useEffect(() => {
-    
+    autoSaveTrigger && handleAutosave();
+  }, [autoSaveTrigger, autoSave, handleAutosave, userData, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings]);
+  
+  useEffect(() => {
+    if(!autoSave) return;
+
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
     };
 
-    saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+    saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
     );
 
     const handleBeforeUnload = (event) => {
-      handleAutosave();
+      setAutoSaveTrigger(true);
       handleUpdateTimeSpent(ref.current);
       event.preventDefault();
       event.returnValue = "";
       ref.current = 0;
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    const handleInteraction = () => {
+      setLastInteraction(Date.now());
+      setIsActive(true);
+    };
 
-    // Add event listener for visibility change
+    const checkInactivity = () => {
+      const currentTime = Date.now();
+      if (currentTime - lastInteraction >= inactivityThreshold) {
+        setIsActive(false);
+      }
+    };
+
+    document.addEventListener('mousemove', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    const interval = setInterval(checkInactivity, 1000);
+
+    if(!isActive){
+      handleUpdateTimeSpent(ref.current);
+      clearInterval(saveIntervalRef.current);
+      clearInterval(timeSpentIntervalRef.current);
+      ref.current = 0;
+    }
+  
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
-        saveIntervalRef.current = setInterval(handleAutosave, 60 * 1000);
+        saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
         timeSpentIntervalRef.current = setInterval(
           handleUpdateTimeSpent,
           60 * 1000
         );
       } else {
-        handleAutosave();
+        setAutoSaveTrigger(true);
         handleUpdateTimeSpent(ref.current);
         // Tab is inactive, clear the autosave interval
         clearInterval(saveIntervalRef.current);
@@ -296,10 +338,14 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         ref.current = 0;
       }
     };
-
+    
+    window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      document.removeEventListener('mousemove', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      clearInterval(interval);
       clearInterval(saveIntervalRef.current);
       clearInterval(timeSpentIntervalRef.current);
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -307,7 +353,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
 
     // eslint-disable-next-line
-  }, [result, taskId, AnnotationsTaskDetails, stdTranscription, stdTranscriptionSettings, disableBtns]);
+  }, [autoSave, userData, taskId, annotations, taskDetails, isActive]);
 
   // useEffect(() => {
   //   const apiObj = new FetchTaskDetailsAPI(taskId);
@@ -342,33 +388,13 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     let standardisedTranscription = "";
-    if (
-      AnnotationsTaskDetails.some((obj) =>
-        obj.result.every((item) => Object.keys(item).length === 0)
-      )
-    ) {
-      const filteredArray = AnnotationsTaskDetails.filter((obj) =>
-        obj?.result.some((item) => Object.keys(item).length > 0)
-      );
-      const sub = filteredArray[1]?.result?.filter((item) => {
-        if ("standardised_transcription" in item) {
-          standardisedTranscription = item.standardised_transcription;
-          return false;
-        } else return true;
-      }).map((item) => new Sub(item));
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    } else {
-      const filteredArray = AnnotationsTaskDetails?.filter(
-        (annotation) => annotation?.annotation_type === 3
-      );
-      const sub = annotations[0]?.result?.filter((item) => {
-        if ("standardised_transcription" in item) {
-          standardisedTranscription = item.standardised_transcription;
-          return false;
-        } else return true;
-      }).map((item) => new Sub(item));
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    }
+    const sub = annotations[0]?.result?.filter((item) => {
+      if ("standardised_transcription" in item) {
+        standardisedTranscription = item.standardised_transcription;
+        return false;
+      } else return true;
+    }).map((item) => new Sub(item));
+    dispatch(setSubtitles(sub, C.SUBTITLES));
 
     setStdTranscription(standardisedTranscription);
     // const newSub = cloneDeep(sub);
@@ -532,6 +558,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     reviewNotesValue,
   ) => {
     setLoading(true);
+    setAutoSave(false);
     const PatchAPIdata = {
       annotation_status: value,
       supercheck_notes: JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
@@ -546,10 +573,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     };
     const L1Check = !textBox && !speakerBox && result?.length > 0;
     if (
-      ["draft", "skipped"].includes(value) ||
-      (["rejected"].includes(value) && L1Check) ||
+      ["draft", "skipped", "rejected"].includes(value) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
+      if(value === "rejected") PatchAPIdata["result"] = [];
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
@@ -566,15 +593,16 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
             message: resp?.message,
             variant: "success",
           });
-      
       } else {
+        setAutoSave(true);
         setSnackbarInfo({
           open: true,
           message: resp?.message,
           variant: "error",
         });
       }
-  } else {
+    } else {
+      setAutoSave(true);
       if (textBox || !L2Check) {
         setSnackbarInfo({
           open: true,
@@ -587,7 +615,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           message: "Please Select The Speaker",
           variant: "error",
         });
-      }else{
+      } else {
         setSnackbarInfo({
           open: true,
           message: "Error in saving annotation",
@@ -595,7 +623,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         });
       }
     }
-  
     setLoading(false);
     setShowNotes(false);
     setAnchorEl(null);
@@ -871,9 +898,9 @@ useEffect(() => {
     }
   };
 
-  document.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('keydown', handleKeyDown);
   return () => {
-    document.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keydown', handleKeyDown);
   };
 }, [player]);
 
@@ -950,7 +977,45 @@ useEffect(() => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
             />
-            <Grid container spacing={1} sx={{ mt: 2, ml: 3 }}>
+            <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
+             <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+                <Typography fontSize={14} fontWeight={"medium"} color="#555">
+                  Timeline Scale:
+                </Typography>
+                <Slider
+                  sx={{
+                    width: 140,
+                  }}
+                  color="primary"
+                  aria-label="Scale"
+                  min={2} max={player ? Math.floor(player.duration * 2) : 100} step={1}
+                  value={duration}
+                  onChange={(e) => {
+                    setDuration(e.target.value);
+                    player.currentTime += 0.01;
+                    player.currentTime -= 0.01;
+                  }}/>
+              </Stack>
+              <Stack spacing={2} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+                <Typography fontSize={14} fontWeight={"medium"} color="#555">
+                  Playback Speed:
+                </Typography>
+                <Slider
+                  sx={{
+                    width: 140,
+                  }}
+                  color="primary"
+                  aria-label="Playback Spped"
+                  marks
+                  min={0.25} max={2.0} step={0.25}
+                  defaultValue={1.0}
+                  valueLabelDisplay="auto"
+                  onChange={(e) => {
+                    player.playbackRate = e.target.value;
+                  }}/>
+              </Stack>
+            </Grid>
+            <Grid container spacing={1} sx={{ ml: 3 }}>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -986,8 +1051,7 @@ useEffect(() => {
               style={{
                 display: showNotes ? "block" : "none",
                 paddingBottom: "16px",
-                overflow:"auto",
-                height:"100px"
+                height: "175px", overflow: "scroll"
               }}
             >
               {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
@@ -1121,7 +1185,6 @@ useEffect(() => {
                     <td>Scrollable:&nbsp;&nbsp;<input type='checkbox' checked={scrollable} onChange={() => {setScrollable(!scrollable)}}></input></td>
                   </tr>
                   <tr>
-                    <td colSpan={2}>Duration:&nbsp;&nbsp;<input type='range' min={2} max={100} step={2} value={duration} onChange={(e) => {setDuration(e.target.value)}}></input>&nbsp;{duration}</td>
                     <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='range' min={0} max={20} step={1} value={padding} onChange={(e) => {setPadding(e.target.value)}}></input>&nbsp;{padding}</td>
                     <td colSpan={2}>Pixel Ratio:&nbsp;&nbsp;<input type='range' min={1} max={2} step={1} value={pixelRatio} onChange={(e) => {setPixelRatio(e.target.value)}}></input>&nbsp;{pixelRatio}</td>
                   </tr>

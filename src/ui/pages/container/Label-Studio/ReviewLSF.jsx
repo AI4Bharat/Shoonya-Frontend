@@ -351,7 +351,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-          projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -378,7 +378,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-          projectType === "AudioTranscriptionEditing"
+          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",

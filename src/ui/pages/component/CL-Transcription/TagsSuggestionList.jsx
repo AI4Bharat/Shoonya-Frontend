@@ -6,7 +6,7 @@ import { onSubtitleChange } from "../../../../utils/SubTitlesUtils";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 
 //Components
-import { Grid, IconButton, Popover, Tooltip, Typography } from "@mui/material";
+import { Grid, IconButton, Popover, Tooltip, Typography, Autocomplete, TextField } from "@mui/material";
 
 //Icons
 import CloseIcon from "@mui/icons-material/Close";
@@ -15,26 +15,31 @@ import CloseIcon from "@mui/icons-material/Close";
 import C from "../../../../redux/constants";
 import { setSubtitles } from "../../../../redux/actions/Common";
 
-const TagsSuggestionList = ({
-  tagSuggestionsAnchorEl,
-  setTagSuggestionList,
-  index,
-  setTagSuggestionsAnchorEl,
-  textWithoutTripleDollar,
-  textAfterTripleDollar,
-  // saveTranscriptHandler,
-  setEnableTransliterationSuggestion,
-  TabsSuggestionData,
-}) => {
+const TagsSuggestionList = React.forwardRef((props, ref) => {
+  
+  const {
+    tagSuggestionsAnchorEl,
+    setTagSuggestionList,
+    index,
+    setTagSuggestionsAnchorEl,
+    textWithoutTripleDollar,
+    textAfterTripleDollar,
+    // saveTranscriptHandler,
+    setEnableTransliterationSuggestion,
+    TabsSuggestionData,
+    tagSuggestionsAcoustic,
+    currentSelection,
+  } = props;
+
   const dispatch = useDispatch();
   const classes = AudioTranscriptionLandingStyle();
   const handleTagClick = (suggestion) => {
     const modifiedText = `${textWithoutTripleDollar}[${suggestion}]${textAfterTripleDollar}`;
 
-    const sub = onSubtitleChange(modifiedText, index);
+    const sub = onSubtitleChange(modifiedText, index, tagSuggestionsAcoustic);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
-
+    setTimeout(() => ref.setSelectionRange(currentSelection + suggestion.length - 1, currentSelection + suggestion.length - 1), 100);
     setEnableTransliterationSuggestion(true);
     setTagSuggestionsAnchorEl(null);
   };
@@ -63,30 +68,31 @@ const TagsSuggestionList = ({
     >
       <Grid width={200}>
         <Grid className={classes.suggestionListHeader}>
-          <Typography variant="body1" sx={{ fontSize: "16px" }}>
-            Select Tag
-          </Typography>
+          <Autocomplete
+            onChange={(event, value) => handleTagClick(value)}
+            id="tags-suggestions-auto"
+            options={TabsSuggestionData}
+            sx={{ width: 300 }}
+            renderInput={(params) => <TextField {...params} label="Select Tag" />}
+            renderOption={(props, option, { selected }) => (
+              <Typography
+                {...props}
+                variant="body2"
+                className={classes.suggestionListTypography}
+              >
+                {option}
+              </Typography>
+            )}
+          />
           <Tooltip title="close suggestions">
             <IconButton onClick={() => setTagSuggestionsAnchorEl(null)}>
               <CloseIcon />
             </IconButton>
           </Tooltip>
         </Grid>
-
-        <Grid maxHeight={250}>
-          {TabsSuggestionData.map((name, value) => (
-            <Typography
-              onClick={() => handleTagClick(name)}
-              variant="body2"
-              className={classes.suggestionListTypography}
-            >
-              {name}
-            </Typography>
-          ))}
-        </Grid>
       </Grid>
     </Popover>
   );
-};
+});
 
 export default TagsSuggestionList;

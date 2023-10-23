@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useLocation, useNavigate } from "react-router-dom";
+import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import CustomButton from "../common/Button";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
@@ -40,6 +41,7 @@ const Header = () => {
   const [anchorElHelp, setAnchorElHelp] = useState(null);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
+  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
   const [showTransliterationModel, setShowTransliterationModel] =
     useState(false);
   const [snackbar, setSnackbarInfo] = useState({
@@ -652,8 +654,8 @@ const Header = () => {
     // },
   ];
 
-  const handleTransliterationModelClose = () => {
-    setShowTransliterationModel(false);
+  const handleTransliterationModelClose =  () => {
+        setShowTransliterationModel(false);
   };
 
   return (
@@ -748,6 +750,7 @@ const Header = () => {
                         <Avatar
                           alt="user_profile_pic"
                           variant="contained"
+                          src={loggedInUserData?.profile_photo?loggedInUserData.profile_photo:''}
                           className={classes.avatar}
                         >
                           {loggedInUserData &&
@@ -876,6 +879,10 @@ const Header = () => {
       >
         <Transliteration
           onCancelTransliteration={() => handleTransliterationModelClose}
+          setIsSpaceClicked={setIsSpaceClicked}
+          isSpaceClicked={isSpaceClicked}
+          setShowTransliterationModel={setShowTransliterationModel}
+
         />
       </Modal>
     </Grid>
