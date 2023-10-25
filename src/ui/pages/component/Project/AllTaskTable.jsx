@@ -34,6 +34,7 @@ const excludeCols = [
   "language",
   "unverified_conversation_json",
   "ocr_prediction_json",
+  "machine_transcribed_json",
 ];
 
 const excludeSearch = ["status", "actions"];

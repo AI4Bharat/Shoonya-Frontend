@@ -30,6 +30,7 @@ import { styled } from '@mui/material/styles';
 import { addDays } from 'date-fns';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import { snakeToTitleCase } from "../../../../utils/utils";
+import GetOrganizationDetailedProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationDetailedProjectReports";
 
 
 const ProgressType = ["Annotation Stage", "Review Stage", "Super Check Stage", "All Stage"]
@@ -81,6 +82,8 @@ const OrganizationReports = () => {
   const [reportTypes, setReportTypes] = useState("Annotator");
   const [radiobutton, setRadiobutton] = useState("ProjectReports");
   const [reportfilter, setReportfilter] = useState(["All Stage"]);
+  const [projectReportType, setProjectReportType] = useState(1);
+  const [statisticsType, setStatisticsType] = useState(1);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -117,8 +120,10 @@ const OrganizationReports = () => {
         "ConversationTranslationEditing",
         "AcousticNormalisedTranscriptionEditing",
         "AllAudioProjects",
+        "OCRTranscription",
+        "OCRTranscriptionEditing",
       ]);
-      setSelectedType("AudioTranscription");
+      setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -131,31 +136,55 @@ const OrganizationReports = () => {
   }, [ProjectTypes, radiobutton]);
 
   useEffect(() => {
-    if (reportRequested && UserReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(UserReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(UserReports);
-      setSelectedColumns(tempSelected);
-    } else {
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
+    if (reportRequested) {
+      setSnackbarInfo({
+        open: true,
+        message: UserReports.message,
+        variant: "success",
+      })
     }
+    setReportRequested(false);
     setShowSpinner(false);
   }, [UserReports]);
+
+  useEffect(() => {
+    if (reportRequested) {
+      setSnackbarInfo({
+        open: true,
+        message: ProjectReports.message,
+        variant: "success",
+      })
+    }
+    setReportRequested(false);
+    setShowSpinner(false);
+  }, [ProjectReports]);
+
+  // useEffect(() => {
+  //   if (reportRequested && UserReports?.length) {
+  //     let tempColumns = [];
+  //     let tempSelected = [];
+  //     Object.keys(UserReports[0]).forEach((key) => {
+  //       tempColumns.push({
+  //         name: key,
+  //         label: key,
+  //         options: {
+  //           filter: false,
+  //           sort: true,
+  //           align: "center",
+  //         },
+  //       });
+  //       tempSelected.push(key);
+  //     });
+  //     setColumns(tempColumns);
+  //     setReportData(UserReports);
+  //     setSelectedColumns(tempSelected);
+  //   } else {
+  //     setColumns([]);
+  //     setReportData([]);
+  //     setSelectedColumns([]);
+  //   }
+  //   setShowSpinner(false);
+  // }, [UserReports]);
 
   // useEffect(() => {
   //   if (reportRequested && ProjectReports?.length) {
@@ -246,6 +275,8 @@ const OrganizationReports = () => {
     console.log(selection, "selection");
   };
 
+  const userId = useSelector((state) => state.fetchLoggedInUserData.data.id);
+
   const handleSubmit = () => {
     if (radiobutton === "PaymentReports") {
       const userReportObj = new SendOrganizationUserReports(
@@ -267,16 +298,15 @@ const OrganizationReports = () => {
       setReportRequested(true);
       setShowSpinner(true);
       setShowPicker(false);
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
+      // setColumns([]);
+      // setReportData([]);
+      // setSelectedColumns([]);
       if (radiobutton === "UsersReports" && reportTypes === "Annotator" && reportfilter == "") {
         setSnackbarInfo({
           open: true,
           message: "Please fill Report Filter",
           variant: "error",
         })
-
       }
       let ReviewData = []
 
@@ -300,7 +330,6 @@ const OrganizationReports = () => {
 
         );
         dispatch(APITransport(userReportObj));
-
       } else if ((reportTypes === "SuperCheck" || reportfilter === "All Stage" && radiobutton === "UsersReports")) {
         const supercheckObj = new GetOrganizationUserReportsAPI(
           orgId,
@@ -311,22 +340,26 @@ const OrganizationReports = () => {
           targetLanguage,
         );
         dispatch(APITransport(supercheckObj));
-
-
       }
       else if (radiobutton === "ProjectReports") {
+        if(projectReportType === 1){
         const projectReportObj = new GetOrganizationProjectReportsAPI(
           orgId,
           selectedType,
           targetLanguage,
+          userId,
         );
         dispatch(APITransport(projectReportObj));
-        setSnackbarInfo({
-          open: true,
-          message: "Project Reports will be e-mailed to you shortly",
-          variant: "success",
-        })
+      }else if(projectReportType === 2){
+        const projectReportObj = new GetOrganizationDetailedProjectReportsAPI(
+          Number(orgId),
+          selectedType,
+          userId,
+          statisticsType
+        );
+        dispatch(APITransport(projectReportObj));
       }
+    }
     }
   };
 
@@ -394,6 +427,24 @@ const OrganizationReports = () => {
           </Grid >
         </Grid>
 
+        {radiobutton === "ProjectReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="project-report-type-label" sx={{ fontSize: "16px" }}>Type</InputLabel>
+            <Select
+              style={{ zIndex: "0" }}
+              inputProps={{ "aria-label": "Without label" }}
+              MenuProps={MenuProps}
+              labelId="project-report-type-type-label"
+              id="project-report-type-select"
+              value={projectReportType}
+              label="Project Report Type"
+              onChange={(e) => setProjectReportType(e.target.value)}
+            >
+              <MenuItem value={1}>High-Level Reports</MenuItem>
+              <MenuItem value={2}>Detailed Reports</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>}
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small" >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
@@ -415,6 +466,42 @@ const OrganizationReports = () => {
             </Select>
           </FormControl>
         </Grid>
+        {(radiobutton === "ProjectReports" && projectReportType === 1) &&  <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
+          <Select
+            labelId="language-label"
+            id="language-select"
+            value={targetLanguage}
+            label="Target Language"
+            onChange={(e) => setTargetLanguage(e.target.value)}
+            MenuProps={MenuProps}
+          >
+            <MenuItem value={"all"}>All languages</MenuItem>
+            {LanguageChoices.language?.map((lang) => (
+              <MenuItem value={lang} key={lang}>
+                {lang}
+              </MenuItem>))}
+          </Select>
+        </FormControl>
+      </Grid>}
+      {(radiobutton === "ProjectReports" && projectReportType === 2) &&  <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="statistics-label" sx={{ fontSize: "16px" }}>Statistics</InputLabel>
+          <Select
+            labelId="statistics-label"
+            id="statistics-select"
+            value={statisticsType}
+            label="Statistics"
+            onChange={(e) => setStatisticsType(e.target.value)}
+            MenuProps={MenuProps}
+          >
+          <MenuItem value={1}>Annotation Statistics</MenuItem>
+          <MenuItem value={2}>Meta-Info Statistics</MenuItem>
+          <MenuItem value={3}>Complete Statistics</MenuItem>
+        </Select>
+        </FormControl>
+      </Grid>}
         {radiobutton === "PaymentReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="participation-type-label" sx={{ fontSize: "16px" }}>Participation Types</InputLabel>
@@ -454,7 +541,7 @@ const OrganizationReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {radiobutton === "UsersReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {radiobutton === "UsersReports" && <><Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small" disabled={reportTypes === "SuperCheck" || radiobutton === "ProjectReports"} >
             <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Projects Filter</InputLabel>
             <Select
@@ -474,27 +561,28 @@ const OrganizationReports = () => {
               ))}
             </Select>
           </FormControl>
-        </Grid>}
+        </Grid>
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
+          <Select
+            labelId="language-label"
+            id="language-select"
+            value={targetLanguage}
+            label="Target Language"
+            onChange={(e) => setTargetLanguage(e.target.value)}
+            MenuProps={MenuProps}
+          >
+            <MenuItem value={"all"}>All languages</MenuItem>
+            {LanguageChoices.language?.map((lang) => (
+              <MenuItem value={lang} key={lang}>
+                {lang}
+              </MenuItem>))}
+          </Select>
+        </FormControl>
+      </Grid>
+      </>}
 
-        {radiobutton !== "PaymentReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="language-label" sx={{ fontSize: "16px" }}>Target Language</InputLabel>
-            <Select
-              labelId="language-label"
-              id="language-select"
-              value={targetLanguage}
-              label="Target Language"
-              onChange={(e) => setTargetLanguage(e.target.value)}
-              MenuProps={MenuProps}
-            >
-              <MenuItem value={"all"}>All languages</MenuItem>
-              {LanguageChoices.language?.map((lang) => (
-                <MenuItem value={lang} key={lang}>
-                  {lang}
-                </MenuItem>))}
-            </Select>
-          </FormControl>
-        </Grid>}
         {["UsersReports", "PaymentReports"].includes(radiobutton) &&
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
