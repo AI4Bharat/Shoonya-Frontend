@@ -115,7 +115,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [autoSave, setAutoSave] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState(-2); 
+  const [selectedUserId, setSelectedUserId] = useState(-1); 
 
   // useEffect(() => {
   //   let intervalId;
@@ -357,20 +357,20 @@ const ReviewAudioTranscriptionLandingPage = () => {
   useEffect(() => {
     if(!autoSave || disableBtns) return;
 
-    const handleUpdateTimeSpent = (time = 60) => {
-      // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
-      // dispatch(APITransport(apiObj));
-    };
+    /* const handleUpdateTimeSpent = (time = 60) => {
+      const apiObj = new UpdateTimeSpentPerTask(taskId, time);
+      dispatch(APITransport(apiObj));
+    }; */
 
     saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
-    timeSpentIntervalRef.current = setInterval(
+    /* timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
-    );
+    ); */
 
     const handleBeforeUnload = (event) => {
       setAutoSaveTrigger(true);
-      handleUpdateTimeSpent(ref.current);
+      ///handleUpdateTimeSpent(ref.current);
       event.preventDefault();
       event.returnValue = "";
       ref.current = 0;
@@ -393,7 +393,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     const interval = setInterval(checkInactivity, 1000);
 
     if(!isActive){
-      handleUpdateTimeSpent(ref.current);
+      //handleUpdateTimeSpent(ref.current);
       clearInterval(saveIntervalRef.current);
       clearInterval(timeSpentIntervalRef.current);
       ref.current = 0;
@@ -403,16 +403,16 @@ const ReviewAudioTranscriptionLandingPage = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
         saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
-        timeSpentIntervalRef.current = setInterval(
+        /* timeSpentIntervalRef.current = setInterval(
           handleUpdateTimeSpent,
           60 * 1000
-        );
+        ); */
       } else {
         setAutoSaveTrigger(true);
-        handleUpdateTimeSpent(ref.current);
+        // handleUpdateTimeSpent(ref.current);
         // Tab is inactive, clear the autosave interval
         clearInterval(saveIntervalRef.current);
-        clearInterval(timeSpentIntervalRef.current);
+        // clearInterval(timeSpentIntervalRef.current);
         ref.current = 0;
       }
     };
@@ -424,7 +424,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       document.removeEventListener('keydown', handleInteraction);
       clearInterval(interval);
       clearInterval(saveIntervalRef.current);
-      clearInterval(timeSpentIntervalRef.current);
+      // clearInterval(timeSpentIntervalRef.current);
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
@@ -522,29 +522,22 @@ const ReviewAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    if(selectedUserId === -1) {
+    if(selectedUserId === -1) return;
+    if(selectedUserId === user?.id) {
       setFilterMessage("");
       setDisableBtns(false);
       setDisableButton(false);
-      filterAnnotations(AnnotationsTaskDetails, user, taskDetailList);
+      getAnnotationsTaskData(taskId);
       return;
     }
     const userAnnotations = AnnotationsTaskDetails?.filter((item) => item.completed_by === selectedUserId);
     if(userAnnotations.length) {
       setDisableButton(true);
       setDisableBtns(true);
-      if(userAnnotations[0].annotation_type === 1) {
-        setFilterMessage("This is the Annotator's Annotation in read only mode");
-      }
-      else if(userAnnotations[0].annotation_type === 2) {
-        setFilterMessage("This is the Reviewer's Annotation in read only mode");
-      }
-      else if(userAnnotations[0].annotation_type === 3) {
-        setFilterMessage("This is the Super Checker's Annotation in read only mode");
-      }
+      setFilterMessage(`This is the ${["Annotator", "Reviewer", "Super Checker"][userAnnotations[0].annotation_type - 1]}'s Annotation in read only mode`);
       setAnnotations(userAnnotations);
     }
-  }, [selectedUserId]);
+  }, [selectedUserId, user, taskId]);
 
   useEffect(() => {
     const showAssignedUsers = async () => {
@@ -1097,15 +1090,16 @@ useEffect(() => {
                     gap: "4px",
                     alignItems: "flex-start"
                   }}>
-                    <Button
-                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === -1 ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
-                        onClick={() => setSelectedUserId(-1)}>
-                        Default (Reset filters)
-                    </Button>
                     {assignedUsers.map((u, idx) => u && 
                       <Button
-                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === u.id ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
-                        onClick={() => setSelectedUserId(u.id)}>
+                      style={{
+                        display: "inline",
+                        fontSize: 12,
+                        color: "black",
+                        border: (selectedUserId === u.id || (selectedUserId === -1 && user?.id === u.id))
+                          ? "1px solid rgba(0, 0, 0, 0.2)" : "none"
+                      }}
+                      onClick={() => setSelectedUserId(u.id)}>
                         {UserMappedByRole(idx + 1).element} {u.email}
                       </Button>
                     )}
