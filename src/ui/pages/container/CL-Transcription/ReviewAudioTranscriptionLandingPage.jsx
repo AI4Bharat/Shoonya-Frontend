@@ -646,8 +646,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     };
     const L1Check = !textBox && !speakerBox && result?.length > 0;
     if (
-      ["draft", "skipped"].includes(value) ||
-      (["to_be_revised"].includes(value) && L1Check) ||
+      ["draft", "skipped", "to_be_revised"].includes(value) ||
       (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
     ) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
