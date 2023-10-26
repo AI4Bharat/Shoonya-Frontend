@@ -906,6 +906,16 @@ const LabelStudioWrapper = ({
               </Typography>
             </div>)}
         </div>
+        {projectType.includes("AudioTranscription") && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            Do not delete first audio segment to prevent saving errors.
+          </Alert>
+        )}
+        {projectType.includes("OCR") && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            Do not delete first bounding box to prevent saving errors.
+          </Alert>
+        )}
       </div>
 
       {!loader && (

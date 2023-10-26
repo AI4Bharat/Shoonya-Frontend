@@ -744,8 +744,6 @@ const LabelStudioWrapper = ({
               annotations,
               [],
               annotationNotesRef,
-              reviewNotesRef,
-              superCheckerNotesRef,
               projectType
             );
           })
@@ -904,6 +902,16 @@ const LabelStudioWrapper = ({
       {filterMessage && (
         <Alert severity="info" sx={{ mb: 3 }}>
           {filterMessage}
+        </Alert>
+      )}
+      {projectType.includes("AudioTranscription") && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          Do not delete first audio segment to prevent saving errors.
+        </Alert>
+      )}
+      {projectType.includes("OCR") && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          Do not delete first bounding box to prevent saving errors.
         </Alert>
       )}
       {!loader && (
