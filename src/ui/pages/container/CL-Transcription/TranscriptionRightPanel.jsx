@@ -228,17 +228,6 @@ const TranscriptionRightPanel = ({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [enableTransliteration, setTransliteration]);
-  
-
-  const getPayload = (offset = currentOffset, lim = limit) => {
-    const payloadObj = new GetAnnotationsTaskAPI(
-      taskId
-      // taskData.task_type,
-      // offset,
-      // lim
-    );
-    dispatch(APITransport(payloadObj));
-  };
 
   const prevOffsetRef = useRef(currentOffset);
   useEffect(() => {
@@ -247,7 +236,6 @@ const TranscriptionRightPanel = ({
       setRedoStack([]);
       prevOffsetRef.current = currentOffset;
     }
-    getPayload(currentOffset, limit);
     // eslint-disable-next-line
   }, [limit, currentOffset]);
 
@@ -478,10 +466,6 @@ const TranscriptionRightPanel = ({
     if (subtitles[index]?.text?.trim() !== "")
       return subtitles[index]?.text?.trim()?.split(" ")?.length;
     return 0;
-  };
-
-  const onNavigationClick = (value) => {
-    getPayload(value, limit);
   };
 
   const handleSpeakerChange = (id, index) => {
