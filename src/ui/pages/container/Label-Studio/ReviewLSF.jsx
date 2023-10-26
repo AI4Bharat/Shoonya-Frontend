@@ -256,7 +256,7 @@ const LabelStudioWrapper = ({
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
-  const [selectedUserId, setSelectedUserId] = useState(-2);
+  const [selectedUserId, setSelectedUserId] = useState(-1);
 
 
   //console.log("projectId, taskId", projectId, taskId);
@@ -1043,25 +1043,32 @@ const LabelStudioWrapper = ({
   }, [visible]);
 
   useEffect(() => {
-    if(selectedUserId === -1) {
+    if(selectedUserId === -1) return;
+    if(selectedUserId === userData?.id) {
+      const fetchUpdatedAnnotations = async () => {
+        getProjectsandTasks(projectId, taskId)
+          .then(([temp1, temp2, annotations, temp3]) => {
+            LSFRoot(
+              rootRef,
+              lsfRef,
+              userData,
+              projectId,
+              taskData,
+              labelConfig,
+              annotations,
+              [],
+              annotationNotesRef,
+              reviewNotesRef,
+              superCheckerNotesRef,
+              projectType
+            );
+          })
+      }
       setAutoSave(true);
       setFilterMessage(null);
       setDisableBtns(false);
       setDisableButton(false);
-      LSFRoot(
-        rootRef,
-        lsfRef,
-        userData,
-        projectId,
-        taskData,
-        labelConfig,
-        annotations,
-        [],
-        annotationNotesRef,
-        reviewNotesRef,
-        superCheckerNotesRef,
-        projectType,
-      );
+      fetchUpdatedAnnotations();
       return;
     }
     const userAnnotations = annotations?.filter((item) => item.completed_by === selectedUserId);
@@ -1069,15 +1076,7 @@ const LabelStudioWrapper = ({
       setDisableButton(true);
       setDisableBtns(true);
       setAutoSave(false);
-      if(userAnnotations[0].annotation_type === 1) {
-        setFilterMessage("This is the Annotator's Annotation in read only mode");
-      }
-      else if(userAnnotations[0].annotation_type === 2) {
-        setFilterMessage("This is the Reviewer's Annotation in read only mode");
-      }
-      else if(userAnnotations[0].annotation_type === 3) {
-        setFilterMessage("This is the Super Checker's Annotation in read only mode");
-      }
+      setFilterMessage(`This is the ${["Annotator", "Reviewer", "Super Checker"][userAnnotations[0].annotation_type - 1]}'s Annotation in read only mode`);
       LSFRoot(
         rootRef,
         lsfRef,
@@ -1094,7 +1093,7 @@ const LabelStudioWrapper = ({
         false
       );
     }
-  }, [selectedUserId]);
+  }, [selectedUserId, userData, taskId]);
 
   useEffect(() => {
     const showAssignedUsers = async () => {
@@ -1185,16 +1184,17 @@ const LabelStudioWrapper = ({
                     gap: "4px",
                     alignItems: "flex-start"
                   }}>
-                    <Button
-                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === -1 ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
-                        onClick={() => setSelectedUserId(-1)}>
-                        Default (Reset filters)
-                    </Button>
                     {assignedUsers.map((u, idx) => u && 
                       <Button
-                        style={{display: "inline", fontSize: 12, color: "black", border: selectedUserId === u.id ? "1px solid rgba(0, 0, 0, 0.2)" : "none"}}
+                        style={{
+                          display: "inline",
+                          fontSize: 12,
+                          color: "black",
+                          border: (selectedUserId === u.id || (selectedUserId === -1 && userData?.id === u.id))
+                            ? "1px solid rgba(0, 0, 0, 0.2)" : "none"
+                        }}
                         onClick={() => setSelectedUserId(u.id)}>
-                        {UserMappedByRole(idx + 1).element} {u.email}
+                          {UserMappedByRole(idx + 1).element} {u.email}
                       </Button>
                     )}
                   </div>
