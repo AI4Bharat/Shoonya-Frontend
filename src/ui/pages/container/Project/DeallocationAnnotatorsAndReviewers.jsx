@@ -209,7 +209,7 @@ const renderSnackBar = () => {
         console.log(rsp_data);
       }
     }else if(radiobutton === "superChecker"){
-      if(pin === "0104"){
+      if(pin === "9327"){
         handleok();
       }else{
         window.alert("Incorrect pin entered");
