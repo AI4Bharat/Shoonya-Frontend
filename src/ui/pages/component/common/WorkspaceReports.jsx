@@ -65,6 +65,7 @@ const WorkspaceReports = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportData, setReportData] = useState([]);
   const [reportRequested, setReportRequested] = useState(false);
+  const [emailRequested, setEmailRequested] = useState(false);
   const [projectType, setProjectType] = useState("AnnotatationReports");
   const [reportfilter, setReportfilter] = useState("AllStage");
   const [projectReportType, setProjectReportType] = useState(1);
@@ -126,26 +127,72 @@ const WorkspaceReports = () => {
   }, [ProjectTypes, radioButton]);
 
   useEffect(() => {
-    if (reportRequested) {
-      setSnackbarInfo({
-        open: true,
-        message: UserReports.message,
-        variant: "success",
-      })
+    if (reportRequested && UserReports?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(UserReports[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+      setReportData(UserReports);
+      setSelectedColumns(tempSelected);
+    } else {
+      if(emailRequested){
+        setSnackbarInfo({
+          open: true,
+          message: UserReports.message,
+          variant: "success",
+        })
+        setEmailRequested(false);
+      }
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
     }
-    setReportRequested(false);
     setShowSpinner(false);
   }, [UserReports]);
 
   useEffect(() => {
-    if (reportRequested) {
-      setSnackbarInfo({
-        open: true,
-        message: ProjectReports.message,
-        variant: "success",
-      })
+    if (reportRequested && ProjectReports?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(ProjectReports[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+      setReportData(ProjectReports);
+      setSelectedColumns(tempSelected);
+    } else {
+      if(emailRequested){
+        setSnackbarInfo({
+          open: true,
+          message: ProjectReports.message,
+          variant: "success",
+        })
+        setEmailRequested(false);
+      }
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
     }
-    setReportRequested(false);
     setShowSpinner(false);
   }, [ProjectReports]);
 
@@ -193,7 +240,7 @@ const WorkspaceReports = () => {
     setSelectRange([selection]);
     console.log(selection, "selection");
   };
-  const handleDateSubmit = () => {
+  const handleDateSubmit = (sendMail) => {
     if (radioButton === "payment") {
       const userReportObj = new SendWorkspaceUserReportsAPI(
         id,
@@ -211,7 +258,12 @@ const WorkspaceReports = () => {
       })
     }
     else {
-      setReportRequested(true);
+      if(sendMail){
+        setReportRequested(false);
+        setEmailRequested(true);
+      }else{
+        setReportRequested(true);
+      }
       setShowSpinner(true);
       setShowPicker(false);
       if (radioButton === "user") {
@@ -221,6 +273,7 @@ const WorkspaceReports = () => {
           format(selectRange[0].startDate, 'yyyy-MM-dd'),
           format(selectRange[0].endDate, 'yyyy-MM-dd'),
           language,
+          sendMail,
           projectType === "AnnotatationReports" ? "annotation" : projectType === "ReviewerReports" ? "review" : "supercheck",
           reportfilter,
         );
@@ -232,6 +285,7 @@ const WorkspaceReports = () => {
           selectedType,
 
           language,
+          sendMail,
           projectType === "AnnotatationReports" ? "annotation" : projectType === "ReviewerReports" ? "review" : "supercheck",
         );
         dispatch(APITransport(projectReportObj));
@@ -463,7 +517,7 @@ const WorkspaceReports = () => {
           </FormControl>
         </Grid>}
         {(radioButton === "user" || radioButton === "payment") &&
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
               endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
@@ -476,14 +530,24 @@ const WorkspaceReports = () => {
           </Grid>
         }
 
-        <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+        {radioButton!=="payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             variant="contained"
-            onClick={handleDateSubmit}
+            onClick={() => handleDateSubmit(false)}
             sx={{ width: "130px" }}
           >
-            {radioButton === "payment" ? "E-mail CSV" : "Submit"}
+            Submit
+          </Button>
+        </Grid>}
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => handleDateSubmit(true)}
+            sx={{ width: "130px" }}
+          >
+            E-mail CSV
           </Button>
         </Grid>
       </Grid>
@@ -518,7 +582,7 @@ const WorkspaceReports = () => {
           />
         </Card>
       </Box>}
-      {/* {showSpinner ? <div></div> : reportRequested && (
+      {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
           <MUIDataTable
             title={ProjectReports.length > 0 ? "Reports" : ""}
@@ -527,7 +591,7 @@ const WorkspaceReports = () => {
             options={options}
           />
         </ThemeProvider>)
-      } */}
+      }
       {/* <Grid
           container
           justifyContent="center"
