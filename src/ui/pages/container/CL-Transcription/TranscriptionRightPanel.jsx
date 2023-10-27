@@ -81,6 +81,7 @@ const TranscriptionRightPanel = ({
   handleStdTranscriptionSettings,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
+  annotationId,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -548,6 +549,7 @@ const TranscriptionRightPanel = ({
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
+              annotationId={annotationId}
             />
           </Grid>
           {showAcousticText && <Grid
