@@ -1086,6 +1086,7 @@ useEffect(() => {
             advancedWaveformSettings={advancedWaveformSettings}
             setAdvancedWaveformSettings={setAdvancedWaveformSettings}
             stage={3}
+            annotationId={annotations[0]?.id}
           />
         </Grid>
       </Grid>

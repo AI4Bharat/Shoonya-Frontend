@@ -645,6 +645,7 @@ const AllAudioTranscriptionLandingPage = () => {
             handleStdTranscriptionSettings={setStdTranscriptionSettings}
             advancedWaveformSettings={advancedWaveformSettings}
             setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            annotationId={annotations[0]?.id}
           />
         </Grid>
       </Grid>

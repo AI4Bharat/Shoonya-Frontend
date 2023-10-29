@@ -297,6 +297,11 @@ const WorkspaceReports = () => {
             statisticsType
           );
           dispatch(APITransport(projectReportObj));
+          setSnackbarInfo({
+            open: true,
+            message: "Report will be e-mailed to you shortly",
+            variant: "success",
+          });
         }
       }
     }
@@ -530,7 +535,7 @@ const WorkspaceReports = () => {
           </Grid>
         }
 
-        {radioButton!=="payment" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {(radioButton==="user" || (radioButton==="project" && projectReportType === 1)) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             variant="contained"

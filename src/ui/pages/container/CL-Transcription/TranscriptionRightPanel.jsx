@@ -81,6 +81,7 @@ const TranscriptionRightPanel = ({
   handleStdTranscriptionSettings,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
+  annotationId,
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -228,17 +229,6 @@ const TranscriptionRightPanel = ({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [enableTransliteration, setTransliteration]);
-  
-
-  const getPayload = (offset = currentOffset, lim = limit) => {
-    const payloadObj = new GetAnnotationsTaskAPI(
-      taskId
-      // taskData.task_type,
-      // offset,
-      // lim
-    );
-    dispatch(APITransport(payloadObj));
-  };
 
   const prevOffsetRef = useRef(currentOffset);
   useEffect(() => {
@@ -247,7 +237,6 @@ const TranscriptionRightPanel = ({
       setRedoStack([]);
       prevOffsetRef.current = currentOffset;
     }
-    getPayload(currentOffset, limit);
     // eslint-disable-next-line
   }, [limit, currentOffset]);
 
@@ -480,10 +469,6 @@ const TranscriptionRightPanel = ({
     return 0;
   };
 
-  const onNavigationClick = (value) => {
-    getPayload(value, limit);
-  };
-
   const handleSpeakerChange = (id, index) => {
     const sub = assignSpeakerId(id, index);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -564,6 +549,7 @@ const TranscriptionRightPanel = ({
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
+              annotationId={annotationId}
             />
           </Grid>
           {showAcousticText && <Grid
