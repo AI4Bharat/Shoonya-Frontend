@@ -350,7 +350,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
-              {userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && (props.type === addUserTypes.PROJECT_REVIEWER  || props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
+              {userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && (props.type === addUserTypes.PROJECT_REVIEWER) && (
                 <CustomButton
                   sx={{
                     borderRadius: 2,
@@ -360,6 +360,19 @@ const MembersTable = (props) => {
                   }}
                   label="Remove"
                   onClick={() => {setElId(el.id); setElEmail(el.email); setConfirmationDialog(true); setMemberOrReviewer("reviewer");}}
+                  disabled={projectlist(el.id)|| ProjectDetails.is_archived}
+                />
+              )}
+              {userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && (props.type === addUserTypes.PROJECT_SUPERCHECKER) && (
+                <CustomButton
+                  sx={{
+                    borderRadius: 2,
+                    backgroundColor: "#cf5959",
+                    m: 1,
+                    height: "40px",
+                  }}
+                  label="Remove"
+                  onClick={() => {setElId(el.id); setElEmail(el.email); setConfirmationDialog(true); setMemberOrReviewer("superchecker");}}
                   disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
@@ -432,25 +445,35 @@ const MembersTable = (props) => {
   const [elId, setElId] = useState("");
   const emailId = localStorage.getItem("email_id");
   const [password, setPassword] = useState("");
+  const [pin, setPin] = useState("");
   const [memberOrReviewer, setMemberOrReviewer] = useState("");
   const handleConfirm = async () => {
-    const apiObj = new LoginAPI(emailId, password);
-    const res = await fetch(apiObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(apiObj.getBody()),
-      headers: apiObj.getHeaders().headers,
-    });
-    const rsp_data = await res.json();
-    if (res.ok) {
-      if(memberOrReviewer === "member"){
-      handleProjectMember(elId);
-    }else if(memberOrReviewer === "reviewer"){
-      handleProjectReviewer(elId);
-    }
-      setConfirmationDialog(false);
-    }else{
-      window.alert("Invalid credentials, please try again");
-      console.log(rsp_data);
+    if (memberOrReviewer === "member" || memberOrReviewer === "reviewer"){
+      const apiObj = new LoginAPI(emailId, password);
+      const res = await fetch(apiObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(apiObj.getBody()),
+        headers: apiObj.getHeaders().headers,
+      });
+      const rsp_data = await res.json();
+      if (res.ok) {
+        if(memberOrReviewer === "member"){
+        handleProjectMember(elId);
+      }else if(memberOrReviewer === "reviewer"){
+        handleProjectReviewer(elId);
+      }
+        setConfirmationDialog(false);
+      }else{
+        window.alert("Invalid credentials, please try again");
+        console.log(rsp_data);
+      }}
+    else if(memberOrReviewer === "superchecker"){
+      if(pin === "0104"){
+        handleProjectReviewer(elId);
+        setConfirmationDialog(false);
+      }else{
+        window.alert("Incorrect pin entered");
+      }
     }
   };
   return (
@@ -480,6 +503,7 @@ const MembersTable = (props) => {
                     {elEmail} will be removed from this project. Please be careful as
                     this action cannot be undone.
                   </DialogContentText>
+                {(memberOrReviewer === "member" || memberOrReviewer === "reviewer") &&
                   <TextField
                     autoFocus
                     margin="dense"
@@ -489,7 +513,18 @@ const MembersTable = (props) => {
                     fullWidth
                     variant="standard"
                     onChange={(e) => setPassword(e.target.value)}
-                  />
+                  />}
+                  {memberOrReviewer === "superchecker" &&
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="pin"
+                    label="Pin"
+                    type="pin"
+                    fullWidth
+                    variant="standard"
+                    onChange={(e) => setPin(e.target.value)}
+                  />}
                 </DialogContent>
                 <DialogActions>
                   <Button
