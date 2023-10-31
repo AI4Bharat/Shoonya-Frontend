@@ -266,7 +266,7 @@ function ProgressList() {
   const handleSubmit = async () => {
     setShowBarChar(false);
     if(metaInfo) {
-      if(!selectedType.includes("Audio")) {
+      if(!selectedType.includes("Audio") && !selectedType.includes("Acoustic")) {
         setOptions({
           ...defaultOptions,
           scales: {
@@ -497,7 +497,7 @@ function ProgressList() {
     const getCumulativeMetaInfo = (e) => {
       let val;
       if(metaInfo) {
-        if(selectedType.includes("Audio")) {
+        if(selectedType.includes("Audio") || selectedType.includes("Acoustic")) {
           let [hours, minutes, seconds] = e.cumulative_aud_duration.split(":");
           val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
         } else {
@@ -511,7 +511,7 @@ function ProgressList() {
     const getPeriodicalMetaInfo = (e) => {
       let val;
       if(metaInfo) {
-        if(selectedType.includes("Audio")) {
+        if(selectedType.includes("Audio") || selectedType.includes("Acoustic")) {
           let [hours, minutes, seconds] = e.periodical_aud_duration.split(":");
           val = hoursToSeconds(hours) + minutesToSeconds(minutes) + parseInt(seconds);
         } else {
@@ -542,7 +542,7 @@ function ProgressList() {
             {
               label: baseperiod,
               data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
-              time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
+              time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               stack: "stack 0",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
               borderColor: "white",
@@ -571,7 +571,7 @@ function ProgressList() {
               return {
                 label: formatDateRangeChartLabel(el.date_range),
                 data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
-                time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
+                time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
                 stack: "stack 0",
                 borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
                 borderColor: "white",
@@ -592,7 +592,7 @@ function ProgressList() {
           return {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
-            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
+            time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 0",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -625,7 +625,7 @@ function ProgressList() {
           return {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
-            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
+            time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 0",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -638,7 +638,7 @@ function ProgressList() {
           return {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
-            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
+            time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 1",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -657,7 +657,7 @@ function ProgressList() {
           return {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
-            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
+            time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 0",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -669,7 +669,7 @@ function ProgressList() {
         const cumulativeTasksDataset = {
           label: comparisonperiod,
           data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
-          time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
+          time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
           stack: "stack 1",
           borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
           borderColor: "white",
@@ -689,7 +689,7 @@ function ProgressList() {
         const cumulativeTasksDataset = [{
           label: baseperiod,
           data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
-          time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
+          time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
           stack: "stack 0",
           borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
           borderColor: "white",
@@ -701,7 +701,7 @@ function ProgressList() {
           return {
             label: formatDateRangeChartLabel(el.date_range),
             data: el.data?.map((e) => getPeriodicalMetaInfo(e)),
-            time: (metaInfo && selectedType.includes("Audio")) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
+            time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? el.data?.map((el, i) => el.periodical_aud_duration) : null,
             stack: "stack 1",
             borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
             borderColor: "white",
@@ -726,7 +726,7 @@ function ProgressList() {
             {
               label: baseperiod,
               data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
-              time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
+              time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               stack: "stack 0",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
               borderColor: "white",
@@ -737,7 +737,7 @@ function ProgressList() {
             
               label: comparisonperiod,
               data: CumulativeTasksData.map((e) => getCumulativeMetaInfo(e)),
-              time: (metaInfo && selectedType.includes("Audio")) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
+              time: (metaInfo && (selectedType.includes("Audio") || selectedType.includes("Acoustic"))) ? CumulativeTasksData.map((el, i) => el.cumulative_aud_duration) : null,
               stack: "stack 1",
               borderWidth: {top: 2, left: 0, right: 0, bottom: 0},
               borderColor: "white",
