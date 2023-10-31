@@ -658,7 +658,7 @@ const Header = () => {
         setShowTransliterationModel(false);
   };
 
-  return 
+  return (
     <Grid container direction="row" style={{zIndex:1}}>
       <Box
         className={location.pathname.includes("AudioTranscriptionLandingPage") ? classes.AudioparentContainers
