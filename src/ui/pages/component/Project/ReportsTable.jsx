@@ -290,7 +290,7 @@ const ReportsTable = (props) => {
                         {
                             showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
                                 <MUIDataTable
-                                    title={radiobutton === "AnnotatationReports" ? "Annotation Report" : "Reviewer Report"}
+                                    title={radiobutton === "AnnotatationReports" ? "Annotation Report" : (radiobutton === "ReviewerReports" ? "Reviewer Report" : "Super Checker Report")}
                                     data={ProjectReport}
                                     columns={columns.filter(col => selectedColumns.includes(col.name))}
                                     options={options}

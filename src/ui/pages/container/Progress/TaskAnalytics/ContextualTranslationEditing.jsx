@@ -109,7 +109,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Tasks Count
+                Total Annotated Translation Pairs
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalTaskCount &&
@@ -118,7 +118,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Sentence Pairs
+                Review Pending Translation Pairs
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -180,7 +180,7 @@ function ContextualTranslationEditing(props) {
                 }
               >
                 <Label
-                  value="# of Completed Tasks"
+                  value="# of Completed Translations"
                   angle={-90}
                   position= 'insideLeft'
                   fontWeight="bold"
