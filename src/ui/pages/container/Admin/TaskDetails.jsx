@@ -1,40 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, TextField, Button, Tab, Tabs, Box, Typography } from '@mui/material';
-import { ArrowDropDown } from '@mui/icons-material';
 import { JSONTree } from 'react-json-tree';
 import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails.js";
 import { snakeToTitleCase } from '../../../../utils/utils.js';
-import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers.js';
 import GetTaskAnnotationsAPI from '../../../../redux/actions/api/Tasks/GetTaskAnnotations.js';
+import FetchUserByIdAPI from "../../../../redux/actions/api/UserManagement/FetchUserById";
 
 function TaskDetails() {
     const [taskId, setTaskId] = useState('');
     const [tabValue, setTabValue] = useState(0);
     const [taskDetails, setTaskDetails] = useState(null);
-    const [userDetails, setUserDetails] = useState(null);
     const [annotations, setAnnotations] = useState(null);
 
     const fetchTaskDetails = async () => {
         setTaskDetails(null);
-        setUserDetails(null);
         setAnnotations(null);
         fetchTaskAnnotations();
         const apiObj = new GetTaskDetailsAPI(taskId);
         fetch(apiObj.apiEndPoint(), apiObj.getHeaders())
             .then(response => response.json())
-            .then(data =>  {
+            .then(async (data) => {
+                const users = await getTaskAssignedUsers(data);
+                if(data['review_user'])
+                    data['review_user'] = `${data['review_user']} (${users[1]?.email})`;
+                if(data['super_check_user'])
+                    data['super_check_user'] = `${data['super_check_user']} (${users[2]?.email})`;
+                if(data['annotation_users']?.length)
+                    data['annotation_users'][0] = `${data['annotation_users'][0]} (${users[0]?.email})`;
                 setTaskDetails(data);
                 return data;
             })
-            // .then(data => getTaskAssignedUsers(data))
-            // .then(userData => setUserDetails(userData))
     };
 
     const fetchTaskAnnotations = async () => {
         const apiObj = new GetTaskAnnotationsAPI(taskId);
         fetch(apiObj.apiEndPoint(), apiObj.getHeaders())
             .then(response => response.json())
-            .then(data => setAnnotations(data));
+            .then(data => {
+                let displayData = {};
+                data.forEach((annotation) => {
+                    annotation.annotation_type === 1 && (displayData['annotation'] = annotation);
+                    annotation.annotation_type === 2 && (displayData['review'] = annotation);
+                    annotation.annotation_type === 3 && (displayData['super_check'] = annotation);
+                });
+                setAnnotations(displayData);
+            });
+    };
+
+    const getTaskAssignedUsers = async (data) => {
+        const getAnnotator = async () => {
+            if(!(data?.annotation_users?.length))
+                return Promise.resolve(null);
+            
+            const annotatorObj = new FetchUserByIdAPI(data?.annotation_users[0]);
+            return fetch(annotatorObj.apiEndPoint(), annotatorObj.getHeaders())
+                .then(res => res.json());
+        };
+    
+        const getReviewer = async () => {
+            if(!(data?.review_user))
+                return Promise.resolve(null);
+    
+            const reviewerObj = new FetchUserByIdAPI(data?.review_user);
+            return fetch(reviewerObj.apiEndPoint(), reviewerObj.getHeaders())
+                .then(res => res.json());
+        }
+    
+        const getSuperChecker = async () => {
+            if(!(data?.super_check_user))
+                return Promise.resolve(null);
+            
+            const superCheckerObj = new FetchUserByIdAPI(data?.super_check_user);
+            return fetch(superCheckerObj.apiEndPoint(), superCheckerObj.getHeaders())
+                .then(res => res.json());
+        };
+    
+        return Promise.all([getAnnotator(), getReviewer(), getSuperChecker()]);
     };
 
     const theme = {
@@ -47,9 +88,9 @@ function TaskDetails() {
         base06: '#f5f4f1',
         base07: '#f9f8f5',
         base08: '#f92672',
-        base09: '#fd971f',
+        base09: '#fd971f', //orange
         base0A: '#f4bf75',
-        base0B: '#a6e22e',
+        base0B: '#a6e22e', //green
         base0C: '#a1efe4',
         base0D: '#66d9ef',
         base0E: '#ae81ff',
@@ -106,24 +147,9 @@ function TaskDetails() {
                             data={taskDetails}
                             hideRoot={true}
                             invertTheme={true}
-                            labelRenderer={([key]) => <strong>{key}</strong>}
-                            valueRenderer={(raw) => <em>{raw}</em>}
+                            labelRenderer={([key]) => <strong>{typeof key === "string" ? snakeToTitleCase(key) : key}</strong>}
+                            valueRenderer={(raw) => <span>{typeof raw === "string" && raw.match(/^"(.*)"$/) ? raw.slice(1, -1) :  raw}</span>}
                             theme={theme}
-                            /* theme={{
-                                extend: theme,
-                                // underline keys for literal values
-                                valueLabel: {
-                                textTransform: 'uppercase',
-                                },
-                                // switch key for objects to uppercase when object is expanded.
-                                // `nestedNodeLabel` receives additional argument `expandable`
-                                nestedNodeLabel: ({ style }, keyPath, nodeType, expanded) => ({
-                                style: {
-                                    ...style,
-                                    textTransform: 'uppercase',
-                                },
-                                }),
-                            }}  */
                         />
                     </TabPanel>
                     <TabPanel value={tabValue} index={1}>
@@ -131,8 +157,8 @@ function TaskDetails() {
                             data={annotations}
                             hideRoot={true}
                             invertTheme={true}
-                            labelRenderer={([key]) => <strong>{key}</strong>}
-                            valueRenderer={(raw) => <em>{raw}</em>}
+                            labelRenderer={([key]) => <strong>{typeof key === "string" ? snakeToTitleCase(key) : key}</strong>}
+                            valueRenderer={(raw) => <span>{typeof raw === "string" && raw.match(/^"(.*)"$/) ? raw.slice(1, -1) :  raw}</span>}
                             theme={theme}
                         />
                     </TabPanel>
