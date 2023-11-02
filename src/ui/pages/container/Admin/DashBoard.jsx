@@ -3,6 +3,7 @@ import React from 'react'
 import { useState } from 'react'
 import UserDetail from "./UserDetail";
 import TaskDetails from './TaskDetails';
+import AnnotationDetails from './AnnotationDetails';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -49,7 +50,7 @@ const DashBoard = () => {
                     <TaskDetails  />  
                 </TabPanel> 
                 <TabPanel value={tabValue} index={2}>
-                    <UserDetail  />  
+                    <AnnotationDetails  />  
                 </TabPanel> 
             </Box>
         </>

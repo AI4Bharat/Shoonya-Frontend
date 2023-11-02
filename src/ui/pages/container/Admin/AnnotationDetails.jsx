@@ -1,24 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Button, Tab, Tabs, Box, Typography } from '@mui/material';
+import { Grid, TextField, Button, Box, CircularProgress } from '@mui/material';
 import { JSONTree } from 'react-json-tree';
-import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails.js";
 import { snakeToTitleCase } from '../../../../utils/utils.js';
-import GetTaskAnnotationsAPI from '../../../../redux/actions/api/Tasks/GetTaskAnnotations.js';
 import FetchUserByIdAPI from "../../../../redux/actions/api/UserManagement/FetchUserById";
 import DeleteAnnotationAPI from '../../../../redux/actions/api/Annotation/DeleteAnnotation.js';
 
 function AnnotationDetails() {
     const [annotationId, setAnnotationId] = useState('');
     const [annotationDetails, setAnnotationDetails] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const fetchAnnotationDetails = async () => {
+        setLoading(true);
         setAnnotationDetails(null);
         //not actually deleting the annotation, just fetching the details
         const apiObj = new DeleteAnnotationAPI(annotationId);
         fetch(apiObj.apiEndPoint(), apiObj.getHeaders())
-            .then(response => response.json())
-            .then(data => {
-                setAnnotationDetails(data);
+            .then(async (res) => {
+                if(res.status === 200) {
+                    const data = await res.json();
+                    return data;
+                }
+                else if(res.status === 404)
+                    return { error: 'Annotation not found' };
+                else {
+                    return { error: 'Something went wrong' };
+                }
+            })
+            .then(async (data) => {
+                if(data.error) {
+                    setLoading(false);
+                    setAnnotationDetails(data);
+                }
+                else {
+                    if(data['completed_by']) {
+                        const userEmail = await getUserEmail(data['completed_by']);
+                        data['completed_by'] = `${data['completed_by']} (${userEmail})`;
+                        setLoading(false);
+                        setAnnotationDetails(data);
+                    }
+                    else {
+                        setLoading(false);
+                        setAnnotationDetails(data);
+                    }
+                }
             });
     };
 
@@ -26,7 +51,7 @@ function AnnotationDetails() {
         const apiObj = new FetchUserByIdAPI(userId);
         return fetch(apiObj.apiEndPoint(), apiObj.getHeaders())
             .then(res => res.json())
-            .then(res => res.email);
+            .then(res => res?.email);
     };
 
     const theme = {
@@ -65,6 +90,11 @@ function AnnotationDetails() {
                     </Button>
                 </Box>
             </Grid>
+            {loading && (
+                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 8 }}>
+                    <CircularProgress color="primary" size={50} />
+                </Grid>
+            )}
             {annotationDetails && 
                 <Grid item xs={12}>
                     <JSONTree

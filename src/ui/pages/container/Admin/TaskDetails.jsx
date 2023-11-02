@@ -5,47 +5,95 @@ import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetail
 import { snakeToTitleCase } from '../../../../utils/utils.js';
 import GetTaskAnnotationsAPI from '../../../../redux/actions/api/Tasks/GetTaskAnnotations.js';
 import FetchUserByIdAPI from "../../../../redux/actions/api/UserManagement/FetchUserById";
+import {CircularProgress} from '@mui/material';
 
 function TaskDetails() {
     const [taskId, setTaskId] = useState('');
     const [tabValue, setTabValue] = useState(0);
     const [taskDetails, setTaskDetails] = useState(null);
     const [annotations, setAnnotations] = useState(null);
+    const [usersDetails, setUsersDetails] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const fetchTaskDetails = async () => {
+        setLoading(true);
         setTaskDetails(null);
         setAnnotations(null);
         fetchTaskAnnotations();
         const apiObj = new GetTaskDetailsAPI(taskId);
         fetch(apiObj.apiEndPoint(), apiObj.getHeaders())
-            .then(response => response.json())
+            .then(async (res) => {
+                if(res.status === 200) {
+                    const data = await res.json();
+                    return data;
+                }
+                else if(res.status === 404)
+                    return { error: 'Task not found' };
+                else {
+                    return { error: 'Something went wrong' };
+                }
+            })
             .then(async (data) => {
-                const users = await getTaskAssignedUsers(data);
-                if(data['review_user'])
-                    data['review_user'] = `${data['review_user']} (${users[1]?.email})`;
-                if(data['super_check_user'])
-                    data['super_check_user'] = `${data['super_check_user']} (${users[2]?.email})`;
-                if(data['annotation_users']?.length)
-                    data['annotation_users'][0] = `${data['annotation_users'][0]} (${users[0]?.email})`;
-                setTaskDetails(data);
-                return data;
+                if(data.error) {
+                    setLoading(false);
+                    setTaskDetails(data);
+                }
+                else {
+                    const users = await getTaskAssignedUsers(data);
+                    setUsersDetails(users);
+                    if(data['review_user'])
+                        data['review_user'] = `${data['review_user']} (${users[1]?.email})`;
+                    if(data['super_check_user'])
+                        data['super_check_user'] = `${data['super_check_user']} (${users[2]?.email})`;
+                    if(data['annotation_users']?.length)
+                        data['annotation_users'][0] = `${data['annotation_users'][0]} (${users[0]?.email})`;
+                    setLoading(false);
+                    setTaskDetails(data);
+                }
             })
     };
 
     const fetchTaskAnnotations = async () => {
         const apiObj = new GetTaskAnnotationsAPI(taskId);
         fetch(apiObj.apiEndPoint(), apiObj.getHeaders())
-            .then(response => response.json())
+            .then(async (res) => {
+                if(res.status === 200) {
+                    const data = await res.json();
+                    return data;
+                }
+                else if(res.status === 404)
+                    return { error: 'Task not found' };
+                else {
+                    return { error: 'Something went wrong' };
+                }
+            })
             .then(data => {
-                let displayData = {};
-                data.forEach((annotation) => {
-                    annotation.annotation_type === 1 && (displayData['annotation'] = annotation);
-                    annotation.annotation_type === 2 && (displayData['review'] = annotation);
-                    annotation.annotation_type === 3 && (displayData['super_check'] = annotation);
-                });
-                setAnnotations(displayData);
+                if(data.error) {
+                    setLoading(false);
+                    setAnnotations(data);
+                }
+                else {
+                    let displayData = {};
+                    data.forEach((annotation) => {
+                        annotation.annotation_type === 1 && (displayData['annotator'] = annotation);
+                        annotation.annotation_type === 2 && (displayData['reviewer'] = annotation);
+                        annotation.annotation_type === 3 && (displayData['super_checker'] = annotation);
+                    });
+                    setAnnotations(displayData);
+                }
             });
     };
+
+    useEffect(() => {
+        if(usersDetails?.length && annotations) {
+            if(annotations['annotator'] && annotations['annotator']['completed_by'] === usersDetails[0]?.id)
+                annotations['annotator']['completed_by'] = `${annotations['annotator']['completed_by']} (${usersDetails[0]?.email})`;
+            if(annotations['reviewer'] && annotations['reviewer']['completed_by'] === usersDetails[1]?.id)
+                annotations['reviewer']['completed_by'] = `${annotations['reviewer']['completed_by']} (${usersDetails[1]?.email})`; 
+            if(annotations['super_checker'] && annotations['super_checker']['completed_by'] === usersDetails[2]?.id)
+                annotations['super_checker']['completed_by'] = `${annotations['super_checker']['completed_by']} (${usersDetails[2]?.email})`;
+        };
+    }, [usersDetails, annotations]);
 
     const getTaskAssignedUsers = async (data) => {
         const getAnnotator = async () => {
@@ -133,6 +181,11 @@ function TaskDetails() {
                     </Button>
                 </Box>
             </Grid>
+            {loading && (
+                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 8 }}>
+                    <CircularProgress color="primary" size={50} />
+                </Grid>
+            )}
             {taskDetails && <>
                 <Grid item xs={12}>
                     <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} aria-label="task-details-tabs">
