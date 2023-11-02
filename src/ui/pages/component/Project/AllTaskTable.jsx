@@ -32,9 +32,13 @@ const excludeCols = [
   "machine_translated_conversation_json",
   "speakers_json",
   "language",
-  "unverified_conversation_json",
-  "ocr_prediction_json",
+  "audio_url",
+  "speaker_0_details",
+  "speaker_1_details",
   "machine_transcribed_json",
+  "unverified_conversation_json",
+  "prediction_json",
+  "ocr_prediction_json",
 ];
 
 const excludeSearch = ["status", "actions"];
