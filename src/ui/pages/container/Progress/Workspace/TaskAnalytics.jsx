@@ -4,9 +4,7 @@ import ContextualTranslationEditing from "../TaskAnalytics/ContextualTranslation
 import SemanticTextualSimilarityChart from "../TaskAnalytics/SemanticTextualSimilarityChart";
 import ContextualSentenceVerificationChart from "../TaskAnalytics/ContextualSentenceVerificationChart";
 import WorkspaceTaskAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetTaskAnalytics";
-import SingleSpeakerAudioTranscriptionEditing from "../TaskAnalytics/SingleSpeakerAudioTranscriptionEditing";
-import AudioSegmentation from "../TaskAnalytics/AudioSegmentation";
-import AudioTranscription from "../TaskAnalytics/AudioTranscription";
+import AudioProjects from "../TaskAnalytics/AudioProjects";
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -43,18 +41,27 @@ const TaskAnalytics = () => {
         <ContextualTranslationEditing taskAnalyticsData={taskAnalyticsData} />
       </Grid>}
       {taskAnalyticsData[3]?.length && <Grid style={{marginTop:"40px"}}>
-        <SingleSpeakerAudioTranscriptionEditing
-          taskAnalyticsData={taskAnalyticsData}
+        <AudioProjects
+          taskAnalyticsData={taskAnalyticsData[3]}
+          projectType={"Audio Transcription Editing"}
         />
       </Grid>}
       {taskAnalyticsData[4]?.length && <Grid style={{marginTop:"40px"}}>
-        <AudioTranscription
-          taskAnalyticsData={taskAnalyticsData}
+        <AudioProjects
+          taskAnalyticsData={taskAnalyticsData[4]}
+          projectType={"Audio Transcription"}
         />
       </Grid>}
       {taskAnalyticsData[5]?.length && <Grid style={{marginTop:"40px"}}>
-        <AudioSegmentation
-          taskAnalyticsData={taskAnalyticsData}
+        <AudioProjects
+          taskAnalyticsData={taskAnalyticsData[5]}
+          projectType={"Audio Segmentation"}
+        />
+      </Grid>}
+      {taskAnalyticsData[6]?.length && <Grid style={{marginTop:"40px"}}>
+        <AudioProjects
+          taskAnalyticsData={taskAnalyticsData[6]}
+          projectType={"Acoustic Normalised Transcription Editing"}
         />
       </Grid>}
       {taskAnalyticsData[2]?.length && <Grid style={{marginTop:"40px"}}>
