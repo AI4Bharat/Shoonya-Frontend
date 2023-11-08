@@ -778,7 +778,8 @@ const TranscriptionRightPanel = ({
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
                             ref={el => textRefs.current[index] = el}
-                            onChange={(event) => {
+                            // onChange={(event) => {
+                            onInput={(event) => {
                               changeTranscriptHandler(event, index + idxOffset, false);
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
