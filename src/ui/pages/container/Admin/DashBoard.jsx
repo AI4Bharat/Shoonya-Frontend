@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Tab, Tabs, Typography, Paper } from '@mui/material'
 import React from 'react'
 import { useState } from 'react'
 import UserDetail from "./UserDetail";
@@ -37,20 +37,24 @@ const DashBoard = () => {
         < >
             <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="admin-tabs">
-                    <Tab label="User Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Task Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Annotation Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="User Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                 </Tabs>
             </Box>
             <Box sx={{ p: 1}}>
                 <TabPanel value={tabValue} index={0}>
-                    <UserDetail  />  
+                <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '32px'}}>
+                    <TaskDetails  />  
+                </Paper>
                 </TabPanel> 
                 <TabPanel value={tabValue} index={1}>
-                    <TaskDetails  />  
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '32px'}}>
+                        <AnnotationDetails  />  
+                    </Paper>
                 </TabPanel> 
                 <TabPanel value={tabValue} index={2}>
-                    <AnnotationDetails  />  
+                    <UserDetail  />  
                 </TabPanel> 
             </Box>
         </>
