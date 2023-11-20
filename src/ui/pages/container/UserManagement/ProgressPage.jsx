@@ -29,7 +29,8 @@ const ProfilePage = () => {
     message: "",
     variant: "success",
   });
-
+  const [start_date,setstart_date] = useState();
+  const [end_date,setend_date] = useState();
   const UserDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
@@ -107,7 +108,7 @@ const ProfilePage = () => {
                   <Card>
                     <CardContent>
                       <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
-                      <RecentTasks />
+                      <RecentTasks start_date={start_date} end_date={end_date} setstart_date={setstart_date} setend_date={setend_date}/>
                     </CardContent>
                   </Card> 
               </Grid>
@@ -115,7 +116,7 @@ const ProfilePage = () => {
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
-                    <MyProgress />
+                    <MyProgress setstart_date={setstart_date} setend_date={setend_date}/>
                   </CardContent>
                 </Card>
               

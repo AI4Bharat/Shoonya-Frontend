@@ -16,7 +16,7 @@ import { translate } from "../../../../config/localisation";
 
 const TASK_TYPES = ["annotation", "review","supercheck"]
 
-const RecentTasks = () => {
+const RecentTasks = ({setstart_date, setend_date,start_date,end_date}) => {
 
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -24,6 +24,7 @@ const RecentTasks = () => {
   const [columns, setColumns] = useState([]);
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
+  const [filterdata, setFilteredData] = useState();
 
   const RecentTasks = useSelector((state) => state.getRecentTasks.data)
 
@@ -83,7 +84,21 @@ const RecentTasks = () => {
     jumpToPage: true,
     serverSide: true,
   };
+useEffect(() => {
+  if(start_date && end_date !==null){
+  const updatedData = RecentTasks.results.filter(item => {
+    const datePart = item['Updated at'].split(" ")[0]; // Extract the date part
+    const [day, month, year] = datePart.split("-");
+    const itemDate = new Date(`${year}-${month}-${day}`);
+    console.log((itemDate).getTime(), (new Date(start_date).getTime()));
+    return(itemDate >= new Date(start_date).getTime()) && (itemDate <= new Date(end_date).getTime());
+  });
 
+  setFilteredData(updatedData);
+  console.log(updatedData);
+}
+}, [start_date,end_date]);
+  
   return (
     <ThemeProvider theme={themeDefault}>
       <Box >
@@ -95,7 +110,7 @@ const RecentTasks = () => {
       </Box>
       <ThemeProvider theme={tableTheme}>
         <MUIDataTable
-          data={RecentTasks?.results ?? []}
+          data={filterdata||RecentTasks?.results||[] }
           columns={columns}
           options={tableOptions}
         />

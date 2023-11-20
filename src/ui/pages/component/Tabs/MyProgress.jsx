@@ -47,7 +47,7 @@ import { useParams } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
 import { MenuProps } from "../../../../utils/utils";
 
-const MyProgress = () => {
+const MyProgress = ({setstart_date,setend_date}) => {
   const { id } = useParams();
   const UserDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const [selectRange, setSelectRange] = useState([{
@@ -154,13 +154,34 @@ const MyProgress = () => {
     setShowSpinner(false);
   }, [UserAnalytics]);
 
+
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
     console.log(selection, "selection");
-  };
 
+    const inputendDate = new Date(`${selection.endDate}`);
+    const inputstartDate = new Date(`${selection.startDate}`);
+
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false, // 24-hour format
+    };
+
+    const formatter = new Intl.DateTimeFormat('en-IN', options);
+    var formattedendDate = formatter.format(inputendDate);
+    var formattedstartDate = formatter.format(inputstartDate);
+
+    setstart_date(format(selection.startDate, 'yyyy-MM-dd'));
+    setend_date(format(selection.endDate, 'yyyy-MM-dd'));
+    
+  };
   const handleProgressSubmit = () => {
     setShowPicker(false);
     setSubmitted(true);
@@ -172,13 +193,12 @@ const MyProgress = () => {
     const reviewdata = {
       user_id: id,
       project_type: selectedType,
-      reports_type: radiobutton === "AnnotatationReports" ? "annotation" :radiobutton ==="ReviewerReports" ? "review" : "supercheck" ,
+      reports_type: radiobutton === "AnnotatationReports" ? "annotation" : radiobutton === "ReviewerReports" ? "review" : "supercheck",
       start_date: format(selectRange[0].startDate, 'yyyy-MM-dd'),
       end_date: format(selectRange[0].endDate, 'yyyy-MM-dd'),
 
     }
 
-    
     const progressObj = new GetUserAnalyticsAPI(reviewdata);
     dispatch(APITransport(progressObj));
     // setShowSpinner(true);
@@ -201,7 +221,6 @@ const MyProgress = () => {
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value)
   }
-
 
   const renderToolBar = () => {
     return (
@@ -246,7 +265,7 @@ const MyProgress = () => {
         direction="row"
         justifyContent="start"
         alignItems="center"
-        // sx={{ marginLeft: "50px" }}
+      // sx={{ marginLeft: "50px" }}
       >
         <Grid >
           <Typography gutterBottom component="div" sx={{ marginTop: "15px", fontSize: "16px" }}>
@@ -306,7 +325,7 @@ const MyProgress = () => {
               endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color="primary"
-              sx={{width:"130px"}}
+              sx={{ width: "130px" }}
               onClick={() => setShowPicker(!showPicker)}
             >
               Pick Dates
@@ -339,7 +358,7 @@ const MyProgress = () => {
               fullWidth
               variant="contained"
               onClick={handleProgressSubmit}
-              sx={{width:"130px"}}
+              sx={{ width: "130px" }}
             >
               Submit
             </Button>
@@ -426,7 +445,7 @@ const MyProgress = () => {
           </Grid>
         </Grid>
         }
-      
+
 
         {radiobutton === "ReviewerReports" && totalsummary && <Grid
           container
@@ -529,7 +548,7 @@ const MyProgress = () => {
         {UserAnalytics?.length > 0 ? (
           <ThemeProvider theme={tableTheme}>
             <MUIDataTable
-             title={radiobutton==="AnnotatationReports"? "Annotation Report" :radiobutton==="ReviewerReports"? "Reviewer Report":"Super Checker Report"}
+              title={radiobutton === "AnnotatationReports" ? "Annotation Report" : radiobutton === "ReviewerReports" ? "Reviewer Report" : "Super Checker Report"}
               data={reportData}
               columns={columns.filter((col) => selectedColumns.includes(col.name))}
               options={tableOptions}
