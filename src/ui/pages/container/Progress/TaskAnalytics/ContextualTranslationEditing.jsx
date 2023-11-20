@@ -109,7 +109,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Annotated Translation Pairs
+                Total Translated Sentences
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalTaskCount &&
@@ -118,7 +118,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Review Pending Translation Pairs
+                Review Pending Translations
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -127,7 +127,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Quality/Reviewed Sentence Pairs
+                Quality/Reviewed Translations
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewTasksCount &&
