@@ -9,7 +9,7 @@ const AnnotationStageButtons = ({
   onNextAnnotation,
   AnnotationsTaskDetails,
   disableBtns,
-  disableUpdataButton,
+  disableUpdateButton,
   disableSkipButton,
   filterMessage,
   // taskData
@@ -108,7 +108,7 @@ const AnnotationStageButtons = ({
               </Tooltip>
             </Grid>
           )}
-        {!disableUpdataButton &&
+        {!disableUpdateButton &&
           taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
               <Tooltip>
