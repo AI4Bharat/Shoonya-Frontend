@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   Radio,
 } from "@mui/material";
+
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
@@ -47,7 +48,7 @@ import { useParams } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
 import { MenuProps } from "../../../../utils/utils";
 
-const MyProgress = ({setstart_date,setend_date}) => {
+const MyProgress = () => {
   const { id } = useParams();
   const UserDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const [selectRange, setSelectRange] = useState([{
@@ -56,13 +57,13 @@ const MyProgress = ({setstart_date,setend_date}) => {
     key: "selection"
   }]);
   console.log(UserDetails?.date_joined, "UserDetails?.date_joined")
-  // const [rangeValue, setRangeValue] = useState([
-  //   format(
-  //     Date.parse(UserDetails?.date_joined, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
-  //     "yyyy-MM-dd"
-  //   ),
-  //   Date.now(),
-  // ]);
+  const [rangeValue, setRangeValue] = useState([
+    format(
+      Date.parse(UserDetails?.date_joined, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
+      "yyyy-MM-dd"
+    ),
+    Date.now(),
+  ]);
   const [showPicker, setShowPicker] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
@@ -160,27 +161,6 @@ const MyProgress = ({setstart_date,setend_date}) => {
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
     console.log(selection, "selection");
-
-    const inputendDate = new Date(`${selection.endDate}`);
-    const inputstartDate = new Date(`${selection.startDate}`);
-
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false, // 24-hour format
-    };
-
-    const formatter = new Intl.DateTimeFormat('en-IN', options);
-    var formattedendDate = formatter.format(inputendDate);
-    var formattedstartDate = formatter.format(inputstartDate);
-
-    setstart_date(format(selection.startDate, 'yyyy-MM-dd'));
-    setend_date(format(selection.endDate, 'yyyy-MM-dd'));
-    
   };
   const handleProgressSubmit = () => {
     setShowPicker(false);

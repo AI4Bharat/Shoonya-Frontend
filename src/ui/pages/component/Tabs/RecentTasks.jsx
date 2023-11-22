@@ -3,15 +3,18 @@ import {
   Box,
   Tabs,
   Tab,
+ 
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useParams } from 'react-router-dom';
 import FetchRecentTasksAPI from "../../../../redux/actions/api/UserManagement/FetchRecentTasks";
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import MUIDataTable from "mui-datatables";
+
 import { translate } from "../../../../config/localisation";
 
 const TASK_TYPES = ["annotation", "review","supercheck"]
@@ -25,7 +28,6 @@ const RecentTasks = ({setstart_date, setend_date,start_date,end_date}) => {
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [filterdata, setFilteredData] = useState();
-
   const RecentTasks = useSelector((state) => state.getRecentTasks.data)
 
   useEffect(() => {
@@ -52,6 +54,8 @@ const RecentTasks = ({setstart_date, setend_date,start_date,end_date}) => {
       setColumns([])
     }
   }, [RecentTasks])
+  
+
 
   const tableOptions = {
     count: RecentTasks?.count,
@@ -85,13 +89,21 @@ const RecentTasks = ({setstart_date, setend_date,start_date,end_date}) => {
     serverSide: true,
   };
 useEffect(() => {
-  if(start_date && end_date !==null){
+  if(start_date && end_date !==null  ){
   const updatedData = RecentTasks.results.filter(item => {
-    const datePart = item['Updated at'].split(" ")[0]; // Extract the date part
+    const datePart = item['Updated at'].split(" ")[0]; 
     const [day, month, year] = datePart.split("-");
     const itemDate = new Date(`${year}-${month}-${day}`);
-    console.log((itemDate).getTime(), (new Date(start_date).getTime()));
-    return(itemDate >= new Date(start_date).getTime()) && (itemDate <= new Date(end_date).getTime());
+    const [startDay, startMonth, startYear] = start_date.split("-");
+    const startDateObj = new Date(`${startMonth}-${startDay}-${startYear}`);
+    startDateObj.setHours(0,0,0,0)
+    const [endDay, endMonth, endYear] = end_date.split("-");
+    const endDateObj = new Date(`${endMonth}-${endDay}-${endYear}`);
+    endDateObj.setHours(0,0,0,0)
+    itemDate.setHours(0,0,0,0)
+
+    console.log(itemDate.getDate(),datePart,startDateObj , end_date,endDateObj);
+    return(itemDate >= startDateObj && itemDate <= endDateObj);
   });
 
   setFilteredData(updatedData);
@@ -101,6 +113,7 @@ useEffect(() => {
   
   return (
     <ThemeProvider theme={themeDefault}>
+      
       <Box >
         <Tabs value={taskType} onChange={(e, newVal) => setTaskType(newVal)} aria-label="basic tabs example" sx={{mb: 2}}>
             <Tab label={translate("label.recentTasks.annotation")} value="annotation" sx={{ fontSize: 16, fontWeight: '700'}}/>
@@ -108,6 +121,7 @@ useEffect(() => {
             <Tab label="Super Check" value="supercheck" sx={{ fontSize: 16, fontWeight: '700'}}/>
         </Tabs>
       </Box>
+
       <ThemeProvider theme={tableTheme}>
         <MUIDataTable
           data={filterdata||RecentTasks?.results||[] }
