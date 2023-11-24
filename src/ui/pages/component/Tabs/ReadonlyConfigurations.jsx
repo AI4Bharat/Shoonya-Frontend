@@ -120,7 +120,7 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
               </Typography>
 
               <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
-              {ProjectDetails.sampling_parameters_json?.batch_number?.join(' , ')}
+              {ProjectDetails.sampling_parameters_json?.batch_number}
               </Typography>
             </Grid>)}
 
