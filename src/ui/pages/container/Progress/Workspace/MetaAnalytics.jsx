@@ -10,6 +10,8 @@ import SingleSpeakerAudioTranscriptionEditing from "../MetaAnalytics/SingleSpeak
 import AudioTranscription from "../MetaAnalytics/AudioTranscription";
 import AudioSegmentation from "../MetaAnalytics/AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
+import WordCountBarChartForAudioType from '../MetaAnalytics/WordCountBarChartForAudioType';
+import WordCountBarChartForTranslationType from '../MetaAnalytics/WordCountBarChartForTranslationType';
 
 export default function MetaAnalytics(props) {
     const dispatch = useDispatch();
@@ -24,6 +26,25 @@ export default function MetaAnalytics(props) {
         const userObj = new WorkspaceMetaAnalyticsAPI(workspaceDetails?.id);
         dispatch(APITransport(userObj));
       };
+      const audioProjectTypes=[
+        'AudioTranscription',
+        'AudioSegmentation',
+        'AudioTranscriptionEditing',
+        'AcousticNormalisedTranscriptionEditing'
+      ]
+      const translationProjectTypes=[
+        'MonolingualTranslation',
+        'TranslationEditing',
+        'SemanticTextualSimilarity_Scale5',
+        'ContextualTranslationEditing',
+        'OCRTranscriptionEditing',
+        'SentenceSplitting',
+        'ContextualSentenceVerification',
+        'ContextualSentenceVerificationAndDomainClassification',
+        'ConversationTranslation',
+        'ConversationTranslationEditing',
+        'ConversationVerification'
+      ]
 
       useEffect(() => {
         getMetaAnalyticsdata();
@@ -38,7 +59,7 @@ export default function MetaAnalytics(props) {
   return (
     <div>
       {loading && <Spinner />}
-      {metaAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
+      {/* {metaAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
         <ContextualTranslationEditing metaAnalyticsData={metaAnalyticsData}/>
       </Grid>}
       {metaAnalyticsData[1]?.length && <Grid style={{marginTop:"15px"}}>
@@ -52,7 +73,18 @@ export default function MetaAnalytics(props) {
       </Grid>}
       {metaAnalyticsData[4]?.length && <Grid style={{marginTop:"15px"}}>
       <AudioSegmentation  metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>}
+      </Grid>} */}
+      {metaAnalyticsData.length && metaAnalyticsData.map((analyticsData,_index)=>{
+        if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
+          return (<Grid key={_index} style={{marginTop:"15px"}}>
+          <WordCountBarChartForAudioType analyticsData={analyticsData}/>
+        </Grid>)}
+        if(analyticsData.length && translationProjectTypes.includes(analyticsData[0].projectType)){
+          return <Grid key={_index} style={{marginTop:"15px"}}>
+          <WordCountBarChartForTranslationType analyticsData={analyticsData}/>
+        </Grid>
+        }
+      })}
     </div>
   )
 }
