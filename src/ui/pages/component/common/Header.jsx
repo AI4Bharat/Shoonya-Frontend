@@ -16,6 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import headerStyle from "../../../styles/header";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,11 +34,13 @@ import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
 import UpdateUIPrefsAPI from "../../../../redux/actions/api/UserManagement/UpdateUIPrefs";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElSettings, setAnchorElSettings] = useState(null);
+  const [anchorElNotification, setAnchorElNotification] = useState(null);
   const [anchorElHelp, setAnchorElHelp] = useState(null);
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
@@ -70,13 +73,20 @@ const Header = () => {
     dispatch(APITransport(loggedInUserObj)); 
   };
 
- 
+  const Notification = () => {
+    const loggedInUserObj = new NotificationAPI();
+    dispatch(APITransport(loggedInUserObj)); 
+  };
 
   useEffect(() => {
     getLoggedInUserData();
    
   }, []);
 
+  useEffect(() => {
+    Notification();
+   
+  }, []);
   /* useEffect(()=>{
     if(loggedInUserData?.prefer_cl_ui !== undefined){
       setCheckClUI(loggedInUserData?.prefer_cl_ui)
@@ -125,6 +135,13 @@ const Header = () => {
   };
 
   const handleCloseSettingsMenu = () => {
+    setAnchorElSettings(null);
+  };
+  const handleOpenNotification = (event) => {
+    setAnchorElSettings(event.currentTarget);
+  };
+
+  const handleCloseNotification = () => {
     setAnchorElSettings(null);
   };
 
@@ -725,6 +742,16 @@ const Header = () => {
                   sx={{ textAlign: "center", alignItems: "center" }}
                 >
                   <Grid item xs={3} sm={3} md={2}>
+                    <Tooltip title="Notifications">
+                      <IconButton onClick={handleOpenNotification}>
+                        <NotificationsIcon
+                          color="primary.dark"
+                          fontSize="large"
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="help">
                       <IconButton onClick={handleOpenHelpMenu}>
                         <HelpOutlineIcon
@@ -744,6 +771,7 @@ const Header = () => {
                       </IconButton>
                     </Tooltip>
                   </Grid>
+                  
                   <Grid item xs={6} sm={6} md={7}>
                     <Tooltip title="User Options">
                       <IconButton onClick={handleOpenUserMenu}>
