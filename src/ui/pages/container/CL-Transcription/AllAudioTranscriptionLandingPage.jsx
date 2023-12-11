@@ -293,31 +293,34 @@ const AllAudioTranscriptionLandingPage = () => {
   }
 
   const [wave, setWave] = useState(true);
-  const [waveColor, setWaveColor] = useState("#FFFFFF");
-  const [backgroundColor, setBackgroundColor] = useState("#1C2022");
-  const [paddingColor, setPaddingColor] = useState("#FFFFFF");
+  const [waveColor, setWaveColor] = useState('rgba(156, 39, 176, 1)');
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+  const [paddingColor, setPaddingColor] = useState('#f2f2f2');
   const [cursor, setCursor] = useState(true);
-  const [cursorColor, setCursorColor] = useState("#FF0000");
+  const [cursorColor, setCursorColor] = useState('#ff0000');
   const [progress, setProgress] = useState(true);
-  const [progressColor, setProgressColor] = useState("#FFFFFF");
-  const [grid, setGrid] = useState(true);
-  const [gridColor, setGridColor] = useState("#FFFFFF");
+  const [progressColor, setProgressColor] = useState('rgba(0, 150, 136, 1)');
+  const [grid, setGrid] = useState(false);
+  const [gridColor, setGridColor] = useState('rgba(255, 255, 255, 0.05)');
   const [ruler, setRuler] = useState(true);
-  const [rulerColor, setRulerColor] = useState("#FFFFFF");
+  const [rulerColor, setRulerColor] = useState('rgba(0, 0, 0, 1)');
   const [scrollbar, setScrollbar] = useState(true);
-  const [scrollbarColor, setScrollbarColor] = useState("#FFFFFF");
+  const [scrollbarColor, setScrollbarColor] = useState('rgba(255, 255, 255, 0.25)');
   const [rulerAtTop, setRulerAtTop] = useState(true);
   const [scrollable, setScrollable] = useState(true);
   const [duration, setDuration] = useState(10);
   const [padding, setPadding] = useState(1);
-  const [pixelRatio, setPixelRatio] = useState(1);
+  // const [pixelRatio, setPixelRatio] = useState(window.devicePixelRatio + 1);
+  const [pixelRatio, setPixelRatio] = useState(Number(Math.ceil(window.devicePixelRatio)))
   const [waveScale, setWaveScale] = useState(1);
   const [waveSize, setWaveSize] = useState(1);
+  const [wavWorker, setWavWorker] = useState(true);
+
   const [waveformSettings, setWaveformSettings] = useState({
     "wave": wave, "waveColor": waveColor, "backgroundColor": backgroundColor, "paddingColor": paddingColor,
     "cursor": cursor, "cursorColor": cursorColor, "progress": progress, "progressColor": progressColor, "grid": grid, "gridColor": gridColor, "ruler": ruler,
     "rulerColor": rulerColor, "scrollbar": scrollbar, "scrollbarColor": scrollbarColor, "rulerAtTop": rulerAtTop, "scrollable": scrollable, "duration": duration, "padding": padding,
-    "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize
+    "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize, "worker" : wavWorker
   });
 
   useEffect(() => {
@@ -325,9 +328,9 @@ const AllAudioTranscriptionLandingPage = () => {
       "wave": wave, "waveColor": waveColor, "backgroundColor": backgroundColor, "paddingColor": paddingColor,
       "cursor": cursor, "cursorColor": cursorColor, "progress": progress, "progressColor": progressColor, "grid": grid, "gridColor": gridColor, "ruler": ruler,
       "rulerColor": rulerColor, "scrollbar": scrollbar, "scrollbarColor": scrollbarColor, "rulerAtTop": rulerAtTop, "scrollable": scrollable, "duration": duration, "padding": padding,
-      "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize
-    })
-  }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize]);
+      "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize, "worker" : wavWorker
+  })
+  }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
 
   useEffect(() => {
     if (showNotes === true) {
@@ -591,6 +594,7 @@ const AllAudioTranscriptionLandingPage = () => {
                   <td colSpan={2}>Scrollbar:&nbsp;&nbsp;<input type='checkbox' checked={scrollbar} onChange={() => { setScrollbar(!scrollbar) }}></input>&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={scrollbarColor} onChange={(e) => { setScrollbarColor(e.target.value) }}></input></td>
                   <td>Ruler At Top:&nbsp;&nbsp;<input type='checkbox' checked={rulerAtTop} onChange={() => { setRulerAtTop(!rulerAtTop) }}></input></td>
                   <td>Scrollable:&nbsp;&nbsp;<input type='checkbox' checked={scrollable} onChange={() => { setScrollable(!scrollable) }}></input></td>
+                  <td>Wav worker:&nbsp;&nbsp;<input type='checkbox' checked={wavWorker} onChange={() => {setWavWorker(!wavWorker)}}></input></td>
                 </tr>
                 <tr>
                   <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='range' min={0} max={20} step={1} value={padding} onChange={(e) => { setPadding(e.target.value) }}></input>&nbsp;{padding}</td>
