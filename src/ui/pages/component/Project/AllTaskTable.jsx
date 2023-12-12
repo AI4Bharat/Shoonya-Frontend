@@ -95,6 +95,7 @@ const AllTaskTable = (props) => {
             .map((key) => el.data[key])
         );
         AllTaskData[0].task_status && row.push(el.task_status);
+        console.log("kkk",el);
         row.push( <>
           <Link to={ProjectDetails?.project_type?.includes("Acoustic") ?
           `AllAudioTranscriptionLandingPage/${el.id}` : `Alltask/${el.id}`} className={classes.link}>
