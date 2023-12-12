@@ -66,7 +66,7 @@ const RecentTasks = () => {
 
   useEffect(() => {
     GetAllTasksdata();
-  }, [currentPageNumber, currentRowPerPage,selectedFilters]);
+  }, [taskType,currentPageNumber, currentRowPerPage,selectedFilters]);
 
 
   useEffect(() => {
