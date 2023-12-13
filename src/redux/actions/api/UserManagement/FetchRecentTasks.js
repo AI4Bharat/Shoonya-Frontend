@@ -15,10 +15,7 @@ import constants from "../../../constants";
      let queryString = `${pageNo ? "page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}${task_type ? "&task_type="+task_type:""}`;
      for (let key in filter) {
       if (filter[key] && filter[key] !== -1) {
-            // queryString +=  `&${key}=${JSON.stringify(filter[key])}`
-        // }else{
           queryString +=  `&${key}=${filter[key]}`
-        // }
       }
     }
      this.type = constants.GET_RECENT_TASKS;

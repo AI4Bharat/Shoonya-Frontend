@@ -49,15 +49,6 @@ const RecentTasks = () => {
     Status: ["incomplete", "annotated", "reviewed","super_checked","exported"],
   };
   const [selectedFilters, setsSelectedFilters] = useState({});
-  // useEffect(() => {
-  //   const taskObj = new FetchRecentTasksAPI(id, taskType, currentPageNumber, currentRowPerPage);
-  //   dispatch(APITransport(taskObj));
-  // }, [id, taskType, currentPageNumber,selectedFilters, currentRowPerPage])
-
-  // const GetAllTasksdata = () => {
-  //   const taskObjs = new FetchRecentTasksAPI(id, taskType,currentPageNumber,selectedFilters, currentRowPerPage);
-  //   dispatch(APITransport(taskObjs));
-  // };
 
   const GetAllTasksdata = () => {
     const taskObjs = new FetchRecentTasksAPI( taskType,currentPageNumber,selectedFilters, currentRowPerPage);
@@ -155,148 +146,6 @@ const RecentTasks = () => {
   
 
 
-
-//   const pageSearch = () => {
-
-//     return RecentTasks?.results?.filter((el) => {
-//       console.log(el.ProjectID);
-
-//         if (SearchWorkspace == "") {
-
-//             return el;
-//         } else if (
-//             el['Project ID']
-//                 ?.toString()?.toLowerCase()
-//                 .includes(SearchWorkspace?.toLowerCase())
-//         ) {
-
-//             return el;
-//         }
-//         else if (
-//           el["Task ID"]
-//               .toString()?.toLowerCase()
-//               .includes(SearchWorkspace?.toLowerCase())
-//       ) {
-
-//           return el;
-//       }
-//       else if (
-//         el["Created at"]
-//             ?.toLowerCase()
-//             .includes(SearchWorkspace?.toLowerCase())
-//     ) {
-
-//         return el;
-//     }
-//     else if (
-//       el["Updated at"]
-//           ?.toLowerCase()
-//           .includes(SearchWorkspace?.toLowerCase())
-//   ) {
-
-//       return el;
-//   }else if (
-//     el["Annotated at"]
-//         ?.toLowerCase()
-//         .includes(SearchWorkspace?.toLowerCase())
-// ) {
-
-//     return el;
-// }
-//     })
-
-// }
-// const columns = [
-//   {
-//     name: "Project ID",
-//     label: "Project ID",
-//     options: {
-//                 filter: false,
-//                 sort: false,
-//                 align: "center",
-//               },
-//   },
-//   {
-//     name: "Task ID",
-//     label: "Task ID",
-//     options: {
-//                 filter: false,
-//                 sort: false,
-//                 align: "center",
-//               },
-//   },
-//   {
-//     name: "Created At",
-//     label: "Created At",
-//     options: {
-//                 filter: false,
-//                 sort: false,
-//                 align: "center",
-//               },
-//   },
-//   {
-//     name: "Updated At",
-//     label: "Updated At",
-//     options: {
-//                 filter: false,
-//                 sort: false,
-//                 align: "center",
-//               },
-//   },
-
-//   {
-//     name: "Annotated At",
-//     label: "Annotated At",
-//     options: {
-//                 filter: false,
-//                 sort: false,
-//                 align: "center",
-//               },
-//   },
-// ];
-
-
-
-
-// const data = RecentTasks && RecentTasks?.results?.length > 0 ?pageSearch().map((el, i) => {
-//   return [
-//       el['Project ID'],
-//       el["Task ID"],
-//       el["Updated at"],
-//       el["Created at"],
-//       el["Annotated at"]
-//       // el.managers.map((manager, index) => {
-//       //     return manager.username
-//       // }).join(", "),
-//       // el.created_by && el.created_by.username,
-//       // <Link to={`/workspaces/${el.id}`} style={{ textDecoration: "none" }}>
-//       //     <CustomButton
-//       //         sx={{ borderRadius: 2 }}
-//       //         label="View"
-//       //     />
-//       // </Link>
-//   ]
-// })  : [];
-  // useEffect(() => {
-  //   if (RecentTasks?.results?.length > 0) {
-  //     let tempColumns = []
-  //     Object.keys(RecentTasks.results[0]).forEach((key) => {
-  //       tempColumns.push({
-  //         name: key,
-  //         label: key,
-  //         options: {
-  //           filter: false,
-  //           sort: false,
-  //           align: "center",
-  //         },
-  //       })
-  //     })
-  //     setColumns(tempColumns)
-  //   } else {
-  //     setColumns([])
-  //   }
-  // }, [RecentTasks])
-
   const tableOptions = {
     count: RecentTasks?.count,
       rowsPerPage: currentRowPerPage,
@@ -345,18 +194,7 @@ const RecentTasks = () => {
           options={tableOptions}
         />
       </ThemeProvider>
-      {/* {popoverOpen && (
-        <AllTasksFilterList
-          id={filterId}
-          open={popoverOpen}
-          anchorEl={anchorEl}
-          handleClose={handleClose}
-          filterStatusData={filterData}
-          updateFilters={setsSelectedFilters}
-          currentFilters={selectedFilters}
-          onchange={GetAllTasksdata}
-        />
-      )} */}
+     
        {searchOpen && <AllTaskSearchPopup
                     open={searchOpen}
                     anchorEl={searchAnchor}
