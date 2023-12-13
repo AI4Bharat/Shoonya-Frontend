@@ -44,7 +44,6 @@ const RecentTasks = () => {
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
 
   const RecentTasks = useSelector((state) => state.getRecentTasks.data)
-  const SearchWorkspace = useSelector((state) => state.SearchProjectCards.data);
   const filterData = {
     Status: ["incomplete", "annotated", "reviewed","super_checked","exported"],
   };
@@ -62,17 +61,11 @@ const RecentTasks = () => {
 
   useEffect(() => {
     if (RecentTasks && RecentTasks?.results?.results?.length > 0) {
-      // console.log(RecentTasks.results);
       const data = RecentTasks?.results?.results?.map((el) => {
-        // let row=[];
         if (typeof el === 'object') {
           return Object.keys(el).map((key) => el[key]);
         }
         return []; 
-        // console.log(row);
-        // console.log("kkk",el);
-        // return row;
-        
       });
       let colList = [];
       console.log(...Object.keys(RecentTasks.results.results[0]));

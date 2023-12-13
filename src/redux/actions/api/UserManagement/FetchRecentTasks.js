@@ -10,7 +10,6 @@ import constants from "../../../constants";
    constructor(task_type, pageNo, filter,countPerPage, timeout = 2000) {
     console.log(task_type,"task_typetask_type")
      super("GET", timeout, false);
-    //  this.userId = user_id;
      this.taskType = task_type;
      let queryString = `${pageNo ? "page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}${task_type ? "&task_type="+task_type:""}`;
      for (let key in filter) {
