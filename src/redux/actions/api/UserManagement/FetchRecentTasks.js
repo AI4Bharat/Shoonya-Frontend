@@ -7,11 +7,12 @@
 import constants from "../../../constants";
  
  export default class FetchRecentTasksAPI extends API {
-   constructor(task_type, pageNo, filter,countPerPage, timeout = 2000) {
+   constructor(id,task_type, pageNo, filter,countPerPage, timeout = 2000) {
     console.log(task_type,"task_typetask_type")
      super("GET", timeout, false);
      this.taskType = task_type;
-     let queryString = `${pageNo ? "page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}${task_type ? "&task_type="+task_type:""}`;
+     this.id = id;
+     let queryString = `${pageNo ? "page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}${id ? "&user_id="+id:""}${task_type ? "&task_type="+task_type:""}`;
      for (let key in filter) {
       if (filter[key] && filter[key] !== -1) {
           queryString +=  `&${key}=${filter[key]}`
