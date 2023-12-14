@@ -50,7 +50,7 @@ const RecentTasks = () => {
   const [selectedFilters, setsSelectedFilters] = useState({});
 
   const GetAllTasksdata = () => {
-    const taskObjs = new FetchRecentTasksAPI(id, taskType,currentPageNumber,selectedFilters, currentRowPerPage);
+    const taskObjs = new FetchRecentTasksAPI(id,taskType,currentPageNumber,selectedFilters, currentRowPerPage);
     dispatch(APITransport(taskObjs));
   };
 
