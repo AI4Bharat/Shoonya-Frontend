@@ -3,7 +3,8 @@ import {
   Box,
   Tabs,
   Tab,
-  IconButton
+  IconButton,
+  Tooltip
 } from "@mui/material";
 import { Grid } from "@mui/material";
 
@@ -107,6 +108,21 @@ const RecentTasks = () => {
       setSearchedCol(col);
     }
     const customColumnHead = (col) => {
+      let tooltipText = "";
+
+  switch (col.label) {
+    case "Updated at":
+      tooltipText = "When task was last updated";
+      break;
+    case "Created at":
+      tooltipText = "When task was assigned";
+      break;
+    case "Annotated at":
+      tooltipText = "When task was first annotated";
+      break;
+    default:
+      break;
+  }
       return (
           <Box
               sx={{
@@ -118,7 +134,9 @@ const RecentTasks = () => {
                   alignItems: "center",
               }}
           >
-                 {col.label}
+                 <Tooltip title={tooltipText}>
+                     <span>{col.label}</span>
+                 </Tooltip>
                   { <IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
                       <SearchIcon id={col.name + "_btn"} />
                   </IconButton>}
