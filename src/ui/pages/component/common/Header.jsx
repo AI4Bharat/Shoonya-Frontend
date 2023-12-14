@@ -12,6 +12,8 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  Badge,
+  Chip
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
@@ -42,9 +44,10 @@ const Header = () => {
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElNotification, setAnchorElNotification] = useState(null);
   const [anchorElHelp, setAnchorElHelp] = useState(null);
+  const [Notification, setnotification] = useState()
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
-  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
+  const [isSpaceClicked, setIsSpaceClicked] = useState(false);
   const [showTransliterationModel, setShowTransliterationModel] =
     useState(false);
   const [snackbar, setSnackbarInfo] = useState({
@@ -58,6 +61,7 @@ const Header = () => {
     (state) => state?.fetchLoggedInUserData?.data
   );
 
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -66,27 +70,42 @@ const Header = () => {
   const location = useLocation();
   const classes = headerStyle();
 
- 
 
   const getLoggedInUserData = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
-    dispatch(APITransport(loggedInUserObj)); 
+    dispatch(APITransport(loggedInUserObj));
   };
 
-  const Notification = () => {
-    const loggedInUserObj = new NotificationAPI();
-    dispatch(APITransport(loggedInUserObj)); 
+  const fetchNotifications = () => {
+    let apiObj = new NotificationAPI();
+    var rsp_data = [];
+    fetch(apiObj.apiEndPoint(), {
+      method: "get",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    })
+      .then(async (response) => {
+        rsp_data = await response.json();
+        if (response.ok) {
+         setnotification(response?.data)
+         console.log(Notification);
+        }
+      })
+      .catch((error) => {
+        setnotification(error)
+      });
   };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   useEffect(() => {
     getLoggedInUserData();
-   
+
   }, []);
 
-  useEffect(() => {
-    Notification();
-   
-  }, []);
+
   /* useEffect(()=>{
     if(loggedInUserData?.prefer_cl_ui !== undefined){
       setCheckClUI(loggedInUserData?.prefer_cl_ui)
@@ -138,11 +157,11 @@ const Header = () => {
     setAnchorElSettings(null);
   };
   const handleOpenNotification = (event) => {
-    setAnchorElSettings(event.currentTarget);
+    setAnchorElNotification(event.currentTarget);
   };
 
   const handleCloseNotification = () => {
-    setAnchorElSettings(null);
+    setAnchorElNotification(null);
   };
 
   const handleRTLChange = (event) => {
@@ -160,25 +179,30 @@ const Header = () => {
     }
   };
 
-  const handleTranscriptionFlowChange = async(event) => {
-      const obj = new UpdateUIPrefsAPI(event.target.checked);
-      // dispatch(APITransport(loggedInUserObj));
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "POST",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
+  const handleTranscriptionFlowChange = async (event) => {
+    const obj = new UpdateUIPrefsAPI(event.target.checked);
+    // dispatch(APITransport(loggedInUserObj));
+    const res = await fetch(obj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(obj.getBody()),
+      headers: obj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (res.ok) {
+      getLoggedInUserData();
+      setSnackbarInfo({
+        open: true,
+        message: resp.message,
+        variant: "success",
       });
-      const resp = await res.json();
-      if (res.ok) {
-        getLoggedInUserData();
-        setSnackbarInfo({
-          open: true,
-          message:resp.message,
-          variant: "success",
-        });
-      }
+    }
   };
-
+  const handleRemoveNotification = (notificationId) => {
+    const updatedNotifications = Notification?.filter(
+      (Notification) => Notification.id !== notificationId
+    );
+    setnotification(updatedNotifications);
+  };
   const handleTagsChange = (event) => {
     if (event.target.checked) {
       localStorage.setItem("enableTags", true);
@@ -671,15 +695,15 @@ const Header = () => {
     // },
   ];
 
-  const handleTransliterationModelClose =  () => {
-        setShowTransliterationModel(false);
+  const handleTransliterationModelClose = () => {
+    setShowTransliterationModel(false);
   };
 
   return (
-    <Grid container direction="row" style={{zIndex:1}}>
+    <Grid container direction="row" style={{ zIndex: 1 }}>
       <Box
         className={location.pathname.includes("AudioTranscriptionLandingPage") ? classes.AudioparentContainers
-            : classes.parentContainer
+          : classes.parentContainer
         }
       >
         {isMobile ? (
@@ -703,7 +727,7 @@ const Header = () => {
                     src={Shoonya_Logo}
                     alt="logo"
                     className={classes.headerLogo}
-                    sx={{marginTop: "5%"}}
+                    sx={{ marginTop: "5%" }}
                   />
                 </Link>
                 <Typography
@@ -743,12 +767,11 @@ const Header = () => {
                 >
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
-                      <IconButton onClick={handleOpenNotification}>
-                        <NotificationsIcon
-                          color="primary.dark"
-                          fontSize="large"
-                        />
-                      </IconButton>
+                      <Badge badgeContent={Notification?.lenght} color="secondary">
+                        <IconButton onClick={handleOpenNotification}>
+                          <NotificationsIcon color="primary.dark" fontSize="large" />
+                        </IconButton>
+                      </Badge>
                     </Tooltip>
                   </Grid>
                   <Grid item xs={3} sm={3} md={2}>
@@ -771,14 +794,14 @@ const Header = () => {
                       </IconButton>
                     </Tooltip>
                   </Grid>
-                  
+
                   <Grid item xs={6} sm={6} md={7}>
                     <Tooltip title="User Options">
                       <IconButton onClick={handleOpenUserMenu}>
                         <Avatar
                           alt="user_profile_pic"
                           variant="contained"
-                          src={loggedInUserData?.profile_photo?loggedInUserData.profile_photo:''}
+                          src={loggedInUserData?.profile_photo ? loggedInUserData.profile_photo : ''}
                           className={classes.avatar}
                         >
                           {loggedInUserData &&
@@ -890,6 +913,33 @@ const Header = () => {
                     </MenuItem>
                   ))}
                 </Menu>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElNotification}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  open={Boolean(anchorElNotification)}
+                  onClose={handleCloseNotification}
+                >
+                  {Notification?.map((notification) => (
+                    <MenuItem key={notification.id}>
+                      <Chip
+                        label={notification.title}
+                        onDelete={() => handleRemoveNotification(notification.id)}
+                        color="primary"
+                        variant="outlined"
+                      />
+                    </MenuItem>
+                  ))}
+                </Menu>
               </Box>
             </Toolbar>
           </AppBar>
@@ -903,7 +953,7 @@ const Header = () => {
         topTranslate={"40"}
         leftTranslate={"-50"}
         isTransliteration={true}
-        // sx={{width: "400px"}}
+      // sx={{width: "400px"}}
       >
         <Transliteration
           onCancelTransliteration={() => handleTransliterationModelClose}

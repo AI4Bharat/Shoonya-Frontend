@@ -5,6 +5,7 @@ const apiendpoint =  {
   fetch:"/users/account/",
   getTasks:"/task/",  
   getOrganizations:"/organizations/",
+  notification:"/notifications/",
   getLanguages:"/users/languages/",
   getDatasets:"/data/",
   annotations:"/annotation/",

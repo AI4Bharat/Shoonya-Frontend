@@ -8,14 +8,14 @@
  export default class NotificationAPI extends API {
     constructor( timeout = 2000) {
       super("GET", timeout, false);
-    //   this.type = constants.GET_ORGANIZATION_USERS;
-      this.endpoint = `https://backend.dev.shoonya.ai4bharat.org/notifications/`;
+      this.type = constants.NOTIFICATION;
+      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.notification}`;
     }
   
     processResponse(res) {
       super.processResponse(res);
       if (res) {
-          this.organizationMembers = res;
+          this.notification = res;
       }
   }
   
@@ -36,7 +36,7 @@
     }
   
     getPayload() {
-      return this.organizationMembers;
+      return this.notification;
     }
   }
   
