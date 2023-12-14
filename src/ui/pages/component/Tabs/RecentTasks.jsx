@@ -50,13 +50,13 @@ const RecentTasks = () => {
   const [selectedFilters, setsSelectedFilters] = useState({});
 
   const GetAllTasksdata = () => {
-    const taskObjs = new FetchRecentTasksAPI( taskType,currentPageNumber,selectedFilters, currentRowPerPage);
+    const taskObjs = new FetchRecentTasksAPI(id, taskType,currentPageNumber,selectedFilters, currentRowPerPage);
     dispatch(APITransport(taskObjs));
   };
 
   useEffect(() => {
     GetAllTasksdata();
-  }, [taskType,currentPageNumber, currentRowPerPage,selectedFilters]);
+  }, [id,taskType,currentPageNumber, currentRowPerPage,selectedFilters]);
 
 
   useEffect(() => {
