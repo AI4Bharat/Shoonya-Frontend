@@ -6,19 +6,19 @@ import CustomButton from "../../../component/common/Button";
 import { Button, Grid, ThemeProvider, Select, Box, MenuItem,Radio, InputLabel, FormControl, Card, Typography } from "@mui/material";
 import MetaAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/MetaAnalytics"
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
-import WordCountBarChartForAudioType from './WordCountBarChartForAudioType';
-import ContextualTranslationEditing from "./ContextualTranslationEditing";
-import SemanticTextualSimilarity_Scale5 from "./SemanticTextualSimilarity_Scale5";
+import AudioDurationChart from './AudioDurationMetaAnalyticsChart';
+// import ContextualTranslationEditing from "./ContextualTranslationEditing";
+// import SemanticTextualSimilarity_Scale5 from "./SemanticTextualSimilarity_Scale5";
 import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
-import AudioTranscription from "./AudioTranscription";
-import AudioSegmentation from "./AudioSegmentation";
+// import AudioTranscription from "./AudioTranscription";
+// import AudioSegmentation from "./AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
 import themeDefault from "../../../../theme/theme";
 import LightTooltip from '../../../component/common/Tooltip';
 import { translate } from "../../../../../config/localisation";
 import InfoIcon from '@mui/icons-material/Info';
 import { MenuProps } from "../../../../../utils/utils";
-import WordCountBarChartForTranslationType from './WordCountBarChartForTranslationType';
+import WordCountMetaAnalyticsChart from './WordCountMetaAnalyticsChart';
 
 export default function MetaAnalytics(props) {
     const dispatch = useDispatch();
@@ -60,18 +60,24 @@ export default function MetaAnalytics(props) {
         'TranslationEditing',
         'SemanticTextualSimilarity_Scale5',
         'ContextualTranslationEditing',
-        'OCRTranscriptionEditing',
         'SentenceSplitting',
         'ContextualSentenceVerification',
         'ContextualSentenceVerificationAndDomainClassification',
+      ]
+
+      const conversationProjectTypes=[
         'ConversationTranslation',
         'ConversationTranslationEditing',
         'ConversationVerification'
       ]
 
-      // useEffect(() => {
-      //   getMetaAnalyticsdata();
-      // }, []);
+      const ocrProjectTypes=[
+        'OCRTranscriptionEditing',
+      ]
+
+      useEffect(() => {
+        getMetaAnalyticsdata();
+      }, []);
       const handleSubmit = async () => {
         getMetaAnalyticsdata();
       }
@@ -124,30 +130,19 @@ export default function MetaAnalytics(props) {
 
       </Grid>
       {loading && <Spinner />}
-      {/* {metaAnalyticsData[0]?.length && <Grid style={{marginTop:"15px"}}>
-        <ContextualTranslationEditing metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>}
-      {metaAnalyticsData[1]?.length && <Grid style={{marginTop:"15px"}}>
-      <SemanticTextualSimilarity_Scale5 metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>}
-      {metaAnalyticsData[2]?.length && <Grid style={{marginTop:"15px"}}>
-      <SingleSpeakerAudioTranscriptionEditing  metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>}
-      {metaAnalyticsData[3]?.length && <Grid style={{marginTop:"15px"}}>
-      <AudioTranscription  metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>}
-      {metaAnalyticsData[4]?.length && <Grid style={{marginTop:"15px"}}>
-      <AudioSegmentation  metaAnalyticsData={metaAnalyticsData}/>
-      </Grid>} */}
 
       {metaAnalyticsData.length && metaAnalyticsData.map((analyticsData,_index)=>{
         if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
           return (<Grid key={_index} style={{marginTop:"15px"}}>
-          <WordCountBarChartForAudioType analyticsData={analyticsData}/>
+          <AudioDurationChart analyticsData={analyticsData}/>
         </Grid>)}
-        if(analyticsData.length && translationProjectTypes.includes(analyticsData[0].projectType)){
+        if(analyticsData.length && 
+          (translationProjectTypes.includes(analyticsData[0].projectType) ||
+            conversationProjectTypes.includes(analyticsData[0].projectType)
+            )
+          ){
           return <Grid key={_index} style={{marginTop:"15px"}}>
-          <WordCountBarChartForTranslationType analyticsData={analyticsData}/>
+          <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
         </Grid>
         }
       })}

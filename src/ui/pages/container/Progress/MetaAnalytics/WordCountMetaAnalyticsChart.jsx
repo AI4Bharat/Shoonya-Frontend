@@ -13,7 +13,7 @@ import {
   import { useEffect, useState } from "react";
   import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
-export default function WordCountBarChartForTranslationType(props) {
+export default function WordCountMetaAnalyticsChart(props) {
     const {analyticsData} = props
     const classes = DatasetStyle();
     const [totalWordCount, setTotalWordCount] = useState();
@@ -88,15 +88,10 @@ export default function WordCountBarChartForTranslationType(props) {
   return (
     <Box className={classes.modelChartSection}>
          <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-         Word Count Dashboard - Translation
+         {`Word Count Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Translation Tasks
+            Count of Annotated and Reviewed Data
           </Typography>
-        </Typography>
-
-        <Typography variant="body" sx={{fontSize:"17px"}}>
-          Note : Quality sentence pairs are generated after a pipeline of
-          Annotated & Reviewed tasks.
         </Typography>
         <Paper>
           <Box className={classes.topBar}>
