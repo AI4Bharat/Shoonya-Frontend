@@ -78,23 +78,32 @@ const Header = () => {
 
   const fetchNotifications = () => {
     let apiObj = new NotificationAPI();
-    var rsp_data = [];
     fetch(apiObj.apiEndPoint(), {
       method: "get",
       body: JSON.stringify(apiObj.getBody()),
       headers: apiObj.getHeaders().headers,
     })
       .then(async (response) => {
-        rsp_data = await response.json();
         if (response.ok) {
-         setnotification(response?.data)
-         console.log(Notification);
+          const data = await response?.json();
+          setnotification(data);
+          console.log(Notification?.length, data);
+        } else {
+          console.error("Error fetching notifications:", response.status, response.statusText);
+          setnotification([]);
         }
       })
       .catch((error) => {
-        setnotification(error)
+        console.error("Error fetching notifications:", error);
+        setnotification(error);
+        setSnackbarInfo({
+          open: true,
+          message: error,
+          variant: "Error",
+        });
       });
   };
+
 
   useEffect(() => {
     fetchNotifications();
@@ -757,21 +766,22 @@ const Header = () => {
               </Grid> */}
               {renderTabs()}
               {renderSnackBar()}
-              <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
+              <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={4}>
                 <Grid
                   container
                   direction="row"
                   justifyContent="center"
                   spacing={2}
-                  sx={{ textAlign: "center", alignItems: "center" }}
+                  sx={{ textAlign: "center", alignItems: "center", }}
                 >
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
-                      <Badge badgeContent={Notification?.lenght} color="secondary">
-                        <IconButton onClick={handleOpenNotification}>
+                      <IconButton onClick={handleOpenNotification}>
+                        <Badge badgeContent={Notification?.length}color="primary">
                           <NotificationsIcon color="primary.dark" fontSize="large" />
-                        </IconButton>
-                      </Badge>
+                        </Badge>
+
+                      </IconButton>
                     </Tooltip>
                   </Grid>
                   <Grid item xs={3} sm={3} md={2}>
@@ -784,7 +794,7 @@ const Header = () => {
                       </IconButton>
                     </Tooltip>
                   </Grid>
-                  <Grid item xs={3} sm={3} md={3}>
+                  <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Settings">
                       <IconButton onClick={handleOpenSettingsMenu}>
                         <SettingsOutlinedIcon
@@ -795,7 +805,7 @@ const Header = () => {
                     </Tooltip>
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={7}>
+                  <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="User Options">
                       <IconButton onClick={handleOpenUserMenu}>
                         <Avatar
