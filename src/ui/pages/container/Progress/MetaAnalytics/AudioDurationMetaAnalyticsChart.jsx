@@ -5,66 +5,73 @@ import DatasetStyle from "../../../../styles/Dataset";
 import { useEffect, useState } from "react";
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
-export default function SemanticTextualSimilarity_Scale5(props) {
-  const { metaAnalyticsData } = props;
+export default function AudioDurationChart(props) {
+  const { analyticsData } = props;
   const classes = DatasetStyle();
+  const [totalAudioHours, setTotalAudioHours] = useState();
+  const [totalAnnotationAudioHours, setTotalAnnotationAudioHours] = useState();
+  const [totalReviewAudioHours, setTotalReviewAudioHours] = useState();
   const [data, setData] = useState([]);
-  const [totalWordCount, setTotalWordCount] = useState();
-  const [totalAnnotationWordCount, setTotalAnnotationWordCount] = useState();
-  const [totalReviewWordCount, setTotalReviewWordCount] = useState();
 
   useEffect(() => {
-    metaAnalyticsData[1]?.sort(
+    analyticsData?.sort(
       (a, b) =>
-        b.annotation_cumulative_word_count - a.annotation_cumulative_word_count
+        b.annotation_aud_duration_tohour - a.annotation_aud_duration_tohour
     );
-    setData(metaAnalyticsData[1]);
-    let allAnnotatorCumulativeWordCount = 0;
-    let allReviewCumulativeWordCount = 0;
+    setData(analyticsData);
+    let allAnnotatorAudioHours = 0;
+    let allReviewAudioHours = 0;
     var languages;
-    metaAnalyticsData[1]?.map((element, index) => {
-        allAnnotatorCumulativeWordCount +=
-        element.annotation_cumulative_word_count;
-        allReviewCumulativeWordCount += element.review_cumulative_word_count;
+    analyticsData?.map((element, index) => {
+        allAnnotatorAudioHours +=
+        element.annotation_aud_duration_tohour;
+        allReviewAudioHours += element.review_aud_duration_tohour;
       languages = element.languages;
     });
 
-    setTotalAnnotationWordCount(allAnnotatorCumulativeWordCount);
-    setTotalReviewWordCount(allReviewCumulativeWordCount);
-    setTotalWordCount(
-        allAnnotatorCumulativeWordCount + allReviewCumulativeWordCount
+    setTotalAnnotationAudioHours(allAnnotatorAudioHours);
+    setTotalReviewAudioHours(allReviewAudioHours);
+    setTotalAudioHours(
+        allAnnotatorAudioHours + allReviewAudioHours
     );
-  }, [metaAnalyticsData[1]]);
+  }, [analyticsData]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className={classes.toolTip}>
+        <div className={classes.toolTips}>
           <p style={{ fontWeight: "bold" }}>
             {`${label}`}
             <p style={{ fontWeight: "normal" }}>
-              {`Total count : ${
-                payload[0].payload.annotation_cumulative_word_count
+              {`Total hours : ${
+                payload[0].payload.annotation_aud_duration_tohour
                   ? new Intl.NumberFormat("en").format(
-                      payload[0].payload.annotation_cumulative_word_count
+                      payload[0].payload.annotation_aud_duration_tohour
                     )
                   : 0
               }`}
+              <p style={{ fontWeight: "normal" }}>
+              {`Total duration : ${payload[0].payload.annotation_aud_duration}`}
+
+             
+              
               <p style={{ color: "rgba(243, 156, 18 )" }}>
-                {`Annotation : ${
-                  payload[0].payload.diff_annotation_review
+                {`Annotation duration : ${
+                  payload[0].payload.diff_annotation_review_aud_duration_tohour
                     ? new Intl.NumberFormat("en").format(
-                        payload[0].payload.diff_annotation_review
+                        payload[0].payload
+                          .diff_annotation_review_aud_duration_tohour
                       )
                     : 0
                 }`}
-                <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review : ${
-                  payload[0].payload.review_cumulative_word_count
+                <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review duration : ${
+                  payload[0].payload.review_aud_duration_tohour
                     ? new Intl.NumberFormat("en").format(
-                        payload[0].payload.review_cumulative_word_count
+                        payload[0].payload.review_aud_duration_tohour
                       )
                     : 0
                 }`}</p>
+              </p>
               </p>
             </p>
           </p>
@@ -82,15 +89,15 @@ export default function SemanticTextualSimilarity_Scale5(props) {
         style={{ marginBottom: "35px" }}
         className={classes.heading}
       >
-        Word Count Dashboard - Translation Rating
+       {`Audio Duration Dashboard - ${analyticsData[0].projectType}`}
         <Typography variant="body1">
-          Count of Annotated and Reviewed Translation Rating
+          Count of Annotated and Reviewed Audio Type
         </Typography>
       </Typography>
-
+      
       <Paper>
         <Box className={classes.topBar}>
-        <Box className={classes.topBarInnerBox}>
+          <Box className={classes.topBarInnerBox}>
           <Typography
                 style={{
                   fontSize: "1rem",
@@ -98,39 +105,39 @@ export default function SemanticTextualSimilarity_Scale5(props) {
                   padding: "16px 0",
                 }}
               >
-                word Count Dashboard
-              </Typography>
-            </Box>
-        <Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Word Count
-              </Typography>
-              <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalWordCount &&
-                  new Intl.NumberFormat("en").format(totalWordCount)}
+                Audio Duration Dashboard
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Annotation Word Count
+                Total Audio Hours
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalAnnotationWordCount &&
-                  new Intl.NumberFormat("en").format(totalAnnotationWordCount)}
+                {totalAudioHours &&
+                  new Intl.NumberFormat("en").format(totalAudioHours)}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Quality/Reviewed Word Count
+                Total Annotation Audio Hours
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalReviewWordCount &&
-                  new Intl.NumberFormat("en").format(totalReviewWordCount)}
+                {totalAnnotationAudioHours &&
+                  new Intl.NumberFormat("en").format(totalAnnotationAudioHours)}
               </Typography>
             </Box>
-        </Box>
+            <Box className={classes.topBarInnerBox}>
+              <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
+                Total Reviewed AudioHours
+              </Typography>
+              <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
+                {totalReviewAudioHours &&
+                  new Intl.NumberFormat("en").format(totalReviewAudioHours)}
+              </Typography>
+            </Box>
+            </Box>
         <Grid>
-        <ResponsiveChartContainer>
+            <ResponsiveChartContainer>
           <BarChart
             width={1100}
             height={600}
@@ -156,7 +163,7 @@ export default function SemanticTextualSimilarity_Scale5(props) {
               angle={-30}
             >
               <Label
-                value="Language"
+                value="languages"
                 position="insideBottom"
                 fontWeight="bold"
                 fontSize={16}
@@ -174,7 +181,7 @@ export default function SemanticTextualSimilarity_Scale5(props) {
               }
             >
               <Label
-                value="# of Count Completed "
+                value="# of hours Completed "
                 angle={-90}
                 position="insideLeft"
                 fontWeight="bold"
@@ -191,7 +198,7 @@ export default function SemanticTextualSimilarity_Scale5(props) {
             />
             <Legend verticalAlign="top" />
             <Bar
-              dataKey="review_cumulative_word_count"
+              dataKey="review_aud_duration_tohour"
               barSize={30}
               name="Review"
               stackId="a"
@@ -199,7 +206,7 @@ export default function SemanticTextualSimilarity_Scale5(props) {
               cursor="pointer"
             />
             <Bar
-              dataKey="diff_annotation_review"
+              dataKey="diff_annotation_review_aud_duration_tohour"
               barSize={30}
               name="Annotation"
               stackId="a"
