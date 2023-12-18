@@ -25,23 +25,12 @@ const TaskAnalytics = (props) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState("ConversationTranslationEditing");
+  const [selectedType, setSelectedType] = useState("ContextualTranslationEditing");
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const taskAnalyticsData = useSelector(
     (state) => state.getTaskAnalyticsData.data
   );
-  useEffect(() => {
-    if (ProjectTypes) {
-      let types = [];
-      Object.keys(ProjectTypes).forEach((key) => {
-        let subTypes = Object.keys(ProjectTypes[key]["project_types"]);
-        types.push(...subTypes);
-      });
-      types.push('AllTypes')
-      setProjectTypes(types);
-      types?.length && setSelectedType(types[3]);
-    }
-  }, [ProjectTypes]);
+
   const getTaskAnalyticsdata = () => {
      setLoading(true)
     const userObj = new TaskAnalyticsDataAPI(selectedType);
@@ -71,6 +60,11 @@ const TaskAnalytics = (props) => {
   const ocrProjectTypes=[
     'OCRTranscriptionEditing',
   ]
+
+  useEffect(() => {
+    let types=[...audioProjectTypes,...translationProjectTypes,...conversationProjectTypes,...ocrProjectTypes,'AllTypes']
+    setProjectTypes(types);
+  }, []);
 
   useEffect(() => {
     getTaskAnalyticsdata();
