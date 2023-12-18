@@ -82,7 +82,7 @@ const TaskAnalytics = (props) => {
 
   return (
     <>
-      {console.log(taskAnalyticsData[0])}
+      {/* {console.log(taskAnalyticsData[0])} */}
       <Grid container columnSpacing={3} rowSpacing={2}  mb={1} gap={3}>
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
@@ -122,21 +122,23 @@ const TaskAnalytics = (props) => {
 
       </Grid>
       {loading && <Spinner />}
-      {taskAnalyticsData.length && taskAnalyticsData.map((analyticsData,_index)=>{
-        if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
-          return (<Grid key={_index} style={{marginTop:"15px"}}>
-          <AudioTaskAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>)}
-        if(analyticsData.length && 
-          (translationProjectTypes.includes(analyticsData[0].projectType) ||
-            conversationProjectTypes.includes(analyticsData[0].projectType)
-            )
-          ){
-          return <Grid key={_index} style={{marginTop:"15px"}}>
-          <TaskCountAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>
-        }
-      })}
+      {taskAnalyticsData.length ?
+        taskAnalyticsData.map((analyticsData,_index)=>{
+          if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
+            return (<Grid key={_index} style={{marginTop:"15px"}}>
+            <AudioTaskAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>)}
+          if(analyticsData.length && 
+            (translationProjectTypes.includes(analyticsData[0].projectType) ||
+              conversationProjectTypes.includes(analyticsData[0].projectType)
+              )
+            ){
+            return <Grid key={_index} style={{marginTop:"15px"}}>
+            <TaskCountAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>
+          }
+        })
+      :''}
     </>
   );
 };

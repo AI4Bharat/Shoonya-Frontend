@@ -123,21 +123,24 @@ const TaskAnalytics = () => {
 
       </Grid>
       {loading && <Spinner />}
-      {taskAnalyticsData.length && taskAnalyticsData.map((analyticsData,_index)=>{
-        if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
-          return (<Grid key={_index} style={{marginTop:"15px"}}>
-          <AudioTaskAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>)}
-        if(analyticsData.length && 
-          (translationProjectTypes.includes(analyticsData[0].projectType) ||
-            conversationProjectTypes.includes(analyticsData[0].projectType)
-            )
-          ){
-          return <Grid key={_index} style={{marginTop:"15px"}}>
-          <TaskCountAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>
-        }
-      })}
+      {taskAnalyticsData.length ?
+        taskAnalyticsData.map((analyticsData,_index)=>{
+          if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
+            return (<Grid key={_index} style={{marginTop:"15px"}}>
+            <AudioTaskAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>)}
+          if(analyticsData.length && 
+            (translationProjectTypes.includes(analyticsData[0].projectType) ||
+              conversationProjectTypes.includes(analyticsData[0].projectType)
+              )
+            ){
+            return <Grid key={_index} style={{marginTop:"15px"}}>
+            <TaskCountAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>
+          }
+        })
+        :''
+      }
     </>
   );
 };

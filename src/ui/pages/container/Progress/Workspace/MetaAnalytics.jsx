@@ -124,21 +124,24 @@ export default function MetaAnalytics(props) {
 
       </Grid>
       {loading && <Spinner />}
-      {metaAnalyticsData.length && metaAnalyticsData.map((analyticsData,_index)=>{
-        if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
-          return (<Grid key={_index} style={{marginTop:"15px"}}>
-          <AudioDurationChart analyticsData={analyticsData}/>
-        </Grid>)}
-        if(analyticsData.length && 
-          (translationProjectTypes.includes(analyticsData[0].projectType) ||
-            conversationProjectTypes.includes(analyticsData[0].projectType)
-            )
-          ){
-          return <Grid key={_index} style={{marginTop:"15px"}}>
-          <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>
-        }
-      })}
+      {metaAnalyticsData.length ?
+        metaAnalyticsData.map((analyticsData,_index)=>{
+          if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
+            return (<Grid key={_index} style={{marginTop:"15px"}}>
+            <AudioDurationChart analyticsData={analyticsData}/>
+          </Grid>)}
+          if(analyticsData.length && 
+            (translationProjectTypes.includes(analyticsData[0].projectType) ||
+              conversationProjectTypes.includes(analyticsData[0].projectType)
+              )
+            ){
+            return <Grid key={_index} style={{marginTop:"15px"}}>
+            <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>
+          }
+        })
+        :''
+      }
     </div>
   )
 }
