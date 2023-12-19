@@ -936,6 +936,7 @@ const Header = () => {
                     vertical: "top",
                     horizontal: "center",
                   }}
+                  style={{overflow:"scroll"}}
                   open={Boolean(anchorElNotification)}
                   onClose={handleCloseNotification}
                 >
