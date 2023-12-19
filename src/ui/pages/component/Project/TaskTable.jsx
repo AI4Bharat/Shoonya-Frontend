@@ -84,6 +84,7 @@ const TaskTable = (props) => {
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [rejected,setRejected] = useState("All")
   const [find, setFind] = useState("");
   const [replace, setReplace] = useState("");
   const [OpenFindAndReplaceDialog, setOpenFindAndReplaceDialog] = useState(false);
@@ -180,6 +181,7 @@ const TaskTable = (props) => {
       selectedFilters,
       props.type,
       pullvalue,
+      rejected,
       pull
     );
     dispatch(APITransport(taskObj));
@@ -1144,6 +1146,9 @@ const TaskTable = (props) => {
           currentFilters={selectedFilters}
           pull={pull}
           setpull={setpull}
+          rejected={rejected}
+          setRejected={setRejected}
+          // rejValue = {rejValue}
           pullvalue={pullvalue}
         />
       )}
