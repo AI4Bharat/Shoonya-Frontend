@@ -25,23 +25,12 @@ const TaskAnalytics = (props) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState("ConversationTranslationEditing");
+  const [selectedType, setSelectedType] = useState("ContextualTranslationEditing");
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const taskAnalyticsData = useSelector(
     (state) => state.getTaskAnalyticsData.data
   );
-  useEffect(() => {
-    if (ProjectTypes) {
-      let types = [];
-      Object.keys(ProjectTypes).forEach((key) => {
-        let subTypes = Object.keys(ProjectTypes[key]["project_types"]);
-        types.push(...subTypes);
-      });
-      types.push('AllTypes')
-      setProjectTypes(types);
-      types?.length && setSelectedType(types[3]);
-    }
-  }, [ProjectTypes]);
+
   const getTaskAnalyticsdata = () => {
      setLoading(true)
     const userObj = new TaskAnalyticsDataAPI(selectedType);
@@ -73,6 +62,11 @@ const TaskAnalytics = (props) => {
   ]
 
   useEffect(() => {
+    let types=[...audioProjectTypes,...translationProjectTypes,...conversationProjectTypes,...ocrProjectTypes,'AllTypes']
+    setProjectTypes(types);
+  }, []);
+
+  useEffect(() => {
     getTaskAnalyticsdata();
   }, []);
 
@@ -88,7 +82,7 @@ const TaskAnalytics = (props) => {
 
   return (
     <>
-      {console.log(taskAnalyticsData[0])}
+      {/* {console.log(taskAnalyticsData[0])} */}
       <Grid container columnSpacing={3} rowSpacing={2}  mb={1} gap={3}>
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
@@ -128,21 +122,23 @@ const TaskAnalytics = (props) => {
 
       </Grid>
       {loading && <Spinner />}
-      {taskAnalyticsData.length && taskAnalyticsData.map((analyticsData,_index)=>{
-        if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
-          return (<Grid key={_index} style={{marginTop:"15px"}}>
-          <AudioTaskAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>)}
-        if(analyticsData.length && 
-          (translationProjectTypes.includes(analyticsData[0].projectType) ||
-            conversationProjectTypes.includes(analyticsData[0].projectType)
-            )
-          ){
-          return <Grid key={_index} style={{marginTop:"15px"}}>
-          <TaskCountAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>
-        }
-      })}
+      {taskAnalyticsData.length ?
+        taskAnalyticsData.map((analyticsData,_index)=>{
+          if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
+            return (<Grid key={_index} style={{marginTop:"15px"}}>
+            <AudioTaskAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>)}
+          if(analyticsData.length && 
+            (translationProjectTypes.includes(analyticsData[0].projectType) ||
+              conversationProjectTypes.includes(analyticsData[0].projectType)
+              )
+            ){
+            return <Grid key={_index} style={{marginTop:"15px"}}>
+            <TaskCountAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>
+          }
+        })
+      :''}
     </>
   );
 };

@@ -26,23 +26,12 @@ export default function MetaAnalytics(props) {
     const [loading, setLoading] = useState(false);
     const apiLoading = useSelector((state) => state.apiStatus.loading);
     const [projectTypes, setProjectTypes] = useState([]);
-    const [selectedType, setSelectedType] = useState("ConversationTranslationEditing");
+    const [selectedType, setSelectedType] = useState("ContextualTranslationEditing");
     const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
     const metaAnalyticsData = useSelector(
         (state) => state.getMetaAnalyticsData.data
       );
-      useEffect(() => {
-        if (ProjectTypes) {
-          let types = [];
-          Object.keys(ProjectTypes).forEach((key) => {
-            let subTypes = Object.keys(ProjectTypes[key]["project_types"]);
-            types.push(...subTypes);
-          });
-          types.push('AllTypes')
-          setProjectTypes(types);
-          types?.length && setSelectedType(types[3]);
-        }
-      }, [ProjectTypes]);
+
       const getMetaAnalyticsdata = () => {
         setLoading(true);
         const userObj = new MetaAnalyticsDataAPI(loggedInUserData?.organization?.id,selectedType);
@@ -74,6 +63,11 @@ export default function MetaAnalytics(props) {
       const ocrProjectTypes=[
         'OCRTranscriptionEditing',
       ]
+
+      useEffect(() => {
+        let types=[...audioProjectTypes,...translationProjectTypes,...conversationProjectTypes,...ocrProjectTypes,'AllTypes']
+        setProjectTypes(types);
+      }, []);
 
       useEffect(() => {
         getMetaAnalyticsdata();
@@ -131,21 +125,23 @@ export default function MetaAnalytics(props) {
       </Grid>
       {loading && <Spinner />}
 
-      {metaAnalyticsData.length && metaAnalyticsData.map((analyticsData,_index)=>{
-        if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
-          return (<Grid key={_index} style={{marginTop:"15px"}}>
-          <AudioDurationChart analyticsData={analyticsData}/>
-        </Grid>)}
-        if(analyticsData.length && 
-          (translationProjectTypes.includes(analyticsData[0].projectType) ||
-            conversationProjectTypes.includes(analyticsData[0].projectType)
-            )
-          ){
-          return <Grid key={_index} style={{marginTop:"15px"}}>
-          <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
-        </Grid>
-        }
-      })}
+      {metaAnalyticsData.length ?
+        metaAnalyticsData.map((analyticsData,_index)=>{
+          if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
+            return (<Grid key={_index} style={{marginTop:"15px"}}>
+            <AudioDurationChart analyticsData={analyticsData}/>
+          </Grid>)}
+          if(analyticsData.length && 
+            (translationProjectTypes.includes(analyticsData[0].projectType) ||
+              conversationProjectTypes.includes(analyticsData[0].projectType)
+              )
+            ){
+            return <Grid key={_index} style={{marginTop:"15px"}}>
+            <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
+          </Grid>
+          }
+        })
+      :''}
     </div>
   )
 }
