@@ -14,7 +14,7 @@
      this.type = constants.GET_TASK_LIST;
      let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}`;
      let querystr = pull === "All" ?"": `&editable=${pullvalue}`
-     let querystr1 = rejected === "Yes" ?`&rejected=`+true:rejected === "No"? `&rejected=`+false:""
+     let querystr1 = rejected === "Yes" ?`&rejected=`+"True":rejected === "No"? `&rejected=`+false:""
      for (let key in selectedFilters) {
       if (selectedFilters[key] && selectedFilters[key] !== -1) {
      switch (key) {

@@ -49,7 +49,7 @@ const FilterList = (props) => {
   console.log(filterStatusData, selectedStatus, currentFilters);
   const pulledstatus = currentFilters?.annotation_status ? ["Pulled By reviewer", "Not Pulled By reviewer"]
     : currentFilters?.review_status ? ["Pulled By SuperChecker", "Not Pulled By SuperChecker"] : null;
-  const rejectedStatus = ["Yes", "No"];
+  const rejectedStatus = ["Yes"];
   const handleStatusChange = (e) => {
     let statusvalue = !!currentFilters?.annotation_status ? "annotation_status" : "review_status"
     // let pullvalue = (pull == 'Pulled By reviewer' || pull == 'Pulled By SuperChecker') ? false :
@@ -199,7 +199,7 @@ const FilterList = (props) => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl> : currentFilters?.review_status && selectedStatus == "unreviewed" || selectedStatus == "accepted_with_major_changes" || selectedStatus == "accepted_with_minor_changes" || selectedStatus == "accepted" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+              </FormControl> : currentFilters?.review_status &&  selectedStatus == "accepted_with_major_changes" || selectedStatus == "accepted_with_minor_changes" || selectedStatus == "accepted" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
                 <InputLabel id="project-type-label" sx={{
                   fontSize: "16px",
                   position: "inherit",
