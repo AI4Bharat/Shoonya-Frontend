@@ -6,6 +6,8 @@ import {
   Divider,
   FormControlLabel,
   Grid,
+  Button,
+  Stack,
   IconButton,
   Menu,
   MenuItem,
@@ -16,7 +18,9 @@ import {
   Chip
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Link, NavLink } from "react-router-dom";
+import CustomButton from "../common/Button";
 import headerStyle from "../../../styles/header";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
@@ -26,7 +30,6 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useLocation, useNavigate } from "react-router-dom";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
-import CustomButton from "../common/Button";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@mui/material";
@@ -777,7 +780,7 @@ const Header = () => {
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
                       <IconButton onClick={handleOpenNotification}>
-                        <Badge badgeContent={Notification?.length}color="primary">
+                        <Badge badgeContent={Notification?.length} color="primary">
                           <NotificationsIcon color="primary.dark" fontSize="large" />
                         </Badge>
 
@@ -923,27 +926,41 @@ const Header = () => {
                     </MenuItem>
                   ))}
                 </Menu>
-     
+
                 <Menu
-                  sx={{ mt: "45px" }}
+                  sx={{ mt: "45px", display: "flex", flexDirection: "row" }}
                   id="menu-appbar"
                   anchorEl={anchorElNotification}
                   anchorOrigin={{
                     vertical: "top",
                     horizontal: "right",
                   }}
+
                   keepMounted
                   transformOrigin={{
                     vertical: "top",
                     horizontal: "center",
                   }}
-                  style={{overflow:"scroll"}}
+                  style={{ overflow: "scroll" }}
                   open={Boolean(anchorElNotification)}
                   onClose={handleCloseNotification}
                 >
-
+                  <Stack  direction="row" style={{justifyContent:"space-between",padding:"0 10px 0 10px"}} >
+                    <Typography variant="h4">Notifications</Typography>
+                    <IconButton aria-label="add an alarm">
+                      <MoreHorizIcon />
+                    </IconButton>
+                  </Stack>
+                  <Stack  direction="row" spacing={2} style={{padding:"0 0 10px 10px"}}>
+                    <Button 
+                    label="All"
+                    variant="contained"
+                    size="small">All</Button>
+                    <Button label="Unread"
+                    variant="contained" size="small">unread</Button>
+                  </Stack>
                   {Notification?.map((notification) => (
-                    <MenuItem key={notification.id}>
+                    <MenuItem key={notification.id} >
                       <Chip
                         label={notification.title}
                         onDelete={() => handleRemoveNotification(notification.id)}
