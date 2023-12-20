@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Radio,
   Autocomplete,
+  RadioGroup,
   Box,
   FormControl,
   InputLabel,
@@ -49,7 +50,6 @@ const FilterList = (props) => {
   console.log(filterStatusData, selectedStatus, currentFilters);
   const pulledstatus = currentFilters?.annotation_status ? ["Pulled By reviewer", "Not Pulled By reviewer"]
     : currentFilters?.review_status ? ["Pulled By SuperChecker", "Not Pulled By SuperChecker"] : null;
-  const rejectedStatus = ["Yes"];
   const handleStatusChange = (e) => {
     let statusvalue = !!currentFilters?.annotation_status ? "annotation_status" : "review_status"
     // let pullvalue = (pull == 'Pulled By reviewer' || pull == 'Pulled By SuperChecker') ? false :
@@ -175,54 +175,28 @@ const FilterList = (props) => {
                   </FormControl> : null
 
               }
-              {currentFilters?.annotation_status && selectedStatus == "labeled" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
-                <InputLabel id="project-type-label" sx={{
-                  fontSize: "16px",
-                  position: "inherit",
-                  top: "23px",
-                  left: "-3px",
-                }} >{currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}</InputLabel>
-                <Select
-
-                  labelId="rejected-label"
-                  id="rejected-select"
-                  value={rejected}
-                  label={currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}
-                  defaultValue={"All"}
-                  onChange={(e) => setRejected(e.target.value)}
-
-                >
-                  <MenuItem value={'All'} selected>All</MenuItem>
-                  {rejectedStatus.map((type, index) => (
-                    <MenuItem value={type} key={index}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl> : currentFilters?.review_status &&  selectedStatus == "accepted_with_major_changes" || selectedStatus == "accepted_with_minor_changes" || selectedStatus == "accepted" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
-                <InputLabel id="project-type-label" sx={{
-                  fontSize: "16px",
-                  position: "inherit",
-                  top: "23px",
-                  left: "-3px",
-                }} >{currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}</InputLabel>
-                <Select
-
-                  labelId="rejected-label"
-                  id="rejected-select"
-                  value={rejected}
-                  label={currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}
-                  defaultValue={"All"}
-                  onChange={(e) => setRejected(e.target.value)}
-
-                >
-                  <MenuItem value={'All'} selected>All</MenuItem>
-                  {rejectedStatus.map((type, index) => (
-                    <MenuItem value={type} key={index}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </Select>
+              {currentFilters?.annotation_status && selectedStatus == "labeled" ? 
+              <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+                 <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rejected}
+                  onChange={() => setRejected(!rejected)}
+                />
+              }
+              label={currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}
+            />
+              </FormControl> : currentFilters?.review_status && selectedStatus == "accepted_with_major_changes" || selectedStatus == "accepted_with_minor_changes" || selectedStatus == "accepted" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+               
+                <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rejected}
+                  onChange={() => setRejected(!rejected)}
+                />
+              }
+              label={currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}
+            />
               </FormControl> : null}
             </Stack>
 
