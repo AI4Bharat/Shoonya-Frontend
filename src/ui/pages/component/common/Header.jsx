@@ -14,6 +14,8 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  Tabs,
+  Tab,
   Badge,
   Popover,
   Chip
@@ -83,6 +85,11 @@ const Header = () => {
   const loggedInUserData = useSelector(
     (state) => state?.fetchLoggedInUserData?.data
   );
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
 
   const theme = useTheme();
@@ -133,17 +140,25 @@ const Header = () => {
     dispatch(APITransport(task));
     fetchNotifications()
   };
-  
+
   const markAllAsRead = () => {
-    const tasks = Notification.map((notification) => new NotificationPatchAPI(notification.id));
+    const notificationIds = Notification.map((notification) => notification.id);
+    console.log(notificationIds, "kkkk");
+    const tasks = new NotificationPatchAPI(notificationIds);
     dispatch(APITransport(tasks));
     fetchNotifications()
   };
-  
+
   const handleMarkAllAsReadClick = () => {
+    console.log("kkkk");
     markAllAsRead();
+    console.log("kkkk");
+    handleMoreHorizonClose()
   };
-  
+  const handleall = () => {
+    setunread(null)
+    fetchNotifications()
+  }
   const handleMarkAsRead = () => {
     markAsRead(selectedNotificationId);
     handlePopoverClose();
@@ -208,7 +223,7 @@ const Header = () => {
     setSelectedNotificationId(null);
   };
 
- 
+
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -269,7 +284,14 @@ const Header = () => {
       });
     }
   };
-
+  const handleTabChange = (index) => {
+    if (index === 1) {
+      setunread(null);
+    } else if (index === 0) {
+      setunread("False");
+    }
+    fetchNotifications()
+  };
   const handleTagsChange = (event) => {
     if (event.target.checked) {
       localStorage.setItem("enableTags", true);
@@ -295,6 +317,8 @@ const Header = () => {
       />
     );
   };
+  const unseenNotifications = Notification.filter(notification => !notification.seen_json[loggedInUserData.id]);
+
 
   const renderTabs = () => {
     if (
@@ -835,7 +859,7 @@ const Header = () => {
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
                       <IconButton onClick={handleOpenNotification}>
-                        <Badge badgeContent={Notification?.length} color="primary">
+                        <Badge  badgeContent={unseenNotifications.length > 0 ? unseenNotifications.length : null} color="primary">
                           <NotificationsIcon color="primary.dark" fontSize="large" />
                         </Badge>
 
@@ -1000,26 +1024,28 @@ const Header = () => {
                   open={Boolean(anchorElNotification)}
                   onClose={handleCloseNotification}
                 >
+                  <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
+                    <Typography variant="h4">Notifications</Typography>
+                    {Notification && Notification.length > 0 ?<IconButton aria-label="More" onClick={handleMoreHorizonClick}>
+                      <MoreHorizIcon />
+                    </IconButton>:null}
+                  </Stack>
+                  <Stack direction="row" spacing={2} style={{ padding: "0 0 10px 10px" }}>
+                    <Tabs value={value} onChange={handleChange} sx={{
+                      '& .MuiTabs-indicator': {
+                        backgroundColor: theme => theme.palette.primary.main,
+                      }
+                    }}>
+                      <Tab label="All" onClick={() => handleTabChange(0)} />
+                      <Tab label="Unread" onClick={() => handleTabChange(1)} />
+                    </Tabs>
+                  </Stack>
                   {Notification && Notification.length > 0 ? (
                     <>
-                      <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
-                        <Typography variant="h4">Notifications</Typography>
-                        <IconButton aria-label="More" onClick={handleMoreHorizonClick}>
-                          <MoreHorizIcon />
-                        </IconButton>
-                      </Stack>
-                      <Stack direction="row" spacing={2} style={{ padding: "0 0 10px 10px" }}>
-                        <Button
-                          label="All"
-                          variant="contained"
-                          size="small">All</Button>
-                        <Button label="Unread"
-                          variant="contained" size="small" onClick={handleread}>unread</Button>
-                      </Stack>
-                      {Notification?.map((notification, index) => (
+                      {Notification.map((notification, index) => (
                         <div key={index} style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
                           <div style={{ marginRight: '10px' }}>
-                            <FiberManualRecordIcon color={notification?.seen == true ? 'action' : "primary"} />
+                            <FiberManualRecordIcon color={notification?.seen_json[loggedInUserData.id]? 'action' : 'primary'} />
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
@@ -1028,61 +1054,57 @@ const Header = () => {
                               <Typography style={{ padding: "5px 5px 0px 5px" }} variant="caption" color="action">{`${formatDistanceToNow(new Date(notification?.created_at), { addSuffix: true })}`}</Typography>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
-
-
                               <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
                               <IconButton aria-label="More" onClick={(event) => handleTitleMouseEnter(event, notification?.id)}>
                                 <MoreHorizIcon />
                               </IconButton>
                             </div>
-
                             <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
-
                           </div>
-                          <Popover
-                            open={Boolean(moreHorizonAnchorEl)}
-                            anchorEl={moreHorizonAnchorEl}
-                            onClose={handleMoreHorizonClose}
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right',
-                            }}
-                            transformOrigin={{
-                              vertical: 'top',
-                              horizontal: 'right',
-                            }}
-                          >
-                            <MenuItem onclick={handleMarkAllAsReadClick}>Mark All as read</MenuItem>
-                          </Popover>
-                          <Popover
-                            open={Boolean(popoverAnchorEl)}
-                            anchorEl={popoverAnchorEl}
-                            onClose={handlePopoverClose}
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right',
-                            }}
-                            transformOrigin={{
-                              vertical: 'top',
-                              horizontal: 'right',
-                            }}
-                          >
-                            <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
-                          </Popover>
-
                         </div>
-
-                      ))}</>) : (
+                      ))}
+                    </>
+                  ) : (
                     <div style={{ textAlign: 'center', padding: '20px' }}>
                       <NotificationsOffIcon color="disabled" fontSize="large" />
-
                       <Typography variant="h5" color="textSecondary" style={{ marginTop: '10px' }}>
                         No notifications found
                       </Typography>
                     </div>
                   )}
 
+
                 </Menu>
+                <Popover
+                  open={Boolean(moreHorizonAnchorEl)}
+                  anchorEl={moreHorizonAnchorEl}
+                  onClose={handleMoreHorizonClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                >
+                  <MenuItem onClick={handleMarkAllAsReadClick}>Mark All as read</MenuItem>
+                </Popover>
+                <Popover
+                  open={Boolean(popoverAnchorEl)}
+                  anchorEl={popoverAnchorEl}
+                  onClose={handlePopoverClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                >
+                  <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
+                </Popover>
 
               </Box>
             </Toolbar>
