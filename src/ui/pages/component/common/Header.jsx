@@ -15,14 +15,21 @@ import {
   Tooltip,
   Typography,
   Badge,
+  Popover,
   Chip
 } from "@mui/material";
 import { useEffect, useState } from "react";
+
+import { formatDistanceToNow, format } from 'date-fns';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { Link, NavLink } from "react-router-dom";
 import CustomButton from "../common/Button";
 import headerStyle from "../../../styles/header";
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationPatchAPI from "../../../../redux/actions/api/Notification/NotificationPatchApi";
 import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
@@ -51,6 +58,9 @@ const Header = () => {
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
   const [isSpaceClicked, setIsSpaceClicked] = useState(false);
+  const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
+  const [unread, setunread] = useState(null)
+  const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const [showTransliterationModel, setShowTransliterationModel] =
     useState(false);
   const [snackbar, setSnackbarInfo] = useState({
@@ -59,6 +69,16 @@ const Header = () => {
     variant: "success",
   });
   //const[checkClUI,setCheckClUI]=useState(null)
+  const [moreHorizonAnchorEl, setMoreHorizonAnchorEl] = useState(null);
+
+  const handleMoreHorizonClick = (event) => {
+    setMoreHorizonAnchorEl(event.currentTarget);
+  };
+
+  const handleMoreHorizonClose = () => {
+    setMoreHorizonAnchorEl(null);
+  };
+
 
   const loggedInUserData = useSelector(
     (state) => state?.fetchLoggedInUserData?.data
@@ -81,7 +101,9 @@ const Header = () => {
 
   const fetchNotifications = () => {
     let apiObj = new NotificationAPI();
-    fetch(apiObj.apiEndPoint(), {
+    const endpoint = unread == null ? apiObj.apiEndPoint() : `${apiObj.apiEndPoint()}?seen=${unread}`;
+
+    fetch(endpoint, {
       method: "get",
       body: JSON.stringify(apiObj.getBody()),
       headers: apiObj.getHeaders().headers,
@@ -106,7 +128,30 @@ const Header = () => {
         });
       });
   };
-
+  const markAsRead = (notificationId) => {
+    const task = new NotificationPatchAPI(notificationId);
+    dispatch(APITransport(task));
+    fetchNotifications()
+  };
+  
+  const markAllAsRead = () => {
+    const tasks = Notification.map((notification) => new NotificationPatchAPI(notification.id));
+    dispatch(APITransport(tasks));
+    fetchNotifications()
+  };
+  
+  const handleMarkAllAsReadClick = () => {
+    markAllAsRead();
+  };
+  
+  const handleMarkAsRead = () => {
+    markAsRead(selectedNotificationId);
+    handlePopoverClose();
+  };
+  const handleread = () => {
+    setunread("False");
+    fetchNotifications();
+  }
 
   useEffect(() => {
     fetchNotifications();
@@ -145,10 +190,25 @@ const Header = () => {
       window.removeEventListener("keydown", keyPress);
     };
   }, [keyPress]);
+  const handleTitleMouseEnter = (event, notificationId) => {
+    setPopoverAnchorEl(event.currentTarget);
+    setSelectedNotificationId(notificationId);
+  };
+
+  const handleTitleMouseLeave = () => {
+    setPopoverAnchorEl(null);
+    setSelectedNotificationId(null);
+  }
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  const handlePopoverClose = () => {
+    setPopoverAnchorEl(null);
+    setSelectedNotificationId(null);
+  };
+
+ 
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -209,12 +269,7 @@ const Header = () => {
       });
     }
   };
-  const handleRemoveNotification = (notificationId) => {
-    const updatedNotifications = Notification?.filter(
-      (Notification) => Notification.id !== notificationId
-    );
-    setnotification(updatedNotifications);
-  };
+
   const handleTagsChange = (event) => {
     if (event.target.checked) {
       localStorage.setItem("enableTags", true);
@@ -945,31 +1000,90 @@ const Header = () => {
                   open={Boolean(anchorElNotification)}
                   onClose={handleCloseNotification}
                 >
-                  <Stack  direction="row" style={{justifyContent:"space-between",padding:"0 10px 0 10px"}} >
-                    <Typography variant="h4">Notifications</Typography>
-                    <IconButton aria-label="add an alarm">
-                      <MoreHorizIcon />
-                    </IconButton>
-                  </Stack>
-                  <Stack  direction="row" spacing={2} style={{padding:"0 0 10px 10px"}}>
-                    <Button 
-                    label="All"
-                    variant="contained"
-                    size="small">All</Button>
-                    <Button label="Unread"
-                    variant="contained" size="small">unread</Button>
-                  </Stack>
-                  {Notification?.map((notification) => (
-                    <MenuItem key={notification.id} >
-                      <Chip
-                        label={notification.title}
-                        onDelete={() => handleRemoveNotification(notification.id)}
-                        color="primary"
-                        variant="outlined"
-                      />
-                    </MenuItem>
-                  ))}
+                  {Notification && Notification.length > 0 ? (
+                    <>
+                      <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
+                        <Typography variant="h4">Notifications</Typography>
+                        <IconButton aria-label="More" onClick={handleMoreHorizonClick}>
+                          <MoreHorizIcon />
+                        </IconButton>
+                      </Stack>
+                      <Stack direction="row" spacing={2} style={{ padding: "0 0 10px 10px" }}>
+                        <Button
+                          label="All"
+                          variant="contained"
+                          size="small">All</Button>
+                        <Button label="Unread"
+                          variant="contained" size="small" onClick={handleread}>unread</Button>
+                      </Stack>
+                      {Notification?.map((notification, index) => (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+                          <div style={{ marginRight: '10px' }}>
+                            <FiberManualRecordIcon color={notification?.seen == true ? 'action' : "primary"} />
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                              <Typography variant="subtitle2">{`ID: ${notification?.title?.split('-')[0]}`}</Typography>
+                              <Typography style={{ paddingLeft: "10px" }} variant="subtitle2">{`TITLE: ${notification?.notification_type}`}</Typography>
+                              <Typography style={{ padding: "5px 5px 0px 5px" }} variant="caption" color="action">{`${formatDistanceToNow(new Date(notification?.created_at), { addSuffix: true })}`}</Typography>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
+
+
+                              <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
+                              <IconButton aria-label="More" onClick={(event) => handleTitleMouseEnter(event, notification?.id)}>
+                                <MoreHorizIcon />
+                              </IconButton>
+                            </div>
+
+                            <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
+
+                          </div>
+                          <Popover
+                            open={Boolean(moreHorizonAnchorEl)}
+                            anchorEl={moreHorizonAnchorEl}
+                            onClose={handleMoreHorizonClose}
+                            anchorOrigin={{
+                              vertical: 'bottom',
+                              horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                            }}
+                          >
+                            <MenuItem onclick={handleMarkAllAsReadClick}>Mark All as read</MenuItem>
+                          </Popover>
+                          <Popover
+                            open={Boolean(popoverAnchorEl)}
+                            anchorEl={popoverAnchorEl}
+                            onClose={handlePopoverClose}
+                            anchorOrigin={{
+                              vertical: 'bottom',
+                              horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                            }}
+                          >
+                            <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
+                          </Popover>
+
+                        </div>
+
+                      ))}</>) : (
+                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                      <NotificationsOffIcon color="disabled" fontSize="large" />
+
+                      <Typography variant="h5" color="textSecondary" style={{ marginTop: '10px' }}>
+                        No notifications found
+                      </Typography>
+                    </div>
+                  )}
+
                 </Menu>
+
               </Box>
             </Toolbar>
           </AppBar>
