@@ -13,8 +13,8 @@ import {
   import { useEffect, useState } from "react";
   import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
-export default function ContextualTranslationEditing(props) {
-    const {metaAnalyticsData} = props
+export default function WordCountMetaAnalyticsChart(props) {
+    const {analyticsData} = props
     const classes = DatasetStyle();
     const [totalWordCount, setTotalWordCount] = useState();
     const [totalAnnotationWordCount, setTotalAnnotationWordCount] = useState();
@@ -22,16 +22,16 @@ export default function ContextualTranslationEditing(props) {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        metaAnalyticsData[0]?.sort(
+        analyticsData?.sort(
         (a, b) =>
           b.annotation_cumulative_word_count -
           a.annotation_cumulative_word_count
       );
-      setData(metaAnalyticsData[0]);
+      setData(analyticsData);
       let allAnnotatorCumulativeWordCount = 0;
       let allReviewCumulativeWordCount = 0;
       var languages;
-      metaAnalyticsData[0]?.map((element, index) => {
+      analyticsData?.map((element, index) => {
           allAnnotatorCumulativeWordCount +=
           element.annotation_cumulative_word_count;
           allReviewCumulativeWordCount += element.review_cumulative_word_count;
@@ -43,7 +43,7 @@ export default function ContextualTranslationEditing(props) {
       setTotalWordCount(
           allAnnotatorCumulativeWordCount + allReviewCumulativeWordCount
       );
-    }, [metaAnalyticsData[0]]);
+    }, [analyticsData]);
 
 
     const CustomTooltip = ({ active, payload, label }) => {
@@ -88,15 +88,10 @@ export default function ContextualTranslationEditing(props) {
   return (
     <Box className={classes.modelChartSection}>
          <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-         Word Count Dashboard - Translation
+         {`Word Count Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Translation Tasks
+            Count of Annotated and Reviewed Data
           </Typography>
-        </Typography>
-
-        <Typography variant="body" sx={{fontSize:"17px"}}>
-          Note : Quality sentence pairs are generated after a pipeline of
-          Annotated & Reviewed tasks.
         </Typography>
         <Paper>
           <Box className={classes.topBar}>
