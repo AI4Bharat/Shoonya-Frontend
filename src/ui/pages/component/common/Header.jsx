@@ -309,7 +309,7 @@ const Header = () => {
       />
     );
   };
-  const unseenNotifications = Notification?.filter(notification =>notification?.seen_json && !notification.seen_json[loggedInUserData.id]);
+  const unseenNotifications = Notification?.length>0 && Notification?.filter(notification =>notification?.seen_json && !notification.seen_json[loggedInUserData.id]);
 
 
   const renderTabs = () => {
@@ -851,7 +851,7 @@ const Header = () => {
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
                       <IconButton onClick={handleOpenNotification}>
-                        <Badge  badgeContent={unseenNotifications?.length > 0 ? unseenNotifications?.length : null} color="primary">
+                        <Badge  badgeContent={Notification?.length} color="primary">
                           <NotificationsIcon color="primary.dark" fontSize="large" />
                         </Badge>
 
@@ -1018,7 +1018,7 @@ const Header = () => {
                 >
                   <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
                     <Typography variant="h4">Notifications</Typography>
-                    {Notification && Notification?.length > 0  && unseenNotifications && unseenNotifications?.length>0? <IconButton aria-label="More" onClick={handleMoreHorizonClick}>
+                    {Notification && Notification?.length > 0  ? <IconButton aria-label="More" onClick={handleMoreHorizonClick}>
                       <MoreHorizIcon />
                     </IconButton>:null}
                   </Stack>
@@ -1051,9 +1051,9 @@ const Header = () => {
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
                               <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
-                              {unseenNotifications?.length>0?<IconButton aria-label="More" onClick={(event) => handleTitleMouseEnter(event, notification?.id)}>
+                              <IconButton aria-label="More" onClick={(event) => handleTitleMouseEnter(event, notification?.id)}>
                                 <MoreHorizIcon />
-                              </IconButton>:null}
+                              </IconButton>
                             </div>
                             <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
                           </div>
