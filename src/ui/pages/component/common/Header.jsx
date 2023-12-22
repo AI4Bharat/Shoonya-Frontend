@@ -143,34 +143,25 @@ const Header = () => {
 
   const markAllAsRead = () => {
     const notificationIds = Notification.map((notification) => notification.id);
-    console.log(notificationIds, "kkkk");
     const tasks = new NotificationPatchAPI(notificationIds);
     dispatch(APITransport(tasks));
     fetchNotifications()
   };
 
   const handleMarkAllAsReadClick = () => {
-    console.log("kkkk");
     markAllAsRead();
-    console.log("kkkk");
     handleMoreHorizonClose()
   };
-  const handleall = () => {
-    setunread(null)
-    fetchNotifications()
-  }
+
   const handleMarkAsRead = () => {
     markAsRead(selectedNotificationId);
     handlePopoverClose();
   };
-  const handleread = () => {
-    setunread("False");
-    fetchNotifications();
-  }
+
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [unread]);
 
   useEffect(() => {
     getLoggedInUserData();
@@ -284,13 +275,14 @@ const Header = () => {
       });
     }
   };
-  const handleTabChange = (index) => {
-    if (index === 1) {
-      setunread(null);
-    } else if (index === 0) {
-      setunread("False");
+  const handleTabChange = async (index) => {
+    if (index === 0) {
+     await setunread(null);
+    } else if (index === 1) {
+     await setunread("False");
     }
-    fetchNotifications()
+   
+  
   };
   const handleTagsChange = (event) => {
     if (event.target.checked) {
@@ -317,7 +309,7 @@ const Header = () => {
       />
     );
   };
-  const unseenNotifications = Notification.filter(notification => !notification.seen_json[loggedInUserData.id]);
+  const unseenNotifications = Notification?.filter(notification =>notification?.seen_json && !notification.seen_json[loggedInUserData.id]);
 
 
   const renderTabs = () => {
@@ -859,7 +851,7 @@ const Header = () => {
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
                       <IconButton onClick={handleOpenNotification}>
-                        <Badge  badgeContent={unseenNotifications.length > 0 ? unseenNotifications.length : null} color="primary">
+                        <Badge  badgeContent={unseenNotifications?.length > 0 ? unseenNotifications?.length : null} color="primary">
                           <NotificationsIcon color="primary.dark" fontSize="large" />
                         </Badge>
 
@@ -1026,7 +1018,7 @@ const Header = () => {
                 >
                   <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
                     <Typography variant="h4">Notifications</Typography>
-                    {Notification && Notification.length > 0 ?<IconButton aria-label="More" onClick={handleMoreHorizonClick}>
+                    {Notification && Notification?.length > 0  && unseenNotifications && unseenNotifications?.length>0? <IconButton aria-label="More" onClick={handleMoreHorizonClick}>
                       <MoreHorizIcon />
                     </IconButton>:null}
                   </Stack>
@@ -1040,12 +1032,16 @@ const Header = () => {
                       <Tab label="Unread" onClick={() => handleTabChange(1)} />
                     </Tabs>
                   </Stack>
-                  {Notification && Notification.length > 0 ? (
+                  {Notification && Notification?.length > 0 ? (
                     <>
                       {Notification.map((notification, index) => (
                         <div key={index} style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
                           <div style={{ marginRight: '10px' }}>
-                            <FiberManualRecordIcon color={notification?.seen_json[loggedInUserData.id]? 'action' : 'primary'} />
+                            <FiberManualRecordIcon color={  notification?.seen_json
+      ? notification?.seen_json[loggedInUserData.id]
+        ? 'action'
+        : 'primary'
+      : "primary"} />
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
@@ -1055,9 +1051,9 @@ const Header = () => {
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
                               <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
-                              <IconButton aria-label="More" onClick={(event) => handleTitleMouseEnter(event, notification?.id)}>
+                              {unseenNotifications?.length>0?<IconButton aria-label="More" onClick={(event) => handleTitleMouseEnter(event, notification?.id)}>
                                 <MoreHorizIcon />
-                              </IconButton>
+                              </IconButton>:null}
                             </div>
                             <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
                           </div>
