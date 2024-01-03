@@ -13,61 +13,36 @@ import {
   import { useEffect, useState } from "react";
   import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
-export default function WordCountMetaAnalyticsChart(props) {
-    const {analyticsData,graphCategory} = props
+export default function SentanceCountMetaAnalyticsChart(props) {
+    const {analyticsData} = props
     const classes = DatasetStyle();
-    const [totalWordCount, setTotalWordCount] = useState();
-    const [totalAnnotationWordCount, setTotalAnnotationWordCount] = useState();
-    const [totalReviewWordCount, setTotalReviewWordCount] = useState();
+    const [totalSentanceCount, setTotalSentanceCount] = useState();
+    const [totalAnnotationSentanceCount, setTotalAnnotationSentanceCount] = useState();
+    const [totalReviewSentanceCount, setTotalReviewSentanceCount] = useState();
     const [data, setData] = useState([]);
 
     useEffect(() => {
-      if (graphCategory=="audioWordCount"){
         analyticsData?.sort(
-          (a, b) =>
-            b.annotation_audio_word_count -
-            a.review_audio_word_count
-        );
-        setData(analyticsData);
-        let allAnnotatorAudioWordCount = 0;
-        let allReviewAudioWordCount = 0;
-        var languages;
-        analyticsData?.map((element, index) => {
-            allAnnotatorAudioWordCount +=
-            (element.annotation_audio_word_count?element.annotation_audio_word_count:0);
-            allReviewAudioWordCount += (element.review_audio_word_count?element.review_audio_word_count:0);
-          languages = element.languages;
-        });
-    
-        setTotalAnnotationWordCount(allAnnotatorAudioWordCount);
-        setTotalReviewWordCount(allReviewAudioWordCount);
-        setTotalWordCount(
-          allAnnotatorAudioWordCount + allReviewAudioWordCount
-        );
-      }
-      else{
-        analyticsData?.sort(
-          (a, b) =>
-            b.annotation_cumulative_word_count -
-            a.annotation_cumulative_word_count
-        );
-        setData(analyticsData);
-        let allAnnotatorCumulativeWordCount = 0;
-        let allReviewCumulativeWordCount = 0;
-        var languages;
-        analyticsData?.map((element, index) => {
-            allAnnotatorCumulativeWordCount +=
-            element.annotation_cumulative_word_count;
-            allReviewCumulativeWordCount += element.review_cumulative_word_count;
-          languages = element.languages;
-        });
-    
-        setTotalAnnotationWordCount(allAnnotatorCumulativeWordCount);
-        setTotalReviewWordCount(allReviewCumulativeWordCount);
-        setTotalWordCount(
-            allAnnotatorCumulativeWordCount + allReviewCumulativeWordCount
-        );
-      }
+        (a, b) =>
+          b.annotation_cumulative_sentance_count -
+          a.annotation_cumulative_sentance_count
+      );
+      setData(analyticsData);
+      let allAnnotatorCumulativeSentanceCount = 0;
+      let allReviewCumulativeSentanceCount = 0;
+      var languages;
+      analyticsData?.map((element, index) => {
+          allAnnotatorCumulativeSentanceCount +=
+          (element.annotation_cumulative_sentance_count?element.annotation_cumulative_sentance_count:0);
+          allReviewCumulativeSentanceCount += (element.review_cumulative_sentance_count?element.review_cumulative_sentance_count:0);
+        languages = element.languages;
+      });
+  
+      setTotalAnnotationSentanceCount(allAnnotatorCumulativeSentanceCount);
+      setTotalReviewSentanceCount(allReviewCumulativeSentanceCount);
+      setTotalSentanceCount(
+          allAnnotatorCumulativeSentanceCount + allReviewCumulativeSentanceCount
+      );
     }, [analyticsData]);
 
 
@@ -77,57 +52,31 @@ export default function WordCountMetaAnalyticsChart(props) {
             <div className={classes.toolTip}>
               <p style={{ fontWeight: "bold" }}>
                 {`${label}`}
-                {graphCategory=="audioWordCount"?<p style={{ fontWeight: "normal" }}>
-                  {`Total count : ${
-                    payload[0].payload.annotation_audio_word_count
-                      ? new Intl.NumberFormat("en").format(
-                          payload[0].payload.annotation_audio_word_count
-                        )
-                      : 0
-                  }`}
-                  <p style={{ color: "rgba(243, 156, 18 )" }}>
-                    {`Annotation : ${
-                      payload[0].payload.diff_annotation_review_audio_word
-                        ? new Intl.NumberFormat("en").format(
-                            payload[0].payload.diff_annotation_review_audio_word
-                          )
-                        : 0
-                    }`}
-                    <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review : ${
-                      payload[0].payload.review_audio_word_count
-                        ? new Intl.NumberFormat("en").format(
-                            payload[0].payload.review_audio_word_count
-                          )
-                        : 0
-                    }`}</p>
-                  </p>  
-                </p>
-                :
                 <p style={{ fontWeight: "normal" }}>
                   {`Total count : ${
-                    payload[0].payload.annotation_cumulative_word_count
+                    payload[0].payload.annotation_cumulative_sentance_count
                       ? new Intl.NumberFormat("en").format(
-                          payload[0].payload.annotation_cumulative_word_count
+                          payload[0].payload.annotation_cumulative_sentance_count
                         )
                       : 0
                   }`}
                   <p style={{ color: "rgba(243, 156, 18 )" }}>
                     {`Annotation : ${
-                      payload[0].payload.diff_annotation_review
+                      payload[0].payload.diff_annotation_review_sentance_count
                         ? new Intl.NumberFormat("en").format(
-                            payload[0].payload.diff_annotation_review
+                            payload[0].payload.diff_annotation_review_sentance_count
                           )
                         : 0
                     }`}
                     <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review : ${
-                      payload[0].payload.review_cumulative_word_count
+                      payload[0].payload.review_cumulative_sentance_count
                         ? new Intl.NumberFormat("en").format(
-                            payload[0].payload.review_cumulative_word_count
+                            payload[0].payload.review_cumulative_sentance_count
                           )
                         : 0
                     }`}</p>
-                  </p>  
-                </p>}
+                  </p>
+                </p>
               </p>
             </div>
           );
@@ -139,7 +88,7 @@ export default function WordCountMetaAnalyticsChart(props) {
   return (
     <Box className={classes.modelChartSection}>
          <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-         {`Word Count Dashboard - ${analyticsData[0].projectType}`}
+         {`Sentance Count Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
             Count of Annotated and Reviewed Data
           </Typography>
@@ -154,34 +103,34 @@ export default function WordCountMetaAnalyticsChart(props) {
                   padding: "16px 0",
                 }}
               >
-                word Count Dashboard
+                Sentance Count Dashboard
               </Typography>
             </Box>
         <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Word Count
+                Total Sentance Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalWordCount &&
-                  new Intl.NumberFormat("en").format(totalWordCount)}
+                {totalSentanceCount &&
+                  new Intl.NumberFormat("en").format(totalSentanceCount)}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Annotation Word Count
+                Total Annotation Sentance Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalAnnotationWordCount &&
-                  new Intl.NumberFormat("en").format(totalAnnotationWordCount)}
+                {totalAnnotationSentanceCount &&
+                  new Intl.NumberFormat("en").format(totalAnnotationSentanceCount)}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Quality/Reviewed Word Count
+                Total Quality/Reviewed Sentance Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalReviewWordCount &&
-                  new Intl.NumberFormat("en").format(totalReviewWordCount)}
+                {totalReviewSentanceCount &&
+                  new Intl.NumberFormat("en").format(totalReviewSentanceCount)}
               </Typography>
             </Box>
           </Box>
@@ -247,7 +196,7 @@ export default function WordCountMetaAnalyticsChart(props) {
               />
               <Legend verticalAlign="top" />
               <Bar
-                dataKey={graphCategory=='audioWordCount'?"review_audio_word_count":"review_cumulative_word_count"}
+                dataKey="review_cumulative_sentance_count"
                 barSize={30}
                 name="Review"
                 stackId="a"
@@ -255,7 +204,7 @@ export default function WordCountMetaAnalyticsChart(props) {
                 cursor="pointer"
               />
               <Bar
-                dataKey={graphCategory=='audioWordCount'?"diff_annotation_review_audio_word":"diff_annotation_review"}
+                dataKey="diff_annotation_review_sentance_count"
                 barSize={30}
                 name="Annotation"
                 stackId="a"

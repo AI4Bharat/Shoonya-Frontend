@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
 export default function AudioDurationChart(props) {
-  const { analyticsData } = props;
+  const { analyticsData, graphCategory } = props;
   const classes = DatasetStyle();
   const [totalAudioHours, setTotalAudioHours] = useState();
   const [totalAnnotationAudioHours, setTotalAnnotationAudioHours] = useState();
@@ -14,32 +14,89 @@ export default function AudioDurationChart(props) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    analyticsData?.sort(
-      (a, b) =>
-        b.annotation_aud_duration_tohour - a.annotation_aud_duration_tohour
-    );
-    setData(analyticsData);
-    let allAnnotatorAudioHours = 0;
-    let allReviewAudioHours = 0;
-    var languages;
-    analyticsData?.map((element, index) => {
-        allAnnotatorAudioHours +=
-        element.annotation_aud_duration_tohour;
-        allReviewAudioHours += element.review_aud_duration_tohour;
-      languages = element.languages;
-    });
-
-    setTotalAnnotationAudioHours(allAnnotatorAudioHours);
-    setTotalReviewAudioHours(allReviewAudioHours);
-    setTotalAudioHours(
-        allAnnotatorAudioHours + allReviewAudioHours
-    );
+    if (graphCategory=="rawAudioDuration"){
+      analyticsData?.sort(
+        (a, b) =>
+          b.annotation_raw_aud_duration_tohour - a.annotation_raw_aud_duration_tohour
+      );
+      setData(analyticsData);
+      let allAnnotatorAudioHours = 0;
+      let allReviewAudioHours = 0;
+      var languages;
+      analyticsData?.map((element, index) => {
+          allAnnotatorAudioHours +=
+          (element.annotation_raw_aud_duration_tohour?element.annotation_raw_aud_duration_tohour:0);
+          allReviewAudioHours += (element.review_raw_aud_duration_tohour?element.review_raw_aud_duration_tohour:0);
+        languages = element.languages;
+      });
+      setTotalAnnotationAudioHours(allAnnotatorAudioHours);
+      setTotalReviewAudioHours(allReviewAudioHours);
+      setTotalAudioHours(
+          allAnnotatorAudioHours + allReviewAudioHours
+      );
+    }
+    else{
+      analyticsData?.sort(
+        (a, b) =>
+          b.annotation_aud_duration_tohour - a.annotation_aud_duration_tohour
+      );
+      setData(analyticsData);
+      let allAnnotatorAudioHours = 0;
+      let allReviewAudioHours = 0;
+      var languages;
+      analyticsData?.map((element, index) => {
+          allAnnotatorAudioHours +=
+          element.annotation_aud_duration_tohour;
+          allReviewAudioHours += element.review_aud_duration_tohour;
+        languages = element.languages;
+      });
+      setTotalAnnotationAudioHours(allAnnotatorAudioHours);
+      setTotalReviewAudioHours(allReviewAudioHours);
+      setTotalAudioHours(
+          allAnnotatorAudioHours + allReviewAudioHours
+      );
+    }
   }, [analyticsData]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className={classes.toolTips}>
+          {graphCategory=='rawAudioDuration'?<p style={{ fontWeight: "bold" }}>
+            {`${label}`}
+            <p style={{ fontWeight: "normal" }}>
+              {`Total hours : ${
+                payload[0].payload.annotation_raw_aud_duration_tohour
+                  ? new Intl.NumberFormat("en").format(
+                      payload[0].payload.annotation_raw_aud_duration_tohour
+                    )
+                  : 0
+              }`}
+              <p style={{ fontWeight: "normal" }}>
+              {`Total duration : ${payload[0].payload.annotation_raw_aud_duration}`}
+
+             
+              
+              <p style={{ color: "rgba(243, 156, 18 )" }}>
+                {`Annotation duration : ${
+                  payload[0].payload.diff_annotation_review_raw_aud_duration_tohour
+                    ? new Intl.NumberFormat("en").format(
+                        payload[0].payload
+                          .diff_annotation_review_raw_aud_duration_tohour
+                      )
+                    : 0
+                }`}
+                <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review duration : ${
+                  payload[0].payload.review_raw_aud_duration_tohour
+                    ? new Intl.NumberFormat("en").format(
+                        payload[0].payload.review_raw_aud_duration_tohour
+                      )
+                    : 0
+                }`}</p>
+              </p>
+              </p>
+            </p>
+          </p>:
           <p style={{ fontWeight: "bold" }}>
             {`${label}`}
             <p style={{ fontWeight: "normal" }}>
@@ -52,29 +109,27 @@ export default function AudioDurationChart(props) {
               }`}
               <p style={{ fontWeight: "normal" }}>
               {`Total duration : ${payload[0].payload.annotation_aud_duration}`}
-
-             
-              
-              <p style={{ color: "rgba(243, 156, 18 )" }}>
-                {`Annotation duration : ${
-                  payload[0].payload.diff_annotation_review_aud_duration_tohour
-                    ? new Intl.NumberFormat("en").format(
-                        payload[0].payload
-                          .diff_annotation_review_aud_duration_tohour
-                      )
-                    : 0
-                }`}
-                <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review duration : ${
-                  payload[0].payload.review_aud_duration_tohour
-                    ? new Intl.NumberFormat("en").format(
-                        payload[0].payload.review_aud_duration_tohour
-                      )
-                    : 0
-                }`}</p>
-              </p>
+                <p style={{ color: "rgba(243, 156, 18 )" }}>
+                  {`Annotation duration : ${
+                    payload[0].payload.diff_annotation_review_aud_duration_tohour
+                      ? new Intl.NumberFormat("en").format(
+                          payload[0].payload
+                            .diff_annotation_review_aud_duration_tohour
+                        )
+                      : 0
+                  }`}
+                  <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review duration : ${
+                    payload[0].payload.review_aud_duration_tohour
+                      ? new Intl.NumberFormat("en").format(
+                          payload[0].payload.review_aud_duration_tohour
+                        )
+                      : 0
+                  }`}</p>
+                </p>
               </p>
             </p>
           </p>
+        }
         </div>
       );
     }
@@ -105,7 +160,7 @@ export default function AudioDurationChart(props) {
                   padding: "16px 0",
                 }}
               >
-                Audio Duration Dashboard
+                {graphCategory=="rawAudioDuration"?"Raw Audio Duration Dashboard":"Audio Duration Dashboard"}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
@@ -198,7 +253,7 @@ export default function AudioDurationChart(props) {
             />
             <Legend verticalAlign="top" />
             <Bar
-              dataKey="review_aud_duration_tohour"
+              dataKey={graphCategory=="rawAudioDuration"?"review_raw_aud_duration_tohour":"review_aud_duration_tohour"}
               barSize={30}
               name="Review"
               stackId="a"
@@ -206,7 +261,7 @@ export default function AudioDurationChart(props) {
               cursor="pointer"
             />
             <Bar
-              dataKey="diff_annotation_review_aud_duration_tohour"
+              dataKey={graphCategory=="rawAudioDuration"?"diff_annotation_review_raw_aud_duration_tohour":"diff_annotation_review_aud_duration_tohour"}
               barSize={30}
               name="Annotation"
               stackId="a"

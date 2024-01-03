@@ -1104,6 +1104,7 @@ export default function LSF() {
           startIcon={<ArrowBackIcon />}
           variant="contained"
           color="primary"
+          sx={{mt:2}} 
           onClick={() => {
             localStorage.removeItem("labelAll");
             navigate(`/projects/${projectId}`);
