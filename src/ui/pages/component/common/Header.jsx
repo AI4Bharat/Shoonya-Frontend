@@ -25,6 +25,8 @@ import { useEffect, useState } from "react";
 import { formatDistanceToNow, format } from 'date-fns';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import GradingSharpIcon from '@mui/icons-material/GradingSharp';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { Link, NavLink } from "react-router-dom";
@@ -127,41 +129,37 @@ const Header = () => {
       })
       .catch((error) => {
         console.error("Error fetching notifications:", error);
-        setnotification(error);
-        setSnackbarInfo({
-          open: true,
-          message: error,
-          variant: "Error",
-        });
       });
   };
-  const markAsRead = (notificationId) => {
+  const markAsRead =  (notificationId) => {
     const task = new NotificationPatchAPI(notificationId);
-    dispatch(APITransport(task));
-    fetchNotifications()
+    setSelectedNotificationId(notificationId);
+     dispatch(APITransport(task));
+     fetchNotifications()
+
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead =  () => {
     const notificationIds = Notification.map((notification) => notification.id);
     const tasks = new NotificationPatchAPI(notificationIds);
-    dispatch(APITransport(tasks));
-    fetchNotifications()
+    setSelectedNotificationId(notificationIds)
+     dispatch(APITransport(tasks));
+     fetchNotifications()
+
   };
 
-  const handleMarkAllAsReadClick = () => {
+  const handleMarkAllAsReadClick =  () => {
     markAllAsRead();
-    handleMoreHorizonClose()
   };
 
-  const handleMarkAsRead = () => {
-    markAsRead(selectedNotificationId);
-    handlePopoverClose();
+  const handleMarkAsRead =  (notificationId) => {
+    markAsRead(notificationId);
   };
 
 
   useEffect(() => {
     fetchNotifications();
-  }, [unread]);
+  }, [unread,selectedNotificationId]);
 
   useEffect(() => {
     getLoggedInUserData();
@@ -214,7 +212,11 @@ const Header = () => {
     setSelectedNotificationId(null);
   };
 
-
+const handleopenproject=(id,type)=>{
+  if(type=="publish_project"){
+    navigate(`/projects/${id}`);
+  }
+}
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -277,12 +279,12 @@ const Header = () => {
   };
   const handleTabChange = async (index) => {
     if (index === 0) {
-     await setunread(null);
+      await setunread(null);
     } else if (index === 1) {
-     await setunread("False");
+      await setunread("False");
     }
-   
-  
+
+
   };
   const handleTagsChange = (event) => {
     if (event.target.checked) {
@@ -309,8 +311,8 @@ const Header = () => {
       />
     );
   };
-  const unseenNotifications = Notification?.length>0 && Notification?.filter(notification =>notification?.seen_json && !notification.seen_json[loggedInUserData.id]);
-
+  const unseenNotifications = Notification?.length > 0 && Notification?.filter(notification => notification?.seen_json ==null || !notification?.seen_json[loggedInUserData.id]);
+console.log(unseenNotifications,'uuu');
 
   const renderTabs = () => {
     if (
@@ -851,7 +853,7 @@ const Header = () => {
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
                       <IconButton onClick={handleOpenNotification}>
-                        <Badge  badgeContent={Notification?.length} color="primary">
+                        <Badge badgeContent={unseenNotifications?.length>0 ?unseenNotifications?.length: null} color="primary">
                           <NotificationsIcon color="primary.dark" fontSize="large" />
                         </Badge>
 
@@ -1018,9 +1020,9 @@ const Header = () => {
                 >
                   <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
                     <Typography variant="h4">Notifications</Typography>
-                    {Notification && Notification?.length > 0  ? <IconButton aria-label="More" onClick={handleMoreHorizonClick}>
-                      <MoreHorizIcon />
-                    </IconButton>:null}
+                    {Notification && Notification?.length > 0 && unseenNotifications?.length > 0 ? <Tooltip title="Mark all as read"><IconButton aria-label="More" onClick={handleMarkAllAsReadClick}>
+                      <GradingSharpIcon color="primary"/>
+                    </IconButton> </Tooltip>: null}
                   </Stack>
                   <Stack direction="row" spacing={2} style={{ padding: "0 0 10px 10px" }}>
                     <Tabs value={value} onChange={handleChange} sx={{
@@ -1036,14 +1038,14 @@ const Header = () => {
                     <>
                       {Notification.map((notification, index) => (
                         <div key={index} style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
-                          <div style={{ marginRight: '10px' }}>
-                            <FiberManualRecordIcon color={  notification?.seen_json
-      ? notification?.seen_json[loggedInUserData.id]
-        ? 'action'
-        : 'primary'
-      : "primary"} />
+                          <div style={{ marginRight: '10px' ,cursor:"pointer"}}>
+                            <FiberManualRecordIcon color={notification?.seen_json
+                              ? notification?.seen_json[loggedInUserData.id]
+                                ? 'action'
+                                : 'primary'
+                              : "primary"} />
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' ,cursor:"pointer"}}>
                             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                               <Typography variant="subtitle2">{`ID: ${notification?.title?.split('-')[0]}`}</Typography>
                               <Typography style={{ paddingLeft: "10px" }} variant="subtitle2">{`TITLE: ${notification?.notification_type}`}</Typography>
@@ -1051,12 +1053,15 @@ const Header = () => {
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
                               <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
-                              <IconButton aria-label="More" onClick={(event) => handleTitleMouseEnter(event, notification?.id)}>
-                                <MoreHorizIcon />
-                              </IconButton>
+                              {notification?.seen_json==null || !notification?.seen_json[loggedInUserData.id] ?
+                              <Tooltip title="Mark as read"><IconButton aria-label="More" onClick={() => handleMarkAsRead(notification?.id)}>
+                                <CheckCircleOutlineRoundedIcon color="primary"/>
+                              </IconButton></Tooltip>:null}
                             </div>
                             <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
+                            {index !== Notification?.length - 1 && <Divider />} 
                           </div>
+  
                         </div>
                       ))}
                     </>
@@ -1099,7 +1104,9 @@ const Header = () => {
                     horizontal: 'right',
                   }}
                 >
-                  <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
+
+                    <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
+
                 </Popover>
 
               </Box>
