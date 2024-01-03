@@ -19,6 +19,7 @@ import { MenuProps } from "../../../../../utils/utils";
 import CustomButton from "../../../component/common/Button";
 import AudioDurationChart from '../MetaAnalytics/AudioDurationMetaAnalyticsChart';
 import WordCountMetaAnalyticsChart from '../MetaAnalytics/WordCountMetaAnalyticsChart';
+import SentanceCountMetaAnalyticsChart from '../MetaAnalytics/SentanceCountMetaAnalyticsChart';
 
 export default function MetaAnalytics(props) {
     const dispatch = useDispatch();
@@ -129,6 +130,8 @@ export default function MetaAnalytics(props) {
           if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
             return (<Grid key={_index} style={{marginTop:"15px"}}>
             <AudioDurationChart analyticsData={analyticsData}/>
+            <AudioDurationChart analyticsData={analyticsData} graphCategory='rawAudioDuration'/>
+            <WordCountMetaAnalyticsChart analyticsData={analyticsData} graphCategory='audioWordCount'/>
           </Grid>)}
           if(analyticsData.length && 
             (translationProjectTypes.includes(analyticsData[0].projectType) ||
@@ -137,6 +140,7 @@ export default function MetaAnalytics(props) {
             ){
             return <Grid key={_index} style={{marginTop:"15px"}}>
             <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
+            {analyticsData[0].projectType.includes("Conversation") && <SentanceCountMetaAnalyticsChart analyticsData={analyticsData}/>}
           </Grid>
           }
         })
