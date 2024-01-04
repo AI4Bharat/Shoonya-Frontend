@@ -19,6 +19,7 @@ import { translate } from "../../../../../config/localisation";
 import InfoIcon from '@mui/icons-material/Info';
 import { MenuProps } from "../../../../../utils/utils";
 import WordCountMetaAnalyticsChart from './WordCountMetaAnalyticsChart';
+import SentanceCountMetaAnalyticsChart from './SentanceCountMetaAnalyticsChart';
 
 export default function MetaAnalytics(props) {
     const dispatch = useDispatch();
@@ -130,6 +131,8 @@ export default function MetaAnalytics(props) {
           if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
             return (<Grid key={_index} style={{marginTop:"15px"}}>
             <AudioDurationChart analyticsData={analyticsData}/>
+            <AudioDurationChart analyticsData={analyticsData} graphCategory='rawAudioDuration'/>
+            <WordCountMetaAnalyticsChart analyticsData={analyticsData} graphCategory='audioWordCount'/>
           </Grid>)}
           if(analyticsData.length && 
             (translationProjectTypes.includes(analyticsData[0].projectType) ||
@@ -138,6 +141,7 @@ export default function MetaAnalytics(props) {
             ){
             return <Grid key={_index} style={{marginTop:"15px"}}>
             <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
+            {analyticsData[0].projectType.includes("Conversation") && <SentanceCountMetaAnalyticsChart analyticsData={analyticsData}/>}
           </Grid>
           }
         })
