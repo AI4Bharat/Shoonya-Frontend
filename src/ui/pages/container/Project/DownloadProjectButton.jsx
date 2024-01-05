@@ -12,6 +12,9 @@ import DownloadProjectTsvAPI from '../../../../redux/actions/api/ProjectDetails/
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+import { Tooltip } from "@mui/material";
+
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -74,6 +77,10 @@ function DownloadProjectButton(props) {
   //   dispatch(APITransport(projectObj));
 
   // }
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
 
@@ -190,7 +197,7 @@ function DownloadProjectButton(props) {
         // aria-haspopup="true"
         // aria-expanded={open ? 'true' : undefined}
         variant="contained"
-        disabled= {taskStatus.length > 0 ? false: true } 
+        disabled= {taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role ? false: true } 
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
       >

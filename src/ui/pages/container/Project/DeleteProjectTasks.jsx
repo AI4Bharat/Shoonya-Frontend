@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+
 
 export default function DeleteProjectTasks() {
     const classes = DatasetStyle();
@@ -34,7 +36,10 @@ export default function DeleteProjectTasks() {
         message: "",
         variant: "success",
     });
-
+    const loggedInUserData = useSelector(
+        (state) => state.fetchLoggedInUserData.data
+      );
+    
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -168,6 +173,7 @@ export default function DeleteProjectTasks() {
                 }}
                 aria-describedby={Id}
                 variant="contained"
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
                 onClick={handleClick}
                 color="error">
                 Delete Project Tasks
