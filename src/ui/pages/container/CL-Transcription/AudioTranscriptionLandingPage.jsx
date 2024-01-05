@@ -869,7 +869,7 @@ useEffect(() => {
             startIcon={<ArrowBackIcon />}
             variant="contained"
             color="primary"
-            sx={{ ml: 1 }}
+            sx={{ ml: 1 ,mt:2}}
             onClick={() => {
               localStorage.removeItem("labelAll");
               navigate(`/projects/${projectId}`);

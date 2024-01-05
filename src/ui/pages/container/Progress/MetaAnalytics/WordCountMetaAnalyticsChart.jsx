@@ -13,8 +13,8 @@ import {
   import { useEffect, useState } from "react";
   import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
-export default function WordCountBarChartForTranslationType(props) {
-    const {analyticsData} = props
+export default function WordCountMetaAnalyticsChart(props) {
+    const {analyticsData,graphCategory} = props
     const classes = DatasetStyle();
     const [totalWordCount, setTotalWordCount] = useState();
     const [totalAnnotationWordCount, setTotalAnnotationWordCount] = useState();
@@ -22,27 +22,52 @@ export default function WordCountBarChartForTranslationType(props) {
     const [data, setData] = useState([]);
 
     useEffect(() => {
+      if (graphCategory=="audioWordCount"){
         analyticsData?.sort(
-        (a, b) =>
-          b.annotation_cumulative_word_count -
-          a.annotation_cumulative_word_count
-      );
-      setData(analyticsData);
-      let allAnnotatorCumulativeWordCount = 0;
-      let allReviewCumulativeWordCount = 0;
-      var languages;
-      analyticsData?.map((element, index) => {
-          allAnnotatorCumulativeWordCount +=
-          element.annotation_cumulative_word_count;
-          allReviewCumulativeWordCount += element.review_cumulative_word_count;
-        languages = element.languages;
-      });
-  
-      setTotalAnnotationWordCount(allAnnotatorCumulativeWordCount);
-      setTotalReviewWordCount(allReviewCumulativeWordCount);
-      setTotalWordCount(
-          allAnnotatorCumulativeWordCount + allReviewCumulativeWordCount
-      );
+          (a, b) =>
+            b.annotation_audio_word_count -
+            a.review_audio_word_count
+        );
+        setData(analyticsData);
+        let allAnnotatorAudioWordCount = 0;
+        let allReviewAudioWordCount = 0;
+        var languages;
+        analyticsData?.map((element, index) => {
+            allAnnotatorAudioWordCount +=
+            (element.annotation_audio_word_count?element.annotation_audio_word_count:0);
+            allReviewAudioWordCount += (element.review_audio_word_count?element.review_audio_word_count:0);
+          languages = element.languages;
+        });
+    
+        setTotalAnnotationWordCount(allAnnotatorAudioWordCount);
+        setTotalReviewWordCount(allReviewAudioWordCount);
+        setTotalWordCount(
+          allAnnotatorAudioWordCount + allReviewAudioWordCount
+        );
+      }
+      else{
+        analyticsData?.sort(
+          (a, b) =>
+            b.annotation_cumulative_word_count -
+            a.annotation_cumulative_word_count
+        );
+        setData(analyticsData);
+        let allAnnotatorCumulativeWordCount = 0;
+        let allReviewCumulativeWordCount = 0;
+        var languages;
+        analyticsData?.map((element, index) => {
+            allAnnotatorCumulativeWordCount +=
+            element.annotation_cumulative_word_count;
+            allReviewCumulativeWordCount += element.review_cumulative_word_count;
+          languages = element.languages;
+        });
+    
+        setTotalAnnotationWordCount(allAnnotatorCumulativeWordCount);
+        setTotalReviewWordCount(allReviewCumulativeWordCount);
+        setTotalWordCount(
+            allAnnotatorCumulativeWordCount + allReviewCumulativeWordCount
+        );
+      }
     }, [analyticsData]);
 
 
@@ -52,6 +77,32 @@ export default function WordCountBarChartForTranslationType(props) {
             <div className={classes.toolTip}>
               <p style={{ fontWeight: "bold" }}>
                 {`${label}`}
+                {graphCategory=="audioWordCount"?<p style={{ fontWeight: "normal" }}>
+                  {`Total count : ${
+                    payload[0].payload.annotation_audio_word_count
+                      ? new Intl.NumberFormat("en").format(
+                          payload[0].payload.annotation_audio_word_count
+                        )
+                      : 0
+                  }`}
+                  <p style={{ color: "rgba(243, 156, 18 )" }}>
+                    {`Annotation : ${
+                      payload[0].payload.diff_annotation_review_audio_word
+                        ? new Intl.NumberFormat("en").format(
+                            payload[0].payload.diff_annotation_review_audio_word
+                          )
+                        : 0
+                    }`}
+                    <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review : ${
+                      payload[0].payload.review_audio_word_count
+                        ? new Intl.NumberFormat("en").format(
+                            payload[0].payload.review_audio_word_count
+                          )
+                        : 0
+                    }`}</p>
+                  </p>  
+                </p>
+                :
                 <p style={{ fontWeight: "normal" }}>
                   {`Total count : ${
                     payload[0].payload.annotation_cumulative_word_count
@@ -75,8 +126,8 @@ export default function WordCountBarChartForTranslationType(props) {
                           )
                         : 0
                     }`}</p>
-                  </p>
-                </p>
+                  </p>  
+                </p>}
               </p>
             </div>
           );
@@ -88,15 +139,10 @@ export default function WordCountBarChartForTranslationType(props) {
   return (
     <Box className={classes.modelChartSection}>
          <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-         Word Count Dashboard - Translation
+         {`Word Count Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Translation Tasks
+            Count of Annotated and Reviewed Data
           </Typography>
-        </Typography>
-
-        <Typography variant="body" sx={{fontSize:"17px"}}>
-          Note : Quality sentence pairs are generated after a pipeline of
-          Annotated & Reviewed tasks.
         </Typography>
         <Paper>
           <Box className={classes.topBar}>
@@ -201,7 +247,7 @@ export default function WordCountBarChartForTranslationType(props) {
               />
               <Legend verticalAlign="top" />
               <Bar
-                dataKey="review_cumulative_word_count"
+                dataKey={graphCategory=='audioWordCount'?"review_audio_word_count":"review_cumulative_word_count"}
                 barSize={30}
                 name="Review"
                 stackId="a"
@@ -209,7 +255,7 @@ export default function WordCountBarChartForTranslationType(props) {
                 cursor="pointer"
               />
               <Bar
-                dataKey="diff_annotation_review"
+                dataKey={graphCategory=='audioWordCount'?"diff_annotation_review_audio_word":"diff_annotation_review"}
                 barSize={30}
                 name="Annotation"
                 stackId="a"

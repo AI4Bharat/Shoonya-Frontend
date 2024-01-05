@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Radio,
   Autocomplete,
+  RadioGroup,
   Box,
   FormControl,
   InputLabel,
@@ -26,10 +27,9 @@ import { Stack } from "@mui/material";
 
 const FilterList = (props) => {
   const classes = DatasetStyle();
-  const { filterStatusData, currentFilters, updateFilters,pull,setpull,pullvalue } = props;
+  const { filterStatusData, currentFilters, updateFilters, pull, setpull, rejected, setRejected, pullvalue } = props;
   const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status ? currentFilters?.annotation_status : currentFilters.review_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
-
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
@@ -47,9 +47,9 @@ const FilterList = (props) => {
   //   }
   // };
 
+  console.log(filterStatusData, selectedStatus, currentFilters);
   const pulledstatus = currentFilters?.annotation_status ? ["Pulled By reviewer", "Not Pulled By reviewer"]
     : currentFilters?.review_status ? ["Pulled By SuperChecker", "Not Pulled By SuperChecker"] : null;
-
   const handleStatusChange = (e) => {
     let statusvalue = !!currentFilters?.annotation_status ? "annotation_status" : "review_status"
     // let pullvalue = (pull == 'Pulled By reviewer' || pull == 'Pulled By SuperChecker') ? false :
@@ -96,9 +96,9 @@ const FilterList = (props) => {
         <Box className={classes.filterContainer}>
           <Stack direction="row">
             <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="body2" sx={{ ml: 1, fontWeight: "700",fontSize:"16px" }} className={classes.filterTypo}>
-              {translate("label.filter.status")} 
-            </Typography>
+              <Typography variant="body2" sx={{ ml: 1, fontWeight: "700", fontSize: "16px" }} className={classes.filterTypo}>
+                {translate("label.filter.status")}
+              </Typography>
               {filterStatusData.Status.map((type) => {
                 return (
                   <FormControlLabel
@@ -120,60 +120,86 @@ const FilterList = (props) => {
                 );
               })}
             </FormGroup>
-            {currentFilters?.annotation_status ?
-              <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                <InputLabel id="project-type-label" sx={{
-                  fontSize: "16px",
-                  position: "inherit",
-                  top: "23px",
-                  left: "-3px",
-                }}>Editable</InputLabel>
-                <Select
-                  labelId="editable-label"
-                  id="editable-select"
-                  value={pull}
-                  defaultValue={"All"}
-                  label="editable"
-                  onChange={(e) => setpull(e.target.value)}
-
-                >
-                  <MenuItem value={'All'} selected>
-                    All
-                  </MenuItem>
-                  {pulledstatus.map((type, index) => (
-                    <MenuItem value={type} key={index}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl> : currentFilters?.review_status ?
-                <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+            <Stack direction="column">
+              {currentFilters?.annotation_status ?
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                   <InputLabel id="project-type-label" sx={{
-                  fontSize: "16px",
-                  position: "inherit",
-                  top: "23px",
-                  left: "-3px",
-                }} >Editable</InputLabel>
+                    fontSize: "16px",
+                    position: "inherit",
+                    top: "23px",
+                    left: "-3px",
+                  }}>Editable</InputLabel>
                   <Select
-
                     labelId="editable-label"
                     id="editable-select"
                     value={pull}
-                    label="editable"
                     defaultValue={"All"}
+                    label="editable"
                     onChange={(e) => setpull(e.target.value)}
 
                   >
-                    <MenuItem value={'All'} selected>All</MenuItem>
+                    <MenuItem value={'All'} selected>
+                      All
+                    </MenuItem>
                     {pulledstatus.map((type, index) => (
                       <MenuItem value={type} key={index}>
                         {type}
                       </MenuItem>
                     ))}
                   </Select>
-                </FormControl> : null
+                </FormControl> : currentFilters?.review_status ?
+                  <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+                    <InputLabel id="project-type-label" sx={{
+                      fontSize: "16px",
+                      position: "inherit",
+                      top: "23px",
+                      left: "-3px",
+                    }} >Editable</InputLabel>
+                    <Select
 
-            }
+                      labelId="editable-label"
+                      id="editable-select"
+                      value={pull}
+                      label="editable"
+                      defaultValue={"All"}
+                      onChange={(e) => setpull(e.target.value)}
+
+                    >
+                      <MenuItem value={'All'} selected>All</MenuItem>
+                      {pulledstatus.map((type, index) => (
+                        <MenuItem value={type} key={index}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl> : null
+
+              }
+              {currentFilters?.annotation_status && selectedStatus !== "unlabeled" ? 
+              <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+                 <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rejected}
+                  onChange={() => setRejected(!rejected)}
+                />
+              }
+              label={currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}
+            />
+              </FormControl> : currentFilters?.review_status && selectedStatus !== "unreviewed" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+               
+                <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rejected}
+                  onChange={() => setRejected(!rejected)}
+                />
+              }
+              label={currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}
+            />
+              </FormControl> : null}
+            </Stack>
+
           </Stack>
           <Divider />
           <Box

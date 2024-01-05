@@ -13,37 +13,37 @@ import {
   import { useEffect, useState } from "react";
   import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
-export default function ContextualTranslationEditing(props) {
-    const {metaAnalyticsData} = props
+export default function SentanceCountMetaAnalyticsChart(props) {
+    const {analyticsData} = props
     const classes = DatasetStyle();
-    const [totalWordCount, setTotalWordCount] = useState();
-    const [totalAnnotationWordCount, setTotalAnnotationWordCount] = useState();
-    const [totalReviewWordCount, setTotalReviewWordCount] = useState();
+    const [totalSentanceCount, setTotalSentanceCount] = useState();
+    const [totalAnnotationSentanceCount, setTotalAnnotationSentanceCount] = useState();
+    const [totalReviewSentanceCount, setTotalReviewSentanceCount] = useState();
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        metaAnalyticsData[0]?.sort(
+        analyticsData?.sort(
         (a, b) =>
-          b.annotation_cumulative_word_count -
-          a.annotation_cumulative_word_count
+          b.annotation_cumulative_sentance_count -
+          a.annotation_cumulative_sentance_count
       );
-      setData(metaAnalyticsData[0]);
-      let allAnnotatorCumulativeWordCount = 0;
-      let allReviewCumulativeWordCount = 0;
+      setData(analyticsData);
+      let allAnnotatorCumulativeSentanceCount = 0;
+      let allReviewCumulativeSentanceCount = 0;
       var languages;
-      metaAnalyticsData[0]?.map((element, index) => {
-          allAnnotatorCumulativeWordCount +=
-          element.annotation_cumulative_word_count;
-          allReviewCumulativeWordCount += element.review_cumulative_word_count;
+      analyticsData?.map((element, index) => {
+          allAnnotatorCumulativeSentanceCount +=
+          (element.annotation_cumulative_sentance_count?element.annotation_cumulative_sentance_count:0);
+          allReviewCumulativeSentanceCount += (element.review_cumulative_sentance_count?element.review_cumulative_sentance_count:0);
         languages = element.languages;
       });
   
-      setTotalAnnotationWordCount(allAnnotatorCumulativeWordCount);
-      setTotalReviewWordCount(allReviewCumulativeWordCount);
-      setTotalWordCount(
-          allAnnotatorCumulativeWordCount + allReviewCumulativeWordCount
+      setTotalAnnotationSentanceCount(allAnnotatorCumulativeSentanceCount);
+      setTotalReviewSentanceCount(allReviewCumulativeSentanceCount);
+      setTotalSentanceCount(
+          allAnnotatorCumulativeSentanceCount + allReviewCumulativeSentanceCount
       );
-    }, [metaAnalyticsData[0]]);
+    }, [analyticsData]);
 
 
     const CustomTooltip = ({ active, payload, label }) => {
@@ -54,24 +54,24 @@ export default function ContextualTranslationEditing(props) {
                 {`${label}`}
                 <p style={{ fontWeight: "normal" }}>
                   {`Total count : ${
-                    payload[0].payload.annotation_cumulative_word_count
+                    payload[0].payload.annotation_cumulative_sentance_count
                       ? new Intl.NumberFormat("en").format(
-                          payload[0].payload.annotation_cumulative_word_count
+                          payload[0].payload.annotation_cumulative_sentance_count
                         )
                       : 0
                   }`}
                   <p style={{ color: "rgba(243, 156, 18 )" }}>
                     {`Annotation : ${
-                      payload[0].payload.diff_annotation_review
+                      payload[0].payload.diff_annotation_review_sentance_count
                         ? new Intl.NumberFormat("en").format(
-                            payload[0].payload.diff_annotation_review
+                            payload[0].payload.diff_annotation_review_sentance_count
                           )
                         : 0
                     }`}
                     <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review : ${
-                      payload[0].payload.review_cumulative_word_count
+                      payload[0].payload.review_cumulative_sentance_count
                         ? new Intl.NumberFormat("en").format(
-                            payload[0].payload.review_cumulative_word_count
+                            payload[0].payload.review_cumulative_sentance_count
                           )
                         : 0
                     }`}</p>
@@ -88,15 +88,10 @@ export default function ContextualTranslationEditing(props) {
   return (
     <Box className={classes.modelChartSection}>
          <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-         Word Count Dashboard - Translation
+         {`Sentance Count Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Translation Tasks
+            Count of Annotated and Reviewed Data
           </Typography>
-        </Typography>
-
-        <Typography variant="body" sx={{fontSize:"17px"}}>
-          Note : Quality sentence pairs are generated after a pipeline of
-          Annotated & Reviewed tasks.
         </Typography>
         <Paper>
           <Box className={classes.topBar}>
@@ -108,34 +103,34 @@ export default function ContextualTranslationEditing(props) {
                   padding: "16px 0",
                 }}
               >
-                word Count Dashboard
+                Sentance Count Dashboard
               </Typography>
             </Box>
         <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Word Count
+                Total Sentance Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalWordCount &&
-                  new Intl.NumberFormat("en").format(totalWordCount)}
+                {totalSentanceCount &&
+                  new Intl.NumberFormat("en").format(totalSentanceCount)}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Annotation Word Count
+                Total Annotation Sentance Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalAnnotationWordCount &&
-                  new Intl.NumberFormat("en").format(totalAnnotationWordCount)}
+                {totalAnnotationSentanceCount &&
+                  new Intl.NumberFormat("en").format(totalAnnotationSentanceCount)}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Quality/Reviewed Word Count
+                Total Quality/Reviewed Sentance Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalReviewWordCount &&
-                  new Intl.NumberFormat("en").format(totalReviewWordCount)}
+                {totalReviewSentanceCount &&
+                  new Intl.NumberFormat("en").format(totalReviewSentanceCount)}
               </Typography>
             </Box>
           </Box>
@@ -201,7 +196,7 @@ export default function ContextualTranslationEditing(props) {
               />
               <Legend verticalAlign="top" />
               <Bar
-                dataKey="review_cumulative_word_count"
+                dataKey="review_cumulative_sentance_count"
                 barSize={30}
                 name="Review"
                 stackId="a"
@@ -209,7 +204,7 @@ export default function ContextualTranslationEditing(props) {
                 cursor="pointer"
               />
               <Bar
-                dataKey="diff_annotation_review"
+                dataKey="diff_annotation_review_sentance_count"
                 barSize={30}
                 name="Annotation"
                 stackId="a"
