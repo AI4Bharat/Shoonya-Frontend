@@ -57,6 +57,7 @@ const AudioPanel = memo( ({
       {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio
           controls
+          controlsList="nodownload"
           src={TaskDetails?.data?.audio_url}
           type="audio"
           // style={{
