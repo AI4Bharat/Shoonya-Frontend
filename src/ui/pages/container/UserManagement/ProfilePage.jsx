@@ -11,6 +11,7 @@ import RecentTasks from '../../component/Tabs/RecentTasks';
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
@@ -27,6 +28,7 @@ const ProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = useState(null);
+  const [avatarOverley,setAvatarOverley] = useState(false)
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -102,6 +104,14 @@ const ProfilePage = () => {
       }
   }
 
+  const handleavatarOverleyOpen = () => {
+    setAvatarOverley(true)
+  };
+
+  const handleavatarOverleyClose = () => {
+    setAvatarOverley(false)
+  };
+
   useEffect(() => {
     setLoading(true);
     const userObj = new FetchUserByIdAPI(id);
@@ -130,16 +140,27 @@ const ProfilePage = () => {
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4} sx={{ p: 2 }}>
             <Card sx={{ borderRadius: "5px", mb: 2 }}>
-              <CardContent sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+              <CardContent sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', position:'relative' }}>
                 <Card sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', border: "none" }}>
                   <Input accept="image/*" id="upload-avatar-pic" type="file" hidden onChange={onImageChangeHandler}/>
+                  {avatarOverley && <AddPhotoAlternateIcon sx={{position:'absolute'}}/>}
                   <label htmlFor="upload-avatar-pic">
                       <IconButton component="span">
                           <Avatar
                             alt="user_profile_pic"
                             variant="contained"
                             src={userDetails?.profile_photo?userDetails.profile_photo:''}
-                            sx={{ color: "#FFFFFF !important", bgcolor: "#2A61AD !important", width: 96, height: 96, mb: 2, alignSelf: 'center' }}
+                            sx={{ 
+                              color: "#FFFFFF !important",
+                              bgcolor: "#2A61AD !important",
+                              width: 96,
+                              height: 96,
+                              mb: 2,
+                              alignSelf: 'center',
+                              ":hover": {opacity:'0.5'}
+                            }}
+                            onMouseEnter={handleavatarOverleyOpen} 
+                            onMouseLeave={handleavatarOverleyClose}
                           >
                             {userDetails.username.split("")[0]}
                           </Avatar>
