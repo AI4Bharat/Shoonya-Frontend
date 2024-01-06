@@ -841,14 +841,10 @@ const LabelStudioWrapper = ({
           //   predictions,
           // ]);
           setNotes(taskData, annotations);
-          // let tempLabelConfig =
-          //   labelConfig.project_type === "ConversationTranslation" ||
-          //     labelConfig.project_type === "ConversationTranslationEditing"
-          //     ? generateLabelConfig(taskData.data)
-          //     : labelConfig.project_type === "ConversationVerification"
-          //       ? conversationVerificationLabelConfig(taskData.data)
-          //       : labelConfig.label_config;
-          let tempLabelConfig = labelConfigJS;
+          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+          if (labelConfig.project_type === "OCRTranscription"){
+            tempLabelConfig = labelConfigJS;
+          }
           setLabelConfig(tempLabelConfig);
           setAnnotations(annotations);
           setTaskData(taskData);
