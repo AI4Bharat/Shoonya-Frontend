@@ -175,7 +175,7 @@ const FilterList = (props) => {
                   </FormControl> : null
 
               }
-              {currentFilters?.annotation_status && selectedStatus == "labeled" ? 
+              {currentFilters?.annotation_status && selectedStatus !== "unlabeled" ? 
               <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
                  <FormControlLabel
               control={
@@ -186,7 +186,7 @@ const FilterList = (props) => {
               }
               label={currentFilters?.annotation_status ? "Rejected By reviewer" : currentFilters?.review_status ? "Rejected By SuperChecker" : null}
             />
-              </FormControl> : currentFilters?.review_status && selectedStatus == "accepted_with_major_changes" || selectedStatus == "accepted_with_minor_changes" || selectedStatus == "accepted" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
+              </FormControl> : currentFilters?.review_status && selectedStatus !== "unreviewed" ? <FormControl sx={{ m: 1, minWidth: 125 }} size="small" >
                
                 <FormControlLabel
               control={
