@@ -842,7 +842,7 @@ const LabelStudioWrapper = ({
           // ]);
           setNotes(taskData, annotations);
           let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
-          if (labelConfig.project_type.includes("OCR")){
+          if (labelConfig.project_type.includes("OCRSegmentCategorization")){
             tempLabelConfig = labelConfigJS;
           }
           setLabelConfig(tempLabelConfig);
