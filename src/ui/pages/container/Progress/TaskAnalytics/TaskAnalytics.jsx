@@ -130,13 +130,13 @@ const TaskAnalytics = (props) => {
           </Grid>)}
           if(analyticsData.length && 
             (translationProjectTypes.includes(analyticsData[0].projectType) ||
-              conversationProjectTypes.includes(analyticsData[0].projectType)
+              conversationProjectTypes.includes(analyticsData[0].projectType) ||
+              (ocrProjectTypes.includes(analyticsData[0].projectType))
               )
             ){
             return <Grid key={_index} style={{marginTop:"15px"}}>
             <TaskCountAnalyticsChart analyticsData={analyticsData}/>
-          </Grid>
-          }
+          </Grid>}
         })
       :''}
     </>
