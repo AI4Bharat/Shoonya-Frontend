@@ -26,7 +26,7 @@ export default function WordCountMetaAnalyticsChart(props) {
         analyticsData?.sort(
           (a, b) =>
             b.annotation_audio_word_count -
-            a.review_audio_word_count
+            a.annotation_audio_word_count
         );
         setData(analyticsData);
         let allAnnotatorAudioWordCount = 0;
@@ -43,6 +43,30 @@ export default function WordCountMetaAnalyticsChart(props) {
         setTotalReviewWordCount(allReviewAudioWordCount);
         setTotalWordCount(
           allAnnotatorAudioWordCount + allReviewAudioWordCount
+        );
+      }
+      else if (graphCategory=="ocrWordCount"){
+        analyticsData?.sort(
+          (a, b) =>
+            b.ann_ocr_cumulative_word_count -
+            a.ann_ocr_cumulative_word_count
+        );
+    
+        setData(analyticsData);
+        let allAnnotatorCumulativeWordCount = 0;
+        let allReviewCumulativeWordCount = 0;
+        var languages;
+        analyticsData?.map((element, index) => {
+            allAnnotatorCumulativeWordCount +=
+            element.ann_ocr_cumulative_word_count;
+            allReviewCumulativeWordCount += element.rew_ocr_cumulative_word_count;
+          languages = element.languages;
+        });
+    
+        setTotalAnnotationWordCount(allAnnotatorCumulativeWordCount);
+        setTotalReviewWordCount(allReviewCumulativeWordCount);
+        setTotalWordCount(
+            allAnnotatorCumulativeWordCount + allReviewCumulativeWordCount
         );
       }
       else{
@@ -103,7 +127,34 @@ export default function WordCountMetaAnalyticsChart(props) {
                   </p>  
                 </p>
                 :
-                <p style={{ fontWeight: "normal" }}>
+                graphCategory=="ocrWordCount"?(<p style={{ fontWeight: "normal" }}>
+                  {`Total count : ${
+                    payload[0].payload.ann_ocr_cumulative_word_count
+                      ? new Intl.NumberFormat("en").format(
+                          payload[0].payload.ann_ocr_cumulative_word_count
+                        )
+                      : 0
+                  }`}
+                  <p style={{ color: "rgba(243, 156, 18 )" }}>
+                    {`Annotation : ${
+                      payload[0].payload.diff_annotation_review_ocr_word
+                        ? new Intl.NumberFormat("en").format(
+                            payload[0].payload.diff_annotation_review_ocr_word
+                          )
+                        : 0
+                    }`}
+                    <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review : ${
+                      payload[0].payload.rew_ocr_cumulative_word_count
+                        ? new Intl.NumberFormat("en").format(
+                            payload[0].payload.rew_ocr_cumulative_word_count
+                          )
+                        : 0
+                    }`}
+                    </p>
+                  </p>  
+                </p>)
+                :
+                (<p style={{ fontWeight: "normal" }}>
                   {`Total count : ${
                     payload[0].payload.annotation_cumulative_word_count
                       ? new Intl.NumberFormat("en").format(
@@ -125,9 +176,11 @@ export default function WordCountMetaAnalyticsChart(props) {
                             payload[0].payload.review_cumulative_word_count
                           )
                         : 0
-                    }`}</p>
+                    }`}
+                    </p>
                   </p>  
-                </p>}
+                </p>)
+                }
               </p>
             </div>
           );
@@ -154,7 +207,7 @@ export default function WordCountMetaAnalyticsChart(props) {
                   padding: "16px 0",
                 }}
               >
-                word Count Dashboard
+                Word Count Dashboard
               </Typography>
             </Box>
         <Box className={classes.topBarInnerBox}>
@@ -247,7 +300,7 @@ export default function WordCountMetaAnalyticsChart(props) {
               />
               <Legend verticalAlign="top" />
               <Bar
-                dataKey={graphCategory=='audioWordCount'?"review_audio_word_count":"review_cumulative_word_count"}
+                dataKey={graphCategory=='audioWordCount'?"review_audio_word_count":graphCategory=="ocrWordCount"?"rew_ocr_cumulative_word_count":"review_cumulative_word_count"}
                 barSize={30}
                 name="Review"
                 stackId="a"
@@ -255,7 +308,7 @@ export default function WordCountMetaAnalyticsChart(props) {
                 cursor="pointer"
               />
               <Bar
-                dataKey={graphCategory=='audioWordCount'?"diff_annotation_review_audio_word":"diff_annotation_review"}
+                dataKey={graphCategory=='audioWordCount'?"diff_annotation_review_audio_word":graphCategory=="ocrWordCount"?"diff_annotation_review_ocr_word":"diff_annotation_review"}
                 barSize={30}
                 name="Annotation"
                 stackId="a"

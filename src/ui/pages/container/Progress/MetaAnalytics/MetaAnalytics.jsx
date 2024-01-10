@@ -142,8 +142,11 @@ export default function MetaAnalytics(props) {
             return <Grid key={_index} style={{marginTop:"15px"}}>
             <WordCountMetaAnalyticsChart analyticsData={analyticsData}/>
             {analyticsData[0].projectType.includes("Conversation") && <SentanceCountMetaAnalyticsChart analyticsData={analyticsData}/>}
-          </Grid>
-          }
+          </Grid>}
+          if (analyticsData.length && ocrProjectTypes.includes(analyticsData[0].projectType)){
+            return (<Grid key={_index} style={{marginTop:"15px"}}>
+            <WordCountMetaAnalyticsChart analyticsData={analyticsData} graphCategory='ocrWordCount'/>
+          </Grid>)}
         })
       :''}
     </div>
