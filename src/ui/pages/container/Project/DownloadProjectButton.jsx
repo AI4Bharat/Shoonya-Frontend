@@ -12,6 +12,7 @@ import DownloadProjectTsvAPI from '../../../../redux/actions/api/ProjectDetails/
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -53,6 +54,10 @@ function DownloadProjectButton(props) {
     message: "",
     variant: "success",
   });
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
+
 
   useEffect(() => {
     setLoading(apiLoading);
@@ -190,7 +195,7 @@ function DownloadProjectButton(props) {
         // aria-haspopup="true"
         // aria-expanded={open ? 'true' : undefined}
         variant="contained"
-        disabled= {taskStatus.length > 0 ? false: true } 
+        disabled= {taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role? false: true } 
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
       >

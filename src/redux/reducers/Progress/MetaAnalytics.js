@@ -28,6 +28,10 @@ const diffAnnotationReview = (payload) => {
         review_audio_word_count: (value?.rev_audio_word_count),
         diff_annotation_review_audio_word: (value?.ann_audio_word_count - value?.rev_audio_word_count),
 
+        ann_ocr_cumulative_word_count: (value?.ann_ocr_cumulative_word_count),
+        rew_ocr_cumulative_word_count: (value?.rew_ocr_cumulative_word_count),
+        diff_annotation_review_ocr_word: (value?.ann_ocr_cumulative_word_count - value?.rew_ocr_cumulative_word_count),
+
         annotation_raw_aud_duration:(value?.ann_raw_aud_duration),
         review_raw_aud_duration:(value?.rew_raw_aud_duration),
         annotation_raw_aud_duration_tohour:(value?.ann_raw_aud_duration?.split(':')?.map(Number)?.[0] * 1 + value?.ann_raw_aud_duration?.split(':')?.map(Number)?.[1]/ 60 + value?.ann_raw_aud_duration?.split(':')?.map(Number)?.[2]/3600),
