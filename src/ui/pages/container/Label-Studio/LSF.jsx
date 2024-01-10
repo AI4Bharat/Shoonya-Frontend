@@ -48,6 +48,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import { labelConfigJS } from "./labelConfigJSX";
 
 const filterAnnotations = (
   annotations,
@@ -572,13 +573,10 @@ const LabelStudioWrapper = ({
             }
             // both have loaded!
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
-            let tempLabelConfig =
-              labelConfig.project_type === "ConversationTranslation" ||
-                labelConfig.project_type === "ConversationTranslationEditing"
-                ? generateLabelConfig(taskData.data)
-                : labelConfig.project_type === "ConversationVerification"
-                  ? conversationVerificationLabelConfig(taskData.data)
-                  : labelConfig.label_config;
+            let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+              tempLabelConfig = labelConfigJS;
+            }
             setAnnotations(annotations);
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);

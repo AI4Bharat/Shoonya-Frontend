@@ -51,6 +51,7 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
+import { labelConfigJS } from "./labelConfigJSX";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -585,13 +586,10 @@ const LabelStudioWrapper = ({
           //   predictions,
           // ]);
           setNotes(taskData, annotations);
-          let tempLabelConfig =
-            labelConfig.project_type === "ConversationTranslation" ||
-              labelConfig.project_type === "ConversationTranslationEditing"
-              ? generateLabelConfig(taskData.data)
-              : labelConfig.project_type === "ConversationVerification"
-                ? conversationVerificationLabelConfig(taskData.data)
-                : labelConfig.label_config;
+          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+            tempLabelConfig = labelConfigJS;
+          }
           setAnnotations(annotations);
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);

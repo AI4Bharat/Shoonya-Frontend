@@ -31,6 +31,7 @@ import styles from './lsf.module.css'
 import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
+import { labelConfigJS } from './labelConfigJSX';
 
 //used just in postAnnotation to support draft status update.
 
@@ -342,6 +343,9 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             // both have loaded!
             console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+              tempLabelConfig = labelConfigJS;
+            }
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
             LSFRoot(
