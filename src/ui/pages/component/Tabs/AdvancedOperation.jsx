@@ -699,7 +699,7 @@ const AdvancedOperation = (props) => {
           sx={{ mt: 1 }}
         >
           {/* <div className={classes.divider} ></div> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <FormControlLabel
               control={<Switch color="primary" />}
               label="Download Metadata"
@@ -709,7 +709,7 @@ const AdvancedOperation = (props) => {
               disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
 
             />
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <Dialog
