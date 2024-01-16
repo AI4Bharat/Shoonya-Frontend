@@ -1,14 +1,11 @@
 export const labelConfigJS = `<View>
 <Image name="image_url" value="$image_url"/>
 <Labels name="annotation_labels" toName="image_url" className="ignore_assertion">
-  <Label value="title" background="green" name="title" className="ignore_assertion"/>
   <Label value="title/h1" background="green" name="title/h1" className="ignore_assertion"/>
   <Label value="title/h2" background="green" name="title/h2" className="ignore_assertion"/>
   <Label value="title/h3" background="green" name="title/h3" className="ignore_assertion"/>
-  <Label value="text" background="blue" name="text" className="ignore_assertion"/>
   <Label value="text/paragraph" background="blue" name="text/paragraph" className="ignore_assertion"/>
   <Label value="text/foreign-language-text" background="blue" name="text/foreign-language-text" className="ignore_assertion"/>
-  <Label value="image" background="red" name="image" className="ignore_assertion"/>
   <Label value="image/img" background="red" name="image/img" className="ignore_assertion"/>
   <Label value="image/logo" background="red" name="image/logo" className="ignore_assertion"/>
   <Label value="image/formula" background="red" name="image/formula" className="ignore_assertion"/>
@@ -16,7 +13,6 @@ export const labelConfigJS = `<View>
   <Label value="image/bg-img" background="red" name="image/bg-img" className="ignore_assertion"/>
   <Label value="unord-list" background="yellow" name="unord-list" className="ignore_assertion"/>
   <Label value="ord-list" background="black" name="ord-list" className="ignore_assertion"/>
-  <Label value="placeholder" background="orange" name="placeholder" className="ignore_assertion"/>
   <Label value="placeholder/txt" background="orange" name="placeholder/txt" className="ignore_assertion"/>
   <Label value="placeholder/img" background="orange" name="placeholder/img" className="ignore_assertion"/>
   <Label value="table" background="violet" name="table" className="ignore_assertion"/>
@@ -28,7 +24,6 @@ export const labelConfigJS = `<View>
   <Label value="header" background="olive" name="header" className="ignore_assertion"/>
   <Label value="social-media-handle" background="aqua" name="social-media-handle" className="ignore_assertion"/>
   <Label value="website-link" background="teal" name="website-link" className="ignore_assertion"/>
-  <Label value="caption" background="maroon" name="caption" className="ignore_assertion"/>
   <Label value="caption/fig" background="maroon" name="caption/fig" className="ignore_assertion"/>
   <Label value="caption/table" background="maroon" name="caption/img" className="ignore_assertion"/>
   <Label value="table-header" background="aquamarine" name="table-header" className="ignore_assertion"/>
