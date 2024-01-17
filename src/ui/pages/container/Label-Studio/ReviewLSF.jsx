@@ -559,71 +559,88 @@ const LabelStudioWrapper = ({
         // },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
-            let temp = annotation.serializeAnnotation();
-            const counter = temp.reduce((acc, curr) => {
-              if (curr.from_name === "labels")
-                acc.labels++;
-              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
-                if (curr.value.text[0] === "")
-                  acc.empty++;
-                acc.textareas++;
-              }
-              return acc;
-            },
-              { labels: 0, textareas: 0, empty: 0 }
-            );
-            if (counter.labels !== counter.textareas || counter.empty) {
-              setSnackbarInfo({
-                open: true,
-                message: "Please fill the annotations for every segment/region",
-                variant: "warning",
-              });
-              return;
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;         
+          temp.map((curr) => {
+            ids.add(curr.id);
+            if(curr.type === "labels"){
+              countLables++;
             }
-          }
-          if (taskData.annotation_status !== "freezed") {
-            setAutoSave(false);
-            showLoader();
-            let temp = annotation.serializeAnnotation();
-
-            for (let i = 0; i < temp.length; i++) {
-              if (temp[i].value.text) {
-                temp[i].value.text = [temp[i].value.text[0]];
-              }
-            }
-
-            let review = annotations.filter(
-              (annotation) => annotation.annotation_type === 2
-            )[0];
-            patchReview(
-              review.id,
-              load_time.current,
-              review.lead_time,
-              review_status.current,
-              temp,
-              review.parent_annotation,
-              JSON.stringify(reviewNotesRef.current.getEditor().getContents())
-            ).then(() => {
-              if (localStorage.getItem("labelAll"))
-                getNextProject(projectId, taskData.id, "review").then(
-                  (res) => {
-                    hideLoader();
-                    tasksComplete(res?.id || null);
-                  }
-                );
-              else {
-                hideLoader();
-                window.location.reload();
-              }
-            });
-          } else
+          });
+          if (ids.size>countLables) {
             setSnackbarInfo({
               open: true,
-              message: "Task is frozen",
+              message: "Please select labels for all boxes",
               variant: "error",
             });
-        },
+          }
+          else {
+            if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
+              const counter = temp.reduce((acc, curr) => {
+                if (curr.from_name === "labels")
+                  acc.labels++;
+                else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
+                  if (curr.value.text[0] === "")
+                    acc.empty++;
+                  acc.textareas++;
+                }
+                return acc;
+              },
+                { labels: 0, textareas: 0, empty: 0 }
+              );
+              if (counter.labels !== counter.textareas || counter.empty) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Please fill the annotations for every segment/region",
+                  variant: "warning",
+                });
+                return;
+              }
+            }
+            if (taskData.annotation_status !== "freezed") {
+              setAutoSave(false);
+              showLoader();
+              let temp = annotation.serializeAnnotation();
+
+              for (let i = 0; i < temp.length; i++) {
+                if (temp[i].value.text) {
+                  temp[i].value.text = [temp[i].value.text[0]];
+                }
+              }
+
+              let review = annotations.filter(
+                (annotation) => annotation.annotation_type === 2
+              )[0];
+              patchReview(
+                review.id,
+                load_time.current,
+                review.lead_time,
+                review_status.current,
+                temp,
+                review.parent_annotation,
+                JSON.stringify(reviewNotesRef.current.getEditor().getContents())
+              ).then(() => {
+                if (localStorage.getItem("labelAll"))
+                  getNextProject(projectId, taskData.id, "review").then(
+                    (res) => {
+                      hideLoader();
+                      tasksComplete(res?.id || null);
+                    }
+                  );
+                else {
+                  hideLoader();
+                  window.location.reload();
+                }
+              });
+            } else
+              setSnackbarInfo({
+                open: true,
+                message: "Task is frozen",
+                variant: "error",
+              });
+        }
+      },
       });
     }
   }
