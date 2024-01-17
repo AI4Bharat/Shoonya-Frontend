@@ -211,36 +211,53 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           load_time = new Date();
         },
         onSubmitAnnotation: function (ls, annotation) {
-          showLoader();
-          if (taskData.annotation_status !== "freezed") {
-            postAnnotation(
-              annotation.serializeAnnotation(),
-              taskData.id,
-              userData.id,
-              load_time,
-              annotation.lead_time,
-              annotation_status.current,
-              annotationNotesRef.current.value
-            ).then((res) => {
-              if (localStorage.getItem("labelAll"))
-                getNextProject(projectId, taskData.id).then((res) => {
-                  hideLoader();
-                  // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                  tasksComplete(res?.id || null);
-                })
-              else {
-                hideLoader();
-                window.location.reload();
-              }
-            })
-          }
-          else
-          setSnackbarInfo({
-            open: true,
-            message: "Task is frozen",
-            variant: "error",
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;         
+          temp.map((curr) => {
+            ids.add(curr.id);
+            if(curr.type === "labels"){
+              countLables++;
+            }
           });
-        },
+          if (ids.size>countLables) {
+            setSnackbarInfo({
+              open: true,
+              message: "Please select labels for all boxes",
+              variant: "error",
+            });
+          }
+          else {
+            showLoader();
+            if (taskData.annotation_status !== "freezed") {
+              postAnnotation(
+                annotation.serializeAnnotation(),
+                taskData.id,
+                userData.id,
+                load_time,
+                annotation.lead_time,
+                annotation_status.current,
+                annotationNotesRef.current.value
+              ).then((res) => {
+                if (localStorage.getItem("labelAll"))
+                  getNextProject(projectId, taskData.id).then((res) => {
+                    hideLoader();
+                    // window.location.href = `/projects/${projectId}/task/${res.id}`;
+                    tasksComplete(res?.id || null);
+                  })
+                else {
+                  hideLoader();
+                  window.location.reload();
+                }
+              })
+            }
+            else
+            setSnackbarInfo({
+              open: true,
+              message: "Task is frozen",
+              variant: "error",
+            });
+        }},
 
         onSkipTask: function () {
         //   message.warning('Notes will not be saved for skipped tasks!');
@@ -265,45 +282,61 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.annotation_status !== "freezed") {
-            for (let i = 0; i < annotations.length; i++) {
-              if (!annotations[i].result?.length || annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
-                showLoader();
-                let temp = annotation.serializeAnnotation()
-
-                for (let i = 0; i < temp.length; i++) {
-                  if (temp[i].value.text) {
-                    temp[i].value.text = [temp[i].value.text[0]]
-                  }
-                }
-                patchAnnotation(
-                  temp,
-                  annotations[i].id,
-                  load_time,
-                  annotations[i].lead_time,
-                  annotation_status.current,
-                  annotationNotesRef.current.value
-                  ).then(() => {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id).then((res) => {
-                        hideLoader();
-                        tasksComplete(res?.id || null);
-                      })
-                    else{
-                      hideLoader();
-                      window.location.reload();
-                    }
-                  });
-              }
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;   
+          temp.map((curr) => {
+            ids.add(curr.id);
+            if(curr.type === "labels"){
+              countLables++;
             }
-          } 
-          else
-          setSnackbarInfo({
-            open: true,
-            message: "Task is frozen",
-            variant: "error",
           });
-        },
+          if (ids.size>countLables) {
+            setSnackbarInfo({
+              open: true,
+              message: "Please select labels for all boxes",
+              variant: "error",
+            });
+          }
+          else {
+            if (taskData.annotation_status !== "freezed") {
+              for (let i = 0; i < annotations.length; i++) {
+                if (!annotations[i].result?.length || annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
+                  showLoader();
+
+                  for (let i = 0; i < temp.length; i++) {
+                    if (temp[i].value.text) {
+                      temp[i].value.text = [temp[i].value.text[0]]
+                    }
+                  }
+                  patchAnnotation(
+                    temp,
+                    annotations[i].id,
+                    load_time,
+                    annotations[i].lead_time,
+                    annotation_status.current,
+                    annotationNotesRef.current.value
+                    ).then(() => {
+                      if (localStorage.getItem("labelAll"))
+                        getNextProject(projectId, taskData.id).then((res) => {
+                          hideLoader();
+                          tasksComplete(res?.id || null);
+                        })
+                      else{
+                        hideLoader();
+                        window.location.reload();
+                      }
+                    });
+                }
+              }
+            } 
+            else
+            setSnackbarInfo({
+              open: true,
+              message: "Task is frozen",
+              variant: "error",
+            });
+        }},
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
