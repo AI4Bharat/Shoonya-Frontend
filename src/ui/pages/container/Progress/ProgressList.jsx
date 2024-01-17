@@ -5,6 +5,7 @@ import ProgressAnalytics from './ProgressAnalytics';
 import TaskAnalytics from "./TaskAnalytics/TaskAnalytics";
 import MetaAnalytics from "./MetaAnalytics/MetaAnalytics";
 import {useSelector} from "react-redux";
+import PerformanceAnalytics from './PerformanaceAnalytics/PerformanceAnalytics';
 
 
 
@@ -43,7 +44,8 @@ const ProgressList = () => {
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Meta Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label="Advance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />  
+                    <Tab label="Advance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="Performance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} /> 
                 </Tabs>
             </Box>
             <Box sx={{ p: 1}}>
@@ -55,6 +57,9 @@ const ProgressList = () => {
                 </TabPanel>  
                 <TabPanel value={tabValue} index={2}>
                 <ProgressAnalytics />  
+                </TabPanel> 
+                <TabPanel value={tabValue} index={3}>
+                <PerformanceAnalytics />  
                 </TabPanel>   
             </Box>
         </>
