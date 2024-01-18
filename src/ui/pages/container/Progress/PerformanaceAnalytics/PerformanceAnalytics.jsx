@@ -33,6 +33,7 @@ import Checkbox from "@mui/material/Checkbox";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import InfoIcon from "@mui/icons-material/Info";
+import CircularProgress from '@mui/material/CircularProgress';
 import { MenuProps } from "../../../../../utils/utils";
 import { DateRangePicker } from "react-date-range";
 import {
@@ -67,6 +68,7 @@ ChartJS.register(
 ChartJS.register(CategoryScale);
 
 const ProgressType = [{ ProgressTypename: "daily" }, { ProgressTypename: "weekly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "yearly" }]
+const AudioTypes = ["AcousticNormalisedTranscriptionEditing", "AudioSegmentation", "AudioTranscription", "AudioTranscriptionEditing"]
 
 const footer = (tooltipItems) => {
   let sum = 0;
@@ -189,6 +191,11 @@ export default function PerformanceAnalytics() {
   const handleSubmit = async () => {
     setShowPicker(false)
     setLoading(true);
+    metaInfo?
+    AudioTypes.includes(selectedType)?
+    options["scales"]["y"]["title"]["text"]="Compleated Audio Duration(Hrs)":
+    options["scales"]["y"]["title"]["text"]="Compleated Word Count":
+    options["scales"]["y"]["title"]["text"]="Compleated Tasks Count"
     const OrgId = userDetails.organization.id
     const payload = {
       project_type: selectedType,
@@ -207,11 +214,13 @@ export default function PerformanceAnalytics() {
         setLoading(false);
         } else {
         setLoading(false);
+        setPerformanceAnalyticsTasksData([])
         }
     })
     .catch(err => {
         setLoading(false);
         console.log("err - ", err);
+        setPerformanceAnalyticsTasksData([])
     })
   };
 
@@ -224,7 +233,13 @@ export default function PerformanceAnalytics() {
     let entries = [];
     for (let i of performanceAnalyticsTasksData) {
       labels.push(i["date_range"]);
-      if (metaInfo){
+      if (metaInfo && AudioTypes.includes(selectedType)){
+        let t = i["data"][0]["periodical_aud_duration"]
+        t = t.split(':')
+        let hoursInDecimal=parseFloat(parseInt(t[0], 10) + parseInt(t[1], 10)/60 + parseInt(t[2], 10)/3600);
+        entries.push(hoursInDecimal)
+      }
+      else if (metaInfo){
         entries.push(i["data"][0]["periodical_word_count"]);
       }
       else{
@@ -309,7 +324,7 @@ export default function PerformanceAnalytics() {
           </FormControl>
         </Grid>
 
-        <Grid container mt={4} mb={4}>
+        <Grid container mb={4}>
           <Grid
             item
             xs={12}
@@ -331,7 +346,7 @@ export default function PerformanceAnalytics() {
               checked={metaInfo}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          {/* <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
                     Base period {""}
@@ -348,7 +363,7 @@ export default function PerformanceAnalytics() {
                     ))}
                   </Select>
                 </FormControl>
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <Grid container columnSpacing={3} rowSpacing={2} mb={1}>
@@ -373,6 +388,26 @@ export default function PerformanceAnalytics() {
                 ))}
               </Select>
             </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
+                  Plot Range {""}
+                  </InputLabel>
+                  <Select
+                    labelId="project-type-label"
+                    id="project-type-select"
+                    label="Plot Range"
+                    value={baseperiod}
+                    onChange={handleProgressType}
+                    sx={{ textTransform: "capitalize"}}
+                  >
+                    {ProgressType.map((item, index) => (
+                        <MenuItem key={index} value={item.ProgressTypename} sx={{ textTransform: "capitalize"}}>{item.ProgressTypename}</MenuItem>  
+                    ))}
+                  </Select>
+                </FormControl>
           </Grid>
 
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
@@ -427,7 +462,18 @@ export default function PerformanceAnalytics() {
               Pick Dates
             </Button>
           </Grid>
-          <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+          {/* <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleSubmit}
+              sx={{ width: "130px" }}
+            >
+              Submit
+            </Button>
+          </Grid> */}
+        </Grid>
+        <Grid container mt={4}>
             <Button
               fullWidth
               variant="contained"
@@ -437,7 +483,6 @@ export default function PerformanceAnalytics() {
               Submit
             </Button>
           </Grid>
-        </Grid>
         {showPicker && (
           <Box
             sx={{
@@ -499,7 +544,7 @@ export default function PerformanceAnalytics() {
                       );
                     },
                   },
-                ]}
+                ].filter((staticRange)=>staticRange.label!=="Today" && staticRange.label!=="Yesterday")}
               />
             </Card>
           </Box>
@@ -507,7 +552,8 @@ export default function PerformanceAnalytics() {
 
         {/* </Grid> */}
       </Grid>
-      {performanceAnalyticsTasksData.length?<Line data={chartData} options={options} />:<div></div> }
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
+      {performanceAnalyticsTasksData?.length && !loading?<Line data={chartData} options={options} />:<div></div> }
     </>
   );
 }
