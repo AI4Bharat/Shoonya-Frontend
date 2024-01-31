@@ -714,7 +714,7 @@ const AudioTranscriptionLandingPage = () => {
     );
   }
 
-  const [waveSurfer, setWaveSurfer] = useState(false);
+  const [waveSurfer, setWaveSurfer] = useState(true);
   const [wave, setWave] = useState(true);
   const [waveColor, setWaveColor] = useState('rgba(156, 39, 176, 1)');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
@@ -1087,8 +1087,8 @@ useEffect(() => {
                 <table style={{width: "100%", textAlign: 'center', fontSize: 'large'}}>
                   <tr>
                     <td colSpan={6}>Waveforms: <select value={waveSurfer} onChange={(e) => {setWaveSurfer(e.target.value)}}>
-                        <option value="false">WFPlayer</option>
-                        <option value="true">WaveSurfer</option>
+                        <option value={false}>WFPlayer</option>
+                        <option value={true}>WaveSurfer</option>
                       </select></td>
                   </tr>
                   <tr>
@@ -1142,7 +1142,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {waveSurfer === "true" ? <Timeline2 details={taskDetails}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>}
+        {waveSurfer === true ? <Timeline2 details={taskDetails}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>}
       </Grid>
     </>
   );
