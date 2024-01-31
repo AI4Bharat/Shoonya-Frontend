@@ -714,7 +714,7 @@ const AudioTranscriptionLandingPage = () => {
     );
   }
 
-  const [waveSurfer, setWaveSurfer] = useState(true);
+  const [waveSurfer, setWaveSurfer] = useState(false);
   const [wave, setWave] = useState(true);
   const [waveColor, setWaveColor] = useState('rgba(156, 39, 176, 1)');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
