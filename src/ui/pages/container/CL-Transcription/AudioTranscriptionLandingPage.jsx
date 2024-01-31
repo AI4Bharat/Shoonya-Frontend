@@ -24,6 +24,7 @@ import {
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
+import Timeline2 from './wavesurfer';
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -713,6 +714,7 @@ const AudioTranscriptionLandingPage = () => {
     );
   }
 
+  const [waveSurfer, setWaveSurfer] = useState(false);
   const [wave, setWave] = useState(true);
   const [waveColor, setWaveColor] = useState('rgba(156, 39, 176, 1)');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
@@ -1084,6 +1086,12 @@ useEffect(() => {
               >
                 <table style={{width: "100%", textAlign: 'center', fontSize: 'large'}}>
                   <tr>
+                    <td colSpan={6}>Waveforms: <select value={waveSurfer} onChange={(e) => {setWaveSurfer(e.target.value)}}>
+                        <option value="false">WFPlayer</option>
+                        <option value="true">WaveSurfer</option>
+                      </select></td>
+                  </tr>
+                  <tr>
                     <td>Wave:&nbsp;&nbsp;<input type='checkbox' checked={wave} onChange={() => {setWave(!wave)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveColor} onChange={(e) => {setWaveColor(e.target.value)}}></input></td>
                     <td>Background:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={backgroundColor} onChange={(e) => {setBackgroundColor(e.target.value)}}></input></td>
                     <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={paddingColor} onChange={(e) => {setPaddingColor(e.target.value)}}></input></td>
@@ -1107,7 +1115,6 @@ useEffect(() => {
                     <td colSpan={3}>Wave Scale:&nbsp;&nbsp;<input type='range' min={0.1} max={2} step={0.1} value={waveScale} onChange={(e) => {setWaveScale(e.target.value)}}></input>&nbsp;{waveScale}</td>
                     <td colSpan={3}>Wave Size:&nbsp;&nbsp;<input type='range' min={1} max={10} step={1} value={waveSize} onChange={(e) => {setWaveSize(e.target.value)}}></input>&nbsp;{waveSize}</td>
                   </tr>
-                  
                 </table>
             </div>
           </Box>
@@ -1135,7 +1142,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>
+        {waveSurfer === "true" ? <Timeline2 details={taskDetails}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>}
       </Grid>
     </>
   );
