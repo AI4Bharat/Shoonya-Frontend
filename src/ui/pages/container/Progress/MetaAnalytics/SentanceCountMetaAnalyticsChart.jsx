@@ -88,7 +88,7 @@ export default function SentanceCountMetaAnalyticsChart(props) {
   return (
     <Box className={classes.modelChartSection}>
          <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-         {`Sentance Count Dashboard - ${analyticsData[0].projectType}`}
+         {`Sentence Count Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
             Count of Annotated and Reviewed Data
           </Typography>
@@ -103,7 +103,7 @@ export default function SentanceCountMetaAnalyticsChart(props) {
                   padding: "16px 0",
                 }}
               >
-                Sentance Count Dashboard
+                Sentence Count Dashboard
               </Typography>
             </Box>
         <Box className={classes.topBarInnerBox}>
