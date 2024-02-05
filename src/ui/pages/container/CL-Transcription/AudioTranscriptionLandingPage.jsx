@@ -714,7 +714,6 @@ const AudioTranscriptionLandingPage = () => {
     );
   }
 
-  const [waveSurfer, setWaveSurfer] = useState(false);
   const [wave, setWave] = useState(true);
   const [waveColor, setWaveColor] = useState('rgba(156, 39, 176, 1)');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
@@ -789,7 +788,47 @@ useEffect(() => {
     "worker" : wavWorker
   })
 }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
+
+const [waveSurfer, setWaveSurfer] = useState(false);
+const [waveSurferHeight, setWaveSurferHeigth] = useState(128);
+const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
+const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
+const [waveSurferProgressColor, setWaveSurferProgressColor] = useState("#dd5e98");
+const [waveSurferCursorColor, setWaveSurferCursorColor] = useState("#ddd5e9");
+const [waveSurferCursorWidth, setWaveSurferCursorWidth] = useState(1);
+const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
+const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
+const [waveSurferBarRadius, setWaveSurferBarRadius] = useState(0);
+const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(1);
   
+const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
+  "height": waveSurferHeight,
+  "minPxPerSec": waveSurferMinPxPerSec,
+  "waveColor": waveSurferWaveColor,
+  "progressColor": waveSurferProgressColor,
+  "cursorColor": waveSurferCursorColor,
+  "cursorWidth": waveSurferCursorWidth,
+  "barWidth": waveSurferBarWidth,
+  "barGap": waveSurferBarGap,
+  "barRadius": waveSurferBarRadius,
+  "barHeight": waveSurferBarHeight
+});
+
+useEffect(() => {
+  setWaveSurferWaveformSettings({
+    "height": waveSurferHeight,
+    "minPxPerSec": waveSurferMinPxPerSec,
+    "waveColor": waveSurferWaveColor,
+    "progressColor": waveSurferProgressColor,
+    "cursorColor": waveSurferCursorColor,
+    "cursorWidth": waveSurferCursorWidth,
+    "barWidth": waveSurferBarWidth,
+    "barGap": waveSurferBarGap,
+    "barRadius": waveSurferBarRadius,
+    "barHeight": waveSurferBarHeight
+  })
+}, [waveSurferHeight, waveSurferMinPxPerSec, waveSurferWaveColor, waveSurferProgressColor, waveSurferCursorColor, waveSurferCursorWidth, waveSurferBarWidth, waveSurferBarGap, waveSurferBarRadius, waveSurferBarHeight])
+
 useEffect(() => {
   if(showNotes === true){
     setAdvancedWaveformSettings(false);
@@ -1091,6 +1130,28 @@ useEffect(() => {
                         <option value={true}>WaveSurfer</option>
                       </select></td>
                   </tr>
+                  { waveSurfer ? 
+                  <>
+                  <tr>
+                    <td colSpan={2}>Height:&nbsp;&nbsp;<input type='range' min={10} max={512} step={1} value={waveSurferHeight} onChange={(e) => {setWaveSurferHeigth(e.target.value)}}></input></td>
+                    {/* <td>Width:&nbsp;&nbsp;<input type='range' min={10} max={2000} step={1} value={waveSurferWidth} onChange={(e) => {setWaveSurferWidth(e.target.value)}}></input></td> */}
+                    <td colSpan={2}>Min PX Per Sec:&nbsp;&nbsp;<input type='range' min={1} max={1000} step={1} value={waveSurferMinPxPerSec} onChange={(e) => {setWaveSurferMinPxPerSec(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Wave Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferWaveColor} onChange={(e) => {setWaveSurferWaveColor(e.target.value)}}></input></td>
+                    <td>Progress Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferProgressColor} onChange={(e) => {setWaveSurferProgressColor(e.target.value)}}></input></td>
+                    <td>Cursor Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferCursorColor} onChange={(e) => {setWaveSurferCursorColor(e.target.value)}}></input></td>
+                    <td>Cursor Width:&nbsp;&nbsp;<input type='range' min={0} max={10} step={1} value={waveSurferCursorWidth} onChange={(e) => {setWaveSurferCursorWidth(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Bar Width:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarWidth} onChange={(e) => {setWaveSurferBarWidth(e.target.value)}}></input></td>
+                    <td>Bar Gap:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarGap} onChange={(e) => {setWaveSurferBarGap(e.target.value)}}></input></td>
+                    <td>Bar Radius:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarRadius} onChange={(e) => {setWaveSurferBarRadius(e.target.value)}}></input></td>
+                    <td>Bar Height:&nbsp;&nbsp;<input type='range' min={0.1} max={4} step={0.1} value={waveSurferBarHeight} onChange={(e) => {setWaveSurferBarHeight(e.target.value)}}></input></td>
+                  </tr>
+                  </>
+                  :
+                  <>
                   <tr>
                     <td>Wave:&nbsp;&nbsp;<input type='checkbox' checked={wave} onChange={() => {setWave(!wave)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveColor} onChange={(e) => {setWaveColor(e.target.value)}}></input></td>
                     <td>Background:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={backgroundColor} onChange={(e) => {setBackgroundColor(e.target.value)}}></input></td>
@@ -1115,6 +1176,8 @@ useEffect(() => {
                     <td colSpan={3}>Wave Scale:&nbsp;&nbsp;<input type='range' min={0.1} max={2} step={0.1} value={waveScale} onChange={(e) => {setWaveScale(e.target.value)}}></input>&nbsp;{waveScale}</td>
                     <td colSpan={3}>Wave Size:&nbsp;&nbsp;<input type='range' min={1} max={10} step={1} value={waveSize} onChange={(e) => {setWaveSize(e.target.value)}}></input>&nbsp;{waveSize}</td>
                   </tr>
+                  </>
+                  }
                 </table>
             </div>
           </Box>
@@ -1142,7 +1205,9 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {waveSurfer === true ? <Timeline2 details={taskDetails}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>}
+        {waveSurfer ?
+         <Timeline2 details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> 
+        : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
       </Grid>
     </>
   );
