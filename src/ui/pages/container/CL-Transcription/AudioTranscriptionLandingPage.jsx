@@ -1124,12 +1124,6 @@ useEffect(() => {
               }}
               >
                 <table style={{width: "100%", textAlign: 'center', fontSize: 'large'}}>
-                  <tr>
-                    <td colSpan={6}>Waveforms: <select value={waveSurfer} onChange={(e) => {setWaveSurfer(e.target.value)}}>
-                        <option value={false}>WFPlayer</option>
-                        <option value={true}>WaveSurfer</option>
-                      </select></td>
-                  </tr>
                   { waveSurfer ? 
                   <>
                   <tr>
@@ -1194,6 +1188,8 @@ useEffect(() => {
             handleStdTranscriptionSettings={setStdTranscriptionSettings}
             advancedWaveformSettings={advancedWaveformSettings}
             setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
         </Grid>
@@ -1205,9 +1201,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {waveSurfer ?
-         <Timeline2 details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> 
-        : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
+        {waveSurfer ? <Timeline2 details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
       </Grid>
     </>
   );
