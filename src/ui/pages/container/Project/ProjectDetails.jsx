@@ -34,6 +34,7 @@ import AllTaskTable from "../../component/Project/AllTaskTable";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import SuperCheckerTasks from "../../component/Project/SuperCheckerTasks";
 import SuperChecker from "../../component/Project/SuperChecker";
+import ProjectAnalytics from "../../component/Project/ProjectAnalytics";
 
 const menuOptions = [
   { name: "Tasks", isChecked: false, component: () => null },
@@ -348,6 +349,29 @@ const Projects = () => {
       ),
       tabPanelEle: (
         <ReportsTable
+          annotationreviewertype={annotationreviewertype}
+          userDetails={userDetails}
+          isAnnotators={isAnnotators}
+          isReviewer={isReviewer}
+          isSuperChecker={isSuperChecker}
+        />
+      ),
+      showTab: (isAnnotators || isReviewer || isSuperChecker)
+    },
+    {
+      tabEle: (
+        <Tab
+          label={translate("label.projectanalytics")}
+          sx={{
+            fontSize: 16,
+            fontWeight: "700",
+            flexDirection: "row-reverse",
+          }}
+          onClick={handleClick}
+        />
+      ),
+      tabPanelEle: (
+        <ProjectAnalytics
           annotationreviewertype={annotationreviewertype}
           userDetails={userDetails}
           isAnnotators={isAnnotators}
