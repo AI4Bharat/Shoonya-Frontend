@@ -786,7 +786,6 @@ function ProgressList() {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading}
       <Card
         sx={{
           width: "100%",
