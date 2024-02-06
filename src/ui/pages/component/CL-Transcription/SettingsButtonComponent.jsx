@@ -61,6 +61,8 @@ const SettingsButtonComponent = ({
   handleInfoButtonClick,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
+  waveSurfer,
+  setWaveSurfer,
   pauseOnType,
   setPauseOnType,
   annotationId,
@@ -180,6 +182,19 @@ const SettingsButtonComponent = ({
                 checked={advancedWaveformSettings}
                 onChange={() => {
                   setAdvancedWaveformSettings(!advancedWaveformSettings);
+                }}
+              />
+            }
+          />
+        </MenuItem>
+        <MenuItem>
+          <FormControlLabel
+            label="WaveSurfer"
+            control={
+              <Checkbox
+                checked={waveSurfer}
+                onChange={() => {
+                  setWaveSurfer(!waveSurfer);
                 }}
               />
             }
