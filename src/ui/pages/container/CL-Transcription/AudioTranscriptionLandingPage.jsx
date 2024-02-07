@@ -297,7 +297,7 @@ const AudioTranscriptionLandingPage = () => {
 
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
-    if(taskDetails?.task_status !== "labeled" && taskDetails?.task_status !== "accepted" && taskDetails?.task_status !== "validated"){
+    if(taskDetails?.task_status !== "labeled"){
     if(!autoSave) return;
     const reqBody = {
       task_id: taskId,
