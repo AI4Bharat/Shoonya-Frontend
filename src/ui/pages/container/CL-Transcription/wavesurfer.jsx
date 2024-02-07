@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "../../../../../node_modules/wavesurfer.js/dist/plugins/regions.esm.js";
 import Minimap from "../../../../../node_modules/wavesurfer.js/dist/plugins/minimap.esm.js";
+import TimelinePlugin from '../../../../../node_modules/wavesurfer.js/dist/plugins/timeline.esm.js';
 import { useSelector } from "react-redux";
 
 const Timeline2 = ({ details, waveformSettings }) => {
@@ -38,12 +39,16 @@ const Timeline2 = ({ details, waveformSettings }) => {
         barHeight: waveformSettings.barHeight,
         mediaControls: true,
         url: details?.data?.audio_url,
+        hideScrollbar: true,
         media: document.querySelector('audio'),
         plugins: [
           Minimap.create({
             height: 20,
             waveColor: '#ddd',
             progressColor: '#999',
+            insertPosition: 'beforeBegin',
+          }),
+          TimelinePlugin.create({
           }),
         ],
       });
@@ -68,12 +73,16 @@ const Timeline2 = ({ details, waveformSettings }) => {
         barHeight: waveformSettings.barHeight,
         mediaControls: true,
         url: details?.data?.audio_url,
+        hideScrollbar: true,
         media: document.querySelector('audio'),
         plugins: [
           Minimap.create({
             height: 20,
             waveColor: '#ddd',
             progressColor: '#999',
+            insertPosition: 'beforeBegin',
+          }),
+          TimelinePlugin.create({
           }),
         ],
       });
@@ -106,6 +115,11 @@ const Timeline2 = ({ details, waveformSettings }) => {
           content: sub.text,
           drag: false,
           resize: true,
+          color: sub.speaker_id === "Speaker 1"
+          ? "rgb(0, 87, 158, 0.2)"
+          : sub.speaker_id === "Speaker 0"
+          ? "rgb(123, 29, 0, 0.2)"
+          : "rgb(0, 0, 0, 0.6)",
         })
       })
     }
@@ -130,11 +144,9 @@ const Timeline2 = ({ details, waveformSettings }) => {
   }
 
   return (
-    <Box className={classes.timeLineParent} ref={$footer}>
       <>
         <div style={{ paddingLeft: "20px", paddingRight: "20px" }} id="waveform"></div>
       </>
-    </Box>
   );
 };
 

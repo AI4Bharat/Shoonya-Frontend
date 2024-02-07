@@ -703,7 +703,7 @@ const LabelStudioWrapper = ({
   }, [taskData]);
 
   const autoSaveSuperCheck = () => {
-    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "labeled" && taskData.task_status.toLowerCase() !== "accepted" && taskData.task_status.toLowerCase() !== "validated") {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "validated" && taskData.task_status.toLowerCase() !== "validated_with_changes") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
