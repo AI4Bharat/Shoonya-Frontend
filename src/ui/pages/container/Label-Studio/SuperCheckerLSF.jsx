@@ -389,7 +389,7 @@ const LabelStudioWrapper = ({
               countLables++;
             }
           });
-          if (ids.size>countLables) {
+          if (projectType.includes("OCR") && ids.size>countLables) {
             setSnackbarInfo({
               open: true,
               message: "Please select labels for all boxes",
@@ -703,7 +703,7 @@ const LabelStudioWrapper = ({
   }, [taskData]);
 
   const autoSaveSuperCheck = () => {
-    if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "labeled" && taskData.task_status.toLowerCase() !== "accepted" && taskData.task_status.toLowerCase() !== "validated") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();

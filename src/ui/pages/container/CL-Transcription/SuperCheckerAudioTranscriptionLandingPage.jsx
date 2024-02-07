@@ -234,6 +234,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
+    if(taskDetails?.task_status !== "validated" && taskDetails?.task_status !== "validated_with_changes"){
     if(!autoSave) return;
     const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
     if(!currentAnnotation) return;
@@ -269,6 +270,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         });
       }
     }
+  }
   };
   
   useEffect(() => {
