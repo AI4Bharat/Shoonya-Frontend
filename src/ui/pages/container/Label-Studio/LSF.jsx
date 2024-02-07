@@ -764,7 +764,7 @@ const LabelStudioWrapper = ({
   }, [taskData]);
 
   const autoSaveAnnotation = () => {
-    if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "labeled") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         for (let i = 0; i < annotations.length; i++) {
