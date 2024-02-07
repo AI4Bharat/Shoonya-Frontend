@@ -312,7 +312,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
-    if(taskDetails?.task_status !== "labeled" && taskDetails?.task_status !== "accepted_with_minor_changes" && taskDetails?.task_status !== "accepted_with_major_changes"){
+    if(taskDetails?.task_status !== "accepted" && taskDetails?.task_status !== "accepted_with_minor_changes" && taskDetails?.task_status !== "accepted_with_major_changes"){
     if(!autoSave) return;
     const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === user.id && a.annotation_type === 2);
     if(!currentAnnotation) return;
