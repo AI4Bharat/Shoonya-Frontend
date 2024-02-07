@@ -34,6 +34,7 @@ const localisation = {
     "label.reviewTasks":"Review Tasks",
     "label.allTask ":"All Tasks",
     "label.reports":"Reports",
+    "label.projectanalytics":"Project Analytics",
     "label.projects":"Projects",
     "label.annotators":"Annotators",
     "label.managers":"Managers",
