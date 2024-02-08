@@ -1,6 +1,4 @@
-import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import { useEffect, useRef, memo, useState, useCallback } from "react";
-import { Box } from "@mui/material";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "../../../../../node_modules/wavesurfer.js/dist/plugins/regions.esm.js";
 import Minimap from "../../../../../node_modules/wavesurfer.js/dist/plugins/minimap.esm.js";
@@ -14,6 +12,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
   const waveSurf = useRef(null);
   const regions = useRef(null);
   const result = useSelector((state) => state.commonReducer?.subtitles);
+  const player = useSelector((state) => state.commonReducer?.player);
   const [currentSubs, setCurrentSubs] = useState([]);
   const dispatch = useDispatch();
 
@@ -90,7 +89,6 @@ const Timeline2 = ({ details, waveformSettings }) => {
       regions.current = waveSurf.current.registerPlugin(RegionsPlugin.create());
       if (currentSubs){
         waveSurf.current.on('decode', () => {
-          {
             currentSubs?.map((sub, key) => {
               regions.current.addRegion({
                 start: sub.startTime,
@@ -100,7 +98,6 @@ const Timeline2 = ({ details, waveformSettings }) => {
                 resize: true,
               })
             })
-          }
         })
       }
     }
@@ -126,7 +123,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
         })
       })
     }
-  }, [details, waveSurf.current, currentSubs])
+  }, [details, currentSubs])
 
   if (waveSurf !== null && regions.current !== null) {
     let activeRegion = null
@@ -148,7 +145,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
 
   const updateSub = useCallback((currentSubsCopy) => {
     dispatch(setSubtitles(currentSubsCopy, C.SUBTITLES));
-  }, [result]);
+  }, [dispatch]);
 
   if (waveSurf !== null && regions.current !== null) {
     regions.current.on('region-updated', (region) => {
@@ -157,6 +154,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
       currentSubsCopy[region.id -1].start_time = DT.d2t(region.start);
       currentSubsCopy[region.id -1].end_time = DT.d2t(region.end);
       updateSub(currentSubsCopy);
+      player.play();
     })
   }
 
