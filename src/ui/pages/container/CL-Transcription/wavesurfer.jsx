@@ -1,20 +1,21 @@
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
-import { useEffect, useRef, memo, useState } from "react";
+import { useEffect, useRef, memo, useState, useCallback } from "react";
 import { Box } from "@mui/material";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "../../../../../node_modules/wavesurfer.js/dist/plugins/regions.esm.js";
 import Minimap from "../../../../../node_modules/wavesurfer.js/dist/plugins/minimap.esm.js";
 import TimelinePlugin from '../../../../../node_modules/wavesurfer.js/dist/plugins/timeline.esm.js';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setSubtitles } from "../../../../redux/actions/Common";
+import C from "../../../../redux/constants";
+import DT from "duration-time-conversion";
 
 const Timeline2 = ({ details, waveformSettings }) => {
-  const $footer = useRef();
-  const classes = AudioTranscriptionLandingStyle();
   const waveSurf = useRef(null);
   const regions = useRef(null);
   const result = useSelector((state) => state.commonReducer?.subtitles);
   const [currentSubs, setCurrentSubs] = useState([]);
-  console.log(result);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (result) {
@@ -110,11 +111,13 @@ const Timeline2 = ({ details, waveformSettings }) => {
       regions.current.clearRegions();
       currentSubs?.map((sub, key) => {
         regions.current.addRegion({
+          id: sub.id,
           start: sub.startTime,
           end: sub.endTime,
           content: sub.text,
           drag: false,
           resize: true,
+          contentEditable: true,
           color: sub.speaker_id === "Speaker 1"
           ? "rgb(0, 87, 158, 0.2)"
           : sub.speaker_id === "Speaker 0"
@@ -140,6 +143,20 @@ const Timeline2 = ({ details, waveformSettings }) => {
     })
     waveSurf.current.on('interaction', () => {
       activeRegion = null;
+    })
+  }
+
+  const updateSub = useCallback((currentSubsCopy) => {
+    dispatch(setSubtitles(currentSubsCopy, C.SUBTITLES));
+  }, [result]);
+
+  if (waveSurf !== null && regions.current !== null) {
+    regions.current.on('region-updated', (region) => {
+      let currentSubsCopy = currentSubs;
+      currentSubsCopy[region.id -1].text = region?.content?.innerHTML;
+      currentSubsCopy[region.id -1].start_time = DT.d2t(region.start);
+      currentSubsCopy[region.id -1].end_time = DT.d2t(region.end);
+      updateSub(currentSubsCopy);
     })
   }
 
