@@ -4,11 +4,11 @@
  import constants from "../../../constants";
   
  export default class DownloadProjectTsvAPI extends API {
-    constructor(projectId,taskStatus,downloadMetadataToggle=false, timeout = 2000) {
+    constructor(projectId,taskStatus, timeout = 2000) {
       super("POST", timeout, false);
      this.type = constants.DOWNLOAD_PROJECT_TSV;
      this.projectBody={}//object with key-value pair
-      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=TSV&task_status=${taskStatus}&include_input_data_metadata_json=${downloadMetadataToggle}`;
+      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=TSV&task_status=${taskStatus}`;
     }
   
     processResponse(res) {
