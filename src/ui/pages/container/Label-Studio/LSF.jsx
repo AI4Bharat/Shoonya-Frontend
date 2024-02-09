@@ -456,6 +456,7 @@ const LabelStudioWrapper = ({
           if (annotation) {
             showLoader();
             patchAnnotation(
+              taskId,
               null,
               annotation.id,
               load_time.current,
@@ -528,6 +529,7 @@ const LabelStudioWrapper = ({
                     }
                   }
                   patchAnnotation(
+                    taskId,
                     temp,
                     annotations[i].id,
                     load_time.current,

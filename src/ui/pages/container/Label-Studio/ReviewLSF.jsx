@@ -452,6 +452,7 @@ const LabelStudioWrapper = ({
           if (review) {
             showLoader();
             patchReview(
+              taskId,
               review.id,
               load_time.current,
               review.lead_time,
@@ -613,6 +614,7 @@ const LabelStudioWrapper = ({
                 (annotation) => annotation.annotation_type === 2
               )[0];
               patchReview(
+                taskId,
                 review.id,
                 load_time.current,
                 review.lead_time,
