@@ -482,7 +482,7 @@ const LabelStudioWrapper = ({
               countLables++;
             }
           });
-          if (ids.size>countLables) {
+          if (projectType.includes("OCR") && ids.size>countLables) {
             setSnackbarInfo({
               open: true,
               message: "Please select labels for all boxes",
