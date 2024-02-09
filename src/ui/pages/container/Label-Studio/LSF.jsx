@@ -781,6 +781,7 @@ const LabelStudioWrapper = ({
               }
             }
             patchAnnotation(
+              taskId,
               temp,
               annotations[i].id,
               load_time.current,

@@ -716,6 +716,7 @@ const LabelStudioWrapper = ({
           (value) => value.annotation_type === 3
         )[0];
         patchSuperChecker(
+          taskId,
           superChecker.id,
           load_time.current,
           superChecker.lead_time,
