@@ -98,6 +98,7 @@ const postReview = async (
 
 
 const patchAnnotation = async (
+  taskId,
   result,
   annotationID,
   load_time,
@@ -113,6 +114,7 @@ const patchAnnotation = async (
         lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
         annotation_status: annotation_status,
       }),
+      task_id: taskId,
       annotation_notes: notes,
       ...(autoSave && { auto_save: true }),
     });
@@ -123,6 +125,7 @@ const patchAnnotation = async (
 };
 
 const patchReview = async (
+  taskId,
   annotationID,
   load_time,
   lead_time,
@@ -137,6 +140,7 @@ const patchReview = async (
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status: review_status,
       result: result,
+      task_id: taskId,
       review_notes: reviewnotes,
       ...((review_status === "to_be_revised" ||
         review_status === "accepted" ||
@@ -162,6 +166,7 @@ const patchReview = async (
 
 
 const patchSuperChecker = async (
+  taskId,
   annotationID,
   load_time,
   lead_time,
@@ -176,6 +181,7 @@ const patchSuperChecker = async (
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status: review_status,
+      task_id: taskId,
       result: result,
       parent_annotation: parentAnnotation,
       supercheck_notes: superchecknotes,
