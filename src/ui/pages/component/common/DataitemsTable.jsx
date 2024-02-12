@@ -12,6 +12,7 @@ import ColumnList from "./ColumnList";
 import SearchIcon from '@mui/icons-material/Search';
 import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
 import Spinner from "../../component/common/Spinner";
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 
@@ -277,7 +278,7 @@ const handleSearchClose = () => {
                     currentFilters={selectedFilters}
                     searchedCol={searchedCol}
                 />}
-                {loading && <Spinner />}
+                {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
                 </>
     
   );

@@ -49,6 +49,7 @@ import MetaAnalytics from "../../container/Progress/Workspace/MetaAnalytics";
 import ProgressAnalytics from "../../container/Progress/Workspace/ProgressAnalytics";
 import { DriveEta } from "@material-ui/icons";
 import PerformanceAnalytics from "../../container/Progress/Workspace/PerformanceAnalytics";
+import CircularProgress from '@mui/material/CircularProgress';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -158,7 +159,7 @@ const DetailsViewPage = (props) => {
   }
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
       <Grid
         container
         direction="row"

@@ -15,6 +15,7 @@ import DatasetStyle from "../../../styles/Dataset";
 import themeDefault from "../../../theme/theme";
 import Search from "../../component/common/Search";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function DatasetList() {
   const dispatch = useDispatch();
@@ -69,7 +70,7 @@ export default function DatasetList() {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
 
       <Grid container className={classes.root}>
         <Grid item style={{ flexGrow: "0" }}>
