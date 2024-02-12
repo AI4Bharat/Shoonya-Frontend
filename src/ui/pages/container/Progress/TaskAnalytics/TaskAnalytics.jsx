@@ -19,6 +19,7 @@ import AudioTaskAnalyticsChart from "./AudioTaskAnalyticsChart";
 import TaskCountAnalyticsChart from "./TaskCountAnalyticsChart";
 import { MenuProps } from "../../../../../utils/utils";
 import CustomButton from "../../../component/common/Button";
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 const TaskAnalytics = (props) => {
@@ -121,7 +122,7 @@ const TaskAnalytics = (props) => {
               disabled={loading} />
 
       </Grid>
-      {loading && <Spinner />}
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
       {taskAnalyticsData.length ?
         taskAnalyticsData.map((analyticsData,_index)=>{
           if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){

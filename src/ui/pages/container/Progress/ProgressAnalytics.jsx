@@ -30,6 +30,7 @@ import html2canvas from 'html2canvas';
 import locale, { modifiedStaticRanges } from "../../../../utils/Date_Range/getDateRangeFormat";
 import { MenuProps } from "../../../../utils/utils";
 import { jsPDF } from "jspdf";
+import CircularProgress from '@mui/material/CircularProgress';
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -785,7 +786,6 @@ function ProgressList() {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
       <Card
         sx={{
           width: "100%",
@@ -1018,6 +1018,7 @@ function ProgressList() {
               <Grid container sx={{marginLeft:"17px"}}>
             <CustomButton label="Submit" sx={{ width:"120px", mt: 3 }} onClick={handleSubmit}
               disabled={(baseperiod || comparisonperiod) ? false : true} />
+              {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
          
         </Grid>
 

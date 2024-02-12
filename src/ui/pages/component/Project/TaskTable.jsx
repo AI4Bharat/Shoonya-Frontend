@@ -7,6 +7,7 @@ import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasks
 import CustomButton from "../common/Button";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
+import CircularProgress from '@mui/material/CircularProgress';
 import {
   Button,
   Grid,
@@ -1165,7 +1166,7 @@ const TaskTable = (props) => {
       )}
 
       {renderSnackBar()}
-      {loading && <Spinner />}
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
     </div>
   );
 };

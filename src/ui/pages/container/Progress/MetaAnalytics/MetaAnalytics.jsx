@@ -20,6 +20,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { MenuProps } from "../../../../../utils/utils";
 import WordCountMetaAnalyticsChart from './WordCountMetaAnalyticsChart';
 import SentanceCountMetaAnalyticsChart from './SentanceCountMetaAnalyticsChart';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function MetaAnalytics(props) {
     const dispatch = useDispatch();
@@ -124,7 +125,7 @@ export default function MetaAnalytics(props) {
               disabled={loading} />
 
       </Grid>
-      {loading && <Spinner />}
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
 
       {metaAnalyticsData.length ?
         metaAnalyticsData.map((analyticsData,_index)=>{

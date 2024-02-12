@@ -13,6 +13,7 @@ import Search from "../../component/common/Search";
 import DatasetStyle from "../../../styles/Dataset";
 import themeDefault from "../../../theme/theme";
 import tableTheme from "../../../theme/tableTheme";
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function ProjectList() {
   const [radiobutton, setRadiobutton] = useState(true);
@@ -50,7 +51,7 @@ export default function ProjectList() {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
 
       {/* <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ position: "static", bottom: "-51px", left: "20px" }} > */}
       <Grid container className={classes.root}>

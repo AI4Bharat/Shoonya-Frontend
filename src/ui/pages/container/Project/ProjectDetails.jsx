@@ -35,6 +35,7 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 import SuperCheckerTasks from "../../component/Project/SuperCheckerTasks";
 import SuperChecker from "../../component/Project/SuperChecker";
 import ProjectAnalytics from "../../component/Project/ProjectAnalytics";
+import CircularProgress from '@mui/material/CircularProgress';
 
 const menuOptions = [
   { name: "Tasks", isChecked: false, component: () => null },
@@ -428,7 +429,7 @@ const Projects = () => {
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
-      {loading && <Spinner />}
+      {loading && <Box sx={{ display: 'flex',justifyContent: "center",width: "100%" }}><CircularProgress /></Box>}
       <Grid
         container
         direction="row"
