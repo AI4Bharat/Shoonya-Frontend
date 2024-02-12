@@ -448,17 +448,6 @@ console.log(unseenNotifications,'uuu');
           </Typography>
           <Typography variant="body1">
             <NavLink
-              to="/datasets"
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Datasets
-            </NavLink>
-          </Typography>
-          <Typography variant="body1">
-            <NavLink
               to="/analytics"
               className={({ isActive }) =>
                 isActive ? classes.highlightedMenu : classes.headerMenu
