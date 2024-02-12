@@ -536,6 +536,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
+      task_id: taskId,
       annotation_status: value,
       supercheck_notes: JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
       lead_time:

@@ -614,6 +614,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
+      task_id: taskId,
       annotation_status: value,
       review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
       lead_time:
