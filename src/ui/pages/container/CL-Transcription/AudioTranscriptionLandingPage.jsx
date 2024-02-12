@@ -591,6 +591,7 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
+      task_id: taskId,
       annotation_status: value,
       annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
       lead_time:
