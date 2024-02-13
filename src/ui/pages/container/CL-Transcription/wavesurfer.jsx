@@ -10,7 +10,9 @@ import DT from "duration-time-conversion";
 
 const Timeline2 = ({ details, waveformSettings }) => {
   const waveSurf = useRef(null);
+  const miniMap = useRef(null);
   const regions = useRef(null);
+  const miniMapRegions = useRef(null);
   const result = useSelector((state) => state.commonReducer?.subtitles);
   const player = useSelector((state) => state.commonReducer?.player);
   const [currentSubs, setCurrentSubs] = useState([]);
@@ -42,19 +44,38 @@ const Timeline2 = ({ details, waveformSettings }) => {
         hideScrollbar: true,
         media: document.querySelector('audio'),
         plugins: [
-          Minimap.create({
-            height: 20,
-            waveColor: '#ddd',
-            progressColor: '#999',
-            insertPosition: 'beforeBegin',
-          }),
+          // Minimap.create({
+          //   height: 20,
+          //   waveColor: '#ddd',
+          //   progressColor: '#999',
+          //   insertPosition: 'beforeBegin',
+          // }),
           TimelinePlugin.create({
+            insertPosition: 'beforebegin',
+            timeInterval: 0.2,
+            primaryLabelInterval: 5,
+            secondaryLabelInterval: 1,
+            style: {
+              fontSize: '10px',
+              color: '#2D5B88',
+            },
           }),
         ],
       });
       regions.current = waveSurf.current.registerPlugin(RegionsPlugin.create());
     }
-  }, [details])
+    if (details?.data?.audio_url !== undefined && miniMap.current === null) {
+      miniMap.current = WaveSurfer.create({
+        container: document.querySelector('#minimap'),
+        height: '20',
+        url: details?.data?.audio_url,
+        hideScrollbar: true,
+        mediaControls: true,
+        media: document.querySelector('audio'),
+      });
+      miniMapRegions.current = miniMap.current.registerPlugin(RegionsPlugin.create());
+    }
+  }, [details]);
 
   useEffect(() => {
     if (details?.data?.audio_url !== undefined && waveSurf.current !== null) {
@@ -76,37 +97,73 @@ const Timeline2 = ({ details, waveformSettings }) => {
         hideScrollbar: true,
         media: document.querySelector('audio'),
         plugins: [
-          Minimap.create({
-            height: 20,
-            waveColor: '#ddd',
-            progressColor: '#999',
-            insertPosition: 'beforeBegin',
-          }),
+          // Minimap.create({
+          //   height: 20,
+          //   waveColor: '#ddd',
+          //   progressColor: '#999',
+          //   insertPosition: 'beforeBegin',
+          // }),
           TimelinePlugin.create({
+            insertPosition: 'beforebegin',
+            timeInterval: 0.2,
+            primaryLabelInterval: 5,
+            secondaryLabelInterval: 1,
+            style: {
+              fontSize: '10px',
+              color: '#2D5B88',
+            },
           }),
         ],
       });
       regions.current = waveSurf.current.registerPlugin(RegionsPlugin.create());
-      if (currentSubs){
         waveSurf.current.on('decode', () => {
-            currentSubs?.map((sub, key) => {
-              regions.current.addRegion({
-                start: sub.startTime,
-                end: sub.endTime,
-                content: sub.text,
-                drag: false,
-                resize: true,
-              })
+          currentSubs?.map((sub) => {
+            regions.current.addRegion({
+              id: sub.id,
+              start: sub.startTime,
+              end: sub.endTime,
+              content: sub.text,
+              drag: false,
+              resize: true,
+              contentEditable: true,
+              color: sub.speaker_id === "Speaker 1"
+                ? "rgb(0, 87, 158, 0.2)"
+                : sub.speaker_id === "Speaker 0"
+                  ? "rgb(123, 29, 0, 0.2)"
+                  : "rgb(0, 0, 0, 0.6)",
             })
+          })
         })
       }
+    if (details?.data?.audio_url !== undefined && miniMap.current === null) {
+      miniMap.current.destroy();
+      miniMap.current = WaveSurfer.create({
+        container: document.querySelector('#minimap'),
+        height: '20',
+        url: details?.data?.audio_url,
+        mediaControls: true,
+        media: document.querySelector('audio'),
+        hideScrollbar: true,
+      });
+      miniMapRegions.current = miniMap.current.registerPlugin(RegionsPlugin.create());
+        miniMap.current.on('decode', () => {
+          currentSubs?.map((sub) => {
+            miniMapRegions.current.addRegion({
+              start: sub.startTime,
+              end: sub.endTime,
+              color: sub.text === ""
+                ? "rgb(255, 0, 0, 0.5)"
+                : "rgb(0, 255, 0, 0.5)",
+            })
+          })
+        })
     }
   }, [waveformSettings])
 
   useEffect(() => {
-    if (details?.data !== undefined && waveSurf.current !== null) {
-      regions.current.clearRegions();
-      currentSubs?.map((sub, key) => {
+    if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null) {
+    regions.current.clearRegions();
+      currentSubs?.map((sub) => {
         regions.current.addRegion({
           id: sub.id,
           start: sub.startTime,
@@ -116,10 +173,20 @@ const Timeline2 = ({ details, waveformSettings }) => {
           resize: true,
           contentEditable: true,
           color: sub.speaker_id === "Speaker 1"
-          ? "rgb(0, 87, 158, 0.2)"
-          : sub.speaker_id === "Speaker 0"
-          ? "rgb(123, 29, 0, 0.2)"
-          : "rgb(0, 0, 0, 0.6)",
+            ? "rgb(0, 87, 158, 0.2)"
+            : sub.speaker_id === "Speaker 0"
+              ? "rgb(123, 29, 0, 0.2)"
+              : "rgb(0, 0, 0, 0.6)",
+        })
+      })
+      miniMapRegions.current.clearRegions();
+      currentSubs?.map((sub) => {
+        miniMapRegions.current.addRegion({
+          start: sub.startTime,
+          end: sub.endTime,
+          color: sub.text === ""
+            ? "rgb(255, 0, 0, 0.5)"
+            : "rgb(0, 255, 0, 0.5)",
         })
       })
     }
@@ -150,18 +217,19 @@ const Timeline2 = ({ details, waveformSettings }) => {
   if (waveSurf !== null && regions.current !== null) {
     regions.current.on('region-updated', (region) => {
       let currentSubsCopy = currentSubs;
-      currentSubsCopy[region.id -1].text = region?.content?.innerHTML;
-      currentSubsCopy[region.id -1].start_time = DT.d2t(region.start);
-      currentSubsCopy[region.id -1].end_time = DT.d2t(region.end);
+      currentSubsCopy[region.id - 1].text = region?.content?.innerHTML;
+      currentSubsCopy[region.id - 1].start_time = DT.d2t(region.start);
+      currentSubsCopy[region.id - 1].end_time = DT.d2t(region.end);
       updateSub(currentSubsCopy);
       player.play();
     })
   }
 
   return (
-      <>
-        <div style={{ paddingLeft: "20px", paddingRight: "20px" }} id="waveform"></div>
-      </>
+    <>
+      <div style={{paddingLeft: "20px", paddingRight:"20px"}} id="minimap"></div>
+      <div style={{ paddingLeft: "20px", paddingRight: "20px" }} id="waveform"></div>
+    </>
   );
 };
 
