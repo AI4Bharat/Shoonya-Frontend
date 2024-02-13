@@ -836,7 +836,7 @@ useEffect(() => {
   })
 }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
 
-const [waveSurfer, setWaveSurfer] = useState(false);
+const [waveSurfer, setWaveSurfer] = useState(true);
 const [waveSurferHeight, setWaveSurferHeigth] = useState(128);
 const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
 const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
