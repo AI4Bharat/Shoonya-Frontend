@@ -363,6 +363,7 @@ const LabelStudioWrapper = ({
           if (review) {
             showLoader();
             patchSuperChecker(
+              taskId,
               review.id,
               load_time.current,
               review.lead_time,
@@ -436,6 +437,7 @@ const LabelStudioWrapper = ({
               )[0];
 
               patchSuperChecker(
+                taskId,
                 superChecker.id,
                 load_time.current,
                 superChecker.lead_time,
@@ -716,6 +718,7 @@ const LabelStudioWrapper = ({
           (value) => value.annotation_type === 3
         )[0];
         patchSuperChecker(
+          taskId,
           superChecker.id,
           load_time.current,
           superChecker.lead_time,
