@@ -75,7 +75,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
       });
       miniMapRegions.current = miniMap.current.registerPlugin(RegionsPlugin.create());
     }
-  }, [details])
+  }, [details]);
 
   useEffect(() => {
     if (details?.data?.audio_url !== undefined && waveSurf.current !== null) {
@@ -116,9 +116,8 @@ const Timeline2 = ({ details, waveformSettings }) => {
         ],
       });
       regions.current = waveSurf.current.registerPlugin(RegionsPlugin.create());
-      if (currentSubs) {
         waveSurf.current.on('decode', () => {
-          currentSubs?.map((sub, key) => {
+          currentSubs?.map((sub) => {
             regions.current.addRegion({
               id: sub.id,
               start: sub.startTime,
@@ -136,8 +135,8 @@ const Timeline2 = ({ details, waveformSettings }) => {
           })
         })
       }
-    }
     if (details?.data?.audio_url !== undefined && miniMap.current === null) {
+      miniMap.current.destroy();
       miniMap.current = WaveSurfer.create({
         container: document.querySelector('#minimap'),
         height: '20',
@@ -147,9 +146,8 @@ const Timeline2 = ({ details, waveformSettings }) => {
         hideScrollbar: true,
       });
       miniMapRegions.current = miniMap.current.registerPlugin(RegionsPlugin.create());
-      if (currentSubs) {
         miniMap.current.on('decode', () => {
-          currentSubs?.map((sub, key) => {
+          currentSubs?.map((sub) => {
             miniMapRegions.current.addRegion({
               start: sub.startTime,
               end: sub.endTime,
@@ -159,14 +157,13 @@ const Timeline2 = ({ details, waveformSettings }) => {
             })
           })
         })
-      }
     }
   }, [waveformSettings])
 
   useEffect(() => {
-    if (details?.data !== undefined && waveSurf.current !== null) {
-      regions.current.clearRegions();
-      currentSubs?.map((sub, key) => {
+    if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null) {
+    regions.current.clearRegions();
+      currentSubs?.map((sub) => {
         regions.current.addRegion({
           id: sub.id,
           start: sub.startTime,
@@ -183,7 +180,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
         })
       })
       miniMapRegions.current.clearRegions();
-      currentSubs?.map((sub, key) => {
+      currentSubs?.map((sub) => {
         miniMapRegions.current.addRegion({
           start: sub.startTime,
           end: sub.endTime,
