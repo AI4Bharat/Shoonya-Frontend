@@ -17,9 +17,46 @@ const Timeline2 = ({ details, waveformSettings }) => {
   const player = useSelector((state) => state.commonReducer?.player);
   const [currentSubs, setCurrentSubs] = useState([]);
   const dispatch = useDispatch();
+  const [regionsInit, setRegionsInit] = useState(false);
 
   useEffect(() => {
     if (result) {
+      if (!regionsInit) {
+        if (waveSurf.current !== null) {
+          waveSurf.current.once('decode', () => {
+            setRegionsInit(true);
+            setTimeout(() => {
+              regions.current.clearRegions();
+              miniMapRegions.current.clearRegions();
+              result?.map((sub) => {
+                regions.current.addRegion({
+                  id: sub.id,
+                  start: sub.startTime,
+                  end: sub.endTime,
+                  content: sub.text,
+                  drag: false,
+                  resize: true,
+                  contentEditable: true,
+                  color: sub.speaker_id === "Speaker 1"
+                    ? "rgb(0, 87, 158, 0.2)"
+                    : sub.speaker_id === "Speaker 0"
+                      ? "rgb(123, 29, 0, 0.2)"
+                      : "rgb(0, 0, 0, 0.6)",
+                })
+                miniMapRegions.current.addRegion({
+                  start: sub.startTime,
+                  end: sub.endTime,
+                  color: sub.text === ""
+                    ? "rgb(255, 0, 0, 0.5)"
+                    : "rgb(0, 255, 0, 0.5)",
+                  drag: false,
+                  resize: false,
+                })
+              })
+            }, 500);
+          });
+        }
+      }
       setCurrentSubs(result);
     }
   }, [result]);
@@ -116,25 +153,25 @@ const Timeline2 = ({ details, waveformSettings }) => {
         ],
       });
       regions.current = waveSurf.current.registerPlugin(RegionsPlugin.create());
-        waveSurf.current.on('decode', () => {
-          currentSubs?.map((sub) => {
-            regions.current.addRegion({
-              id: sub.id,
-              start: sub.startTime,
-              end: sub.endTime,
-              content: sub.text,
-              drag: false,
-              resize: true,
-              contentEditable: true,
-              color: sub.speaker_id === "Speaker 1"
-                ? "rgb(0, 87, 158, 0.2)"
-                : sub.speaker_id === "Speaker 0"
-                  ? "rgb(123, 29, 0, 0.2)"
-                  : "rgb(0, 0, 0, 0.6)",
-            })
+      waveSurf.current.on('decode', () => {
+        currentSubs?.map((sub) => {
+          regions.current.addRegion({
+            id: sub.id,
+            start: sub.startTime,
+            end: sub.endTime,
+            content: sub.text,
+            drag: false,
+            resize: true,
+            contentEditable: true,
+            color: sub.speaker_id === "Speaker 1"
+              ? "rgb(0, 87, 158, 0.2)"
+              : sub.speaker_id === "Speaker 0"
+                ? "rgb(123, 29, 0, 0.2)"
+                : "rgb(0, 0, 0, 0.6)",
           })
         })
-      }
+      })
+    }
     if (details?.data?.audio_url !== undefined && miniMap.current === null) {
       miniMap.current.destroy();
       miniMap.current = WaveSurfer.create({
@@ -146,23 +183,25 @@ const Timeline2 = ({ details, waveformSettings }) => {
         hideScrollbar: true,
       });
       miniMapRegions.current = miniMap.current.registerPlugin(RegionsPlugin.create());
-        miniMap.current.on('decode', () => {
-          currentSubs?.map((sub) => {
-            miniMapRegions.current.addRegion({
-              start: sub.startTime,
-              end: sub.endTime,
-              color: sub.text === ""
-                ? "rgb(255, 0, 0, 0.5)"
-                : "rgb(0, 255, 0, 0.5)",
-            })
+      miniMap.current.on('decode', () => {
+        currentSubs?.map((sub) => {
+          miniMapRegions.current.addRegion({
+            start: sub.startTime,
+            end: sub.endTime,
+            color: sub.text === ""
+              ? "rgb(255, 0, 0, 0.5)"
+              : "rgb(0, 255, 0, 0.5)",
+            drag: false,
+            resize: false,
           })
         })
+      })
     }
   }, [waveformSettings])
 
   useEffect(() => {
     if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null) {
-    regions.current.clearRegions();
+      regions.current.clearRegions();
       currentSubs?.map((sub) => {
         regions.current.addRegion({
           id: sub.id,
@@ -187,6 +226,8 @@ const Timeline2 = ({ details, waveformSettings }) => {
           color: sub.text === ""
             ? "rgb(255, 0, 0, 0.5)"
             : "rgb(0, 255, 0, 0.5)",
+          drag: false,
+          resize: false,
         })
       })
     }
@@ -227,7 +268,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
 
   return (
     <>
-      <div style={{paddingLeft: "20px", paddingRight:"20px"}} id="minimap"></div>
+      <div style={{ paddingLeft: "20px", paddingRight: "20px" }} id="minimap"></div>
       <div style={{ paddingLeft: "20px", paddingRight: "20px" }} id="waveform"></div>
     </>
   );
