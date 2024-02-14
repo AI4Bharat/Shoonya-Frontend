@@ -34,6 +34,7 @@ import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import { Paper } from "@mui/material";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ProjectAnalytics = (props) => {
@@ -73,10 +74,45 @@ const ProjectAnalytics = (props) => {
   );
   const [submitted, setSubmitted] = useState(false);
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+  const [tableData, setTableData] = useState([]);
 
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
+
+  const colorList = [
+    "#3366cc",
+    "#dc3912",
+    "#ff9900",
+    "#109618",
+    "#990099",
+    "#0099c6",
+    "#dd4477",
+    "#66aa00",
+    "#b82e2e",
+    "#316395",
+    "#994499",
+    "#22aa99",
+    "#aaaa11",
+    "#6633cc",
+    "#e67300",
+    "#8b0707",
+    "#651067",
+    "#329262",
+    "#5574a6",
+    "#3b3eac",
+    "#b77322",
+    "#16d620",
+    "#b91383",
+    "#f4359e",
+    "#9c5935",
+    "#a9c413",
+    "#2a778d",
+    "#668d1c",
+    "#bea413",
+    "#0c5922",
+    "#743411",
+  ];
 
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value);
@@ -257,13 +293,7 @@ const ProjectAnalytics = (props) => {
         {
           //   label: "Project Analytics",
           data: entries,
-          backgroundColor: [
-            "#0fd17b",
-            "#1473fc",
-            "#922d88",
-            "#1db5d8",
-            "#443fb1",
-          ],
+          backgroundColor: colorList,
           //   backgroundColor: ['#FF708D', '#884DFF', '#8BA446'],
           //   backgroundColor: "rgba(255, 0, 0)",
           //   fill: {
@@ -273,6 +303,12 @@ const ProjectAnalytics = (props) => {
         },
       ],
     });
+
+    setTableData(
+      labels.map((ele, idx) => {
+        return { name: ele, task_count: entries[idx], color: idx };
+      })
+    );
   };
 
   useEffect(() => {
@@ -442,16 +478,71 @@ const ProjectAnalytics = (props) => {
                   style={{
                     display: "flex",
                     justifyContent: "center",
-                    Padding: "20px",
-                    width: "50%",
+                    alignItems: "center",
                   }}
                 >
-                  <Pie
-                    data={chartData}
-                    // width={`300px`}
-                    // height={`300px`}
-                    options={options}
-                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      Padding: "10px",
+                      width: "45%",
+                    }}
+                  >
+                    <Pie
+                      data={chartData}
+                      // width={`300px`}
+                      // height={`300px`}
+                      options={options}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      Padding: "10px",
+                      width: "45%",
+                    }}
+                  >
+                    <MUIDataTable
+                      // title={"Project Analytics"}
+                      data={tableData}
+                      columns={[
+                        {
+                          name: "name",
+                          label: "Name",
+                        },
+                        {
+                          name: "task_count",
+                          label: "Task Count",
+                        },
+                        {
+                          name: "color",
+                          label: "Color",
+                          options: {
+                            customBodyRender: (
+                              value,
+                              tableMeta,
+                              updateValue
+                            ) => {
+                              return (
+                                <Paper sx={{backgroundColor:`${colorList[value]}`,height:"10px",width:"80px"}}/>
+                              );
+                            },
+                          },
+                        },
+                      ]}
+                      options={{
+                        ...options,
+                        filter: false,
+                        search: false,
+                        print: false,
+                        viewColumns: false,
+                        download: false,
+                        selectableRows: false,
+                      }}
+                    />
+                  </div>
                 </div>
               )
             )}
