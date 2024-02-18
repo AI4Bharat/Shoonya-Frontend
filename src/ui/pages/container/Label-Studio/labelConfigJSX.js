@@ -1,32 +1,45 @@
 export const labelConfigJS = `<View>
 <Image name="image_url" value="$image_url"/>
 <Labels name="annotation_labels" toName="image_url" className="ignore_assertion">
-  <Label value="title/h1" background="green" name="title/h1" className="ignore_assertion"/>
-  <Label value="title/h2" background="green" name="title/h2" className="ignore_assertion"/>
-  <Label value="title/h3" background="green" name="title/h3" className="ignore_assertion"/>
-  <Label value="text/paragraph" background="blue" name="text/paragraph" className="ignore_assertion"/>
-  <Label value="text/foreign-language-text" background="blue" name="text/foreign-language-text" className="ignore_assertion"/>
-  <Label value="image/img" background="red" name="image/img" className="ignore_assertion"/>
-  <Label value="image/logo" background="red" name="image/logo" className="ignore_assertion"/>
-  <Label value="image/formula" background="red" name="image/formula" className="ignore_assertion"/>
-  <Label value="image/equation" background="red" name="image/equation" className="ignore_assertion"/>
-  <Label value="image/bg-img" background="red" name="image/bg-img" className="ignore_assertion"/>
-  <Label value="unord-list" background="yellow" name="unord-list" className="ignore_assertion"/>
-  <Label value="ord-list" background="black" name="ord-list" className="ignore_assertion"/>
-  <Label value="placeholder/txt" background="orange" name="placeholder/txt" className="ignore_assertion"/>
-  <Label value="placeholder/img" background="orange" name="placeholder/img" className="ignore_assertion"/>
-  <Label value="table" background="violet" name="table" className="ignore_assertion"/>
-  <Label value="dateline" background="cyan" name="dateline" className="ignore_assertion"/>
-  <Label value="byline" background="brown" name="byline" className="ignore_assertion"/>
-  <Label value="page-number" background="purple" name="page-number" className="ignore_assertion"/>
-  <Label value="footer" background="indigo" name="footer" className="ignore_assertion"/>
-  <Label value="footnote" background="pink" name="footnote" className="ignore_assertion"/>
-  <Label value="header" background="olive" name="header" className="ignore_assertion"/>
-  <Label value="social-media-handle" background="aqua" name="social-media-handle" className="ignore_assertion"/>
-  <Label value="website-link" background="teal" name="website-link" className="ignore_assertion"/>
-  <Label value="caption/fig" background="maroon" name="caption/fig" className="ignore_assertion"/>
-  <Label value="caption/table" background="maroon" name="caption/img" className="ignore_assertion"/>
-  <Label value="table-header" background="aquamarine" name="table-header" className="ignore_assertion"/>
+<Label value="paragraph" name="paragraph" background="green" className="ignore_assertion"/>
+<Label value="figure" name="figure" background="yellow" className="ignore_assertion"/>
+<Label value="figure-caption" name="figure-caption" background="red" className="ignore_assertion"/>
+<Label value="table" name="table" background="cyan" className="ignore_assertion"/>
+<Label value="table-caption" name="table-caption" background="brown" className="ignore_assertion"/>
+<Label value="footer" name="footer" background="olive" className="ignore_assertion"/>
+<Label value="folio" name="folio" background="aqua" className="ignore_assertion"/>
+<Label value="footnote" name="footnote" background="maroon" className="ignore_assertion"/>
+<Label value="page-number" name="page-number" background="green" className="ignore_assertion"/>
+<Label value="author" name="author" background="yellow" className="ignore_assertion"/>
+<Label value="dateline" name="dateline" background="red" className="ignore_assertion"/>
+<Label value="ordered-list" name="ordered-list" background="cyan" className="ignore_assertion"/>
+<Label value="sub-ordered-list" name="sub-ordered-list" background="brown" className="ignore_assertion"/>
+<Label value="subsub-ordered-list" name="subsub-ordered-list" background="olive" className="ignore_assertion"/>
+<Label value="unordered-list" name="unordered-list" background="aqua" className="ignore_assertion"/>
+<Label value="sub-unordered-list" name="sub-unordered-list" background="maroon" className="ignore_assertion"/>
+<Label value="subsub-unordered-list" name="subsub-unordered-list" background="green" className="ignore_assertion"/>
+<Label value="section-title" name="section-title" background="yellow" className="ignore_assertion"/>
+<Label value="sub-section-title" name="sub-section-title" background="red" className="ignore_assertion"/>
+<Label value="subsub-section-title" name="subsub-section-title" background="cyan" className="ignore_assertion"/>
+<Label value="headline" name="headline" background="brown" className="ignore_assertion"/>
+<Label value="sub-headline" name="sub-headline" background="olive" className="ignore_assertion"/>
+<Label value="subsub-headline" name="subsub-headline" background="aqua" className="ignore_assertion"/>
+<Label value="chapter-title" name="chapter-title" background="maroon" className="ignore_assertion"/>
+<Label value="placeholder-text" name="placeholder-text" background="green" className="ignore_assertion"/>
+<Label value="formula" name="formula" background="yellow" className="ignore_assertion"/>
+<Label value="first-level-question" name="first-level-question" background="red" className="ignore_assertion"/>
+<Label value="second-level-question" name="second-level-question" background="cyan" className="ignore_assertion"/>
+<Label value="third-level-question" name="third-level-question" background="brown" className="ignore_assertion"/>
+<Label value="options" name="options" background="olive" className="ignore_assertion"/>
+<Label value="index" name="index" background="aqua" className="ignore_assertion"/>
+<Label value="table-of-contents" name="table-of-contents" background="maroon" className="ignore_assertion"/>
+<Label value="jumpline" name="jumpline" background="green" className="ignore_assertion"/>
+<Label value="advertisement" name="advertisement" background="yellow" className="ignore_assertion"/>
+<Label value="sidebar" name="sidebar" background="red" className="ignore_assertion"/>
+<Label value="flag" name="flag" background="cyan" className="ignore_assertion"/>
+<Label value="reference" name="reference" background="brown" className="ignore_assertion"/>
+<Label value="contact-info" name="contact-info" background="olive" className="ignore_assertion"/>
+<Label value="website-link" name="website-link" background="aqua" className="ignore_assertion"/>
   
 </Labels>
 
