@@ -170,10 +170,10 @@ const DatasetStyle = makeStyles({
     position: 'fixed',
     // backgroundColor: 'rgba(0.5, 0, 0, 0.5)',
     zIndex: 1000,
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
+    // width: '100%',
+    // height: '100%',
+    top: '50%',
+    left: '50%',
     opacity: 1
   },
   search: {
