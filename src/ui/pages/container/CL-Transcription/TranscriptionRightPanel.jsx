@@ -914,4 +914,4 @@ const TranscriptionRightPanel = ({
   );
 };
 
-export default TranscriptionRightPanel;
+export default memo(TranscriptionRightPanel);
