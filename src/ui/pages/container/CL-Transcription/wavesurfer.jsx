@@ -16,8 +16,41 @@ const Timeline2 = ({ details, waveformSettings }) => {
   const result = useSelector((state) => state.commonReducer?.subtitles);
   const player = useSelector((state) => state.commonReducer?.player);
   const [currentSubs, setCurrentSubs] = useState([]);
+  const [currentSubsCopy, setCurrentSubsCopy] = useState([]);
   const dispatch = useDispatch();
   const [regionsInit, setRegionsInit] = useState(false);
+
+  const updateRegions = (currentSubs) => {
+    if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null && currentSubs.length > 0) {
+      regions.current.clearRegions();
+      miniMapRegions.current.clearRegions();
+      currentSubs?.map((sub) => {
+        regions.current.addRegion({
+          id: sub.id,
+          start: sub.startTime,
+          end: sub.endTime,
+          content: sub.text,
+          drag: true,
+          resize: true,
+          contentEditable: true,
+          color: sub.speaker_id === "Speaker 1"
+            ? "rgb(0, 87, 158, 0.2)"
+            : sub.speaker_id === "Speaker 0"
+              ? "rgb(123, 29, 0, 0.2)"
+              : "rgb(0, 0, 0, 0.6)",
+        });
+        miniMapRegions.current.addRegion({
+          start: sub.startTime,
+          end: sub.endTime,
+          color: sub.text === ""
+            ? "rgb(255, 0, 0, 0.5)"
+            : "rgb(0, 255, 0, 0.5)",
+          drag: false,
+          resize: false,
+        });
+      })
+    }
+  };
 
   useEffect(() => {
     if (result) {
@@ -26,38 +59,13 @@ const Timeline2 = ({ details, waveformSettings }) => {
           waveSurf.current.once('decode', () => {
             setRegionsInit(true);
             setTimeout(() => {
-              regions.current.clearRegions();
-              miniMapRegions.current.clearRegions();
-              result?.map((sub) => {
-                regions.current.addRegion({
-                  id: sub.id,
-                  start: sub.startTime,
-                  end: sub.endTime,
-                  content: sub.text,
-                  drag: false,
-                  resize: true,
-                  contentEditable: true,
-                  color: sub.speaker_id === "Speaker 1"
-                    ? "rgb(0, 87, 158, 0.2)"
-                    : sub.speaker_id === "Speaker 0"
-                      ? "rgb(123, 29, 0, 0.2)"
-                      : "rgb(0, 0, 0, 0.6)",
-                })
-                miniMapRegions.current.addRegion({
-                  start: sub.startTime,
-                  end: sub.endTime,
-                  color: sub.text === ""
-                    ? "rgb(255, 0, 0, 0.5)"
-                    : "rgb(0, 255, 0, 0.5)",
-                  drag: false,
-                  resize: false,
-                })
-              })
+              updateRegions(result);
             }, 500);
           });
         }
       }
       setCurrentSubs(result);
+      setCurrentSubsCopy(result);
     }
   }, [result]);
 
@@ -160,7 +168,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
             start: sub.startTime,
             end: sub.endTime,
             content: sub.text,
-            drag: false,
+            drag: true,
             resize: true,
             contentEditable: true,
             color: sub.speaker_id === "Speaker 1"
@@ -200,37 +208,7 @@ const Timeline2 = ({ details, waveformSettings }) => {
   }, [waveformSettings])
 
   useEffect(() => {
-    if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null) {
-      regions.current.clearRegions();
-      currentSubs?.map((sub) => {
-        regions.current.addRegion({
-          id: sub.id,
-          start: sub.startTime,
-          end: sub.endTime,
-          content: sub.text,
-          drag: false,
-          resize: true,
-          contentEditable: true,
-          color: sub.speaker_id === "Speaker 1"
-            ? "rgb(0, 87, 158, 0.2)"
-            : sub.speaker_id === "Speaker 0"
-              ? "rgb(123, 29, 0, 0.2)"
-              : "rgb(0, 0, 0, 0.6)",
-        })
-      })
-      miniMapRegions.current.clearRegions();
-      currentSubs?.map((sub) => {
-        miniMapRegions.current.addRegion({
-          start: sub.startTime,
-          end: sub.endTime,
-          color: sub.text === ""
-            ? "rgb(255, 0, 0, 0.5)"
-            : "rgb(0, 255, 0, 0.5)",
-          drag: false,
-          resize: false,
-        })
-      })
-    }
+    updateRegions(currentSubs);
   }, [details, currentSubs])
 
   if (waveSurf !== null && regions.current !== null) {
@@ -257,12 +235,28 @@ const Timeline2 = ({ details, waveformSettings }) => {
 
   if (waveSurf !== null && regions.current !== null) {
     regions.current.on('region-updated', (region) => {
-      let currentSubsCopy = currentSubs;
-      currentSubsCopy[region.id - 1].text = region?.content?.innerHTML;
-      currentSubsCopy[region.id - 1].start_time = DT.d2t(region.start);
-      currentSubsCopy[region.id - 1].end_time = DT.d2t(region.end);
-      updateSub(currentSubsCopy);
-      player.play();
+      if (currentSubsCopy.length > 0) {
+        if (region?.content?.innerHTML) {
+          currentSubsCopy[region.id - 1].text = region?.content?.innerHTML;
+        }
+        currentSubsCopy[region.id - 1].start_time = DT.d2t(region.start);
+        currentSubsCopy[region.id - 1].end_time = DT.d2t(region.end);
+        if (region.id > 1) {
+          if (DT.t2d(currentSubsCopy[region.id - 1].start_time) < DT.t2d(currentSubsCopy[region.id - 2]?.end_time)) {
+            currentSubsCopy[region.id - 1].start_time = currentSubs[region.id - 2].end_time;
+            currentSubsCopy[region.id - 1].end_time = currentSubs[region.id - 1].end_time;
+          }
+        }
+        if (region.id < currentSubsCopy.length) {
+          if (DT.t2d(currentSubsCopy[region.id - 1].end_time) > DT.t2d(currentSubsCopy[region.id]?.start_time)) {
+            currentSubsCopy[region.id - 1].end_time = currentSubs[region.id].start_time;
+            currentSubsCopy[region.id - 1].start_time = currentSubs[region.id - 1].start_time;
+          }
+        }
+        updateSub(currentSubsCopy);
+        player.play();
+        updateRegions(currentSubsCopy);
+      }
     })
   }
 
