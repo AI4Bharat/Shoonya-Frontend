@@ -81,6 +81,8 @@ const TranscriptionRightPanel = ({
   handleStdTranscriptionSettings,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
+  waveSurfer,
+  setWaveSurfer,
   annotationId,
 }) => {
   const { taskId } = useParams();
@@ -562,6 +564,8 @@ const TranscriptionRightPanel = ({
               showSplit={true}
               advancedWaveformSettings={advancedWaveformSettings}
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+              waveSurfer={waveSurfer}
+              setWaveSurfer={setWaveSurfer}
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
               annotationId={annotationId}
@@ -910,4 +914,4 @@ const TranscriptionRightPanel = ({
   );
 };
 
-export default TranscriptionRightPanel;
+export default memo(TranscriptionRightPanel);

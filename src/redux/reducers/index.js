@@ -15,6 +15,7 @@ import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
 import getDatasetList from './Dataset/GetDatasetList';
 import getTaskDetails from './Tasks/GetTaskDetails'
+import getQueuedTaskDetails from './Tasks/GetQueuedTaskDetails'
 import getDatasetDetails from './Dataset/GetDatasetDetails';
 import getDataitemsById from './Dataset/GetDataitemsById';
 import getArchiveProject from './ProjectDetails/ArchiveProject';
@@ -116,6 +117,7 @@ const index = {
     getOrganizationUsers,
     getDatasetList,
     getTaskDetails,
+    getQueuedTaskDetails,
     getDatasetList,
     getDatasetDetails,
     getDataitemsById,

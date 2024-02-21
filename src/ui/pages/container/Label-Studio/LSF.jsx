@@ -48,6 +48,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import { labelConfigJS } from "./labelConfigJSX";
 
 const filterAnnotations = (
   annotations,
@@ -377,57 +378,74 @@ const LabelStudioWrapper = ({
         },
 
         onSubmitAnnotation: function (ls, annotation) {
-          if (isAudioProject.current) {
-            let temp = annotation.serializeAnnotation();
-            const counter = temp.reduce((acc, curr) => {
-              if (curr.from_name === "labels")
-                acc.labels++;
-              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
-                if (curr.value.text[0] === "")
-                  acc.empty++;
-                acc.textareas++;
-              }
-              return acc;
-            },
-              { labels: 0, textareas: 0, empty: 0 }
-            );
-            if (counter.labels !== counter.textareas || counter.empty) {
-              setSnackbarInfo({
-                open: true,
-                message: "Please fill the annotations for every segment/region",
-                variant: "warning",
-              });
-              return;
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;
+          temp.map((curr) => {
+            ids.add(curr.id);
+            if(curr.type === "labels"){
+              countLables++;
             }
-          }
-          showLoader();
-          if (taskData.annotation_status !== "freezed") {
-            postAnnotation(
-              annotation.serializeAnnotation(),
-              taskData.id,
-              userData.id,
-              load_time.current,
-              annotation.lead_time,
-              annotation_status.current,
-              JSON.stringify(annotationNotesRef.current.getEditor().getContents())
-            ).then((res) => {
-              if (localStorage.getItem("labelAll"))
-                getNextProject(projectId, taskData.id).then((res) => {
-                  hideLoader();
-                  // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                  tasksComplete(res?.id || null);
-                });
-              else {
-                hideLoader();
-                window.location.reload();
-              }
-            });
-          } else
+          });
+          if (projectType.includes("OCR") && ids.size>countLables) {
             setSnackbarInfo({
               open: true,
-              message: "Task is frozen",
+              message: "Please select labels for all boxes",
               variant: "error",
             });
+          }
+          else {
+            if (isAudioProject.current) {
+              const counter = temp.reduce((acc, curr) => {
+                if (curr.from_name === "labels")
+                  acc.labels++;
+                else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
+                  if (curr.value.text[0] === "")
+                    acc.empty++;
+                  acc.textareas++;
+                }
+                return acc;
+              },
+                { labels: 0, textareas: 0, empty: 0 }
+              );
+              if (counter.labels !== counter.textareas || counter.empty) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Please fill the annotations for every segment/region",
+                  variant: "warning",
+                });
+                return;
+              }
+            }
+            showLoader();
+            if (taskData.annotation_status !== "freezed") {
+              postAnnotation(
+                annotation.serializeAnnotation(),
+                taskData.id,
+                userData.id,
+                load_time.current,
+                annotation.lead_time,
+                annotation_status.current,
+                JSON.stringify(annotationNotesRef.current.getEditor().getContents())
+              ).then((res) => {
+                if (localStorage.getItem("labelAll"))
+                  getNextProject(projectId, taskData.id).then((res) => {
+                    hideLoader();
+                    // window.location.href = `/projects/${projectId}/task/${res.id}`;
+                    tasksComplete(res?.id || null);
+                  });
+                else {
+                  hideLoader();
+                  window.location.reload();
+                }
+              });
+            } else
+              setSnackbarInfo({
+                open: true,
+                message: "Task is frozen",
+                variant: "error",
+              });
+          }
         },
 
         onSkipTask: function () {
@@ -438,6 +456,7 @@ const LabelStudioWrapper = ({
           if (annotation) {
             showLoader();
             patchAnnotation(
+              taskId,
               null,
               annotation.id,
               load_time.current,
@@ -454,76 +473,95 @@ const LabelStudioWrapper = ({
         },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (isAudioProject.current) {
-            let temp = annotation.serializeAnnotation();
-            const counter = temp.reduce((acc, curr) => {
-              if (curr.from_name === "labels")
-                acc.labels++;
-              else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
-                if (curr.value.text[0] === "")
-                  acc.empty++;
-                acc.textareas++;
-              }
-              return acc;
-            },
-              { labels: 0, textareas: 0, empty: 0 }
-            );
-            if (counter.labels !== counter.textareas || counter.empty) {
-              setSnackbarInfo({
-                open: true,
-                message: "Please fill the annotations for every segment/region",
-                variant: "warning",
-              });
-              return;
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;       
+          temp.map((curr) => {
+            console.log(curr);
+            ids.add(curr.id);
+            if(curr.type === "labels"){
+              countLables++;
             }
-          }
-          if (taskData.annotation_status !== "freezed") {
-            for (let i = 0; i < annotations.length; i++) {
-              if (
-                !annotations[i].result?.length || !annotation.serializeAnnotation().length ||
-                annotation.serializeAnnotation()[0].id ===
-                annotations[i].result[0].id
-              ) {
-                setAutoSave(false);
-                showLoader();
-                let temp = annotation.serializeAnnotation();
-                for (let i = 0; i < temp.length; i++) {
-                  if (temp[i].value.text) {
-                    temp[i].value.text = [temp[i].value.text[0]];
-                  }
-                }
-                patchAnnotation(
-                  temp,
-                  annotations[i].id,
-                  load_time.current,
-                  annotations[i].lead_time,
-                  annotation_status.current,
-                  JSON.stringify(annotationNotesRef.current.getEditor().getContents())
-                ).then((res) => {
-                  hideLoader();
-                  if (res.status !== 200) {
-                    setSnackbarInfo({
-                      open: true,
-                      message: "Error in saving annotation",
-                      variant: "error",
-                    });
-                  }
-                  else if (localStorage.getItem("labelAll"))
-                    getNextProject(projectId, taskData.id).then((res) => {
-                      tasksComplete(res?.id || null);
-                    });
-                  else {
-                    window.location.reload();
-                  }
-                });
-              }
-            }
-          } else
+          });
+          if (projectType.includes("OCR") && ids.size>countLables) {
             setSnackbarInfo({
               open: true,
-              message: "Task is frozen",
+              message: "Please select labels for all boxes",
               variant: "error",
             });
+          }
+          else {
+            if (isAudioProject.current) {
+              const counter = temp.reduce((acc, curr) => {
+                if (curr.from_name === "labels")
+                  acc.labels++;
+                else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
+                  if (curr.value.text[0] === "")
+                    acc.empty++;
+                  acc.textareas++;
+                }
+                return acc;
+              },
+                { labels: 0, textareas: 0, empty: 0 }
+              );
+              if (counter.labels !== counter.textareas || counter.empty) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Please fill the annotations for every segment/region",
+                  variant: "warning",
+                });
+                return;
+              }
+            }
+            if (taskData.annotation_status !== "freezed") {
+              for (let i = 0; i < annotations.length; i++) {
+                if (
+                  !annotations[i].result?.length || !annotation.serializeAnnotation().length ||
+                  annotation.serializeAnnotation()[0].id ===
+                  annotations[i].result[0].id
+                ) {
+                  setAutoSave(false);
+                  showLoader();
+                  let temp = annotation.serializeAnnotation();
+                  for (let i = 0; i < temp.length; i++) {
+                    if (temp[i].value.text) {
+                      temp[i].value.text = [temp[i].value.text[0]];
+                    }
+                  }
+                  patchAnnotation(
+                    taskId,
+                    temp,
+                    annotations[i].id,
+                    load_time.current,
+                    annotations[i].lead_time,
+                    annotation_status.current,
+                    JSON.stringify(annotationNotesRef.current.getEditor().getContents())
+                  ).then((res) => {
+                    hideLoader();
+                    if (res.status !== 200) {
+                      setSnackbarInfo({
+                        open: true,
+                        message: "Error in saving annotation",
+                        variant: "error",
+                      });
+                    }
+                    else if (localStorage.getItem("labelAll"))
+                      getNextProject(projectId, taskData.id).then((res) => {
+                        tasksComplete(res?.id || null);
+                      });
+                    else {
+                      window.location.reload();
+                    }
+                  });
+                }
+              }
+            } else
+              setSnackbarInfo({
+                open: true,
+                message: "Task is frozen",
+                variant: "error",
+              });
+          }
         },
 
         onDeleteAnnotation: function (ls, annotation) {
@@ -572,13 +610,10 @@ const LabelStudioWrapper = ({
             }
             // both have loaded!
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
-            let tempLabelConfig =
-              labelConfig.project_type === "ConversationTranslation" ||
-                labelConfig.project_type === "ConversationTranslationEditing"
-                ? generateLabelConfig(taskData.data)
-                : labelConfig.project_type === "ConversationVerification"
-                  ? conversationVerificationLabelConfig(taskData.data)
-                  : labelConfig.label_config;
+            let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+              tempLabelConfig = labelConfigJS;
+            }
             setAnnotations(annotations);
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
@@ -731,7 +766,7 @@ const LabelStudioWrapper = ({
   }, [taskData]);
 
   const autoSaveAnnotation = () => {
-    if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "labeled") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         for (let i = 0; i < annotations.length; i++) {
@@ -748,6 +783,7 @@ const LabelStudioWrapper = ({
               }
             }
             patchAnnotation(
+              taskId,
               temp,
               annotations[i].id,
               load_time.current,
