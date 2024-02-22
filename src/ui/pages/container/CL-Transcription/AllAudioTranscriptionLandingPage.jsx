@@ -338,7 +338,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
   const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
   const [waveSurferProgressColor, setWaveSurferProgressColor] = useState("#dd5e98");
-  const [waveSurferCursorColor, setWaveSurferCursorColor] = useState("#ddd5e9");
+  const [waveSurferCursorColor, setWaveSurferCursorColor] = useState("#935ae8");
   const [waveSurferCursorWidth, setWaveSurferCursorWidth] = useState(1);
   const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
   const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
