@@ -551,7 +551,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       navigate(
         `/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${id}`
       );
-      window.location.reload();
+      window.location.reload(true);
     } else {
       // navigate(-1);
       // resetNotes();
