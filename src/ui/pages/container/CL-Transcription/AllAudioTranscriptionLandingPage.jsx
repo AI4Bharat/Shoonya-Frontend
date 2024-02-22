@@ -177,6 +177,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const tasksComplete = (id) => {
     if (id) {
       navigate(`/projects/${projectId}/AllAudioTranscriptionLandingPage/${id}`);
+      window.location.reload();
     } else {
       setSnackbarInfo({
         open: true,
