@@ -471,7 +471,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       navigate(
         `/projects/${projectId}/SuperCheckerAudioTranscriptionLandingPage/${id}`
       );
-      window.location.reload();
+      window.location.reload(true);
     } else {
       // navigate(-1);
       // resetNotes();

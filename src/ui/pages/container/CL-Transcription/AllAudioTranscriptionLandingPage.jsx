@@ -187,7 +187,7 @@ const AllAudioTranscriptionLandingPage = () => {
       setTimeout(() => {
         localStorage.removeItem("labelAll");
         window.location.replace(`/#/projects/${projectId}`);
-        window.location.reload();
+        window.location.reload(true);
       }, 1000);
     }
   };
