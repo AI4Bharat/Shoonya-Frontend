@@ -87,6 +87,9 @@ const Timeline2 = ({ details, waveformSettings }) => {
         mediaControls: true,
         url: details?.data?.audio_url,
         hideScrollbar: true,
+        autoCenter: true,
+        autoScroll: true,
+        cursorWidth: 2,
         media: document.querySelector('audio'),
         plugins: [
           // Minimap.create({
@@ -140,6 +143,9 @@ const Timeline2 = ({ details, waveformSettings }) => {
         mediaControls: true,
         url: details?.data?.audio_url,
         hideScrollbar: true,
+        autoCenter: true,
+        autoScroll: true,
+        cursorWidth: 2,
         media: document.querySelector('audio'),
         plugins: [
           // Minimap.create({
