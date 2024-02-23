@@ -312,7 +312,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
-    if(taskDetails?.task_status !== "accepted" && taskDetails?.task_status !== "accepted_with_minor_changes" && taskDetails?.task_status !== "accepted_with_major_changes"){
+    if(AnnotationsTaskDetails[0]?.annotation_status !== "accepted" && AnnotationsTaskDetails[0]?.annotation_status !== "accepted_with_minor_changes" && AnnotationsTaskDetails[0]?.annotation_status !== "accepted_with_major_changes"){
     if(!autoSave) return;
     const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === user.id && a.annotation_type === 2);
     if(!currentAnnotation) return;
@@ -332,9 +332,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
           headers: obj.getHeaders().headers,
         });
         if (!res.ok) {
+          const data = await res.json();
           setSnackbarInfo({
             open: true,
-            message: "Error in autosaving annotation",
+            message: data.message,
             variant: "error",
           });
           return res;
