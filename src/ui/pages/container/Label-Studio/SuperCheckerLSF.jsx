@@ -189,7 +189,7 @@ const LabelStudioWrapper = ({
   }, [userData]); */
   
   useEffect(() => {
-    let sidePanel = ProjectDetails?.project_type?.includes("Audio") || !ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
