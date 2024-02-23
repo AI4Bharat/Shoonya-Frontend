@@ -234,7 +234,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
-    if(taskDetails?.task_status !== "validated" && taskDetails?.task_status !== "validated_with_changes"){
+    if(AnnotationsTaskDetails[0]?.annotation_status !== "validated" && AnnotationsTaskDetails[0]?.annotation_status !== "validated_with_changes"){
     if(!autoSave) return;
     const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === userData.id && a.annotation_type === 3);
     if(!currentAnnotation) return;
@@ -254,9 +254,10 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         headers: obj.getHeaders().headers,
       });
       if (!res.ok) {
-        setSnackbarInfo({
+          const data = await res.json();
+          setSnackbarInfo({
           open: true,
-          message: "Error in autosaving annotation",
+          message: data.message,
           variant: "error",
         });
       } 

@@ -297,7 +297,7 @@ const AudioTranscriptionLandingPage = () => {
 
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
-    if(taskDetails?.task_status !== "labeled"){
+    if(AnnotationsTaskDetails[0]?.annotation_status !== "labeled"){
     if(!autoSave) return;
     const reqBody = {
       task_id: taskId,
@@ -315,9 +315,10 @@ const AudioTranscriptionLandingPage = () => {
           headers: obj.getHeaders().headers,
         });
         if (!res.ok) {
+          const data = await res.json();
           setSnackbarInfo({
             open: true,
-            message: "Error in autosaving annotation",
+            message: data.message,
             variant: "error",
           });
         }
