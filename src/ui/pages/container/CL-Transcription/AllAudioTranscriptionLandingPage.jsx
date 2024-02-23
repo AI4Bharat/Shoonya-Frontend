@@ -335,7 +335,7 @@ const AllAudioTranscriptionLandingPage = () => {
   }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
 
   const [waveSurfer, setWaveSurfer] = useState(true);
-  const [waveSurferHeight, setWaveSurferHeigth] = useState(128);
+  const [waveSurferHeight, setWaveSurferHeigth] = useState(140);
   const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
   const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
   const [waveSurferProgressColor, setWaveSurferProgressColor] = useState("#dd5e98");
@@ -344,7 +344,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
   const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
   const [waveSurferBarRadius, setWaveSurferBarRadius] = useState(0);
-  const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(1);
+  const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(2.2);
     
   const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
     "height": waveSurferHeight,
