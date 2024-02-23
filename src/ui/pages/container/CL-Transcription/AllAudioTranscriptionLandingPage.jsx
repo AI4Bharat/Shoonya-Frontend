@@ -177,7 +177,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const tasksComplete = (id) => {
     if (id) {
       navigate(`/projects/${projectId}/AllAudioTranscriptionLandingPage/${id}`);
-      window.location.reload();
+      window.location.reload(true);
     } else {
       setSnackbarInfo({
         open: true,
@@ -187,7 +187,7 @@ const AllAudioTranscriptionLandingPage = () => {
       setTimeout(() => {
         localStorage.removeItem("labelAll");
         window.location.replace(`/#/projects/${projectId}`);
-        window.location.reload(true);
+        window.location.reload();
       }, 1000);
     }
   };
