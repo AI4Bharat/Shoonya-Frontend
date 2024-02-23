@@ -1,7 +1,6 @@
 import { useEffect, useRef, memo, useState, useCallback } from "react";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "../../../../../node_modules/wavesurfer.js/dist/plugins/regions.esm.js";
-import Minimap from "../../../../../node_modules/wavesurfer.js/dist/plugins/minimap.esm.js";
 import TimelinePlugin from '../../../../../node_modules/wavesurfer.js/dist/plugins/timeline.esm.js';
 import { useSelector, useDispatch } from "react-redux";
 import { setSubtitles } from "../../../../redux/actions/Common";
@@ -260,7 +259,11 @@ const Timeline2 = ({ details, waveformSettings }) => {
           }
         }
         updateSub(currentSubsCopy);
-        player.play();
+        if (region.start.toFixed(3) === parseFloat(DT.t2d(currentSubsCopy[region.id -1].start_time))){
+          player.currentTime = region.end;
+        }else{
+          player.currentTime = region.start;
+        }
         updateRegions(currentSubsCopy);
       }
     })
@@ -268,8 +271,8 @@ const Timeline2 = ({ details, waveformSettings }) => {
 
   return (
     <>
-      <div style={{ paddingLeft: "20px", paddingRight: "20px" }} id="minimap"></div>
-      <div style={{ paddingLeft: "20px", paddingRight: "20px" }} id="waveform"></div>
+      <div style={{ paddingLeft: "20px", paddingRight: "20px", backgroundColor: "#ffffff" }} id="minimap"></div>
+      <div style={{ paddingLeft: "20px", paddingRight: "20px", backgroundColor: "#ffffff" }} id="waveform"></div>
     </>
   );
 };
