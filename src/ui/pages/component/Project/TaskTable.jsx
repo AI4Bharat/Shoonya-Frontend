@@ -233,7 +233,7 @@ const TaskTable = (props) => {
 
   const unassignTasks = async () => {
     setDeallocateDialog(false);
-    if (props.ProjectDetails.project_type === "AcousticNormalisedTranscriptionEditing") {
+    if (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing") {
       setSnackbarInfo({
         open: true,
         message: 'The task de-allocation has been disabled for your project',
