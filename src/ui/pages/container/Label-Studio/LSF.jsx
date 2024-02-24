@@ -217,12 +217,11 @@ const LabelStudioWrapper = ({
   }, [userData]); */
   
   useEffect(() => {
+    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel:
-          !(ProjectDetails?.project_type?.includes("Audio")
-          || ProjectDetails?.project_type?.includes("Acoustic")),
+        bottomSidePanel: !sidePanel,
         continuousLabeling: false,
         enableAutoSave: true,
         enableHotkeys: true,

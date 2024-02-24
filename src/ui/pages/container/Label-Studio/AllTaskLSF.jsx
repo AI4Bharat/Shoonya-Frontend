@@ -60,8 +60,9 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   // debugger
 
   useEffect(() => {
-    localStorage.setItem("labelStudio:settings", JSON.stringify({
-      bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
+    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    localStorage.setItem("labelStudio:settings", JSON.stringify({    
+      bottomSidePanel: !sidePanel,
       continuousLabeling: false,
       enableAutoSave: false,
       enableHotkeys: true,
