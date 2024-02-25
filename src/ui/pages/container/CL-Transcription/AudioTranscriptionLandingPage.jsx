@@ -803,7 +803,7 @@ const [waveSurferCursorWidth, setWaveSurferCursorWidth] = useState(1);
 const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
 const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
 const [waveSurferBarRadius, setWaveSurferBarRadius] = useState(0);
-const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(2.2);
+const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(1.5);
   
 const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
   "height": waveSurferHeight,
@@ -1205,7 +1205,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {waveSurfer ? <Timeline2 details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
+        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
       </Grid>
     </>
   );
