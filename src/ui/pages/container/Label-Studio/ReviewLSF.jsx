@@ -278,7 +278,7 @@ useEffect(() => {
       JSON.stringify({
         bottomSidePanel: !sidePanel,
         continuousLabeling: continousLabelingOnly,
-        enableAutoSave: true,
+        enableAutoSave: false,
         enableHotkeys: true,
         enableLabelTooltips: true,
         enablePanelHotkeys: true,
