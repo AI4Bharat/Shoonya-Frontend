@@ -208,19 +208,15 @@ const LabelStudioWrapper = ({
   }, [userData]); */
 
   useEffect(() => {
-    let sidePanel = ProjectDetails?.project_type?.includes(
-      "OCRSegmentCategorization"
-    );
-    let showLabelsOnly = ProjectDetails?.project_type?.includes(
-      "OCRSegmentCategorization"
-    );
-    let selectAfterCreateOnly = true;
-
+    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
         bottomSidePanel: !sidePanel,
-        continuousLabeling: true,
+        continuousLabeling: continousLabelingOnly,
         enableAutoSave: true,
         enableHotkeys: true,
         enableLabelTooltips: true,
@@ -814,35 +810,33 @@ const LabelStudioWrapper = ({
                 temp[i].value.text = [temp[i].value.text[0]];
               }
             }
+            patchAnnotation(
+              taskId,
+              temp,
+              annotations[i].id,
+              load_time.current,
+              annotations[i].lead_time,
+              annotations[i].annotation_status,
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              true
+            ).then((res) => {
+              if (res.status !== 200) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Error in autosaving annotation",
+                  variant: "error",
+                });
+              }
+            });
           }
-          patchAnnotation(
-            taskId,
-            temp,
-            annotations[i].id,
-            load_time.current,
-            annotations[i].lead_time,
-            annotations[i].annotation_status,
-            JSON.stringify(
-              annotationNotesRef.current.getEditor().getContents()
-            ),
-            true
-          ).then((res) => {
-            if (res.status !== 200) {
-              setSnackbarInfo({
-                open: true,
-                message: "Error in autosaving annotation",
-                variant: "error",
-              });
-            }
-          });
         }
-      }
-    } else
-      setSnackbarInfo({
-        open: true,
-        message: "Task is frozen",
-        variant: "error",
-      });
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
   };
 
   let hidden, visibilityChange;

@@ -59,17 +59,17 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
-  useEffect(() => {
+useEffect(() => {
     let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let selectAfterCreateOnly = true;
-
+    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
         bottomSidePanel: !sidePanel,
-        continuousLabeling: true,
-        enableAutoSave: true,
+        continuousLabeling: continousLabelingOnly,
+        enableAutoSave: false,
         enableHotkeys: true,
         enableLabelTooltips: true,
         enablePanelHotkeys: true,
@@ -85,6 +85,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       })
     );
   }, []);
+
   useEffect(() => {
     const showAssignedUsers = async () => {
       getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
