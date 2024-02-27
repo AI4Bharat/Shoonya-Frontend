@@ -226,7 +226,7 @@ const LabelStudioWrapper = ({
       JSON.stringify({
         bottomSidePanel: !sidePanel,
         continuousLabeling: continousLabelingOnly,
-        enableAutoSave: false,
+        enableAutoSave: true,
         enableHotkeys: true,
         enableLabelTooltips: true,
         enablePanelHotkeys: true,
