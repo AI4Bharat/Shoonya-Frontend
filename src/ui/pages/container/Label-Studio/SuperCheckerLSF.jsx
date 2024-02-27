@@ -190,28 +190,30 @@ const LabelStudioWrapper = ({
   
   useEffect(() => {
     let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = true;
+
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
         bottomSidePanel: !sidePanel,
-        continuousLabeling: false,
-        enableAutoSave: false,
+        continuousLabeling: true,
+        enableAutoSave: true,
         enableHotkeys: true,
         enableLabelTooltips: true,
         enablePanelHotkeys: true,
         enableTooltips: false,
         fullscreen: false,
         imageFullSize: false,
-        selectAfterCreate: false,
+        selectAfterCreate: selectAfterCreateOnly,
         showAnnotationsPanel: true,
-        showLabels: false,
+        showLabels: showLabelsOnly,
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
       })
     );
   }, []);
-
   const tasksComplete = (id) => {
     if (id) {
       resetNotes();
