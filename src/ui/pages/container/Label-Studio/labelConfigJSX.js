@@ -3,7 +3,7 @@ export const labelConfigJS = `<View>
 <Filter name="filter" toName="annotation_labels"
           hotkey="shift+f" minlength="0"
           placeholder="Filter Labels" />
-<RectangleLabels name="annotation_labels" toName="image_url" className="ignore_assertion">
+<Labels name="annotation_labels" toName="image_url" className="ignore_assertion">
 <Label value="paragraph" name="paragraph" background="#55EFC4" className="ignore_assertion"/>
 <Label value="figure" name="figure" background="#FFEAA7" className="ignore_assertion"/>
 <Label value="figure-caption" name="figure-caption" background="#FDCB6E" className="ignore_assertion"/>
@@ -43,7 +43,7 @@ export const labelConfigJS = `<View>
 <Label value="reference" name="reference" background="#F2D7D9" className="ignore_assertion"/>
 <Label value="contact-info" name="contact-info" background="#DAEAF1" className="ignore_assertion"/>
 <Label value="website-link" name="website-link" background="#8CC0DE" className="ignore_assertion"/>
-</RectangleLabels>
+</Labels>
 <Rectangle name="annotation_bboxes" toName="image_url" strokeWidth="3" className="ignore_assertion"/>
 <Relations>
     <Relation value="continues-to" selected="true"/>
