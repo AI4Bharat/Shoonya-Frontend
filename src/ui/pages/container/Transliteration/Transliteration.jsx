@@ -2,7 +2,7 @@ import React, { useEffect, useState ,useRef} from "react";
 import { TextField } from "@mui/material";
 import { Autocomplete, Box, Button, Card, Grid, Typography } from "@mui/material";
 import { IndicTransliterate, getTransliterationLanguages, getTransliterateSuggestions } from "@ai4bharat/indic-transliterate";
-import "@ai4bharat/indic-transliterate/dist/index.css";
+import "../../../../IndicTransliterate/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
@@ -21,8 +21,8 @@ const Transliteration = (props) => {
   const suggestionRef = useRef([null]);
   const newKeystrokesRef = useRef();
   const [flag, setflag] = useState();
-  const [debouncedText, setDebouncedText] = useState("");
-  const debouncedTextRef = useRef("");
+  // const [debouncedText, setDebouncedText] = useState("");
+  // const debouncedTextRef = useRef("");
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -36,7 +36,7 @@ const Transliteration = (props) => {
   let searchFilters = JSON.parse(localStorage.getItem("TaskData"));
 
   var data = languageList.filter((e) => e.DisplayName.includes(ProjectDetails.tgt_language));
-console.log("nnn",data,ProjectDetails,searchFilters);
+// console.log("nnn",data,ProjectDetails,searchFilters);
   useEffect(() => {
     if (params.taskId) {
       setText(searchFilters?.data?.machine_translation);
@@ -49,70 +49,70 @@ console.log("nnn",data,ProjectDetails,searchFilters);
 console.log(isSpaceClicked);
  
 
-  useEffect(() => {
-    console.log("nnn","useEffect is running",prev);
-    const processConsoleLog = (args) => {
-      const msg = JSON.stringify(args);
-      if (msg.includes('library data')) {
-        const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
-        setflag(dataMatch.result)
-        return dataMatch.result;
-      }
-      return ;
-    };
-    const originalConsoleLog = console.log;
-    console.log = (...args) => {
-      const newSuggestions = processConsoleLog(args);
-      if (newSuggestions!=null) {
-        suggestionRef.current  = prev==true?flag:newSuggestions
-      }
-      originalConsoleLog(...args);
-    };
+  // useEffect(() => {
+  //   console.log("nnn","useEffect is running",prev);
+  //   const processConsoleLog = (args) => {
+  //     const msg = JSON.stringify(args);
+  //     if (msg.includes('library data')) {
+  //       const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+  //       setflag(dataMatch.result)
+  //       return dataMatch.result;
+  //     }
+  //     return ;
+  //   };
+  //   const originalConsoleLog = console.log;
+  //   console.log = (...args) => {
+  //     const newSuggestions = processConsoleLog(args);
+  //     if (newSuggestions!=null) {
+  //       suggestionRef.current  = prev==true?flag:newSuggestions
+  //     }
+  //     originalConsoleLog(...args);
+  //   };
     
-    return () => {
-      console.log = originalConsoleLog;
-    };
-  }, [debouncedTextRef.current,prev,selectedLang.LangCode]);
+  //   return () => {
+  //     console.log = originalConsoleLog;
+  //   };
+  // }, [debouncedTextRef.current,prev,selectedLang.LangCode]);
   
 
-  useEffect(() => { 
-    if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
-      console.log("nnn",suggestionRef.current);
-      console.log("nnn",debouncedTextRef.current,text);
-      const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
+  // useEffect(() => { 
+  //   if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
+  //     console.log("nnn",suggestionRef.current);
+  //     console.log("nnn",debouncedTextRef.current,text);
+  //     const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
 
-        const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
+  //       const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
 
-        const newKeystroke = {
-          keystrokes: debouncedTextRef.current,
-          results: suggestionRef.current,
-          opted:optedWord,
-          created_at: new Date().toISOString(),
-        };
-        newKeystrokesRef.current = newKeystroke
-        if (
-          keystrokesRef.current.length > 0 &&
-          keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
-        ) {
-          keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
-        } else {
-          keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
-        }
-        console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
-        const finalJson = {
-          word: debouncedTextRef.current,
-          steps: keystrokesRef.current,
-          language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
-        };
-        localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-    }
-  }, [suggestionRef.current,prev,selectedLang.LangCode]);
+  //       const newKeystroke = {
+  //         keystrokes: debouncedTextRef.current,
+  //         results: suggestionRef.current,
+  //         opted:optedWord,
+  //         created_at: new Date().toISOString(),
+  //       };
+  //       newKeystrokesRef.current = newKeystroke
+  //       if (
+  //         keystrokesRef.current.length > 0 &&
+  //         keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
+  //       ) {
+  //         keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
+  //       } else {
+  //         keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
+  //       }
+  //       console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+  //       const finalJson = {
+  //         word: debouncedTextRef.current,
+  //         steps: keystrokesRef.current,
+  //         language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
+  //       };
+  //       localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+  //   }
+  // }, [suggestionRef.current,prev,selectedLang.LangCode]);
 
-useEffect(()=>{
-  if (isSpaceClicked==true) {
-    json()
-  }
-},[isSpaceClicked])
+// useEffect(()=>{
+//   if (isSpaceClicked==true) {
+//     json()
+//   }
+// },[isSpaceClicked])
 
   const renderTextarea = (props) => {
     return (
@@ -124,28 +124,28 @@ useEffect(()=>{
       />
     );
   };
-const json=()=>{
-  const api = localStorage.getItem('TransliterateLogging');
-  const transliterateObj = new TransliterationAPI(JSON.parse(api));
-  fetch(transliterateObj.apiEndPoint(), {
-    method: "POST",
-    body: JSON.stringify(transliterateObj.getBody()),
-    headers: transliterateObj.getHeaders().headers,
-  })
-    .then(async (res) => {
-      if (!res.ok) throw await res.json();
-      else return await res.json();
-    })
-    .then((res) => {
-      setShowSnackBar({ open: true, message: res.message, variant: "success" });
-      console.log("success");
-    })
-    .catch((err) => {
-      setShowSnackBar({ open: true, message: err.message, variant: "error" });
-      console.log("error", err);
-    });
-  setIsSpaceClicked(false)
-}
+// const json=()=>{
+//   const api = localStorage.getItem('TransliterateLogging');
+//   const transliterateObj = new TransliterationAPI(JSON.parse(api));
+//   fetch(transliterateObj.apiEndPoint(), {
+//     method: "POST",
+//     body: JSON.stringify(transliterateObj.getBody()),
+//     headers: transliterateObj.getHeaders().headers,
+//   })
+//     .then(async (res) => {
+//       if (!res.ok) throw await res.json();
+//       else return await res.json();
+//     })
+//     .then((res) => {
+//       setShowSnackBar({ open: true, message: res.message, variant: "success" });
+//       console.log("success");
+//     })
+//     .catch((err) => {
+//       setShowSnackBar({ open: true, message: err.message, variant: "error" });
+//       console.log("error", err);
+//     });
+//   setIsSpaceClicked(false)
+// }
 
 
   useEffect(() => {
@@ -160,12 +160,12 @@ const json=()=>{
 
   const handleLanguageChange = (event, val) => {
     setSelectedLang(val);
-    setIsSpaceClicked(true)
+    // setIsSpaceClicked(true)
 
   };
 
   const onCopyButtonClick = () => {
-    setIsSpaceClicked(true)
+    // setIsSpaceClicked(true)
     navigator.clipboard.writeText(text);
     setShowSnackBar({
       message: "Copied to clipboard!",
@@ -175,8 +175,8 @@ const json=()=>{
     });
   };
   const onCloseButtonClick = async () => {
-    console.log("kkkk");
-    json()
+    // console.log("kkkk");
+    // json()
     setShowTransliterationModel(false);
   };
   const handleSnackBarClose = () => {
@@ -229,15 +229,15 @@ const json=()=>{
         value={text}
         onChangeText={(val) => {
           setText(val)
-          setDebouncedText(val);
-          debouncedTextRef.current=val
-          if(!debouncedTextRef.current.toString().includes(debouncedText)){
-            setprev(true)
-          }
-          else{
-            setprev(false)
-          }
-          console.log("nnn",text,debouncedText,debouncedTextRef.current);
+          // setDebouncedText(val);
+          // debouncedTextRef.current=val
+          // if(!debouncedTextRef.current.toString().includes(debouncedText)){
+          //   setprev(true)
+          // }
+          // else{
+          //   setprev(false)
+          // }
+          // console.log("nnn",text,debouncedText,debouncedTextRef.current);
         }}
         renderComponent={(props) => renderTextarea(props)}
         showCurrentWordAsLastSuggestion={true}

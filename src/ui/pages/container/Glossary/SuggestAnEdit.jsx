@@ -25,7 +25,7 @@ import {
   IndicTransliterate,
   getTransliterationLanguages,
 } from "@ai4bharat/indic-transliterate";
-import "@ai4bharat/indic-transliterate/dist/index.css";
+import "../../../../IndicTransliterate/index.css";
 
 const SuggestAnEdit = ({
   openDialog,
