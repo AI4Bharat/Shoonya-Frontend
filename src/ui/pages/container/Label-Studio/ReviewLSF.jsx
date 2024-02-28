@@ -997,7 +997,9 @@ useEffect(() => {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
-          if (temp[i].value.text) {
+          if(temp[i].type === "relation"){
+            continue;
+          }else if (temp[i].value.text) {
             temp[i].value.text = [temp[i].value.text[0]];
           }
         }
