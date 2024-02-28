@@ -387,7 +387,9 @@ useEffect(() => {
           let ids = new Set();
           let countLables = 0;   
           temp.map((curr) => {
-            ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
@@ -405,10 +407,12 @@ useEffect(() => {
                 if (curr.from_name === "labels")
                   acc.labels++;
                 else if (curr.from_name === "transcribed_json") {
-                  if (curr.value.text[0] === "")
+                  if(curr.type !== "relation"){
+                    if (curr.value.text[0] === "")
                     acc.empty++;
                   acc.textareas++;
                 }
+              }
                 return acc;
               },
                 { labels: 0, textareas: 0, empty: 0 }
@@ -429,7 +433,9 @@ useEffect(() => {
                 ? [] : annotation.serializeAnnotation();
 
               for (let i = 0; i < temp.length; i++) {
-                if (temp[i].value.text) {
+                if(temp[i].type === "relation"){
+                  continue;
+                }else if (temp[i].value.text) {
                   temp[i].value.text = [temp[i].value.text[0]];
                 }
               }
