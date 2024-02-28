@@ -218,11 +218,14 @@ const LabelStudioWrapper = ({
   
   useEffect(() => {
     let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
         bottomSidePanel: !sidePanel,
-        continuousLabeling: false,
+        continuousLabeling: continousLabelingOnly,
         enableAutoSave: true,
         enableHotkeys: true,
         enableLabelTooltips: true,
@@ -230,9 +233,9 @@ const LabelStudioWrapper = ({
         enableTooltips: false,
         fullscreen: false,
         imageFullSize: false,
-        selectAfterCreate: false,
+        selectAfterCreate: selectAfterCreateOnly,
         showAnnotationsPanel: true,
-        showLabels: false,
+        showLabels: showLabelsOnly,
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
@@ -777,7 +780,9 @@ const LabelStudioWrapper = ({
             let temp = annotation.serializeAnnotation();
             if (annotations[i].annotation_type !== 1) continue;
             for (let i = 0; i < temp.length; i++) {
-              if (temp[i].value.text) {
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
                 temp[i].value.text = [temp[i].value.text[0]];
               }
             }
