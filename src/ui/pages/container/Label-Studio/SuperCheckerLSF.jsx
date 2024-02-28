@@ -188,13 +188,16 @@ const LabelStudioWrapper = ({
     }
   }, [userData]); */
   
-  useEffect(() => {
+useEffect(() => {
     let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
         bottomSidePanel: !sidePanel,
-        continuousLabeling: false,
+        continuousLabeling: continousLabelingOnly,
         enableAutoSave: false,
         enableHotkeys: true,
         enableLabelTooltips: true,
@@ -202,9 +205,9 @@ const LabelStudioWrapper = ({
         enableTooltips: false,
         fullscreen: false,
         imageFullSize: false,
-        selectAfterCreate: false,
+        selectAfterCreate: selectAfterCreateOnly,
         showAnnotationsPanel: true,
-        showLabels: false,
+        showLabels: showLabelsOnly,
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",

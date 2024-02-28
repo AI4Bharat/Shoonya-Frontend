@@ -59,26 +59,32 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
-  useEffect(() => {
+useEffect(() => {
     let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    localStorage.setItem("labelStudio:settings", JSON.stringify({    
-      bottomSidePanel: !sidePanel,
-      continuousLabeling: false,
-      enableAutoSave: false,
-      enableHotkeys: true,
-      enableLabelTooltips: true,
-      enablePanelHotkeys: true,
-      enableTooltips: false,
-      fullscreen: false,
-      imageFullSize: false,
-      selectAfterCreate: false,
-      showAnnotationsPanel: true,
-      showLabels: false,
-      showLineNumbers: false,
-      showPredictionsPanel: true,
-      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
-    }))
-  }, [])
+    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    localStorage.setItem(
+      "labelStudio:settings",
+      JSON.stringify({
+        bottomSidePanel: !sidePanel,
+        continuousLabeling: continousLabelingOnly,
+        enableAutoSave: false,
+        enableHotkeys: true,
+        enableLabelTooltips: true,
+        enablePanelHotkeys: true,
+        enableTooltips: false,
+        fullscreen: false,
+        imageFullSize: false,
+        selectAfterCreate: selectAfterCreateOnly,
+        showAnnotationsPanel: true,
+        showLabels: showLabelsOnly,
+        showLineNumbers: false,
+        showPredictionsPanel: true,
+        sidePanelMode: "SIDEPANEL_MODE_REGIONS",
+      })
+    );
+  }, []);
 
   useEffect(() => {
     const showAssignedUsers = async () => {
