@@ -780,7 +780,9 @@ const LabelStudioWrapper = ({
             let temp = annotation.serializeAnnotation();
             if (annotations[i].annotation_type !== 1) continue;
             for (let i = 0; i < temp.length; i++) {
-              if (temp[i].value.text) {
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
                 temp[i].value.text = [temp[i].value.text[0]];
               }
             }
