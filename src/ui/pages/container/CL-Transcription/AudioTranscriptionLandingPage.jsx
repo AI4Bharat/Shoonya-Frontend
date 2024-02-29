@@ -110,6 +110,7 @@ const AudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [autoSave, setAutoSave] = useState(true);
+  const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
   // useEffect(() => {
@@ -286,7 +287,12 @@ const AudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     } else {
-      setTaskData(resp)
+      setTaskData(resp);
+      if (resp?.data?.audio_duration < 700){
+        setWaveSurfer(false);
+      }else{
+        setWaveSurfer(true);
+      }
     }
     setLoading(false);
   };
@@ -793,7 +799,6 @@ useEffect(() => {
   })
 }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
 
-const [waveSurfer, setWaveSurfer] = useState(false);
 const [waveSurferHeight, setWaveSurferHeigth] = useState(140);
 const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
 const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
