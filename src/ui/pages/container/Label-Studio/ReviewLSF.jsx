@@ -35,6 +35,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import keymap from "./keymap";
 
 import {
   getProjectsandTasks,
@@ -420,6 +421,7 @@ useEffect(() => {
           id: taskData.id,
           data: taskData.data,
         },
+        keymap: keymap,
 
         onLabelStudioLoad: function (ls) {
           // if (taskData.correct_annotation) {
