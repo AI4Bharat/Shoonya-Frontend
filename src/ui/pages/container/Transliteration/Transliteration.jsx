@@ -13,6 +13,8 @@ const Transliteration = (props) => {
   const { onCancelTransliteration ,setIsSpaceClicked,isSpaceClicked,setShowTransliterationModel} = props;
   const params = useParams();
   const classes = GlobalStyles();
+  const [options, setOptions] = useState([]);
+  const [selected, setSelected] = useState("");
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
   const [selectedLang, setSelectedLang] = useState("");
@@ -48,6 +50,9 @@ const Transliteration = (props) => {
 
 console.log(isSpaceClicked);
  
+  useEffect(() => {
+    console.log(selected);
+  }, [selected]);
 
   // useEffect(() => {
   //   console.log("nnn","useEffect is running",prev);
@@ -241,6 +246,9 @@ console.log(isSpaceClicked);
         }}
         renderComponent={(props) => renderTextarea(props)}
         showCurrentWordAsLastSuggestion={true}
+        options = {options}
+        setOptions = {setOptions}
+        setSelected = {setSelected}
       />
       <Grid
         container
