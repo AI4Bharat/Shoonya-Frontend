@@ -26,7 +26,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 import { snakeToTitleCase } from '../../../../utils/utils';
-
+import keymap from './keymap';
 import styles from './lsf.module.css'
 import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
@@ -205,6 +205,7 @@ useEffect(() => {
           id: taskData.id,
           data: taskData.data,
         },
+        keymap: keymap,
 
         onLabelStudioLoad: function (ls) {
           annotation_status.current = ProjectDetails.project_stage == 2 ? "labeled": "accepted";
@@ -312,7 +313,9 @@ useEffect(() => {
                   showLoader();
 
                   for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
+                    if(temp[i].type === "relation"){
+                      continue;
+                    }else if (temp[i].value.text) {
                       temp[i].value.text = [temp[i].value.text[0]]
                     }
                   }

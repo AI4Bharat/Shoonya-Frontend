@@ -24,6 +24,8 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
+// import keymap from "@label-studio/keymap";
+import keymap from "./keymap";
 
 import {
   getProjectsandTasks,
@@ -364,6 +366,7 @@ const LabelStudioWrapper = ({
           id: taskData.id,
           data: taskData.data,
         },
+        keymap:  keymap,
 
         onLabelStudioLoad: function (ls) {
           annotation_status.current =
@@ -383,8 +386,10 @@ const LabelStudioWrapper = ({
           let ids = new Set();
           let countLables = 0;
           temp.map((curr) => {
-            ids.add(curr.id);
-            if (curr.type === "labels") {
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
+            if(curr.type === "labels"){
               countLables++;
             }
           });
@@ -396,19 +401,18 @@ const LabelStudioWrapper = ({
             });
           } else {
             if (isAudioProject.current) {
-              const counter = temp.reduce(
-                (acc, curr) => {
-                  if (curr.from_name === "labels") acc.labels++;
-                  else if (
-                    ["transcribed_json", "verbatim_transcribed_json"].includes(
-                      curr.from_name
-                    )
-                  ) {
-                    if (curr.value.text[0] === "") acc.empty++;
-                    acc.textareas++;
-                  }
-                  return acc;
-                },
+              const counter = temp.reduce((acc, curr) => {
+                if (curr.from_name === "labels")
+                  acc.labels++;
+                else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
+
+                if(curr.type !== "relation"){
+                if (curr.value.text[0] === "")
+                    acc.empty++;
+                  acc.textareas++;
+                }}
+                return acc;
+              },
                 { labels: 0, textareas: 0, empty: 0 }
               );
               if (counter.labels !== counter.textareas || counter.empty) {
@@ -485,9 +489,11 @@ const LabelStudioWrapper = ({
           let ids = new Set();
           let countLables = 0;
           temp.map((curr) => {
-            console.log(curr);
-            ids.add(curr.id);
-            if (curr.type === "labels") {
+            // console.log(curr);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
+            if(curr.type === "labels"){
               countLables++;
             }
           });
@@ -499,19 +505,17 @@ const LabelStudioWrapper = ({
             });
           } else {
             if (isAudioProject.current) {
-              const counter = temp.reduce(
-                (acc, curr) => {
-                  if (curr.from_name === "labels") acc.labels++;
-                  else if (
-                    ["transcribed_json", "verbatim_transcribed_json"].includes(
-                      curr.from_name
-                    )
-                  ) {
-                    if (curr.value.text[0] === "") acc.empty++;
+              const counter = temp.reduce((acc, curr) => {
+                if (curr.from_name === "labels")
+                  acc.labels++;
+                else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
+                  if(curr.type !== "relation"){
+                    if (curr.value.text[0] === "")
+                      acc.empty++;
                     acc.textareas++;
-                  }
-                  return acc;
-                },
+                  }}
+                return acc;
+              },
                 { labels: 0, textareas: 0, empty: 0 }
               );
               if (counter.labels !== counter.textareas || counter.empty) {
@@ -536,7 +540,9 @@ const LabelStudioWrapper = ({
                   showLoader();
                   let temp = annotation.serializeAnnotation();
                   for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
+                    if(temp[i].type === "relation"){
+                      continue;
+                    }else if (temp[i].value.text) {
                       temp[i].value.text = [temp[i].value.text[0]];
                     }
                   }
@@ -806,7 +812,9 @@ const LabelStudioWrapper = ({
             temp = annotation.serializeAnnotation();
             if (annotations[i].annotation_type !== 1) continue;
             for (let i = 0; i < temp.length; i++) {
-              if (temp[i].value.text) {
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
                 temp[i].value.text = [temp[i].value.text[0]];
               }
             }

@@ -35,6 +35,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import keymap from "./keymap";
 
 import {
   getProjectsandTasks,
@@ -420,6 +421,7 @@ useEffect(() => {
           id: taskData.id,
           data: taskData.data,
         },
+        keymap: keymap,
 
         onLabelStudioLoad: function (ls) {
           // if (taskData.correct_annotation) {
@@ -565,8 +567,11 @@ useEffect(() => {
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;         
+          console.log(temp);
           temp.map((curr) => {
-            ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
@@ -584,10 +589,11 @@ useEffect(() => {
                 if (curr.from_name === "labels")
                   acc.labels++;
                 else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
-                  if (curr.value.text[0] === "")
+                  if(curr.type === "relation"){
+                    if (curr.value.text[0] === "")
                     acc.empty++;
                   acc.textareas++;
-                }
+                }}
                 return acc;
               },
                 { labels: 0, textareas: 0, empty: 0 }
@@ -607,7 +613,9 @@ useEffect(() => {
               let temp = annotation.serializeAnnotation();
 
               for (let i = 0; i < temp.length; i++) {
-                if (temp[i].value.text) {
+                if(temp[i].type === "relation"){
+                  continue;
+                }else if (temp[i].value.text) {
                   temp[i].value.text = [temp[i].value.text[0]];
                 }
               }
@@ -997,7 +1005,9 @@ useEffect(() => {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
-          if (temp[i].value.text) {
+          if(temp[i].type === "relation"){
+            continue;
+          }else if (temp[i].value.text) {
             temp[i].value.text = [temp[i].value.text[0]];
           }
         }
