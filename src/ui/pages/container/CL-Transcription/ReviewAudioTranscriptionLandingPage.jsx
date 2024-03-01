@@ -116,7 +116,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-  const [waveSurfer, setWaveSurfer] = useState(true);
 
   // useEffect(() => {
   //   let intervalId;
