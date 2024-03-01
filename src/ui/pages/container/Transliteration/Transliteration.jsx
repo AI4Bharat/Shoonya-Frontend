@@ -1,4 +1,4 @@
-import React, { useEffect, useState ,useRef} from "react";
+import React, { useEffect, useState ,useRef, useDebugValue} from "react";
 import { TextField } from "@mui/material";
 import { Autocomplete, Box, Button, Card, Grid, Typography } from "@mui/material";
 import { IndicTransliterate, getTransliterationLanguages, getTransliterateSuggestions } from "@ai4bharat/indic-transliterate";
@@ -50,9 +50,37 @@ const Transliteration = (props) => {
 
 console.log(isSpaceClicked);
  
+  const [logJsonArray, setLogJsonArray] = useState([]);
   useEffect(() => {
-    console.log(selected);
-  }, [selected]);
+    let logJson = {
+              keystrokes: text,
+              results: options,
+              opted: "",
+              created_at: new Date().toISOString()}
+    setLogJsonArray([...logJsonArray, logJson]);
+  }, [options])
+
+
+  useEffect(() => {
+    // let tempLogJsonArray = logJsonArray;
+    // if(tempLogJsonArray[tempLogJsonArray.length-1]){
+    //   tempLogJsonArray[tempLogJsonArray.length-1].opted = selected;
+    // }
+    // setLogJsonArray(tempLogJsonArray);
+    if(logJsonArray.length){
+    let lastLogJson = logJsonArray[logJsonArray.length-1];
+    let logJson = {
+      keystrokes: lastLogJson.keystrokes,
+      results: lastLogJson.results,
+      opted: selected,
+      created_at: new Date().toISOString()}
+    setLogJsonArray([...logJsonArray, logJson]);
+    }
+  }, [selected])
+
+  useEffect(() => {
+    console.log(logJsonArray);
+  }, [logJsonArray])
 
   // useEffect(() => {
   //   console.log("nnn","useEffect is running",prev);
@@ -113,11 +141,11 @@ console.log(isSpaceClicked);
   //   }
   // }, [suggestionRef.current,prev,selectedLang.LangCode]);
 
-// useEffect(()=>{
-//   if (isSpaceClicked==true) {
-//     json()
-//   }
-// },[isSpaceClicked])
+useEffect(()=>{
+  if (isSpaceClicked==true) {
+    json()
+  }
+},[isSpaceClicked])
 
   const renderTextarea = (props) => {
     return (
@@ -129,28 +157,32 @@ console.log(isSpaceClicked);
       />
     );
   };
-// const json=()=>{
-//   const api = localStorage.getItem('TransliterateLogging');
-//   const transliterateObj = new TransliterationAPI(JSON.parse(api));
-//   fetch(transliterateObj.apiEndPoint(), {
-//     method: "POST",
-//     body: JSON.stringify(transliterateObj.getBody()),
-//     headers: transliterateObj.getHeaders().headers,
-//   })
-//     .then(async (res) => {
-//       if (!res.ok) throw await res.json();
-//       else return await res.json();
-//     })
-//     .then((res) => {
-//       setShowSnackBar({ open: true, message: res.message, variant: "success" });
-//       console.log("success");
-//     })
-//     .catch((err) => {
-//       setShowSnackBar({ open: true, message: err.message, variant: "error" });
-//       console.log("error", err);
-//     });
-//   setIsSpaceClicked(false)
-// }
+
+const json=()=>{
+  let tempLogJsonArray = logJsonArray;
+  tempLogJsonArray.shift();
+  const finalJson = {"word": text, "source": "shoonya-frontend", "language": selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi", "steps":tempLogJsonArray};
+  const transliterateObj = new TransliterationAPI(finalJson);
+  fetch(transliterateObj.apiEndPoint(), {
+    method: "POST",
+    body: JSON.stringify(transliterateObj.getBody()),
+    headers: transliterateObj.getHeaders().headers,
+  })
+    .then(async (res) => {
+      if (!res.ok) throw await res.json();
+      else return await res.json();
+    })
+    .then((res) => {
+      setShowSnackBar({ open: true, message: res.message, variant: "success" });
+      console.log("success");
+    })
+    .catch((err) => {
+      setShowSnackBar({ open: true, message: err.message, variant: "error" });
+      console.log("error", err);
+    });
+    setLogJsonArray([]);
+  setIsSpaceClicked(false)
+}
 
 
   useEffect(() => {
@@ -170,7 +202,7 @@ console.log(isSpaceClicked);
   };
 
   const onCopyButtonClick = () => {
-    // setIsSpaceClicked(true)
+    setIsSpaceClicked(true)
     navigator.clipboard.writeText(text);
     setShowSnackBar({
       message: "Copied to clipboard!",
