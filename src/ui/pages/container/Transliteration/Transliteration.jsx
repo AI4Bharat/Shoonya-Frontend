@@ -1,8 +1,8 @@
-import React, { useEffect, useState ,useRef} from "react";
+import React, { useEffect, useState ,useRef, useDebugValue} from "react";
 import { TextField } from "@mui/material";
 import { Autocomplete, Box, Button, Card, Grid, Typography } from "@mui/material";
 import { IndicTransliterate, getTransliterationLanguages, getTransliterateSuggestions } from "@ai4bharat/indic-transliterate";
-import "@ai4bharat/indic-transliterate/dist/index.css";
+import "../../../../IndicTransliterate/index.css";
 import GlobalStyles from "../../../styles/LayoutStyles";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
@@ -13,6 +13,8 @@ const Transliteration = (props) => {
   const { onCancelTransliteration ,setIsSpaceClicked,isSpaceClicked,setShowTransliterationModel} = props;
   const params = useParams();
   const classes = GlobalStyles();
+  const [options, setOptions] = useState([]);
+  const [selected, setSelected] = useState("");
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
   const [selectedLang, setSelectedLang] = useState("");
@@ -21,8 +23,8 @@ const Transliteration = (props) => {
   const suggestionRef = useRef([null]);
   const newKeystrokesRef = useRef();
   const [flag, setflag] = useState();
-  const [debouncedText, setDebouncedText] = useState("");
-  const debouncedTextRef = useRef("");
+  // const [debouncedText, setDebouncedText] = useState("");
+  // const debouncedTextRef = useRef("");
   const [showSnackBar, setShowSnackBar] = useState({
     message: "",
     variant: "",
@@ -36,7 +38,7 @@ const Transliteration = (props) => {
   let searchFilters = JSON.parse(localStorage.getItem("TaskData"));
 
   var data = languageList.filter((e) => e.DisplayName.includes(ProjectDetails.tgt_language));
-console.log("nnn",data,ProjectDetails,searchFilters);
+// console.log("nnn",data,ProjectDetails,searchFilters);
   useEffect(() => {
     if (params.taskId) {
       setText(searchFilters?.data?.machine_translation);
@@ -48,65 +50,104 @@ console.log("nnn",data,ProjectDetails,searchFilters);
 
 console.log(isSpaceClicked);
  
+  const [logJsonArray, setLogJsonArray] = useState([]);
+  const [numSpaces, setNumSpaces] = useState(0);
+  useEffect(() => {
+    let logJson = {
+              keystrokes: text,
+              results: options,
+              opted: "",
+              created_at: new Date().toISOString()}
+    setLogJsonArray([...logJsonArray, logJson]);
+  }, [options])
+
 
   useEffect(() => {
-    console.log("nnn","useEffect is running",prev);
-    const processConsoleLog = (args) => {
-      const msg = JSON.stringify(args);
-      if (msg.includes('library data')) {
-        const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
-        setflag(dataMatch.result)
-        return dataMatch.result;
-      }
-      return ;
-    };
-    const originalConsoleLog = console.log;
-    console.log = (...args) => {
-      const newSuggestions = processConsoleLog(args);
-      if (newSuggestions!=null) {
-        suggestionRef.current  = prev==true?flag:newSuggestions
-      }
-      originalConsoleLog(...args);
-    };
+    // let tempLogJsonArray = logJsonArray;
+    // if(tempLogJsonArray[tempLogJsonArray.length-1]){
+    //   tempLogJsonArray[tempLogJsonArray.length-1].opted = selected;
+    // }
+    // setLogJsonArray(tempLogJsonArray);
+    if(logJsonArray.length){
+    let lastLogJson = logJsonArray[logJsonArray.length-1];
+    let logJson = {
+      keystrokes: lastLogJson.keystrokes,
+      results: lastLogJson.results,
+      opted: selected,
+      created_at: new Date().toISOString()}
+    setLogJsonArray([...logJsonArray, logJson]);
+    }
+  }, [selected])
+
+  // useEffect(() => {
+  //   console.log(logJsonArray);
+  // }, [logJsonArray])
+
+  useEffect(() => {
+    if (String(text).match(/ /g)?.length >= numSpaces+5){
+      setIsSpaceClicked(true);
+      setNumSpaces(numSpaces+5);
+    }
+  }, [text]);
+
+  // useEffect(() => {
+  //   console.log("nnn","useEffect is running",prev);
+  //   const processConsoleLog = (args) => {
+  //     const msg = JSON.stringify(args);
+  //     if (msg.includes('library data')) {
+  //       const dataMatch = JSON.parse(msg.match(/{[^}]*}/));
+  //       setflag(dataMatch.result)
+  //       return dataMatch.result;
+  //     }
+  //     return ;
+  //   };
+  //   const originalConsoleLog = console.log;
+  //   console.log = (...args) => {
+  //     const newSuggestions = processConsoleLog(args);
+  //     if (newSuggestions!=null) {
+  //       suggestionRef.current  = prev==true?flag:newSuggestions
+  //     }
+  //     originalConsoleLog(...args);
+  //   };
     
-    return () => {
-      console.log = originalConsoleLog;
-    };
-  }, [debouncedTextRef.current,prev,selectedLang.LangCode]);
+  //   return () => {
+  //     console.log = originalConsoleLog;
+  //   };
+  // }, [debouncedTextRef.current,prev,selectedLang.LangCode]);
   
 
-  useEffect(() => { 
-    if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
-      console.log("nnn",suggestionRef.current);
-      console.log("nnn",debouncedTextRef.current,text);
-      const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
+  // useEffect(() => { 
+  //   if (debouncedTextRef.current.trim()!="" && suggestionRef.current.length>1) {
+  //     console.log("nnn",suggestionRef.current);
+  //     console.log("nnn",debouncedTextRef.current,text);
+  //     const words = debouncedTextRef.current.split(/\s+/).filter(word => word.trim() !== "");
 
-        const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
+  //       const optedWord = suggestionRef.current.find((item) => item === words[words.length-1]) || "";
 
-        const newKeystroke = {
-          keystrokes: debouncedTextRef.current,
-          results: suggestionRef.current,
-          opted:optedWord,
-          created_at: new Date().toISOString(),
-        };
-        newKeystrokesRef.current = newKeystroke
-        if (
-          keystrokesRef.current.length > 0 &&
-          keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
-        ) {
-          keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
-        } else {
-          keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
-        }
-        console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
-        const finalJson = {
-          word: debouncedTextRef.current,
-          steps: keystrokesRef.current,
-          language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
-        };
-        localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
-    }
-  }, [suggestionRef.current,prev,selectedLang.LangCode]);
+  //       const newKeystroke = {
+  //         keystrokes: debouncedTextRef.current,
+  //         results: suggestionRef.current,
+  //         opted:optedWord,
+  //         created_at: new Date().toISOString(),
+  //       };
+  //       newKeystrokesRef.current = newKeystroke
+  //       if (
+  //         keystrokesRef.current.length > 0 &&
+  //         keystrokesRef.current[keystrokesRef.current.length - 1].keystrokes === newKeystroke.keystrokes
+  //       ) {
+  //         keystrokesRef.current[keystrokesRef.current.length - 1] = newKeystroke;
+  //       } else {
+  //         keystrokesRef.current = [...keystrokesRef.current, newKeystroke];
+  //       }
+  //       console.log("nnn", keystrokesRef.current,newKeystrokesRef.current);
+  //       const finalJson = {
+  //         word: debouncedTextRef.current,
+  //         steps: keystrokesRef.current,
+  //         language: selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi",
+  //       };
+  //       localStorage.setItem('TransliterateLogging', JSON.stringify(finalJson));
+  //   }
+  // }, [suggestionRef.current,prev,selectedLang.LangCode]);
 
 useEffect(()=>{
   if (isSpaceClicked==true) {
@@ -124,9 +165,12 @@ useEffect(()=>{
       />
     );
   };
+
 const json=()=>{
-  const api = localStorage.getItem('TransliterateLogging');
-  const transliterateObj = new TransliterationAPI(JSON.parse(api));
+  let tempLogJsonArray = logJsonArray;
+  tempLogJsonArray.shift();
+  const finalJson = {"word": text, "source": "shoonya-frontend", "language": selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi", "steps":tempLogJsonArray};
+  const transliterateObj = new TransliterationAPI(finalJson);
   fetch(transliterateObj.apiEndPoint(), {
     method: "POST",
     body: JSON.stringify(transliterateObj.getBody()),
@@ -144,6 +188,7 @@ const json=()=>{
       setShowSnackBar({ open: true, message: err.message, variant: "error" });
       console.log("error", err);
     });
+    setLogJsonArray([]);
   setIsSpaceClicked(false)
 }
 
@@ -160,7 +205,7 @@ const json=()=>{
 
   const handleLanguageChange = (event, val) => {
     setSelectedLang(val);
-    setIsSpaceClicked(true)
+    // setIsSpaceClicked(true)
 
   };
 
@@ -175,8 +220,8 @@ const json=()=>{
     });
   };
   const onCloseButtonClick = async () => {
-    console.log("kkkk");
-    json()
+    // console.log("kkkk");
+    // json()
     setShowTransliterationModel(false);
   };
   const handleSnackBarClose = () => {
@@ -229,18 +274,21 @@ const json=()=>{
         value={text}
         onChangeText={(val) => {
           setText(val)
-          setDebouncedText(val);
-          debouncedTextRef.current=val
-          if(!debouncedTextRef.current.toString().includes(debouncedText)){
-            setprev(true)
-          }
-          else{
-            setprev(false)
-          }
-          console.log("nnn",text,debouncedText,debouncedTextRef.current);
+          // setDebouncedText(val);
+          // debouncedTextRef.current=val
+          // if(!debouncedTextRef.current.toString().includes(debouncedText)){
+          //   setprev(true)
+          // }
+          // else{
+          //   setprev(false)
+          // }
+          // console.log("nnn",text,debouncedText,debouncedTextRef.current);
         }}
         renderComponent={(props) => renderTextarea(props)}
         showCurrentWordAsLastSuggestion={true}
+        options = {options}
+        setOptions = {setOptions}
+        setSelected = {setSelected}
       />
       <Grid
         container

@@ -25,7 +25,7 @@ import {
   IndicTransliterate,
   getTransliterationLanguages,
 } from "@ai4bharat/indic-transliterate";
-import "@ai4bharat/indic-transliterate/dist/index.css";
+import "../../../../IndicTransliterate/index.css";
 
 const SuggestAnEdit = ({
   openDialog,
@@ -39,6 +39,8 @@ const SuggestAnEdit = ({
   data,
   targetlang
 }) => {
+  const [options, setOptions] = useState([]);
+  const [selected, setSelected] = useState("");
   const classes = DatasetStyle();
   const dispatch = useDispatch();
 
@@ -153,6 +155,9 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
                     settargetText(targetText);
                   }}
                   renderComponent={(props) => renderTargetText(props)}
+                  options = {options}
+                  setOptions = {setOptions}
+                  setSelected = {setSelected}
                 />): (
                  <OutlinedTextField
 
