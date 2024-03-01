@@ -51,6 +51,7 @@ const Transliteration = (props) => {
 console.log(isSpaceClicked);
  
   const [logJsonArray, setLogJsonArray] = useState([]);
+  const [numSpaces, setNumSpaces] = useState(0);
   useEffect(() => {
     let logJson = {
               keystrokes: text,
@@ -78,9 +79,16 @@ console.log(isSpaceClicked);
     }
   }, [selected])
 
+  // useEffect(() => {
+  //   console.log(logJsonArray);
+  // }, [logJsonArray])
+
   useEffect(() => {
-    console.log(logJsonArray);
-  }, [logJsonArray])
+    if (String(text).match(/ /g)?.length >= numSpaces+5){
+      setIsSpaceClicked(true);
+      setNumSpaces(numSpaces+5);
+    }
+  }, [text]);
 
   // useEffect(() => {
   //   console.log("nnn","useEffect is running",prev);
