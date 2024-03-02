@@ -169,6 +169,7 @@ useEffect(()=>{
 const json=()=>{
   let tempLogJsonArray = logJsonArray;
   tempLogJsonArray.shift();
+  tempLogJsonArray.shift();
   const finalJson = {"word": text, "source": "shoonya-frontend", "language": selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi", "steps":tempLogJsonArray};
   const transliterateObj = new TransliterationAPI(finalJson);
   fetch(transliterateObj.apiEndPoint(), {
