@@ -71,6 +71,7 @@ import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 // } from "redux/actions";
 import { IconButton, Tooltip } from "@mui/material";
 import { Add, MoreVert, Remove } from "@material-ui/icons";
+import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 
 const TranscriptionRightPanel = ({
   currentIndex,
@@ -86,8 +87,7 @@ const TranscriptionRightPanel = ({
   annotationId,
 }) => {
   const { taskId } = useParams();
-  const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState("");
+
   const classes = AudioTranscriptionLandingStyle();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -779,9 +779,7 @@ const TranscriptionRightPanel = ({
                       </span> */}
                               </div>
                             )}}
-                            options = {options}
-                            setOptions = {setOptions}
-                            setSelected = {setSelected}
+
                         />
                       ) : (
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
@@ -834,9 +832,7 @@ const TranscriptionRightPanel = ({
                                 />
                               </div>
                             )}}
-                            options = {options}
-                            setOptions = {setOptions}
-                            setSelected = {setSelected}
+
                           />
                         ) : (
                           <div className={classes.relative} style={{ width: "100%", height: "100%" }}>

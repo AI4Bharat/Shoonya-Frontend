@@ -39,8 +39,6 @@ const SuggestAnEdit = ({
   data,
   targetlang
 }) => {
-  const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState("");
   const classes = DatasetStyle();
   const dispatch = useDispatch();
 
@@ -155,9 +153,7 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
                     settargetText(targetText);
                   }}
                   renderComponent={(props) => renderTargetText(props)}
-                  options = {options}
-                  setOptions = {setOptions}
-                  setSelected = {setSelected}
+
                 />): (
                  <OutlinedTextField
 
