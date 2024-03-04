@@ -52,8 +52,6 @@ import LightTooltip from "../../component/common/Tooltip"
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
-  const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let location = useLocation();
@@ -1323,9 +1321,6 @@ useEffect(() => {
                       />
                     </div>
                   )}
-                  options = {options}
-                  setOptions = {setOptions}
-                  setSelected = {setSelected}
                 />
               ) : (
                 <div className={classes.relative} style={{ width: "100%" }}>

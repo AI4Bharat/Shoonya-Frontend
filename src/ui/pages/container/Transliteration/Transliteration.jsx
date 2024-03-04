@@ -13,8 +13,6 @@ const Transliteration = (props) => {
   const { onCancelTransliteration ,setIsSpaceClicked,isSpaceClicked,setShowTransliterationModel} = props;
   const params = useParams();
   const classes = GlobalStyles();
-  const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState("");
   const [text, setText] = useState("");
   const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
   const [selectedLang, setSelectedLang] = useState("");
@@ -48,47 +46,11 @@ const Transliteration = (props) => {
   }, []);
 
 
-console.log(isSpaceClicked);
+// console.log(isSpaceClicked);
  
-  const [logJsonArray, setLogJsonArray] = useState([]);
-  const [numSpaces, setNumSpaces] = useState(0);
-  useEffect(() => {
-    let logJson = {
-              keystrokes: text,
-              results: options,
-              opted: "",
-              created_at: new Date().toISOString()}
-    setLogJsonArray([...logJsonArray, logJson]);
-  }, [options])
-
-
-  useEffect(() => {
-    // let tempLogJsonArray = logJsonArray;
-    // if(tempLogJsonArray[tempLogJsonArray.length-1]){
-    //   tempLogJsonArray[tempLogJsonArray.length-1].opted = selected;
-    // }
-    // setLogJsonArray(tempLogJsonArray);
-    if(logJsonArray.length){
-    let lastLogJson = logJsonArray[logJsonArray.length-1];
-    let logJson = {
-      keystrokes: lastLogJson.keystrokes,
-      results: lastLogJson.results,
-      opted: selected,
-      created_at: new Date().toISOString()}
-    setLogJsonArray([...logJsonArray, logJson]);
-    }
-  }, [selected])
-
   // useEffect(() => {
   //   console.log(logJsonArray);
   // }, [logJsonArray])
-
-  useEffect(() => {
-    if (String(text).match(/ /g)?.length >= numSpaces+5){
-      setIsSpaceClicked(true);
-      setNumSpaces(numSpaces+5);
-    }
-  }, [text]);
 
   // useEffect(() => {
   //   console.log("nnn","useEffect is running",prev);
@@ -149,12 +111,6 @@ console.log(isSpaceClicked);
   //   }
   // }, [suggestionRef.current,prev,selectedLang.LangCode]);
 
-useEffect(()=>{
-  if (isSpaceClicked==true) {
-    json()
-  }
-},[isSpaceClicked])
-
   const renderTextarea = (props) => {
     return (
       <textarea
@@ -166,33 +122,32 @@ useEffect(()=>{
     );
   };
 
-const json=()=>{
-  let tempLogJsonArray = logJsonArray;
-  tempLogJsonArray.shift();
-  tempLogJsonArray.shift();
-  const finalJson = {"word": text, "source": "shoonya-frontend", "language": selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi", "steps":tempLogJsonArray};
-  const transliterateObj = new TransliterationAPI(finalJson);
-  fetch(transliterateObj.apiEndPoint(), {
-    method: "POST",
-    body: JSON.stringify(transliterateObj.getBody()),
-    headers: transliterateObj.getHeaders().headers,
-  })
-    .then(async (res) => {
-      if (!res.ok) throw await res.json();
-      else return await res.json();
-    })
-    .then((res) => {
-      setShowSnackBar({ open: true, message: res.message, variant: "success" });
-      console.log("success");
-    })
-    .catch((err) => {
-      setShowSnackBar({ open: true, message: err.message, variant: "error" });
-      console.log("error", err);
-    });
-    setLogJsonArray([]);
-  setIsSpaceClicked(false)
-}
-
+// const json=()=>{
+//   let tempLogJsonArray = logJsonArray;
+//   tempLogJsonArray.shift();
+//   tempLogJsonArray.shift();
+//   const finalJson = {"word": text, "source": "shoonya-frontend", "language": selectedLang.LangCode!=undefined?selectedLang.LangCode:"hi", "steps":tempLogJsonArray};
+//   const transliterateObj = new TransliterationAPI(finalJson);
+//   fetch(transliterateObj.apiEndPoint(), {
+//     method: "POST",
+//     body: JSON.stringify(transliterateObj.getBody()),
+//     headers: transliterateObj.getHeaders().headers,
+//   })
+//     .then(async (res) => {
+//       if (!res.ok) throw await res.json();
+//       else return await res.json();
+//     })
+//     .then((res) => {
+//       setShowSnackBar({ open: true, message: res.message, variant: "success" });
+//       console.log("success");
+//     })
+//     .catch((err) => {
+//       setShowSnackBar({ open: true, message: err.message, variant: "error" });
+//       console.log("error", err);
+//     });
+//     setLogJsonArray([]);
+//   setIsSpaceClicked(false)
+// }
 
   useEffect(() => {
     getTransliterationLanguages()
@@ -286,10 +241,6 @@ const json=()=>{
           // console.log("nnn",text,debouncedText,debouncedTextRef.current);
         }}
         renderComponent={(props) => renderTextarea(props)}
-        showCurrentWordAsLastSuggestion={true}
-        options = {options}
-        setOptions = {setOptions}
-        setSelected = {setSelected}
       />
       <Grid
         container

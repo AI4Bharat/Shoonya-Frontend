@@ -39,8 +39,6 @@ const AddGlossary = ({
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const allLevels = glossaryLevel;
-  const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState("");
   const [selectedSourceLang, setselectedSourceLang] = useState(Sourcelang);
   const [selectedTargetLang, setselectedTargetLang] = useState(targetlang);
   const [SourceText, setSourceText] = useState("");
@@ -286,9 +284,7 @@ const AddGlossary = ({
                     setSourceText(SourceText);
                   }}
                   renderComponent={(props) => renderSourceText(props)}
-                  options = {options}
-                  setOptions = {setOptions}
-                  setSelected = {setSelected}
+                  
                 />): ( <OutlinedTextField
                 placeholder="Source Text"
                 sx={{ m: 1, width: 200 }}
@@ -303,9 +299,7 @@ const AddGlossary = ({
                     settargetText(targetText);
                   }}
                   renderComponent={(props) => renderTargetText(props)}
-                  options = {options}
-                  setOptions = {setOptions}
-                  setSelected = {setSelected}
+
                 />): ( <OutlinedTextField
                   placeholder="Target Text"
                   sx={{ m: 1, width: 200 }}
