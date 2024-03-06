@@ -11,14 +11,15 @@ import FormControl from "@mui/material/FormControl";
 import DatasetStyle from "../../../styles/Dataset";
 import { translate } from "../../../../config/localisation";
 import { useDispatch, useSelector } from "react-redux";
-import {useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { snakeToTitleCase } from "../../../../utils/utils";
-import DeallocationAnnotatorsAndReviewersAPI from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
+import  DeallocationAnnotatorsAndReviewersAPI from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import TextField from '@mui/material/TextField';
+import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
-
+import { DeallocateTaskById } from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
+import { Tab, Tabs } from "@mui/material";
 
 let AnnotationStatus = [
   "unlabeled",
@@ -28,18 +29,18 @@ let AnnotationStatus = [
   "to_be_revised",
 ];
 
-let ReviewStatus =  [
-    "unreviewed",
-    "accepted",
-    "accepted_with_minor_changes",
-    "accepted_with_major_changes",
-    "to_be_revised",
-    "draft",
-    "skipped",
-  ];
+let ReviewStatus = [
+  "unreviewed",
+  "accepted",
+  "accepted_with_minor_changes",
+  "accepted_with_major_changes",
+  "to_be_revised",
+  "draft",
+  "skipped",
+];
 
-  let SuperChecker = ["unvalidated","validated","validated_with_changes","skipped","draft","rejected"];
-  const ITEM_HEIGHT = 48;
+let SuperChecker = ["unvalidated","validated","validated_with_changes","skipped","draft","rejected"];
+const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
@@ -61,122 +62,155 @@ const MenuProps = {
 };
 export default function DeallocationAnnotatorsAndReviewers() {
   const classes = DatasetStyle();
-  const dispatch = useDispatch();
-  const {id} = useParams();
+  const { id } = useParams();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [radiobutton, setRadiobutton] = useState("annotation");
+  const [userLevel, setuserLevel] = useState("annotation");
   const [openDialog, setOpenDialog] = useState(false);
-  const[annotatorsUser,setAnnotatorsUser] = useState("")
-  const[annotationStatus,setAnnotationStatus] = useState([])
-  const[reviewerssUser,setReviewersUser] = useState("")
-  const[superCheckersUser,setSuperCheckersUser] = useState("")
-  const[reviewStatus,setReviewStatus] = useState([])
-  const[superCheckStatus,setSuperCheckStatus] = useState([])
+  const [annotatorsUser, setAnnotatorsUser] = useState("");
+  const [annotationStatus, setAnnotationStatus] = useState([]);
+  const [reviewerssUser, setReviewersUser] = useState("");
+  const [superCheckersUser, setSuperCheckersUser] = useState("");
+  const [reviewStatus, setReviewStatus] = useState([]);
+  const [superCheckStatus, setSuperCheckStatus] = useState([]);
+  const [dealocateTasksBy, setDealocateTasksBy] = useState("taskId");
+  const [dataIds, setdataIds] = useState("");
+
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
     variant: "success",
-});
-
-
-
+  });
 
   const open = Boolean(anchorEl);
   const Id = open ? "simple-popover" : undefined;
 
-  const ProjectDetails = useSelector(state => state.getProjectDetails.data);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const handleClickOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-
   const handleClose = () => {
     setAnchorEl(null);
-    setAnnotatorsUser("")
-    setAnnotationStatus([])
-    setReviewersUser("")
-    setReviewStatus([])
-    setSuperCheckersUser("")
-    setSuperCheckStatus([])
+    setAnnotatorsUser("");
+    setAnnotationStatus([]);
+    setReviewersUser("");
+    setReviewStatus([]);
+    setSuperCheckersUser("");
+    setSuperCheckStatus([]);
+  };
+  const handleUserLevelChange = (userLevel) => {
+    setuserLevel(userLevel);
   };
 
   const handleAnnotation = () => {
-    setRadiobutton("annotation");
+    setuserLevel("annotation");
   };
   const handleReview = () => {
-    setRadiobutton("review");
+    setuserLevel("review");
   };
   const handlesuperChecker = () => {
-    setRadiobutton("superChecker");
+    setuserLevel("superChecker");
   };
 
   const handleSubmit = () => {
     setAnchorEl(null);
     setOpenDialog(true);
-}
+  };
 
-const handleCloseDialog = () => {
+  const handleCloseDialog = () => {
     setOpenDialog(false);
-    setAnnotatorsUser("")
-    setAnnotationStatus([])
-    setReviewersUser("")
-    setReviewStatus([])
-    setSuperCheckersUser("")
-    setSuperCheckStatus([])
-};
+    setAnnotatorsUser("");
+    setAnnotationStatus([]);
+    setReviewersUser("");
+    setReviewStatus([]);
+    setSuperCheckersUser("");
+    setSuperCheckStatus([]);
+  };
 
-const handleChangeAnnotationStatus = (event) => {
+  const handleChangeAnnotationStatus = (event) => {
     const value = event.target.value;
     setAnnotationStatus(value);
   };
 
-  const handleChangeReviewStatus = (event) =>{
+  const handleChangeReviewStatus = (event) => {
     const value = event.target.value;
     setReviewStatus(value);
-  }
-  const handleChangeSuperCheckerStatus = (event) =>{
+  };
+  const handleChangeSuperCheckerStatus = (event) => {
     const value = event.target.value;
     setSuperCheckStatus(value);
-  }
+  };
 
-  
-
-const handleok = async() => {
+  const handleok = async () => {
     setAnchorEl(null);
     setOpenDialog(false);
-    setAnnotatorsUser("")
-    setAnnotationStatus([])
-    setReviewersUser("")
-    setReviewStatus([])
-    setSuperCheckersUser("")
-    setSuperCheckStatus([])
-    const projectObj = new DeallocationAnnotatorsAndReviewersAPI(id,radiobutton,annotatorsUser,reviewerssUser,annotationStatus,reviewStatus,superCheckersUser,superCheckStatus);
+    setAnnotatorsUser("");
+    setAnnotationStatus([]);
+    setReviewersUser("");
+    setReviewStatus([]);
+    setSuperCheckersUser("");
+    setSuperCheckStatus([]);
+
+    if(dealocateTasksBy === "taskId"){
+      const projectObj = new DeallocateTaskById(id, dataIds, userLevel,reviewerssUser,reviewStatus);
+      const res = await fetch(projectObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(projectObj.getBody()),
+        headers: projectObj.getHeaders(),
+      });
+
+      const resp = await res.json();
+      // setLoading(false);
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
+    } else {
+
+    const projectObj = new DeallocationAnnotatorsAndReviewersAPI(
+      id,
+      userLevel,
+      annotatorsUser,
+      reviewerssUser,
+      annotationStatus,
+      reviewStatus,
+      superCheckersUser,
+      superCheckStatus
+    );
     // dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
-        method: "GET",
-        body: JSON.stringify(projectObj.getBody()),
-        headers: projectObj.getHeaders().headers,
+      method: "POST",
+      body: JSON.stringify(projectObj.getBody()),
+      headers: projectObj.getHeaders().headers,
     });
     const resp = await res.json();
     // setLoading(false);
     if (res.ok) {
-        setSnackbarInfo({
-            open: true,
-            message: resp?.message,
-            variant: "success",
-        })
-       
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
     } else {
-        setSnackbarInfo({
-            open: true,
-            message: resp?.message,
-            variant: "error",
-        })
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
     }
-}
+  }
+  };
 
-
-const renderSnackBar = () => {
+  const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
         open={snackbar.open}
@@ -189,12 +223,24 @@ const renderSnackBar = () => {
       />
     );
   };
+ 
+
+  const [tabValue, setTabValue] = useState(0);
+    const handleTabChange = (e, v) => {
+        if(v === 0){
+            setDealocateTasksBy("taskId");
+        } else {
+            setDealocateTasksBy("userId");
+        }
+        setTabValue(v);
+
+    }
 
   const emailId = localStorage.getItem("email_id");
   const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
   const handleConfirm = async () => {
-    if(radiobutton === "annotation" || radiobutton === "review"){
+    if (userLevel === "annotation" || userLevel === "review") {
       const apiObj = new LoginAPI(emailId, password);
       const res = await fetch(apiObj.apiEndPoint(), {
         method: "POST",
@@ -204,14 +250,14 @@ const renderSnackBar = () => {
       const rsp_data = await res.json();
       if (res.ok) {
         handleok();
-      }else{
+      } else {
         window.alert("Invalid credentials, please try again");
         console.log(rsp_data);
       }
-    }else if(radiobutton === "superChecker"){
-      if(pin === "9327"){
+    } else if (userLevel === "superChecker") {
+      if (pin === "9327") {
         handleok();
-      }else{
+      } else {
         window.alert("Incorrect pin entered");
       }
     }
@@ -219,7 +265,7 @@ const renderSnackBar = () => {
 
   return (
     <div>
-        {renderSnackBar()}
+      {renderSnackBar()}
       <CustomButton
         sx={{
           inlineSize: "max-content",
@@ -247,37 +293,77 @@ const renderSnackBar = () => {
         <Grid container className={classes.root}>
           <Grid item style={{ flexGrow: "1", padding: "10px" }}>
             <FormControl>
-              <RadioGroup
-                row
-                aria-labelledby="demo-row-radio-buttons-group-label"
-                name="row-radio-buttons-group"
-                defaultValue="annotation"
-              >
-                <FormControlLabel
-                  value="annotation"
-                  control={<Radio />}
-                  label="Annotators"
-                  onClick={handleAnnotation}
-                />
-                <FormControlLabel
-                  value="review"
-                  control={<Radio />}
-                  label="Reviewers"
-                  onClick={handleReview}
-                />
-                <FormControlLabel
-                  value="superChecker"
-                  control={<Radio />}
-                  label="Super Check"
-                  onClick={handlesuperChecker}
-                />
-              </RadioGroup>
+              <Box sx={{mb:2,}} >
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+                    <Tab label="Deallocate by Task ID" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="Deallocate by user ID" sx={{ fontSize: 17, fontWeight: '700' }} />
+                </Tabs>
+            </Box>
             </FormControl>
+              <Grid
+              container
+              direction="row"
+              sx={{
+                alignItems: "center",
+                p: 1,
+                width: "370px",
+              }}
+            > 
+              <FormControl>
+                <RadioGroup
+                  row
+                  aria-labelledby="demo-row-radio-buttons-group-label"
+                  name="row-radio-buttons-group"
+                  defaultValue="annotation"
+                >
+                  {["annotation", "review", "superChecker"].map((userLevel) => (
+                    <FormControlLabel
+                      key={userLevel}
+                      value={userLevel}
+                      control={<Radio />}
+                      label={userLevel} 
+                      onClick={() => handleUserLevelChange(userLevel)}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              </Grid>
+            
           </Grid>
         </Grid>
-        {radiobutton === "annotation" && (
+
+        {dealocateTasksBy === "taskId" && (
+          <Grid
+            container
+            direction="row"
+            sx={{
+              alignItems: "center",
+              p: 1,
+            }}
+          >
+            <Grid items xs={12} sm={12} md={12} lg={5} xl={5}>
+              <Typography variant="body2" fontWeight="700" label="Required">
+                Project Task IDs:
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={12} lg={6} xl={6} sm={6}>
+              <TextField
+                size="small"
+                variant="outlined"
+                value={dataIds}
+                onChange={(e,) => setdataIds(e.target.value)}
+                inputProps={{
+                  style: {
+                    fontSize: "16px",
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
+        )}
+        {userLevel === "annotation" && dealocateTasksBy === "userId" && (
           <>
-            <Grid
+          <Grid
               container
               direction="row"
               sx={{
@@ -354,9 +440,9 @@ const renderSnackBar = () => {
             </Grid>
           </>
         )}
-        {radiobutton === "review" && (
+        {userLevel === "review"  && (
           <>
-            <Grid
+          <Grid
               container
               direction="row"
               sx={{
@@ -431,10 +517,9 @@ const renderSnackBar = () => {
             </Grid>
           </>
         )}
-
-   {radiobutton === "superChecker" && (
+        {userLevel === "superChecker" && dealocateTasksBy === "userId" && (
           <>
-            <Grid
+          <Grid
               container
               direction="row"
               sx={{
@@ -509,7 +594,6 @@ const renderSnackBar = () => {
             </Grid>
           </>
         )}
-        
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, p: 1 }}>
           <Button
@@ -546,7 +630,7 @@ const renderSnackBar = () => {
                     <DialogContentText id="alert-dialog-description">
                     Are you sure want to Deallocate User Tasks ? 
                     </DialogContentText>
-                    {(radiobutton === "annotation" || radiobutton === "review") && <TextField
+                    {(userLevel === "annotation" || userLevel === "review") && <TextField
                             autoFocus
                             margin="dense"
                             id="password"
@@ -556,7 +640,7 @@ const renderSnackBar = () => {
                             variant="standard"
                             onChange={(e) => setPassword(e.target.value)}
                           />}
-                    {radiobutton === "superChecker" && <TextField
+                    {userLevel === "superChecker" && <TextField
                             autoFocus
                             margin="dense"
                             id="pin"
