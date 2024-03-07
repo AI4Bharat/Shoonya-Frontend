@@ -125,6 +125,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
     setReviewStatus([]);
     setSuperCheckersUser("");
     setSuperCheckStatus([]);
+    setdataIds("");
   };
 
   const handleChangeAnnotationStatus = (event) => {
@@ -150,6 +151,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
     setReviewStatus([]);
     setSuperCheckersUser("");
     setSuperCheckStatus([]);
+    setdataIds("");
 
     if(dealocateTasksBy === "taskId"){
       const projectObj = new DeallocateTaskById(id, dataIds, userLevel,reviewerssUser,reviewStatus);
@@ -440,7 +442,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
             </Grid>
           </>
         )}
-        {userLevel === "review"  && (
+        {userLevel === "review"  && dealocateTasksBy === "userId" && (
           <>
           <Grid
               container
