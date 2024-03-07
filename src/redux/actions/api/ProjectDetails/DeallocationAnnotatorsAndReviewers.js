@@ -3,8 +3,7 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export class DeallocateTaskById extends API {
-  constructor(projectId, taskId, selectedUser, reviewerssUser, reviewStatus,
-    timeout = 2000) {
+  constructor(projectId, taskId, selectedUser, timeout = 2000) {
     super("POST", timeout, false);
     this.projectId = projectId;
 
@@ -15,7 +14,7 @@ export class DeallocateTaskById extends API {
 
     const endpointMap = {
       annotation: 'unassign_tasks/',
-      review: `unassign_review_tasks/?reviewer_id=${reviewerssUser}&review_status=["${reviewStatus}"]`,
+      review: `unassign_review_tasks/`,
       superChecker: 'unassign_supercheck_task/',
     };
     
@@ -53,7 +52,7 @@ export class DeallocateTaskById extends API {
 
 export default class DeallocationAnnotatorsAndReviewersAPI extends API {
   constructor(projectId,radiobutton,annotatorsUser,reviewerssUser,annotationStatus,reviewStatus,superCheckUser,SuperCheckStatus,projectObj, timeout = 2000) {
-   super("GET", timeout, false);
+   super("POST", timeout, false);
     this.projectObj = projectObj;
     const queryString = radiobutton === "annotation" ? `unassign_tasks/?annotator_id=${annotatorsUser}&annotation_status=["${annotationStatus}"]` : radiobutton === "review"? `unassign_review_tasks/?reviewer_id=${reviewerssUser}&review_status=["${reviewStatus}"]`:`unassign_supercheck_tasks/?superchecker_id=${superCheckUser}&supercheck_status=["${SuperCheckStatus}"]`;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/${queryString}`;
