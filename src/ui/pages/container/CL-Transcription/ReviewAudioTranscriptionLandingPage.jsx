@@ -114,8 +114,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);  
   const [autoSave, setAutoSave] = useState(true);
-  const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
   const [waveSurfer, setWaveSurfer] = useState(true);
+  const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
   // useEffect(() => {
   //   let intervalId;
@@ -304,11 +304,11 @@ const ReviewAudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     }else{setTaskDetailList(resp);
-      if (resp?.data?.audio_duration < 700){
-        setWaveSurfer(false);
-      }else{
-        setWaveSurfer(true);
-      }}
+    if (resp?.data?.audio_duration < 700){
+      setWaveSurfer(false);
+    }else{
+      setWaveSurfer(true);
+    }}
     setLoading(false);
   };
 

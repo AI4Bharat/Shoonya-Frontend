@@ -110,8 +110,8 @@ const AudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [autoSave, setAutoSave] = useState(true);
-  const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
   const [waveSurfer, setWaveSurfer] = useState(true);
+  const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
   // useEffect(() => {
   //   let intervalId;

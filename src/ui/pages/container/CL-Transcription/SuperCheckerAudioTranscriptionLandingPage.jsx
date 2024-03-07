@@ -112,8 +112,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [autoSave, setAutoSave] = useState(true);
+  const [waveSurfer, setWaveSurfer] = useState(false);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-  const [waveSurfer, setWaveSurfer] = useState(true);
 
   // useEffect(() => {
   //   let intervalId;
@@ -1142,6 +1142,7 @@ useEffect(() => {
                       />
                     </div>
                   )}
+
                 />
               ) : (
                 <div className={classes.relative} style={{ width: "100%" }}>
