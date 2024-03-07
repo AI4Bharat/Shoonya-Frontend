@@ -8,7 +8,7 @@ import constants from "../../../constants";
 export default class DeallocateSuperCheckerTasksAPI extends API {
 
   constructor(projectId,selectedFilters, timeout = 2000) {
-    super("GET", timeout, false);
+    super("POST", timeout, false);
     this.projectId = projectId;
     this.type = constants.DE_ALLOCATE_SUPERCHECKER_TASKS;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_supercheck_tasks/?supercheck_status=['${selectedFilters}']`;
