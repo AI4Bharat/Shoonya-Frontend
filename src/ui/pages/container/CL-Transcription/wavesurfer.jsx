@@ -8,7 +8,6 @@ import C from "../../../../redux/constants";
 import DT from "duration-time-conversion";
 
 const Timeline2 = ({ key, details, waveformSettings }) => {
-  console.log(key);
   const waveSurf = useRef(null);
   const miniMap = useRef(null);
   const regions = useRef(null);
