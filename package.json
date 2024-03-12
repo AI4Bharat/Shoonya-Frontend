@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@ai4bharat/indic-transliterate": "github:AI4Bharat/indic-transliterate-js",
+    "@ai4bharat/indic-transliterate": "^1.3.0",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@heartexlabs/label-studio": "^1.4.0",
