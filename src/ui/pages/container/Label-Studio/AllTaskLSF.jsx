@@ -26,7 +26,7 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 import { snakeToTitleCase } from '../../../../utils/utils';
-
+import keymap from './keymap';
 import styles from './lsf.module.css'
 import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
@@ -59,26 +59,32 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
-  useEffect(() => {
+useEffect(() => {
     let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    localStorage.setItem("labelStudio:settings", JSON.stringify({    
-      bottomSidePanel: !sidePanel,
-      continuousLabeling: false,
-      enableAutoSave: false,
-      enableHotkeys: true,
-      enableLabelTooltips: true,
-      enablePanelHotkeys: true,
-      enableTooltips: false,
-      fullscreen: false,
-      imageFullSize: false,
-      selectAfterCreate: false,
-      showAnnotationsPanel: true,
-      showLabels: false,
-      showLineNumbers: false,
-      showPredictionsPanel: true,
-      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
-    }))
-  }, [])
+    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    localStorage.setItem(
+      "labelStudio:settings",
+      JSON.stringify({
+        bottomSidePanel: !sidePanel,
+        continuousLabeling: continousLabelingOnly,
+        enableAutoSave: false,
+        enableHotkeys: true,
+        enableLabelTooltips: true,
+        enablePanelHotkeys: true,
+        enableTooltips: false,
+        fullscreen: false,
+        imageFullSize: false,
+        selectAfterCreate: selectAfterCreateOnly,
+        showAnnotationsPanel: true,
+        showLabels: showLabelsOnly,
+        showLineNumbers: false,
+        showPredictionsPanel: true,
+        sidePanelMode: "SIDEPANEL_MODE_REGIONS",
+      })
+    );
+  }, []);
 
   useEffect(() => {
     const showAssignedUsers = async () => {
@@ -199,6 +205,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           id: taskData.id,
           data: taskData.data,
         },
+        keymap: keymap,
 
         onLabelStudioLoad: function (ls) {
           annotation_status.current = ProjectDetails.project_stage == 2 ? "labeled": "accepted";
@@ -306,7 +313,9 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
                   showLoader();
 
                   for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
+                    if(temp[i].type === "relation"){
+                      continue;
+                    }else if (temp[i].value.text) {
                       temp[i].value.text = [temp[i].value.text[0]]
                     }
                   }
