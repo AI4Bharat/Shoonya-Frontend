@@ -18,7 +18,7 @@ export class DeallocateTaskById extends API {
     const endpointMap = {
       annotation: 'unassign_tasks/',
       review: `unassign_review_tasks/`,
-      superChecker: 'unassign_supercheck_task/',
+      superChecker: 'unassign_supercheck_tasks/',
     };
     
     const selectedUserEndpoint = endpointMap[selectedUser];
