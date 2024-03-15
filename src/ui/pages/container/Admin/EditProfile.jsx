@@ -211,14 +211,10 @@ const EditProfile = (props) => {
               //onChange={(e) => setRole(e.target.value)}
               onChange={(e) => {
                 const newRole = e.target.value;
-                const currentRole = Role; // Assuming `role` is your current role state variable
-              
-                // If the new role value is less than the current role value, show a warning popup
+                const currentRole = Role; 
                 if (newRole < currentRole) {
                   alert("Warning: Demoting someone’s role on the platform may cause inconsistencies and is not advised. Please check with platform admins on this");
                 }
-              
-                // Set the role state
                 setRole(newRole);
               }}
               sx={{
