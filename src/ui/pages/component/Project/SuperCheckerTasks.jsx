@@ -308,7 +308,7 @@ const unassignTasks = async () => {
   setDeallocateDialog(false);
   const deallocateObj = new DeallocateSuperCheckerTasksAPI(id, selectedFilters.supercheck_status);
   const res = await fetch(deallocateObj.apiEndPoint(), {
-    method: "GET",
+    method: "POST",
     body: JSON.stringify(deallocateObj.getBody()),
     headers: deallocateObj.getHeaders().headers,
   });

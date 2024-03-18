@@ -152,6 +152,7 @@ const Login = () => {
       localStorage.setItem("shoonya_access_token", rsp_data.access);
       localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
       localStorage.setItem("email_id", credentials.email.toLowerCase());
+      localStorage.setItem("userCustomTranscriptionSettings", JSON.stringify({}))
       getLoggedInUserData();
       // setLoading(false);
     } else{

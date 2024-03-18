@@ -141,6 +141,7 @@ const SettingsButtonComponent = ({
                 checked={enableTransliteration}
                 onChange={() => {
                   setAnchorElSettings(null);
+                  localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"enableTransliteration":!enableTransliteration}))
                   setTransliteration(!enableTransliteration);
                 }}
               />
@@ -155,6 +156,7 @@ const SettingsButtonComponent = ({
                 checked={enableRTL_Typing}
                 onChange={() => {
                   setAnchorElSettings(null);
+                  localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"enableRTL_Typing":!enableRTL_Typing}))
                   setRTL_Typing(!enableRTL_Typing);
                 }}
               />
@@ -297,6 +299,7 @@ const SettingsButtonComponent = ({
           <MenuItem
             key={index}
             onClick={() => {
+              localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"fontSize":item.size}))
               setFontSize(item.size);
             }}
           >
