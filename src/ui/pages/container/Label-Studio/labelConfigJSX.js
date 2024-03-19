@@ -1,5 +1,8 @@
 export const labelConfigJS = `<View>
 <Image name="image_url" value="$image_url"/>
+<Filter name="filter" toName="annotation_labels"
+          hotkey="shift+f" minlength="0"
+          placeholder="Filter Labels" />
 <Labels name="annotation_labels" toName="image_url" className="ignore_assertion">
 <Label value="paragraph" name="paragraph" background="#55EFC4" className="ignore_assertion"/>
 <Label value="figure" name="figure" background="#FFEAA7" className="ignore_assertion"/>
@@ -45,7 +48,8 @@ export const labelConfigJS = `<View>
 <Label value="unsure" name="unsure" background="#D35400" className="ignore_assertion"/>
 
 </Labels>
-
 <Rectangle name="annotation_bboxes" toName="image_url" strokeWidth="3" className="ignore_assertion"/>
-  
+<Relations>
+    <Relation value="continues-to" selected="true"/>
+</Relations>
 </View>`;
