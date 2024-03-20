@@ -105,6 +105,8 @@ const patchAnnotation = async (
   lead_time,
   annotation_status,
   notes,
+  languages,
+  ocr_domain,
   autoSave=false
 ) => {
   try {
@@ -116,6 +118,8 @@ const patchAnnotation = async (
       }),
       task_id: taskId,
       annotation_notes: notes,
+      languages: languages,
+      ocr_domain: ocr_domain,
       ...(autoSave && { auto_save: true }),
     });
     return res;

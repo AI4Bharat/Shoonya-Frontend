@@ -183,6 +183,7 @@ const LabelStudioWrapper = ({
   });
 
   const [taskData, setTaskData] = useState(undefined);
+  const [predictions, setPredictions] = useState([]);
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
   const [autoSave, setAutoSave] = useState(true);
@@ -190,6 +191,10 @@ const LabelStudioWrapper = ({
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
+
+  useEffect(() => {
+    setPredictions(taskData?.data?.ocr_prediction_json);
+  }, [taskData]);
 
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
@@ -472,9 +477,9 @@ const LabelStudioWrapper = ({
               load_time.current,
               annotation.lead_time,
               "skipped",
-              JSON.stringify(
-                annotationNotesRef.current.getEditor().getContents()
-              )
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              selectedLanguages,
+              ocrDomain
             ).then(() => {
               getNextProject(projectId, taskData.id).then((res) => {
                 hideLoader();
@@ -553,9 +558,9 @@ const LabelStudioWrapper = ({
                     load_time.current,
                     annotations[i].lead_time,
                     annotation_status.current,
-                    JSON.stringify(
-                      annotationNotesRef.current.getEditor().getContents()
-                    )
+                    JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+                    selectedLanguages,
+                    ocrDomain
                   ).then((res) => {
                     hideLoader();
                     if (res.status !== 200) {
@@ -826,6 +831,8 @@ const LabelStudioWrapper = ({
               annotations[i].lead_time,
               annotations[i].annotation_status,
               JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              selectedLanguages,
+              ocrDomain,
               true
             ).then((res) => {
               if (res.status !== 200) {
@@ -912,6 +919,14 @@ const LabelStudioWrapper = ({
         autoHideDuration={3000}
       />
     );
+  };
+
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [ocrDomain, setOcrDomain] = useState("");
+
+  const handleSelectChange = (event) => {
+    const selectedOptions = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedLanguages(selectedOptions);
   };
 
   return (
@@ -1027,7 +1042,67 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
-
+      {!loader && 
+          <>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
+              <select multiple onChange={handleSelectChange} value={selectedLanguages}>
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="mr">Marathi</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
+                <option value="kn">Kannada</option>
+                <option value="gu">Gujarati</option>
+                <option value="pa">Punjabi</option>
+                <option value="bn">Bengali</option>
+                <option value="ml">Malayalam</option>
+                <option value="as">Assamese</option>
+                <option value="brx">Bodo</option>
+                <option value="doi">Dogri</option>
+                <option value="ks">Kashmiri</option>
+                <option value="mai">Maithili</option>
+                <option value="mni">Manipuri</option>
+                <option value="ne">Nepali</option>
+                <option value="or">Odia</option>
+                <option value="sd">Sindhi</option>
+                <option value="si">Sinhala</option>
+                <option value="ur">Urdu</option>
+                <option value="sat">Santali</option>
+                <option value="sa">Sanskrit</option>
+                <option value="gom">Goan Konkani</option>
+              </select>
+              </div>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrDomain(e.target.value)}} value={ocrDomain}>
+                <option disabled selected></option>
+                <option value="BO">Books</option>
+                <option value="FO">Forms</option>
+                <option value="OT">Others</option>
+                <option value="TB">Textbooks</option>
+                <option value="NV">Novels</option>
+                <option value="NP">Newspapers</option>
+                <option value="MG">Magazines</option>
+                <option value="RP">Research_Papers</option>
+                <option value="FM">Form</option>
+                <option value="BR">Brochure_Posters_Leaflets</option>
+                <option value="AR">Acts_Rules</option>
+                <option value="PB">Publication</option>
+                <option value="NT">Notice</option>
+                <option value="SY">Syllabus</option>
+                <option value="QP">Question_Papers</option>
+                <option value="MN">Manual</option>
+              </select>
+              </div>
+            </div>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
+              {predictions?.map((pred, index) => (
+                <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
+              ))}
+            </div>
+          </>
+        }
       {loader}
       {renderSnackBar()}
     </div>
@@ -1041,7 +1116,6 @@ export default function LSF() {
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
-  const [predictions, setPredictions] = useState([]);
   const [annotationtext,setannotationtext] = useState('')
   const [reviewtext,setreviewtext] = useState('')
   const [showTagsInput, setShowTagsInput] = useState(false);
@@ -1069,10 +1143,6 @@ export default function LSF() {
     'bold','italic','underline','strike',
     'color','background',
     'script']
-
-  useEffect(() => {
-    setPredictions(taskData?.data?.ocr_prediction_json);
-  }, [taskData]);
 
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
@@ -1336,67 +1406,6 @@ export default function LSF() {
           showLoader={showLoader}
           hideLoader={hideLoader}
         />
-        {!loader && 
-          <>
-            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
-              <select multiple>
-                <option value="en">English</option>
-                <option value="hi">Hindi</option>
-                <option value="mr">Marathi</option>
-                <option value="ta">Tamil</option>
-                <option value="te">Telugu</option>
-                <option value="kn">Kannada</option>
-                <option value="gu">Gujarati</option>
-                <option value="pa">Punjabi</option>
-                <option value="bn">Bengali</option>
-                <option value="ml">Malayalam</option>
-                <option value="as">Assamese</option>
-                <option value="brx">Bodo</option>
-                <option value="doi">Dogri</option>
-                <option value="ks">Kashmiri</option>
-                <option value="mai">Maithili</option>
-                <option value="mni">Manipuri</option>
-                <option value="ne">Nepali</option>
-                <option value="or">Odia</option>
-                <option value="sd">Sindhi</option>
-                <option value="si">Sinhala</option>
-                <option value="ur">Urdu</option>
-                <option value="sat">Santali</option>
-                <option value="sa">Sanskrit</option>
-                <option value="gom">Goan Konkani</option>
-              </select>
-              </div>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
-              <select style={{margin:"auto"}}>
-                <option disabled selected></option>
-                <option value="BO">Books</option>
-                <option value="FO">Forms</option>
-                <option value="OT">Others</option>
-                <option value="TB">Textbooks</option>
-                <option value="NV">Novels</option>
-                <option value="NP">Newspapers</option>
-                <option value="MG">Magazines</option>
-                <option value="RP">Research_Papers</option>
-                <option value="FM">Form</option>
-                <option value="BR">Brochure_Posters_Leaflets</option>
-                <option value="AR">Acts_Rules</option>
-                <option value="PB">Publication</option>
-                <option value="NT">Notice</option>
-                <option value="SY">Syllabus</option>
-                <option value="QP">Question_Papers</option>
-                <option value="MN">Manual</option>
-              </select>
-              </div>
-            </div>
-            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
-              {predictions?.map((pred, index) => (
-                <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
-              ))}
-            </div>
-          </>
-        }
       </Card>
     </div>
   );
