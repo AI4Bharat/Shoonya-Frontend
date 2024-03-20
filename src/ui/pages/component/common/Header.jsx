@@ -1038,12 +1038,13 @@ console.log(unseenNotifications,'uuu');
                                 : 'primary'
                               : "primary"} />
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' ,cursor:"pointer"}}>
+                          <Link style={{ color: "rgba(0, 0, 0, 0.87)", display: 'flex', flexDirection: 'column', width: '100%' ,cursor:"pointer",textDecoration:"none" }} to={notification.on_click}>
                             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                               <Typography variant="subtitle2">{`ID: ${notification?.title?.split('-')[0]}`}</Typography>
                               <Typography style={{ paddingLeft: "10px" }} variant="subtitle2">{`TITLE: ${notification?.notification_type}`}</Typography>
                               <Typography style={{ padding: "5px 5px 0px 5px" }} variant="caption" color="action">{`${formatDistanceToNow(new Date(notification?.created_at), { addSuffix: true })}`}</Typography>
                             </div>
+                           
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
                               <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
                               {notification?.seen_json==null || !notification?.seen_json[loggedInUserData.id] ?
@@ -1053,8 +1054,7 @@ console.log(unseenNotifications,'uuu');
                             </div>
                             <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
                             {index !== Notification?.length - 1 && <Divider />} 
-                          </div>
-  
+                          </Link>  
                         </div>
                       ))}
                     </>
