@@ -1,5 +1,5 @@
 export const labelConfigJS = `<View>
-<Image name="image_url" value="$image_url"/>
+<Image name="image_url" value="$image_url" maxWidth="900px"/>
 <Labels name="annotation_labels" toName="image_url" className="ignore_assertion">
 <Label value="paragraph" name="paragraph" background="#55EFC4" className="ignore_assertion"/>
 <Label value="figure" name="figure" background="#FFEAA7" className="ignore_assertion"/>

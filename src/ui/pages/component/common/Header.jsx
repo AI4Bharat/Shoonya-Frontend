@@ -778,7 +778,7 @@ console.log(unseenNotifications,'uuu');
   };
 
   return (
-    <Grid container direction="row" style={{ zIndex: 2 }}>
+    <Grid container direction="row" style={{ zIndex: 200 }}>
       <Box
         className={location.pathname.includes("AudioTranscriptionLandingPage") ? classes.AudioparentContainers
           : classes.parentContainer
