@@ -1,5 +1,5 @@
 export const labelConfigJS = `<View>
-<Image name="image_url" value="$image_url"/>
+<Image name="image_url" value="$image_url" maxWidth="900px"/>
 <Filter name="filter" toName="annotation_labels"
           hotkey="shift+f" minlength="0"
           placeholder="Filter Labels" />
