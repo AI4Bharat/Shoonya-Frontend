@@ -208,7 +208,15 @@ const EditProfile = (props) => {
               id="demo-simple-select-helper"
               value={Role}
               label="Role"
-              onChange={(e) => setRole(e.target.value)}
+              //onChange={(e) => setRole(e.target.value)}
+              onChange={(e) => {
+                const newRole = e.target.value;
+                const currentRole = Role; 
+                if (newRole < currentRole) {
+                  alert("Warning: Demoting someone’s role on the platform may cause inconsistencies and is not advised. Please check with platform admins on this");
+                }
+                setRole(newRole);
+              }}
               sx={{
                 textAlign: "left",
               }}

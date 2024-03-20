@@ -354,7 +354,7 @@ const MyProgress = () => {
                 {
                   label: "Till Date",
                   range: () => ({
-                    startDate: new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+                    startDate: new Date('2021-01-01'),
                     endDate: new Date(),
                   }),
                   isSelected(range) {
@@ -370,7 +370,7 @@ const MyProgress = () => {
               moveRangeOnFirstSelection={false}
               months={2}
               ranges={selectRange}
-              minDate={new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
+              minDate={new Date('2021-01-01')}
               maxDate={new Date()}
               direction="horizontal"
             />
