@@ -188,7 +188,8 @@ const LabelStudioWrapper = ({
     message: "",
     variant: "success",
   });
-
+  const ocrDomain = useRef();
+  const selectedLanguages = useRef();
   const [taskData, setTaskData] = useState(undefined);
   const [predictions, setPredictions] = useState([]);
   const [annotations, setAnnotations] = useState([]);
@@ -466,9 +467,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               annotation.lead_time,
               "skipped",
-              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
-              selectedLanguages,
-              ocrDomain
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents())
             ).then(() => {
               getNextProject(projectId, taskData.id).then((res) => {
                 hideLoader();
@@ -483,7 +482,7 @@ const LabelStudioWrapper = ({
           let ids = new Set();
           let countLables = 0;       
           temp.map((curr) => {
-            console.log(curr);
+            // console.log(curr);
             ids.add(curr.id);
             if(curr.type === "labels"){
               countLables++;
@@ -542,6 +541,7 @@ const LabelStudioWrapper = ({
                     annotations[i].lead_time,
                     annotation_status.current,
                     JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+                    false,
                     selectedLanguages,
                     ocrDomain
                   ).then((res) => {
@@ -798,9 +798,9 @@ const LabelStudioWrapper = ({
               annotations[i].lead_time,
               annotations[i].annotation_status,
               JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              true,
               selectedLanguages,
-              ocrDomain,
-              true
+              ocrDomain
             ).then((res) => {
               if (res.status !== 200) {
                 setSnackbarInfo({
@@ -883,12 +883,8 @@ const LabelStudioWrapper = ({
     );
   };
 
-  const [selectedLanguages, setSelectedLanguages] = useState([]);
-  const [ocrDomain, setOcrDomain] = useState("");
-
   const handleSelectChange = (event) => {
-    const selectedOptions = Array.from(event.target.selectedOptions, (option) => option.value);
-    setSelectedLanguages(selectedOptions);
+    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
   };
 
   return (
@@ -1003,7 +999,7 @@ const LabelStudioWrapper = ({
           <>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
-              <select multiple onChange={handleSelectChange} value={selectedLanguages}>
+              <select multiple onChange={handleSelectChange} value={selectedLanguages.current}>
                 <option value="en">English</option>
                 <option value="hi">Hindi</option>
                 <option value="mr">Marathi</option>
@@ -1031,7 +1027,7 @@ const LabelStudioWrapper = ({
               </select>
               </div>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
-              <select style={{margin:"auto"}} onChange={(e) => {setOcrDomain(e.target.value)}} value={ocrDomain}>
+              <select style={{margin:"auto"}} onChange={(e) => {ocrDomain.current = e.target.value}} value={ocrDomain.current}>
                 <option disabled selected></option>
                 <option value="BO">Books</option>
                 <option value="FO">Forms</option>
