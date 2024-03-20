@@ -246,7 +246,7 @@ const TaskTable = (props) => {
         ? new DeallocateTasksAPI(id, selectedFilters.annotation_status)
         : new DeallocateReviewTasksAPI(id, selectedFilters.review_status);
     const res = await fetch(deallocateObj.apiEndPoint(), {
-      method: "GET",
+      method: "POST",
       body: JSON.stringify(deallocateObj.getBody()),
       headers: deallocateObj.getHeaders().headers,
     });
