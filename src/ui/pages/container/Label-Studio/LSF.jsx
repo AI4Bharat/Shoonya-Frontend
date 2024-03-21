@@ -1044,30 +1044,30 @@ const LabelStudioWrapper = ({
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
               <select multiple onChange={handleSelectChange} value={selectedLanguages.current}>
-                <option value="en">English</option>
-                <option value="hi">Hindi</option>
-                <option value="mr">Marathi</option>
-                <option value="ta">Tamil</option>
-                <option value="te">Telugu</option>
-                <option value="kn">Kannada</option>
-                <option value="gu">Gujarati</option>
-                <option value="pa">Punjabi</option>
-                <option value="bn">Bengali</option>
-                <option value="ml">Malayalam</option>
-                <option value="as">Assamese</option>
-                <option value="brx">Bodo</option>
-                <option value="doi">Dogri</option>
-                <option value="ks">Kashmiri</option>
-                <option value="mai">Maithili</option>
-                <option value="mni">Manipuri</option>
-                <option value="ne">Nepali</option>
-                <option value="or">Odia</option>
-                <option value="sd">Sindhi</option>
-                <option value="si">Sinhala</option>
-                <option value="ur">Urdu</option>
-                <option value="sat">Santali</option>
-                <option value="sa">Sanskrit</option>
-                <option value="gom">Goan Konkani</option>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Assamese">Assamese</option>
+                <option value="Bodo">Bodo</option>
+                <option value="Dogri">Dogri</option>
+                <option value="Kashmiri">Kashmiri</option>
+                <option value="Maithili">Maithili</option>
+                <option value="Manipuri">Manipuri</option>
+                <option value="Nepali">Nepali</option>
+                <option value="Odia">Odia</option>
+                <option value="Sindhi">Sindhi</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Santali">Santali</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Goan Konkani">Goan Konkani</option>
               </select>
               </div>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
@@ -1094,9 +1094,10 @@ const LabelStudioWrapper = ({
             </div>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
-              {predictions?.map((pred, index) => (
+              {predictions?.length > 0 ?
+              predictions?.map((pred, index) => (
                 <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
-              ))}
+              )) : <div style={{textAlign:"center"}}>No Predictions Present</div>}
             </div>
           </>
         }
