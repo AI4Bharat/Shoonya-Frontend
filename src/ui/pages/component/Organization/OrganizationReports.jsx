@@ -123,6 +123,8 @@ const OrganizationReports = () => {
         "AllAudioProjects",
         "OCRTranscription",
         "OCRTranscriptionEditing",
+        "Contextual Translation",
+        "Contextual Sentence Verification"
       ]);
       setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
