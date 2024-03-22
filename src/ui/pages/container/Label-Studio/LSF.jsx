@@ -182,7 +182,9 @@ const LabelStudioWrapper = ({
     variant: "success",
   });
   const ocrDomain = useRef();
-  const selectedLanguages = useRef();
+  const [ocrD, setOcrD] = useState("");
+  const selectedLanguages = useRef([]);
+  const [selectedL, setSelectedL] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
   const [predictions, setPredictions] = useState([]);
   const [annotations, setAnnotations] = useState([]);
@@ -924,7 +926,27 @@ const LabelStudioWrapper = ({
 
   const handleSelectChange = (event) => {
     selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
   };
+
+  useEffect(() => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
+          selectedLanguages.current?.push(lang);
+          const newLanguages = [...selectedL, ...taskData?.data?.language];
+          setSelectedL(newLanguages);
+        });
+      }
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+        setSelectedL(taskData?.data?.language);
+      }
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+        ocrDomain.current = taskData?.data?.ocr_domain;
+        setOcrD(taskData?.data?.ocr_domain);
+      }
+    }
+  }, [taskData]);
 
   return (
     <div>
@@ -1039,11 +1061,11 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
-      {!loader && 
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
-              <select multiple onChange={handleSelectChange} value={selectedLanguages.current}>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
                 <option value="English">English</option>
                 <option value="Hindi">Hindi</option>
                 <option value="Marathi">Marathi</option>
@@ -1071,7 +1093,7 @@ const LabelStudioWrapper = ({
               </select>
               </div>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
-              <select style={{margin:"auto"}} onChange={(e) => {ocrDomain.current = e.target.value}} value={ocrDomain.current}>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
                 <option disabled selected></option>
                 <option value="BO">Books</option>
                 <option value="FO">Forms</option>
