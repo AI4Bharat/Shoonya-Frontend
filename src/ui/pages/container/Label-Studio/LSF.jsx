@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
-import React, { useState, useEffect, useRef, useDebugValue } from "react";
-import ReactQuill, { Quill } from 'react-quill';
-import "./editor.css"
-import 'quill/dist/quill.snow.css';
+import React, { useState, useEffect, useRef } from "react";
+import ReactQuill, { Quill } from "react-quill";
+import "./editor.css";
+import "quill/dist/quill.snow.css";
 import LabelStudio from "@heartexlabs/label-studio";
 import {
   Tooltip,
@@ -24,6 +24,8 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
+// import keymap from "@label-studio/keymap";
+import keymap from "./keymap";
 
 import {
   getProjectsandTasks,
@@ -46,7 +48,7 @@ import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 import InfoIcon from "@mui/icons-material/Info";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
+import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import { labelConfigJS } from "./labelConfigJSX";
 
@@ -64,12 +66,10 @@ const filterAnnotations = (
     return annotation.completed_by === user.id && !annotation.parent_annotation;
   });
   let userAnnotationData = annotations.find(
-    (annotation) =>
-      annotation.annotation_type === 2
+    (annotation) => annotation.annotation_type === 2
   );
 
   if (userAnnotation) {
-
     if (userAnnotation.annotation_status === "labeled") {
       const superCheckedAnnotation = annotations.find(
         (annotation) => annotation.annotation_type === 3
@@ -93,12 +93,9 @@ const filterAnnotations = (
         disable = true;
       } else if (
         review &&
-        [
-          "skipped",
-          "draft",
-          "rejected",
-          "unreviewed",
-        ].includes(review.annotation_status)
+        ["skipped", "draft", "rejected", "unreviewed"].includes(
+          review.annotation_status
+        )
       ) {
         filteredAnnotations = [userAnnotation];
         disable = true;
@@ -119,31 +116,27 @@ const filterAnnotations = (
       } else {
         filteredAnnotations = [userAnnotation];
       }
-    }
-    else if (
+    } else if (
       userAnnotationData &&
-      [
-        "draft",
-      ].includes(userAnnotation.annotation_status)
+      ["draft"].includes(userAnnotation.annotation_status)
     ) {
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      setFilterMessage("Skip button is disabled, since the task is being reviewed");
-    }
-    else if (
+      setFilterMessage(
+        "Skip button is disabled, since the task is being reviewed"
+      );
+    } else if (
       userAnnotation &&
-      [
-        "to_be_revised"
-      ].includes(userAnnotation.annotation_status)
+      ["to_be_revised"].includes(userAnnotation.annotation_status)
     ) {
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      setFilterMessage("Skip button is disabled, since the task is being reviewed");
-    }
-
-    else {
+      setFilterMessage(
+        "Skip button is disabled, since the task is being reviewed"
+      );
+    } else {
       filteredAnnotations = [userAnnotation];
     }
   } else if ([4, 5, 6].includes(user.role)) {
@@ -161,7 +154,7 @@ const AUTO_SAVE_INTERVAL = 30000; //1 minute
 const AUDIO_PROJECT_SAVE_CHECK = [
   "AudioTranscription",
   "AudioTranscriptionEditing",
-  "AcousticNormalisedTranscriptionEditing"
+  "AcousticNormalisedTranscriptionEditing",
 ];
 
 const LabelStudioWrapper = ({
@@ -216,21 +209,24 @@ const LabelStudioWrapper = ({
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
-  
+
   /* useEffect(() => {
     if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
       autoSaveAnnotation();
       navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${taskId}`);
     }
   }, [userData]); */
-  
+
   useEffect(() => {
     let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
         bottomSidePanel: !sidePanel,
-        continuousLabeling: false,
+        continuousLabeling: continousLabelingOnly,
         enableAutoSave: true,
         enableHotkeys: true,
         enableLabelTooltips: true,
@@ -238,9 +234,9 @@ const LabelStudioWrapper = ({
         enableTooltips: false,
         fullscreen: false,
         imageFullSize: false,
-        selectAfterCreate: false,
+        selectAfterCreate: selectAfterCreateOnly,
         showAnnotationsPanel: true,
-        showLabels: false,
+        showLabels: showLabelsOnly,
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
@@ -284,13 +280,14 @@ const LabelStudioWrapper = ({
     let interfaces = [];
 
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableLSFControls, disableSkip] = filterAnnotations(
-      annotations,
-      userData,
-      setDisableBtns,
-      setFilterMessage,
-      setDisableButton
-    );
+    const [filteredAnnotations, disableLSFControls, disableSkip] =
+      filterAnnotations(
+        annotations,
+        userData,
+        setDisableBtns,
+        setFilterMessage,
+        setDisableButton
+      );
     isAudioProject.current = AUDIO_PROJECT_SAVE_CHECK.includes(projectType);
     //console.log("labelConfig", labelConfig);
 
@@ -304,7 +301,9 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(isAudioProject.current || projectType.includes("OCR") ? ["side-column"] : []),
+        ...(isAudioProject.current || projectType.includes("OCR")
+          ? ["side-column"]
+          : []),
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -331,7 +330,9 @@ const LabelStudioWrapper = ({
         "infobar",
         "topbar",
         "instruction",
-        ...(isAudioProject.current || projectType.includes("OCR") ? ["side-column"] : []),
+        ...(isAudioProject.current || projectType.includes("OCR")
+          ? ["side-column"]
+          : []),
         "annotations:history",
         "annotations:tabs",
         "annotations:menu",
@@ -345,8 +346,11 @@ const LabelStudioWrapper = ({
         "edit-history",
       ];
     }
-    if (disableLSFControls || !taskData?.annotation_users?.some(
-      (user) => user === userData.id)) setAutoSave(false);
+    if (
+      disableLSFControls ||
+      !taskData?.annotation_users?.some((user) => user === userData.id)
+    )
+      setAutoSave(false);
 
     if (rootRef.current) {
       if (lsfRef.current) {
@@ -370,6 +374,7 @@ const LabelStudioWrapper = ({
           id: taskData.id,
           data: taskData.data,
         },
+        keymap:  keymap,
 
         onLabelStudioLoad: function (ls) {
           annotation_status.current =
@@ -389,28 +394,31 @@ const LabelStudioWrapper = ({
           let ids = new Set();
           let countLables = 0;
           temp.map((curr) => {
-            ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
           });
-          if (projectType.includes("OCR") && ids.size>countLables) {
+          if (projectType.includes("OCR") && ids.size > countLables) {
             setSnackbarInfo({
               open: true,
               message: "Please select labels for all boxes",
               variant: "error",
             });
-          }
-          else {
+          } else {
             if (isAudioProject.current) {
               const counter = temp.reduce((acc, curr) => {
                 if (curr.from_name === "labels")
                   acc.labels++;
                 else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
-                  if (curr.value.text[0] === "")
+
+                if(curr.type !== "relation"){
+                if (curr.value.text[0] === "")
                     acc.empty++;
                   acc.textareas++;
-                }
+                }}
                 return acc;
               },
                 { labels: 0, textareas: 0, empty: 0 }
@@ -418,7 +426,8 @@ const LabelStudioWrapper = ({
               if (counter.labels !== counter.textareas || counter.empty) {
                 setSnackbarInfo({
                   open: true,
-                  message: "Please fill the annotations for every segment/region",
+                  message:
+                    "Please fill the annotations for every segment/region",
                   variant: "warning",
                 });
                 return;
@@ -433,7 +442,9 @@ const LabelStudioWrapper = ({
                 load_time.current,
                 annotation.lead_time,
                 annotation_status.current,
-                JSON.stringify(annotationNotesRef.current.getEditor().getContents())
+                JSON.stringify(
+                  annotationNotesRef.current.getEditor().getContents()
+                )
               ).then((res) => {
                 if (localStorage.getItem("labelAll"))
                   getNextProject(projectId, taskData.id).then((res) => {
@@ -482,31 +493,34 @@ const LabelStudioWrapper = ({
         onUpdateAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
-          let countLables = 0;       
+          let countLables = 0;
           temp.map((curr) => {
             // console.log(curr);
             ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
           });
-          if (projectType.includes("OCR") && ids.size>countLables) {
+          if (projectType.includes("OCR") && ids.size > countLables) {
             setSnackbarInfo({
               open: true,
               message: "Please select labels for all boxes",
               variant: "error",
             });
-          }
-          else {
+          } else {
             if (isAudioProject.current) {
               const counter = temp.reduce((acc, curr) => {
                 if (curr.from_name === "labels")
                   acc.labels++;
                 else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
-                  if (curr.value.text[0] === "")
-                    acc.empty++;
-                  acc.textareas++;
-                }
+                  if(curr.type !== "relation"){
+                    if (curr.value.text[0] === "")
+                      acc.empty++;
+                    acc.textareas++;
+                  }}
                 return acc;
               },
                 { labels: 0, textareas: 0, empty: 0 }
@@ -514,7 +528,8 @@ const LabelStudioWrapper = ({
               if (counter.labels !== counter.textareas || counter.empty) {
                 setSnackbarInfo({
                   open: true,
-                  message: "Please fill the annotations for every segment/region",
+                  message:
+                    "Please fill the annotations for every segment/region",
                   variant: "warning",
                 });
                 return;
@@ -523,15 +538,18 @@ const LabelStudioWrapper = ({
             if (taskData.annotation_status !== "freezed") {
               for (let i = 0; i < annotations.length; i++) {
                 if (
-                  !annotations[i].result?.length || !annotation.serializeAnnotation().length ||
+                  !annotations[i].result?.length ||
+                  !annotation.serializeAnnotation().length ||
                   annotation.serializeAnnotation()[0].id ===
-                  annotations[i].result[0].id
+                    annotations[i].result[0].id
                 ) {
                   setAutoSave(false);
                   showLoader();
                   let temp = annotation.serializeAnnotation();
                   for (let i = 0; i < temp.length; i++) {
-                    if (temp[i].value.text) {
+                    if(temp[i].type === "relation"){
+                      continue;
+                    }else if (temp[i].value.text) {
                       temp[i].value.text = [temp[i].value.text[0]];
                     }
                   }
@@ -554,8 +572,7 @@ const LabelStudioWrapper = ({
                         message: "Error in saving annotation",
                         variant: "error",
                       });
-                    }
-                    else if (localStorage.getItem("labelAll"))
+                    } else if (localStorage.getItem("labelAll"))
                       getNextProject(projectId, taskData.id).then((res) => {
                         tasksComplete(res?.id || null);
                       });
@@ -608,8 +625,12 @@ const LabelStudioWrapper = ({
         loaded.current = taskId;
         getProjectsandTasks(projectId, taskId).then(
           ([labelConfig, taskData, annotations, predictions]) => {
-            if (annotations.message?.includes("not a part of this project") || annotations.detail?.includes("Not found")) {
-              if (annotations.detail?.includes("Not found")) annotations.message = "Task not found";
+            if (
+              annotations.message?.includes("not a part of this project") ||
+              annotations.detail?.includes("Not found")
+            ) {
+              if (annotations.detail?.includes("Not found"))
+                annotations.message = "Task not found";
               setSnackbarInfo({
                 open: true,
                 message: annotations.message,
@@ -620,8 +641,14 @@ const LabelStudioWrapper = ({
             }
             // both have loaded!
             // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
-            let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
-            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+            let tempLabelConfig =
+              labelConfig.project_type === "ConversationTranslation" ||
+              labelConfig.project_type === "ConversationTranslationEditing"
+                ? generateLabelConfig(taskData.data)
+                : labelConfig.project_type === "ConversationVerification"
+                ? conversationVerificationLabelConfig(taskData.data)
+                : labelConfig.label_config;
+            if (labelConfig.project_type.includes("OCRSegmentCategorization")) {
               tempLabelConfig = labelConfigJS;
             }
             setAnnotations(annotations);
@@ -770,25 +797,32 @@ const LabelStudioWrapper = ({
 
   useEffect(() => {
     const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
-    }
+      getTaskAssignedUsers(taskData).then((res) => setAssignedUsers(res));
+    };
     taskData?.id && showAssignedUsers();
   }, [taskData]);
 
   const autoSaveAnnotation = () => {
-    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "labeled") {
+    if (
+      autoSave &&
+      lsfRef.current?.store?.annotationStore?.selected &&
+      taskData.task_status.toLowerCase() !== "labeled"
+    ) {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp;
         for (let i = 0; i < annotations.length; i++) {
           if (
             !annotations[i].result?.length ||
             annotation.serializeAnnotation()[0].id ===
-            annotations[i].result[0].id
+              annotations[i].result[0].id
           ) {
-            let temp = annotation.serializeAnnotation();
+            temp = annotation.serializeAnnotation();
             if (annotations[i].annotation_type !== 1) continue;
             for (let i = 0; i < temp.length; i++) {
-              if (temp[i].value.text) {
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
                 temp[i].value.text = [temp[i].value.text[0]];
               }
             }
@@ -824,15 +858,15 @@ const LabelStudioWrapper = ({
   };
 
   let hidden, visibilityChange;
-  if (typeof document.hidden !== 'undefined') {
-    hidden = 'hidden';
-    visibilityChange = 'visibilitychange';
-  } else if (typeof document.msHidden !== 'undefined') {
-    hidden = 'msHidden';
-    visibilityChange = 'msvisibilitychange';
-  } else if (typeof document.webkitHidden !== 'undefined') {
-    hidden = 'webkitHidden';
-    visibilityChange = 'webkitvisibilitychange';
+  if (typeof document.hidden !== "undefined") {
+    hidden = "hidden";
+    visibilityChange = "visibilitychange";
+  } else if (typeof document.msHidden !== "undefined") {
+    hidden = "msHidden";
+    visibilityChange = "msvisibilitychange";
+  } else if (typeof document.webkitHidden !== "undefined") {
+    hidden = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
   }
 
   const [visible, setVisibile] = useState(!document[hidden]);
@@ -842,7 +876,7 @@ const LabelStudioWrapper = ({
     document.addEventListener(visibilityChange, handleVisibilityChange);
     return () => {
       document.removeEventListener(visibilityChange, handleVisibilityChange);
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -854,7 +888,12 @@ const LabelStudioWrapper = ({
       visible && autoSaveAnnotation();
     }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
-  }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
+  }, [
+    visible,
+    autoSave,
+    lsfRef.current?.store?.annotationStore?.selected,
+    taskData,
+  ]);
 
   const handleDraftAnnotationClick = async () => {
     annotation_status.current = "draft";
@@ -911,12 +950,13 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
-      {autoSave &&
+      {autoSave && (
         <div style={{ textAlign: "left", marginBottom: "15px" }}>
           <Typography variant="body" color="#000000">
             Auto-save enabled for this scenario.
           </Typography>
-        </div>}
+        </div>
+      )}
       {filterMessage && (
         <Alert severity="info" sx={{ mb: 3 }}>
           {filterMessage}
@@ -938,11 +978,15 @@ const LabelStudioWrapper = ({
                     minWidth: "40px",
                     border: "1px solid #e6e6e6",
                     color: "grey",
-                    pt: 1, pl: 1, pr: 1,
+                    pt: 1,
+                    pl: 1,
+                    pr: 1,
                     borderBottom: "None",
                   }}
-                  > 
-                    <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
+                >
+                  <InfoOutlinedIcon
+                    sx={{ mb: "-3px", ml: "2px", color: "grey" }}
+                  />
                 </Button>
               </LightTooltip>
             </Grid>
@@ -951,7 +995,7 @@ const LabelStudioWrapper = ({
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
-                (!disableBtns) && (
+                !disableBtns && (
                   <Tooltip title="Save task for later">
                     <Button
                       value="Draft"
@@ -1106,13 +1150,12 @@ export default function LSF() {
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const modules = {
-    toolbar:[
-      
-    [{ size: [] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'color': [] }],
-    [{ 'script': 'sub'}, { 'script': 'super' }],
-    ]
+    toolbar: [
+      [{ size: [] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }],
+      [{ script: "sub" }, { script: "super" }],
+    ],
   };
 
   const formats = [
@@ -1134,11 +1177,11 @@ export default function LSF() {
     }
   };
 
-
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
-      (ProjectDetails?.project_type.toLowerCase().includes("audio") || ProjectDetails?.project_type?.includes("Acoustic"))
+      (ProjectDetails?.project_type.toLowerCase().includes("audio") ||
+        ProjectDetails?.project_type?.includes("Acoustic"))
     ) {
       setShowTagsInput(true);
     }
@@ -1158,27 +1201,32 @@ export default function LSF() {
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
         try {
-          const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+          const newDelta2 =
+            annotationNotesRef.current.value !== ""
+              ? JSON.parse(annotationNotesRef.current.value)
+              : "";
           console.log(newDelta2);
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
-          if(err instanceof SyntaxError){
+          if (err instanceof SyntaxError) {
             const newDelta2 = annotationNotesRef.current.value;
             annotationNotesRef.current.getEditor().setText(newDelta2);
           }
         }
         try {
-          const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+          const newDelta1 =
+            reviewNotesRef.current.value != ""
+              ? JSON.parse(reviewNotesRef.current.value)
+              : "";
           reviewNotesRef.current.getEditor().setContents(newDelta1);
         } catch (err) {
-          if(err instanceof SyntaxError){
+          if (err instanceof SyntaxError) {
             const newDelta1 = reviewNotesRef.current.value;
             reviewNotesRef.current.getEditor().setText(newDelta1);
           }
         }
-        setannotationtext(annotationNotesRef.current.getEditor().getText())
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
-
+        setannotationtext(annotationNotesRef.current.getEditor().getText());
+        setreviewtext(reviewNotesRef.current.getEditor().getText());
       }
     });
   }, [taskId]);
@@ -1205,7 +1253,7 @@ export default function LSF() {
           startIcon={<ArrowBackIcon />}
           variant="contained"
           color="primary"
-          sx={{mt:2}} 
+          sx={{ mt: 2 }}
           onClick={() => {
             localStorage.removeItem("labelAll");
             navigate(`/projects/${projectId}`);
@@ -1234,11 +1282,9 @@ export default function LSF() {
             <Button
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
-              color={
-                reviewtext.trim().length === 0 ? "primary" : "success"
-              }
+              color={reviewtext.trim().length === 0 ? "primary" : "success"}
               onClick={handleCollapseClick}
-            // style={{ marginBottom: "20px" }}
+              // style={{ marginBottom: "20px" }}
             >
               Notes {reviewtext.trim().length === 0 ? "" : "*"}
             </Button>
@@ -1249,7 +1295,6 @@ export default function LSF() {
             style={{
               display: showNotes ? "block" : "none",
               paddingBottom: "16px",
-               
             }}
           >
             {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
