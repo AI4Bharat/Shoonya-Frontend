@@ -33,7 +33,7 @@ const excludeKeys = [
   "unverified_conversation_json",
   "annotation_bboxes",
   "annotation_labels",
-  "annotation_transcripts"
+  "annotation_transcripts",
 ];
 
 const DataitemsTable = () => {
@@ -102,7 +102,7 @@ useEffect(() => {
               align: "center",
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
-                if (key.includes("json")) && value !== null ) {
+                if ((key.includes("json")) && value !== null ) {
                  const data = JSON.stringify(value)
                  const metadata = data.replace(/\\/g, "");
                   return metadata;
