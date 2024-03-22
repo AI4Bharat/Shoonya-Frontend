@@ -939,7 +939,8 @@ const LabelStudioWrapper = ({
         });
       }
       if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
-        setSelectedL(taskData?.data?.language);
+        setSelectedL([taskData?.data?.language]);
+        selectedLanguages.current?.push(taskData?.data?.language);
       }
       if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
         ocrDomain.current = taskData?.data?.ocr_domain;
