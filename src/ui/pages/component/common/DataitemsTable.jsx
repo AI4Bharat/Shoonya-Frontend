@@ -102,7 +102,7 @@ useEffect(() => {
               align: "center",
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
-                if ((key == "metadata_json" || key == "prediction_json"|| key == "ocr_prediction_json"|| key == "transcribed_json"|| key == "draft_data_json" || key == "ocr_transcribed_json" || key == "annotated_document_details_json") && value !== null ) {
+                if (key.includes("json")) && value !== null ) {
                  const data = JSON.stringify(value)
                  const metadata = data.replace(/\\/g, "");
                   return metadata;
