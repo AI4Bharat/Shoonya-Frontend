@@ -181,8 +181,12 @@ const LabelStudioWrapper = ({
     message: "",
     variant: "success",
   });
-
+  const ocrDomain = useRef();
+  const [ocrD, setOcrD] = useState("");
+  const selectedLanguages = useRef([]);
+  const [selectedL, setSelectedL] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
+  const [predictions, setPredictions] = useState([]);
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
   const [autoSave, setAutoSave] = useState(true);
@@ -190,6 +194,10 @@ const LabelStudioWrapper = ({
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   let loaded = useRef();
+
+  useEffect(() => {
+    setPredictions(taskData?.data?.ocr_prediction_json);
+  }, [taskData]);
 
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
@@ -472,9 +480,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               annotation.lead_time,
               "skipped",
-              JSON.stringify(
-                annotationNotesRef.current.getEditor().getContents()
-              )
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents())
             ).then(() => {
               getNextProject(projectId, taskData.id).then((res) => {
                 hideLoader();
@@ -490,6 +496,7 @@ const LabelStudioWrapper = ({
           let countLables = 0;
           temp.map((curr) => {
             // console.log(curr);
+            ids.add(curr.id);
             if(curr.type !== "relation"){
               ids.add(curr.id);
             }
@@ -553,9 +560,10 @@ const LabelStudioWrapper = ({
                     load_time.current,
                     annotations[i].lead_time,
                     annotation_status.current,
-                    JSON.stringify(
-                      annotationNotesRef.current.getEditor().getContents()
-                    )
+                    JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+                    false,
+                    selectedLanguages,
+                    ocrDomain
                   ).then((res) => {
                     hideLoader();
                     if (res.status !== 200) {
@@ -826,7 +834,9 @@ const LabelStudioWrapper = ({
               annotations[i].lead_time,
               annotations[i].annotation_status,
               JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
-              true
+              true,
+              selectedLanguages,
+              ocrDomain
             ).then((res) => {
               if (res.status !== 200) {
                 setSnackbarInfo({
@@ -913,6 +923,31 @@ const LabelStudioWrapper = ({
       />
     );
   };
+
+  const handleSelectChange = (event) => {
+    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
+  };
+
+  useEffect(() => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
+          selectedLanguages.current?.push(lang);
+          const newLanguages = [...selectedL, ...taskData?.data?.language];
+          setSelectedL(newLanguages);
+        });
+      }
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+        setSelectedL([taskData?.data?.language]);
+        selectedLanguages.current?.push(taskData?.data?.language);
+      }
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+        ocrDomain.current = taskData?.data?.ocr_domain;
+        setOcrD(taskData?.data?.ocr_domain);
+      }
+    }
+  }, [taskData]);
 
   return (
     <div>
@@ -1027,7 +1062,68 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
-
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
+          <>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Assamese">Assamese</option>
+                <option value="Bodo">Bodo</option>
+                <option value="Dogri">Dogri</option>
+                <option value="Kashmiri">Kashmiri</option>
+                <option value="Maithili">Maithili</option>
+                <option value="Manipuri">Manipuri</option>
+                <option value="Nepali">Nepali</option>
+                <option value="Odia">Odia</option>
+                <option value="Sindhi">Sindhi</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Santali">Santali</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Goan Konkani">Goan Konkani</option>
+              </select>
+              </div>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
+                <option disabled selected></option>
+                <option value="BO">Books</option>
+                <option value="FO">Forms</option>
+                <option value="OT">Others</option>
+                <option value="TB">Textbooks</option>
+                <option value="NV">Novels</option>
+                <option value="NP">Newspapers</option>
+                <option value="MG">Magazines</option>
+                <option value="RP">Research_Papers</option>
+                <option value="FM">Form</option>
+                <option value="BR">Brochure_Posters_Leaflets</option>
+                <option value="AR">Acts_Rules</option>
+                <option value="PB">Publication</option>
+                <option value="NT">Notice</option>
+                <option value="SY">Syllabus</option>
+                <option value="QP">Question_Papers</option>
+                <option value="MN">Manual</option>
+              </select>
+              </div>
+            </div>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
+              {predictions?.length > 0 ?
+              predictions?.map((pred, index) => (
+                <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
+              )) : <div style={{textAlign:"center"}}>No Predictions Present</div>}
+            </div>
+          </>
+        }
       {loader}
       {renderSnackBar()}
     </div>
@@ -1041,8 +1137,8 @@ export default function LSF() {
   const reviewNotesRef = useRef(null);
   const { taskId } = useParams();
   const [taskData, setTaskData] = useState([]);
-  const [annotationtext, setannotationtext] = useState("");
-  const [reviewtext, setreviewtext] = useState("");
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
   const [alertData, setAlertData] = useState({
@@ -1064,15 +1160,10 @@ export default function LSF() {
   };
 
   const formats = [
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "color",
-    "background",
-    "script",
-  ];
+    'size',
+    'bold','italic','underline','strike',
+    'color','background',
+    'script']
 
   const handleTagChange = (event, value, reason) => {
     if (reason === "selectOption") {
