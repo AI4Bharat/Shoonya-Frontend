@@ -181,7 +181,10 @@ const LabelStudioWrapper = ({
     message: "",
     variant: "success",
   });
-
+  const ocrDomain = useRef();
+  const [ocrD, setOcrD] = useState("");
+  const selectedLanguages = useRef([]);
+  const [selectedL, setSelectedL] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
   const [predictions, setPredictions] = useState([]);
   const [annotations, setAnnotations] = useState([]);
@@ -477,9 +480,7 @@ const LabelStudioWrapper = ({
               load_time.current,
               annotation.lead_time,
               "skipped",
-              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
-              selectedLanguages,
-              ocrDomain
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents())
             ).then(() => {
               getNextProject(projectId, taskData.id).then((res) => {
                 hideLoader();
@@ -495,6 +496,7 @@ const LabelStudioWrapper = ({
           let countLables = 0;
           temp.map((curr) => {
             // console.log(curr);
+            ids.add(curr.id);
             if(curr.type !== "relation"){
               ids.add(curr.id);
             }
@@ -559,6 +561,7 @@ const LabelStudioWrapper = ({
                     annotations[i].lead_time,
                     annotation_status.current,
                     JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+                    false,
                     selectedLanguages,
                     ocrDomain
                   ).then((res) => {
@@ -831,9 +834,9 @@ const LabelStudioWrapper = ({
               annotations[i].lead_time,
               annotations[i].annotation_status,
               JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              true,
               selectedLanguages,
-              ocrDomain,
-              true
+              ocrDomain
             ).then((res) => {
               if (res.status !== 200) {
                 setSnackbarInfo({
@@ -921,13 +924,30 @@ const LabelStudioWrapper = ({
     );
   };
 
-  const [selectedLanguages, setSelectedLanguages] = useState([]);
-  const [ocrDomain, setOcrDomain] = useState("");
-
   const handleSelectChange = (event) => {
-    const selectedOptions = Array.from(event.target.selectedOptions, (option) => option.value);
-    setSelectedLanguages(selectedOptions);
+    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
   };
+
+  useEffect(() => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
+          selectedLanguages.current?.push(lang);
+          const newLanguages = [...selectedL, ...taskData?.data?.language];
+          setSelectedL(newLanguages);
+        });
+      }
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+        setSelectedL([taskData?.data?.language]);
+        selectedLanguages.current?.push(taskData?.data?.language);
+      }
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+        ocrDomain.current = taskData?.data?.ocr_domain;
+        setOcrD(taskData?.data?.ocr_domain);
+      }
+    }
+  }, [taskData]);
 
   return (
     <div>
@@ -1042,39 +1062,39 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
-      {!loader && 
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
-              <select multiple onChange={handleSelectChange} value={selectedLanguages}>
-                <option value="en">English</option>
-                <option value="hi">Hindi</option>
-                <option value="mr">Marathi</option>
-                <option value="ta">Tamil</option>
-                <option value="te">Telugu</option>
-                <option value="kn">Kannada</option>
-                <option value="gu">Gujarati</option>
-                <option value="pa">Punjabi</option>
-                <option value="bn">Bengali</option>
-                <option value="ml">Malayalam</option>
-                <option value="as">Assamese</option>
-                <option value="brx">Bodo</option>
-                <option value="doi">Dogri</option>
-                <option value="ks">Kashmiri</option>
-                <option value="mai">Maithili</option>
-                <option value="mni">Manipuri</option>
-                <option value="ne">Nepali</option>
-                <option value="or">Odia</option>
-                <option value="sd">Sindhi</option>
-                <option value="si">Sinhala</option>
-                <option value="ur">Urdu</option>
-                <option value="sat">Santali</option>
-                <option value="sa">Sanskrit</option>
-                <option value="gom">Goan Konkani</option>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Assamese">Assamese</option>
+                <option value="Bodo">Bodo</option>
+                <option value="Dogri">Dogri</option>
+                <option value="Kashmiri">Kashmiri</option>
+                <option value="Maithili">Maithili</option>
+                <option value="Manipuri">Manipuri</option>
+                <option value="Nepali">Nepali</option>
+                <option value="Odia">Odia</option>
+                <option value="Sindhi">Sindhi</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Santali">Santali</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Goan Konkani">Goan Konkani</option>
               </select>
               </div>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
-              <select style={{margin:"auto"}} onChange={(e) => {setOcrDomain(e.target.value)}} value={ocrDomain}>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
                 <option disabled selected></option>
                 <option value="BO">Books</option>
                 <option value="FO">Forms</option>
@@ -1097,9 +1117,10 @@ const LabelStudioWrapper = ({
             </div>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
-              {predictions?.map((pred, index) => (
+              {predictions?.length > 0 ?
+              predictions?.map((pred, index) => (
                 <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
-              ))}
+              )) : <div style={{textAlign:"center"}}>No Predictions Present</div>}
             </div>
           </>
         }
