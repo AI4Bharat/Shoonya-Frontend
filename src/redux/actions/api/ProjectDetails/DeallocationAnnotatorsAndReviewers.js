@@ -7,15 +7,18 @@ export class DeallocateTaskById extends API {
     super("POST", timeout, false);
     this.projectId = projectId;
 
+    console.log(taskId);
     this.payload = {
-      task_ids: Array.isArray(taskId) ? taskId.map(id => parseInt(id)) : [parseInt(taskId)],
+      // task_ids: Array.isArray(taskId) ? taskId.map(id => parseInt(id)) : [parseInt(taskId)],
+
+      task_ids: taskId.split(',').map(i => parseInt(i)),
     };
     const baseEndpoint = `${super.apiEndPointAuto()}/${ENDPOINTS.getProjects}${projectId}/`;
 
     const endpointMap = {
       annotation: 'unassign_tasks/',
       review: `unassign_review_tasks/`,
-      superChecker: 'unassign_supercheck_task/',
+      superChecker: 'unassign_supercheck_tasks/',
     };
     
     const selectedUserEndpoint = endpointMap[selectedUser];
