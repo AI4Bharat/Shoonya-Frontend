@@ -6,6 +6,7 @@ import { snakeToTitleCase } from '../../../../utils/utils.js';
 import GetTaskAnnotationsAPI from '../../../../redux/actions/api/Tasks/GetTaskAnnotations.js';
 import FetchUserByIdAPI from "../../../../redux/actions/api/UserManagement/FetchUserById";
 import {CircularProgress} from '@mui/material';
+import { Link } from 'react-router-dom';
 
 function TaskDetails() {
     const [taskId, setTaskId] = useState('');
@@ -231,6 +232,11 @@ function TaskDetails() {
                             valueRenderer={(raw) => <span>{typeof raw === "string" && raw.match(/^"(.*)"$/) ? raw.slice(1, -1) :  raw}</span>}
                             theme={theme}
                         />
+                        {taskDetails &&(
+                            <Link to ={`/projects/${taskDetails.project_id}`}>
+                                <Button variant="contained">Project Page</Button>
+                            </Link>
+                        )}
                     </TabPanel>
                     <TabPanel value={tabValue} index={1}>
                         <JSONTree
