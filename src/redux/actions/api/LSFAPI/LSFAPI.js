@@ -105,9 +105,9 @@ const patchAnnotation = async (
   lead_time,
   annotation_status,
   notes,
+  autoSave=false,
   languages,
-  ocr_domain,
-  autoSave=false
+  ocr_domain
 ) => {
   try {
     const res = await axiosInstance.patch(`/annotation/${annotationID}/`, {
@@ -118,8 +118,8 @@ const patchAnnotation = async (
       }),
       task_id: taskId,
       annotation_notes: notes,
-      languages: languages,
-      ocr_domain: ocr_domain,
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
       ...(autoSave && { auto_save: true }),
     });
     return res;
@@ -137,7 +137,9 @@ const patchReview = async (
   result,
   parentAnnotation,
   reviewnotes,
-  autoSave=false
+  autoSave=false,
+  languages,
+  ocr_domain
 ) => {
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
@@ -156,6 +158,8 @@ const patchReview = async (
         parent_annotation: parentAnnotation,
         review_notes: reviewnotes,
       }),
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
       ...(autoSave && { auto_save: true }),
     });
     // if (review_status === "to_be_revised") {
@@ -178,7 +182,9 @@ const patchSuperChecker = async (
   result,
   parentAnnotation,
   superchecknotes,
-  autoSave=false
+  autoSave=false,
+  languages,
+  ocr_domain
 ) => {
   console.log(superchecknotes,"superchecknotes")
   try {
@@ -189,6 +195,8 @@ const patchSuperChecker = async (
       result: result,
       parent_annotation: parentAnnotation,
       supercheck_notes: superchecknotes,
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
       ...(autoSave && { auto_save: true }),
     });
    
