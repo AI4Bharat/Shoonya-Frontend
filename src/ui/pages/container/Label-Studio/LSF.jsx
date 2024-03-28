@@ -1118,9 +1118,26 @@ const LabelStudioWrapper = ({
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
               {predictions?.length > 0 ?
-              predictions?.map((pred, index) => (
-                <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
-              )) : <div style={{textAlign:"center"}}>No Predictions Present</div>}
+                (() => {
+                  try {
+                    return JSON.parse(predictions)?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  } catch (error) {
+                    console.error("Error parsing predictions:", error);
+                    return predictions?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  }
+                })()
+              :
+              <div style={{textAlign:"center"}}>No Predictions Present</div>}
             </div>
           </>
         }
