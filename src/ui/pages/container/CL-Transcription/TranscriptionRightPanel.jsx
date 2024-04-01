@@ -71,6 +71,7 @@ import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 // } from "redux/actions";
 import { IconButton, Tooltip } from "@mui/material";
 import { Add, MoreVert, Remove } from "@material-ui/icons";
+import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 
 const TranscriptionRightPanel = ({
   currentIndex,
@@ -81,9 +82,12 @@ const TranscriptionRightPanel = ({
   handleStdTranscriptionSettings,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
+  waveSurfer,
+  setWaveSurfer,
   annotationId,
 }) => {
   const { taskId } = useParams();
+
   const classes = AudioTranscriptionLandingStyle();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -121,11 +125,11 @@ const TranscriptionRightPanel = ({
   const [selectionStart, setSelectionStart] = useState();
   const [currentIndexToSplitTextBlock, setCurrentIndexToSplitTextBlock] =
     useState();
-  const [enableTransliteration, setTransliteration] = useState(false);
-  const [enableRTL_Typing, setRTL_Typing] = useState(false);
+  const [enableTransliteration, setTransliteration] = useState(JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))?.enableTransliteration || false);
+  const [enableRTL_Typing, setRTL_Typing] = useState(JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))?.enableRTL_Typing || false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [fontSize, setFontSize] = useState("large");
+  const [fontSize, setFontSize] = useState(JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))?.fontSize || "large");
   const [currentOffset, setCurrentOffset] = useState(1);
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
@@ -220,6 +224,7 @@ const TranscriptionRightPanel = ({
     const handleKeyDown = (event) => {
       if (event.altKey && event.key === "1") {
         event.preventDefault();
+        localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"enableTransliteration":!enableTransliteration}))
         setTransliteration(!enableTransliteration);
       }
     };
@@ -562,6 +567,8 @@ const TranscriptionRightPanel = ({
               showSplit={true}
               advancedWaveformSettings={advancedWaveformSettings}
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+              waveSurfer={waveSurfer}
+              setWaveSurfer={setWaveSurfer}
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
               annotationId={annotationId}
@@ -588,7 +595,7 @@ const TranscriptionRightPanel = ({
           </Box>
 
           <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
-            height: showAcousticText ? "calc(100vh - 380px)" : "calc(100vh - 385px)",
+            height: showAcousticText ? "calc(102vh - 380px)" : "calc(102vh - 385px)",
             alignItems: "center",
           }}>
           {currentPageData?.map((item, index) => {
@@ -773,12 +780,14 @@ const TranscriptionRightPanel = ({
                       </span> */}
                               </div>
                             )}}
+
                         />
                       ) : (
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
                             ref={el => textRefs.current[index] = el}
-                            onChange={(event) => {
+                            // onChange={(event) => {
+                            onInput={(event) => {
                               changeTranscriptHandler(event, index + idxOffset, false);
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
@@ -824,6 +833,7 @@ const TranscriptionRightPanel = ({
                                 />
                               </div>
                             )}}
+
                           />
                         ) : (
                           <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
@@ -909,4 +919,4 @@ const TranscriptionRightPanel = ({
   );
 };
 
-export default TranscriptionRightPanel;
+export default memo(TranscriptionRightPanel);

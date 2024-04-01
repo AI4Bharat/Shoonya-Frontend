@@ -115,7 +115,7 @@ const AnnotateTask = () => {
         variant="contained" 
         color="primary" 
         startIcon={<  ArrowBackIcon />} 
-        sx={{ color:"white" ,   mb:2  }} 
+        sx={{ color:"white" ,   mb:2  ,mt:2}} 
         onClick={() => navigate(`/projects/${urlParams?.projectId}`)}
       >
         {translate("label.backToProject")}

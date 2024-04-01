@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
+import Timeline2 from './wavesurfer';
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -82,6 +83,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  const [waveSurfer, setWaveSurfer] = useState(true);
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -110,7 +112,12 @@ const AllAudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     } else {
-      setTaskData(resp)
+      setTaskData(resp);
+      if (resp?.data?.audio_duration < 700){
+        setWaveSurfer(false);
+      }else{
+        setWaveSurfer(true);
+      }
     }
     setLoading(false);
   };
@@ -176,6 +183,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const tasksComplete = (id) => {
     if (id) {
       navigate(`/projects/${projectId}/AllAudioTranscriptionLandingPage/${id}`);
+      window.location.reload(true);
     } else {
       setSnackbarInfo({
         open: true,
@@ -293,31 +301,34 @@ const AllAudioTranscriptionLandingPage = () => {
   }
 
   const [wave, setWave] = useState(true);
-  const [waveColor, setWaveColor] = useState("#FFFFFF");
-  const [backgroundColor, setBackgroundColor] = useState("#1C2022");
-  const [paddingColor, setPaddingColor] = useState("#FFFFFF");
+  const [waveColor, setWaveColor] = useState('rgba(156, 39, 176, 1)');
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+  const [paddingColor, setPaddingColor] = useState('#f2f2f2');
   const [cursor, setCursor] = useState(true);
-  const [cursorColor, setCursorColor] = useState("#FF0000");
+  const [cursorColor, setCursorColor] = useState('#ff0000');
   const [progress, setProgress] = useState(true);
-  const [progressColor, setProgressColor] = useState("#FFFFFF");
-  const [grid, setGrid] = useState(true);
-  const [gridColor, setGridColor] = useState("#FFFFFF");
+  const [progressColor, setProgressColor] = useState('rgba(0, 150, 136, 1)');
+  const [grid, setGrid] = useState(false);
+  const [gridColor, setGridColor] = useState('rgba(255, 255, 255, 0.05)');
   const [ruler, setRuler] = useState(true);
-  const [rulerColor, setRulerColor] = useState("#FFFFFF");
+  const [rulerColor, setRulerColor] = useState('rgba(0, 0, 0, 1)');
   const [scrollbar, setScrollbar] = useState(true);
-  const [scrollbarColor, setScrollbarColor] = useState("#FFFFFF");
+  const [scrollbarColor, setScrollbarColor] = useState('rgba(255, 255, 255, 0.25)');
   const [rulerAtTop, setRulerAtTop] = useState(true);
   const [scrollable, setScrollable] = useState(true);
   const [duration, setDuration] = useState(10);
   const [padding, setPadding] = useState(1);
-  const [pixelRatio, setPixelRatio] = useState(1);
+  // const [pixelRatio, setPixelRatio] = useState(window.devicePixelRatio + 1);
+  const [pixelRatio, setPixelRatio] = useState(Number(Math.ceil(window.devicePixelRatio)))
   const [waveScale, setWaveScale] = useState(1);
   const [waveSize, setWaveSize] = useState(1);
+  const [wavWorker, setWavWorker] = useState(true);
+
   const [waveformSettings, setWaveformSettings] = useState({
     "wave": wave, "waveColor": waveColor, "backgroundColor": backgroundColor, "paddingColor": paddingColor,
     "cursor": cursor, "cursorColor": cursorColor, "progress": progress, "progressColor": progressColor, "grid": grid, "gridColor": gridColor, "ruler": ruler,
     "rulerColor": rulerColor, "scrollbar": scrollbar, "scrollbarColor": scrollbarColor, "rulerAtTop": rulerAtTop, "scrollable": scrollable, "duration": duration, "padding": padding,
-    "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize
+    "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize, "worker" : wavWorker
   });
 
   useEffect(() => {
@@ -325,9 +336,48 @@ const AllAudioTranscriptionLandingPage = () => {
       "wave": wave, "waveColor": waveColor, "backgroundColor": backgroundColor, "paddingColor": paddingColor,
       "cursor": cursor, "cursorColor": cursorColor, "progress": progress, "progressColor": progressColor, "grid": grid, "gridColor": gridColor, "ruler": ruler,
       "rulerColor": rulerColor, "scrollbar": scrollbar, "scrollbarColor": scrollbarColor, "rulerAtTop": rulerAtTop, "scrollable": scrollable, "duration": duration, "padding": padding,
-      "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize
+      "pixelRatio": pixelRatio, "waveScale": waveScale, "waveSize": waveSize, "worker" : wavWorker
+  })
+  }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
+
+  const [waveSurferHeight, setWaveSurferHeigth] = useState(140);
+  const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
+  const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
+  const [waveSurferProgressColor, setWaveSurferProgressColor] = useState("#dd5e98");
+  const [waveSurferCursorColor, setWaveSurferCursorColor] = useState("#935ae8");
+  const [waveSurferCursorWidth, setWaveSurferCursorWidth] = useState(1);
+  const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
+  const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
+  const [waveSurferBarRadius, setWaveSurferBarRadius] = useState(0);
+  const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(1.5);
+    
+  const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
+    "height": waveSurferHeight,
+    "minPxPerSec": waveSurferMinPxPerSec,
+    "waveColor": waveSurferWaveColor,
+    "progressColor": waveSurferProgressColor,
+    "cursorColor": waveSurferCursorColor,
+    "cursorWidth": waveSurferCursorWidth,
+    "barWidth": waveSurferBarWidth,
+    "barGap": waveSurferBarGap,
+    "barRadius": waveSurferBarRadius,
+    "barHeight": waveSurferBarHeight
+  });
+
+  useEffect(() => {
+    setWaveSurferWaveformSettings({
+      "height": waveSurferHeight,
+      "minPxPerSec": waveSurferMinPxPerSec,
+      "waveColor": waveSurferWaveColor,
+      "progressColor": waveSurferProgressColor,
+      "cursorColor": waveSurferCursorColor,
+      "cursorWidth": waveSurferCursorWidth,
+      "barWidth": waveSurferBarWidth,
+      "barGap": waveSurferBarGap,
+      "barRadius": waveSurferBarRadius,
+      "barHeight": waveSurferBarHeight
     })
-  }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize]);
+  }, [waveSurferHeight, waveSurferMinPxPerSec, waveSurferWaveColor, waveSurferProgressColor, waveSurferCursorColor, waveSurferCursorWidth, waveSurferBarWidth, waveSurferBarGap, waveSurferBarRadius, waveSurferBarHeight])
 
   useEffect(() => {
     if (showNotes === true) {
@@ -357,13 +407,13 @@ const AllAudioTranscriptionLandingPage = () => {
       if (event.shiftKey && event.key === 'ArrowLeft') {
         event.preventDefault();
         if (player) {
-          player.currentTime = player.currentTime - 0.05;
+          player.currentTime = player.currentTime - 1.25;
         }
       }
       if (event.shiftKey && event.key === 'ArrowRight') {
         event.preventDefault();
         if (player) {
-          player.currentTime = player.currentTime + 0.05;
+          player.currentTime = player.currentTime + 1.25;
         }
       }
     };
@@ -385,7 +435,7 @@ const AllAudioTranscriptionLandingPage = () => {
             startIcon={<ArrowBackIcon />}
             variant="contained"
             color="primary"
-            sx={{ ml: 1 }}
+            sx={{ ml: 1 ,mt:2}}
             onClick={() => {
               localStorage.removeItem("labelAll");
               navigate(`/projects/${projectId}`);
@@ -577,30 +627,56 @@ const AllAudioTranscriptionLandingPage = () => {
                 height: "max-content"
               }}
             >
-              <table style={{ width: "100%", textAlign: 'center', fontSize: 'large' }}>
-                <tr>
-                  <td>Wave:&nbsp;&nbsp;<input type='checkbox' checked={wave} onChange={() => { setWave(!wave) }}></input>&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={waveColor} onChange={(e) => { setWaveColor(e.target.value) }}></input></td>
-                  <td>Background:&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={backgroundColor} onChange={(e) => { setBackgroundColor(e.target.value) }}></input></td>
-                  <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={paddingColor} onChange={(e) => { setPaddingColor(e.target.value) }}></input></td>
-                  <td>Cursor:&nbsp;&nbsp;<input type='checkbox' checked={cursor} onChange={() => { setCursor(!cursor) }}></input>&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={cursorColor} onChange={(e) => { setCursorColor(e.target.value) }}></input></td>
-                  <td>Progress:&nbsp;&nbsp;<input type='checkbox' checked={progress} onChange={() => { setProgress(!progress) }}></input>&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={progressColor} onChange={(e) => { setProgressColor(e.target.value) }}></input></td>
-                </tr>
-                <tr>
-                  <td>Grid:&nbsp;&nbsp;<input type='checkbox' checked={grid} onChange={() => { setGrid(!grid) }}></input>&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={gridColor} onChange={(e) => { setGridColor(e.target.value) }}></input></td>
-                  <td>Ruler:&nbsp;&nbsp;<input type='checkbox' checked={ruler} onChange={() => { setRuler(!ruler) }}></input>&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={rulerColor} onChange={(e) => { setRulerColor(e.target.value) }}></input></td>
-                  <td colSpan={2}>Scrollbar:&nbsp;&nbsp;<input type='checkbox' checked={scrollbar} onChange={() => { setScrollbar(!scrollbar) }}></input>&nbsp;&nbsp;<input type='color' style={{ width: "25px", padding: "0px" }} value={scrollbarColor} onChange={(e) => { setScrollbarColor(e.target.value) }}></input></td>
-                  <td>Ruler At Top:&nbsp;&nbsp;<input type='checkbox' checked={rulerAtTop} onChange={() => { setRulerAtTop(!rulerAtTop) }}></input></td>
-                  <td>Scrollable:&nbsp;&nbsp;<input type='checkbox' checked={scrollable} onChange={() => { setScrollable(!scrollable) }}></input></td>
-                </tr>
-                <tr>
-                  <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='range' min={0} max={20} step={1} value={padding} onChange={(e) => { setPadding(e.target.value) }}></input>&nbsp;{padding}</td>
-                  <td colSpan={2}>Pixel Ratio:&nbsp;&nbsp;<input type='range' min={1} max={2} step={1} value={pixelRatio} onChange={(e) => { setPixelRatio(e.target.value) }}></input>&nbsp;{pixelRatio}</td>
-                </tr>
-                <tr>
-                  <td colSpan={3}>Wave Scale:&nbsp;&nbsp;<input type='range' min={0.1} max={2} step={0.1} value={waveScale} onChange={(e) => { setWaveScale(e.target.value) }}></input>&nbsp;{waveScale}</td>
-                  <td colSpan={3}>Wave Size:&nbsp;&nbsp;<input type='range' min={1} max={10} step={1} value={waveSize} onChange={(e) => { setWaveSize(e.target.value) }}></input>&nbsp;{waveSize}</td>
-                </tr>
-              </table>
+                <table style={{width: "100%", textAlign: 'center', fontSize: 'large'}}>
+                  { waveSurfer ? 
+                  <>
+                  <tr>
+                    <td colSpan={2}>Height:&nbsp;&nbsp;<input type='range' min={10} max={512} step={1} value={waveSurferHeight} onChange={(e) => {setWaveSurferHeigth(e.target.value)}}></input></td>
+                    {/* <td>Width:&nbsp;&nbsp;<input type='range' min={10} max={2000} step={1} value={waveSurferWidth} onChange={(e) => {setWaveSurferWidth(e.target.value)}}></input></td> */}
+                    <td colSpan={2}>Min PX Per Sec:&nbsp;&nbsp;<input type='range' min={1} max={1000} step={1} value={waveSurferMinPxPerSec} onChange={(e) => {setWaveSurferMinPxPerSec(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Wave Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferWaveColor} onChange={(e) => {setWaveSurferWaveColor(e.target.value)}}></input></td>
+                    <td>Progress Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferProgressColor} onChange={(e) => {setWaveSurferProgressColor(e.target.value)}}></input></td>
+                    <td>Cursor Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferCursorColor} onChange={(e) => {setWaveSurferCursorColor(e.target.value)}}></input></td>
+                    <td>Cursor Width:&nbsp;&nbsp;<input type='range' min={0} max={10} step={1} value={waveSurferCursorWidth} onChange={(e) => {setWaveSurferCursorWidth(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Bar Width:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarWidth} onChange={(e) => {setWaveSurferBarWidth(e.target.value)}}></input></td>
+                    <td>Bar Gap:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarGap} onChange={(e) => {setWaveSurferBarGap(e.target.value)}}></input></td>
+                    <td>Bar Radius:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarRadius} onChange={(e) => {setWaveSurferBarRadius(e.target.value)}}></input></td>
+                    <td>Bar Height:&nbsp;&nbsp;<input type='range' min={0.1} max={4} step={0.1} value={waveSurferBarHeight} onChange={(e) => {setWaveSurferBarHeight(e.target.value)}}></input></td>
+                  </tr>
+                  </>
+                  :
+                  <>
+                  <tr>
+                    <td>Wave:&nbsp;&nbsp;<input type='checkbox' checked={wave} onChange={() => {setWave(!wave)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveColor} onChange={(e) => {setWaveColor(e.target.value)}}></input></td>
+                    <td>Background:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={backgroundColor} onChange={(e) => {setBackgroundColor(e.target.value)}}></input></td>
+                    <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={paddingColor} onChange={(e) => {setPaddingColor(e.target.value)}}></input></td>
+                    <td>Cursor:&nbsp;&nbsp;<input type='checkbox' checked={cursor} onChange={() => {setCursor(!cursor)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={cursorColor} onChange={(e) => {setCursorColor(e.target.value)}}></input></td>
+                    <td>Progress:&nbsp;&nbsp;<input type='checkbox' checked={progress} onChange={() => {setProgress(!progress)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={progressColor} onChange={(e) => {setProgressColor(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Grid:&nbsp;&nbsp;<input type='checkbox' checked={grid} onChange={() => {setGrid(!grid)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={gridColor} onChange={(e) => {setGridColor(e.target.value)}}></input></td>
+                    <td>Ruler:&nbsp;&nbsp;<input type='checkbox' checked={ruler} onChange={() => {setRuler(!ruler)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={rulerColor} onChange={(e) => {setRulerColor(e.target.value)}}></input></td>
+                    <td colSpan={2}>Scrollbar:&nbsp;&nbsp;<input type='checkbox' checked={scrollbar} onChange={() => {setScrollbar(!scrollbar)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={scrollbarColor} onChange={(e) => {setScrollbarColor(e.target.value)}}></input></td>
+                    <td>Ruler At Top:&nbsp;&nbsp;<input type='checkbox' checked={rulerAtTop} onChange={() => {setRulerAtTop(!rulerAtTop)}}></input></td>
+                    <td>Scrollable:&nbsp;&nbsp;<input type='checkbox' checked={scrollable} onChange={() => {setScrollable(!scrollable)}}></input></td>
+                    <td>Wav worker:&nbsp;&nbsp;<input type='checkbox' checked={wavWorker} onChange={() => {setWavWorker(!wavWorker)}}></input></td>
+
+                  </tr>
+                  <tr>
+                    <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='range' min={0} max={20} step={1} value={padding} onChange={(e) => {setPadding(e.target.value)}}></input>&nbsp;{padding}</td>
+                    <td colSpan={2}>Pixel Ratio:&nbsp;&nbsp;<input type='range' min={1} max={2} step={1} value={pixelRatio} onChange={(e) => {setPixelRatio(e.target.value)}}></input>&nbsp;{pixelRatio}</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3}>Wave Scale:&nbsp;&nbsp;<input type='range' min={0.1} max={2} step={0.1} value={waveScale} onChange={(e) => {setWaveScale(e.target.value)}}></input>&nbsp;{waveScale}</td>
+                    <td colSpan={3}>Wave Size:&nbsp;&nbsp;<input type='range' min={1} max={10} step={1} value={waveSize} onChange={(e) => {setWaveSize(e.target.value)}}></input>&nbsp;{waveSize}</td>
+                  </tr>
+                  </>
+                  }
+                </table>
             </div>
           </Box>
         </Grid>
@@ -616,6 +692,8 @@ const AllAudioTranscriptionLandingPage = () => {
             handleStdTranscriptionSettings={setStdTranscriptionSettings}
             advancedWaveformSettings={advancedWaveformSettings}
             setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
         </Grid>
@@ -626,7 +704,7 @@ const AllAudioTranscriptionLandingPage = () => {
         position="fixed"
         bottom={1}
       >
-        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} />
+        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} />}
       </Grid>
     </>
   );

@@ -51,13 +51,24 @@ const AudioPanel = memo( ({
   //   }, [$video]);
 
 //console.log(TaskDetails?.data?.audio_url,"TaskDetailsTaskDetailsTaskDetails")
+
+  useEffect(() => {
+    const audio = document.getElementById('audio-panel');
+    audio.oncontextmenu = function (e) {
+      e.preventDefault();
+    };
+  }, [])
+
   return (
     <Grid style={{ padding: "0px 20px 0px 20px" }}>
      
       {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio
+          id ="audio-panel"
           controls
+          controlsList="nodownload"
           src={TaskDetails?.data?.audio_url}
+          preload="metadata"
           type="audio"
           // style={{
           //   width: videoDetails?.video?.audio_only ? "20%" : "",

@@ -113,6 +113,9 @@ const WorkspaceReports = () => {
         "AllAudioProjects",
         "OCRTranscription",
         "OCRTranscriptionEditing",
+        "ContextualTranslation",
+        "ContextualSentenceVerification",
+        "ContextualTranslationEditing"
       ]);
       setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
@@ -294,7 +297,8 @@ const WorkspaceReports = () => {
             Number(id),
             selectedType,
             userId,
-            statisticsType
+            statisticsType,
+            language,
           );
           dispatch(APITransport(projectReportObj));
           setSnackbarInfo({
@@ -387,7 +391,7 @@ const WorkspaceReports = () => {
           </FormControl>
         </Grid>}
 
-        {(radioButton !== "project" || projectReportType !==2) && <Grid
+        {(radioButton !== "project") && <Grid
           item
           xs={12}
           sm={12}
@@ -462,7 +466,7 @@ const WorkspaceReports = () => {
             </Select>
           </FormControl>
         </Grid>}
-        {(radioButton !== "payment" && (radioButton !== "project" || projectReportType !== 2))&& <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {(radioButton !== "payment") && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <FormControl fullWidth size="small">
             <InputLabel id="language-label" sx={{ fontSize: "16px" }}>
               Target Language

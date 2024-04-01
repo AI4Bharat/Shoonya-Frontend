@@ -48,6 +48,7 @@ import TaskAnalytics from "../../container/Progress/Workspace/TaskAnalytics";
 import MetaAnalytics from "../../container/Progress/Workspace/MetaAnalytics";
 import ProgressAnalytics from "../../container/Progress/Workspace/ProgressAnalytics";
 import { DriveEta } from "@material-ui/icons";
+import PerformanceAnalytics from "../../container/Progress/Workspace/PerformanceAnalytics";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -293,6 +294,7 @@ const DetailsViewPage = (props) => {
             <MenuItem selected={selectmenu=== "TaskAnalytics"} onClick={() => handleClickMenu("TaskAnalytics")}> Task Analytics </MenuItem>
             <MenuItem selected={ selectmenu=== "MetaAnalytics"} onClick={() => handleClickMenu("MetaAnalytics")}>Meta Analytics</MenuItem>
             <MenuItem selected={selectmenu=== "AdvanceAnalytics"} onClick={() => handleClickMenu("AdvanceAnalytics")}>Advance Analytics</MenuItem>
+            <MenuItem selected={selectmenu=== "PerformanceAnalytics"} onClick={() => handleClickMenu("PerformanceAnalytics")}>Performance Analytics</MenuItem>
           </Menu>
           <TabPanel
             value={value}
@@ -404,6 +406,7 @@ const DetailsViewPage = (props) => {
             {pageType === componentType.Type_Workspace && selectmenu=== "TaskAnalytics" && <TaskAnalytics />}
             {pageType === componentType.Type_Workspace && selectmenu=== "MetaAnalytics" && <MetaAnalytics />}
             {pageType === componentType.Type_Workspace && selectmenu=== "AdvanceAnalytics" && <ProgressAnalytics />}
+            {pageType === componentType.Type_Workspace && selectmenu=== "PerformanceAnalytics" && <PerformanceAnalytics /> }
             {pageType === componentType.Type_Organization && (
               <OrganizationSettings />
             )}

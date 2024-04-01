@@ -24,6 +24,7 @@ import {
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
+import Timeline2 from './wavesurfer';
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -109,6 +110,7 @@ const AudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [autoSave, setAutoSave] = useState(true);
+  const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
   // useEffect(() => {
@@ -285,7 +287,12 @@ const AudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     } else {
-      setTaskData(resp)
+      setTaskData(resp);
+      if (resp?.data?.audio_duration < 700){
+        setWaveSurfer(false);
+      }else{
+        setWaveSurfer(true);
+      }
     }
     setLoading(false);
   };
@@ -296,6 +303,7 @@ const AudioTranscriptionLandingPage = () => {
 
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
+    if(AnnotationsTaskDetails[0]?.annotation_status !== "labeled"){
     if(!autoSave) return;
     const reqBody = {
       task_id: taskId,
@@ -313,9 +321,10 @@ const AudioTranscriptionLandingPage = () => {
           headers: obj.getHeaders().headers,
         });
         if (!res.ok) {
+          const data = await res.json();
           setSnackbarInfo({
             open: true,
-            message: "Error in autosaving annotation",
+            message: data.message,
             variant: "error",
           });
         }
@@ -328,7 +337,7 @@ const AudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       }
-    }
+    }}
   };
   
   useEffect(() => {
@@ -527,6 +536,7 @@ const AudioTranscriptionLandingPage = () => {
       // resetNotes();
       // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
       navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${id}`);
+      window.location.reload(true);
     } else {
       // navigate(-1);
       // resetNotes();
@@ -589,6 +599,7 @@ const AudioTranscriptionLandingPage = () => {
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
+      task_id: taskId,
       annotation_status: value,
       annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
       lead_time:
@@ -787,7 +798,46 @@ useEffect(() => {
     "worker" : wavWorker
   })
 }, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
+
+const [waveSurferHeight, setWaveSurferHeigth] = useState(140);
+const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
+const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
+const [waveSurferProgressColor, setWaveSurferProgressColor] = useState("#dd5e98");
+const [waveSurferCursorColor, setWaveSurferCursorColor] = useState("#935ae8");
+const [waveSurferCursorWidth, setWaveSurferCursorWidth] = useState(1);
+const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
+const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
+const [waveSurferBarRadius, setWaveSurferBarRadius] = useState(0);
+const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(1.5);
   
+const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
+  "height": waveSurferHeight,
+  "minPxPerSec": waveSurferMinPxPerSec,
+  "waveColor": waveSurferWaveColor,
+  "progressColor": waveSurferProgressColor,
+  "cursorColor": waveSurferCursorColor,
+  "cursorWidth": waveSurferCursorWidth,
+  "barWidth": waveSurferBarWidth,
+  "barGap": waveSurferBarGap,
+  "barRadius": waveSurferBarRadius,
+  "barHeight": waveSurferBarHeight
+});
+
+useEffect(() => {
+  setWaveSurferWaveformSettings({
+    "height": waveSurferHeight,
+    "minPxPerSec": waveSurferMinPxPerSec,
+    "waveColor": waveSurferWaveColor,
+    "progressColor": waveSurferProgressColor,
+    "cursorColor": waveSurferCursorColor,
+    "cursorWidth": waveSurferCursorWidth,
+    "barWidth": waveSurferBarWidth,
+    "barGap": waveSurferBarGap,
+    "barRadius": waveSurferBarRadius,
+    "barHeight": waveSurferBarHeight
+  })
+}, [waveSurferHeight, waveSurferMinPxPerSec, waveSurferWaveColor, waveSurferProgressColor, waveSurferCursorColor, waveSurferCursorWidth, waveSurferBarWidth, waveSurferBarGap, waveSurferBarRadius, waveSurferBarHeight])
+
 useEffect(() => {
   if(showNotes === true){
     setAdvancedWaveformSettings(false);
@@ -817,13 +867,13 @@ useEffect(() => {
     if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
-        player.currentTime = player.currentTime - 0.05;
+        player.currentTime = player.currentTime - 1.25;
       }
     }
     if (event.shiftKey && event.key === 'ArrowRight') {
       event.preventDefault();
       if(player){
-        player.currentTime = player.currentTime + 0.05;
+        player.currentTime = player.currentTime + 1.25;
       }
     }
   };
@@ -845,7 +895,7 @@ useEffect(() => {
             startIcon={<ArrowBackIcon />}
             variant="contained"
             color="primary"
-            sx={{ ml: 1 }}
+            sx={{ ml: 1 ,mt:2}}
             onClick={() => {
               localStorage.removeItem("labelAll");
               navigate(`/projects/${projectId}`);
@@ -1083,6 +1133,28 @@ useEffect(() => {
               }}
               >
                 <table style={{width: "100%", textAlign: 'center', fontSize: 'large'}}>
+                  { waveSurfer ? 
+                  <>
+                  <tr>
+                    <td colSpan={2}>Height:&nbsp;&nbsp;<input type='range' min={10} max={512} step={1} value={waveSurferHeight} onChange={(e) => {setWaveSurferHeigth(e.target.value)}}></input></td>
+                    {/* <td>Width:&nbsp;&nbsp;<input type='range' min={10} max={2000} step={1} value={waveSurferWidth} onChange={(e) => {setWaveSurferWidth(e.target.value)}}></input></td> */}
+                    <td colSpan={2}>Min PX Per Sec:&nbsp;&nbsp;<input type='range' min={1} max={1000} step={1} value={waveSurferMinPxPerSec} onChange={(e) => {setWaveSurferMinPxPerSec(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Wave Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferWaveColor} onChange={(e) => {setWaveSurferWaveColor(e.target.value)}}></input></td>
+                    <td>Progress Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferProgressColor} onChange={(e) => {setWaveSurferProgressColor(e.target.value)}}></input></td>
+                    <td>Cursor Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferCursorColor} onChange={(e) => {setWaveSurferCursorColor(e.target.value)}}></input></td>
+                    <td>Cursor Width:&nbsp;&nbsp;<input type='range' min={0} max={10} step={1} value={waveSurferCursorWidth} onChange={(e) => {setWaveSurferCursorWidth(e.target.value)}}></input></td>
+                  </tr>
+                  <tr>
+                    <td>Bar Width:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarWidth} onChange={(e) => {setWaveSurferBarWidth(e.target.value)}}></input></td>
+                    <td>Bar Gap:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarGap} onChange={(e) => {setWaveSurferBarGap(e.target.value)}}></input></td>
+                    <td>Bar Radius:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarRadius} onChange={(e) => {setWaveSurferBarRadius(e.target.value)}}></input></td>
+                    <td>Bar Height:&nbsp;&nbsp;<input type='range' min={0.1} max={4} step={0.1} value={waveSurferBarHeight} onChange={(e) => {setWaveSurferBarHeight(e.target.value)}}></input></td>
+                  </tr>
+                  </>
+                  :
+                  <>
                   <tr>
                     <td>Wave:&nbsp;&nbsp;<input type='checkbox' checked={wave} onChange={() => {setWave(!wave)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveColor} onChange={(e) => {setWaveColor(e.target.value)}}></input></td>
                     <td>Background:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={backgroundColor} onChange={(e) => {setBackgroundColor(e.target.value)}}></input></td>
@@ -1107,7 +1179,8 @@ useEffect(() => {
                     <td colSpan={3}>Wave Scale:&nbsp;&nbsp;<input type='range' min={0.1} max={2} step={0.1} value={waveScale} onChange={(e) => {setWaveScale(e.target.value)}}></input>&nbsp;{waveScale}</td>
                     <td colSpan={3}>Wave Size:&nbsp;&nbsp;<input type='range' min={1} max={10} step={1} value={waveSize} onChange={(e) => {setWaveSize(e.target.value)}}></input>&nbsp;{waveSize}</td>
                   </tr>
-                  
+                  </>
+                  }
                 </table>
             </div>
           </Box>
@@ -1124,6 +1197,8 @@ useEffect(() => {
             handleStdTranscriptionSettings={setStdTranscriptionSettings}
             advancedWaveformSettings={advancedWaveformSettings}
             setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
         </Grid>
@@ -1135,7 +1210,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>
+        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
       </Grid>
     </>
   );

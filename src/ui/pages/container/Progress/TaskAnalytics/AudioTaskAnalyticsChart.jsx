@@ -3,32 +3,42 @@ import { Grid, ThemeProvider, Box, Typography, Paper } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import DatasetStyle from "../../../../styles/Dataset";
 import React, { PureComponent } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, Label } from "recharts";
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Label,
+} from "recharts";
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
 
-function ContextualTranslationEditing(props) {
+function AudioTaskAnalyticsChart(props) {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
-  const { taskAnalyticsData } = props;
-
+  const { analyticsData } = props;
   const [totalTaskCount, setTotalTaskCount] = useState();
   const [totalAnnotationTasksCount, setTotalAnnotationTasksCount] = useState();
   const [totalReviewTasksCount, setTotalReviewTasksCount] = useState();
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    taskAnalyticsData[0]?.sort(
+    analyticsData?.sort(
       (a, b) =>
         b.annotation_cumulative_tasks_count -
         a.annotation_cumulative_tasks_count
     );
-    setData(taskAnalyticsData[0]);
+    setData(analyticsData);
 
     let allAnnotatorCumulativeTasksCount = 0;
     let allReviewCumulativeTasksCount = 0;
     var languages;
-    taskAnalyticsData[0]?.map((element, index) => {
+    analyticsData?.map((element, index) => {
       allAnnotatorCumulativeTasksCount +=
         element.annotation_cumulative_tasks_count;
       allReviewCumulativeTasksCount += element.review_cumulative_tasks_count;
@@ -40,7 +50,7 @@ function ContextualTranslationEditing(props) {
     setTotalTaskCount(
       allAnnotatorCumulativeTasksCount + allReviewCumulativeTasksCount
     );
-  }, [taskAnalyticsData[0]]);
+  }, [analyticsData]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -85,15 +95,12 @@ function ContextualTranslationEditing(props) {
     <>
       <Box className={classes.modelChartSection}>
         <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-          Tasks Dashboard - Translation
+          {`Tasks Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Translation Tasks
+            Count of Annotated and Reviewed Audio Data
           </Typography>
         </Typography>
-        <Typography variant="body" sx={{fontSize:"17px"}}>
-          Note : Quality sentence pairs are generated after a pipeline of
-          Annotated & Reviewed tasks.
-        </Typography>
+       
         <Paper>
           <Box className={classes.topBar}>
             <Box className={classes.topBarInnerBox}>
@@ -109,7 +116,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Translated Sentences
+                Total Tasks Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalTaskCount &&
@@ -118,7 +125,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Review Pending Translations
+              Total Audio Files Annotated
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -127,7 +134,7 @@ function ContextualTranslationEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Quality/Reviewed Translations
+              Total quality/ reviewed audio files
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewTasksCount &&
@@ -145,7 +152,7 @@ function ContextualTranslationEditing(props) {
               fontFamily="Roboto"
               margin={{
                 top: 20,
-                right: 20,
+                right: 60,
                 left: 40,
                 bottom: 20,
               }}
@@ -155,7 +162,7 @@ function ContextualTranslationEditing(props) {
                 dataKey="languages"
                 textAnchor={"end"}
                 // tick={<CustomizedAxisTick />}
-                height={90}
+                height={70}
                 interval={0}
                 position="insideLeft"
                 type="category"
@@ -180,12 +187,12 @@ function ContextualTranslationEditing(props) {
                 }
               >
                 <Label
-                  value="# of Completed Translations"
+                  value="# of Completed Tasks"
                   angle={-90}
-                  position= 'insideLeft'
+                  position="insideLeft"
                   fontWeight="bold"
                   fontSize={16}
-                  offset={-10}
+                  offset={-15}
                 ></Label>
               </YAxis>
               {/* <Label value="Count" position="insideLeft" offset={15} /> */}
@@ -210,7 +217,6 @@ function ContextualTranslationEditing(props) {
                 name="Annotation"
                 stackId="a"
                 fill="rgba(243, 156, 18 )"
-                
               />
             </BarChart>
             </ResponsiveChartContainer>
@@ -220,4 +226,4 @@ function ContextualTranslationEditing(props) {
     </>
   );
 }
-export default ContextualTranslationEditing;
+export default AudioTaskAnalyticsChart;

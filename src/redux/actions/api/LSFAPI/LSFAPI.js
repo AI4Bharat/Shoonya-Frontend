@@ -98,13 +98,16 @@ const postReview = async (
 
 
 const patchAnnotation = async (
+  taskId,
   result,
   annotationID,
   load_time,
   lead_time,
   annotation_status,
   notes,
-  autoSave=false
+  autoSave=false,
+  languages,
+  ocr_domain
 ) => {
   try {
     const res = await axiosInstance.patch(`/annotation/${annotationID}/`, {
@@ -113,7 +116,10 @@ const patchAnnotation = async (
         lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
         annotation_status: annotation_status,
       }),
+      task_id: taskId,
       annotation_notes: notes,
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
       ...(autoSave && { auto_save: true }),
     });
     return res;
@@ -123,6 +129,7 @@ const patchAnnotation = async (
 };
 
 const patchReview = async (
+  taskId,
   annotationID,
   load_time,
   lead_time,
@@ -130,13 +137,16 @@ const patchReview = async (
   result,
   parentAnnotation,
   reviewnotes,
-  autoSave=false
+  autoSave=false,
+  languages,
+  ocr_domain
 ) => {
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status: review_status,
       result: result,
+      task_id: taskId,
       review_notes: reviewnotes,
       ...((review_status === "to_be_revised" ||
         review_status === "accepted" ||
@@ -148,6 +158,8 @@ const patchReview = async (
         parent_annotation: parentAnnotation,
         review_notes: reviewnotes,
       }),
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
       ...(autoSave && { auto_save: true }),
     });
     // if (review_status === "to_be_revised") {
@@ -162,6 +174,7 @@ const patchReview = async (
 
 
 const patchSuperChecker = async (
+  taskId,
   annotationID,
   load_time,
   lead_time,
@@ -169,16 +182,21 @@ const patchSuperChecker = async (
   result,
   parentAnnotation,
   superchecknotes,
-  autoSave=false
+  autoSave=false,
+  languages,
+  ocr_domain
 ) => {
   console.log(superchecknotes,"superchecknotes")
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status: review_status,
+      task_id: taskId,
       result: result,
       parent_annotation: parentAnnotation,
       supercheck_notes: superchecknotes,
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
       ...(autoSave && { auto_save: true }),
     });
    

@@ -1,12 +1,13 @@
 import API from "../../../api";
 
 export default class GetWorkspaceDetailedProjectReportsAPI extends API {
-  constructor(workId, projectType, userId, statistics, timeout = 2000) {
+  constructor(workId, projectType, userId, statistics, language, timeout = 2000) {
     super("POST", timeout, false);
     this.workId = workId;
     this.projectType = projectType;
     this.userId = userId;
     this.statistics = statistics;
+    this.language = language;
     this.endpoint = `${super.apiEndPointAuto()}/functions/schedule_project_reports_email`;
   }
 
@@ -26,6 +27,7 @@ export default class GetWorkspaceDetailedProjectReportsAPI extends API {
       workspace_id: this.workId,
       user_id: this.userId,
       project_type: this.projectType,
+      language: this.language
     };
 
     if(this.statistics === 1){
