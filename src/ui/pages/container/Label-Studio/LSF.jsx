@@ -496,7 +496,6 @@ const LabelStudioWrapper = ({
           let countLables = 0;
           temp.map((curr) => {
             // console.log(curr);
-            ids.add(curr.id);
             if(curr.type !== "relation"){
               ids.add(curr.id);
             }
