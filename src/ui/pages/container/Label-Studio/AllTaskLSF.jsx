@@ -232,7 +232,9 @@ useEffect(() => {
           let ids = new Set();
           let countLables = 0;         
           temp.map((curr) => {
-            ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
@@ -303,7 +305,9 @@ useEffect(() => {
           let ids = new Set();
           let countLables = 0;   
           temp.map((curr) => {
-            ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
