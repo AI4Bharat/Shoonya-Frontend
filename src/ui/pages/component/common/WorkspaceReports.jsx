@@ -113,6 +113,9 @@ const WorkspaceReports = () => {
         "AllAudioProjects",
         "OCRTranscription",
         "OCRTranscriptionEditing",
+        "ContextualTranslation",
+        "ContextualSentenceVerification",
+        "ContextualTranslationEditing"
       ]);
       setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
