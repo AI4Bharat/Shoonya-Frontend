@@ -198,10 +198,12 @@ const LabelStudioWrapper = ({
   }, [userData]); */
   
 useEffect(() => {
-    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
@@ -221,8 +223,7 @@ useEffect(() => {
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
       })
-    );
-  }, []);
+    );});},[]);
 
   const tasksComplete = (id) => {
     if (id) {
