@@ -114,6 +114,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(false);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(new Date());
 
   // useEffect(() => {
   //   let intervalId;
@@ -183,6 +184,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, userData);
+    setLastUpdatedAt(AnnotationsTaskDetails[2]?.updated_at);
   }, [AnnotationsTaskDetails, userData]);
   //console.log(disableSkip);
 
@@ -250,6 +252,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       lead_time:
       (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      updated_at: new Date(),
+      last_updated_at: lastUpdatedAt,
     };
     if(result.length && taskDetails?.super_check_user === userData.id) {
     try{ 
@@ -266,6 +270,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           message: data.message,
           variant: "error",
         });
+      }else{
+        setLastUpdatedAt(reqBody.updated_at);
       } 
       return res;
     }

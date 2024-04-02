@@ -112,6 +112,7 @@ const AudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(new Date());
 
   // useEffect(() => {
   //   let intervalId;
@@ -248,6 +249,7 @@ const AudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, user);
+    setLastUpdatedAt(AnnotationsTaskDetails[0]?.updated_at);
   }, [AnnotationsTaskDetails, user]);
 
   const handleCollapseClick = () => {
@@ -311,6 +313,8 @@ const AudioTranscriptionLandingPage = () => {
       lead_time:
         (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      updated_at: new Date(),
+      last_updated_at: lastUpdatedAt,
     };
     if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
       try{
@@ -327,6 +331,8 @@ const AudioTranscriptionLandingPage = () => {
             message: data.message,
             variant: "error",
           });
+        }else{
+          setLastUpdatedAt(reqBody.updated_at);
         }
         return res;
       }

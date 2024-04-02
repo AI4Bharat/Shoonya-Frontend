@@ -116,6 +116,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(new Date());
 
   // useEffect(() => {
   //   let intervalId;
@@ -264,6 +265,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, user, taskDetailList);
+    setLastUpdatedAt(AnnotationsTaskDetails[1]?.updated_at);
   }, [AnnotationsTaskDetails, user, taskDetailList]);
 
   useEffect(() => {
@@ -328,6 +330,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
       lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      updated_at: new Date(),
+      last_updated_at: lastUpdatedAt,
     };
     if(result.length && taskDetails?.review_user === user.id) {
       try{
@@ -345,6 +349,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
             variant: "error",
           });
           return res;
+        }else{
+          setLastUpdatedAt(reqBody.updated_at);
         }
       }
       catch(err) {
