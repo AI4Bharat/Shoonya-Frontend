@@ -55,6 +55,16 @@ const QueuedTasksDetails = (props) => {
           return {
             uuid:el.uuid,
             name:el.name,
+            received:el.received,
+            sent:el.sent|| "No",
+            started:el.started,
+            rejected:el.rejected|| "No",
+            succeeded:el.succeeded,
+            failed:el.failed || "No",
+            exception:el.exception || "No",
+            traceback:el.traceback|| "No",
+            worker:el.worker,
+            result:el.result,
             state:el.state,
             args:el.args,
             args:el.kwargs,
@@ -91,56 +101,41 @@ const QueuedTasksDetails = (props) => {
     });
   };
 
-  const columns = [
-    {
-      name: "uuid",
-      label: "Id",
-      options: {
-        display: false,
-        filter: false,
-        sort: false,
-        align: "center",
-      },
-    },
-    {
-      name: "name",
-      label: "Name",
-      options: {
-        filter: false,
-        sort: false,
-        align: "center",
-      },
-    },
-    {
-      name: "state",
-      label: "State",
-      options: {
-        filter: false,
-        sort: false,
-        align: "center",
-      },
-    },
-    {
-      name: "args",
-      label: "Args",
-      options: {
-        filter: false,
-        sort: false,
-        align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
-      },
-    },
-    {
-      name: "kwargs",
-      label: "KwArgs",
-      options: {
-        filter: false,
-        sort: false,
-        align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
-      },
-    },
-  ];
+  const defaultOptions = {
+    filter: false,
+    sort: false,
+    align: "center",
+    setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+};
+
+function createColumn(name, label, options = {}) {
+    return {
+        name,
+        label,
+        options: {
+            ...defaultOptions,
+            ...options 
+        }
+    };
+}
+
+const columns = [
+    createColumn("uuid", "Id", { display: true }),
+    createColumn("name", "Name"),
+    createColumn("state", "State"),
+    createColumn("args", "Args"),
+    createColumn("kwargs", "KwArgs"),
+    createColumn("received", "Received", { display: true }),
+    createColumn("sent", "Sent", { display: true }),
+    createColumn("started", "Started", { display: true }),
+    createColumn("rejected", "Rejected", { display: true }),
+    createColumn("succeeded", "Succeeded", { display: true }),
+    createColumn("failed", "Failed", { display: true }),
+    createColumn("exception", "Exception", { display: true }),
+    createColumn("traceback", "Traceback", { display: true }),
+    createColumn("worker", "Worker", { display: true }),
+    createColumn("result", "Result", { display: true }),
+];
 
   const options = {
     textLabels: {
