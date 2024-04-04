@@ -69,10 +69,12 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   // debugger
 
 useEffect(() => {
-    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
@@ -91,9 +93,7 @@ useEffect(() => {
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
-      })
-    );
-  }, []);
+      }));});}, []);
 
   useEffect(() => {
     const showAssignedUsers = async () => {
@@ -232,7 +232,9 @@ useEffect(() => {
           let ids = new Set();
           let countLables = 0;         
           temp.map((curr) => {
-            ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
@@ -303,7 +305,9 @@ useEffect(() => {
           let ids = new Set();
           let countLables = 0;   
           temp.map((curr) => {
-            ids.add(curr.id);
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
             if(curr.type === "labels"){
               countLables++;
             }
