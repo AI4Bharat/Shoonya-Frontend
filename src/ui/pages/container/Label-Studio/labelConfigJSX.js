@@ -10,7 +10,7 @@ export const labelConfigJS = `<View>
 <Label value="chapter-title" name="chapter-title" background="#F7C8E0" className="ignore_assertion"/>
 <Label value="contact-info" name="contact-info" background="#D35400" className="ignore_assertion"/>
 <Label value="dateline" name="dateline" background="#16A085" className="ignore_assertion"/>
-<Label value="figure" name="figure" background="#FFEAA7" className="ignore_assertion"/>
+<Label value="figure" name="figure" background="#8E44AD" className="ignore_assertion"/>
 <Label value="figure-caption" name="figure-caption" background="#FDCB6E" className="ignore_assertion"/>
 <Label value="first-level-question" name="first-level-question" background="#E74C3C" className="ignore_assertion"/>
 <Label value="flag" name="flag" background="#34495E" className="ignore_assertion"/>
