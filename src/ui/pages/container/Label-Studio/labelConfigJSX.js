@@ -5,7 +5,7 @@ export const labelConfigJS = `<View>
           placeholder="Filter Labels" />
 <Labels name="annotation_labels" toName="image_url" className="ignore_assertion">
 <Label value="paragraph" name="paragraph" background="#55EFC4" className="ignore_assertion"/>
-<Label value="figure" name="figure" background="#FFEAA7" className="ignore_assertion"/>
+<Label value="figure" name="figure" background="#8E44AD" className="ignore_assertion"/>
 <Label value="figure-caption" name="figure-caption" background="#FDCB6E" className="ignore_assertion"/>
 <Label value="table" name="table" background="#FAB1A0" className="ignore_assertion"/>
 <Label value="table-caption" name="table-caption" background="#E17055" className="ignore_assertion"/>
