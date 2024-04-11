@@ -12,6 +12,7 @@ env:
   REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_DEVELOP }}
   AZURE_CREDS: ${{ secrets.SHOONYA_AZURE_CREDS_E2E }}
   AZURE_STORAGEKEY: ${{ secrets.SHOONYA_AZURE_STORAGEKEY_DEVELOP_E2E }}
+  AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.SHOONYA_AZURE_CONNECTION_STRING_DEVELOP_E2E }}
 
 jobs:
   cicd:
@@ -40,7 +41,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name shoonyastoragedevelop --account-key ${{ env.AZURE_STORAGEKEY }} -d '$web' -s ./build --overwrite
+            az storage blob upload-batch --connection-string env. ${{ env.AZURE_STORAGE_CONNECTION_STRING }} -d '$web' -s ./build --overwrite
 
     - name: Purge CDN endpoint
       uses: azure/CLI@v1
