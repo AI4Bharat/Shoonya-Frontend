@@ -10,8 +10,9 @@ env:
   CI: false
   NODE_OPTIONS: "--max_old_space_size=4096"
   REACT_APP_APIGW_BASE_URL: ${{ secrets.REACT_APP_APIGW_BASE_URL_PROD }}
-  AZURE_CREDS: ${{ secrets.SHOONYA_AZURE_CREDS }}
-  AZURE_STORAGEKEY: ${{ secrets.SHOONYA_AZURE_STORAGEKEY_PROD }}
+  AZURE_CREDS: ${{ secrets.SHOONYA_AZURE_CREDS_PROD_E2E }}
+  AZURE_STORAGEKEY: ${{ secrets.SHOONYA_AZURE_STORAGEKEY_PROD_E2E }}
+  AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.SHOONYA_AZURE_CONNECTION_STRING_PROD_E2E }}
 
 jobs:
   cicd:
@@ -46,7 +47,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-           az cdn endpoint purge --no-wait --content-paths  "/*" --profile-name prod-react-static --name frontend-prod-shoonya --resource-group shoonya
+           az cdn endpoint purge --no-wait --content-paths  "/*" --profile-name shoonya-prod-cdn --name shoonya-prod-cdn-endpoint --resource-group shoonya-dev
    
     - name: Azure logout
       run: |
