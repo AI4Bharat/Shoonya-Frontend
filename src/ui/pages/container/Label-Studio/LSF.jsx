@@ -218,10 +218,12 @@ const LabelStudioWrapper = ({
   }, [userData]); */
 
   useEffect(() => {
-    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
@@ -240,8 +242,7 @@ const LabelStudioWrapper = ({
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
-      })
-    );
+      }));});
   }, []);
 
   const tasksComplete = (id) => {
@@ -496,7 +497,6 @@ const LabelStudioWrapper = ({
           let countLables = 0;
           temp.map((curr) => {
             // console.log(curr);
-            ids.add(curr.id);
             if(curr.type !== "relation"){
               ids.add(curr.id);
             }
@@ -1118,9 +1118,26 @@ const LabelStudioWrapper = ({
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
               {predictions?.length > 0 ?
-              predictions?.map((pred, index) => (
-                <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
-              )) : <div style={{textAlign:"center"}}>No Predictions Present</div>}
+                (() => {
+                  try {
+                    return JSON.parse(predictions)?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  } catch (error) {
+                    console.error("Error parsing predictions:", error);
+                    return predictions?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  }
+                })()
+              :
+              <div style={{textAlign:"center"}}>No Predictions Present</div>}
             </div>
           </>
         }
