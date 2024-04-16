@@ -184,7 +184,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, userData);
-    setLastUpdatedAt(AnnotationsTaskDetails[2]?.updated_at);
+    setLastUpdatedAt(AnnotationsTaskDetails[2]?.version_updated_at);
   }, [AnnotationsTaskDetails, userData]);
   //console.log(disableSkip);
 
@@ -252,7 +252,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       lead_time:
       (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      updated_at: new Date(),
+      version_updated_at: new Date(),
       last_updated_at: lastUpdatedAt,
     };
     if(result.length && taskDetails?.super_check_user === userData.id) {
@@ -271,7 +271,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
           variant: "error",
         });
       }else{
-        setLastUpdatedAt(reqBody.updated_at);
+        setLastUpdatedAt(reqBody.version_updated_at);
       } 
       return res;
     }
@@ -556,6 +556,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      last_updated_at: lastUpdatedAt,
       ...((value === "rejected" ||
         value === "validated" ||
         value === "validated_with_changes") && {

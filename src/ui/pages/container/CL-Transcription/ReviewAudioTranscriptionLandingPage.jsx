@@ -265,7 +265,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, user, taskDetailList);
-    setLastUpdatedAt(AnnotationsTaskDetails[1]?.updated_at);
+    setLastUpdatedAt(AnnotationsTaskDetails[1]?.version_updated_at);
   }, [AnnotationsTaskDetails, user, taskDetailList]);
 
   useEffect(() => {
@@ -330,7 +330,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      updated_at: new Date(),
+      version_updated_at: new Date(),
       last_updated_at: lastUpdatedAt,
     };
     if(result.length && taskDetails?.review_user === user.id) {
@@ -350,7 +350,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
           });
           return res;
         }else{
-          setLastUpdatedAt(reqBody.updated_at);
+          setLastUpdatedAt(reqBody.version_updated_at);
         }
       }
       catch(err) {
@@ -634,6 +634,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
       result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      last_updated_at: lastUpdatedAt,
       ...((value === "to_be_revised" || value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
