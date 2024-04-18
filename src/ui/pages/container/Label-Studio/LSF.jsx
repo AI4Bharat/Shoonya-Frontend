@@ -1098,6 +1098,7 @@ const LabelStudioWrapper = ({
               <div style={{ minWidth: "160px" }} />
             )} */}
             </Grid>
+            {ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
             <Grid item>
               <Tooltip title="Clear all children bboxes">
                 <Button
@@ -1117,6 +1118,7 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             </Grid>
+            }
           </Grid>
         </div>
       )}
