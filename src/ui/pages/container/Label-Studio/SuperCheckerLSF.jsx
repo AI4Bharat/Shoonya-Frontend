@@ -1079,6 +1079,7 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
+            {ProjectDetails?.project_type?.includes("OCRSegmentCategorization") &&
             <Tooltip title="Clear all children bboxes">
                 <Button
                   type="default"
@@ -1096,6 +1097,7 @@ useEffect(() => {
                   Clear Child BBoxes
                 </Button>
               </Tooltip>
+          }
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
