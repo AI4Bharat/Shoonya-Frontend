@@ -858,9 +858,8 @@ const LabelStudioWrapper = ({
   };
 
   const clearAllChildren = () => {
-    if (lsfRef.current?.store?.annotationStore?.selected) {
-      let annotation = lsfRef.current.store.annotationStore.selected;
-      let temp;
+    if (lsfRef.current?.store?.annotationStore?.selected&&
+      taskData.task_status.toLowerCase() !== "labeled") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp;
@@ -897,7 +896,7 @@ const LabelStudioWrapper = ({
               if (res.status !== 200) {
                 setSnackbarInfo({
                   open: true,
-                  message: "Error in clearing children",
+              message: "Error in clearing children bboxes",
                   variant: "error",
                 });
               }else{
@@ -906,7 +905,13 @@ const LabelStudioWrapper = ({
             });
           }
         }
-      }}
+      }else
+      setSnackbarInfo({
+        open: true,
+        message: "Task is frozen",
+        variant: "error",
+      });
+    }
   };
 
   let hidden, visibilityChange;
@@ -1094,7 +1099,7 @@ const LabelStudioWrapper = ({
             )} */}
             </Grid>
             <Grid item>
-              <Tooltip title="Clear all children">
+              <Tooltip title="Clear all children bboxes">
                 <Button
                   type="default"
                   onClick={() => {clearAllChildren()}}
@@ -1108,7 +1113,7 @@ const LabelStudioWrapper = ({
                   }}
                   className="lsf-button"
                 >
-                  Clear Children
+                  Clear Child BBoxes
                 </Button>
               </Tooltip>
             </Grid>
