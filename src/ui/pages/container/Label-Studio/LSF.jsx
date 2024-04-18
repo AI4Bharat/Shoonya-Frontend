@@ -857,6 +857,58 @@ const LabelStudioWrapper = ({
     }
   };
 
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected) {
+      let annotation = lsfRef.current.store.annotationStore.selected;
+      let temp;
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            !annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id
+          ) {
+            temp = annotation.serializeAnnotation();
+            if (annotations[i].annotation_type !== 1) continue;
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].parentID !== undefined){
+                delete temp[i].parentID;
+              }
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
+              }
+            }
+            patchAnnotation(
+              taskId,
+              temp,
+              annotations[i].id,
+              load_time.current,
+              annotations[i].lead_time,
+              annotations[i].annotation_status,
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              true,
+              selectedLanguages,
+              ocrDomain
+            ).then((res) => {
+              if (res.status !== 200) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Error in clearing children",
+                  variant: "error",
+                });
+              }else{
+                window.location.reload();
+              }
+            });
+          }
+        }
+      }}
+  };
+
   let hidden, visibilityChange;
   if (typeof document.hidden !== "undefined") {
     hidden = "hidden";
@@ -1040,6 +1092,25 @@ const LabelStudioWrapper = ({
               {/* ) : (
               <div style={{ minWidth: "160px" }} />
             )} */}
+            </Grid>
+            <Grid item>
+              <Tooltip title="Clear all children">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear Children
+                </Button>
+              </Tooltip>
             </Grid>
           </Grid>
         </div>
