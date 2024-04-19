@@ -1026,7 +1026,7 @@ const LabelStudioWrapper = ({
           className="lsf-controls"
         >
           <div />
-          <Grid container spacing={0}>
+          <Grid container justifyContent="space-between">
             <Grid item>
               <LightTooltip title={assignedUsers ? assignedUsers : ""}>
                 <Button
@@ -1047,9 +1047,7 @@ const LabelStudioWrapper = ({
                   />
                 </Button>
               </LightTooltip>
-            </Grid>
             {/* <Grid container spacing={0} sx={{ justifyContent: "end" }}> */}
-            <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
@@ -1073,8 +1071,6 @@ const LabelStudioWrapper = ({
                     </Button>
                   </Tooltip>
                 )}
-            </Grid>
-            <Grid item>
               {/* {localStorage.getItem("labelAll") === "true" ? ( */}
               <Tooltip title="Go to next task">
                 <Button
@@ -1098,8 +1094,9 @@ const LabelStudioWrapper = ({
               <div style={{ minWidth: "160px" }} />
             )} */}
             </Grid>
-            {ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
-            <Grid item>
+            {ProjectDetails?.project_type?.includes("OCR") && 
+            <>
+            <Grid item >
               <Tooltip title="Clear all children bboxes">
                 <Button
                   type="default"
@@ -1111,13 +1108,15 @@ const LabelStudioWrapper = ({
                     pt: 3,
                     pb: 3,
                     borderBottom: "None",
+                    color: "#f00",
                   }}
                   className="lsf-button"
                 >
-                  Clear Child BBoxes
+                  Clear All Mergings
                 </Button>
               </Tooltip>
             </Grid>
+            </>
             }
           </Grid>
         </div>
