@@ -1332,7 +1332,7 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
-            {ProjectDetails?.project_type?.includes("OCRSegmentCategorization") &&
+            {ProjectDetails?.project_type?.includes("OCR") &&
             <Tooltip title="Clear all children bboxes">
                 <Button
                   type="default"
@@ -1344,10 +1344,11 @@ useEffect(() => {
                     pt: 3,
                     pb: 3,
                     borderBottom: "None",
+                    color: "#f00",
                   }}
                   className="lsf-button"
                 >
-                  Clear Child BBoxes
+                  Clear All Mergings
                 </Button>
               </Tooltip>
             }
