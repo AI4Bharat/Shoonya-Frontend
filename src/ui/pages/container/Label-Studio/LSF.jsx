@@ -857,6 +857,63 @@ const LabelStudioWrapper = ({
     }
   };
 
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected&&
+      taskData.task_status.toLowerCase() !== "labeled") {
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            !annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id
+          ) {
+            temp = annotation.serializeAnnotation();
+            if (annotations[i].annotation_type !== 1) continue;
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].parentID !== undefined){
+                delete temp[i].parentID;
+              }
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
+              }
+            }
+            patchAnnotation(
+              taskId,
+              temp,
+              annotations[i].id,
+              load_time.current,
+              annotations[i].lead_time,
+              annotations[i].annotation_status,
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              true,
+              selectedLanguages,
+              ocrDomain
+            ).then((res) => {
+              if (res.status !== 200) {
+                setSnackbarInfo({
+                  open: true,
+              message: "Error in clearing children bboxes",
+                  variant: "error",
+                });
+              }else{
+                window.location.reload();
+              }
+            });
+          }
+        }
+      }else
+      setSnackbarInfo({
+        open: true,
+        message: "Task is frozen",
+        variant: "error",
+      });
+    }
+  };
+
   let hidden, visibilityChange;
   if (typeof document.hidden !== "undefined") {
     hidden = "hidden";
@@ -969,7 +1026,7 @@ const LabelStudioWrapper = ({
           className="lsf-controls"
         >
           <div />
-          <Grid container spacing={0}>
+          <Grid container justifyContent="space-between">
             <Grid item>
               <LightTooltip title={assignedUsers ? assignedUsers : ""}>
                 <Button
@@ -990,9 +1047,7 @@ const LabelStudioWrapper = ({
                   />
                 </Button>
               </LightTooltip>
-            </Grid>
             {/* <Grid container spacing={0} sx={{ justifyContent: "end" }}> */}
-            <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
@@ -1016,8 +1071,6 @@ const LabelStudioWrapper = ({
                     </Button>
                   </Tooltip>
                 )}
-            </Grid>
-            <Grid item>
               {/* {localStorage.getItem("labelAll") === "true" ? ( */}
               <Tooltip title="Go to next task">
                 <Button
@@ -1041,6 +1094,30 @@ const LabelStudioWrapper = ({
               <div style={{ minWidth: "160px" }} />
             )} */}
             </Grid>
+            {ProjectDetails?.project_type?.includes("OCR") && 
+            <>
+            <Grid item >
+              <Tooltip title="Clear all children bboxes">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    color: "#f00",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear All Mergings
+                </Button>
+              </Tooltip>
+            </Grid>
+            </>
+            }
           </Grid>
         </div>
       )}

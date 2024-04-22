@@ -771,6 +771,56 @@ useEffect(() => {
     }
   };
 
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "validated" && taskData.task_status.toLowerCase() !== "validated_with_changes") {
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp = annotation.serializeAnnotation();
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].parentID !== undefined){
+            delete temp[i].parentID;
+          }
+          if(temp[i].type === "relation"){
+            continue;
+          }else if (temp[i].value.text) {
+            temp[i].value.text = [temp[i].value.text[0]];
+          }
+        }
+        let superChecker = annotations.filter(
+          (value) => value.annotation_type === 3
+        )[0];
+        patchSuperChecker(
+          taskId,
+          superChecker.id,
+          load_time.current,
+          superChecker.lead_time,
+          superChecker.annotation_status,
+          temp,
+          superChecker.parent_annotation,
+          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+          true,
+          selectedLanguages,
+          ocrDomain
+        ).then((res) => {
+          if (res.status !== 200) {
+            setSnackbarInfo({
+              open: true,
+              message: "Error in clearing children bboxes",
+              variant: "error",
+            });
+          }else{
+            window.location.reload();
+          }
+        });
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
+  };
+
   let hidden, visibilityChange;
   if (typeof document.hidden !== 'undefined') {
     hidden = 'hidden';
@@ -1029,6 +1079,26 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
+            {ProjectDetails?.project_type?.includes("OCR") &&
+            <Tooltip title="Clear all children bboxes">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    color: "#f00",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear All Mergings
+                </Button>
+              </Tooltip>
+          }
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
