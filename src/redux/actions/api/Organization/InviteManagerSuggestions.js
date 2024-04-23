@@ -5,14 +5,14 @@ import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
-export default class RequestManagerSuggestions extends API {
+export default class InviteManagerSuggestions extends API {
    constructor(orgId, emails, role, timeout = 2000) {
      super("POST", timeout, false);
      this.type = constants.INVITE_USERS_TO_ORG;
      this.organization_id = orgId;
      this.emails = emails;
      this.role = role;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getPendingUsers}request_user`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getPendingUsers}request_user/`;
    }
  
    processResponse(res) {
@@ -45,7 +45,7 @@ export default class RequestManagerSuggestions extends API {
    }
  
    getPayload() {
-     return this.RequestManagerSuggestions;
+     return this.InviteManagerSuggestions;
    }
  }
  

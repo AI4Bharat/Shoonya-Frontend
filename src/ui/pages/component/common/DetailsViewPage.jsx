@@ -52,7 +52,9 @@ import PerformanceAnalytics from "../../container/Progress/Workspace/Performance
 import InviteUsersDialog from "./InviteUsersDialog";
 import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers"
+import InviteManagerSuggestions from "../../../../redux/actions/api/Organization/InviteManagerSuggestions";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI"
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -131,6 +133,7 @@ const DetailsViewPage = (props) => {
     }
     
   }, []);
+  const organisation_id = useSelector(state => state.getWorkspacesProjectData?.data?.[0]?.organization_id);
 
   let navigate = useNavigate();
 
@@ -167,8 +170,41 @@ const DetailsViewPage = (props) => {
 
   const addBtnClickHandler = async () => {
     setLoading(true);
+    if(userDetails?.role === userRole.WorkspaceManager)
+    {
+      const addUsesrsObj = new InviteManagerSuggestions(
+        organisation_id,
+        selectedUsers,
+        userType
+      );
+      const res = await fetch(addUsesrsObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(addUsesrsObj.getBody()),
+        headers: addUsesrsObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+        const orgObj = new GetOragnizationUsersAPI(id);
+        dispatch(APITransport(orgObj));
+
+      }else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
+    }
+    else 
+    {
+
     const addMembersObj = new InviteUsersToOrgAPI(
-        orgId,
+        organisation_id,
         selectedUsers,
         userType
       );
@@ -193,14 +229,14 @@ const DetailsViewPage = (props) => {
           variant: "error",
         });
       }
-      handleUserDialogClose();
+    }
+    handleUserDialogClose();
     setLoading(false);
     setSelectedUsers([ ]);
     setSelectedEmails([]);
     setCsvFile(null);
     setbtn(null)
     setUserType(Object.keys(UserRolesList)[0])
-    console.log('todo')
   };
   useEffect(() => {
     setLoading(apiLoading);

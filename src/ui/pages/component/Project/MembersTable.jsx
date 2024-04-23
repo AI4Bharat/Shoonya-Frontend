@@ -76,6 +76,8 @@ const MembersTable = (props) => {
     rejectButton,
     hideViewButton,
   } = props;
+
+ 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -134,17 +136,20 @@ const MembersTable = (props) => {
         sort: false,
       },
     },
-    // showInvitedBy && {
-    //   name: "Invited By",
-    //   label: "Invited By",
-    //   options: {
-    //     filter: false,
-    //     sort: false,
-    //   },
      
-    // },
   ];
   
+  if(showInvitedBy){
+      columns.splice(3, 0, {
+        name: "Invited By",
+        label: "Invited By",
+        options: {
+          filter: false,
+          sort: false,
+        },
+      });
+
+  }
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -338,6 +343,7 @@ const MembersTable = (props) => {
     setLoading(apiLoading);
   }, [apiLoading]);
 
+ 
   const projectlist = (el) => {
     let temp = false;
     ProjectDetails?.frozen_users?.forEach((em) => {
@@ -356,7 +362,7 @@ const MembersTable = (props) => {
             el.username,
             el.email,
             userRole ? userRole : el.role,
-            
+            el.invited_by,
             <>  
              
               {!hideViewButton && (
@@ -476,6 +482,8 @@ const MembersTable = (props) => {
     search: false,
     jumpToPage: true,
   };
+
+
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars

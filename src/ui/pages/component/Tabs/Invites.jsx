@@ -90,12 +90,8 @@ const Invites = (props) => {
     }
 
     useEffect(() => {
-        if(userDetails)
-        {
-            console.log(userDetails)
-        }
-        getOrganizationMembersData();
         getManagerSuggestions();
+        getOrganizationMembersData();
     }, []);
 
     return (
@@ -127,7 +123,7 @@ const Invites = (props) => {
             hideButton = {hideButton ? hideButton : false}
             approveButton = {true}
             rejectButton = {true}
-            dataSource={mockdata}
+            dataSource={ManagerSuggestions && ManagerSuggestions.length > 0 && ManagerSuggestions.filter((el, i) => { return !el.has_accepted_invite })}
             />
             </>
         }
