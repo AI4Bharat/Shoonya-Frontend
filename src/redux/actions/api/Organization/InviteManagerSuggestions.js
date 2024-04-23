@@ -8,7 +8,7 @@ import constants from "../../../constants";
 export default class InviteManagerSuggestions extends API {
    constructor(orgId, emails, role, timeout = 2000) {
      super("POST", timeout, false);
-     this.type = constants.INVITE_USERS_TO_ORG;
+     this.type = constants.REQUEST_MANAGER_SUGGESTIONS;
      this.organization_id = orgId;
      this.emails = emails;
      this.role = role;
@@ -18,7 +18,7 @@ export default class InviteManagerSuggestions extends API {
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-         this.RequestManagerSuggestions = res;
+         this.InviteManagerSuggestions = res;
      }
  }
  
