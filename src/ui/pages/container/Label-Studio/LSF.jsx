@@ -991,8 +991,8 @@ const LabelStudioWrapper = ({
       if(Array.isArray(taskData?.data?.language)){
         taskData?.data?.language?.map((lang)=>{
           selectedLanguages.current?.push(lang);
-          const newLanguages = [...selectedL, ...taskData?.data?.language];
-          setSelectedL(newLanguages);
+          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
+          setSelectedL(Array.from(newLanguages));
         });
       }
       if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
