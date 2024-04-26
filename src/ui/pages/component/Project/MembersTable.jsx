@@ -148,7 +148,6 @@ const MembersTable = (props) => {
           sort: false,
         },
       });
-
   }
   const pageSearch = () => {
     return dataSource.filter((el) => {
@@ -362,10 +361,10 @@ const MembersTable = (props) => {
             el.username,
             el.email,
             userRole ? userRole : el.role,
-            el.invited_by,
+            ...(showInvitedBy ? [el.invited_by] : []),
+
             <>  
-             
-              {!hideViewButton && (
+                 {!hideViewButton && (
                 <CustomButton
                   sx={{ p: 1, borderRadius: 2 }}
                   onClick={() => {
@@ -413,6 +412,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
+              
 
            {projectlist(el.id) &&(
                 <CustomButton
@@ -483,7 +483,9 @@ const MembersTable = (props) => {
     jumpToPage: true,
   };
 
-
+  // console.log('columns',columns)
+  // console.log('options',options)
+  // console.log('data',data)
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars

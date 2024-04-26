@@ -13,58 +13,6 @@ import Tabs from '@mui/material/Tabs';
 import Box from '@mui/material/Box';
 import { FormControl } from "@mui/material";
 
-const mockdata = [
-    {
-        "id": 316,
-        "username": "Translator Gujarati - LSB",
-        "email": "translatorguj1@gmail.com",
-        "first_name": "",
-        "last_name": "",
-        "role": 2,
-        "invited_by": "Vasudev Aital",
-        "has_accepted_invite": true
-    },
-    {
-        "id": 320,
-        "username": "rmanojvarma",
-        "email": "rmanojvarma@gmail.com",
-        "first_name": "Manoj",
-        "last_name": "varma",
-        "role": 3,
-        "invited_by": "Vasudev Aital",
-        "has_accepted_invite": true
-    },
-    {
-        "id": 344,
-        "username": "sandesh",
-        "email": "sandeshprabhudesai@gmail.com",
-        "first_name": "Sandesh",
-        "last_name": "Prabhudesai",
-        "role": 3,
-        "invited_by": "Vasudev Aital",
-        "has_accepted_invite": true
-    },
-    {
-        "id": 383,
-        "username": "Vasudev Aital",
-        "email": "vasu.aital@gmail.com",
-        "first_name": "Vasudev",
-        "last_name": "Aital",
-        "role": 2,
-        "invited_by": "Vasudev Aital",
-        "has_accepted_invite": true
-    },
-    {
-        "id": 148,
-        "username": "dhakaram.kafle@gmail.com",
-        "email": "dhakaram.kafle@gmail.com",
-        "first_name": "Dhaka Ram",
-        "last_name": "Kafle",
-        "role": 2,
-        "invited_by": "Vasudev Aital",
-        "has_accepted_invite": true
-    },
-]
 
 const Invites = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
@@ -92,7 +40,7 @@ const Invites = (props) => {
     useEffect(() => {
         getManagerSuggestions();
         getOrganizationMembersData();
-    }, []);
+    }, [tabValue]);
 
     return (
         <React.Fragment>
@@ -112,6 +60,8 @@ const Invites = (props) => {
             <MembersTable
             key={1}
             reSendButton ={reSendButton}
+            hideViewButton={false}
+            showInvitedBy={false}
             hideButton = {hideButton ? hideButton : false}
             dataSource={OrganizationUserData && OrganizationUserData.length > 0 && OrganizationUserData.filter((el, i) => { return !el.has_accepted_invite })}
             />

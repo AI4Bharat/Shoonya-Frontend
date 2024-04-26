@@ -54,6 +54,7 @@ import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
 import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers"
 import InviteManagerSuggestions from "../../../../redux/actions/api/Organization/InviteManagerSuggestions";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI"
+import CustomizedSnackbars from "./Snackbar";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -119,6 +120,7 @@ const DetailsViewPage = (props) => {
   //     dispatch(APITransport(workspaceObj));
   //   }
 
+
   useEffect(() => {
     // getDashboardWorkspaceData();
   }, []);
@@ -166,6 +168,20 @@ const DetailsViewPage = (props) => {
   };
   const handleUserDialogClose = () => {
     setAddUserDialogOpen(false);
+  };
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
   };
 
   const addBtnClickHandler = async () => {
@@ -252,6 +268,7 @@ const DetailsViewPage = (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
+      {renderSnackBar()}
       <Grid
         container
         direction="row"
@@ -458,7 +475,7 @@ const DetailsViewPage = (props) => {
                     className={classes.annotatorsButton}
                     label={"Add Members to Workspace"}
                     sx={{ width: "100%", mb: 2 }}
-                    onClick={handleUserDialogOpen}
+                    onClick={handleAnnotatorDialogOpen}
                   />
                     <InviteUsersDialog
                       handleDialogClose={handleUserDialogClose}
