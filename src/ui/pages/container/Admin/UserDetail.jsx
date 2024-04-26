@@ -125,41 +125,18 @@ const UserDetail = (props) => {
 
   const pageSearch = () => {
     return UserDetail.filter((el) => {
-      if (SearchUserDetail == "") {
-        return el;
-      } else if (
-        el.email?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
-      ) {
-        return el;
-      }else if(
-        el.username?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
-      ){
-        return el;
-      } else if (
-        el.first_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
-      ) {
-        return el;
-      }else if(
-        el.is_active?.toString()
-        ?.toLowerCase()
-        .includes(SearchUserDetail?.toLowerCase())
-      ){
-        return el;
-      } else if (
-        el.last_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
-      ) {
-        return el;
-      } else if (
-        el.participation_type
-          .toString()
-          ?.toLowerCase()
-          .includes(SearchUserDetail?.toLowerCase())
-      ) {
-        return el;
-      } else if (
-        el.languages?.some((val) =>
-          val?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
-        )
+      const searchValue = SearchUserDetail.toLowerCase();
+      if (
+        searchValue === "" ||
+        el.email?.toLowerCase().includes(searchValue) ||
+        el.username?.toLowerCase().includes(searchValue) ||
+        el.first_name?.toLowerCase().includes(searchValue) ||
+        el.last_name?.toLowerCase().includes(searchValue) ||
+        el.participation_type.toString().toLowerCase().includes(searchValue) ||
+        el.languages?.some((val) => val?.toLowerCase().includes(searchValue)) ||
+        ((el.is_active === true && searchValue === "active") ||
+        (el.is_active === false && searchValue === "not active")) ||
+        (searchValue === "not" && !el.is_active) // Recommend "not active" when searching for "not"
       ) {
         return el;
       }
