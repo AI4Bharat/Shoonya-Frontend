@@ -50,6 +50,6 @@ export const labelConfigJS = `<View>
 </Labels>
 <Rectangle name="annotation_bboxes" toName="image_url" strokeWidth="3" className="ignore_assertion"/>
 <Relations>
-    <Relation value="continues-to" selected="true"/>
+    <Relation value="c" selected="true"/>
 </Relations>
 </View>`;

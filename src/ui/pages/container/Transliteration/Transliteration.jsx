@@ -221,7 +221,7 @@ const Transliteration = (props) => {
           getOptionLabel={(el) => el.DisplayName}
           sx={{ width: window.innerWidth * 0.15 }}
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
-          
+          disableClearable={true}
         />
       </Grid>
 
