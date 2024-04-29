@@ -34,45 +34,11 @@ import RemoveFrozenUserAPI from "../../../../redux/actions/api/ProjectDetails/Re
 import userRoles from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import RejectManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/RejectManagerSuggestions";
+import ApproveManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/ApproveManagerSuggestions";
 
-const columns = [
-  {
-    name: "Name",
-    label: "Name",
-    options: {
-      filter: false,
-      sort: false,
-      align: "center",
-      setCellHeaderProps: (sort) => ({
-        style: { height: "70px", padding: "16px" },
-      }),
-    },
-  },
-  {
-    name: "Email",
-    label: "Email",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-  {
-    name: "Role",
-    label: "Role",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-  {
-    name: "Actions",
-    label: "Actions",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-];
+
+
 
 const options = {
   filterType: "checkbox",
@@ -103,9 +69,15 @@ const MembersTable = (props) => {
   const {
     dataSource,
     hideButton,
+    showInvitedBy,
     onRemoveSuccessGetUpdatedMembers,
     reSendButton,
+    approveButton,
+    rejectButton,
+    hideViewButton,
   } = props;
+
+ 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -127,6 +99,56 @@ const MembersTable = (props) => {
     (state) => state.fetchLoggedInUserData.data
   );
 
+  const columns = [
+    {
+      name: "Name",
+      label: "Name",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+        setCellHeaderProps: (sort) => ({
+          style: { height: "70px", padding: "16px" },
+        }),
+      },
+    },
+    {
+      name: "Email",
+      label: "Email",
+      options: {
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "Role",
+      label: "Role",
+      options: {
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "Actions",
+      label: "Actions",
+      options: {
+        filter: false,
+        sort: false,
+      },
+    },
+     
+  ];
+  
+  if(showInvitedBy){
+      columns.splice(3, 0, {
+        name: "Invited By",
+        label: "Invited By",
+        options: {
+          filter: false,
+          sort: false,
+        },
+      });
+  }
   const pageSearch = () => {
     return dataSource.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -149,6 +171,16 @@ const MembersTable = (props) => {
     userDetails && setUserRole(userDetails.role);
   }, []);
 
+  const handleApproveUser=(userId)=>{
+    const projectObj = new ApproveManagerSuggestionsAPI(userId);
+    dispatch(APITransport(projectObj));
+  }
+
+  const handleRejectUser=(userId)=>{
+    const projectObj = new RejectManagerSuggestionsAPI(userId);
+    dispatch(APITransport(projectObj));
+
+  }
   const handleUserDialogClose = () => {
     setAddUserDialogOpen(false);
   };
@@ -310,6 +342,7 @@ const MembersTable = (props) => {
     setLoading(apiLoading);
   }, [apiLoading]);
 
+ 
   const projectlist = (el) => {
     let temp = false;
     ProjectDetails?.frozen_users?.forEach((em) => {
@@ -328,15 +361,18 @@ const MembersTable = (props) => {
             el.username,
             el.email,
             userRole ? userRole : el.role,
-            <>
-              <CustomButton
-                sx={{ p: 1, borderRadius: 2 }}
-                onClick={() => {
-                  navigate(`/profile/${el.id}`);
-                }}
-                label={"View"}
-              />
+            ...(showInvitedBy ? [el.invited_by] : []),
 
+            <>  
+                 {!hideViewButton && (
+                <CustomButton
+                  sx={{ p: 1, borderRadius: 2 }}
+                  onClick={() => {
+                    navigate(`/profile/${el.id}`);
+                  }}
+                  label={"View"}
+                />
+              )}
               {(userRoles.WorkspaceManager === loggedInUserData?.role || userRoles.OrganizationOwner === loggedInUserData?.role || userRoles.Admin === loggedInUserData?.role && props.type === addUserTypes.PROJECT_ANNOTATORS) && (
                 <CustomButton
                   sx={{
@@ -376,6 +412,7 @@ const MembersTable = (props) => {
                   disabled={projectlist(el.id)|| ProjectDetails.is_archived}
                 />
               )}
+              
 
            {projectlist(el.id) &&(
                 <CustomButton
@@ -393,6 +430,25 @@ const MembersTable = (props) => {
                   label={"Resend"}
                 />
               )}
+              {
+                approveButton && (
+                  <CustomButton
+                    sx={{ p: 1, m: 1, borderRadius: 2 }}
+                    onClick={() => handleApproveUser(el.id)}
+                    label={"Approve"}
+                  />
+                )
+              }
+              {
+                rejectButton && (
+                  <CustomButton
+                    sx={{ p: 1, m: 1, borderRadius: 2, backgroundColor: "#cf5959"}}
+                    color="error"
+                    onClick={() => handleRejectUser(el.id)}
+                    label={"Reject"}
+                  />
+                )
+              }
 
               
             </>,
@@ -426,6 +482,10 @@ const MembersTable = (props) => {
     search: false,
     jumpToPage: true,
   };
+
+  // console.log('columns',columns)
+  // console.log('options',options)
+  // console.log('data',data)
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
