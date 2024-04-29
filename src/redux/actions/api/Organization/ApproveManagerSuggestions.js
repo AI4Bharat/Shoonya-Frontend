@@ -5,9 +5,9 @@ import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
-export default class RejectManagerSuggestionsAPI extends API {
+export default class ApproveManagerSuggestionsAPI extends API {
    constructor(userId, timeout = 2000) {
-     super("PATCH", timeout, false);
+     super("POST", timeout, false);
      this.type = constants.APPROVE_MANAGER_SUGGESTIONS;
      this.userId = userId;
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getPendingUsers}approve_user/?userId=${this.userId}`;
