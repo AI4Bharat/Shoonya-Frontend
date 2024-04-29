@@ -471,35 +471,17 @@ const DetailsViewPage = (props) => {
                   rowSpacing={2}
                 >
                   <Grid item xs={12} sm={6}>
-                  <Button
+                  <CustomButton
                     className={classes.annotatorsButton}
                     label={"Add Members to Workspace"}
                     sx={{ width: "100%", mb: 2 }}
                     onClick={handleAnnotatorDialogOpen}
                   />
-                    <InviteUsersDialog
-                      handleDialogClose={handleUserDialogClose}
-                      isOpen={addUserDialogOpen}
-                      selectedUsers={selectedUsers}
-                      setSelectedUsers={setSelectedUsers}
-                      userType={userType}
-                      setUserType={setUserType}
-                      addBtnClickHandler={()=>addBtnClickHandler()}
-                      loading={loading}
-                      selectedEmails={selectedEmails}
-                      setSelectedEmails={setSelectedEmails}
-                      csvFile={csvFile}
-                      setCsvFile={setCsvFile}
-                      btn={btn}
-                      setbtn={setbtn}
-                      value={value}
-                      setvalue={setValue}
-                    />
 
 
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                  <Button
+                  <CustomButton
                     className={classes.annotatorsButton}
                     label={"Invite Users to Organisation"}
                     sx={{ width: "100%", mb: 2 }}
@@ -507,7 +489,6 @@ const DetailsViewPage = (props) => {
                   />
                   </Grid>
                 </Grid>
-                
                 <AnnotatorsTable
                   onRemoveSuccessGetUpdatedMembers={() => getWorkspaceDetails()}
                 />
@@ -517,6 +498,24 @@ const DetailsViewPage = (props) => {
                   userType={addUserTypes.ANNOTATOR}
                   id={id}
                 />
+                <InviteUsersDialog
+                handleDialogClose={handleUserDialogClose}
+                isOpen={addUserDialogOpen}
+                selectedUsers={selectedUsers}
+                setSelectedUsers={setSelectedUsers}
+                userType={userType}
+                setUserType={setUserType}
+                addBtnClickHandler={()=>addBtnClickHandler()}
+                loading={loading}
+                selectedEmails={selectedEmails}
+                setSelectedEmails={setSelectedEmails}
+                csvFile={csvFile}
+                setCsvFile={setCsvFile}
+                btn={btn}
+                setbtn={setbtn}
+                value={value}
+                setvalue={setValue}
+              />
               </>
             )}
             {pageType === componentType.Type_Organization && (
