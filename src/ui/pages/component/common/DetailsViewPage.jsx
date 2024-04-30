@@ -515,6 +515,7 @@ const DetailsViewPage = (props) => {
                 setbtn={setbtn}
                 value={value}
                 setvalue={setValue}
+                popUpLabel={userDetails?.role === userRole.WorkspaceManager ? "Request admin to add users to organization" : "Invite users to organization" }
               />
               </>
             )}

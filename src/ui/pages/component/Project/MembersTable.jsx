@@ -36,8 +36,7 @@ import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import RejectManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/RejectManagerSuggestions";
 import ApproveManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/ApproveManagerSuggestions";
-
-
+import { getManagerSuggestions } from "../Tabs/Invites";
 
 
 const options = {
@@ -174,11 +173,13 @@ const MembersTable = (props) => {
   const handleApproveUser=(userId)=>{
     const projectObj = new ApproveManagerSuggestionsAPI(userId);
     dispatch(APITransport(projectObj));
+    getManagerSuggestions(dispatch,orgId);
   }
 
   const handleRejectUser=(userId)=>{
     const projectObj = new RejectManagerSuggestionsAPI(userId);
     dispatch(APITransport(projectObj));
+    getManagerSuggestions(dispatch,orgId);
 
   }
   const handleUserDialogClose = () => {
@@ -525,7 +526,7 @@ const MembersTable = (props) => {
         setConfirmationDialog(false);
       }else{
         window.alert("Invalid credentials, please try again");
-        console.log(rsp_data);
+        // console.log(rsp_data);
       }}
     else if(memberOrReviewer === "superchecker"){
       if(pin === "0104"){
