@@ -13,7 +13,10 @@ import Tabs from '@mui/material/Tabs';
 import Box from '@mui/material/Box';
 import { FormControl } from "@mui/material";
 
-
+export const getManagerSuggestions = (dispatch, orgId) => {
+    const managerSuggestionsObj = new GetManagerSuggestionsAPI(orgId);
+    dispatch(APITransport(managerSuggestionsObj));
+}
 const Invites = (props) => {
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     const {hideButton,reSendButton} = props;
@@ -26,19 +29,14 @@ const Invites = (props) => {
     const getOrganizationMembersData = () => {
         const organizationUsersObj = new GetOragnizationUsersAPI(orgId);
         dispatch(APITransport(organizationUsersObj));
-        console.log(OrganizationUserData)
     }
 
-    const getManagerSuggestions = () => {
-        const managerSuggestionsObj = new GetManagerSuggestionsAPI(orgId);
-        dispatch(APITransport(managerSuggestionsObj));
-    }
     const handleTabChange = (e, v) => {
         setTabValue(v);
     }
 
     useEffect(() => {
-        getManagerSuggestions();
+        getManagerSuggestions(dispatch, orgId);
         getOrganizationMembersData();
     }, [tabValue]);
 

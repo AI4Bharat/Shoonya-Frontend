@@ -44,7 +44,8 @@ const InviteUsersDialog = ({
   btn,
   setbtn,
   value,
-  setvalue
+  setvalue,
+  popUpLabel,
 }) => {
 
 
@@ -91,7 +92,7 @@ const InviteUsersDialog = ({
 
   return (
     <Dialog open={isOpen} onClose={dialogCloseHandler} close>
-      <DialogTitle style={{ paddingBottom: 0 }}>Invite users to organization</DialogTitle>
+      <DialogTitle style={{ paddingBottom: 0 }}>{popUpLabel ? popUpLabel : "Invite users to organization" } </DialogTitle>
       <DialogContent >
         <Stack direction="row">
           {btn?<Autocomplete
