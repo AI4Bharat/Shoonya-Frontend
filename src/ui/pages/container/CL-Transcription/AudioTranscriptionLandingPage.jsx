@@ -112,7 +112,6 @@ const AudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-  const [audioURL, setAudioURL] = useState("");
 
   // useEffect(() => {
   //   let intervalId;
@@ -293,27 +292,6 @@ const AudioTranscriptionLandingPage = () => {
         setWaveSurfer(false);
       }else{
         setWaveSurfer(true);
-      }
-      const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `https://${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
-        method: "GET",
-        headers: ProjectObj.getHeaders().headers
-      })
-      if (!fetchAudioData.ok){
-        setAudioURL(resp?.data?.audio_url)
-      }else{
-        try {
-          var base64data = await fetchAudioData.json();
-          var binaryData = atob(base64data);
-          var buffer = new ArrayBuffer(binaryData.length);
-          var view = new Uint8Array(buffer);
-          for (var i = 0; i < binaryData.length; i++) {
-              view[i] = binaryData.charCodeAt(i);
-          }
-          var blob = new Blob([view], { type: 'audio/mpeg' });
-          setAudioURL(URL.createObjectURL(blob));
-        } catch {
-          setAudioURL(resp?.data?.audio_url)
-        }
       }
     }
     setLoading(false);
@@ -949,7 +927,6 @@ useEffect(() => {
               filterMessage={filterMessage}
               taskData={taskData}
             />
-            {audioURL && 
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
@@ -957,8 +934,7 @@ useEffect(() => {
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskData}
-              audioUrl={audioURL}
-            />}
+            />
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -1234,7 +1210,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {audioURL && (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>)} 
+        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
       </Grid>
     </>
   );
