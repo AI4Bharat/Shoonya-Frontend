@@ -113,7 +113,6 @@ const AudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-  const [audioURL, setAudioURL] = useState("");
 
   // useEffect(() => {
   //   let intervalId;
@@ -950,7 +949,6 @@ useEffect(() => {
               filterMessage={filterMessage}
               taskData={taskData}
             />
-            {audioURL && 
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
@@ -958,8 +956,7 @@ useEffect(() => {
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskData}
-              audioUrl={audioURL}
-            />}
+            />
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -1235,7 +1232,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {audioURL && (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>)} 
+        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>} 
       </Grid>
     </>
   );

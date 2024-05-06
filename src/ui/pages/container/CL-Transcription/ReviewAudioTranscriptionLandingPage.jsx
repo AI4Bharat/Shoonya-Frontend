@@ -49,7 +49,6 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip"
-import configs from '../../../../config/config';
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -117,7 +116,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-  const [audioURL, setAudioURL] = useState("");
 
   // useEffect(() => {
   //   let intervalId;
@@ -310,6 +308,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       setWaveSurfer(false);
     }else{
       setWaveSurfer(true);
+
     }
       const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
         method: "GET",
@@ -1149,16 +1148,13 @@ useEffect(() => {
               disableButton={disableButton}
               anchorEl={anchorEl} setAnchorEl={setAnchorEl}
             />
-            {audioURL && 
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
-              audioUrl={audioURL}
             />
-            }
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -1459,7 +1455,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {audioURL && (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList} waveformSettings={waveformSettings}/>)}
+        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList} waveformSettings={waveformSettings}/>}
       </Grid>
     </>
   );
