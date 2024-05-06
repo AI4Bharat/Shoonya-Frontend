@@ -48,6 +48,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import configs from '../../../../config/config';
 
 const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -557,6 +558,7 @@ const AudioTranscriptionLandingPage = () => {
     if (id) {
       // resetNotes();
       // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
+      window.alert("next");
       navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${id}`);
       window.location.reload(true);
     } else {

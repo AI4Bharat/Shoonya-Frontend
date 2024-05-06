@@ -49,6 +49,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import configs from '../../../../config/config';
 
 const SuperCheckerAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
