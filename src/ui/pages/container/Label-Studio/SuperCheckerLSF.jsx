@@ -910,14 +910,18 @@ useEffect(() => {
     if(taskData){
       if(Array.isArray(taskData?.data?.language)){
         taskData?.data?.language?.map((lang)=>{
-          selectedLanguages.current?.push(lang);
+          if (!selectedLanguages.current.includes(lang)) {
+            selectedLanguages.current.push(lang);
+          }        
           const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
           setSelectedL(Array.from(newLanguages));
         });
       }
       if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
         setSelectedL([taskData?.data?.language]);
-        selectedLanguages.current?.push(taskData?.data?.language);
+        if (!selectedLanguages.current.includes(taskData?.data?.language)) {
+          selectedLanguages.current.push(taskData?.data?.language);
+        }      
       }
       if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
         ocrDomain.current = taskData?.data?.ocr_domain;
