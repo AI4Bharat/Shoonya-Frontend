@@ -232,7 +232,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       }else{
         setWaveSurfer(true);
       }
-      const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `https://${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
+      const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
         method: "GET",
         headers: ProjectObj.getHeaders().headers
       })
