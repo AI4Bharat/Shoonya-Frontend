@@ -558,7 +558,6 @@ const AudioTranscriptionLandingPage = () => {
     if (id) {
       // resetNotes();
       // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
-      window.alert("next");
       navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${id}`);
       window.location.reload(true);
     } else {
