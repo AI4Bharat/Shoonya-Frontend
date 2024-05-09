@@ -440,8 +440,7 @@ useEffect(() => {
             if (taskData.annotation_status !== "freezed") {
               setAutoSave(false);
               showLoader();
-              let temp = review_status.current === "rejected"
-                ? [] : annotation.serializeAnnotation();
+              let temp = annotation.serializeAnnotation();
 
               for (let i = 0; i < temp.length; i++) {
                 if(temp[i].type === "relation"){
