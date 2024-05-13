@@ -241,6 +241,11 @@ const LabelStudioWrapper = ({
     message: "",
     variant: "success",
   });
+  const ocrDomain = useRef();
+  const [ocrD, setOcrD] = useState("");
+  const selectedLanguages = useRef([]);
+  const [selectedL, setSelectedL] = useState([]);
+  const [predictions, setPredictions] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
@@ -257,7 +262,9 @@ const LabelStudioWrapper = ({
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
  
-
+  useEffect(() => {
+    setPredictions(taskData?.data?.ocr_prediction_json);
+  }, [taskData]);
 
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -270,10 +277,12 @@ const LabelStudioWrapper = ({
   }, [userData]); */
   
 useEffect(() => {
-    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
@@ -293,8 +302,7 @@ useEffect(() => {
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
       })
-    );
-  }, []);
+    );});}, []);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -631,7 +639,10 @@ useEffect(() => {
                 review_status.current,
                 temp,
                 review.parent_annotation,
-                JSON.stringify(reviewNotesRef.current.getEditor().getContents())
+                JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
+                false,
+                selectedLanguages,
+                ocrDomain
               ).then(() => {
                 if (localStorage.getItem("labelAll"))
                   getNextProject(projectId, taskData.id, "review").then(
@@ -1023,7 +1034,9 @@ useEffect(() => {
           temp,
           review.parent_annotation,
           JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
-          true
+          true,
+          selectedLanguages,
+          ocrDomain
         ).then((res) => {
           if (res.status !== 200) {
             setSnackbarInfo({
@@ -1031,6 +1044,56 @@ useEffect(() => {
               message: "Error in autosaving annotation",
               variant: "error",
             });
+          }
+        });
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
+  };
+
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "accepted" && taskData.task_status.toLowerCase() !== "accepted_with_minor_changes" && taskData.task_status.toLowerCase() !== "accepted_with_major_changes") {
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp = annotation.serializeAnnotation();
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].parentID !== undefined){
+            delete temp[i].parentID;
+          }
+          if(temp[i].type === "relation"){
+            continue;
+          }else if (temp[i].value.text) {
+            temp[i].value.text = [temp[i].value.text[0]];
+          }
+        }
+        let review = annotations.filter(
+          (annotation) => annotation.annotation_type === 2
+        )[0];
+        patchReview(
+          taskId,
+          review.id,
+          load_time.current,
+          review.lead_time,
+          review.annotation_status,
+          temp,
+          review.parent_annotation,
+          JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
+          true,
+          selectedLanguages,
+          ocrDomain
+        ).then((res) => {
+          if (res.status !== 200) {
+            setSnackbarInfo({
+              open: true,
+              message: "Error in clearing children bboxes",
+              variant: "error",
+            });
+          }else{
+            window.location.reload();
           }
         });
       } else
@@ -1125,6 +1188,35 @@ useEffect(() => {
       />
     );
   };
+
+  const handleSelectChange = (event) => {
+    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
+  };
+
+  useEffect(() => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
+          if (!selectedLanguages.current.includes(lang)) {
+            selectedLanguages.current.push(lang);
+          }        
+          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
+          setSelectedL(Array.from(newLanguages));
+        });
+      }
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+        setSelectedL([taskData?.data?.language]);
+        if (!selectedLanguages.current.includes(taskData?.data?.language)) {
+          selectedLanguages.current.push(taskData?.data?.language);
+        }      
+      }
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+        ocrDomain.current = taskData?.data?.ocr_domain;
+        setOcrD(taskData?.data?.ocr_domain);
+      }
+    }
+  }, [taskData]);
 
   return (
     <div>
@@ -1244,6 +1336,26 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
+            {ProjectDetails?.project_type?.includes("OCR") &&
+            <Tooltip title="Clear all children bboxes">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    color: "#f00",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear All Mergings
+                </Button>
+              </Tooltip>
+            }
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
@@ -1293,6 +1405,85 @@ useEffect(() => {
           {tagSuggestionList}
         </Popover>
       </Box>
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
+          <>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Assamese">Assamese</option>
+                <option value="Bodo">Bodo</option>
+                <option value="Dogri">Dogri</option>
+                <option value="Kashmiri">Kashmiri</option>
+                <option value="Maithili">Maithili</option>
+                <option value="Manipuri">Manipuri</option>
+                <option value="Nepali">Nepali</option>
+                <option value="Odia">Odia</option>
+                <option value="Sindhi">Sindhi</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Santali">Santali</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Goan Konkani">Goan Konkani</option>
+              </select>
+              </div>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
+                <option disabled selected></option>
+                <option value="BO">Books</option>
+                <option value="FO">Forms</option>
+                <option value="OT">Others</option>
+                <option value="TB">Textbooks</option>
+                <option value="NV">Novels</option>
+                <option value="NP">Newspapers</option>
+                <option value="MG">Magazines</option>
+                <option value="RP">Research_Papers</option>
+                <option value="FM">Form</option>
+                <option value="BR">Brochure_Posters_Leaflets</option>
+                <option value="AR">Acts_Rules</option>
+                <option value="PB">Publication</option>
+                <option value="NT">Notice</option>
+                <option value="SY">Syllabus</option>
+                <option value="QP">Question_Papers</option>
+                <option value="MN">Manual</option>
+              </select>
+              </div>
+            </div>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
+              {predictions?.length > 0 ?
+                (() => {
+                  try {
+                    return JSON.parse(predictions)?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  } catch (error) {
+                    console.error("Error parsing predictions:", error);
+                    return predictions?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  }
+                })()
+              :
+              <div style={{textAlign:"center"}}>No Predictions Present</div>}
+            </div>
+          </>
+        }
       {loader}
       {renderSnackBar()}
     </div>

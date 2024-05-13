@@ -182,7 +182,9 @@ const LabelStudioWrapper = ({
     variant: "success",
   });
   const ocrDomain = useRef();
-  const selectedLanguages = useRef();
+  const [ocrD, setOcrD] = useState("");
+  const selectedLanguages = useRef([]);
+  const [selectedL, setSelectedL] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
   const [predictions, setPredictions] = useState([]);
   const [annotations, setAnnotations] = useState([]);
@@ -216,10 +218,12 @@ const LabelStudioWrapper = ({
   }, [userData]); */
 
   useEffect(() => {
-    let sidePanel = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let showLabelsOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let selectAfterCreateOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-    let continousLabelingOnly = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
@@ -238,8 +242,7 @@ const LabelStudioWrapper = ({
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
-      })
-    );
+      }));});
   }, []);
 
   const tasksComplete = (id) => {
@@ -494,7 +497,6 @@ const LabelStudioWrapper = ({
           let countLables = 0;
           temp.map((curr) => {
             // console.log(curr);
-            ids.add(curr.id);
             if(curr.type !== "relation"){
               ids.add(curr.id);
             }
@@ -855,6 +857,63 @@ const LabelStudioWrapper = ({
     }
   };
 
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected&&
+      taskData.task_status.toLowerCase() !== "labeled") {
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            !annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id
+          ) {
+            temp = annotation.serializeAnnotation();
+            if (annotations[i].annotation_type !== 1) continue;
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].parentID !== undefined){
+                delete temp[i].parentID;
+              }
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
+              }
+            }
+            patchAnnotation(
+              taskId,
+              temp,
+              annotations[i].id,
+              load_time.current,
+              annotations[i].lead_time,
+              annotations[i].annotation_status,
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              true,
+              selectedLanguages,
+              ocrDomain
+            ).then((res) => {
+              if (res.status !== 200) {
+                setSnackbarInfo({
+                  open: true,
+              message: "Error in clearing children bboxes",
+                  variant: "error",
+                });
+              }else{
+                window.location.reload();
+              }
+            });
+          }
+        }
+      }else
+      setSnackbarInfo({
+        open: true,
+        message: "Task is frozen",
+        variant: "error",
+      });
+    }
+  };
+
   let hidden, visibilityChange;
   if (typeof document.hidden !== "undefined") {
     hidden = "hidden";
@@ -924,7 +983,32 @@ const LabelStudioWrapper = ({
 
   const handleSelectChange = (event) => {
     selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
   };
+
+  useEffect(() => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
+          if (!selectedLanguages.current.includes(lang)) {
+            selectedLanguages.current.push(lang);
+          }        
+          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
+          setSelectedL(Array.from(newLanguages));
+        });
+      }
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+        setSelectedL([taskData?.data?.language]);
+        if (!selectedLanguages.current.includes(taskData?.data?.language)) {
+          selectedLanguages.current.push(taskData?.data?.language);
+        }      
+      }
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+        ocrDomain.current = taskData?.data?.ocr_domain;
+        setOcrD(taskData?.data?.ocr_domain);
+      }
+    }
+  }, [taskData]);
 
   return (
     <div>
@@ -946,7 +1030,7 @@ const LabelStudioWrapper = ({
           className="lsf-controls"
         >
           <div />
-          <Grid container spacing={0}>
+          <Grid container justifyContent="space-between">
             <Grid item>
               <LightTooltip title={assignedUsers ? assignedUsers : ""}>
                 <Button
@@ -967,9 +1051,7 @@ const LabelStudioWrapper = ({
                   />
                 </Button>
               </LightTooltip>
-            </Grid>
             {/* <Grid container spacing={0} sx={{ justifyContent: "end" }}> */}
-            <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
@@ -993,8 +1075,6 @@ const LabelStudioWrapper = ({
                     </Button>
                   </Tooltip>
                 )}
-            </Grid>
-            <Grid item>
               {/* {localStorage.getItem("labelAll") === "true" ? ( */}
               <Tooltip title="Go to next task">
                 <Button
@@ -1018,6 +1098,30 @@ const LabelStudioWrapper = ({
               <div style={{ minWidth: "160px" }} />
             )} */}
             </Grid>
+            {ProjectDetails?.project_type?.includes("OCR") && 
+            <>
+            <Grid item >
+              <Tooltip title="Clear all children bboxes">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    color: "#f00",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear All Mergings
+                </Button>
+              </Tooltip>
+            </Grid>
+            </>
+            }
           </Grid>
         </div>
       )}
@@ -1039,11 +1143,11 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
-      {!loader && 
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
-              <select multiple onChange={handleSelectChange} value={selectedLanguages.current}>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
                 <option value="English">English</option>
                 <option value="Hindi">Hindi</option>
                 <option value="Marathi">Marathi</option>
@@ -1071,7 +1175,7 @@ const LabelStudioWrapper = ({
               </select>
               </div>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
-              <select style={{margin:"auto"}} onChange={(e) => {ocrDomain.current = e.target.value}} value={ocrDomain.current}>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
                 <option disabled selected></option>
                 <option value="BO">Books</option>
                 <option value="FO">Forms</option>
@@ -1095,9 +1199,26 @@ const LabelStudioWrapper = ({
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
               <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
               {predictions?.length > 0 ?
-              predictions?.map((pred, index) => (
-                <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}><div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div><textarea readOnly style={{width:"100%",  borderColor:"#E0E0E0"}} value={pred.text}/></div>
-              )) : <div style={{textAlign:"center"}}>No Predictions Present</div>}
+                (() => {
+                  try {
+                    return JSON.parse(predictions)?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  } catch (error) {
+                    console.error("Error parsing predictions:", error);
+                    return predictions?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  }
+                })()
+              :
+              <div style={{textAlign:"center"}}>No Predictions Present</div>}
             </div>
           </>
         }

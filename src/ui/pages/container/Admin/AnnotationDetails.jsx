@@ -5,6 +5,7 @@ import { snakeToTitleCase } from '../../../../utils/utils.js';
 import FetchUserByIdAPI from "../../../../redux/actions/api/UserManagement/FetchUserById";
 import DeleteAnnotationAPI from '../../../../redux/actions/api/Annotation/DeleteAnnotation.js';
 import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails.js";
+import { Link } from 'react-router-dom';
 
 function AnnotationDetails() {
     const [annotationId, setAnnotationId] = useState('');
@@ -142,6 +143,11 @@ function AnnotationDetails() {
                         valueRenderer={(raw) => <span>{typeof raw === "string" && raw.match(/^"(.*)"$/) ? raw.slice(1, -1) :  raw}</span>}
                         theme={theme}
                     />
+                    {annotationDetails &&(
+                        <Link to ={`/projects/${annotationDetails.project_id}`}>
+                            <Button variant="contained">Project Page</Button>
+                        </Link>
+                    )}
                 </Grid>
             }
         </Grid>

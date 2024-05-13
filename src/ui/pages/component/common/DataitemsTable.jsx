@@ -56,8 +56,15 @@ const DataitemsTable = () => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
-  localStorage.setItem("DataitemsList", JSON.stringify(columns));
-  localStorage.setItem("Dataitem",  JSON.stringify(dataitemsList));
+
+  useEffect(()=>{
+    try{
+      localStorage.setItem("DataitemsList", JSON.stringify(columns));
+      localStorage.setItem("Dataitem",  JSON.stringify(dataitemsList));  
+    }catch{
+      console.log("Local storage set item quota exceeded")
+    }
+  }, [columns, dataitemsList]);
   
   const getDataitems = () => {
     const dataObj = new GetDataitemsById(
@@ -102,7 +109,7 @@ useEffect(() => {
               align: "center",
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
-                if ((key == "metadata_json" || key == "prediction_json"|| key == "ocr_prediction_json"|| key == "transcribed_json"|| key == "draft_data_json" || key == "ocr_transcribed_json" || key == "bboxes_relation_json") && value !== null ) {
+                if ((key.includes("json")) && value !== null ) {
                  const data = JSON.stringify(value)
                  const metadata = data.replace(/\\/g, "");
                   return metadata;
