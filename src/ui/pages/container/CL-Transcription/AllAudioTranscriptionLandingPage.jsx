@@ -41,6 +41,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import StandarisedisedTranscriptionEditing from "./StandardisedTranscription";
 
 const AllAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -682,6 +683,27 @@ const AllAudioTranscriptionLandingPage = () => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
+
+          {ProjectDetails && ProjectDetails?.data?.project_type === "StandardisedTranscriptionEditing" ? 
+          <>
+          <StandarisedisedTranscriptionEditing
+            currentIndex={currentIndex}
+            AnnotationsTaskDetails={AnnotationsTaskDetails}
+            player={player}
+            ProjectDetails={ProjectDetails}
+            TaskDetails={taskData}
+            stage={3}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
+            advancedWaveformSettings={advancedWaveformSettings}
+            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
+            annotationId={annotations[0]?.id}
+          />
+
+          </> 
+          :
+          <> 
           <TranscriptionRightPanel
             currentIndex={currentIndex}
             AnnotationsTaskDetails={AnnotationsTaskDetails}
@@ -696,6 +718,9 @@ const AllAudioTranscriptionLandingPage = () => {
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
+          </>
+          }
+         
         </Grid>
       </Grid>
 
