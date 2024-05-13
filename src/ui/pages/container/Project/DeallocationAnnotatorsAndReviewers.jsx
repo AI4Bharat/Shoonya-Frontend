@@ -242,8 +242,8 @@ export default function DeallocationAnnotatorsAndReviewers() {
   const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
   const handleConfirm = async () => {
-    if (userLevel === "annotation" || userLevel === "review") {
-      const apiObj = new LoginAPI(emailId, password);
+    // if (userLevel === "annotation" || userLevel === "review") {
+      const apiObj = new LoginAPI(emailId,password);
       const res = await fetch(apiObj.apiEndPoint(), {
         method: "POST",
         body: JSON.stringify(apiObj.getBody()),
@@ -256,13 +256,13 @@ export default function DeallocationAnnotatorsAndReviewers() {
         window.alert("Invalid credentials, please try again");
         console.log(rsp_data);
       }
-    } else if (userLevel === "superChecker") {
-      if (pin === "9327") {
-        handleok();
-      } else {
-        window.alert("Incorrect pin entered");
-      }
-    }
+    // } else if (userLevel === "superChecker") {
+    //   if (pin === "9327") {
+    //     handleok();
+    //   } else {
+    //     window.alert("Incorrect pin entered");
+    //   }
+    // }
   };
 
   return (
@@ -632,7 +632,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
                     <DialogContentText id="alert-dialog-description">
                     Are you sure want to Deallocate User Tasks ? 
                     </DialogContentText>
-                    {(userLevel === "annotation" || userLevel === "review") && <TextField
+                    <TextField
                             autoFocus
                             margin="dense"
                             id="password"
@@ -641,8 +641,8 @@ export default function DeallocationAnnotatorsAndReviewers() {
                             fullWidth
                             variant="standard"
                             onChange={(e) => setPassword(e.target.value)}
-                          />}
-                    {userLevel === "superChecker" && <TextField
+                          />
+                    {/* {userLevel === "superChecker" && <TextField
                             autoFocus
                             margin="dense"
                             id="pin"
@@ -651,8 +651,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
                             fullWidth
                             variant="standard"
                             onChange={(e) => setPin(e.target.value)}
-                          />}
-                          
+                          />} */}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}
