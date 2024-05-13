@@ -233,14 +233,14 @@ const TaskTable = (props) => {
 
   const unassignTasks = async () => {
     setDeallocateDialog(false);
-    if (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing") {
-      setSnackbarInfo({
-        open: true,
-        message: 'The task de-allocation has been disabled for your project',
-        variant: "error",
-      });
-      return 
-    }
+    // if (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing") {
+    //   setSnackbarInfo({
+    //     open: true,
+    //     message: 'The task de-allocation has been disabled for your project',
+    //     variant: "error",
+    //   });
+    //   return 
+    // }
     const deallocateObj =
       props.type === "annotation"
         ? new DeallocateTasksAPI(id, selectedFilters.annotation_status)
