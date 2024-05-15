@@ -155,6 +155,7 @@ const TranscriptionRightPanel = ({
   const textRefs = useRef([]);
   const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
   const [currentSelection, setCurrentSelection] = useState(null);
+  const [mergedIndex, setMergedIndex] = useState(0);
 
   useEffect(() => {
     currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
@@ -274,6 +275,7 @@ const TranscriptionRightPanel = ({
 
       const sub = onMerge(index);
       dispatch(setSubtitles(sub, C.SUBTITLES));
+      setMergedIndex(index);
       // saveTranscriptHandler(false, true, sub);
     },
     // eslint-disable-next-line
@@ -281,11 +283,14 @@ const TranscriptionRightPanel = ({
   );
 
   const onMouseUp = (e, blockIdx) => {
+
     if (e.target.selectionStart < e.target.value?.length) {
       e.preventDefault();
       setShowPopOver(true);
       setCurrentIndexToSplitTextBlock(blockIdx);
       setSelectionStart(e.target.selectionStart);
+      populateAcoustic(mergedIndex)
+
     }
   };
 
@@ -342,6 +347,7 @@ const TranscriptionRightPanel = ({
 
   const populateAcoustic = (index) => {
     const sub = onSubtitleChange("", index, false, true);
+    console.log('during populating',sub)
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
 
