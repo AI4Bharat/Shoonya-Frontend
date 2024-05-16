@@ -230,7 +230,7 @@ const EditProfile = (props) => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mb: 2 }}>
+        {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ mb: 2 }}>
           <FormControl sx={{ m: 1, minWidth: 210 }}>
             <InputLabel id="demo-simple-select-helper-label">Active_status</InputLabel>
             <Select
@@ -248,7 +248,7 @@ const EditProfile = (props) => {
               <MenuItem value={false}>Not Active</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
+        </Grid> */}
       </Grid>
 
       <Grid sx={{ textAlignLast: "end" }}>
