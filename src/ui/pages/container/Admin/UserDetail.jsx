@@ -3,7 +3,7 @@ import MUIDataTable from "mui-datatables";
 import { useNavigate } from "react-router-dom";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { ThemeProvider, Grid, IconButton } from "@mui/material";
+import { ThemeProvider, Grid, IconButton, Switch } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
@@ -68,8 +68,9 @@ const UserDetail = (props) => {
     participation_type,
     role,
     is_active,
+    openDialog = true,
   ) => {
-    setOpenDialog(true);
+    setOpenDialog(openDialog);
     setId(id);
     setEmail(email);
     setUserName(username);
@@ -123,25 +124,72 @@ const UserDetail = (props) => {
     handleCloseDialog();
   };
 
+  const handleToggleIsActive = async (id, data) => {
+    setLoading(true);
+    const UserObj = new GetUserDetailUpdateAPI(id, data);
+    const res = await fetch(UserObj.apiEndPoint(), {
+      method: "PATCH",
+      body: JSON.stringify(UserObj.getBody()),
+      headers: UserObj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    setLoading(false);
+    if (res.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "success",
+      });
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: resp?.message,
+        variant: "error",
+      });
+    }
+  };
   const pageSearch = () => {
     return UserDetail.filter((el) => {
-      const searchValue = SearchUserDetail.toLowerCase();
-      if (
-        searchValue === "" ||
-        el.email?.toLowerCase().includes(searchValue) ||
-        el.username?.toLowerCase().includes(searchValue) ||
-        el.first_name?.toLowerCase().includes(searchValue) ||
-        el.last_name?.toLowerCase().includes(searchValue) ||
-        el.participation_type.toString().toLowerCase().includes(searchValue) ||
-        el.languages?.some((val) => val?.toLowerCase().includes(searchValue)) ||
-        ((el.is_active === true && searchValue === "active") ||
-        (el.is_active === false && searchValue === "not active")) ||
-        (searchValue === "not" && !el.is_active) // Recommend "not active" when searching for "not"
+      const isActive = el.is_active ? "active" : "inactive";
+      if (SearchUserDetail == "") {
+        return el;
+      } else if (
+        el.email?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
+      ) {
+        return el;
+      }else if(
+        el.username?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
+      ){
+        return el;
+      } else if (
+        el.first_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
+      ) {
+        return el;
+      }else if (
+        SearchUserDetail.toLowerCase() === "active" && el.is_active ||
+        SearchUserDetail.toLowerCase() === "inactive" && !el.is_active
+      ) {
+        return el;
+      } else if (
+        el.last_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
+      ) {
+        return el;
+      } else if (
+        el.participation_type
+          .toString()
+          ?.toLowerCase()
+          .includes(SearchUserDetail?.toLowerCase())
+      ) {
+        return el;
+      } else if (
+        el.languages?.some((val) =>
+          val?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
+        )
       ) {
         return el;
       }
     });
-  };
+  }; 
 
   const columns = [
     {
@@ -257,7 +305,21 @@ const UserDetail = (props) => {
             el.languages.join(", "),
             el.participation_type,
             userRoleFromList ? userRoleFromList : el.role,
-            el.is_active==true?"Active":"Not Active",
+            <Switch color="primary" 
+              defaultChecked={el.is_active}
+              onClick={() => {
+                handleToggleIsActive(el.id, {
+                  email: el.email,
+                  username: el.username,
+                  first_name: el.first_name,
+                  last_name: el.last_name,
+                  languages: el.languages,
+                  participation_type: el.participation_type,
+                  role: el.role,
+                  is_active: !el.is_active,
+                })
+              }} 
+            />,
             <>
               <div style={{display:"flex", flexDirection:"row"}}>
               <IconButton size="small" color="primary">
