@@ -439,5 +439,4 @@ const UserDetail = (props) => {
     </div>
   );
 };
-
 export default UserDetail;
