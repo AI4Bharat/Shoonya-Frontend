@@ -543,12 +543,16 @@ if(currentPageData)
   }
 
 let updatedProjectData = []
-if (currentPageData?.length) {
+if (currentPageData?.length && stage===3) {
   updatedProjectData = [{
     start_time: currentPageData[0].start_time,
     end_time: currentPageData[currentPageData.length - 1].end_time,
     text: currentPageData.map((item) => item.text)
   }]
+}
+else 
+{
+  updatedProjectData = currentPageData;
 }
   if(currentPageData)
     {
@@ -592,7 +596,7 @@ if (currentPageData?.length) {
               annotationId={annotationId}
             />
           </Grid>
-          {showAcousticText && <Grid
+          {showAcousticText && stage==2 && <Grid
             style={{
               display: "flex",
               direction: "row",
@@ -610,6 +614,23 @@ if (currentPageData?.length) {
                 Semantic (L2) Transcription 
             </Typography>
           </Grid>}
+
+          {ProjectDetails?.project_type && stage===3 && <>
+            <Grid
+            style={{
+              display: "flex",
+              direction: "row",
+              flexWrap: "wrap",
+              justifyContent: "space-around",
+              backgroundColor: "rgb(44, 39, 153, 0.2)"}}>
+            <Typography
+              variant="caption"
+              sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
+               Final Transcription L3
+            </Typography>
+          </Grid>
+            
+          </>}
           </Box>
 
           <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
@@ -723,8 +744,7 @@ if (currentPageData?.length) {
                       >
                         <Add/>
                       </IconButton>
-                    </Tooltip>}
-                      
+                    </Tooltip>}    
                       {showAdditionalOptions && 
                         <ButtonComponent
                           index={index + idxOffset}
@@ -795,6 +815,7 @@ if (currentPageData?.length) {
                                   }}
                                   {...props}
                                 />
+                                
                                 {/* <span id="charNum" className={classes.wordCount}>
                         {targetLength(index)}
                       </span> */}
@@ -822,6 +843,7 @@ if (currentPageData?.length) {
                               }, 200);
                             }}
                           />
+                          
                           {/* <span id="charNum" className={classes.wordCount}>
                         {targetLength(index)}
                       </span> */}

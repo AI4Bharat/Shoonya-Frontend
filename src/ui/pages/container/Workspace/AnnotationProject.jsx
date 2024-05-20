@@ -822,7 +822,9 @@ const AnnotationProject = (props) => {
                 selectedType === "AudioTranscription" ||
                 selectedType === "AudioSegmentation" ||
                 selectedType === "AudioTranscriptionEditing" ||
-                selectedType === "AcousticNormalisedTranscriptionEditing") && (
+                selectedType === "AcousticNormalisedTranscriptionEditing" ||
+                selectedType === "StandardizedTranscriptionEditing" 
+                ) && (
                 <>
                   <Grid
                     className={classes.projectsettingGrid}
