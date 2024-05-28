@@ -49,6 +49,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip"
+import StandarisedisedTranscriptionEditing from './StandardisedTranscription';
+import { Tab, Tabs } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -116,7 +120,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-
   // useEffect(() => {
   //   let intervalId;
 
@@ -281,6 +284,12 @@ const ReviewAudioTranscriptionLandingPage = () => {
     !showNotes && setShowStdTranscript(false);
     setShowNotes(!showNotes);
   };
+
+  const [tabValue, setTabValue] = useState(0);
+  const handleTabChange = (e, v) => {
+    e.preventDefault()
+    setTabValue(v);
+  }
 
   const getTaskData = async (id) => {
     setLoading(true);
@@ -1409,20 +1418,29 @@ useEffect(() => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
-          <TranscriptionRightPanel
-            currentIndex={currentIndex}
-            AnnotationsTaskDetails={AnnotationsTaskDetails}
-            player={player}
-            ProjectDetails={ProjectDetails}
-            TaskDetails={taskDetailList}
-            stage={2}
-            handleStdTranscriptionSettings={setStdTranscriptionSettings}
-            advancedWaveformSettings={advancedWaveformSettings}
-            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
-            waveSurfer={waveSurfer}
-            setWaveSurfer={setWaveSurfer}
-            annotationId={annotations[0]?.id}
-          />
+          <FormControl>
+              <Box sx={{mb:2,}} >
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+                    <Tab label="L1 & L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                </Tabs>
+            </Box>
+          </FormControl>
+
+          <StandarisedisedTranscriptionEditing
+          currentIndex={currentIndex}
+          AnnotationsTaskDetails={AnnotationsTaskDetails}
+          player={player}
+          ProjectDetails={ProjectDetails}
+          TaskDetails={taskDetailList}
+          stage={tabValue+2}
+          handleStdTranscriptionSettings={setStdTranscriptionSettings}
+          advancedWaveformSettings={advancedWaveformSettings}
+          setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+          waveSurfer={waveSurfer}
+          setWaveSurfer={setWaveSurfer}
+          annotationId={annotations[0]?.id}
+        /> 
         </Grid>
       </Grid>
 
