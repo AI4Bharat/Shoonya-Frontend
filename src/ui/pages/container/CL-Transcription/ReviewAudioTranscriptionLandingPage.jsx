@@ -49,7 +49,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip"
-import StandarisedisedTranscriptionEditing from './StandardisedTranscription';
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
 import { Tab, Tabs } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 
@@ -336,7 +336,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       auto_save: true,
       lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardized_transcription: stdTranscription }] : result),
     };
     if(result.length && taskDetails?.review_user === user.id) {
       try{
@@ -482,17 +482,17 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
 
-    let standardisedTranscription = "";
+    let standardizedTranscription = "";
 
     const sub = annotations[0]?.result?.filter((item) => {
-      if ("standardised_transcription" in item) {
-        standardisedTranscription = item.standardised_transcription;
+      if ("standardized_transcription" in item) {
+        standardizedTranscription = item.standardized_transcription;
         return false;
       } else return true;
     }).map((item) => new Sub(item));
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
-    setStdTranscription(standardisedTranscription);
+    setStdTranscription(standardizedTranscription);
 
     // const newSub = cloneDeep(sub);
 
@@ -636,7 +636,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardized_transcription: stdTranscription }] : result),
       ...((value === "to_be_revised" || value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
@@ -1264,7 +1264,7 @@ useEffect(() => {
                     }}
                   // style={{ marginBottom: "20px" }}
                   >
-                    Standardised Transcription
+                    Standardized Transcription
                   </Button>
                 </Grid>}
             </Grid>

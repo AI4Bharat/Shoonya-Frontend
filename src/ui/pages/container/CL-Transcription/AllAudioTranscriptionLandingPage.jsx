@@ -41,7 +41,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
-import StandarisedisedTranscriptionEditing from './StandardisedTranscription';
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
 
 const AllAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -124,16 +124,16 @@ const AllAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    let standardisedTranscription = "";
+    let standardizedTranscription = "";
 
     const sub = annotations[0]?.result.filter((item) => {
-      if ("standardised_transcription" in item) {
-        standardisedTranscription = item.standardised_transcription;
+      if ("standardized_transcription" in item) {
+        standardizedTranscription = item.standardized_transcription;
         return false;
       } else return true;
     }).map((item) => new Sub(item));
 
-    setStdTranscription(standardisedTranscription);
+    setStdTranscription(standardizedTranscription);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   }, [annotations]);
 
@@ -540,7 +540,7 @@ const AllAudioTranscriptionLandingPage = () => {
                       setShowNotes(false);
                     }}
                   >
-                    Standardised Transcription
+                    Standardized Transcription
                   </Button>
                 </Grid>}
             </Grid>
@@ -684,7 +684,7 @@ const AllAudioTranscriptionLandingPage = () => {
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
 
-          {ProjectDetails && ProjectDetails?.data?.project_type === "StandardisedTranscriptionEditing" ? 
+          {ProjectDetails && ProjectDetails?.data?.project_type === "StandardizedTranscriptionEditing" ? 
           <>
           <StandarisedisedTranscriptionEditing
             currentIndex={currentIndex}
