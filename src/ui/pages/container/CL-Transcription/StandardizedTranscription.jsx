@@ -87,7 +87,6 @@ const StandarisedisedTranscriptionEditing = ({
   annotationId,
 }) => {
   const { taskId } = useParams();
-
   const classes = AudioTranscriptionLandingStyle();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -596,7 +595,7 @@ else
               annotationId={annotationId}
             />
           </Grid>
-          {showAcousticText && stage==2 && <Grid
+          {showAcousticText  && <Grid
             style={{
               display: "flex",
               direction: "row",
@@ -782,7 +781,7 @@ else
                       }}
                     >
                       {ProjectDetails?.tgt_language !== "en" &&
-                        enableTransliteration ? (
+                        false ? (
                         <IndicTransliterate
                           lang={targetlang}
                           value={item.text}
@@ -826,7 +825,7 @@ else
                       ) : (
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
-                            ref={el => textRefs.current[index] = el}
+                            // ref={el => textRefs.current[index] = el}
                             // onChange={(event) => {
                             onInput={(event) => {
                               changeTranscriptHandler(event, index + idxOffset, false);
@@ -962,3 +961,4 @@ else
 };
 
 export default memo(StandarisedisedTranscriptionEditing);
+// export default StandarisedisedTranscriptionEditing;
