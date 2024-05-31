@@ -48,7 +48,7 @@ import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
 import AudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AudioTranscriptionLandingPage";
 import ReviewAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/ReviewAudioTranscriptionLandingPage";
 import SuperCheckerAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/SuperCheckerAudioTranscriptionLandingPage"
-
+import AnnotationTranscription from "./ui/pages/container/CL-Transcription/AnnotationTranscription";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -185,7 +185,9 @@ const App = () => {
         <Route
           path="projects/:projectId/task/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<LSF />} />
+            // <Layout component={<LSF />} />
+            <Layout component={<AudioTranscriptionLandingPage />} />
+
             // <Layout component={<AnnotateTask />} />
           )}
         />
@@ -288,7 +290,8 @@ const App = () => {
           <Route
           path="projects/:projectId/AudioTranscriptionLandingPage/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<AudioTranscriptionLandingPage />} />
+            <Layout 
+            component={<AnnotationTranscription />} />
           )}
         />
          <Route
