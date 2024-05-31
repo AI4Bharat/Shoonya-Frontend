@@ -207,7 +207,7 @@ const StandarisedisedTranscriptionEditing = ({
   useEffect(() => {
     if(showAcousticText) {
       handleStdTranscriptionSettings({
-        //set enable:true to enable standardised_transcription
+        //set enable:true to enable standardized_transcription
         enable: false,
         showAcoustic: true,
         rtl: enableRTL_Typing,
