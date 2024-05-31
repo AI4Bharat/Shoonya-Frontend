@@ -626,7 +626,7 @@ const AnnotationProject = (props) => {
                 className={classes.projectsettingGrid}
               >
                 <Typography gutterBottom component="div" label="Required">
-                  Title:
+                  Title<span style={{ color: '#d93025' }}>*</span> :
                 </Typography>
               </Grid>
               <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -647,7 +647,7 @@ const AnnotationProject = (props) => {
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Description:
+                Description<span style={{ color: '#d93025' }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -669,7 +669,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a Category to Work in:
+                    Select a Category to Work in<span style={{ color: '#d93025' }}>*</span> :
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -693,7 +693,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a Project Type:
+                    Select a Project Type<span style={{ color: '#d93025' }}>*</span> :
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -724,7 +724,7 @@ const AnnotationProject = (props) => {
                     xl={12}
                   >
                     <Typography gutterBottom component="div">
-                      Variable Parameters:
+                      Variable Parameters<span style={{ color: '#d93025' }}>*</span> :
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -822,7 +822,9 @@ const AnnotationProject = (props) => {
                 selectedType === "AudioTranscription" ||
                 selectedType === "AudioSegmentation" ||
                 selectedType === "AudioTranscriptionEditing" ||
-                selectedType === "AcousticNormalisedTranscriptionEditing") && (
+                selectedType === "AcousticNormalisedTranscriptionEditing" ||
+                selectedType === "StandardizedTranscriptionEditing" 
+                ) && (
                 <>
                   <Grid
                     className={classes.projectsettingGrid}
@@ -965,7 +967,7 @@ const AnnotationProject = (props) => {
                       xl={12}
                     >
                       <Typography gutterBottom component="div">
-                        Select sources to fetch data from:
+                        Select sources to fetch data from<span style={{ color: '#d93025' }}>*</span> :
                       </Typography>
                     </Grid>
 
@@ -1100,7 +1102,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select Sampling Type:
+                    Select Sampling Type<span style={{ color: '#d93025' }}>*</span> :
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>

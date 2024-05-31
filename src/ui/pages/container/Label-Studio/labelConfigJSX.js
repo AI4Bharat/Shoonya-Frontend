@@ -27,6 +27,7 @@ export const labelConfigJS = `<View>
 <Label value="page-number" name="page-number" background="#A0BCC2" className="ignore_assertion"/>
 <Label value="paragraph" name="paragraph" background="#55EFC4" className="ignore_assertion"/>
 <Label value="placeholder-text" name="placeholder-text" background="#3498DB" className="ignore_assertion"/>
+
 <Label value="reference" name="reference" background="#27AE60" className="ignore_assertion"/>
 <Label value="second-level-question" name="second-level-question" background="#9B59B6" className="ignore_assertion"/>
 <Label value="section-title" name="section-title" background="#F39C12" className="ignore_assertion"/>
