@@ -684,7 +684,7 @@ const AllAudioTranscriptionLandingPage = () => {
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
 
-          {ProjectDetails && ProjectDetails?.data?.project_type === "StandardisedTranscriptionEditing" ? 
+          {ProjectDetails && ProjectDetails?.data?.project_type === "StandardizedTranscriptionEditing" ? 
           <>
           <StandarisedisedTranscriptionEditing
             currentIndex={currentIndex}
@@ -692,7 +692,7 @@ const AllAudioTranscriptionLandingPage = () => {
             player={player}
             ProjectDetails={ProjectDetails}
             TaskDetails={taskData}
-            stage={3}
+            // stage={2}
             handleStdTranscriptionSettings={setStdTranscriptionSettings}
             advancedWaveformSettings={advancedWaveformSettings}
             setAdvancedWaveformSettings={setAdvancedWaveformSettings}

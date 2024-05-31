@@ -1427,7 +1427,7 @@ useEffect(() => {
             </Box>
           </FormControl>
 
-          <StandarisedisedTranscriptionEditing
+        <StandarisedisedTranscriptionEditing
           currentIndex={currentIndex}
           AnnotationsTaskDetails={AnnotationsTaskDetails}
           player={player}
