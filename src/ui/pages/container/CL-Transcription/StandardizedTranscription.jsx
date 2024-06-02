@@ -595,7 +595,7 @@ else
               annotationId={annotationId}
             />
           </Grid>
-          {showAcousticText  && <Grid
+          {ProjectDetails?.project_type && stage===2 && <Grid
             style={{
               display: "flex",
               direction: "row",
