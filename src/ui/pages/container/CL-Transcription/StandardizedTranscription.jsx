@@ -114,7 +114,7 @@ const StandarisedisedTranscriptionEditing = ({
   const currentPageData = subtitles;
   // const currentPageData = subtitles?.slice(startIndex, endIndex);
   const idxOffset = (itemsPerPage * (page - 1));
-  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
+  const showAcousticText = ProjectDetails?.project_type === "StandardizedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -546,7 +546,7 @@ if (currentPageData?.length && stage===3) {
   updatedProjectData = [{
     start_time: currentPageData[0].start_time,
     end_time: currentPageData[currentPageData.length - 1].end_time,
-    text: currentPageData.map((item) => item.text)
+    text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text)
   }]
 }
 else 
@@ -848,7 +848,7 @@ else
                       </span> */}
                         </div>
                       )}
-                      {showAcousticText &&
+                      {stage==2 &&
                         (ProjectDetails?.tgt_language !== "en" &&
                           enableTransliteration ? (
                           <IndicTransliterate
