@@ -369,7 +369,7 @@ const AnnotationProject = (props) => {
               align: "center",
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
-                if ((keys == "metadata_json" || keys == "prediction_json" || keys == "ocr_prediction_json" || keys == "transcribed_json" || keys == "draft_data_json" || keys == "ocr_transcribed_json") && value !== null) {
+                if ((keys.includes("json")) && value !== null ) {
                   const data = JSON.stringify(value)
                   const metadata = data.replace(/\\/g, "");
                   return metadata;

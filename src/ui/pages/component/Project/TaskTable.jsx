@@ -84,6 +84,7 @@ const TaskTable = (props) => {
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [rejected,setRejected] = useState(false)
   const [find, setFind] = useState("");
   const [replace, setReplace] = useState("");
   const [OpenFindAndReplaceDialog, setOpenFindAndReplaceDialog] = useState(false);
@@ -180,6 +181,7 @@ const TaskTable = (props) => {
       selectedFilters,
       props.type,
       pullvalue,
+      rejected,
       pull
     );
     dispatch(APITransport(taskObj));
@@ -231,7 +233,7 @@ const TaskTable = (props) => {
 
   const unassignTasks = async () => {
     setDeallocateDialog(false);
-    if (props.ProjectDetails.project_type === "AcousticNormalisedTranscriptionEditing") {
+    if (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing") {
       setSnackbarInfo({
         open: true,
         message: 'The task de-allocation has been disabled for your project',
@@ -244,7 +246,7 @@ const TaskTable = (props) => {
         ? new DeallocateTasksAPI(id, selectedFilters.annotation_status)
         : new DeallocateReviewTasksAPI(id, selectedFilters.review_status);
     const res = await fetch(deallocateObj.apiEndPoint(), {
-      method: "GET",
+      method: "POST",
       body: JSON.stringify(deallocateObj.getBody()),
       headers: deallocateObj.getHeaders().headers,
     });
@@ -1144,6 +1146,9 @@ const TaskTable = (props) => {
           currentFilters={selectedFilters}
           pull={pull}
           setpull={setpull}
+          rejected={rejected}
+          setRejected={setRejected}
+          // rejValue = {rejValue}
           pullvalue={pullvalue}
         />
       )}

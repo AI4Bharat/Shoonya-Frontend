@@ -48,6 +48,13 @@ import TaskAnalytics from "../../container/Progress/Workspace/TaskAnalytics";
 import MetaAnalytics from "../../container/Progress/Workspace/MetaAnalytics";
 import ProgressAnalytics from "../../container/Progress/Workspace/ProgressAnalytics";
 import { DriveEta } from "@material-ui/icons";
+import PerformanceAnalytics from "../../container/Progress/Workspace/PerformanceAnalytics";
+import InviteUsersDialog from "./InviteUsersDialog";
+import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
+import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers"
+import InviteManagerSuggestions from "../../../../redux/actions/api/Organization/InviteManagerSuggestions";
+import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI"
+import CustomizedSnackbars from "./Snackbar";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -89,7 +96,17 @@ const DetailsViewPage = (props) => {
     setAnchorEl(event.currentTarget);
 
   };
-
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [csvFile, setCsvFile] = useState(null);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
+  const [selectedEmails, setSelectedEmails] = useState([]);
+  const [btn,setbtn] = useState(null);
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
@@ -102,6 +119,7 @@ const DetailsViewPage = (props) => {
   //     const workspaceObj = new GetWorkspacesAPI(1);
   //     dispatch(APITransport(workspaceObj));
   //   }
+
 
   useEffect(() => {
     // getDashboardWorkspaceData();
@@ -117,6 +135,7 @@ const DetailsViewPage = (props) => {
     }
     
   }, []);
+  const organisation_id = useSelector(state => state.getWorkspacesProjectData?.data?.[0]?.organization_id);
 
   let navigate = useNavigate();
 
@@ -144,6 +163,97 @@ const DetailsViewPage = (props) => {
     setAddWorkspacesDialogOpen(true);
   };
 
+  const handleUserDialogOpen = () => {
+    setAddUserDialogOpen(true);
+  };
+  const handleUserDialogClose = () => {
+    setAddUserDialogOpen(false);
+  };
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
+
+  const addBtnClickHandler = async () => {
+    setLoading(true);
+    if(userDetails?.role === userRole.WorkspaceManager)
+    {
+      const addUsesrsObj = new InviteManagerSuggestions(
+        organisation_id,
+        selectedUsers,
+        userType
+      );
+      const res = await fetch(addUsesrsObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(addUsesrsObj.getBody()),
+        headers: addUsesrsObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+        const orgObj = new GetOragnizationUsersAPI(id);
+        dispatch(APITransport(orgObj));
+
+      }else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
+    }
+    else 
+    {
+
+    const addMembersObj = new InviteUsersToOrgAPI(
+        organisation_id,
+        selectedUsers,
+        userType
+      );
+      const res = await fetch(addMembersObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(addMembersObj.getBody()),
+        headers: addMembersObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+        const orgObj = new GetOragnizationUsersAPI(id);
+        dispatch(APITransport(orgObj));
+      }else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
+    }
+    handleUserDialogClose();
+    setLoading(false);
+    setSelectedUsers([ ]);
+    setSelectedEmails([]);
+    setCsvFile(null);
+    setbtn(null)
+    setUserType(Object.keys(UserRolesList)[0])
+  };
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
@@ -158,6 +268,7 @@ const DetailsViewPage = (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
+      {renderSnackBar()}
       <Grid
         container
         direction="row"
@@ -293,6 +404,7 @@ const DetailsViewPage = (props) => {
             <MenuItem selected={selectmenu=== "TaskAnalytics"} onClick={() => handleClickMenu("TaskAnalytics")}> Task Analytics </MenuItem>
             <MenuItem selected={ selectmenu=== "MetaAnalytics"} onClick={() => handleClickMenu("MetaAnalytics")}>Meta Analytics</MenuItem>
             <MenuItem selected={selectmenu=== "AdvanceAnalytics"} onClick={() => handleClickMenu("AdvanceAnalytics")}>Advance Analytics</MenuItem>
+            <MenuItem selected={selectmenu=== "PerformanceAnalytics"} onClick={() => handleClickMenu("PerformanceAnalytics")}>Performance Analytics</MenuItem>
           </Menu>
           <TabPanel
             value={value}
@@ -350,12 +462,33 @@ const DetailsViewPage = (props) => {
           <TabPanel value={value} index={1}>
             {pageType === componentType.Type_Workspace && (
               <>
-                <Button
-                  className={classes.annotatorsButton}
-                  label={"Add Members to Workspace"}
-                  sx={{ width: "100%", mb: 2 }}
-                  onClick={handleAnnotatorDialogOpen}
-                />
+              <Grid
+                  container
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  columnSpacing={4}
+                  rowSpacing={2}
+                >
+                  <Grid item xs={12} sm={6}>
+                  <CustomButton
+                    className={classes.annotatorsButton}
+                    label={"Add Members to Workspace"}
+                    sx={{ width: "100%", mb: 2 }}
+                    onClick={handleAnnotatorDialogOpen}
+                  />
+
+
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                  <CustomButton
+                    className={classes.annotatorsButton}
+                    label={"Invite Users to Organisation"}
+                    sx={{ width: "100%", mb: 2 }}
+                    onClick={handleUserDialogOpen}
+                  />
+                  </Grid>
+                </Grid>
                 <AnnotatorsTable
                   onRemoveSuccessGetUpdatedMembers={() => getWorkspaceDetails()}
                 />
@@ -365,6 +498,25 @@ const DetailsViewPage = (props) => {
                   userType={addUserTypes.ANNOTATOR}
                   id={id}
                 />
+                <InviteUsersDialog
+                handleDialogClose={handleUserDialogClose}
+                isOpen={addUserDialogOpen}
+                selectedUsers={selectedUsers}
+                setSelectedUsers={setSelectedUsers}
+                userType={userType}
+                setUserType={setUserType}
+                addBtnClickHandler={()=>addBtnClickHandler()}
+                loading={loading}
+                selectedEmails={selectedEmails}
+                setSelectedEmails={setSelectedEmails}
+                csvFile={csvFile}
+                setCsvFile={setCsvFile}
+                btn={btn}
+                setbtn={setbtn}
+                value={value}
+                setvalue={setValue}
+                popUpLabel={userDetails?.role === userRole.WorkspaceManager ? "Request admin to add users to organization" : "Invite users to organization" }
+              />
               </>
             )}
             {pageType === componentType.Type_Organization && (
@@ -404,6 +556,7 @@ const DetailsViewPage = (props) => {
             {pageType === componentType.Type_Workspace && selectmenu=== "TaskAnalytics" && <TaskAnalytics />}
             {pageType === componentType.Type_Workspace && selectmenu=== "MetaAnalytics" && <MetaAnalytics />}
             {pageType === componentType.Type_Workspace && selectmenu=== "AdvanceAnalytics" && <ProgressAnalytics />}
+            {pageType === componentType.Type_Workspace && selectmenu=== "PerformanceAnalytics" && <PerformanceAnalytics /> }
             {pageType === componentType.Type_Organization && (
               <OrganizationSettings />
             )}

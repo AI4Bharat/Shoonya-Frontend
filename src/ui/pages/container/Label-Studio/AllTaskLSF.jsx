@@ -26,11 +26,12 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 import { snakeToTitleCase } from '../../../../utils/utils';
-
+import keymap from './keymap';
 import styles from './lsf.module.css'
 import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
+import { labelConfigJS } from './labelConfigJSX';
 
 //used just in postAnnotation to support draft status update.
 
@@ -49,34 +50,50 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     message: "",
     variant: "success",
   });
+  const ocrDomain = useRef();
+  const [ocrD, setOcrD] = useState("");
+  const selectedLanguages = useRef([]);
+  const [selectedL, setSelectedL] = useState([]);
+  const [predictions, setPredictions] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
   const userData = useSelector(state=>state.fetchLoggedInUserData.data)
   const [assignedUsers, setAssignedUsers] = useState(null);
   let loaded = useRef();
 
+  useEffect(() => {
+    setPredictions(taskData?.data?.ocr_prediction_json);
+  }, [taskData]);
+
   console.log("projectId, taskId", projectId, taskId);
   // debugger
 
-  useEffect(() => {
-    localStorage.setItem("labelStudio:settings", JSON.stringify({
-      bottomSidePanel: ProjectDetails?.project_type?.includes("Audio") ? false : true ,
-      continuousLabeling: false,
-      enableAutoSave: false,
-      enableHotkeys: true,
-      enableLabelTooltips: true,
-      enablePanelHotkeys: true,
-      enableTooltips: false,
-      fullscreen: false,
-      imageFullSize: false,
-      selectAfterCreate: false,
-      showAnnotationsPanel: true,
-      showLabels: false,
-      showLineNumbers: false,
-      showPredictionsPanel: true,
-      sidePanelMode: "SIDEPANEL_MODE_REGIONS"
-    }))
-  }, [])
+useEffect(() => {
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
+    localStorage.setItem(
+      "labelStudio:settings",
+      JSON.stringify({
+        bottomSidePanel: !sidePanel,
+        continuousLabeling: continousLabelingOnly,
+        enableAutoSave: false,
+        enableHotkeys: true,
+        enableLabelTooltips: true,
+        enablePanelHotkeys: true,
+        enableTooltips: false,
+        fullscreen: false,
+        imageFullSize: false,
+        selectAfterCreate: selectAfterCreateOnly,
+        showAnnotationsPanel: true,
+        showLabels: showLabelsOnly,
+        showLineNumbers: false,
+        showPredictionsPanel: true,
+        sidePanelMode: "SIDEPANEL_MODE_REGIONS",
+      }));});}, []);
 
   useEffect(() => {
     const showAssignedUsers = async () => {
@@ -197,6 +214,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           id: taskData.id,
           data: taskData.data,
         },
+        keymap: keymap,
 
         onLabelStudioLoad: function (ls) {
           annotation_status.current = ProjectDetails.project_stage == 2 ? "labeled": "accepted";
@@ -210,36 +228,55 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
           load_time = new Date();
         },
         onSubmitAnnotation: function (ls, annotation) {
-          showLoader();
-          if (taskData.annotation_status !== "freezed") {
-            postAnnotation(
-              annotation.serializeAnnotation(),
-              taskData.id,
-              userData.id,
-              load_time,
-              annotation.lead_time,
-              annotation_status.current,
-              annotationNotesRef.current.value
-            ).then((res) => {
-              if (localStorage.getItem("labelAll"))
-                getNextProject(projectId, taskData.id).then((res) => {
-                  hideLoader();
-                  // window.location.href = `/projects/${projectId}/task/${res.id}`;
-                  tasksComplete(res?.id || null);
-                })
-              else {
-                hideLoader();
-                window.location.reload();
-              }
-            })
-          }
-          else
-          setSnackbarInfo({
-            open: true,
-            message: "Task is frozen",
-            variant: "error",
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;         
+          temp.map((curr) => {
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
+            }
+            if(curr.type === "labels"){
+              countLables++;
+            }
           });
-        },
+          if (ids.size>countLables) {
+            setSnackbarInfo({
+              open: true,
+              message: "Please select labels for all boxes",
+              variant: "error",
+            });
+          }
+          else {
+            showLoader();
+            if (taskData.annotation_status !== "freezed") {
+              postAnnotation(
+                annotation.serializeAnnotation(),
+                taskData.id,
+                userData.id,
+                load_time,
+                annotation.lead_time,
+                annotation_status.current,
+                annotationNotesRef.current.value
+              ).then((res) => {
+                if (localStorage.getItem("labelAll"))
+                  getNextProject(projectId, taskData.id).then((res) => {
+                    hideLoader();
+                    // window.location.href = `/projects/${projectId}/task/${res.id}`;
+                    tasksComplete(res?.id || null);
+                  })
+                else {
+                  hideLoader();
+                  window.location.reload();
+                }
+              })
+            }
+            else
+            setSnackbarInfo({
+              open: true,
+              message: "Task is frozen",
+              variant: "error",
+            });
+        }},
 
         onSkipTask: function () {
         //   message.warning('Notes will not be saved for skipped tasks!');
@@ -264,45 +301,69 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
         },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (taskData.annotation_status !== "freezed") {
-            for (let i = 0; i < annotations.length; i++) {
-              if (!annotations[i].result?.length || annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
-                showLoader();
-                let temp = annotation.serializeAnnotation()
-
-                for (let i = 0; i < temp.length; i++) {
-                  if (temp[i].value.text) {
-                    temp[i].value.text = [temp[i].value.text[0]]
-                  }
-                }
-                patchAnnotation(
-                  temp,
-                  annotations[i].id,
-                  load_time,
-                  annotations[i].lead_time,
-                  annotation_status.current,
-                  annotationNotesRef.current.value
-                  ).then(() => {
-                    if (localStorage.getItem("labelAll"))
-                      getNextProject(projectId, taskData.id).then((res) => {
-                        hideLoader();
-                        tasksComplete(res?.id || null);
-                      })
-                    else{
-                      hideLoader();
-                      window.location.reload();
-                    }
-                  });
-              }
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;   
+          temp.map((curr) => {
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
             }
-          } 
-          else
-          setSnackbarInfo({
-            open: true,
-            message: "Task is frozen",
-            variant: "error",
+            if(curr.type === "labels"){
+              countLables++;
+            }
           });
-        },
+          if (ids.size>countLables) {
+            setSnackbarInfo({
+              open: true,
+              message: "Please select labels for all boxes",
+              variant: "error",
+            });
+          }
+          else {
+            if (taskData.annotation_status !== "freezed") {
+              for (let i = 0; i < annotations.length; i++) {
+                if (!annotations[i].result?.length || annotation.serializeAnnotation()[0].id === annotations[i].result[0].id) {
+                  showLoader();
+
+                  for (let i = 0; i < temp.length; i++) {
+                    if(temp[i].type === "relation"){
+                      continue;
+                    }else if (temp[i].value.text) {
+                      temp[i].value.text = [temp[i].value.text[0]]
+                    }
+                  }
+                  patchAnnotation(
+                    temp,
+                    annotations[i].id,
+                    load_time,
+                    annotations[i].lead_time,
+                    annotation_status.current,
+                    annotationNotesRef.current.value,
+                    {},
+                    false,
+                    selectedLanguages,
+                    ocrDomain
+                    ).then(() => {
+                      if (localStorage.getItem("labelAll"))
+                        getNextProject(projectId, taskData.id).then((res) => {
+                          hideLoader();
+                          tasksComplete(res?.id || null);
+                        })
+                      else{
+                        hideLoader();
+                        window.location.reload();
+                      }
+                    });
+                }
+              }
+            } 
+            else
+            setSnackbarInfo({
+              open: true,
+              message: "Task is frozen",
+              variant: "error",
+            });
+        }},
 
         onDeleteAnnotation: function (ls, annotation) {
           for (let i = 0; i < annotations.length; i++) {
@@ -342,6 +403,9 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
             // both have loaded!
             console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+              tempLabelConfig = labelConfigJS;
+            }
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
             LSFRoot(
@@ -395,6 +459,31 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       />
     );
   };
+
+  const handleSelectChange = (event) => {
+    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
+  };
+
+  useEffect(() => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
+          selectedLanguages.current?.push(lang);
+          const newLanguages = [...selectedL, ...taskData?.data?.language];
+          setSelectedL(newLanguages);
+        });
+      }
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+        setSelectedL([taskData?.data?.language]);
+        selectedLanguages.current?.push(taskData?.data?.language);
+      }
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+        ocrDomain.current = taskData?.data?.ocr_domain;
+        setOcrD(taskData?.data?.ocr_domain);
+      }
+    }
+  }, [taskData]);
 
   return (
     <div>
@@ -461,6 +550,85 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       >
         <div className="label-studio-root" ref={rootRef}></div>
       </Box>
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
+          <>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Assamese">Assamese</option>
+                <option value="Bodo">Bodo</option>
+                <option value="Dogri">Dogri</option>
+                <option value="Kashmiri">Kashmiri</option>
+                <option value="Maithili">Maithili</option>
+                <option value="Manipuri">Manipuri</option>
+                <option value="Nepali">Nepali</option>
+                <option value="Odia">Odia</option>
+                <option value="Sindhi">Sindhi</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Santali">Santali</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Goan Konkani">Goan Konkani</option>
+              </select>
+              </div>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
+                <option disabled selected></option>
+                <option value="BO">Books</option>
+                <option value="FO">Forms</option>
+                <option value="OT">Others</option>
+                <option value="TB">Textbooks</option>
+                <option value="NV">Novels</option>
+                <option value="NP">Newspapers</option>
+                <option value="MG">Magazines</option>
+                <option value="RP">Research_Papers</option>
+                <option value="FM">Form</option>
+                <option value="BR">Brochure_Posters_Leaflets</option>
+                <option value="AR">Acts_Rules</option>
+                <option value="PB">Publication</option>
+                <option value="NT">Notice</option>
+                <option value="SY">Syllabus</option>
+                <option value="QP">Question_Papers</option>
+                <option value="MN">Manual</option>
+              </select>
+              </div>
+            </div>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
+              {predictions?.length > 0 ?
+                (() => {
+                  try {
+                    return JSON.parse(predictions)?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  } catch (error) {
+                    console.error("Error parsing predictions:", error);
+                    return predictions?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  }
+                })()
+              :
+              <div style={{textAlign:"center"}}>No Predictions Present</div>}
+            </div>
+          </>
+        }
 
       {loader}
       {renderSnackBar()}
@@ -508,6 +676,7 @@ export default function LSF() {
         startIcon={<  ArrowBackIcon />}
         variant="contained" 
         color="primary"
+        sx={{mt:2}} 
         onClick={() => {
           localStorage.removeItem("labelAll");
           navigate(`/projects/${projectId}`);

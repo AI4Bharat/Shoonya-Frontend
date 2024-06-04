@@ -18,28 +18,27 @@ import {
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
 
-function SemanticTextualSimilarityChart(props) {
+function AudioTaskAnalyticsChart(props) {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
-  const { taskAnalyticsData } = props;
-
+  const { analyticsData } = props;
   const [totalTaskCount, setTotalTaskCount] = useState();
   const [totalAnnotationTasksCount, setTotalAnnotationTasksCount] = useState();
   const [totalReviewTasksCount, setTotalReviewTasksCount] = useState();
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    taskAnalyticsData[2]?.sort(
+    analyticsData?.sort(
       (a, b) =>
         b.annotation_cumulative_tasks_count -
         a.annotation_cumulative_tasks_count
     );
-    setData(taskAnalyticsData[2]);
+    setData(analyticsData);
 
     let allAnnotatorCumulativeTasksCount = 0;
     let allReviewCumulativeTasksCount = 0;
     var languages;
-    taskAnalyticsData[2]?.map((element, index) => {
+    analyticsData?.map((element, index) => {
       allAnnotatorCumulativeTasksCount +=
         element.annotation_cumulative_tasks_count;
       allReviewCumulativeTasksCount += element.review_cumulative_tasks_count;
@@ -51,7 +50,7 @@ function SemanticTextualSimilarityChart(props) {
     setTotalTaskCount(
       allAnnotatorCumulativeTasksCount + allReviewCumulativeTasksCount
     );
-  }, [taskAnalyticsData[2]]);
+  }, [analyticsData]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -96,11 +95,12 @@ function SemanticTextualSimilarityChart(props) {
     <>
       <Box className={classes.modelChartSection}>
         <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-          Tasks Dashboard - Translation Rating
+          {`Tasks Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Translation Rating
+            Count of Annotated and Reviewed Audio Data
           </Typography>
         </Typography>
+       
         <Paper>
           <Box className={classes.topBar}>
             <Box className={classes.topBarInnerBox}>
@@ -125,7 +125,7 @@ function SemanticTextualSimilarityChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Sentence Pairs
+              Total Audio Files Annotated
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -134,7 +134,7 @@ function SemanticTextualSimilarityChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Quality/Reviewed Sentence Pairs
+              Total quality/ reviewed audio files
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewTasksCount &&
@@ -162,7 +162,7 @@ function SemanticTextualSimilarityChart(props) {
                 dataKey="languages"
                 textAnchor={"end"}
                 // tick={<CustomizedAxisTick />}
-                height={90}
+                height={70}
                 interval={0}
                 position="insideLeft"
                 type="category"
@@ -226,4 +226,4 @@ function SemanticTextualSimilarityChart(props) {
     </>
   );
 }
-export default SemanticTextualSimilarityChart;
+export default AudioTaskAnalyticsChart;

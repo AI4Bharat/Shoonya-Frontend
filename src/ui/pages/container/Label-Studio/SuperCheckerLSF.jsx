@@ -35,7 +35,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
-
+import keymap from "./keymap";
 import {
   getProjectsandTasks,
   getNextProject,
@@ -51,6 +51,7 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
+import { labelConfigJS } from "./labelConfigJSX";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -165,6 +166,11 @@ const LabelStudioWrapper = ({
     message: "",
     variant: "success",
   });
+  const ocrDomain = useRef();
+  const [ocrD, setOcrD] = useState("");
+  const selectedLanguages = useRef([]);
+  const [selectedL, setSelectedL] = useState([]);
+  const [predictions, setPredictions] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
   const [annotations, setAnnotations] = useState([]);
   const load_time = useRef();
@@ -178,6 +184,10 @@ const LabelStudioWrapper = ({
   const [tagSuggestionList, setTagSuggestionList] = useState();
   const [assignedUsers, setAssignedUsers] = useState(null);
 
+  useEffect(() => {
+    setPredictions(taskData?.data?.ocr_prediction_json);
+  }, [taskData]);
+
   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   /* useEffect(() => {
@@ -187,14 +197,18 @@ const LabelStudioWrapper = ({
     }
   }, [userData]); */
   
-  useEffect(() => {
+useEffect(() => {
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
     localStorage.setItem(
       "labelStudio:settings",
       JSON.stringify({
-        bottomSidePanel: ProjectDetails?.project_type?.includes("Audio")
-          ? false
-          : true,
-        continuousLabeling: false,
+        bottomSidePanel: !sidePanel,
+        continuousLabeling: continousLabelingOnly,
         enableAutoSave: false,
         enableHotkeys: true,
         enableLabelTooltips: true,
@@ -202,15 +216,14 @@ const LabelStudioWrapper = ({
         enableTooltips: false,
         fullscreen: false,
         imageFullSize: false,
-        selectAfterCreate: false,
+        selectAfterCreate: selectAfterCreateOnly,
         showAnnotationsPanel: true,
-        showLabels: false,
+        showLabels: showLabelsOnly,
         showLineNumbers: false,
         showPredictionsPanel: true,
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
       })
-    );
-  }, []);
+    );});},[]);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -328,6 +341,7 @@ const LabelStudioWrapper = ({
           id: taskData.id,
           data: taskData.data,
         },
+        keymap: keymap,
 
         onLabelStudioLoad: function (ls) {
           // if (taskData.correct_annotation) {
@@ -362,6 +376,7 @@ const LabelStudioWrapper = ({
           if (review) {
             showLoader();
             patchSuperChecker(
+              taskId,
               review.id,
               load_time.current,
               review.lead_time,
@@ -379,73 +394,99 @@ const LabelStudioWrapper = ({
         },
 
         onUpdateAnnotation: function (ls, annotation) {
-          if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
-            let temp = annotation.serializeAnnotation();
-            const counter = temp.reduce((acc, curr) => {
-              if (curr.from_name === "labels")
-                acc.labels++;
-              else if (curr.from_name === "transcribed_json") {
-                if (curr.value.text[0] === "")
-                  acc.empty++;
-                acc.textareas++;
-              }
-              return acc;
-            },
-              { labels: 0, textareas: 0, empty: 0 }
-            );
-            if (counter.labels !== counter.textareas || counter.empty) {
-              setSnackbarInfo({
-                open: true,
-                message: "Please fill the annotations for every segment/region",
-                variant: "warning",
-              });
-              return;
+          let temp = annotation.serializeAnnotation();
+          let ids = new Set();
+          let countLables = 0;   
+          temp.map((curr) => {
+            if(curr.type !== "relation"){
+              ids.add(curr.id);
             }
-          }
-          if (taskData.annotation_status !== "freezed") {
-            setAutoSave(false);
-            showLoader();
-            let temp = review_status.current === "rejected"
-              ? [] : annotation.serializeAnnotation();
-
-            for (let i = 0; i < temp.length; i++) {
-              if (temp[i].value.text) {
-                temp[i].value.text = [temp[i].value.text[0]];
-              }
+            if(curr.type === "labels"){
+              countLables++;
             }
-
-            let superChecker = annotations.filter(
-              (value) => value.annotation_type === 3
-            )[0];
-
-            patchSuperChecker(
-              superChecker.id,
-              load_time.current,
-              superChecker.lead_time,
-              review_status.current,
-              temp,
-              superChecker.parent_annotation,
-              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
-            ).then(() => {
-              if (localStorage.getItem("labelAll"))
-                getNextProject(projectId, taskData.id, "supercheck").then(
-                  (res) => {
-                    hideLoader();
-                    tasksComplete(res?.id || null);
-                  }
-                );
-              else {
-                hideLoader();
-                window.location.reload();
-              }
-            });
-          } else
+          });
+          if (projectType.includes("OCR") && ids.size>countLables) {
             setSnackbarInfo({
               open: true,
-              message: "Task is frozen",
+              message: "Please select labels for all boxes",
               variant: "error",
             });
-        },
+          }
+          else {
+            if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
+              const counter = temp.reduce((acc, curr) => {
+                if (curr.from_name === "labels")
+                  acc.labels++;
+                else if (curr.from_name === "transcribed_json") {
+                  if(curr.type !== "relation"){
+                    if (curr.value.text[0] === "")
+                    acc.empty++;
+                  acc.textareas++;
+                }
+              }
+                return acc;
+              },
+                { labels: 0, textareas: 0, empty: 0 }
+              );
+              if (counter.labels !== counter.textareas || counter.empty) {
+                setSnackbarInfo({
+                  open: true,
+                  message: "Please fill the annotations for every segment/region",
+                  variant: "warning",
+                });
+                return;
+              }
+            }
+            if (taskData.annotation_status !== "freezed") {
+              setAutoSave(false);
+              showLoader();
+              let temp = review_status.current === "rejected"
+                ? [] : annotation.serializeAnnotation();
+
+              for (let i = 0; i < temp.length; i++) {
+                if(temp[i].type === "relation"){
+                  continue;
+                }else if (temp[i].value.text) {
+                  temp[i].value.text = [temp[i].value.text[0]];
+                }
+              }
+
+              let superChecker = annotations.filter(
+                (value) => value.annotation_type === 3
+              )[0];
+
+              patchSuperChecker(
+                taskId,
+                superChecker.id,
+                load_time.current,
+                superChecker.lead_time,
+                review_status.current,
+                temp,
+                superChecker.parent_annotation,
+                JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+                false,
+                selectedLanguages,
+                ocrDomain
+              ).then(() => {
+                if (localStorage.getItem("labelAll"))
+                  getNextProject(projectId, taskData.id, "supercheck").then(
+                    (res) => {
+                      hideLoader();
+                      tasksComplete(res?.id || null);
+                    }
+                  );
+                else {
+                  hideLoader();
+                  window.location.reload();
+                }
+              });
+            } else
+              setSnackbarInfo({
+                open: true,
+                message: "Task is frozen",
+                variant: "error",
+              });
+        }},
       });
     }
   }
@@ -585,13 +626,10 @@ const LabelStudioWrapper = ({
           //   predictions,
           // ]);
           setNotes(taskData, annotations);
-          let tempLabelConfig =
-            labelConfig.project_type === "ConversationTranslation" ||
-              labelConfig.project_type === "ConversationTranslationEditing"
-              ? generateLabelConfig(taskData.data)
-              : labelConfig.project_type === "ConversationVerification"
-                ? conversationVerificationLabelConfig(taskData.data)
-                : labelConfig.label_config;
+          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+            tempLabelConfig = labelConfigJS;
+          }
           setAnnotations(annotations);
           setLabelConfig(tempLabelConfig);
           setTaskData(taskData);
@@ -689,12 +727,14 @@ const LabelStudioWrapper = ({
   }, [taskData]);
 
   const autoSaveSuperCheck = () => {
-    if (autoSave && lsfRef.current?.store?.annotationStore?.selected) {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "validated" && taskData.task_status.toLowerCase() !== "validated_with_changes") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
-          if (temp[i].value.text) {
+          if(temp[i].type === "relation"){
+            continue;
+          }else if (temp[i].value.text) {
             temp[i].value.text = [temp[i].value.text[0]];
           }
         }
@@ -702,6 +742,7 @@ const LabelStudioWrapper = ({
           (value) => value.annotation_type === 3
         )[0];
         patchSuperChecker(
+          taskId,
           superChecker.id,
           load_time.current,
           superChecker.lead_time,
@@ -709,7 +750,9 @@ const LabelStudioWrapper = ({
           temp,
           superChecker.parent_annotation,
           JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
-          true
+          true,
+          selectedLanguages,
+          ocrDomain
         ).then((res) => {
           if (res.status !== 200) {
             setSnackbarInfo({
@@ -717,6 +760,56 @@ const LabelStudioWrapper = ({
               message: "Error in autosaving annotation",
               variant: "error",
             });
+          }
+        });
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
+  };
+
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "validated" && taskData.task_status.toLowerCase() !== "validated_with_changes") {
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp = annotation.serializeAnnotation();
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].parentID !== undefined){
+            delete temp[i].parentID;
+          }
+          if(temp[i].type === "relation"){
+            continue;
+          }else if (temp[i].value.text) {
+            temp[i].value.text = [temp[i].value.text[0]];
+          }
+        }
+        let superChecker = annotations.filter(
+          (value) => value.annotation_type === 3
+        )[0];
+        patchSuperChecker(
+          taskId,
+          superChecker.id,
+          load_time.current,
+          superChecker.lead_time,
+          superChecker.annotation_status,
+          temp,
+          superChecker.parent_annotation,
+          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+          true,
+          selectedLanguages,
+          ocrDomain
+        ).then((res) => {
+          if (res.status !== 200) {
+            setSnackbarInfo({
+              open: true,
+              message: "Error in clearing children bboxes",
+              variant: "error",
+            });
+          }else{
+            window.location.reload();
           }
         });
       } else
@@ -807,6 +900,35 @@ const LabelStudioWrapper = ({
 
   const ProjectsData = localStorage.getItem("projectData");
   const ProjectData = JSON.parse(ProjectsData);
+
+  const handleSelectChange = (event) => {
+    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
+  };
+
+  useEffect(() => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
+          if (!selectedLanguages.current.includes(lang)) {
+            selectedLanguages.current.push(lang);
+          }        
+          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
+          setSelectedL(Array.from(newLanguages));
+        });
+      }
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+        setSelectedL([taskData?.data?.language]);
+        if (!selectedLanguages.current.includes(taskData?.data?.language)) {
+          selectedLanguages.current.push(taskData?.data?.language);
+        }      
+      }
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+        ocrDomain.current = taskData?.data?.ocr_domain;
+        setOcrD(taskData?.data?.ocr_domain);
+      }
+    }
+  }, [taskData]);
 
   return (
     <div>
@@ -961,6 +1083,26 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
+            {ProjectDetails?.project_type?.includes("OCR") &&
+            <Tooltip title="Clear all children bboxes">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    color: "#f00",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear All Mergings
+                </Button>
+              </Tooltip>
+          }
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
@@ -1004,6 +1146,85 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
+          <>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Assamese">Assamese</option>
+                <option value="Bodo">Bodo</option>
+                <option value="Dogri">Dogri</option>
+                <option value="Kashmiri">Kashmiri</option>
+                <option value="Maithili">Maithili</option>
+                <option value="Manipuri">Manipuri</option>
+                <option value="Nepali">Nepali</option>
+                <option value="Odia">Odia</option>
+                <option value="Sindhi">Sindhi</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Santali">Santali</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Goan Konkani">Goan Konkani</option>
+              </select>
+              </div>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
+                <option disabled selected></option>
+                <option value="BO">Books</option>
+                <option value="FO">Forms</option>
+                <option value="OT">Others</option>
+                <option value="TB">Textbooks</option>
+                <option value="NV">Novels</option>
+                <option value="NP">Newspapers</option>
+                <option value="MG">Magazines</option>
+                <option value="RP">Research_Papers</option>
+                <option value="FM">Form</option>
+                <option value="BR">Brochure_Posters_Leaflets</option>
+                <option value="AR">Acts_Rules</option>
+                <option value="PB">Publication</option>
+                <option value="NT">Notice</option>
+                <option value="SY">Syllabus</option>
+                <option value="QP">Question_Papers</option>
+                <option value="MN">Manual</option>
+              </select>
+              </div>
+            </div>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
+              {predictions?.length > 0 ?
+                (() => {
+                  try {
+                    return JSON.parse(predictions)?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  } catch (error) {
+                    console.error("Error parsing predictions:", error);
+                    return predictions?.map((pred, index) => (
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      </div>
+                    ));
+                  }
+                })()
+              :
+              <div style={{textAlign:"center"}}>No Predictions Present</div>}
+            </div>
+          </>
+        }
       {loader}
       {renderSnackBar()}
     </div>
@@ -1102,6 +1323,7 @@ export default function LSF() {
           startIcon={<ArrowBackIcon />}
           variant="contained"
           color="primary"
+          sx={{mt:2}} 
           onClick={() => {
             localStorage.removeItem("labelAll");
             navigate(`/projects/${projectId}`);

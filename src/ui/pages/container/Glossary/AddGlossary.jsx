@@ -26,7 +26,7 @@ import {
   IndicTransliterate,
   getTransliterationLanguages,
 } from "@ai4bharat/indic-transliterate";
-import "@ai4bharat/indic-transliterate/dist/index.css";
+import "../../../../IndicTransliterate/index.css";
 import { MenuProps } from "../../../../utils/utils";
 
 const AddGlossary = ({
@@ -284,8 +284,7 @@ const AddGlossary = ({
                     setSourceText(SourceText);
                   }}
                   renderComponent={(props) => renderSourceText(props)}
-
-                 
+                  
                 />): ( <OutlinedTextField
                 placeholder="Source Text"
                 sx={{ m: 1, width: 200 }}
@@ -300,6 +299,7 @@ const AddGlossary = ({
                     settargetText(targetText);
                   }}
                   renderComponent={(props) => renderTargetText(props)}
+
                 />): ( <OutlinedTextField
                   placeholder="Target Text"
                   sx={{ m: 1, width: 200 }}

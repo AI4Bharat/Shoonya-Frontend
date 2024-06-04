@@ -3,11 +3,14 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import C from "../../../constants";
  
  export default class MetaAnalyticsDataAPI extends API {
-   constructor(OrgId,progressObj, timeout = 2000) {
+   constructor(OrgId,project_type_filter,progressObj, timeout = 2000) {
      super("GET", timeout, false);
      this.progressObj = progressObj;
      this.type = C.FETCH_META_ANALYTICS_DATA;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}public/${OrgId}/cumulative_tasks_count/?metainfo=true`;
+     project_type_filter=='AllTypes'?
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}public/${OrgId}/cumulative_tasks_count/?metainfo=true`
+     : 
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getOrganizations}public/${OrgId}/cumulative_tasks_count/?metainfo=true&project_type_filter=${project_type_filter}`
    }
   
    processResponse(res) {

@@ -57,7 +57,7 @@ const ProgressType = [
   "super_checked",
   "exported",
 ];
-const projectStage = [{name:"Annotation Stage",value: 1 ,disabled:false}, {name:"Review Stage",value: 2,disabled:false} ,{name:"Super Check Stage",value: 3,disabled:false}]
+const projectStage = [{ name: "Annotation Stage", value: 1, disabled: false }, { name: "Review Stage", value: 2, disabled: false }, { name: "Super Check Stage", value: 3, disabled: false }]
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -97,7 +97,7 @@ const AdvancedOperation = (props) => {
   const [OpenExportProjectDialog, setOpenExportProjectDialog] = useState(false);
   const [datasetId, setDatasetId] = useState("");
   const [projectType, setProjectType] = useState("");
-  const [taskReviews,setTaskReviews] = useState( "")
+  const [taskReviews, setTaskReviews] = useState("")
   const { id } = useParams();
   const classes = DatasetStyle();
   const dispatch = useDispatch();
@@ -113,14 +113,14 @@ const AdvancedOperation = (props) => {
   );
 
   const isSuperChecker =
-  ((userRole.WorkspaceManager === loggedInUserData?.role ||
-    userRole.OrganizationOwner === loggedInUserData?.role ||
-    userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
-  ProjectDetails?.review_supercheckers?.some(
-    (superchecker) => superchecker.id === loggedInUserData?.id
-  ));
+    ((userRole.WorkspaceManager === loggedInUserData?.role ||
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
+    ProjectDetails?.review_supercheckers?.some(
+      (superchecker) => superchecker.id === loggedInUserData?.id
+    ));
 
-  const [taskStatus, setTaskStatus] = useState(isSuperChecker ?["incomplete", "annotated", "reviewed", "super_checked", "exported", ]:[ "incomplete", "annotated","reviewed","super_checked","exported",]);
+  const [taskStatus, setTaskStatus] = useState(isSuperChecker ? ["incomplete", "annotated", "reviewed", "super_checked", "exported",] : ["incomplete", "annotated", "reviewed", "super_checked", "exported",]);
 
   let ProgressTypeValue = "super_checked"
   const filterdata = ProgressType.filter(item => item !== ProgressTypeValue)
@@ -131,7 +131,7 @@ const AdvancedOperation = (props) => {
     dispatch(APITransport(projectObj));
   };
   useEffect(() => {
-   setProjectType(ProjectTypes.input_dataset?.class)
+    setProjectType(ProjectTypes.input_dataset?.class)
   }, [ProjectTypes])
 
   useEffect(() => {
@@ -151,17 +151,17 @@ const AdvancedOperation = (props) => {
     dispatch(APITransport(typesObj));
   }, []);
 
- 
+
   const getExportProjectButton = async () => {
     setOpenExportProjectDialog(false);
     const projectObj =
       ProjectTypes?.output_dataset?.save_type === "new_record"
         ? new GetExportProjectButtonAPI(
-            id,
-            ProjectDetails?.datasets[0].instance_id,
-            datasetId,
-            ProjectTypes?.output_dataset?.save_type
-          )
+          id,
+          ProjectDetails?.datasets[0].instance_id,
+          datasetId,
+          ProjectTypes?.output_dataset?.save_type
+        )
         : new GetExportProjectButtonAPI(id);
     //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
@@ -186,11 +186,11 @@ const AdvancedOperation = (props) => {
     }
   };
 
-  const getDownloadProjectAnnotations=async()=>{
+  const getDownloadProjectAnnotations = async () => {
     // 'https://backend.shoonya.ai4bharat.org/projects/606/export_project_tasks/'
     // SetTask([])
     // setLoading(true)
-    const projectObj = new getDownloadProjectAnnotationsAPI(id,taskStatus);
+    const projectObj = new getDownloadProjectAnnotationsAPI(id, taskStatus);
     dispatch(APITransport(projectObj));
     // const projectObj = new GetPublishProjectButtonAPI(id);
     // const res = await fetch(projectObj.apiEndPoint(), {
@@ -214,45 +214,45 @@ const AdvancedOperation = (props) => {
     //   });
     // }
 
-      
+
   }
 
   const handleReviewToggle = async (e) => {
     let ProjectStageValue = e.target.value
     setTaskReviews(e.target.value)
-    
+
     if (ProjectStageValue === 1) {
       const disableSuperchecker = [...projectStage].map((opt) => {
-        if (  opt.value === 3 ) opt.disabled = true;
+        if (opt.value === 3) opt.disabled = true;
         else opt.disabled = false;
         return opt;
       })
-     
+
       setTaskReviews(disableSuperchecker);
     }
     else if (ProjectStageValue === 2) {
       const disableSuperchecker = [...projectStage].map((opt) => {
-        if (  opt.value === 3 ) opt.disabled = false;
+        if (opt.value === 3) opt.disabled = false;
         else opt.disabled = false;
         return opt;
 
       });
-      
+
       setTaskReviews(disableSuperchecker);
     }
     else if (ProjectStageValue === 3) {
       const disableSuperchecker = [...projectStage].map((opt) => {
-        if (  opt.value === 1 ) opt.disabled = true;
+        if (opt.value === 1) opt.disabled = true;
         else opt.disabled = false;
         return opt;
 
       });
-    
+
       setTaskReviews(disableSuperchecker);
     }
 
-    setLoading(true); 
-    const reviewObj =  new TaskReviewsAPI(id,e.target.value);
+    setLoading(true);
+    const reviewObj = new TaskReviewsAPI(id, e.target.value);
     const res = await fetch(reviewObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(reviewObj.getBody()),
@@ -279,7 +279,7 @@ const AdvancedOperation = (props) => {
 
   const handleDownoadMetadataToggle = async () => {
     // setLoading(true);
-    setDownloadMetadataToggle((downloadMetadataToggle)=>!downloadMetadataToggle)
+    setDownloadMetadataToggle((downloadMetadataToggle) => !downloadMetadataToggle)
   };
 
   const getPublishProjectButton = async () => {
@@ -343,7 +343,7 @@ const AdvancedOperation = (props) => {
 
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
   const [isArchived, setIsArchived] = useState(false);
-  const [downloadMetadataToggle,setDownloadMetadataToggle]=useState(true)
+  const [downloadMetadataToggle, setDownloadMetadataToggle] = useState(true)
   const getArchiveProjectAPI = () => {
     const projectObj = new GetArchiveProjectAPI(id);
     dispatch(APITransport(projectObj));
@@ -351,7 +351,7 @@ const AdvancedOperation = (props) => {
 
   useEffect(() => {
     setIsArchived(ProjectDetails?.is_archived);
-  }, [ProjectDetails]);  
+  }, [ProjectDetails]);
 
   const handleDownloadProjectAnnotations = () => {
     getDownloadProjectAnnotations();
@@ -423,7 +423,7 @@ const AdvancedOperation = (props) => {
     const rsp_data = await res.json();
     if (res.ok) {
       handleok();
-    }else{
+    } else {
       window.alert("Invalid credentials, please try again");
       console.log(rsp_data);
     }
@@ -474,6 +474,7 @@ const AdvancedOperation = (props) => {
               color="error"
               onClick={handleClickOpen}
               label={isArchived ? "Archived" : "Archive"}
+              disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
             />
           </Grid>
 
@@ -486,7 +487,8 @@ const AdvancedOperation = (props) => {
             xl={12}
             sx={{ ml: 2, height: "20px", mb: 2 }}
           >
-            <FormControl size="small" className={classes.formControl}>
+                        {userRole.WorkspaceManager === loggedInUserData?.role ? null :
+<FormControl size="small" className={classes.formControl}>
               <InputLabel
                 id="Select-Task-Statuses"
                 sx={{ fontSize: "16px", padding: "3px" }}
@@ -515,7 +517,7 @@ const AdvancedOperation = (props) => {
                   </MenuItem>
                 ))}
               </Select>
-            </FormControl>
+            </FormControl>}
           </Grid>
         </Grid>
 
@@ -532,8 +534,8 @@ const AdvancedOperation = (props) => {
           sx={{ float: "left" }}
           columnSpacing={2}
         >
-          {ProjectDetails.project_type=='ContextualTranslationEditing'?(
-          <Grid
+          {ProjectDetails.project_type == 'ContextualTranslationEditing' ? (
+            <Grid
               item
               xs={12}
               sm={12}
@@ -541,19 +543,19 @@ const AdvancedOperation = (props) => {
               lg={12}
               xl={12}
 
-          >
+            >
               <CustomButton
-                  sx={{
-                      inlineSize: "max-content",
-                      p: 2,
-                      borderRadius: 3,
-                      ml: 2,
-                      width: "300px",
+                sx={{
+                  inlineSize: "max-content",
+                  p: 2,
+                  borderRadius: 3,
+                  ml: 2,
+                  width: "300px",
 
-                  }}
-                  onClick={handleDownloadProjectAnnotations}
-                  label="Downoload Project Annotations" />
-          </Grid>):" "}
+                }}
+                onClick={handleDownloadProjectAnnotations}
+                label="Downoload Project Annotations" />
+            </Grid>) : " "}
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
@@ -567,6 +569,8 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handleOpenExportProjectDialog}
                 label="Export Project into Dataset"
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+
               />
             ) : (
               <CustomButton
@@ -579,6 +583,8 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handleExportProject}
                 label="Export Project into Dataset"
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+
               />
             )}
           </Grid>
@@ -595,6 +601,7 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handlePullNewData}
                 label="Pull New Data Items from Source Dataset"
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
               />
             ) : (
               " "
@@ -610,10 +617,10 @@ const AdvancedOperation = (props) => {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeleteProjectTasks />
           </Grid>
-         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeallocationAnnotatorsAndReviewers />
           </Grid>
-          
+
         </Grid>
 
         <Grid
@@ -627,7 +634,7 @@ const AdvancedOperation = (props) => {
           spacing={1}
           rowGap={2}
           columnSpacing={2}
-          sx={{mb:"10px"}}
+          sx={{ mb: "10px" }}
         >
           {/* <div className={classes.divider} ></div> */}
           {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -639,44 +646,44 @@ const AdvancedOperation = (props) => {
               onChange={handleReviewToggle}
             />
           </Grid> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}             
-           sx={{ ml: 2 }}
-         >
-            <FormControl  size="small" className={classes.formControl}>
-              <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
-              Project Stage
-              </InputLabel>
-              <Select
-                labelId="task-Reviews-label"
-                id="task-Reviews-select"
-                value={taskReviews}
-                label="Task Reviews"
-                onChange={handleReviewToggle}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}
+            sx={{ ml: 2 }}
+          >
+              <FormControl size="small" className={classes.formControl}>
+                <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
+                  Project Stage
+                </InputLabel>
+                <Select
+                  labelId="task-Reviews-label"
+                  id="task-Reviews-select"
+                  value={taskReviews}
+                  label="Task Reviews"
+                  onChange={handleReviewToggle}
                 // getOptionDisabled={(option) => option.disabled}
-              >
-                {projectStage.map((type, index) => (
-                  <MenuItem value={type.value} key={index} disabled={type.disabled} >
-                    {type.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                >
+                  {projectStage.map((type, index) => (
+                    <MenuItem value={type.value} key={index} disabled={type.disabled} >
+                      {type.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
           </Grid>
 
-        {((userRole.WorkspaceManager === loggedInUserData?.role ||
-      userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
-    ProjectDetails?.review_supercheckers?.some(
-      (superchecker) => superchecker.id === loggedInUserData?.id
-    )) &&
-          <Grid item xs={12} sm={12} md={12} lg={6} xl={6}             
-         >
-              <SuperCheckSettings ProjectDetails={ProjectDetails}/>
-          </Grid>}
+          {((userRole.WorkspaceManager === loggedInUserData?.role ||
+            userRole.OrganizationOwner === loggedInUserData?.role ||
+            userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
+          ProjectDetails?.review_supercheckers?.some(
+            (superchecker) => superchecker.id === loggedInUserData?.id
+          )) &&
+            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}
+            >
+              <SuperCheckSettings ProjectDetails={ProjectDetails} />
+            </Grid>}
         </Grid>
 
 
-       
+
 
         <Grid
           container
@@ -689,18 +696,20 @@ const AdvancedOperation = (props) => {
           spacing={1}
           rowGap={2}
           columnSpacing={2}
-          sx={{mt:1}}
+          sx={{ mt: 1 }}
         >
           {/* <div className={classes.divider} ></div> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <FormControlLabel
               control={<Switch color="primary" />}
               label="Download Metadata"
               labelPlacement="start"
               checked={downloadMetadataToggle}
               onChange={handleDownoadMetadataToggle}
+              disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
+
             />
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <Dialog
@@ -715,24 +724,24 @@ const AdvancedOperation = (props) => {
               this project?
             </DialogContentText>
             <TextField
-                    autoFocus
-                    margin="dense"
-                    id="password"
-                    label="Password"
-                    type="password"
-                    fullWidth
-                    variant="standard"
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+              autoFocus
+              margin="dense"
+              id="password"
+              label="Password"
+              type="password"
+              fullWidth
+              variant="standard"
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} 
-                    variant="outlined"
-                    color="error">Cancel</Button>
-            <Button onClick={handleConfirm} 
-                    variant="contained"
-                    color="error"
-                    autoFocus>Confirm</Button>
+            <Button onClick={handleClose}
+              variant="outlined"
+              color="error">Cancel</Button>
+            <Button onClick={handleConfirm}
+              variant="contained"
+              color="error"
+              autoFocus>Confirm</Button>
           </DialogActions>
         </Dialog>
         {OpenExportProjectDialog && (

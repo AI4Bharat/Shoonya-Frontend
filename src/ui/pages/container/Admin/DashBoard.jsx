@@ -1,10 +1,10 @@
-import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
+import { Box, Tab, Tabs, Typography, Paper } from '@mui/material'
 import React from 'react'
 import { useState } from 'react'
-import {useSelector} from "react-redux";
 import UserDetail from "./UserDetail";
-
-
+import TaskDetails from './TaskDetails';
+import AnnotationDetails from './AnnotationDetails';
+import QueuedTasksDetails from './QueuedTasksDetails';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -37,16 +37,30 @@ const DashBoard = () => {
       
         < >
             <Box sx={{mb:2,}} >
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
-                    <Tab label="User Detail" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                     
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="admin-tabs">
+                    <Tab label="Task Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="Annotation Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="User Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="Queued Tasks Status" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                 </Tabs>
             </Box>
             <Box sx={{ p: 1}}>
                 <TabPanel value={tabValue} index={0}>
-                <UserDetail  />  
+                <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '32px'}}>
+                    <TaskDetails  />  
+                </Paper>
                 </TabPanel> 
-                 
+                <TabPanel value={tabValue} index={1}>
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '32px'}}>
+                        <AnnotationDetails  />  
+                    </Paper>
+                </TabPanel> 
+                <TabPanel value={tabValue} index={2}>
+                    <UserDetail  />  
+                </TabPanel>
+                <TabPanel value={tabValue} index={3}>
+                    <QueuedTasksDetails  />  
+                </TabPanel> 
             </Box>
         </>
        

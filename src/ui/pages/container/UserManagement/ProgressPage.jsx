@@ -114,7 +114,7 @@ const ProfilePage = () => {
               <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
-                    <Typography variant="h4" sx={{mb: 1}}>My Progress</Typography>
+                    <Typography variant="h4" sx={{mb: 1}}>{LoggedInUserId===userDetails.id?  "My Progress": `Progress of ${userDetails?.first_name} ${userDetails?.last_name}` }</Typography>
                     <MyProgress />
                   </CardContent>
                 </Card>

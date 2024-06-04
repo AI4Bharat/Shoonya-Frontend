@@ -13,8 +13,10 @@ import getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
 import getTaskPrediction from './Tasks/GetTaskPrediction';
 import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
+import getManagerSuggestions from './Organization/GetManagerSuggestions';
 import getDatasetList from './Dataset/GetDatasetList';
 import getTaskDetails from './Tasks/GetTaskDetails'
+import getQueuedTaskDetails from './Tasks/GetQueuedTaskDetails'
 import getDatasetDetails from './Dataset/GetDatasetDetails';
 import getDataitemsById from './Dataset/GetDataitemsById';
 import getArchiveProject from './ProjectDetails/ArchiveProject';
@@ -116,6 +118,7 @@ const index = {
     getOrganizationUsers,
     getDatasetList,
     getTaskDetails,
+    getQueuedTaskDetails,
     getDatasetList,
     getDatasetDetails,
     getDataitemsById,
@@ -200,7 +203,7 @@ const index = {
     getAnnotationsTask,
     patchAnnotation,
     updateUIPrefs,
-
+    getManagerSuggestions,
 };
 
 export default index;

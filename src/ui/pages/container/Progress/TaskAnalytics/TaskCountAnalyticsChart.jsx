@@ -18,27 +18,28 @@ import {
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
 
 
-function AudioSegmentation(props) {
+function TaskCountAnalyticsChart(props) {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
-  const { taskAnalyticsData } = props;
+  const { analyticsData } = props;
+
   const [totalTaskCount, setTotalTaskCount] = useState();
   const [totalAnnotationTasksCount, setTotalAnnotationTasksCount] = useState();
   const [totalReviewTasksCount, setTotalReviewTasksCount] = useState();
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    taskAnalyticsData[5]?.sort(
+    analyticsData?.sort(
       (a, b) =>
         b.annotation_cumulative_tasks_count -
         a.annotation_cumulative_tasks_count
     );
-    setData(taskAnalyticsData[5]);
+    setData(analyticsData);
 
     let allAnnotatorCumulativeTasksCount = 0;
     let allReviewCumulativeTasksCount = 0;
     var languages;
-    taskAnalyticsData[5]?.map((element, index) => {
+    analyticsData?.map((element, index) => {
       allAnnotatorCumulativeTasksCount +=
         element.annotation_cumulative_tasks_count;
       allReviewCumulativeTasksCount += element.review_cumulative_tasks_count;
@@ -50,7 +51,7 @@ function AudioSegmentation(props) {
     setTotalTaskCount(
       allAnnotatorCumulativeTasksCount + allReviewCumulativeTasksCount
     );
-  }, [taskAnalyticsData[5]]);
+  }, [analyticsData]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -95,12 +96,11 @@ function AudioSegmentation(props) {
     <>
       <Box className={classes.modelChartSection}>
         <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
-          Tasks Dashboard - Audio Segmentation
+          {`Tasks Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Audio Segmentation
+            Count of Annotated and Reviewed Data
           </Typography>
         </Typography>
-       
         <Paper>
           <Box className={classes.topBar}>
             <Box className={classes.topBarInnerBox}>
@@ -125,7 +125,7 @@ function AudioSegmentation(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Total Audio Files Annotated
+                Total Sentence Pairs
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -134,7 +134,7 @@ function AudioSegmentation(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Total quality/ reviewed audio files
+                Total Quality/Reviewed Sentence Pairs
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewTasksCount &&
@@ -162,7 +162,7 @@ function AudioSegmentation(props) {
                 dataKey="languages"
                 textAnchor={"end"}
                 // tick={<CustomizedAxisTick />}
-                height={70}
+                height={90}
                 interval={0}
                 position="insideLeft"
                 type="category"
@@ -226,4 +226,4 @@ function AudioSegmentation(props) {
     </>
   );
 }
-export default AudioSegmentation;
+export default TaskCountAnalyticsChart;

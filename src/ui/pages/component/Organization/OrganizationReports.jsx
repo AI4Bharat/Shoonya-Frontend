@@ -123,6 +123,9 @@ const OrganizationReports = () => {
         "AllAudioProjects",
         "OCRTranscription",
         "OCRTranscriptionEditing",
+        "ContextualTranslation",
+        "ContextualSentenceVerification",
+        "ContextualTranslationEditing"
       ]);
       setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
@@ -359,6 +362,11 @@ const OrganizationReports = () => {
           statisticsType
         );
         dispatch(APITransport(projectReportObj));
+        setSnackbarInfo({
+          open: true,
+          message: "Report will be e-mailed to you shortly",
+          variant: "success",
+        })
       }
     }
     }
@@ -598,7 +606,7 @@ const OrganizationReports = () => {
           </Grid>
         }
 
-        {radiobutton!=="PaymentReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+        {(radiobutton==="UsersReports"|| (radiobutton==="ProjectReports" && projectReportType === 1)) && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             variant="contained"

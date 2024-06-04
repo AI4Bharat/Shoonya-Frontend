@@ -54,7 +54,13 @@ const excludeCols = [
   "machine_translated_conversation_json",
   "speakers_json",
   "language",
+  "audio_url",
+  "speaker_0_details",
+  "speaker_1_details",
+  "machine_transcribed_json",
   "unverified_conversation_json",
+  "prediction_json",
+  "ocr_prediction_json",
 ];
 const excludeSearch = ["status", "actions"];
 const SuperCheckerTasks = (props) => {
@@ -302,7 +308,7 @@ const unassignTasks = async () => {
   setDeallocateDialog(false);
   const deallocateObj = new DeallocateSuperCheckerTasksAPI(id, selectedFilters.supercheck_status);
   const res = await fetch(deallocateObj.apiEndPoint(), {
-    method: "GET",
+    method: "POST",
     body: JSON.stringify(deallocateObj.getBody()),
     headers: deallocateObj.getHeaders().headers,
   });

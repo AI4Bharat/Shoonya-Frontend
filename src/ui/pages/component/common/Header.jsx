@@ -6,16 +6,34 @@ import {
   Divider,
   FormControlLabel,
   Grid,
+  Button,
+  Stack,
   IconButton,
   Menu,
   MenuItem,
   Toolbar,
   Tooltip,
   Typography,
+  Tabs,
+  Tab,
+  Badge,
+  Popover,
+  Chip
 } from "@mui/material";
 import { useEffect, useState } from "react";
+
+import { formatDistanceToNow, format } from 'date-fns';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import GradingSharpIcon from '@mui/icons-material/GradingSharp';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { Link, NavLink } from "react-router-dom";
+import CustomButton from "../common/Button";
 import headerStyle from "../../../styles/header";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationPatchAPI from "../../../../redux/actions/api/Notification/NotificationPatchApi";
 import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +41,6 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useLocation, useNavigate } from "react-router-dom";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
-import CustomButton from "../common/Button";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@mui/material";
@@ -33,15 +50,21 @@ import Modal from "./Modal";
 import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
 import UpdateUIPrefsAPI from "../../../../redux/actions/api/UserManagement/UpdateUIPrefs";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElSettings, setAnchorElSettings] = useState(null);
+  const [anchorElNotification, setAnchorElNotification] = useState(null);
   const [anchorElHelp, setAnchorElHelp] = useState(null);
+  const [Notification, setnotification] = useState()
   const [activeproject, setActiveproject] = useState("activeButtonproject");
   const [activeworkspace, setActiveworkspace] = useState("");
-  const [isSpaceClicked, setIsSpaceClicked] = useState(false); 
+  const [isSpaceClicked, setIsSpaceClicked] = useState(false);
+  const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
+  const [unread, setunread] = useState(null)
+  const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const [showTransliterationModel, setShowTransliterationModel] =
     useState(false);
   const [snackbar, setSnackbarInfo] = useState({
@@ -50,10 +73,30 @@ const Header = () => {
     variant: "success",
   });
   //const[checkClUI,setCheckClUI]=useState(null)
+  const [moreHorizonAnchorEl, setMoreHorizonAnchorEl] = useState(null);
+
+  if(localStorage.getItem("source") !== undefined){
+    localStorage.setItem("source", "shoonya-frontend");
+  }
+
+  const handleMoreHorizonClick = (event) => {
+    setMoreHorizonAnchorEl(event.currentTarget);
+  };
+
+  const handleMoreHorizonClose = () => {
+    setMoreHorizonAnchorEl(null);
+  };
+
 
   const loggedInUserData = useSelector(
     (state) => state?.fetchLoggedInUserData?.data
   );
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -63,19 +106,70 @@ const Header = () => {
   const location = useLocation();
   const classes = headerStyle();
 
- 
 
   const getLoggedInUserData = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
-    dispatch(APITransport(loggedInUserObj)); 
+    dispatch(APITransport(loggedInUserObj));
   };
 
- 
+  const fetchNotifications = () => {
+    let apiObj = new NotificationAPI();
+    const endpoint = unread == null ? apiObj.apiEndPoint() : `${apiObj.apiEndPoint()}?seen=${unread}`;
+
+    fetch(endpoint, {
+      method: "get",
+      body: JSON.stringify(apiObj.getBody()),
+      headers: apiObj.getHeaders().headers,
+    })
+      .then(async (response) => {
+        if (response.ok) {
+          const data = await response?.json();
+          setnotification(data);
+          console.log(Notification?.length, data);
+        } else {
+          console.error("Error fetching notifications:", response.status, response.statusText);
+          setnotification([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching notifications:", error);
+      });
+  };
+  const markAsRead =  (notificationId) => {
+    const task = new NotificationPatchAPI(notificationId);
+    setSelectedNotificationId(notificationId);
+     dispatch(APITransport(task));
+     fetchNotifications()
+
+  };
+
+  const markAllAsRead =  () => {
+    const notificationIds = Notification.map((notification) => notification.id);
+    const tasks = new NotificationPatchAPI(notificationIds);
+    setSelectedNotificationId(notificationIds)
+     dispatch(APITransport(tasks));
+     fetchNotifications()
+
+  };
+
+  const handleMarkAllAsReadClick =  () => {
+    markAllAsRead();
+  };
+
+  const handleMarkAsRead =  (notificationId) => {
+    markAsRead(notificationId);
+  };
+
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [unread,selectedNotificationId]);
 
   useEffect(() => {
     getLoggedInUserData();
-   
+
   }, []);
+
 
   /* useEffect(()=>{
     if(loggedInUserData?.prefer_cl_ui !== undefined){
@@ -104,10 +198,29 @@ const Header = () => {
       window.removeEventListener("keydown", keyPress);
     };
   }, [keyPress]);
+  const handleTitleMouseEnter = (event, notificationId) => {
+    setPopoverAnchorEl(event.currentTarget);
+    setSelectedNotificationId(notificationId);
+  };
+
+  const handleTitleMouseLeave = () => {
+    setPopoverAnchorEl(null);
+    setSelectedNotificationId(null);
+  }
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  const handlePopoverClose = () => {
+    setPopoverAnchorEl(null);
+    setSelectedNotificationId(null);
+  };
+
+const handleopenproject=(id,type)=>{
+  if(type=="publish_project"){
+    navigate(`/projects/${id}`);
+  }
+}
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -127,6 +240,13 @@ const Header = () => {
   const handleCloseSettingsMenu = () => {
     setAnchorElSettings(null);
   };
+  const handleOpenNotification = (event) => {
+    setAnchorElNotification(event.currentTarget);
+  };
+
+  const handleCloseNotification = () => {
+    setAnchorElNotification(null);
+  };
 
   const handleRTLChange = (event) => {
     let style;
@@ -143,25 +263,33 @@ const Header = () => {
     }
   };
 
-  const handleTranscriptionFlowChange = async(event) => {
-      const obj = new UpdateUIPrefsAPI(event.target.checked);
-      // dispatch(APITransport(loggedInUserObj));
-      const res = await fetch(obj.apiEndPoint(), {
-        method: "POST",
-        body: JSON.stringify(obj.getBody()),
-        headers: obj.getHeaders().headers,
+  const handleTranscriptionFlowChange = async (event) => {
+    const obj = new UpdateUIPrefsAPI(event.target.checked);
+    // dispatch(APITransport(loggedInUserObj));
+    const res = await fetch(obj.apiEndPoint(), {
+      method: "POST",
+      body: JSON.stringify(obj.getBody()),
+      headers: obj.getHeaders().headers,
+    });
+    const resp = await res.json();
+    if (res.ok) {
+      getLoggedInUserData();
+      setSnackbarInfo({
+        open: true,
+        message: resp.message,
+        variant: "success",
       });
-      const resp = await res.json();
-      if (res.ok) {
-        getLoggedInUserData();
-        setSnackbarInfo({
-          open: true,
-          message:resp.message,
-          variant: "success",
-        });
-      }
+    }
   };
+  const handleTabChange = async (index) => {
+    if (index === 0) {
+      await setunread(null);
+    } else if (index === 1) {
+      await setunread("False");
+    }
 
+
+  };
   const handleTagsChange = (event) => {
     if (event.target.checked) {
       localStorage.setItem("enableTags", true);
@@ -187,6 +315,8 @@ const Header = () => {
       />
     );
   };
+  const unseenNotifications = Notification?.length > 0 && Notification?.filter(notification => notification?.seen_json ==null || !notification?.seen_json[loggedInUserData.id]);
+console.log(unseenNotifications,'uuu');
 
   const renderTabs = () => {
     if (
@@ -318,17 +448,6 @@ const Header = () => {
               activeClassName={classes.highlightedMenu}
             >
               Projects
-            </NavLink>
-          </Typography>
-          <Typography variant="body1">
-            <NavLink
-              to="/datasets"
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Datasets
             </NavLink>
           </Typography>
           <Typography variant="body1">
@@ -654,15 +773,15 @@ const Header = () => {
     // },
   ];
 
-  const handleTransliterationModelClose =  () => {
-        setShowTransliterationModel(false);
+  const handleTransliterationModelClose = () => {
+    setShowTransliterationModel(false);
   };
 
   return (
-    <Grid container direction="row">
+    <Grid container direction="row" style={{ zIndex: 200 }}>
       <Box
         className={location.pathname.includes("AudioTranscriptionLandingPage") ? classes.AudioparentContainers
-            : classes.parentContainer
+          : classes.parentContainer
         }
       >
         {isMobile ? (
@@ -686,7 +805,7 @@ const Header = () => {
                     src={Shoonya_Logo}
                     alt="logo"
                     className={classes.headerLogo}
-                    sx={{marginTop: "5%"}}
+                    sx={{ marginTop: "5%" }}
                   />
                 </Link>
                 <Typography
@@ -716,14 +835,24 @@ const Header = () => {
               </Grid> */}
               {renderTabs()}
               {renderSnackBar()}
-              <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={2}>
+              <Box sx={{ flexGrow: 0 }} xs={12} sm={12} md={4}>
                 <Grid
                   container
                   direction="row"
                   justifyContent="center"
                   spacing={2}
-                  sx={{ textAlign: "center", alignItems: "center" }}
+                  sx={{ textAlign: "center", alignItems: "center", }}
                 >
+                  <Grid item xs={3} sm={3} md={2}>
+                    <Tooltip title="Notifications">
+                      <IconButton onClick={handleOpenNotification}>
+                        <Badge badgeContent={unseenNotifications?.length>0 ?unseenNotifications?.length: null} color="primary">
+                          <NotificationsIcon color="primary.dark" fontSize="large" />
+                        </Badge>
+
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="help">
                       <IconButton onClick={handleOpenHelpMenu}>
@@ -734,7 +863,7 @@ const Header = () => {
                       </IconButton>
                     </Tooltip>
                   </Grid>
-                  <Grid item xs={3} sm={3} md={3}>
+                  <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Settings">
                       <IconButton onClick={handleOpenSettingsMenu}>
                         <SettingsOutlinedIcon
@@ -744,13 +873,14 @@ const Header = () => {
                       </IconButton>
                     </Tooltip>
                   </Grid>
-                  <Grid item xs={6} sm={6} md={7}>
+
+                  <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="User Options">
                       <IconButton onClick={handleOpenUserMenu}>
                         <Avatar
                           alt="user_profile_pic"
                           variant="contained"
-                          src={loggedInUserData?.profile_photo?loggedInUserData.profile_photo:''}
+                          src={loggedInUserData?.profile_photo ? loggedInUserData.profile_photo : ''}
                           className={classes.avatar}
                         >
                           {loggedInUserData &&
@@ -862,6 +992,116 @@ const Header = () => {
                     </MenuItem>
                   ))}
                 </Menu>
+
+                <Menu
+                  sx={{ mt: "45px", display: "flex", flexDirection: "row" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElNotification}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  style={{ overflow: "scroll" }}
+                  open={Boolean(anchorElNotification)}
+                  onClose={handleCloseNotification}
+                >
+                  <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
+                    <Typography variant="h4">Notifications</Typography>
+                    {Notification && Notification?.length > 0 && unseenNotifications?.length > 0 ? <Tooltip title="Mark all as read"><IconButton aria-label="More" onClick={handleMarkAllAsReadClick}>
+                      <GradingSharpIcon color="primary"/>
+                    </IconButton> </Tooltip>: null}
+                  </Stack>
+                  <Stack direction="row" spacing={2} style={{ padding: "0 0 10px 10px" }}>
+                    <Tabs value={value} onChange={handleChange} sx={{
+                      '& .MuiTabs-indicator': {
+                        backgroundColor: theme => theme.palette.primary.main,
+                      }
+                    }}>
+                      <Tab label="All" onClick={() => handleTabChange(0)} />
+                      <Tab label="Unread" onClick={() => handleTabChange(1)} />
+                    </Tabs>
+                  </Stack>
+                  {Notification && Notification?.length > 0 ? (
+                    <>
+                      {Notification.map((notification, index) => (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+                          <div style={{ marginRight: '10px' ,cursor:"pointer"}}>
+                            <FiberManualRecordIcon color={notification?.seen_json
+                              ? notification?.seen_json[loggedInUserData.id]
+                                ? 'action'
+                                : 'primary'
+                              : "primary"} />
+                          </div>
+                          <Link style={{ color: "rgba(0, 0, 0, 0.87)", display: 'flex', flexDirection: 'column', width: '100%' ,cursor:"pointer",textDecoration:"none" }} to={notification.on_click}>
+                            <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                              <Typography variant="subtitle2">{`ID: ${notification?.title?.split('-')[0]}`}</Typography>
+                              <Typography style={{ paddingLeft: "10px" }} variant="subtitle2">{`TITLE: ${notification?.notification_type}`}</Typography>
+                              <Typography style={{ padding: "5px 5px 0px 5px" }} variant="caption" color="action">{`${formatDistanceToNow(new Date(notification?.created_at), { addSuffix: true })}`}</Typography>
+                            </div>
+                           
+                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
+                              <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
+                              {notification?.seen_json==null || !notification?.seen_json[loggedInUserData.id] ?
+                              <Tooltip title="Mark as read"><IconButton aria-label="More" onClick={() => handleMarkAsRead(notification?.id)}>
+                                <CheckCircleOutlineRoundedIcon color="primary"/>
+                              </IconButton></Tooltip>:null}
+                            </div>
+                            <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
+                            {index !== Notification?.length - 1 && <Divider />} 
+                          </Link>  
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                      <NotificationsOffIcon color="disabled" fontSize="large" />
+                      <Typography variant="h5" color="textSecondary" style={{ marginTop: '10px' }}>
+                        No notifications found
+                      </Typography>
+                    </div>
+                  )}
+
+
+                </Menu>
+                <Popover
+                  open={Boolean(moreHorizonAnchorEl)}
+                  anchorEl={moreHorizonAnchorEl}
+                  onClose={handleMoreHorizonClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                >
+                  <MenuItem onClick={handleMarkAllAsReadClick}>Mark All as read</MenuItem>
+                </Popover>
+                <Popover
+                  open={Boolean(popoverAnchorEl)}
+                  anchorEl={popoverAnchorEl}
+                  onClose={handlePopoverClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                >
+
+                    <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
+
+                </Popover>
+
               </Box>
             </Toolbar>
           </AppBar>
@@ -875,7 +1115,7 @@ const Header = () => {
         topTranslate={"40"}
         leftTranslate={"-50"}
         isTransliteration={true}
-        // sx={{width: "400px"}}
+      // sx={{width: "400px"}}
       >
         <Transliteration
           onCancelTransliteration={() => handleTransliterationModelClose}

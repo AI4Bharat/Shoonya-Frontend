@@ -172,20 +172,20 @@ const MyProgress = () => {
     const reviewdata = {
       user_id: id,
       project_type: selectedType,
-      reports_type: radiobutton === "AnnotatationReports" ? "annotation" :radiobutton ==="ReviewerReports" ? "review" : "supercheck" ,
+      reports_type: radiobutton === "AnnotatationReports" ? "annotation" : radiobutton === "ReviewerReports" ? "review" : "supercheck",
       start_date: format(selectRange[0].startDate, 'yyyy-MM-dd'),
       end_date: format(selectRange[0].endDate, 'yyyy-MM-dd'),
 
     }
 
-    
+
     const progressObj = new GetUserAnalyticsAPI(reviewdata);
     dispatch(APITransport(progressObj));
     // setShowSpinner(true);
     setTotalsummary(true)
 
   };
-
+  console.log(UserAnalyticstotalsummary);
   const showSnackbar = () => {
     setSnackbarOpen(true);
   };
@@ -246,7 +246,7 @@ const MyProgress = () => {
         direction="row"
         justifyContent="start"
         alignItems="center"
-        // sx={{ marginLeft: "50px" }}
+      // sx={{ marginLeft: "50px" }}
       >
         <Grid >
           <Typography gutterBottom component="div" sx={{ marginTop: "15px", fontSize: "16px" }}>
@@ -306,7 +306,7 @@ const MyProgress = () => {
               endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
               color="primary"
-              sx={{width:"130px"}}
+              sx={{ width: "130px" }}
               onClick={() => setShowPicker(!showPicker)}
             >
               Pick Dates
@@ -339,7 +339,7 @@ const MyProgress = () => {
               fullWidth
               variant="contained"
               onClick={handleProgressSubmit}
-              sx={{width:"130px"}}
+              sx={{ width: "130px" }}
             >
               Submit
             </Button>
@@ -354,7 +354,7 @@ const MyProgress = () => {
                 {
                   label: "Till Date",
                   range: () => ({
-                    startDate: new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ')),
+                    startDate: new Date('2021-01-01'),
                     endDate: new Date(),
                   }),
                   isSelected(range) {
@@ -370,7 +370,7 @@ const MyProgress = () => {
               moveRangeOnFirstSelection={false}
               months={2}
               ranges={selectRange}
-              minDate={new Date(Date.parse(UserDetails?.date_joined, 'yyyy-MM-ddTHH:mm:ss.SSSZ'))}
+              minDate={new Date('2021-01-01')}
               maxDate={new Date()}
               direction="horizontal"
             />
@@ -394,39 +394,22 @@ const MyProgress = () => {
             <Typography variant="h6">Total Summary </Typography>
 
           </Grid>
+          {UserAnalyticstotalsummary?.[0] && Object.entries(UserAnalyticstotalsummary?.[0]).map(([title, value], index) => (
+              <Grid
+              key={index}
+                container
+                alignItems="center"
+                direction="row"
+                justifyContent="flex-start"
 
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-
-          >
-            <Typography variant="subtitle1">Annotated Tasks : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Annotated Tasks"]}</Typography>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-
-
-          >
-            <Typography variant="subtitle1">Average Annotation Time (In Seconds) : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Avg Annotation Time (sec)"]}</Typography>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-            justifyContent="flex-start"
-
-          >
-            <Typography variant="subtitle1">Word Count : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Word Count"]}</Typography>
-          </Grid>
+              >
+                <Typography variant="subtitle1">{title}:</Typography>
+                <Typography variant="body2" className={classes.TotalSummarydata}>{value}</Typography>
+              </Grid>
+          ))}
         </Grid>
         }
-      
+
 
         {radiobutton === "ReviewerReports" && totalsummary && <Grid
           container
@@ -446,37 +429,19 @@ const MyProgress = () => {
 
           </Grid>
 
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-            justifyContent="flex-start"
+          {UserAnalyticstotalsummary?.[0] && Object.entries(UserAnalyticstotalsummary?.[0]).map(([title, value], index) => (
+              <Grid
+              key={index}
+                container
+                alignItems="center"
+                direction="row"
+                justifyContent="flex-start"
 
-          >
-            <Typography variant="subtitle1">Reviewed Tasks : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata} >{UserAnalyticstotalsummary?.at(0)?.["Reviewed Tasks"]}</Typography>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-            justifyContent="flex-start"
-
-          >
-            <Typography variant="subtitle1">Average Review Time (In Seconds) : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Avg Review Time (sec)"]}</Typography>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-            justifyContent="flex-start"
-
-          >
-            <Typography variant="subtitle1">Word Count : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Word Count"]}</Typography>
-          </Grid>
-        </Grid>}
+              >
+                <Typography variant="subtitle1">{title}:</Typography>
+                <Typography variant="body2" className={classes.TotalSummarydata}>{value}</Typography>
+              </Grid>
+          ))}        </Grid>}
         {radiobutton === "SuperCheckerReports" && totalsummary && <Grid
           container
           alignItems="center"
@@ -495,41 +460,24 @@ const MyProgress = () => {
 
           </Grid>
 
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-            justifyContent="flex-start"
+          {UserAnalyticstotalsummary?.[0] && Object.entries(UserAnalyticstotalsummary?.[0]).map(([title, value], index) => (
+              <Grid
+              key={index}
+                container
+                alignItems="center"
+                direction="row"
+                justifyContent="flex-start"
 
-          >
-            <Typography variant="subtitle1">Super Checker Tasks : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata} >{UserAnalyticstotalsummary?.at(0)?.["SuperChecked Tasks"]}</Typography>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-            justifyContent="flex-start"
-
-          >
-            <Typography variant="subtitle1">Average Super Checker Time (In Seconds) : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Avg SuperCheck Time (sec)"]}</Typography>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            direction="row"
-            justifyContent="flex-start"
-
-          >
-            <Typography variant="subtitle1">Word Count : </Typography>
-            <Typography variant="body2" className={classes.TotalSummarydata}>{UserAnalyticstotalsummary?.at(0)?.["Word Count"]}</Typography>
-          </Grid>
+              >
+                <Typography variant="subtitle1">{title}:</Typography>
+                <Typography variant="body2" className={classes.TotalSummarydata}>{value}</Typography>
+              </Grid>
+          ))}
         </Grid>}
         {UserAnalytics?.length > 0 ? (
           <ThemeProvider theme={tableTheme}>
             <MUIDataTable
-             title={radiobutton==="AnnotatationReports"? "Annotation Report" :radiobutton==="ReviewerReports"? "Reviewer Report":"Super Checker Report"}
+              title={radiobutton === "AnnotatationReports" ? "Annotation Report" : radiobutton === "ReviewerReports" ? "Reviewer Report" : "Super Checker Report"}
               data={reportData}
               columns={columns.filter((col) => selectedColumns.includes(col.name))}
               options={tableOptions}
