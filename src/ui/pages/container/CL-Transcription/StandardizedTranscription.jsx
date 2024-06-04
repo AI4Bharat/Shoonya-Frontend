@@ -154,6 +154,7 @@ const StandarisedisedTranscriptionEditing = ({
   const textRefs = useRef([]);
   const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
   const [currentSelection, setCurrentSelection] = useState(null);
+  const [selectedSpeaker, setSelectedSpeaker] = useState(speakerIdList?.[0]?.name);
 
   useEffect(() => {
     currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
@@ -305,6 +306,15 @@ const StandarisedisedTranscriptionEditing = ({
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
+  const onMergeClickL3 = useCallback(()=>{
+    // merge the transcription L2 into L3 
+    updatedProjectData = [{
+      start_time: currentPageData[0].start_time,
+      end_time: currentPageData[currentPageData.length - 1].end_time,
+      text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text)
+    }]
+
+  })
   const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const {
       target: { value },
@@ -546,13 +556,17 @@ if (currentPageData?.length && stage===3) {
   updatedProjectData = [{
     start_time: currentPageData[0].start_time,
     end_time: currentPageData[currentPageData.length - 1].end_time,
-    text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text)
+    text: currentPageData[0].acoustic_standardized_text
   }]
 }
 else 
 {
   updatedProjectData = currentPageData;
 }
+
+useEffect(() => {
+  setSelectedSpeaker(speakerIdList?.[0]?.name);
+}, [stage]);
   if(currentPageData)
     {
       console.log("updatedPageData", updatedProjectData)
@@ -593,6 +607,8 @@ else
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
               annotationId={annotationId}
+              showMerge={true}
+              onMergeClick={onMergeClickL3}
             />
           </Grid>
           {ProjectDetails?.project_type && stage===2 && <Grid
@@ -694,6 +710,7 @@ else
                           labelId="select-speaker"
                           label="Select Speaker"
                           value={item.speaker_id}
+                          defaultValue={stage==3 ? selectedSpeaker : ""}
                           onChange={(event) =>
                             handleSpeakerChange(event.target.value, index + idxOffset)
                           }
