@@ -20,6 +20,7 @@ import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import { DeallocateTaskById } from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import { Tab, Tabs } from "@mui/material";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 let AnnotationStatus = [
   "unlabeled",
@@ -81,6 +82,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
   const [superCheckStatus, setSuperCheckStatus] = useState([]);
   const [dealocateTasksBy, setDealocateTasksBy] = useState("taskId");
   const [dataIds, setdataIds] = useState("");
+  const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -275,7 +277,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
   return (
     <div>
       {renderSnackBar()}
-      <CustomButton
+     <CustomButton
         sx={{
           inlineSize: "max-content",
           p: 2,
@@ -287,6 +289,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
         onClick={handleClickOpen}
         label="Deallocate User Tasks"
         color="error"
+        disabled = {(userRole?.WorkspaceManager === loggedInUserData?.role )?true:false}
       />
 
       <Popover
