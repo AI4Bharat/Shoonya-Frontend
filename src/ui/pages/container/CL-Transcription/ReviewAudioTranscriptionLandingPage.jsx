@@ -1418,15 +1418,20 @@ useEffect(() => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
+          {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing"  && 
           <FormControl>
               <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="L1 & L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage >=2 || ProjectDetails?.project_stage >=2 && 
                     <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    }
                 </Tabs>
             </Box>
-          </FormControl>
-
+          </FormControl>  
+        }
+        {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing" ?
+        
         <StandarisedisedTranscriptionEditing
           currentIndex={currentIndex}
           AnnotationsTaskDetails={AnnotationsTaskDetails}
@@ -1441,6 +1446,22 @@ useEffect(() => {
           setWaveSurfer={setWaveSurfer}
           annotationId={annotations[0]?.id}
         /> 
+         : 
+         <TranscriptionRightPanel
+          currentIndex={currentIndex}
+          AnnotationsTaskDetails={AnnotationsTaskDetails}
+          player={player}
+          ProjectDetails={ProjectDetails}
+          TaskDetails={taskDetailList}
+          stage={2}
+          handleStdTranscriptionSettings={setStdTranscriptionSettings}
+          advancedWaveformSettings={advancedWaveformSettings}
+          setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+          waveSurfer={waveSurfer}
+          setWaveSurfer={setWaveSurfer}
+          annotationId={annotations[0]?.id}
+        /> 
+        }
         </Grid>
       </Grid>
 
