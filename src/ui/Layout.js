@@ -27,6 +27,7 @@ const Layout= (props) => {
   const [popUp, setPopup] = useState(true);
   const apiStatus = useSelector((state) => state.apiStatus);
   const location = useLocation();
+  const projectType = useSelector((state) => state.getProjectDetails.data?.project_type);
 
   const classes = GlobalStyles();
 //   const history = useHistory();
@@ -93,7 +94,7 @@ const Layout= (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
-      className={location.pathname.includes("AudioTranscriptionLandingPage") ? classes.Audioroot : classes.root}
+      className={location.pathname.includes("AudioTranscriptionLandingPage")  ? classes.Audioroot : classes.root}
       >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
@@ -103,7 +104,7 @@ const Layout= (props) => {
           />
         </Suspense>
         <div
-        className={location.pathname.includes("AudioTranscriptionLandingPage") ? classes.Audiocontainer : classes.container}
+        className={location.pathname.includes("AudioTranscriptionLandingPage") || projectType=="StandardizedTranscriptionEditing"  ? classes.Audiocontainer : classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}

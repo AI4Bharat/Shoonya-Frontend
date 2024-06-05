@@ -543,7 +543,7 @@ useEffect(() => {
             );
             reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
             superCheckerNotesRef.current.value =
-              superCheckerAnnotation.supercheck_notes ?? "";
+              superCheckerAnnotation?.supercheck_notes ?? "";
 
               
               try {
@@ -576,7 +576,7 @@ useEffect(() => {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
-              superCheckerAnnotation.supercheck_notes ?? "";
+              superCheckerAnnotation?.supercheck_notes ?? "";
               
               try {
                 const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
@@ -943,7 +943,7 @@ useEffect(() => {
           </div>
         }
         <div>
-          {ProjectData.revision_loop_count >
+          {ProjectData && ProjectData?.revision_loop_count >
             taskData?.revision_loop_count?.super_check_count
             ? false
             : true && (
@@ -955,7 +955,7 @@ useEffect(() => {
               </div>
             )}
 
-          {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
+          {ProjectData && ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
             <div style={{ textAlign: "right", marginBottom: "15px" }}>
               <Typography variant="body" color="#f5222d">
                 Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
@@ -1029,7 +1029,7 @@ useEffect(() => {
                   type="default"
                   onClick={handleRejectClick}
                   disabled={
-                    ProjectData.revision_loop_count >
+                    ProjectData?.revision_loop_count >
                       taskData?.revision_loop_count?.super_check_count
                       ? false
                       : true
@@ -1038,7 +1038,7 @@ useEffect(() => {
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
                     color: (
-                      ProjectData.revision_loop_count >
+                      ProjectData?.revision_loop_count >
                         taskData?.revision_loop_count?.super_check_count
                         ? false
                         : true

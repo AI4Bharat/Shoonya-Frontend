@@ -48,8 +48,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import { Tab, Tabs } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
 
-const AudioTranscriptionLandingPage = () => {
+const AudioTranscriptionLandingPage = ({project_type}) => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -137,6 +139,11 @@ const AudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
+  const [tabValue, setTabValue] = useState(0);
+  const handleTabChange = (e, v) => {
+    e.preventDefault()
+    setTabValue(v);
+  }
   const filterAnnotations = (annotations, user) => {
     let disableSkip = false;
     let disableUpdate = false;
@@ -823,6 +830,7 @@ const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
   "barHeight": waveSurferBarHeight
 });
 
+
 useEffect(() => {
   setWaveSurferWaveformSettings({
     "height": waveSurferHeight,
@@ -1187,6 +1195,16 @@ useEffect(() => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
+          
+        {project_type && project_type === "StandardizedTranscriptionEditing" &&
+        <FormControl>
+            <Box sx={{mb:2,}} >
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+                    <Tab label="L1-L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                </Tabs>
+            </Box>
+          </FormControl>
+        }
           <TranscriptionRightPanel
             currentIndex={currentIndex}
             AnnotationsTaskDetails={AnnotationsTaskDetails}
