@@ -115,7 +115,7 @@ const AnnotationProject = (props) => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [createannotationsAutomatically, setsCreateannotationsAutomatically] = useState("none");
-  const [acousticEnabledStage, setAcousticEnabledStage] = useState(null);
+  const [acousticEnabledStage, setAcousticEnabledStage] = useState(1);
 
   const searchOpen = Boolean(searchAnchor);
   const excludeKeys = [
@@ -1299,7 +1299,7 @@ const AnnotationProject = (props) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                {selectedType === "AcousticNormalisedTranscriptionEditing" && <>
+                {(selectedType === "AcousticNormalisedTranscriptionEditing" || selectedType ==="StandardizedTranscriptionEditing")   && <>
                   <Grid
                     xs={12}
                     sm={12}
