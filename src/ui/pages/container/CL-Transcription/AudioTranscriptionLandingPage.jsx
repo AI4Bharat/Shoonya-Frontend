@@ -1203,7 +1203,7 @@ useEffect(() => {
             <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="L1-L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage >=2  && 
+                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage <=1  && 
                     <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
                     }
                 </Tabs>
@@ -1218,7 +1218,7 @@ useEffect(() => {
             player={player}
             ProjectDetails={ProjectDetails}
             TaskDetails={taskData}
-            stage={2}
+            stage={tabValue+2}
             handleStdTranscriptionSettings={setStdTranscriptionSettings}
             advancedWaveformSettings={advancedWaveformSettings}
             setAdvancedWaveformSettings={setAdvancedWaveformSettings}
