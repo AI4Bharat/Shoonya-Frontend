@@ -9,7 +9,7 @@ export default class SaveTranscriptAPI extends API {
      super("PATCH", timeout, false);
      this.GlossaryObj = GlossaryObj;
      //this.type = constants.Add_GLOSSARY;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.annotations}${annotationsId}/?cl_format=True`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.annotations}${annotationsId}/?cl_format=true`;
    }
   
    processResponse(res) {
