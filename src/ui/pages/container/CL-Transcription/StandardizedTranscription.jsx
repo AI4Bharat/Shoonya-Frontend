@@ -154,6 +154,7 @@ const StandarisedisedTranscriptionEditing = ({
   const textRefs = useRef([]);
   const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
   const [currentSelection, setCurrentSelection] = useState(null);
+  const [selectedSpeaker, setSelectedSpeaker] = useState(speakerIdList?.[0]?.name);
 
   useEffect(() => {
     currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
@@ -305,6 +306,7 @@ const StandarisedisedTranscriptionEditing = ({
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
+ 
   const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const {
       target: { value },
@@ -536,28 +538,38 @@ const StandarisedisedTranscriptionEditing = ({
     return () => clearTimeout(timer);
   }, []);
 
-if(currentPageData)
-  {
-    console.log("currentPageData", currentPageData)
-  }
+// Initialize updatedProjectData state
+const [updatedProjectData, setUpdatedProjectData] = useState([]);
 
-let updatedProjectData = []
-if (currentPageData?.length && stage===3) {
-  updatedProjectData = [{
-    start_time: currentPageData[0].start_time,
-    end_time: currentPageData[currentPageData.length - 1].end_time,
-    text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text)
-  }]
-}
-else 
-{
-  updatedProjectData = currentPageData;
-}
-  if(currentPageData)
-    {
-      console.log("updatedPageData", updatedProjectData)
-    }
- 
+useEffect(() => {
+  if (currentPageData?.length && stage===3) {
+    setUpdatedProjectData([{
+      start_time: currentPageData[0].start_time,
+      end_time: currentPageData[currentPageData.length - 1].end_time,
+      text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData[0].acoustic_normalised_text
+    }]);
+  }
+  else 
+  {
+    setUpdatedProjectData(currentPageData);
+  }
+}, [currentPageData, stage]); // add dependencies
+
+const onMergeClickL3 = useCallback(()=>{
+  // merge the transcription L2 into L3 
+  if (currentPageData?.length && stage===3) {
+    setUpdatedProjectData([{
+      start_time: currentPageData[0].start_time,
+      end_time: currentPageData[currentPageData.length - 1].end_time,
+      text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+    }]);
+  }
+}, [currentPageData, stage]); 
+
+useEffect(() => {
+  setSelectedSpeaker(speakerIdList?.[0]?.name);
+}, [stage]);
+  
   return (
     <>
       {" "}
@@ -593,6 +605,8 @@ else
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
               annotationId={annotationId}
+              showMerge={true && stage===3}
+              onMergeClickL3={onMergeClickL3}
             />
           </Grid>
           {ProjectDetails?.project_type && stage===2 && <Grid
@@ -694,6 +708,7 @@ else
                           labelId="select-speaker"
                           label="Select Speaker"
                           value={item.speaker_id}
+                          defaultValue={stage==3 ? selectedSpeaker : ""}
                           onChange={(event) =>
                             handleSpeakerChange(event.target.value, index + idxOffset)
                           }

@@ -50,6 +50,8 @@ import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import { Tab, Tabs } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
+
 
 const AudioTranscriptionLandingPage = ({project_type}) => {
   const classes = AudioTranscriptionLandingStyle();
@@ -1201,11 +1203,31 @@ useEffect(() => {
             <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="L1-L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage <=1  && 
+                    <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    }
                 </Tabs>
             </Box>
           </FormControl>
         }
-          <TranscriptionRightPanel
+
+        {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing" ?
+          <StandarisedisedTranscriptionEditing
+            currentIndex={currentIndex}
+            AnnotationsTaskDetails={AnnotationsTaskDetails}
+            player={player}
+            ProjectDetails={ProjectDetails}
+            TaskDetails={taskData}
+            stage={tabValue+2}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
+            advancedWaveformSettings={advancedWaveformSettings}
+            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
+            annotationId={annotations[0]?.id}
+          /> 
+         : 
+         <TranscriptionRightPanel
             currentIndex={currentIndex}
             AnnotationsTaskDetails={AnnotationsTaskDetails}
             player={player}
@@ -1219,6 +1241,8 @@ useEffect(() => {
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
+        }
+          
         </Grid>
       </Grid>
 

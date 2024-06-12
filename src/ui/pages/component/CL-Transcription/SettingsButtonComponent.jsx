@@ -24,6 +24,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
+import MergeIcon from "@mui/icons-material/MergeType";
 // import { FindAndReplace } from "common";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 // import FormatLineSpacingIcon from "@mui/icons-material/FormatLineSpacingIcon";
@@ -66,6 +67,8 @@ const SettingsButtonComponent = ({
   pauseOnType,
   setPauseOnType,
   annotationId,
+  showMerge,
+  onMergeClickL3,
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   // const dispatch = useDispatch();
@@ -100,6 +103,27 @@ const SettingsButtonComponent = ({
         </Tooltip>
       )}
 
+      {showMerge && (
+        <Tooltip title="Merge L2 Transcription" placement="bottom">
+          <IconButton
+            sx={{
+              backgroundColor: "#2C2799",
+              borderRadius: "50%",
+              color: "#fff",
+              marginX: "5px",
+              marginRight: "5px",
+              "&.Mui-disabled": { backgroundColor: "lightgray" },
+              "&:hover": {
+                backgroundColor: "#271e4f",
+              },
+            }}
+            onClick={onMergeClickL3}
+            // disabled={!showPopOver}
+          >
+            <MergeIcon />
+          </IconButton>
+        </Tooltip>
+      )}
       <Tooltip title="Settings" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
