@@ -543,11 +543,26 @@ const [updatedProjectData, setUpdatedProjectData] = useState([]);
 
 useEffect(() => {
   if (currentPageData?.length && stage===3) {
-    setUpdatedProjectData([{
-      start_time: currentPageData[0].start_time,
-      end_time: currentPageData[currentPageData.length - 1].end_time,
-      text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData[0].acoustic_normalised_text
-    }]);
+
+    // setUpdatedProjectData((prev)=>{
+    //   let updatedData = [...prev];
+    //   currentPageData.map((item, index) => {
+    //     updatedData[index] = {
+    //       start_time: item.start_time,
+    //       end_time: item.end_time,
+    //       text: item.acoustic_standardized_text? item.acoustic_standardized_text : item.acoustic_normalised_text
+    //     }
+    //   });
+    //   return updatedData;
+    // });
+    console.log("currentPageData", currentPageData);
+    setUpdatedProjectData(currentPageData);
+
+    // setUpdatedProjectData([{
+    //   start_time: currentPageData[0].start_time,
+    //   end_time: currentPageData[currentPageData.length - 1].end_time,
+    //   text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+    // }]);
   }
   else 
   {
@@ -563,6 +578,19 @@ const onMergeClickL3 = useCallback(()=>{
       end_time: currentPageData[currentPageData.length - 1].end_time,
       text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
     }]);
+
+    
+
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: "merge",
+        index: currentPageData.length - 1,
+        timings: getTimings(currentPageData.length - 1),
+        selectionStart: getSelectionStart(currentPageData.length - 1),
+      },
+    ]);
+
   }
 }, [currentPageData, stage]); 
 
@@ -837,7 +865,9 @@ useEffect(() => {
                             )}}
 
                         />
-                      ) : (
+                      ) : ( 
+
+                        stage ===1 &&
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
                             // ref={el => textRefs.current[index] = el}
@@ -862,7 +892,9 @@ useEffect(() => {
                         {targetLength(index)}
                       </span> */}
                         </div>
-                      )}
+                      )} 
+
+
                       {stage==2 &&
                         (ProjectDetails?.tgt_language !== "en" &&
                           enableTransliteration ? (
@@ -907,6 +939,77 @@ useEffect(() => {
                             />
                           </div>
                         ))}
+
+
+                        {ProjectDetails?.tgt_language !== "en" &&
+                        false ? (
+                        <IndicTransliterate
+                          lang={targetlang}
+                          value={item.text}
+                          onChange={(event) => {
+                            changeTranscriptHandler(event, index + idxOffset, false);
+                          }}
+                          enabled={enableTransliterationSuggestion}
+                          onChangeText={() => { }}
+                          onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                          containerStyles={{ width: "100%", height: "100%" }}
+                          onBlur={() => {
+                            setTimeout(() => {
+                              setShowPopOver(false);
+                            }, 200);
+                          }}
+                          style={{ fontSize: fontSize, height: "100%" }}
+                          renderComponent={(props) => {
+                            textRefs.current[index] = props.ref.current;
+                            return (
+                              <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                                <textarea
+                                  className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                    }`}
+                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                  onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                                  onBlur={() => {
+                                    setTimeout(() => {
+                                      setShowPopOver(false);
+                                    }, 200);
+                                  }}
+                                  {...props}
+                                />
+                                
+                                {/* <span id="charNum" className={classes.wordCount}>
+                        {targetLength(index)}
+                      </span> */}
+                              </div>
+                            )}}
+
+                        />
+                      ) : (
+                        stage==3 &&
+                        <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                          <textarea
+                            // ref={el => textRefs.current[index] = el}
+                            // onChange={(event) => {
+                            onInput={(event) => {
+                              changeTranscriptHandler(event, index + idxOffset, false);
+                            }}
+                            onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                            value={item.text}
+                            dir={enableRTL_Typing ? "rtl" : "ltr"}
+                            className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                              }`}
+                            style={{ fontSize: fontSize, height: "100%"}}
+                            onBlur={() => {
+                              setTimeout(() => {
+                                setShowPopOver(false);
+                              }, 200);
+                            }}
+                          />
+                          
+                          {/* <span id="charNum" className={classes.wordCount}>
+                        {targetLength(index)}
+                      </span> */}
+                        </div>
+                      )}
                     </CardContent>
                   </Box>
                 </Resizable>
