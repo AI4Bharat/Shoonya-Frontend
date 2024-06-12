@@ -155,7 +155,17 @@ const StandarisedisedTranscriptionEditing = ({
   const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
   const [currentSelection, setCurrentSelection] = useState(null);
   const [selectedSpeaker, setSelectedSpeaker] = useState(speakerIdList?.[0]?.name);
+  const [acousticStandardizedText, setAcousticStandardizedText] = useState('');
 
+  useEffect(() => {
+    if (currentPageData.length) {
+      const initialText = currentPageData[0].acoustic_standardized_text
+        ? currentPageData[0].acoustic_standardized_text
+        : currentPageData.map(item => item.acoustic_normalised_text).join(' ');
+      setAcousticStandardizedText(initialText);
+    }
+  }, [currentPageData]);
+  
   useEffect(() => {
     currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
   }, [showAcousticText, currentPageData]);
@@ -279,6 +289,18 @@ const StandarisedisedTranscriptionEditing = ({
     // eslint-disable-next-line
     [limit, currentOffset]
   );
+
+  const handleTextareaChange = (event) => {
+    setAcousticStandardizedText(event.target.value);
+  };
+
+  const updateCurrentPageData = () => {
+    const updatedData = currentPageData.map((item, index) => ({
+      ...item,
+      acoustic_standardized_text: acousticStandardizedText.split(' ')[index] || '',
+    }));
+    setUpdatedProjectData(updatedData);
+  };
 
   const onMouseUp = (e, blockIdx) => {
     if (e.target.selectionStart < e.target.value?.length) {
@@ -837,7 +859,26 @@ useEffect(() => {
                             )}}
 
                         />
-                      ) : (
+                      ) : stage===3 ? (
+                        <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+      {acousticStandardizedText && (
+        <textarea
+          placeholder="type here"
+          onInput={handleTextareaChange}
+          value={acousticStandardizedText}
+          dir={enableRTL_Typing ? "rtl" : "ltr"}
+          className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === idxOffset ? classes.boxHighlight : ""}`}
+          style={{ fontSize, height: "100%" }}
+          onBlur={() => {
+            setTimeout(() => {
+              setShowPopOver(false);
+              updateCurrentPageData();
+            }, 200);
+          }}
+        />
+      )}
+    </div>
+                      ):(
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
                             // ref={el => textRefs.current[index] = el}
