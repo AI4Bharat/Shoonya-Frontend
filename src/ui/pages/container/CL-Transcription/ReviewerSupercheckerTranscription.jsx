@@ -9,10 +9,11 @@ import { useDispatch } from "react-redux";
 import SuperCheckerLSF from "../Label-Studio/SuperCheckerLSF";
 import SuperCheckerAudioTranscriptionLandingPage from "./SuperCheckerAudioTranscriptionLandingPage";
 
-const ReviewerSupercheckerTranscription = () => {
+const ReviewerSupercheckerTranscription = (props) => {
   const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
   const { projectId, taskId } = useParams();
-  const dispatch = useDispatch();
+  const { path } = props;
+   const dispatch = useDispatch();
 
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(projectId);
@@ -21,13 +22,12 @@ const ReviewerSupercheckerTranscription = () => {
   useEffect(() => {
     getProjectDetails();
   }, [projectId, taskId]);
-
   return (
     <div style={{ margin: 0, padding: 0 }}>
       {ProjectDetails?.project_type === "StandardizedTranscriptionEditing" ? (
-        ProjectDetails?.project_stage === 2 ? (
+        path === "projects/:projectId/review/:taskId" ? (
           <ReviewAudioTranscriptionLandingPage />
-        ) : ProjectDetails?.project_stage === 3 ? (
+        ) : path==="projects/:projectId/SuperChecker/:taskId"? (
           <SuperCheckerAudioTranscriptionLandingPage />
         ) : (
           <SuperCheckerLSF />
@@ -38,5 +38,4 @@ const ReviewerSupercheckerTranscription = () => {
     </div>
   );
 };
-
 export default ReviewerSupercheckerTranscription;

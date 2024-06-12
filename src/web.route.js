@@ -193,7 +193,9 @@ const App = () => {
         <Route
           path="projects/:projectId/review/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<ReviewerSupercheckerTranscription />} />
+            <Layout component={<ReviewerSupercheckerTranscription 
+              path="projects/:projectId/review/:taskId"
+             />} />
           )}
         />
          <Route
@@ -205,7 +207,9 @@ const App = () => {
            <Route
           path="projects/:projectId/SuperChecker/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<ReviewerSupercheckerTranscription />} />
+            <Layout component={<ReviewerSupercheckerTranscription 
+              path="projects/:projectId/SuperChecker/:taskId"
+             />} />
           )}
           />
         <Route

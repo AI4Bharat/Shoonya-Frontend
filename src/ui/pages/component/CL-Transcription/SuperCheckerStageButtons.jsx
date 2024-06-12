@@ -91,7 +91,7 @@ const SuperCheckerStageButtons = ({
   return (
     <>
       <div>
-        {ProjectData.revision_loop_count >
+        {ProjectData?.revision_loop_count >
         taskData?.revision_loop_count?.super_check_count
           ? false
           : true && (
@@ -110,7 +110,7 @@ const SuperCheckerStageButtons = ({
               </div>
             )}
 
-        {ProjectData.revision_loop_count -
+        {ProjectData?.revision_loop_count -
           taskData?.revision_loop_count?.super_check_count !==
           0 && (
           <div
@@ -118,7 +118,7 @@ const SuperCheckerStageButtons = ({
           >
             <Typography variant="body" color="#f5222d">
               Note: This task can be rejected{" "}
-              {ProjectData.revision_loop_count -
+              {ProjectData?.revision_loop_count -
                 taskData?.revision_loop_count?.super_check_count}{" "}
               more times.
             </Typography>
@@ -219,7 +219,7 @@ const SuperCheckerStageButtons = ({
                   )
                 }
                 disabled={
-                  ProjectData.revision_loop_count >
+                  ProjectData?.revision_loop_count >
                   taskData?.revision_loop_count?.super_check_count
                     ? false
                     : true
@@ -228,7 +228,7 @@ const SuperCheckerStageButtons = ({
                   minWidth: "120px",
                   border: "1px solid gray",
                   color: (
-                    ProjectData.revision_loop_count >
+                    ProjectData?.revision_loop_count >
                     taskData?.revision_loop_count?.super_check_count
                       ? false
                       : true

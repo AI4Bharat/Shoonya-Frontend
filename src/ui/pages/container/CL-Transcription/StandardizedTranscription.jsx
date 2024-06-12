@@ -158,7 +158,7 @@ const StandarisedisedTranscriptionEditing = ({
   const [acousticStandardizedText, setAcousticStandardizedText] = useState('');
 
   useEffect(() => {
-    if (currentPageData.length) {
+    if (currentPageData?.length) {
       const initialText = currentPageData[0].acoustic_standardized_text
         ? currentPageData[0].acoustic_standardized_text
         : currentPageData.map(item => item.acoustic_normalised_text).join(' ');
@@ -167,7 +167,7 @@ const StandarisedisedTranscriptionEditing = ({
   }, [currentPageData]);
   
   useEffect(() => {
-    currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
+    currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData?.length));
   }, [showAcousticText, currentPageData]);
 
   useEffect(() => {
@@ -537,7 +537,7 @@ const StandarisedisedTranscriptionEditing = ({
 
   useEffect(() => {
     if(subtitles !== undefined)
-    setTotalSegments(subtitles.length);
+    setTotalSegments(subtitles?.length);
   }, [subtitles]);
 
   const toggleAdditionalOptions = () => {
@@ -567,8 +567,8 @@ useEffect(() => {
   if (currentPageData?.length && stage===3) {
     setUpdatedProjectData([{
       start_time: currentPageData[0].start_time,
-      end_time: currentPageData[currentPageData.length - 1].end_time,
-      text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData[0].acoustic_normalised_text
+      end_time: currentPageData[currentPageData?.length - 1].end_time,
+      acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
     }]);
   }
   else 
@@ -580,11 +580,40 @@ useEffect(() => {
 const onMergeClickL3 = useCallback(()=>{
   // merge the transcription L2 into L3 
   if (currentPageData?.length && stage===3) {
-    setUpdatedProjectData([{
-      start_time: currentPageData[0].start_time,
-      end_time: currentPageData[currentPageData.length - 1].end_time,
-      text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
-    }]);
+
+    // setUpdatedProjectData((prev)=>{
+
+    // })
+    setUpdatedProjectData((prev) =>{
+      return prev.map((item, index) => {
+        if(index === 0){
+          return {
+            ...item,
+            start_time: currentPageData[0].start_time,
+            end_time: currentPageData[currentPageData?.length - 1].end_time,
+            acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+          }
+        }
+        else{
+          return {
+            ...item,
+            start_time: currentPageData[0].start_time,
+            end_time: currentPageData[currentPageData?.length - 1].end_time,
+            acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+          }
+        }
+      })
+    })
+
+    // set the stack for undo and redo 
+    
+
+
+    // setUpdatedProjectData([{
+    //   start_time: currentPageData[0].start_time,
+    //   end_time: currentPageData[currentPageData?.length - 1].end_time,
+    //   acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+    // }]);
   }
 }, [currentPageData, stage]); 
 
@@ -861,23 +890,23 @@ useEffect(() => {
                         />
                       ) : stage===3 ? (
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
-      {acousticStandardizedText && (
-        <textarea
-          placeholder="type here"
-          onInput={handleTextareaChange}
-          value={acousticStandardizedText}
-          dir={enableRTL_Typing ? "rtl" : "ltr"}
-          className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === idxOffset ? classes.boxHighlight : ""}`}
-          style={{ fontSize, height: "100%" }}
-          onBlur={() => {
-            setTimeout(() => {
-              setShowPopOver(false);
-              updateCurrentPageData();
-            }, 200);
-          }}
-        />
-      )}
-    </div>
+                          {acousticStandardizedText && (
+                            <textarea
+                              placeholder="type here"
+                              onInput={handleTextareaChange}
+                              value={acousticStandardizedText}
+                              dir={enableRTL_Typing ? "rtl" : "ltr"}
+                              className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === idxOffset ? classes.boxHighlight : ""}`}
+                              style={{ fontSize, height: "100%" }}
+                              onBlur={() => {
+                                setTimeout(() => {
+                                  setShowPopOver(false);
+                                  updateCurrentPageData();
+                                }, 200);
+                              }}
+                            />
+                          )}
+                        </div>
                       ):(
                         <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
                           <textarea
