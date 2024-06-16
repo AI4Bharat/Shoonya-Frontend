@@ -36,6 +36,47 @@ const fetchAnnotation = async (taskID) => {
   }
 };
 
+
+const fetchTransliteration = async (sourceText,srcLng,tgtLng) => {
+  const url = 'https://api.dhruva.ekstep.ai/services/inference/transliteration';
+  const payload = {
+    input: [
+      {
+        source: sourceText,
+      },
+    ],
+    config: {
+      serviceId: 'ai4bharat/indicxlit--gpu-t4',
+      language: {
+        sourceLanguage: srcLng,
+        sourceScriptCode: '',
+        targetLanguage: tgtLng,
+        targetScriptCode: '',
+      },
+      isSentence: true,
+      numSuggestions: 0,
+    },
+    controlConfig: {
+      dataTracking: true,
+    },
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'uOQOvZAkdKQpaeZa5-K03k9SIXOtZFEIkdj995-lTz_bozcijCNgVye2jEGIRFQG',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return data;
+};
+
 const postAnnotation = async (
   result,
   task,
@@ -273,6 +314,7 @@ export {
   patchAnnotation,
   deleteAnnotation,
   fetchAnnotation,
+  fetchTransliteration,
   postReview,
   patchReview,
   patchSuperChecker,

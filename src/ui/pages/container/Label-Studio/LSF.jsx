@@ -34,6 +34,7 @@ import {
   patchAnnotation,
   deleteAnnotation,
   fetchAnnotation,
+  fetchTransliteration,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -51,6 +52,11 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import { labelConfigJS } from "./labelConfigJSX";
+import DatasetStyle from "../../../styles/Dataset";
+import { set } from "date-fns";
+import CustomButton from "../../component/common/Button";
+import CircularProgress from '@mui/material/CircularProgress';
+import LanguageCode from "../../../../utils/LanguageCode";
 
 const filterAnnotations = (
   annotations,
@@ -206,7 +212,9 @@ const LabelStudioWrapper = ({
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
-  //console.log("projectId, taskId", projectId, taskId);
+  const [translitrationData, setTransliterationData] = useState([]);
+  const [showSpinner , setShowSpinner] = useState(false);
+   //console.log("projectId, taskId", projectId, taskId);
   // debugger
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
 
@@ -553,6 +561,12 @@ const LabelStudioWrapper = ({
                       temp[i].value.text = [temp[i].value.text[0]];
                     }
                   }
+                  setSnackbarInfo({
+                    open: true,
+                    message: "Please click on Check Transliteration button first",
+                    variant: "info",
+                  });
+                 
                   patchAnnotation(
                     taskId,
                     temp,
@@ -966,6 +980,36 @@ const LabelStudioWrapper = ({
     });
   };
 
+  const handleTranslitrationOnClick = async () => {
+    setShowSpinner(true)
+    const language = LanguageCode.languages 
+    let input_lng_code = ''
+    let output_lng_code = ''
+
+    language.filter((lang) => {
+      if(lang.label === taskData?.data?.input_language){
+        input_lng_code= lang.code
+      }
+      if(lang.label === taskData?.data?.output_language){
+        output_lng_code = lang.code
+      } 
+    })
+    const res = await fetchTransliteration(taskData?.data?.input_text,input_lng_code, output_lng_code);
+    if(res && res?.output) {
+      setTransliterationData(res);
+      setSnackbarInfo({
+        open: true,
+        message: "Transliteration Done",
+        variant: "success",
+      });
+      setShowSpinner(false)
+    }
+  }
+  
+   
+  
+ 
+ 
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -1142,6 +1186,35 @@ const LabelStudioWrapper = ({
         >
           {tagSuggestionList}
         </Popover>
+
+        {!loader&&  ProjectDetails?.project_type?.includes("ContextualTranslationEditing") && 
+        <Grid container spacing={2}  style={{
+          display: "flex", flexDirection: "column", justifyContent: "right", alignItems: "flex-end", padding:"1%", width:"100%", alignItems:"flex-end", zIndex:"10", marginTop:"-30px"
+        }}>
+          <Grid item xs={12} >
+            <CustomButton
+              startIcon={showSpinner && <CircularProgress size="0.8rem" color="secondary" />}
+              onClick={handleTranslitrationOnClick}
+              label="Check Transliteration"
+              disabled={showSpinner}
+            />
+          </Grid>
+
+          {translitrationData?.output && 
+          <Grid item xs={12} style={{width:"400px"}} className="ant-form-item-control-input-content">
+          <textarea rows="4" id="outlined-multiline-static"  
+            className="ant-input is-search"
+            label="Output tranliteration"
+            style={{width:"100%", height:"120px", lineHeight:"1.5715", maxWidth:"100%", minHeight:"32px", transition:"all .3s, height 0s", verticalAlign:"bottom"}}  
+            value={translitrationData?.output.map((item) => item.target).join(" ")}
+          />
+          </Grid> 
+          }
+        </Grid>
+
+        
+        }
+
       </Box>
       {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
