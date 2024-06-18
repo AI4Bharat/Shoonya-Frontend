@@ -1244,8 +1244,10 @@ useEffect(() => {
                    
                     {ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2   &&
                     <React.Fragment>
+                      <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="L1 & L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    </Tabs>
                     </React.Fragment>
                     }
                 </Tabs>
@@ -1261,6 +1263,7 @@ useEffect(() => {
           ProjectDetails={ProjectDetails}
           TaskDetails={taskDetailList}
           stage={ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2 ? tabValue+2 : 3}
+          tabValue={tabValue}
           handleStdTranscriptionSettings={setStdTranscriptionSettings}
           advancedWaveformSettings={advancedWaveformSettings}
           setAdvancedWaveformSettings={setAdvancedWaveformSettings}
