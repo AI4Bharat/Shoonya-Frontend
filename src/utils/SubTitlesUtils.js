@@ -142,93 +142,121 @@ export const onSubtitleDelete = (index) => {
   return copySub;
 };
 
-export const onSplit = (
-  currentIndex,
-  selectionStart,
-  timings = null,
-  targetSelectionStart = null
-) => {
-  const subtitles = store.getState().commonReducer.subtitles;
+  export const onSplit = (
+    currentIndex,
+    selectionStart,
+    stage,
+    updatedProjectData,
+    timings = null,
+    targetSelectionStart = null,
+    
+  ) => {
+    const subtitles = store.getState().commonReducer.subtitles;
+    console.log(subtitles)
+    console.log("stage " + stage);
+    const copySub = [...subtitles];
+    const targetTextBlock = stage === 3 ? updatedProjectData[currentIndex] :  subtitles[currentIndex];
+    const index = hasSub(subtitles[currentIndex], subtitles);
+    console.log(targetTextBlock);
+    const duration = DT.t2d(targetTextBlock.end_time) - DT.t2d(targetTextBlock.start_time);
+    console.log(duration)
+    const textToSplit = stage === 3 ? updatedProjectData[currentIndex].acoustic_standardized_text : targetTextBlock.text;
+    console.log("data " + updatedProjectData);
 
-  const copySub = [...subtitles];
-  const targetTextBlock = subtitles[currentIndex];
-  const index = hasSub(subtitles[currentIndex], subtitles);
-
-  const text1 = targetTextBlock?.text.slice(0, selectionStart).trim();
-  const text2 = targetTextBlock?.text.slice(selectionStart).trim();
-  const targetText1 = targetSelectionStart
-    ? targetTextBlock.target_text.slice(0, targetSelectionStart).trim()
-    : null;
-  const targetText2 = targetSelectionStart
-    ? targetTextBlock.target_text.slice(targetSelectionStart).trim()
-    : null;
-
-  if (
-    !text1 ||
-    !text2 ||
-    (targetSelectionStart && (!targetText1 || !targetText2))
-  )
-    return copySub;
-
- 
-  let middleTime = null;
-  if (!timings) {
-    const splitDuration = (
-      targetTextBlock.duration *
-      (selectionStart / targetTextBlock.text.length)
-    ).toFixed(3);
-    if (splitDuration < 0.2 || targetTextBlock.duration - splitDuration < 0.2)
+    console.log(textToSplit)
+    const text1 = textToSplit.slice(0, selectionStart).trim();
+    const text2 = textToSplit.slice(selectionStart).trim();
+    console.log("text1: " + text1)
+    console.log("text2: " + text2)
+    const targetText1 = targetSelectionStart
+      ? targetTextBlock.target_text.slice(0, targetSelectionStart).trim()
+      : null;
+    const targetText2 = targetSelectionStart
+      ? targetTextBlock.target_text.slice(targetSelectionStart).trim()
+      : null;
+console.log(targetText1 )
+console.log(targetText2)
+    if (
+      !text1 ||
+      !text2 ||
+      (targetSelectionStart && (!targetText1 || !targetText2))
+    )
       return copySub;
 
-    middleTime = DT.d2t(targetTextBlock.startTime + parseFloat(splitDuration));
-  }
-  copySub.splice(currentIndex, 1);
-  copySub.splice(
-    index,
-    0,
-    newSub({
-      start_time: middleTime
-        ? subtitles[currentIndex].start_time
-        : timings[0].start,
-      end_time: middleTime ?? timings[0].end,
-      text: text1,
-      acoustic_normalised_text: targetTextBlock?.acoustic_normalised_text,
-      ...(targetSelectionStart && { target_text: targetText1 }),
-      speaker_id: "",
-    })
-  );
+    let middleTime = null;
+    if (!timings) {
 
-  
-  copySub.splice(
-    index + 1,
-    0,
-    newSub({
-      start_time: middleTime ?? timings[1].start ?? timings[0].end,
-      end_time:
-        middleTime || !timings[1].end
-          ? subtitles[currentIndex].end_time
-          : timings[1].end,
-      text: text2,
-      acoustic_normalised_text: "",
-      ...(targetSelectionStart && { target_text: targetText2 }),
-      speaker_id: "",
-    })
-  );
+      const splitDuration = (
+        duration *
+        (selectionStart / textToSplit.length)
+      ).toFixed(3);
+      if (splitDuration < 0.2 || duration - splitDuration < 0.2)
+        return copySub;
 
-  return copySub;
-};
+      middleTime = DT.d2t(DT.t2d(targetTextBlock.start_time) + parseFloat(splitDuration));
+      console.log(middleTime);
+      console.log(targetTextBlock.start_time);
+      console.log(targetTextBlock.end_time)
+    }
+    copySub.splice(currentIndex, 1);
+    copySub.splice(
+      index,
+      0,
+      newSub({
+        start_time: middleTime
+          ? targetTextBlock.start_time
+          : timings[0].start,
+        end_time: middleTime ?? timings[0].end,
+        text: stage === 3 ? targetTextBlock.text : text1, 
+        acoustic_standardized_text: stage === 3 ? text1 : targetTextBlock.acoustic_standardized_text, 
+        ...(targetSelectionStart && { target_text: targetText1 }),
+        speaker_id: "",
+      })
+    );
 
-export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic) => {
-  const subtitles = store.getState().commonReducer.subtitles;
+    console.log(copySub[0]);
+
+    copySub.splice(
+      index + 1,
+      0,
+      newSub({
+        start_time: middleTime ?? timings[1].start ?? timings[0].end,
+        end_time:
+          middleTime || !timings[1].end
+            ? targetTextBlock.end_time
+            : timings[1].end,
+        text: stage === 3 ? targetTextBlock.text : text2, 
+        acoustic_standardized_text: stage === 3 ? text2 : targetTextBlock.acoustic_standardized_text, 
+        ...(targetSelectionStart && { target_text: targetText2 }),
+        speaker_id: "",
+      })
+    );
+
+    console.log(copySub[1]);
+
+    return copySub;
+  };
+
+export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic, stage, updatedProjectData) => {
+  const subtitles = stage === 3? updatedProjectData : store.getState().commonReducer.subtitles;
   const copySub = [...subtitles];
+  console.log(copySub)
   const sub = copySub[index];
-
-  if (updateAcoustic)
+console.log(sub);
+  if (updateAcoustic === 1)
     sub.acoustic_normalised_text = text;
+  
   else if (populateAcoustic) {
     if (!sub.acoustic_normalised_text) sub.acoustic_normalised_text = sub.text;
   }
-  else sub.text = text;
+
+  else if(updateAcoustic === 2)
+    sub.acoustic_standardized_text = text;
+
+  else if(updateAcoustic === 0)
+    sub.text = text;
+
+  
 
   /* copySub.forEach((element, i) => {
     if (index === i) {
