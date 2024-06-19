@@ -307,11 +307,13 @@ const StandarisedisedTranscriptionEditing = ({
     console.log(updatedProjectData);
   
     const newSubtitles = onSplit(currentIndexToSplitTextBlock, selectionStart, stage, updatedProjectData);
-  
+    console.log(newSubtitles);
+    console.log(currentIndexToSplitTextBlock);
+
     if (stage === 3) {
       const updatedData = [...updatedProjectData];
-      updatedData[currentIndexToSplitTextBlock] = newSubtitles[0];
-      updatedData.splice(currentIndexToSplitTextBlock + 1, 0, newSubtitles[1]);
+      updatedData[currentIndexToSplitTextBlock] = newSubtitles[currentIndexToSplitTextBlock];
+      updatedData.splice(currentIndexToSplitTextBlock + 1, 0, newSubtitles[currentIndexToSplitTextBlock + 1]);
       setUpdatedProjectData(updatedData);
     }
     else {
@@ -353,12 +355,13 @@ const StandarisedisedTranscriptionEditing = ({
       setTagSuggestionsAcoustic(updateAcoustic);
     }
     const sub = onSubtitleChange(value, index, updateAcoustic, false, stage, updatedProjectData);
+    console.log(sub);
     if(stage === 3){
-      const updatedData = [...updatedProjectData];
+      const updatedData = sub;
       console.log(updatedData);
       console.log(index);
       console.log(value);
-      updatedData[index].acoustic_standardized_text = value;
+      
       setUpdatedProjectData(updatedData)
     }
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -366,7 +369,7 @@ const StandarisedisedTranscriptionEditing = ({
   };
 
   const populateAcoustic = (index) => {
-    const sub = onSubtitleChange("", index, false, true);
+    const sub = onSubtitleChange("", index, false, true, stage, updatedProjectData);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
 
