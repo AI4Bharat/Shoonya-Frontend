@@ -52,8 +52,6 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import { labelConfigJS } from "./labelConfigJSX";
-import DatasetStyle from "../../../styles/Dataset";
-import { set } from "date-fns";
 import CustomButton from "../../component/common/Button";
 import CircularProgress from '@mui/material/CircularProgress';
 import LanguageCode from "../../../../utils/LanguageCode";
@@ -995,7 +993,7 @@ const LabelStudioWrapper = ({
 
   const fetchAnnotationTask = async () => {
     const res = await fetchAnnotation(taskId);
-    console.log(res);
+    // console.log(res);
     if(res[0]?.result[0])
     { 
       setIndicText(res[0]?.result[0]?.value?.text);
@@ -1027,7 +1025,6 @@ const LabelStudioWrapper = ({
 
       const res = dispatch(APITransport(postTransliterationForLogging));
       if(res){
-        console.log('response', res)
         setTransliterationData([]);
         setOriginalRomanisedText("");
         setEditedRomanisedText("");
@@ -1054,11 +1051,6 @@ const LabelStudioWrapper = ({
     const language = LanguageCode.languages 
     let input_lng_code = ''
     let output_lng_code = ''
-    if(taskData)
-      {
-        console.log(taskData)
-        console.log(annotationNotesRef.current.getEditor().getContents())
-      }
 
     language.filter((lang) => {
       if(lang.label === taskData?.data?.input_language){
@@ -1465,7 +1457,7 @@ export default function LSF() {
   useEffect(() => {
     fetchAnnotation(taskId).then((data) => {
       if (data && Array.isArray(data) && data.length > 0) {
-        console.log(annotationNotesRef);
+        // console.log(annotationNotesRef);
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
         try {
@@ -1473,7 +1465,7 @@ export default function LSF() {
             annotationNotesRef.current.value !== ""
               ? JSON.parse(annotationNotesRef.current.value)
               : "";
-          console.log(newDelta2);
+          // console.log(newDelta2);
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
           if (err instanceof SyntaxError) {
