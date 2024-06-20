@@ -3,12 +3,14 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class PostTransliterationForLogging extends API {
-  constructor(source_text, target_text, transliterated_text, timeout = 2000) {
+  constructor(source_text, target_text, orginal_romanised_text,edited_romanised_text,target_language, timeout = 2000) {
     super("POST", timeout, false);
     this.transliterationLog = {
-      source_text: source_text,
-      target_text: target_text,
-      transliterated_text: transliterated_text
+      source_english_text: source_text,
+      indic_translation_text: target_text[0],
+      romanised_text: orginal_romanised_text,
+      edited_romanised_text: edited_romanised_text,
+      language: target_language,
     };
     this.type = constants.POST_TRANSLITERATION_LOG;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.transliteration_log}`;

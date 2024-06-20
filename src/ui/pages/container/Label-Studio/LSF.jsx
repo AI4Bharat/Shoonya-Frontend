@@ -57,6 +57,7 @@ import { set } from "date-fns";
 import CustomButton from "../../component/common/Button";
 import CircularProgress from '@mui/material/CircularProgress';
 import LanguageCode from "../../../../utils/LanguageCode";
+import PostTransliterationForLogging from "../../../../redux/actions/api/Annotation/PostTransliterationForLogging";
 
 const filterAnnotations = (
   annotations,
@@ -214,6 +215,9 @@ const LabelStudioWrapper = ({
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [translitrationData, setTransliterationData] = useState([]);
   const [showSpinner , setShowSpinner] = useState(false);
+  const [originalRomanisedText, setOriginalRomanisedText] = useState("");
+  const [editedRomanisedText, setEditedRomanisedText] = useState("")
+  const [indicText, setIndicText] = useState("");
    //console.log("projectId, taskId", projectId, taskId);
   // debugger
   // const projectType = ProjectDetails?.project_type?.includes("Audio")
@@ -561,12 +565,16 @@ const LabelStudioWrapper = ({
                       temp[i].value.text = [temp[i].value.text[0]];
                     }
                   }
-                  setSnackbarInfo({
-                    open: true,
-                    message: "Please click on Check Transliteration button first",
-                    variant: "info",
-                  });
-                 
+                  if(originalRomanisedText.length==0  && projectType.includes("ContextualTranslationEditing")){
+                    setSnackbarInfo({
+                      open: true,
+                      message: "Please click on Check Transliteration button first",
+                      variant: "info",
+                    });
+                    // dont allow to move forward
+                    hideLoader();
+                  }
+                  
                   patchAnnotation(
                     taskId,
                     temp,
@@ -979,12 +987,78 @@ const LabelStudioWrapper = ({
       tasksComplete(res?.id || null);
     });
   };
+  useEffect(() => {
+    if (taskId) {
+      fetchAnnotationTask();
+    }
+  }, [taskId]);
 
+  const fetchAnnotationTask = async () => {
+    const res = await fetchAnnotation(taskId);
+    console.log(res);
+    if(res[0]?.result[0])
+    { 
+      setIndicText(res[0]?.result[0]?.value?.text);
+    }
+    setTaskData(res);
+    setAnnotations(res?.annotations);
+  };
+
+  // create a handleSubmitRomanisedText function
+  const handleSubmitRomanisedText = async () => {
+    if(taskData?.data?.input_text && taskData?.data?.input_language && taskData?.data?.output_language){
+      const language = LanguageCode.languages 
+      let output_lng_code = ''
+
+      language.filter((lang) => {
+        if(lang.label === taskData?.data?.input_language){
+          output_lng_code= lang.code
+        }
+      });
+
+      // Create a new instance of the class
+      const postTransliterationForLogging = new PostTransliterationForLogging(
+        taskData?.data?.input_text, 
+        indicText , 
+        originalRomanisedText, 
+        editedRomanisedText,
+        output_lng_code
+      );
+
+      const res = dispatch(APITransport(postTransliterationForLogging));
+      if(res){
+        console.log('response', res)
+        setTransliterationData([]);
+        setOriginalRomanisedText("");
+        setEditedRomanisedText("");
+        setSnackbarInfo({
+          open: true,
+          message: "Transliteration Logged",
+          variant: "success",
+        });
+        setShowSpinner(false)
+
+      }else{
+        setSnackbarInfo({
+          open: true,
+          message: "Error in logging transliteration",
+          variant: "error",
+        });
+        setShowSpinner(false)
+      }
+    }
+  }
+  
   const handleTranslitrationOnClick = async () => {
     setShowSpinner(true)
     const language = LanguageCode.languages 
     let input_lng_code = ''
     let output_lng_code = ''
+    if(taskData)
+      {
+        console.log(taskData)
+        console.log(annotationNotesRef.current.getEditor().getContents())
+      }
 
     language.filter((lang) => {
       if(lang.label === taskData?.data?.input_language){
@@ -997,6 +1071,10 @@ const LabelStudioWrapper = ({
     const res = await fetchTransliteration(taskData?.data?.input_text,input_lng_code, output_lng_code);
     if(res && res?.output) {
       setTransliterationData(res);
+      if(res?.output)
+      {
+        setOriginalRomanisedText(res?.output.map((item) => item.target).join(" "));
+      }
       setSnackbarInfo({
         open: true,
         message: "Transliteration Done",
@@ -1005,8 +1083,15 @@ const LabelStudioWrapper = ({
       setShowSpinner(false)
     }
   }
-  
+  useEffect(() => {
+    if(originalRomanisedText) {
+      setEditedRomanisedText(originalRomanisedText);
+    }
+  }, [originalRomanisedText]);
    
+  const handleEditableRomanisedText =(e)=>{
+    setEditedRomanisedText(e.target.value)
+  }
   
  
  
@@ -1191,13 +1276,20 @@ const LabelStudioWrapper = ({
         <Grid container spacing={2}  style={{
           display: "flex", flexDirection: "column", justifyContent: "right", alignItems: "flex-end", padding:"1%", width:"100%", alignItems:"flex-end", zIndex:"10", marginTop:"-30px"
         }}>
-          <Grid item xs={12} >
+          <Grid item xs={12}  style={{display:"flex", gap:"5px"}}>
             <CustomButton
               startIcon={showSpinner && <CircularProgress size="0.8rem" color="secondary" />}
               onClick={handleTranslitrationOnClick}
               label="Check Transliteration"
               disabled={showSpinner}
             />
+            {originalRomanisedText &&
+            <CustomButton
+              startIcon={showSpinner && <CircularProgress size="0.8rem" color="secondary" />}
+              onClick={handleSubmitRomanisedText}
+              label="Submit"
+            />
+            }
           </Grid>
 
           {translitrationData?.output && 
@@ -1206,8 +1298,12 @@ const LabelStudioWrapper = ({
             className="ant-input is-search"
             label="Output tranliteration"
             style={{width:"100%", height:"120px", lineHeight:"1.5715", maxWidth:"100%", minHeight:"32px", transition:"all .3s, height 0s", verticalAlign:"bottom"}}  
-            value={translitrationData?.output.map((item) => item.target).join(" ")}
-          />
+            value={editedRomanisedText}
+            onChange = {handleEditableRomanisedText}
+          /> 
+           
+
+
           </Grid> 
           }
         </Grid>
