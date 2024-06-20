@@ -124,14 +124,23 @@ export default function dispatchAPI(api) {
     };
   }
   return dispatch => {
-    dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, "",null, null, true));
-    axios
-      .get(api.apiEndPoint(), api.getHeaders())
-      .then(res => {
-        success(res, api, dispatch);
-      })
-      .catch(err => {
-        error(err, api, dispatch);
-      });
+    if (api.dontShowApiLoader && typeof api.dontShowApiLoader === 'function') {
+      dispatch(apiStatusAsync(api.dontShowApiLoader() ? false : true, false, "",null, null, true));
+    }
+  
+    if (api.apiEndPoint && typeof api.apiEndPoint === 'function' && api.getHeaders && typeof api.getHeaders === 'function') {
+      axios
+        .get(api.apiEndPoint(), api.getHeaders())
+        .then(res => {
+          if (success && typeof success === 'function') {
+            success(res, api, dispatch);
+          }
+        })
+        .catch(err => {
+          if (error && typeof error === 'function') {
+            error(err, api, dispatch);
+          }
+        });
+    }
   };
 }

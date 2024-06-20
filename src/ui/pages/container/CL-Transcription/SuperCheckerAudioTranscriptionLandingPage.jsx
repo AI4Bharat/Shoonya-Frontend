@@ -49,6 +49,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
+import { Tab, Tabs } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+
 
 const SuperCheckerAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -895,6 +899,11 @@ useEffect(() => {
   }
 }, [advancedWaveformSettings]);
 
+const [tabValue, setTabValue] = useState(0);
+  const handleTabChange = (e, v) => {
+    e.preventDefault()
+    setTabValue(v);
+  }
 useEffect(() => {
   const handleKeyDown = (event) => {
     if (event.shiftKey && event.key === ' ') {
@@ -1225,7 +1234,42 @@ useEffect(() => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
-          <TranscriptionRightPanel
+        {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing"  && 
+          <FormControl>
+              <Box sx={{mb:2,}} >
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+                   {ProjectDetails?.metadata_json?.acoustic_enabled_stage ==3 &&
+                    <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                   }
+                   
+                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2   &&
+                    <React.Fragment>
+                    <Tab label="L1 & L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    </React.Fragment>
+                    }
+                </Tabs>
+            </Box>
+          </FormControl>  
+        }
+        {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing" ?
+        
+        <StandarisedisedTranscriptionEditing
+          currentIndex={currentIndex}
+          AnnotationsTaskDetails={AnnotationsTaskDetails}
+          player={player}
+          ProjectDetails={ProjectDetails}
+          TaskDetails={taskDetailList}
+          stage={ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2 ? tabValue+2 : 3}
+          handleStdTranscriptionSettings={setStdTranscriptionSettings}
+          advancedWaveformSettings={advancedWaveformSettings}
+          setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+          waveSurfer={waveSurfer}
+          setWaveSurfer={setWaveSurfer}
+          annotationId={annotations[0]?.id}
+        /> 
+         : 
+         <TranscriptionRightPanel
             currentIndex={currentIndex}
             AnnotationsTaskDetails={AnnotationsTaskDetails}
             player={player}
@@ -1239,6 +1283,8 @@ useEffect(() => {
             stage={3}
             annotationId={annotations[0]?.id}
           />
+        }
+          
         </Grid>
       </Grid>
 

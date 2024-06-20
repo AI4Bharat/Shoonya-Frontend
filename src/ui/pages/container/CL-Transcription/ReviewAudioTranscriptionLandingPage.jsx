@@ -49,6 +49,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip"
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
+import { Tab, Tabs } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -116,7 +120,6 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
-
   // useEffect(() => {
   //   let intervalId;
 
@@ -282,6 +285,12 @@ const ReviewAudioTranscriptionLandingPage = () => {
     setShowNotes(!showNotes);
   };
 
+  const [tabValue, setTabValue] = useState(0);
+  const handleTabChange = (e, v) => {
+    e.preventDefault()
+    setTabValue(v);
+  }
+
   const getTaskData = async (id) => {
     setLoading(true);
     const ProjectObj = new GetTaskDetailsAPI(id);
@@ -327,7 +336,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       auto_save: true,
       lead_time:
         (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardized_transcription: stdTranscription }] : result),
     };
     if(result.length && taskDetails?.review_user === user.id) {
       try{
@@ -473,17 +482,17 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
 
-    let standardisedTranscription = "";
+    let standardizedTranscription = "";
 
     const sub = annotations[0]?.result?.filter((item) => {
-      if ("standardised_transcription" in item) {
-        standardisedTranscription = item.standardised_transcription;
+      if ("standardized_transcription" in item) {
+        standardizedTranscription = item.standardized_transcription;
         return false;
       } else return true;
     }).map((item) => new Sub(item));
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
-    setStdTranscription(standardisedTranscription);
+    setStdTranscription(standardizedTranscription);
 
     // const newSub = cloneDeep(sub);
 
@@ -627,7 +636,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
       review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
+      result: (stdTranscriptionSettings.enable ? [...result, { standardized_transcription: stdTranscription }] : result),
       ...((value === "to_be_revised" || value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
@@ -1255,7 +1264,7 @@ useEffect(() => {
                     }}
                   // style={{ marginBottom: "20px" }}
                   >
-                    Standardised Transcription
+                    Standardized Transcription
                   </Button>
                 </Grid>}
             </Grid>
@@ -1409,20 +1418,50 @@ useEffect(() => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
-          <TranscriptionRightPanel
-            currentIndex={currentIndex}
-            AnnotationsTaskDetails={AnnotationsTaskDetails}
-            player={player}
-            ProjectDetails={ProjectDetails}
-            TaskDetails={taskDetailList}
-            stage={2}
-            handleStdTranscriptionSettings={setStdTranscriptionSettings}
-            advancedWaveformSettings={advancedWaveformSettings}
-            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
-            waveSurfer={waveSurfer}
-            setWaveSurfer={setWaveSurfer}
-            annotationId={annotations[0]?.id}
-          />
+          {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing"  && 
+          <FormControl>
+              <Box sx={{mb:2,}} >
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+                    <Tab label="L1 & L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2  && 
+                    <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    }
+                </Tabs>
+            </Box>
+          </FormControl>  
+        }
+        {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing" ?
+        
+        <StandarisedisedTranscriptionEditing
+          currentIndex={currentIndex}
+          AnnotationsTaskDetails={AnnotationsTaskDetails}
+          player={player}
+          ProjectDetails={ProjectDetails}
+          TaskDetails={taskDetailList}
+          stage={tabValue+2}
+          handleStdTranscriptionSettings={setStdTranscriptionSettings}
+          advancedWaveformSettings={advancedWaveformSettings}
+          setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+          waveSurfer={waveSurfer}
+          setWaveSurfer={setWaveSurfer}
+          annotationId={annotations[0]?.id}
+        /> 
+         : 
+         <TranscriptionRightPanel
+          currentIndex={currentIndex}
+          AnnotationsTaskDetails={AnnotationsTaskDetails}
+          player={player}
+          ProjectDetails={ProjectDetails}
+          TaskDetails={taskDetailList}
+          stage={2}
+          handleStdTranscriptionSettings={setStdTranscriptionSettings}
+          advancedWaveformSettings={advancedWaveformSettings}
+          setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+          waveSurfer={waveSurfer}
+          setWaveSurfer={setWaveSurfer}
+          annotationId={annotations[0]?.id}
+        /> 
+        }
         </Grid>
       </Grid>
 

@@ -123,6 +123,14 @@ const InviteUsersDialog = ({
                 placeholder="Email ids"
                 defaultValue=" "
                 value={selectedEmails.join(",")}
+                sx={{
+                  '& .MuiInputLabel-root': {
+                    fontSize: '0.93rem', 
+                  },
+                  minWidth: "350px",
+                  maxWidth: "450px"
+                  
+                }}
               />
             )
             }
@@ -152,6 +160,16 @@ const InviteUsersDialog = ({
                       variant="outlined"
                       label="Enter email ids of users to invite"
                       placeholder="Email ids"
+                      sx={{
+                        '& .MuiInputLabel-root': {
+                          fontSize: '0.93rem', 
+                          zIndex: 100,
+                        },
+                        minWidth: "350px",
+                        maxWidth: "450px"
+                        
+                      }}
+
             
                   />
                   )}
