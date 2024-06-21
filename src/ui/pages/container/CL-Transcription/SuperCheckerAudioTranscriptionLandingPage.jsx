@@ -582,8 +582,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         setAutoSave(true);
         setSnackbarInfo({
           open: true,
-          message: resp?.message,
-          variant: "error",
+          message: resp?.message ? resp?.message : "This task is having duplicate annotation. Please deallocate this task",          variant: "error",
         });
       }
     } else {
