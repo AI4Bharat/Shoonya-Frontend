@@ -524,6 +524,17 @@ console.log(unseenNotifications,'uuu');
               Analytics
             </NavLink>
           </Typography>
+          <Typography variant="body1">
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                isActive ? classes.highlightedMenu : classes.headerMenu
+              }
+              activeClassName={classes.highlightedMenu}
+            >
+              Admin
+            </NavLink>
+          </Typography>
         </Grid>
       );
     } else if (userRole.Admin === loggedInUserData?.role) {

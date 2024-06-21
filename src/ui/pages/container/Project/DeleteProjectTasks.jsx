@@ -174,7 +174,7 @@ export default function DeleteProjectTasks() {
                 aria-describedby={Id}
                 variant="contained"
                 onClick={handleClick}
-                disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
+                disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ?true:false}
                 color="error">
                 Delete Project Tasks
             </Button>

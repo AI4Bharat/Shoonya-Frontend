@@ -474,7 +474,7 @@ const AdvancedOperation = (props) => {
               color="error"
               onClick={handleClickOpen}
               label={isArchived ? "Archived" : "Archive"}
-              disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
+              disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role?true:false}
             />
           </Grid>
 
