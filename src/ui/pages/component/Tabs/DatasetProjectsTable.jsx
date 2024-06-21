@@ -16,6 +16,7 @@ import Search from "../../component/common/Search";
 import { Grid, Stack, ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import { width } from "@mui/system";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const columns = [
 	{
@@ -98,7 +99,10 @@ export default function DatasetProjectsTable({ datasetId }) {
 		variant: "success",
 	});
 	const [loading, setLoading] = useState(false);
-
+	const loggedInUserData = useSelector(
+		(state) => state?.fetchLoggedInUserData?.data
+	  );
+	
 	useEffect(() => {
 		dispatch(APITransport(new GetDatasetProjects(datasetId)));
 	}, [dispatch, datasetId]);
