@@ -668,7 +668,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         setAutoSave(true);
         setSnackbarInfo({
           open: true,
-          message: resp?.message,
+          message: resp?.message ? resp?.message : "This task is having duplicate annotation. Please deallocate this task",
           variant: "error",
         });
       }

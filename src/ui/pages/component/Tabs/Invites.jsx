@@ -45,7 +45,7 @@ const Invites = (props) => {
         <FormControl>
               <Box sx={{mb:2,}} >
 
-            {userDetails && userDetails.role === 6 &&  
+            {userDetails && userDetails.role === 6  || userDetails.role === 5 &&  
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="Invited Users" sx={{ fontSize: 17, fontWeight: '700' }} />
                     <Tab label="Manager Suggestions" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />

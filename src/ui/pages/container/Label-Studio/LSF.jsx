@@ -896,7 +896,7 @@ const LabelStudioWrapper = ({
               if (res.status !== 200) {
                 setSnackbarInfo({
                   open: true,
-              message: "Error in clearing children bboxes",
+                  message: "Error in clearing children bboxes",
                   variant: "error",
                 });
               }else{
