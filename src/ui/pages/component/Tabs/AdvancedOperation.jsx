@@ -569,7 +569,7 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handleOpenExportProjectDialog}
                 label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role  ? true : false}
 
               />
             ) : (
@@ -583,7 +583,7 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handleExportProject}
                 label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role  ? true : false}
 
               />
             )}
@@ -659,7 +659,8 @@ const AdvancedOperation = (props) => {
                   value={taskReviews}
                   label="Task Reviews"
                   onChange={handleReviewToggle}
-                // getOptionDisabled={(option) => option.disabled}
+                  disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ?true:false}
+                  // getOptionDisabled={(option) => option.disabled}
                 >
                   {projectStage.map((type, index) => (
                     <MenuItem value={type.value} key={index} disabled={type.disabled} >
