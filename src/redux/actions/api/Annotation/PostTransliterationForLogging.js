@@ -7,7 +7,7 @@ export default class PostTransliterationForLogging extends API {
     super("POST", timeout, false);
     this.transliterationLog = {
       source_english_text: source_text,
-      indic_translation_text: target_text[0],
+      indic_translation_text: target_text,
       romanised_text: orginal_romanised_text,
       edited_romanised_text: edited_romanised_text,
       language: target_language,

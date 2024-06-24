@@ -56,6 +56,8 @@ import CustomButton from "../../component/common/Button";
 import CircularProgress from '@mui/material/CircularProgress';
 import LanguageCode from "../../../../utils/LanguageCode";
 import PostTransliterationForLogging from "../../../../redux/actions/api/Annotation/PostTransliterationForLogging";
+import RomanisedTransliteration from "../Transliteration/RomanisedTransliteration";
+
 
 const filterAnnotations = (
   annotations,
@@ -211,7 +213,14 @@ const LabelStudioWrapper = ({
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
-  const [translitrationData, setTransliterationData] = useState([]);
+  const [romanisedTransliterationData, setRomanisedTransliterationData] = useState({
+    timestamp: '',
+    error: '',
+    input: '',
+    romanised_transliteration: '',
+    success: false
+  });
+  const [showRomanisedTransliterationModel, setShowRomanisedTransliterationModel] = useState(true);
   const [showSpinner , setShowSpinner] = useState(false);
   const [originalRomanisedText, setOriginalRomanisedText] = useState("");
   const [editedRomanisedText, setEditedRomanisedText] = useState("")
@@ -254,6 +263,11 @@ const LabelStudioWrapper = ({
         sidePanelMode: "SIDEPANEL_MODE_REGIONS",
       }));});
   }, []);
+
+  // useEffect(() => {
+  //   const showModel = localStorage.getItem("showRomanisedTransliterationModel") === "true";
+  //   setShowRomanisedTransliterationModel(showModel);
+  // }, [localStorage]);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -989,14 +1003,13 @@ const LabelStudioWrapper = ({
     if (taskId) {
       fetchAnnotationTask();
     }
-  }, [taskId]);
-
+  }, [taskId]); 
   const fetchAnnotationTask = async () => {
     const res = await fetchAnnotation(taskId);
     // console.log(res);
     if(res[0]?.result[0])
     { 
-      setIndicText(res[0]?.result[0]?.value?.text);
+      setIndicText(res[0]?.result[0]?.value?.text[0]);
     }
     setTaskData(res);
     setAnnotations(res?.annotations);
@@ -1004,16 +1017,15 @@ const LabelStudioWrapper = ({
 
   // create a handleSubmitRomanisedText function
   const handleSubmitRomanisedText = async () => {
-    if(taskData?.data?.input_text && taskData?.data?.input_language && taskData?.data?.output_language){
+    if(taskData?.data?.input_text && taskData?.data?.output_language){
       const language = LanguageCode.languages 
       let output_lng_code = ''
 
       language.filter((lang) => {
-        if(lang.label === taskData?.data?.input_language){
+        if(lang.label === taskData?.data?.output_language){
           output_lng_code= lang.code
         }
       });
-
       // Create a new instance of the class
       const postTransliterationForLogging = new PostTransliterationForLogging(
         taskData?.data?.input_text, 
@@ -1025,7 +1037,15 @@ const LabelStudioWrapper = ({
 
       const res = dispatch(APITransport(postTransliterationForLogging));
       if(res){
-        setTransliterationData([]);
+        setRomanisedTransliterationData(
+          {
+            timestamp: '',
+            error: '',
+            input: '',
+            romanised_transliteration: '',
+            success: false
+          }
+        )
         setOriginalRomanisedText("");
         setEditedRomanisedText("");
         setSnackbarInfo({
@@ -1049,23 +1069,21 @@ const LabelStudioWrapper = ({
   const handleTranslitrationOnClick = async () => {
     setShowSpinner(true)
     const language = LanguageCode.languages 
-    let input_lng_code = ''
     let output_lng_code = ''
 
     language.filter((lang) => {
-      if(lang.label === taskData?.data?.input_language){
-        input_lng_code= lang.code
-      }
-      if(lang.label === taskData?.data?.output_language){
+      if(lang.label == taskData?.data?.output_language){
         output_lng_code = lang.code
       } 
     })
-    const res = await fetchTransliteration(taskData?.data?.input_text,input_lng_code, output_lng_code);
-    if(res && res?.output) {
-      setTransliterationData(res);
-      if(res?.output)
+    try {
+
+    const res = await fetchTransliteration(indicText, output_lng_code);
+    if(res?.success && res?.romanised_transliteration) {
+      setRomanisedTransliterationData(res);
+      if(res?.romanised_transliteration)
       {
-        setOriginalRomanisedText(res?.output.map((item) => item.target).join(" "));
+        setOriginalRomanisedText(res.romanised_transliteration);
       }
       setSnackbarInfo({
         open: true,
@@ -1075,18 +1093,57 @@ const LabelStudioWrapper = ({
       setShowSpinner(false)
     }
   }
+  catch (error) {
+    setSnackbarInfo({
+      open: true,
+      message: "Error in fetching romanised text",
+      variant: "error",
+    });
+    setShowSpinner(false)
+  }
+  
+  }
   useEffect(() => {
     if(originalRomanisedText) {
       setEditedRomanisedText(originalRomanisedText);
     }
   }, [originalRomanisedText]);
+
+  useEffect(() => {
+    let annotation = lsfRef?.current?.store?.annotationStore?.selected;
+      let temp;
+      for (let i = 0; i < annotations?.length; i++) {
+        if (
+          !annotations[i]?.result?.length ||
+          annotation.serializeAnnotation()[0].id ===
+            annotations[i]?.result[0].id
+        ) {
+          temp = annotation.serializeAnnotation();
+          if (annotations[i]?.annotation_type !== 1) continue;
+          for (let i = 0; i < temp?.length; i++) {
+            if(temp[i].type === "relation"){
+              continue;
+            }else if (temp[i]?.value.text) {
+              temp[i].value.text = [temp[i].value.text[0]];
+            }
+          }          
+          if(temp[0]?.value?.text[0]?.length >0){
+            setIndicText(temp[0]?.value?.text[0])
+          }
+        }
+        }
+  }, [annotations, fetchTransliteration, handleSubmitRomanisedText]);
    
   const handleEditableRomanisedText =(e)=>{
     setEditedRomanisedText(e.target.value)
   }
   
- 
- 
+  // call the handleTransliteration for first time if the indic text is present 
+  useEffect(() => {
+    if(indicText){
+      handleTranslitrationOnClick()
+    }
+  }, [indicText]);
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -1264,43 +1321,21 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
 
-        {!loader&&  ProjectDetails?.project_type?.includes("ContextualTranslationEditing") && 
-        <Grid container spacing={2}  style={{
-          display: "flex", flexDirection: "column", justifyContent: "right", alignItems: "flex-end", padding:"1%", width:"100%", alignItems:"flex-end", zIndex:"10", marginTop:"-30px"
-        }}>
-          <Grid item xs={12}  style={{display:"flex", gap:"5px"}}>
-            <CustomButton
-              startIcon={showSpinner && <CircularProgress size="0.8rem" color="secondary" />}
-              onClick={handleTranslitrationOnClick}
-              label="Check Transliteration"
-              disabled={showSpinner}
-            />
-            {originalRomanisedText &&
-            <CustomButton
-              startIcon={showSpinner && <CircularProgress size="0.8rem" color="secondary" />}
-              onClick={handleSubmitRomanisedText}
-              label="Submit"
-            />
-            }
-          </Grid>
-
-          {translitrationData?.output && 
-          <Grid item xs={12} style={{width:"400px"}} className="ant-form-item-control-input-content">
-          <textarea rows="4" id="outlined-multiline-static"  
-            className="ant-input is-search"
-            label="Output tranliteration"
-            style={{width:"100%", height:"120px", lineHeight:"1.5715", maxWidth:"100%", minHeight:"32px", transition:"all .3s, height 0s", verticalAlign:"bottom"}}  
-            value={editedRomanisedText}
-            onChange = {handleEditableRomanisedText}
-          /> 
-           
-
-
-          </Grid> 
-          }
-        </Grid>
-
-        
+        {!loader &&  showRomanisedTransliterationModel && 
+          <RomanisedTransliteration
+            open = {localStorage.getItem("showRomanisedTransliterationModel") == "true"}
+            onClose = {() => {
+              setShowRomanisedTransliterationModel(false) 
+            }}
+            setShowRomanisedTransliterationModel = {setShowRomanisedTransliterationModel}
+            indicText={indicText}
+            originalRomanisedText={originalRomanisedText}
+            editedRomanisedText={editedRomanisedText}
+            handleEditableRomanisedText={handleEditableRomanisedText}
+            handleTranslitrationOnClick={handleTranslitrationOnClick}
+            handleSubmitRomanisedText={handleSubmitRomanisedText}
+            showSpinner={showSpinner}
+          />
         }
 
       </Box>
