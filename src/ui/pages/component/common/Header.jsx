@@ -1139,14 +1139,6 @@ console.log(unseenNotifications,'uuu');
 
         />
       </Modal>
-
-      {/* {showRomanisedTransliterationModel && 
-        <RomanisedTransliteration 
-        open={showRomanisedTransliterationModel}
-        onClose={() => setShowRomanisedTransliterationModel(false)}
-        setShowRomanisedTransliterationModel = {setShowRomanisedTransliterationModel}
-        />
-      } */}
     </Grid>
   );
 };

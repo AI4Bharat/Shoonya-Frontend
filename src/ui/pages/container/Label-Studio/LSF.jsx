@@ -264,11 +264,6 @@ const LabelStudioWrapper = ({
       }));});
   }, []);
 
-  // useEffect(() => {
-  //   const showModel = localStorage.getItem("showRomanisedTransliterationModel") === "true";
-  //   setShowRomanisedTransliterationModel(showModel);
-  // }, [localStorage]);
-
   const tasksComplete = (id) => {
     if (id) {
       resetNotes();
@@ -1492,7 +1487,6 @@ export default function LSF() {
   useEffect(() => {
     fetchAnnotation(taskId).then((data) => {
       if (data && Array.isArray(data) && data.length > 0) {
-        // console.log(annotationNotesRef);
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
         try {
@@ -1500,7 +1494,6 @@ export default function LSF() {
             annotationNotesRef.current.value !== ""
               ? JSON.parse(annotationNotesRef.current.value)
               : "";
-          // console.log(newDelta2);
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
           if (err instanceof SyntaxError) {
