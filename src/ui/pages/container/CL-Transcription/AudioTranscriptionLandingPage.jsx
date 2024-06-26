@@ -93,6 +93,7 @@ const AudioTranscriptionLandingPage = ({project_type}) => {
   const [annotationtext, setannotationtext] = useState('')
   const [reviewtext, setreviewtext] = useState('')
   const [taskData, setTaskData] = useState()
+  const [updatedProjectData, setUpdatedProjectData] = useState([]);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -1225,6 +1226,8 @@ useEffect(() => {
             waveSurfer={waveSurfer}
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
+            updatedProjectData={updatedProjectData}
+          setUpdatedProjectData={setUpdatedProjectData}
           /> 
          : 
          <TranscriptionRightPanel

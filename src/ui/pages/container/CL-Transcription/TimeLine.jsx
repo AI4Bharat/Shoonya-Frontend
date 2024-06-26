@@ -68,7 +68,7 @@ const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
   return <div className={classes.waveform} ref={$waveform} />;
 });
 
-const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
+const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId, updatedProjectData, setupdatedProjectData, stage}) => {
   const classes = AudioTranscriptionLandingStyle();
   const firstLoaded = useRef(false);
   const dispatch = useDispatch();
@@ -77,8 +77,8 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
   const limit = useSelector((state) => state.commonReducer.limit);
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
 
-  const sub = useSelector((state) => state.commonReducer?.subtitles);
-
+  const subtitles = useSelector((state) => state.commonReducer?.subtitles);
+  const sub = stage===3? updatedProjectData : subtitles;
   // console.log(taskDetails)
 
   const [grabbing, setGrabbing] = useState(false);
@@ -169,9 +169,37 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
         {sub != undefined //TODO check if the Semantic (L2) transcription box is empty for Supercheckers/Reviewers of internal language
           ? sub.map((item, index) => {
               const { duration } = player;
-              // console.log(item)
+              console.log("duration: "+item.duration);
+              console.log("starttime: "+item.startTime)
+              console.log("starttime: "+item.endTime)
+              const itemDuration = (DT.t2d(item.end_time) - DT.t2d(item.start_time))
+              console.log("item duration: "+itemDuration);
               return (
-                item.text === ''? 
+               
+                stage===3? (item.acoustic_standardized_text === ''? 
+                (
+                <span
+                  key={index}
+                  className={classes.item}
+                  style={{
+                    left: `${(item.startTime / duration) * 100}%`,
+                    width: `${(itemDuration / duration) * 100}%`,
+                  }}
+                /> 
+              ):
+               (
+                 <span
+                  key={index}
+                  className={classes.item_completed}
+                  style={{
+                    left: `${(item.startTime / duration) * 100}%`,
+                    width: `${(itemDuration / duration) * 100}%`,
+                  }}
+                />
+              ) 
+              ): 
+                (item.text === ''? 
+                (
                 <span
                   key={index}
                   className={classes.item}
@@ -179,7 +207,9 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
                     left: `${(item.startTime / duration) * 100}%`,
                     width: `${(item.duration / duration) * 100}%`,
                   }}
-                /> :
+                /> 
+              ):
+                (
                 <span
                   key={index}
                   className={classes.item_completed}
@@ -188,6 +218,8 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
                     width: `${(item.duration / duration) * 100}%`,
                   }}
                 />
+              )
+            )
               );
             })
           : null}
@@ -293,7 +325,7 @@ const Duration = memo(({ currentTime }) => {
   );
 });
 
-const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
+const Timeline = ({ currentTime, playing ,taskID, waveformSettings, updatedProjectData, setupdatedProjectData, stage }) => {
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
   const player = useSelector((state) => state.commonReducer.player);
@@ -342,7 +374,7 @@ const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
       {player &&
           (
           <>
-            <Progress waveform={waveform} currentTime={currentTime} taskId={taskID}/>
+            <Progress waveform={waveform} currentTime={currentTime} taskId={taskID} updatedProjectData={updatedProjectData} setupdatedProjectData={setupdatedProjectData} stage={stage}/>
             <Duration currentTime={currentTime} />
             <WaveForm setWaveform={setWaveform} setRender={setRender} waveformSettings={waveformSettings} />
             <Grab waveform={waveform} />
@@ -352,6 +384,9 @@ const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
               playing={playing}
               currentTime={currentTime}
               duration={player.duration}
+              updatedProjectData={updatedProjectData}
+              setupdatedProjectData={setupdatedProjectData}
+              stage={stage}
             />
           </>
         )}
