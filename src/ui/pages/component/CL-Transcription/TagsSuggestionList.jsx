@@ -34,7 +34,7 @@ const TagsSuggestionList = React.forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const classes = AudioTranscriptionLandingStyle();
   const handleTagClick = (suggestion) => {
-    const modifiedText = `${textWithoutTripleDollar}[${suggestion}]${textAfterTripleDollar}`;
+    const modifiedText = `${textWithoutTripleDollar}<${suggestion}>${textAfterTripleDollar}`;
 
     const sub = onSubtitleChange(modifiedText, index, tagSuggestionsAcoustic);
     dispatch(setSubtitles(sub, C.SUBTITLES));
