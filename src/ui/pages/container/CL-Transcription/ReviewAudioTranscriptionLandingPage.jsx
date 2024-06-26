@@ -53,7 +53,6 @@ import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
 import { Tab, Tabs } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 
-
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
@@ -90,9 +89,12 @@ const ReviewAudioTranscriptionLandingPage = () => {
     targetlang: "en",
     fontSize: "Normal"
   });
+  const [updatedProjectData, setUpdatedProjectData] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
   const[taskDetailList,setTaskDetailList] = useState()
+  
+
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -1445,6 +1447,8 @@ useEffect(() => {
           waveSurfer={waveSurfer}
           setWaveSurfer={setWaveSurfer}
           annotationId={annotations[0]?.id}
+          updatedProjectData={updatedProjectData}
+          setUpdatedProjectData={setUpdatedProjectData}
         /> 
          : 
          <TranscriptionRightPanel
