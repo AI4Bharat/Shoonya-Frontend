@@ -317,7 +317,7 @@ const TranscriptionRightPanel = ({
 
     let splitText = value.split(" ");
     let invalidCharFlag = 0;
-    splitText.forEach((e) => {
+    splitText.slice(0,-1).forEach((e) => {
         let wordSet = new Set(e);
         if(([...wordSet].every(char => langDictSet.has(char)) || RegExp("\<[a-zA-Z\s,_]+\>").test(e) || RegExp("\[a-zA-Z]\]").test(e)) === false){
           invalidCharFlag = 1;
