@@ -67,6 +67,9 @@ const Header = () => {
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const [showTransliterationModel, setShowTransliterationModel] =
     useState(false);
+
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -758,6 +761,17 @@ console.log(unseenNotifications,'uuu');
     //   onclick: () => {},
     // },
   ];
+
+  if (ProjectDetails?.project_type?.includes("ContextualTranslationEditing")) {
+    appSettings.splice(1, 0, {
+      name: "Romanised Transliteration",
+      onclick: () => {
+        handleCloseSettingsMenu(); 
+        localStorage.setItem("showRomanisedTransliterationModel", "true" );
+      },
+    });
+  }
+  
   const helpMenu = [
     {
       name: "Help",

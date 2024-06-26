@@ -99,6 +99,7 @@ const StandarisedisedTranscriptionEditing = ({
     ?.organization?.id;
   const subtitles = useSelector((state) => state.commonReducer.subtitles);
   console.log(subtitles);
+  console.log(subtitles);
   const player = useSelector((state) => state.commonReducer.player);
   const currentPage = useSelector((state) => state.commonReducer.currentPage);
 

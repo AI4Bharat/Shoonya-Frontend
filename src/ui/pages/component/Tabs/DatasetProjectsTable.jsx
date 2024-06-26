@@ -16,6 +16,7 @@ import Search from "../../component/common/Search";
 import { Grid, Stack, ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import { width } from "@mui/system";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const columns = [
 	{
@@ -179,6 +180,9 @@ export default function DatasetProjectsTable({ datasetId }) {
 			});
 		}
 	};
+	const loggedInUserData = useSelector(
+        (state) => state.fetchLoggedInUserData.data
+      );
 	const renderSnackBar = () => {
 		return (
 			<CustomizedSnackbars
@@ -203,7 +207,7 @@ export default function DatasetProjectsTable({ datasetId }) {
 					>
 						<CustomButton sx={{ borderRadius: 2 }} label="View" />
 					</Link>
-					<CustomButton sx={{ borderRadius: 2, height: 37 }} onClick={() => getExportProjectButton(project)} label="Export" />
+					{userRole.Admin === loggedInUserData?.role ?<CustomButton sx={{ borderRadius: 2, height: 37 }} onClick={() => getExportProjectButton(project)} label="Export" />:null}
 					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" />
 				</Stack>
 			),

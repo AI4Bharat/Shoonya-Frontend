@@ -230,8 +230,8 @@ export const onSplit = (
   );
   console.log("Second Split Subtitle:", copySub[currentIndex + 1]);
 
-  return copySub;
-};
+    return copySub;
+  };
 
 
 export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic, stage, updatedProjectData) => {
