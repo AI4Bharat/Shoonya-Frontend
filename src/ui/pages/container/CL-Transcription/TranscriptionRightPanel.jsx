@@ -314,13 +314,12 @@ const TranscriptionRightPanel = ({
     } = event;
 
     let langDictSet = new Set(langDict[targetlang]);
-    let langDictSetEn = new Set(langDict["en"]);
 
     let splitText = value.split(" ");
     let invalidCharFlag = 0;
-    splitText.forEach((e, i) => {
-        // splitText[i] = [...e].map(char => (langDictSet.has(char) || langDictSetEn.has(char)) ? char : '').join('');
-        if(([...e].map(char => (langDictSet.has(char) || langDictSetEn.has(char)) ? 1 : 0).join('')).search(0) !== -1){
+    splitText.forEach((e) => {
+        let wordSet = new Set(e);
+        if(([...wordSet].every(char => langDictSet.has(char)) || RegExp("\<[a-zA-Z\s,_]+\>").test(e) || RegExp("\[a-zA-Z]\]").test(e)) === false){
           invalidCharFlag = 1;
         }
     });
