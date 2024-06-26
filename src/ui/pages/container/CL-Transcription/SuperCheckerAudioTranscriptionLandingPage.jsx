@@ -96,6 +96,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   });
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
+  const [updatedProjectData, setUpdatedProjectData] = useState([]);
 
   let labellingMode = localStorage.getItem("labellingMode");
   // const subs = useSelector((state) => state.commonReducer.subtitles);
@@ -902,7 +903,9 @@ useEffect(() => {
 const [tabValue, setTabValue] = useState(0);
   const handleTabChange = (e, v) => {
     e.preventDefault()
+    console.log("tabvalue: "+tabValue);
     setTabValue(v);
+    console.log(tabValue);
   }
 useEffect(() => {
   const handleKeyDown = (event) => {
@@ -1262,7 +1265,7 @@ useEffect(() => {
           player={player}
           ProjectDetails={ProjectDetails}
           TaskDetails={taskDetailList}
-          stage={ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2 ? tabValue+2 : 3}
+          stage={ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2 ? tabValue+2:3}
           tabValue={tabValue}
           handleStdTranscriptionSettings={setStdTranscriptionSettings}
           advancedWaveformSettings={advancedWaveformSettings}
@@ -1270,6 +1273,8 @@ useEffect(() => {
           waveSurfer={waveSurfer}
           setWaveSurfer={setWaveSurfer}
           annotationId={annotations[0]?.id}
+          updatedProjectData= {updatedProjectData}
+          setUpdatedProjectData = {setUpdatedProjectData}
         /> 
          : 
          <TranscriptionRightPanel
@@ -1297,7 +1302,7 @@ useEffect(() => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} />}
+        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} updatedProjectData={updatedProjectData} setUpdatedProjectData={setUpdatedProjectData} stage={ ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2 ? tabValue+2:3}/>}
       </Grid>
     </>
   );

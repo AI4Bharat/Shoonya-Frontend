@@ -23,6 +23,7 @@ export const hasSub = (sub, type) => {
 
 export const copySubs = () => {
   const subtitles = store.getState().commonReducer.subtitles;
+  console.log(subtitles)
   return formatSub(subtitles);
 };
 
@@ -83,62 +84,71 @@ export const timeChange = (value, index, type, time) => {
   return copySub;
 };
 
-export const addSubtitleBox = (index) => {
+export const addSubtitleBox = (index, stage, updatedProjectData) => {
   const subtitles = store.getState().commonReducer.subtitles;
-
-  const copySub = [...subtitles];
-
+  const copySub = stage === 3 ? [...updatedProjectData] : [...subtitles];
+  console.log(copySub);
+  console.log(stage);
+  console.log(updatedProjectData)
+  console.log(copySub[index]);
   const duration = DT.t2d(copySub[index].end_time);
-
+  console.log(duration)
+  console.log(copySub[index].end_time)
   copySub.splice(
     index + 1,
     0,
     newSub({
       start_time: copySub[index].end_time,
       end_time:
-        index < subtitles?.length - 1
+        index < (stage === 3 ? updatedProjectData.length : subtitles.length) - 1
           ? copySub[index + 1].start_time
           : DT.d2t(duration + 0.5),
       text: "",
       speaker_id: "",
       target_text: "",
+      acoustic_normalised_text: "",
+      acoustic_standardized_text: "",
     })
   );
-
+  console.log(copySub)
   return copySub;
 };
 
-export const onMerge = (index) => {
+
+export const onMerge = (index, stage, updatedProjectData) => {
+  console.log(index);
   const subtitles = store.getState().commonReducer.subtitles;
-
-  const existingsourceData = [...subtitles];
-
-  existingsourceData.splice(
+  const existingSourceData = stage === 3 ? [...updatedProjectData] : [...subtitles];
+  console.log(existingSourceData);
+  console.log(existingSourceData[index+1]);
+  existingSourceData.splice(
     index,
     2,
     newSub({
-      id: existingsourceData[index].id,
-      start_time: existingsourceData[index].start_time,
-      end_time: existingsourceData[index + 1].end_time,
-      text: `${existingsourceData[index].text} ${existingsourceData[index + 1].text
-        }`,
-      target_text: `${existingsourceData[index].target_text} ${existingsourceData[index + 1].target_text
-        }`,
-      acoustic_normalised_text: `${existingsourceData[index].acoustic_normalised_text} ${existingsourceData[index + 1].acoustic_normalised_text
-        }`,
+      id: existingSourceData[index].id || "",
+      start_time: existingSourceData[index].start_time,
+      end_time: existingSourceData[index + 1].end_time,
+      text: `${existingSourceData[index].text} ${existingSourceData[index + 1].text || ""}`,
+      target_text: `${existingSourceData[index].target_text} ${existingSourceData[index + 1].target_text || ""}`,
+      acoustic_normalised_text: `${existingSourceData[index].acoustic_normalised_text} ${existingSourceData[index + 1].acoustic_normalised_text || ""}`,
+      acoustic_standardized_text: `${existingSourceData[index].acoustic_standardized_text || ""} ${existingSourceData[index + 1].acoustic_standardized_text || ""}`,
       speaker_id: "",
-    })
+    })    
   );
 
-  return existingsourceData;
+  return existingSourceData;
 };
 
-export const onSubtitleDelete = (index) => {
+
+export const onSubtitleDelete = (index, stage, updatedProjectData) => {
+  console.log(index);
+  console.log(stage);
+  console.log(updatedProjectData);
   const subtitles = store.getState().commonReducer.subtitles;
-
-  const copySub = [...subtitles];
+  const copySub = stage===3? [...updatedProjectData] : [...subtitles];
+  console.log(copySub);
   copySub.splice(index, 1);
-
+  console.log(copySub);
   return copySub;
 };
 
@@ -153,9 +163,9 @@ export const onSplit = (
   const subtitles = store.getState().commonReducer.subtitles;
   console.log("Subtitles:", subtitles);
   console.log("Stage:", stage);
-  const copySub = [...subtitles];
+  const copySub = stage === 3? [...updatedProjectData]:[...subtitles];
   const targetTextBlock = stage === 3 ? updatedProjectData[currentIndex] : subtitles[currentIndex];
-  const index = hasSub(subtitles[currentIndex], subtitles);
+  const index = stage === 3 ? currentIndex :  hasSub(subtitles[currentIndex], subtitles);
   console.log("Target Text Block:", targetTextBlock);
 
   const duration = DT.t2d(targetTextBlock.end_time) - DT.t2d(targetTextBlock.start_time);
@@ -251,7 +261,7 @@ console.log(sub);
       element.text = text;
     }
   }); */
-
+  console.log(copySub)
   return copySub;
 };
 
@@ -333,26 +343,28 @@ export const placementMenu = [
 export const onUndoAction = (lastAction) => {
   const subtitles = store.getState().commonReducer.subtitles;
 
-  const { type, index, selectionStart, targetSelectionStart, timings, data } =
+  const { type, index, selectionStart, targetSelectionStart, timings, data, stage, updatedProjectData } =
     lastAction;
-
+  console.log("the last action: " + lastAction);
   switch (type) {
     case "merge":
       return (
-        onSplit(index, selectionStart, timings, targetSelectionStart) ||
+        onSplit(index, selectionStart, stage, updatedProjectData, timings, targetSelectionStart) ||
         subtitles
       );
 
     case "split":
-      return onMerge(index) || subtitles;
+      return onMerge(index, stage, updatedProjectData) || subtitles;
 
     case "delete":
-      const copySub = copySubs();
+      console.log("udpatedprojdta:" + updatedProjectData)
+      const copySub =stage===3? updatedProjectData:  copySubs();
       copySub.splice(index, 0, data);
+      console.log("copysub: " + copySub)
       return copySub;
 
     case "add":
-      return onSubtitleDelete(index + 1);
+      return onSubtitleDelete(index + 1, stage, updatedProjectData);
 
     default:
       return subtitles;
@@ -360,25 +372,26 @@ export const onUndoAction = (lastAction) => {
 };
 
 export const onRedoAction = (lastAction) => {
-  const subtitles = store.getState().commonReducer.subtitles;
-  const { type, index, selectionStart, targetSelectionStart, timings } =
+  const { type, index, selectionStart, targetSelectionStart, timings, stage, updatedProjectData } =
     lastAction;
+  const subtitles = stage===3? updatedProjectData : store.getState().commonReducer.subtitles;
+  
 
   switch (type) {
     case "merge":
-      return onMerge(index) || subtitles;
+      return onMerge(index, stage, updatedProjectData) || subtitles;
 
     case "split":
       return (
-        onSplit(index, selectionStart, timings, targetSelectionStart) ||
+        onSplit(index, selectionStart,stage, updatedProjectData, timings, targetSelectionStart) ||
         subtitles
       );
 
     case "delete":
-      return onSubtitleDelete(index);
+      return onSubtitleDelete(index, stage, updatedProjectData);
 
     case "add":
-      return addSubtitleBox(index);
+      return addSubtitleBox(index, stage, updatedProjectData);
 
     default:
       return subtitles;
@@ -443,20 +456,32 @@ export const isPlaying = (player) => {
   );
 };
 
-export const getSelectionStart = (index) => {
-  const subtitles = store.getState().commonReducer.subtitles;
-  console.log(subtitles)
-  return subtitles[index].text.length;
+export const getSelectionStart = (index, stage, updatedProjectData) => {
+  console.log("index: "+ index);
+  console.log("stage: "+ stage);
+  console.log("updatedprojectdata: "+updatedProjectData)
+  const subtitles = stage === 3 ? updatedProjectData : store.getState().commonReducer.subtitles;
+  console.log("subtitles: "+subtitles);
+  console.log("acc stand text: " + subtitles[index].acoustic_standardized_text);
+  if (stage === 3) {
+    return subtitles[index].acoustic_standardized_text.length;
+  } else {
+    return subtitles[index].text.length;
+  }
 };
+
 
 export const getTargetSelectionStart = (index) => {
   const subtitles = store.getState().commonReducer.subtitles;
   return subtitles[index].target_text.length;
 };
 
-export const getTimings = (index) => {
-  const subtitles = store.getState().commonReducer.subtitles;
-
+export const getTimings = (index, stage, updatedProjectData) => {
+  console.log("index: "+ index);
+  console.log("stage: "+ stage);
+  console.log("updatedprojectdata: "+updatedProjectData)
+  const subtitles = stage === 3 ? updatedProjectData : store.getState().commonReducer.subtitles;
+  console.log("subtitles: "+subtitles);
   const timings = [
     {
       start: subtitles[index].start_time,
@@ -467,19 +492,25 @@ export const getTimings = (index) => {
       end: subtitles[index + 1]?.end_time,
     },
   ];
-
+  console.log("timings: "+timings)
   return timings;
 };
 
-export const getItemForDelete = (index) => {
-  const subtitles = store.getState().commonReducer.subtitles;
+
+export const getItemForDelete = (index, stage, updatedProjectData) => {
+  console.log("index: "+ index);
+  console.log("stage: " + stage)
+  console.log("updatedprojdatad: "+updatedProjectData)
+  const subtitles = stage===3 ? updatedProjectData : store.getState().commonReducer.subtitles;
+  console.log("subtitles: "+subtitles)
   const data = subtitles[index];
+  console.log("data : "+data)
 
   return data;
 };
 
-export const assignSpeakerId = (id, index) => {
-  const subtitles = store.getState().commonReducer.subtitles;
+export const assignSpeakerId = (id, index, stage,updatedProjectData) => {
+  const subtitles = stage===3? updatedProjectData: store.getState().commonReducer.subtitles;
   const copySub = [...subtitles];
   copySub[index].speaker_id = id;
 

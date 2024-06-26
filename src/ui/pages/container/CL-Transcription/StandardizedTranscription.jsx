@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef, memo } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { Resizable } from 're-resizable';
 import {
   addSubtitleBox,
@@ -85,6 +85,8 @@ const StandarisedisedTranscriptionEditing = ({
   waveSurfer,
   setWaveSurfer,
   annotationId,
+  updatedProjectData, 
+  setUpdatedProjectData
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -260,9 +262,13 @@ const StandarisedisedTranscriptionEditing = ({
 
   const onMergeClick = useCallback(
     (index) => {
-      const selectionStart = getSelectionStart(index);
-      const timings = getTimings(index);
-
+      console.log(stage);
+      console.log(updatedProjectData);
+      const selectionStart = getSelectionStart(index, stage, updatedProjectData);
+      console.log("selectionstart: "+selectionStart)
+      const timings = getTimings(index, stage, updatedProjectData);
+      console.log("timings: "+timings)
+  
       setUndoStack((prevState) => [
         ...prevState,
         {
@@ -270,17 +276,28 @@ const StandarisedisedTranscriptionEditing = ({
           index: index,
           timings,
           selectionStart,
+          stage: stage,
+          updatedProjectData: updatedProjectData
         },
       ]);
       setRedoStack([]);
-
-      const sub = onMerge(index);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+  
+      const sub = onMerge(index, stage, updatedProjectData);
+      console.log(sub);
+      if(stage==3){
+        const updatedData = [...updatedProjectData];
+        updatedData.splice(index, 2, sub[index])
+        setUpdatedProjectData(updatedData)
+      }
+      else{
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+      
       // saveTranscriptHandler(false, true, sub);
     },
-    // eslint-disable-next-line
-    [limit, currentOffset]
+    [limit, currentOffset, stage, updatedProjectData]
   );
+  
 
   const onMouseUp = (e, blockIdx) => {
     if (e.target.selectionStart < e.target.value?.length) {
@@ -292,36 +309,62 @@ const StandarisedisedTranscriptionEditing = ({
   };
 
   const onSplitClick = useCallback(() => {
-    setUndoStack((prevState) => [
-      ...prevState,
-      {
-        type: "split",
-        index: currentIndexToSplitTextBlock,
-        selectionStart,
-      },
-    ]);
-  
-    setRedoStack([]);
-  
     console.log(stage);
     console.log(updatedProjectData);
   
     const newSubtitles = onSplit(currentIndexToSplitTextBlock, selectionStart, stage, updatedProjectData);
-    console.log(newSubtitles);
-    console.log(currentIndexToSplitTextBlock);
-
-    if (stage === 3) {
-      const updatedData = [...updatedProjectData];
-      updatedData[currentIndexToSplitTextBlock] = newSubtitles[currentIndexToSplitTextBlock];
-      updatedData.splice(currentIndexToSplitTextBlock + 1, 0, newSubtitles[currentIndexToSplitTextBlock + 1]);
-      setUpdatedProjectData(updatedData);
+  
+    if (newSubtitles.length > updatedProjectData.length) {
+      if (stage === 3) {
+        const updatedData = [...updatedProjectData];
+        updatedData[currentIndexToSplitTextBlock] = newSubtitles[currentIndexToSplitTextBlock];
+        updatedData.splice(currentIndexToSplitTextBlock + 1, 0, newSubtitles[currentIndexToSplitTextBlock + 1]);
+        console.log(updatedData); // Log updated data to confirm changes
+  
+        
+          // Update the undo stack within the state setter
+          setUndoStack((prevState) => [
+            ...prevState,
+            {
+              type: "split",
+              index: currentIndexToSplitTextBlock,
+              selectionStart,
+              stage: stage,
+              updatedProjectData: updatedData,
+            },
+          ]);
+        setUpdatedProjectData(updatedData);
+        // dispatch(setSubtitles(updatedData, C.SUBTITLES));
+       
+      } else {
+        dispatch(setSubtitles(newSubtitles, C.SUBTITLES));
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "split",
+            index: currentIndexToSplitTextBlock,
+            selectionStart,
+            stage: stage,
+            // updatedProjectData: newSubtitles,
+          },
+        ]);
+      }
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: "The split duration is too less",
+        variant: "info",
+      });
     }
-    else {
-      dispatch(setSubtitles(newSubtitles, C.SUBTITLES));
-    }
+  
+    setRedoStack([]);
   
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
+  
+  useEffect(() => {
+    console.log(updatedProjectData); // This should show the updated length
+  }, [updatedProjectData]);
   
 
  
@@ -355,21 +398,22 @@ const StandarisedisedTranscriptionEditing = ({
       setTagSuggestionsAcoustic(updateAcoustic);
     }
     const sub = onSubtitleChange(value, index, updateAcoustic, false, stage, updatedProjectData);
-    console.log(sub);
     if(stage === 3){
-      const updatedData = sub;
+      const updatedData = [...updatedProjectData];
       console.log(updatedData);
       console.log(index);
       console.log(value);
-      
+      updatedData[index].acoustic_standardized_text = sub[index].acoustic_standardized_text
       setUpdatedProjectData(updatedData)
     }
-    dispatch(setSubtitles(sub, C.SUBTITLES));
+    else{
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+    }
     // saveTranscriptHandler(false, false, sub);
   };
 
   const populateAcoustic = (index) => {
-    const sub = onSubtitleChange("", index, false, true, stage, updatedProjectData);
+    const sub = onSubtitleChange("", index, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
 
@@ -436,42 +480,80 @@ const StandarisedisedTranscriptionEditing = ({
 
   const onDelete = useCallback(
     (index) => {
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "delete",
-          index: index,
-          data: getItemForDelete(index),
-        },
-      ]);
-      setRedoStack([]);
+      console.log("index: "+ index);
+  console.log("stage: " + stage)
+  console.log("updatedprojdatad: "+updatedProjectData)
+  const data = getItemForDelete(index, stage, updatedProjectData);
+      
+      const sub = onSubtitleDelete(index, stage, updatedProjectData)
+      
+      console.log(sub);
 
-      const sub = onSubtitleDelete(index);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+      if (stage === 3) {
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "delete",
+            index: index,
+            data: data,
+            stage: stage,
+            updatedProjectData: sub,
+          },
+        ]);
+        setRedoStack([]);
+        setUpdatedProjectData(sub);
+        console.log(updatedProjectData)
+      }
+      else{
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "delete",
+            index: index,
+            data: data,
+            // stage: stage,
+            // updatedProjectData: updatedProjectData,
+          },
+        ]);
+        setRedoStack([]);
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+
+   
       // saveTranscriptHandler(false, false, sub);
     },
     // eslint-disable-next-line
-    [limit, currentOffset]
+    [limit, currentOffset, stage, updatedProjectData, dispatch, setUpdatedProjectData, setUndoStack, setRedoStack]
   );
 
   const addNewSubtitleBox = useCallback(
     (index) => {
-      const sub = addSubtitleBox(index);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-      // saveTranscriptHandler(false, false, sub);
-
+      const sub = addSubtitleBox(index, stage, updatedProjectData);
+  
+      if (stage === 3) {
+        const updatedData = [...updatedProjectData];
+        updatedData.splice(index + 1, 0, sub[index + 1]);
+        setUpdatedProjectData(updatedData);
+      } else {
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+  
+      // Add to undo stack
       setUndoStack((prevState) => [
         ...prevState,
         {
           type: "add",
           index: index,
+          stage:stage,
+          updatedProjectData: updatedProjectData,
         },
       ]);
+  
+      // Clear redo stack
       setRedoStack([]);
     },
-    // eslint-disable-next-line
-    [limit, currentOffset]
-  );
+    [stage, updatedProjectData, dispatch, setUpdatedProjectData, setUndoStack, setRedoStack]
+  );  
 
   const onUndo = useCallback(() => {
     if (undoStack?.length > 0) {
@@ -480,7 +562,14 @@ const StandarisedisedTranscriptionEditing = ({
 
       // modifing subtitles based on last action
       const sub = onUndoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+      console.log("after undo is performed" + sub);
+      if(stage===3){
+        setUpdatedProjectData(sub);
+      }
+      else{
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+      
 
       //removing the last action from undo and putting in redo stack
       setUndoStack(undoStack.slice(0, undoStack?.length - 1));
@@ -497,7 +586,13 @@ const StandarisedisedTranscriptionEditing = ({
 
       // modifing subtitles based on last action
       const sub = onRedoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+      console.log("after redo stack: "+ sub);
+      if(stage === 3){
+        setUpdatedProjectData(sub);
+      }
+      else{
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
 
       //removing the last action from redo and putting in undo stack
       setRedoStack(redoStack.slice(0, redoStack?.length - 1));
@@ -518,8 +613,14 @@ const StandarisedisedTranscriptionEditing = ({
   };
 
   const handleSpeakerChange = (id, index) => {
-    const sub = assignSpeakerId(id, index);
-    dispatch(setSubtitles(sub, C.SUBTITLES));
+    const sub = assignSpeakerId(id, index, stage, updatedProjectData);
+    console.log(sub);
+    if(stage===3){
+      setUpdatedProjectData(sub)
+    }else{
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+    }
+    
     // saveTranscriptHandler(false, false, sub);
   };
 
@@ -565,16 +666,13 @@ const StandarisedisedTranscriptionEditing = ({
     return () => clearTimeout(timer);
   }, []);
 
-// Initialize updatedProjectData state
-const [updatedProjectData, setUpdatedProjectData] = useState([]);
-
 useEffect(() => {
   if (currentPageData?.length && stage===3 ) {
     setUpdatedProjectData([{
       start_time: currentPageData[0].start_time,
       end_time: currentPageData[currentPageData.length - 1].end_time,
       text: currentPageData[0].text,
-      acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+      acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData[0].acoustic_normalised_text,
     
     }]);
   }
@@ -588,19 +686,25 @@ console.log(updatedProjectData)
 const onMergeClickL3 = useCallback(()=>{
   // merge the transcription L2 into L3 
   if (currentPageData?.length && stage===3) {
+    console.log(currentPageData);
+    console.log(stage)
+    console.log(updatedProjectData)
     setUpdatedProjectData([{
       start_time: currentPageData[0].start_time,
       end_time: currentPageData[currentPageData.length - 1].end_time,
-      text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData[0].acoustic_normalised_text,
-      l3Text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+      text: currentPageData[0].text,
+      acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+    
     }]);
+
+    console.log(updatedProjectData);
   }
-}, [currentPageData, stage]); 
+}, [currentPageData, stage, updatedProjectData]); 
 
 useEffect(() => {
   setSelectedSpeaker(speakerIdList?.[0]?.name);
 }, [stage]);
-  
+  console.log("stage : " + stage);
   return (
     <>
       {" "}
@@ -613,7 +717,7 @@ useEffect(() => {
         >
           <Grid className={classes.rightPanelParentGrid}>
             <SettingsButtonComponent
-              totalSegments={totalSegments}
+              totalSegments={stage ===3? updatedProjectData.length : totalSegments}
               setTransliteration={setTransliteration}
               enableTransliteration={enableTransliteration}
               setRTL_Typing={setRTL_Typing}
@@ -1071,7 +1175,7 @@ useEffect(() => {
                       {showAdditionalOptions && 
                         <ButtonComponent
                           index={index + idxOffset}
-                          lastItem={(index + idxOffset) < subtitles?.length - 1}
+                          lastItem={(index + idxOffset) < updatedProjectData?.length - 1}
                           onMergeClick={onMergeClick}
                           onDelete={onDelete}
                           addNewSubtitleBox={addNewSubtitleBox}
@@ -1108,10 +1212,10 @@ useEffect(() => {
                         false ? (
                         <IndicTransliterate
                           lang={targetlang}
-                          value={item.acoustic_standardized_text}
                           onChange={(event) => {
                             changeTranscriptHandler(event, index + idxOffset, 2);
                           }}
+                          value={item.acoustic_standardized_text}
                           enabled={enableTransliterationSuggestion}
                           onChangeText={() => { }}
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
@@ -1151,7 +1255,7 @@ useEffect(() => {
                           <textarea
                             // ref={el => textRefs.current[index] = el}
                             // onChange={(event) => {
-                            onInput={(event) => {
+                            onChange={(event) => {
                               changeTranscriptHandler(event, index + idxOffset, 2);
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
