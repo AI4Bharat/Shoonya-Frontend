@@ -314,12 +314,12 @@ const TranscriptionRightPanel = ({
     } = event;
 
     let langDictSet = new Set(langDict[targetlang]);
-
-    let splitText = value.split(" ");
+    let replacedValue = value.replace(/\[[a-zA-Z]\]/g, '');
+    let splitText = replacedValue.split(" ");
     let invalidCharFlag = 0;
     splitText.forEach((e) => {
         let wordSet = new Set(e);
-        if(([...wordSet].every(char => langDictSet.has(char)) || RegExp("\<[a-zA-Z\s,_]+\>").test(e) || RegExp("\[a-zA-Z]\]").test(e) || RegExp("^[a-z]+$").test(e)) === false){
+        if(([...wordSet].every(char => langDictSet.has(char)) || RegExp("\<[a-zA-Z\s,_]+\>").test(e) || RegExp("^[a-z]+$").test(e)) === false){
           invalidCharFlag = 1;
         }
     });
