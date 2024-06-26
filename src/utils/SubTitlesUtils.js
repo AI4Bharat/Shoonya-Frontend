@@ -248,7 +248,7 @@ export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic, 
   });
   text = splitText.join(" ");
 
-  if (updateAcoustic === 1){
+  if (updateAcoustic === 1 || updateAcoustic === true){
     sub.acoustic_normalised_text = text;
   }
   else if (populateAcoustic) {
@@ -257,7 +257,7 @@ export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic, 
   else if(updateAcoustic === 2){
     sub.acoustic_standardized_text = text;
   }
-  else if(updateAcoustic === 0){
+  else {
     sub.text = text;
   }
   
