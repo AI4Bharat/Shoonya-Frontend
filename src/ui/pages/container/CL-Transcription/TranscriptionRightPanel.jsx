@@ -317,9 +317,9 @@ const TranscriptionRightPanel = ({
 
     let splitText = value.split(" ");
     let invalidCharFlag = 0;
-    splitText.slice(0,-1).forEach((e) => {
+    splitText.forEach((e) => {
         let wordSet = new Set(e);
-        if(([...wordSet].every(char => langDictSet.has(char)) || RegExp("\<[a-zA-Z\s,_]+\>").test(e) || RegExp("\[a-zA-Z]\]").test(e)) === false){
+        if(([...wordSet].every(char => langDictSet.has(char)) || RegExp("\<[a-zA-Z\s,_]+\>").test(e) || RegExp("\[a-zA-Z]\]").test(e) || RegExp("^[a-z]+$").test(e)) === false){
           invalidCharFlag = 1;
         }
     });
