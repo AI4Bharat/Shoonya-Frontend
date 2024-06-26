@@ -20,6 +20,7 @@ import {
   assignSpeakerId,
   // getTagsList,
 } from "../../../../utils/SubTitlesUtils";
+import { langDict } from "./langDict";
 
 //Styles
 // import "../../../styles/scrollbarStyle.css";
@@ -311,6 +312,26 @@ const TranscriptionRightPanel = ({
       target: { value },
       currentTarget,
     } = event;
+
+    let langDictSet = new Set(langDict[targetlang]);
+    let langDictSetEn = new Set(langDict["en"]);
+
+    let splitText = value.split(" ");
+    let invalidCharFlag = 0;
+    splitText.forEach((e, i) => {
+        // splitText[i] = [...e].map(char => (langDictSet.has(char) || langDictSetEn.has(char)) ? char : '').join('');
+        if(([...e].map(char => (langDictSet.has(char) || langDictSetEn.has(char)) ? 1 : 0).join('')).search(0) !== -1){
+          invalidCharFlag = 1;
+        }
+    });
+
+    if(invalidCharFlag){
+      setSnackbarInfo({
+        open: true,
+        message: "Characters belonging to other language are used",
+        variant: "error",
+      });
+    }
 
     const containsTripleDollar = value.includes("$$$");
 
