@@ -923,9 +923,8 @@ useEffect(() => {
         editedRomanisedText,
         output_lng_code
       );
-
-      const res = dispatch(APITransport(postTransliterationForLogging));
-      if(res){
+      const res = await dispatch(APITransport(postTransliterationForLogging));
+      if(res?.success){
         setRomanisedTransliterationData(
           {
             timestamp: '',
@@ -1317,11 +1316,11 @@ useEffect(() => {
           {tagSuggestionList}
         </Popover>
 
-        {!loader &&  showRomanisedTransliterationModel && 
+        {!loader &&  
           <RomanisedTransliteration
-            open = {localStorage.getItem("showRomanisedTransliterationModel") == "true"}
+            minimizeTextbox = {showRomanisedTransliterationModel}
             onClose = {() => {
-              setShowRomanisedTransliterationModel(false) 
+              setShowRomanisedTransliterationModel(!showRomanisedTransliterationModel) 
             }}
             setShowRomanisedTransliterationModel = {setShowRomanisedTransliterationModel}
             indicText={indicText}

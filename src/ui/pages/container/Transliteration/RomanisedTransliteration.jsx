@@ -8,10 +8,14 @@ import TransliterationAPI from "../../../../redux/actions/api/Transliteration/Tr
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from "react-redux";
 import {IconButton} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+// import CloseIcon from "@mui/icons-material/Close";
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import { useParams } from "react-router-dom";
+import Tooltip from "@mui/material/Tooltip";
+import { min } from "date-fns";
 const RomanisedTransliteration = (props) => { 
-  const { onCancelTransliteration, setShowRomanisedTransliterationModel,setIsSpaceClicked, indicText, originalRomanisedText,editedRomanisedText, handleEditableRomanisedText, showSpinner, handleTranslitrationOnClick, handleSubmitRomanisedText } = props;
+  const { setShowRomanisedTransliterationModel,minimizeTextbox,setIsSpaceClicked, indicText, originalRomanisedText,editedRomanisedText, handleEditableRomanisedText, showSpinner, handleTranslitrationOnClick, handleSubmitRomanisedText } = props;
   const params = useParams();
   const classes = GlobalStyles();
   const [text, setText] = useState("");
@@ -63,8 +67,7 @@ const RomanisedTransliteration = (props) => {
 
   
   const onCloseButtonClick = async () => {
-    localStorage.setItem("showRomanisedTransliterationModel", false);
-    setShowRomanisedTransliterationModel(false);
+    setShowRomanisedTransliterationModel(!minimizeTextbox);
   };
   const handleSnackBarClose = () => {
     setShowSnackBar({
@@ -89,7 +92,7 @@ const RomanisedTransliteration = (props) => {
     padding: "0.4rem 1rem", // Padding
     marginBottom: 2, // Margin bottom
   }}
-    >
+    > 
       <Grid
         container
         direction="row"
@@ -100,12 +103,14 @@ const RomanisedTransliteration = (props) => {
           marginBottom: 2,
         }}
       >
-        {/* <Typography variant="h5" style={{padding:"5px"}}></Typography> */}
         <h3 className="ant-typography" style={{"margin": "10px 0px"}}>Romanised Transliteration</h3>
-        <IconButton onClick={onCloseButtonClick} style={{ padding: "5px" }}>
-          <CloseIcon style={{ color: "red" }} />
-        </IconButton>
-        {/* <Typography><h3>Romanised Transliteration</h3></Typography> */}
+        <Tooltip title={minimizeTextbox ? "Expand" : "Minimize"}>
+          <IconButton onClick={onCloseButtonClick} color="primary" style={{ padding: "5px" }}>
+            {minimizeTextbox ? <OpenInFullIcon /> : <CloseFullscreenIcon />}
+          </IconButton>
+        </Tooltip>
+
+        {!minimizeTextbox && 
         <Grid item xs={12} style={{width:"400px"}} className="ant-form-item-control-input-content">
           <textarea rows="4" id="outlined-multiline-static"  
             className="ant-input is-search"
@@ -115,16 +120,10 @@ const RomanisedTransliteration = (props) => {
             onChange = {handleEditableRomanisedText}
           /> 
           </Grid> 
+        }
       </Grid>
 
-      {/* <IndicTransliterate
-        lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ? data[0]?.LangCode : "hi")}
-        value={text}
-        onChangeText={(val) => {
-          setText(val)
-        }}
-        renderComponent={(props) => renderTextarea(props)}
-      /> */}
+      {!minimizeTextbox &&
       <Grid
         container
         direction="row"
@@ -132,6 +131,7 @@ const RomanisedTransliteration = (props) => {
         alignItems="center"
         sx={{ padding: "1rem" }}
       >
+        
         <Button variant="contained" sx={{ mr: 2 }}  onClick={handleTranslitrationOnClick} disabled={!indicText || showSpinner}  >
           Check Transliteration
         </Button>
@@ -148,6 +148,7 @@ const RomanisedTransliteration = (props) => {
           message={showSnackBar.message}
         />
       </Grid>
+      }
     </Card>
   );
 };
