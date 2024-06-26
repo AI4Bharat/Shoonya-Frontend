@@ -335,7 +335,7 @@ const TranscriptionRightPanel = ({
       setCurrentSelection(event.target.selectionEnd);
       setTagSuggestionsAcoustic(updateAcoustic);
     }
-    const sub = onSubtitleChange(value, index, updateAcoustic, false);
+    const sub = onSubtitleChange(value, index, updateAcoustic, false, targetlang);
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };

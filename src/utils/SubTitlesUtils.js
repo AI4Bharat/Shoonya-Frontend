@@ -2,6 +2,7 @@ import Sub from "./Sub";
 import { getUpdatedTime } from "./utils";
 import DT from "duration-time-conversion";
 import store from "../redux/store/store";
+import { langDict } from "./langDict";
 // import { noiseTags } from "./TabsSuggestionData/NoiseTages";
 
 export const newSub = (item) => {
@@ -218,10 +219,19 @@ export const onSplit = (
   return copySub;
 };
 
-export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic) => {
+export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic, lang="en") => {
   const subtitles = store.getState().commonReducer.subtitles;
   const copySub = [...subtitles];
   const sub = copySub[index];
+
+  let langDictSet = new Set(langDict[lang]);
+  let langDictSetEn = new Set(langDict["en"]);
+
+  let splitText = text.split(" ");
+  splitText.forEach((e, i) => {
+      splitText[i] = [...e].map(char => (langDictSet.has(char) || langDictSetEn.has(char)) ? char : '').join('');
+  });
+  text = splitText.join(" ");
 
   if (updateAcoustic)
     sub.acoustic_normalised_text = text;
