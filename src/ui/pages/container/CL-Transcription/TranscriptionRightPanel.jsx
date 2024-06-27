@@ -156,6 +156,7 @@ const TranscriptionRightPanel = ({
   const textRefs = useRef([]);
   const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
   const [currentSelection, setCurrentSelection] = useState(null);
+  const langDictSet = new Set(langDict[targetlang]);
 
   useEffect(() => {
     currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
@@ -203,6 +204,39 @@ const TranscriptionRightPanel = ({
       subtitleScrollEle
         .querySelector(`#sub_${currentIndex}`)
         ?.scrollIntoView(true, { block: "start" });
+    }
+
+    if(currentIndex > startIndex){
+      const copySub = [...subtitles];
+      let sub = copySub[currentIndex-1]
+      let splitText = sub.text.split(" ");
+      let splitANText = sub.acoustic_normalised_text.split(" ");
+      let invalidCharFlag = 0;
+      splitText.slice(0,-1).forEach((e) => {
+        let wordSet = new Set(e);
+        if(([...wordSet].every(char => langDictSet.has(char))) === false){
+          invalidCharFlag = 1;
+          if(RegExp("\<[a-zA-Z\s,_]+\>").test(e)){
+            if(e.length > 2){
+              if(TabsSuggestionData.includes(e.slice(1,-1))){
+                invalidCharFlag = 0;
+      }}}}});
+      splitANText.slice(0,-1).forEach((e) => {
+        let wordSet = new Set(e);
+        if(([...wordSet].every(char => langDictSet.has(char))) === false){
+          invalidCharFlag = 1;
+          if(RegExp("\<[a-zA-Z\s,_]+\>").test(e)){
+            if(e.length > 2){
+              if(TabsSuggestionData.includes(e.slice(1,-1))){
+                invalidCharFlag = 0;
+      }}}}});
+      if(invalidCharFlag){
+        setSnackbarInfo({
+          open: true,
+          message: "Characters belonging to other language are used",
+          variant: "error",
+        });
+      }
     }
   }, [currentIndex]);
 
@@ -312,25 +346,6 @@ const TranscriptionRightPanel = ({
       target: { value },
       currentTarget,
     } = event;
-
-    let langDictSet = new Set(langDict[targetlang]);
-    let replacedValue = value.replace(/\[[a-zA-Z]\]/g, '');
-    let splitText = replacedValue.split(" ");
-    let invalidCharFlag = 0;
-    splitText.forEach((e) => {
-        let wordSet = new Set(e);
-        if(([...wordSet].every(char => langDictSet.has(char)) || RegExp("\<[a-zA-Z\s,_]+\>").test(e) || RegExp("^[a-z]+$").test(e)) === false){
-          invalidCharFlag = 1;
-        }
-    });
-
-    if(invalidCharFlag){
-      setSnackbarInfo({
-        open: true,
-        message: "Characters belonging to other language are used",
-        variant: "error",
-      });
-    }
 
     const containsTripleDollar = value.includes("$$$");
 
