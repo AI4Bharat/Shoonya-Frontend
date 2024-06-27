@@ -209,7 +209,7 @@ const TranscriptionRightPanel = ({
     if (currentIndex > startIndex) {
       const copySub = [...subtitles];
       let sub = copySub[currentIndex - 1]
-      let replacedValue = sub.text.replace(/\[[a-zA-Z]\]/g, '');
+      let replacedValue = sub.text.replace(/\[[a-zA-Z_]+\]/g, '');
       let splitText = replacedValue.split(" ");
       let invalidCharFlag = 0;
       splitText.slice(0, -1).forEach((e) => {
