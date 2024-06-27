@@ -209,8 +209,10 @@ const TranscriptionRightPanel = ({
     if(currentIndex > startIndex){
       const copySub = [...subtitles];
       let sub = copySub[currentIndex-1]
-      let splitText = sub.text.split(" ");
-      let splitANText = sub.acoustic_normalised_text.split(" ");
+      let replacedValue = sub.text.replace(/\[[a-zA-Z]\]/g, '');
+      let splitText = replacedValue.split(" ");
+      let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z]\]/g, '');
+      let splitANText = replacedANValue.split(" ");
       let invalidCharFlag = 0;
       splitText.slice(0,-1).forEach((e) => {
         let wordSet = new Set(e);
