@@ -211,12 +211,27 @@ const TranscriptionRightPanel = ({
       let sub = copySub[currentIndex - 1]
       let replacedValue = sub.text.replace(/\[[a-zA-Z]\]/g, '');
       let splitText = replacedValue.split(" ");
-      let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z]\]/g, '');
-      let splitANText = replacedANValue.split(" ");
       let invalidCharFlag = 0;
       splitText.slice(0, -1).forEach((e) => {
-        let wordSet = new Set(e);
-        if (([...wordSet].every(char => langDictSet.has(char))) === false) {
+        if (RegExp("\<[a-zA-Z\s,_]+\>").test(e)) {
+          if (e.length > 2) {
+            if (!TabsSuggestionData.includes(e.slice(1, -1))) {
+              invalidCharFlag = 1;
+            }
+          } else {
+            invalidCharFlag = 1;
+          }
+        }else{
+          let wordSet = new Set(e);
+          if (([...wordSet].every(char => langDictSet.has(char))) === false) {
+            invalidCharFlag = 1;
+          }
+        }
+      });
+      if(sub.acoustic_normalised_text.length > 0){
+        let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z]\]/g, '');
+        let splitANText = replacedANValue.split(" ");
+        splitANText.slice(0, -1).forEach((e) => {
           if (RegExp("\<[a-zA-Z\s,_]+\>").test(e)) {
             if (e.length > 2) {
               if (!TabsSuggestionData.includes(e.slice(1, -1))) {
@@ -226,26 +241,13 @@ const TranscriptionRightPanel = ({
               invalidCharFlag = 1;
             }
           } else {
-            invalidCharFlag = 1;
-          }
-        }
-      });
-      splitANText.slice(0, -1).forEach((e) => {
-        let wordSet = new Set(e);
-        if (([...wordSet].every(char => langDictSet.has(char))) === false) {
-          if (RegExp("\<[a-zA-Z\s,_]+\>").test(e)) {
-            if (e.length > 2) {
-              if (!TabsSuggestionData.includes(e.slice(1, -1))) {
-                invalidCharFlag = 1;
-              }
-            } else {
+            let wordSet = new Set(e);
+            if (([...wordSet].every(char => langDictSet.has(char))) === false) {
               invalidCharFlag = 1;
             }
-          } else {
-            invalidCharFlag = 1;
           }
-        }
-      });
+        });
+      }
       if (invalidCharFlag) {
         setSnackbarInfo({
           open: true,
