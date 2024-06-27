@@ -25,21 +25,28 @@ let AnnotationStatus = [
   "unlabeled",
   "skipped",
   "draft",
-  "labeled",
+  // "labeled",
   "to_be_revised",
 ];
 
 let ReviewStatus = [
   "unreviewed",
-  "accepted",
-  "accepted_with_minor_changes",
-  "accepted_with_major_changes",
+  // "accepted",
+  // "accepted_with_minor_changes",
+  // "accepted_with_major_changes",
   "to_be_revised",
   "draft",
   "skipped",
 ];
 
-let SuperChecker = ["unvalidated","validated","validated_with_changes","skipped","draft","rejected"];
+let SuperChecker = [
+  "unvalidated",
+  // "validated",
+  // "validated_with_changes",
+  "skipped",
+  "draft",
+  "rejected"
+];
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {

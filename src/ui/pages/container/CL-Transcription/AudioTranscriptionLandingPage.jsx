@@ -49,8 +49,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import configs from '../../../../config/config';
+import { Tab, Tabs } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
 
-const AudioTranscriptionLandingPage = () => {
+
+const AudioTranscriptionLandingPage = ({project_type}) => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -90,6 +94,7 @@ const AudioTranscriptionLandingPage = () => {
   const [annotationtext, setannotationtext] = useState('')
   const [reviewtext, setreviewtext] = useState('')
   const [taskData, setTaskData] = useState()
+  const [updatedProjectData, setUpdatedProjectData] = useState([]);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -139,6 +144,11 @@ const AudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
+  const [tabValue, setTabValue] = useState(0);
+  const handleTabChange = (e, v) => {
+    e.preventDefault()
+    setTabValue(v);
+  }
   const filterAnnotations = (annotations, user) => {
     let disableSkip = false;
     let disableUpdate = false;
@@ -846,6 +856,7 @@ const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
   "barHeight": waveSurferBarHeight
 });
 
+
 useEffect(() => {
   setWaveSurferWaveformSettings({
     "height": waveSurferHeight,
@@ -1212,7 +1223,39 @@ useEffect(() => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
-          <TranscriptionRightPanel
+          
+        {project_type && project_type === "StandardizedTranscriptionEditing" &&
+        <FormControl>
+            <Box sx={{mb:2,}} >
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+                    <Tab label="L1-L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage <=1  && 
+                    <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    }
+                </Tabs>
+            </Box>
+          </FormControl>
+        }
+
+        {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing" ?
+          <StandarisedisedTranscriptionEditing
+            currentIndex={currentIndex}
+            AnnotationsTaskDetails={AnnotationsTaskDetails}
+            player={player}
+            ProjectDetails={ProjectDetails}
+            TaskDetails={taskData}
+            stage={tabValue+2}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
+            advancedWaveformSettings={advancedWaveformSettings}
+            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
+            annotationId={annotations[0]?.id}
+            updatedProjectData={updatedProjectData}
+          setUpdatedProjectData={setUpdatedProjectData}
+          /> 
+         : 
+         <TranscriptionRightPanel
             currentIndex={currentIndex}
             AnnotationsTaskDetails={AnnotationsTaskDetails}
             player={player}
@@ -1226,6 +1269,8 @@ useEffect(() => {
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
+        }
+          
         </Grid>
       </Grid>
 

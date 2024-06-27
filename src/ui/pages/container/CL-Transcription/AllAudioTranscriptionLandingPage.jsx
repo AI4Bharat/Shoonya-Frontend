@@ -42,6 +42,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import configs from '../../../../config/config';
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
 
 const AllAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -146,16 +147,16 @@ const AllAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    let standardisedTranscription = "";
+    let standardizedTranscription = "";
 
     const sub = annotations[0]?.result.filter((item) => {
-      if ("standardised_transcription" in item) {
-        standardisedTranscription = item.standardised_transcription;
+      if ("standardized_transcription" in item) {
+        standardizedTranscription = item.standardized_transcription;
         return false;
       } else return true;
     }).map((item) => new Sub(item));
 
-    setStdTranscription(standardisedTranscription);
+    setStdTranscription(standardizedTranscription);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   }, [annotations]);
 
@@ -565,7 +566,7 @@ const AllAudioTranscriptionLandingPage = () => {
                       setShowNotes(false);
                     }}
                   >
-                    Standardised Transcription
+                    Standardized Transcription
                   </Button>
                 </Grid>}
             </Grid>
@@ -708,6 +709,26 @@ const AllAudioTranscriptionLandingPage = () => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
+
+          {ProjectDetails && ProjectDetails?.data?.project_type === "StandardizedTranscriptionEditing" ? 
+          <>
+          <StandarisedisedTranscriptionEditing
+            currentIndex={currentIndex}
+            AnnotationsTaskDetails={AnnotationsTaskDetails}
+            player={player}
+            ProjectDetails={ProjectDetails}
+            TaskDetails={taskData}
+            // stage={2}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
+            advancedWaveformSettings={advancedWaveformSettings}
+            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
+            annotationId={annotations[0]?.id}
+          /> 
+          </> 
+          :
+          <> 
           <TranscriptionRightPanel
             currentIndex={currentIndex}
             AnnotationsTaskDetails={AnnotationsTaskDetails}
@@ -722,6 +743,9 @@ const AllAudioTranscriptionLandingPage = () => {
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
+          </>
+          }
+         
         </Grid>
       </Grid>
 

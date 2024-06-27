@@ -435,7 +435,7 @@ const TaskTable = (props) => {
         props.type === "review" &&
           row.push(
             <Link
-              to={ProjectDetails?.project_type?.includes("Acoustic")
+              to={ProjectDetails?.project_type?.includes("Acoustic") || ProjectDetails?.project_type?.includes("StandardizedTranscriptionEditing")
               ? `ReviewAudioTranscriptionLandingPage/${el.id}` : `review/${el.id}`} className={classes.link}>
               <CustomButton
                 disabled={ ProjectDetails.is_archived}
