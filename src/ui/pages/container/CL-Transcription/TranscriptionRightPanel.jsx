@@ -213,7 +213,7 @@ const TranscriptionRightPanel = ({
       let splitText = replacedValue.split(" ");
       let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z]\]/g, '');
       let splitANText = replacedANValue.split(" ");
-      let invalidCharFlag = 0;
+      let invalidCharFlag = 0, invalidCharFlagAN = 0;
       splitText.slice(0,-1).forEach((e) => {
         let wordSet = new Set(e);
         if(([...wordSet].every(char => langDictSet.has(char))) === false){
@@ -226,13 +226,13 @@ const TranscriptionRightPanel = ({
       splitANText.slice(0,-1).forEach((e) => {
         let wordSet = new Set(e);
         if(([...wordSet].every(char => langDictSet.has(char))) === false){
-          invalidCharFlag = 1;
+          invalidCharFlagAN = 1;
           if(RegExp("\<[a-zA-Z\s,_]+\>").test(e)){
             if(e.length > 2){
               if(TabsSuggestionData.includes(e.slice(1,-1))){
-                invalidCharFlag = 0;
+                invalidCharFlagAN = 0;
       }}}}});
-      if(invalidCharFlag){
+      if(invalidCharFlag || invalidCharFlagAN){
         setSnackbarInfo({
           open: true,
           message: "Characters belonging to other language are used",
