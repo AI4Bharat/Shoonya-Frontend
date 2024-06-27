@@ -227,7 +227,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     }else{setTaskDetailList(resp);
-      if (resp?.data?.audio_duration < 700){
+      if (resp?.data?.audio_duration < 1000){
         setWaveSurfer(false);
       }else{
         setWaveSurfer(true);
