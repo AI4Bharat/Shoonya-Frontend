@@ -212,46 +212,53 @@ const TranscriptionRightPanel = ({
       let replacedValue = sub.text.replace(/\[[a-zA-Z_]+\]/g, '');
       let splitText = replacedValue.split(" ");
       let invalidCharFlag = 0;
-      splitText.slice(0, -1).forEach((e) => {
+      let invalidWords = [];
+      splitText.forEach((e) => {
         if (RegExp("\<[a-zA-Z\s,_]+\>").test(e)) {
           if (e.length > 2) {
             if (!TabsSuggestionData.includes(e.slice(1, -1))) {
               invalidCharFlag = 1;
-            }
+              invalidWords.push(e);
+          }
           } else {
             invalidCharFlag = 1;
+            invalidWords.push(e);
           }
         }else{
           let wordSet = new Set(e);
           if (([...wordSet].every(char => langDictSet.has(char))) === false) {
             invalidCharFlag = 1;
+            invalidWords.push(e);
           }
         }
       });
       if(sub.acoustic_normalised_text.length > 0){
         let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z]\]/g, '');
         let splitANText = replacedANValue.split(" ");
-        splitANText.slice(0, -1).forEach((e) => {
+        splitANText.forEach((e) => {
           if (RegExp("\<[a-zA-Z\s,_]+\>").test(e)) {
             if (e.length > 2) {
               if (!TabsSuggestionData.includes(e.slice(1, -1))) {
                 invalidCharFlag = 1;
-              }
+                invalidWords.push(e);
+          }
             } else {
               invalidCharFlag = 1;
-            }
+              invalidWords.push(e);
+          }
           } else {
             let wordSet = new Set(e);
             if (([...wordSet].every(char => langDictSet.has(char))) === false) {
               invalidCharFlag = 1;
-            }
+              invalidWords.push(e);
+          }
           }
         });
       }
       if (invalidCharFlag) {
         setSnackbarInfo({
           open: true,
-          message: "Characters belonging to other language are used",
+          message: "Characters belonging to other language are used: "+invalidWords.join(", "),
           variant: "error",
         });
       }
