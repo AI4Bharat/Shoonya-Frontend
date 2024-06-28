@@ -209,12 +209,12 @@ const TranscriptionRightPanel = ({
     if (currentIndex > startIndex) {
       const copySub = [...subtitles];
       let sub = copySub[currentIndex - 1]
-      let replacedValue = sub.text.replace(/\[[a-zA-Z_]+\]/g, '');
+      let replacedValue = sub.text.replace(/\[[a-zA-Z_-]+\]/g, '');
       let splitText = replacedValue.split(" ");
       let invalidCharFlag = 0;
       let invalidWords = [];
       splitText.forEach((e) => {
-        if (RegExp("\<[a-zA-Z\s,_]+\>").test(e)) {
+        if (RegExp("\<[a-zA-Z\s,_-]+\>").test(e)) {
           if (e.length > 2) {
             if (!TabsSuggestionData.includes(e.slice(1, -1))) {
               invalidCharFlag = 1;
@@ -236,7 +236,7 @@ const TranscriptionRightPanel = ({
         let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z]\]/g, '');
         let splitANText = replacedANValue.split(" ");
         splitANText.forEach((e) => {
-          if (RegExp("\<[a-zA-Z\s,_]+\>").test(e)) {
+          if (RegExp("\<[a-zA-Z\s,_-]+\>").test(e)) {
             if (e.length > 2) {
               if (!TabsSuggestionData.includes(e.slice(1, -1))) {
                 invalidCharFlag = 1;
