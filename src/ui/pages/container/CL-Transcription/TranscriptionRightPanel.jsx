@@ -233,7 +233,7 @@ const TranscriptionRightPanel = ({
         }
       });
       if(sub.acoustic_normalised_text.length > 0){
-        let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z]\]/g, '');
+        let replacedANValue = sub.acoustic_normalised_text.replace(/\[[a-zA-Z_-]+\]/g, '');
         let splitANText = replacedANValue.split(" ");
         splitANText.forEach((e) => {
           if (RegExp("\<[a-zA-Z\s,_-]+\>").test(e)) {
