@@ -20,7 +20,7 @@ import {
   Grid,
   Button,
   TextField,
-  Slider, Stack
+  Slider, Stack, CircularProgress
 } from "@mui/material";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -993,7 +993,7 @@ useEffect(() => {
               anchorEl={anchorEl}
               setAnchorEl={setAnchorEl}
             />
-            {audioURL && 
+            {audioURL ?
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
@@ -1002,7 +1002,7 @@ useEffect(() => {
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
               audioUrl={audioURL}
-            />}
+            /> : <Grid style={{ padding: "0px 20px 0px 20px" }}><audio controls preload='none' className={classes.videoPlayer}/></Grid>}
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -1274,7 +1274,7 @@ useEffect(() => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {audioURL && (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} />)}
+        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} />) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
       </Grid>
     </>
   );
