@@ -163,7 +163,7 @@ export default function DeleteProjectTasks() {
     return (
         <div >
             {renderSnackBar()}
-            <Button
+            {userRole.Admin === loggedInUserData?.role ?<Button
                 sx={{
                     inlineSize: "max-content",
                     p: 2,
@@ -174,10 +174,10 @@ export default function DeleteProjectTasks() {
                 aria-describedby={Id}
                 variant="contained"
                 onClick={handleClick}
-                disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
+                // disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
                 color="error">
                 Delete Project Tasks
-            </Button>
+            </Button>:null}
 
             <Popover
                 Id={Id}

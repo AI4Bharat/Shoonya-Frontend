@@ -7,7 +7,7 @@ export default class GetAnnotationsTaskAPI extends API {
    constructor(taskId,timeout = 2000) {
      super("GET", timeout, false);
      this.type = constants.GET_ANNOTATIONS_TASK;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks}${taskId}/annotations/?enable_chitralekha_UI=true`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks}${taskId}/annotations/?enable_chitralekha_UI=True`;
    }
   
    processResponse(res) {

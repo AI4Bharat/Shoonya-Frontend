@@ -49,10 +49,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip"
+import configs from '../../../../config/config';
 import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
 import { Tab, Tabs } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
-
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -90,9 +90,12 @@ const ReviewAudioTranscriptionLandingPage = () => {
     targetlang: "en",
     fontSize: "Normal"
   });
+  const [updatedProjectData, setUpdatedProjectData] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
   const[taskDetailList,setTaskDetailList] = useState()
+  
+
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -120,6 +123,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
+  const [audioURL, setAudioURL] = useState("");
+
   // useEffect(() => {
   //   let intervalId;
 
@@ -313,11 +318,33 @@ const ReviewAudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     }else{setTaskDetailList(resp);
-    if (resp?.data?.audio_duration < 700){
+    if (resp?.data?.audio_duration < 1000){
       setWaveSurfer(false);
     }else{
       setWaveSurfer(true);
-    }}
+    }
+      const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
+        method: "GET",
+        headers: ProjectObj.getHeaders().headers
+      })
+      if (!fetchAudioData.ok){
+        setAudioURL(resp?.data?.audio_url)
+      }else{
+        try {
+          var base64data = await fetchAudioData.json();
+          var binaryData = atob(base64data);
+          var buffer = new ArrayBuffer(binaryData.length);
+          var view = new Uint8Array(buffer);
+          for (var i = 0; i < binaryData.length; i++) {
+              view[i] = binaryData.charCodeAt(i);
+          }
+          var blob = new Blob([view], { type: 'audio/mpeg' });
+          setAudioURL(URL.createObjectURL(blob));
+        } catch {
+          setAudioURL(resp?.data?.audio_url)
+        }
+      }
+    }
     setLoading(false);
   };
 
@@ -1134,13 +1161,16 @@ useEffect(() => {
               disableButton={disableButton}
               anchorEl={anchorEl} setAnchorEl={setAnchorEl}
             />
+            {audioURL && 
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
+              audioUrl={audioURL}
             />
+            }
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -1418,15 +1448,20 @@ useEffect(() => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
+          {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing"  && 
           <FormControl>
               <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="L1 & L2 Transcription" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                    {ProjectDetails?.metadata_json?.acoustic_enabled_stage <=2  && 
                     <Tab label="L3 Transcription" sx={{ fontSize: 17, fontWeight: '700' }} />
+                    }
                 </Tabs>
             </Box>
-          </FormControl>
-
+          </FormControl>  
+        }
+        {ProjectDetails && ProjectDetails?.project_type==="StandardizedTranscriptionEditing" ?
+        
         <StandarisedisedTranscriptionEditing
           currentIndex={currentIndex}
           AnnotationsTaskDetails={AnnotationsTaskDetails}
@@ -1440,7 +1475,25 @@ useEffect(() => {
           waveSurfer={waveSurfer}
           setWaveSurfer={setWaveSurfer}
           annotationId={annotations[0]?.id}
+          updatedProjectData={updatedProjectData}
+          setUpdatedProjectData={setUpdatedProjectData}
         /> 
+         : 
+         <TranscriptionRightPanel
+          currentIndex={currentIndex}
+          AnnotationsTaskDetails={AnnotationsTaskDetails}
+          player={player}
+          ProjectDetails={ProjectDetails}
+          TaskDetails={taskDetailList}
+          stage={2}
+          handleStdTranscriptionSettings={setStdTranscriptionSettings}
+          advancedWaveformSettings={advancedWaveformSettings}
+          setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+          waveSurfer={waveSurfer}
+          setWaveSurfer={setWaveSurfer}
+          annotationId={annotations[0]?.id}
+        /> 
+        }
         </Grid>
       </Grid>
 
@@ -1450,7 +1503,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList} waveformSettings={waveformSettings}/>}
+        {audioURL && (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList} waveformSettings={waveformSettings}/>)}
       </Grid>
     </>
   );

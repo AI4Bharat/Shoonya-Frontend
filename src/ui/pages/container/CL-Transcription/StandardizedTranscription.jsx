@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef, memo } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { Resizable } from 're-resizable';
 import {
   addSubtitleBox,
@@ -85,6 +85,8 @@ const StandarisedisedTranscriptionEditing = ({
   waveSurfer,
   setWaveSurfer,
   annotationId,
+  updatedProjectData, 
+  setUpdatedProjectData
 }) => {
   const { taskId } = useParams();
   const classes = AudioTranscriptionLandingStyle();
@@ -96,6 +98,8 @@ const StandarisedisedTranscriptionEditing = ({
   const assignedOrgId = JSON.parse(localStorage.getItem("userData"))
     ?.organization?.id;
   const subtitles = useSelector((state) => state.commonReducer.subtitles);
+  console.log(subtitles);
+  console.log(subtitles);
   const player = useSelector((state) => state.commonReducer.player);
   const currentPage = useSelector((state) => state.commonReducer.currentPage);
 
@@ -112,9 +116,10 @@ const StandarisedisedTranscriptionEditing = ({
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles;
+  console.log(currentPageData)
   // const currentPageData = subtitles?.slice(startIndex, endIndex);
   const idxOffset = (itemsPerPage * (page - 1));
-  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
+  const showAcousticText = ProjectDetails?.project_type === "StandardizedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -154,6 +159,7 @@ const StandarisedisedTranscriptionEditing = ({
   const textRefs = useRef([]);
   const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
   const [currentSelection, setCurrentSelection] = useState(null);
+  const [selectedSpeaker, setSelectedSpeaker] = useState(speakerIdList?.[0]?.name);
 
   useEffect(() => {
     currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
@@ -257,9 +263,13 @@ const StandarisedisedTranscriptionEditing = ({
 
   const onMergeClick = useCallback(
     (index) => {
-      const selectionStart = getSelectionStart(index);
-      const timings = getTimings(index);
-
+      console.log(stage);
+      console.log(updatedProjectData);
+      const selectionStart = getSelectionStart(index, stage, updatedProjectData);
+      console.log("selectionstart: "+selectionStart)
+      const timings = getTimings(index, stage, updatedProjectData);
+      console.log("timings: "+timings)
+  
       setUndoStack((prevState) => [
         ...prevState,
         {
@@ -267,17 +277,28 @@ const StandarisedisedTranscriptionEditing = ({
           index: index,
           timings,
           selectionStart,
+          stage: stage,
+          updatedProjectData: updatedProjectData
         },
       ]);
       setRedoStack([]);
-
-      const sub = onMerge(index);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+  
+      const sub = onMerge(index, stage, updatedProjectData);
+      console.log(sub);
+      if(stage==3){
+        const updatedData = [...updatedProjectData];
+        updatedData.splice(index, 2, sub[index])
+        setUpdatedProjectData(updatedData)
+      }
+      else{
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+      
       // saveTranscriptHandler(false, true, sub);
     },
-    // eslint-disable-next-line
-    [limit, currentOffset]
+    [limit, currentOffset, stage, updatedProjectData]
   );
+  
 
   const onMouseUp = (e, blockIdx) => {
     if (e.target.selectionStart < e.target.value?.length) {
@@ -289,23 +310,66 @@ const StandarisedisedTranscriptionEditing = ({
   };
 
   const onSplitClick = useCallback(() => {
-    setUndoStack((prevState) => [
-      ...prevState,
-      {
-        type: "split",
-        index: currentIndexToSplitTextBlock,
-        selectionStart,
-      },
-    ]);
+    console.log(stage);
+    console.log(updatedProjectData);
+  
+    const newSubtitles = onSplit(currentIndexToSplitTextBlock, selectionStart, stage, updatedProjectData);
+  
+    if (newSubtitles.length > updatedProjectData.length) {
+      if (stage === 3) {
+        const updatedData = [...updatedProjectData];
+        updatedData[currentIndexToSplitTextBlock] = newSubtitles[currentIndexToSplitTextBlock];
+        updatedData.splice(currentIndexToSplitTextBlock + 1, 0, newSubtitles[currentIndexToSplitTextBlock + 1]);
+        console.log(updatedData); // Log updated data to confirm changes
+  
+        
+          // Update the undo stack within the state setter
+          setUndoStack((prevState) => [
+            ...prevState,
+            {
+              type: "split",
+              index: currentIndexToSplitTextBlock,
+              selectionStart,
+              stage: stage,
+              updatedProjectData: updatedData,
+            },
+          ]);
+        setUpdatedProjectData(updatedData);
+        // dispatch(setSubtitles(updatedData, C.SUBTITLES));
+       
+      } else {
+        dispatch(setSubtitles(newSubtitles, C.SUBTITLES));
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "split",
+            index: currentIndexToSplitTextBlock,
+            selectionStart,
+            stage: stage,
+            // updatedProjectData: newSubtitles,
+          },
+        ]);
+      }
+    } else {
+      setSnackbarInfo({
+        open: true,
+        message: "The split duration is too less",
+        variant: "info",
+      });
+    }
+  
     setRedoStack([]);
-    const sub = onSplit(currentIndexToSplitTextBlock, selectionStart);
-    dispatch(setSubtitles(sub, C.SUBTITLES));
-    // saveTranscriptHandler(false, true, sub);
-
+  
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
+  
+  useEffect(() => {
+    console.log(updatedProjectData); // This should show the updated length
+  }, [updatedProjectData]);
+  
 
-  const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
+ 
+  const changeTranscriptHandler = (event, index, updateAcoustic) => {
     const {
       target: { value },
       currentTarget,
@@ -334,8 +398,18 @@ const StandarisedisedTranscriptionEditing = ({
       setCurrentSelection(event.target.selectionEnd);
       setTagSuggestionsAcoustic(updateAcoustic);
     }
-    const sub = onSubtitleChange(value, index, updateAcoustic, false);
-    dispatch(setSubtitles(sub, C.SUBTITLES));
+    const sub = onSubtitleChange(value, index, updateAcoustic, false, stage, updatedProjectData);
+    if(stage === 3){
+      const updatedData = [...updatedProjectData];
+      console.log(updatedData);
+      console.log(index);
+      console.log(value);
+      updatedData[index].acoustic_standardized_text = sub[index].acoustic_standardized_text
+      setUpdatedProjectData(updatedData)
+    }
+    else{
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+    }
     // saveTranscriptHandler(false, false, sub);
   };
 
@@ -407,42 +481,80 @@ const StandarisedisedTranscriptionEditing = ({
 
   const onDelete = useCallback(
     (index) => {
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "delete",
-          index: index,
-          data: getItemForDelete(index),
-        },
-      ]);
-      setRedoStack([]);
+      console.log("index: "+ index);
+  console.log("stage: " + stage)
+  console.log("updatedprojdatad: "+updatedProjectData)
+  const data = getItemForDelete(index, stage, updatedProjectData);
+      
+      const sub = onSubtitleDelete(index, stage, updatedProjectData)
+      
+      console.log(sub);
 
-      const sub = onSubtitleDelete(index);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+      if (stage === 3) {
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "delete",
+            index: index,
+            data: data,
+            stage: stage,
+            updatedProjectData: sub,
+          },
+        ]);
+        setRedoStack([]);
+        setUpdatedProjectData(sub);
+        console.log(updatedProjectData)
+      }
+      else{
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "delete",
+            index: index,
+            data: data,
+            // stage: stage,
+            // updatedProjectData: updatedProjectData,
+          },
+        ]);
+        setRedoStack([]);
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+
+   
       // saveTranscriptHandler(false, false, sub);
     },
     // eslint-disable-next-line
-    [limit, currentOffset]
+    [limit, currentOffset, stage, updatedProjectData, dispatch, setUpdatedProjectData, setUndoStack, setRedoStack]
   );
 
   const addNewSubtitleBox = useCallback(
     (index) => {
-      const sub = addSubtitleBox(index);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-      // saveTranscriptHandler(false, false, sub);
-
+      const sub = addSubtitleBox(index, stage, updatedProjectData);
+  
+      if (stage === 3) {
+        const updatedData = [...updatedProjectData];
+        updatedData.splice(index + 1, 0, sub[index + 1]);
+        setUpdatedProjectData(updatedData);
+      } else {
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+  
+      // Add to undo stack
       setUndoStack((prevState) => [
         ...prevState,
         {
           type: "add",
           index: index,
+          stage:stage,
+          updatedProjectData: updatedProjectData,
         },
       ]);
+  
+      // Clear redo stack
       setRedoStack([]);
     },
-    // eslint-disable-next-line
-    [limit, currentOffset]
-  );
+    [stage, updatedProjectData, dispatch, setUpdatedProjectData, setUndoStack, setRedoStack]
+  );  
 
   const onUndo = useCallback(() => {
     if (undoStack?.length > 0) {
@@ -451,7 +563,14 @@ const StandarisedisedTranscriptionEditing = ({
 
       // modifing subtitles based on last action
       const sub = onUndoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+      console.log("after undo is performed" + sub);
+      if(stage===3){
+        setUpdatedProjectData(sub);
+      }
+      else{
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
+      
 
       //removing the last action from undo and putting in redo stack
       setUndoStack(undoStack.slice(0, undoStack?.length - 1));
@@ -468,7 +587,13 @@ const StandarisedisedTranscriptionEditing = ({
 
       // modifing subtitles based on last action
       const sub = onRedoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+      console.log("after redo stack: "+ sub);
+      if(stage === 3){
+        setUpdatedProjectData(sub);
+      }
+      else{
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+      }
 
       //removing the last action from redo and putting in undo stack
       setRedoStack(redoStack.slice(0, redoStack?.length - 1));
@@ -489,8 +614,14 @@ const StandarisedisedTranscriptionEditing = ({
   };
 
   const handleSpeakerChange = (id, index) => {
-    const sub = assignSpeakerId(id, index);
-    dispatch(setSubtitles(sub, C.SUBTITLES));
+    const sub = assignSpeakerId(id, index, stage, updatedProjectData);
+    console.log(sub);
+    if(stage===3){
+      setUpdatedProjectData(sub)
+    }else{
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+    }
+    
     // saveTranscriptHandler(false, false, sub);
   };
 
@@ -536,28 +667,45 @@ const StandarisedisedTranscriptionEditing = ({
     return () => clearTimeout(timer);
   }, []);
 
-if(currentPageData)
-  {
-    console.log("currentPageData", currentPageData)
+useEffect(() => {
+  if (currentPageData?.length && stage===3 ) {
+    setUpdatedProjectData([{
+      start_time: currentPageData[0].start_time,
+      end_time: currentPageData[currentPageData.length - 1].end_time,
+      text: currentPageData[0].text,
+      acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData[0].acoustic_normalised_text,
+    
+    }]);
   }
+  else 
+  {
+    setUpdatedProjectData(currentPageData);
+  }
+}, [currentPageData, stage]); // add dependencies
+console.log(updatedProjectData)
 
-let updatedProjectData = []
-if (currentPageData?.length && stage===3) {
-  updatedProjectData = [{
-    start_time: currentPageData[0].start_time,
-    end_time: currentPageData[currentPageData.length - 1].end_time,
-    text: currentPageData.map((item) => item.text)
-  }]
-}
-else 
-{
-  updatedProjectData = currentPageData;
-}
-  if(currentPageData)
-    {
-      console.log("updatedPageData", updatedProjectData)
-    }
- 
+const onMergeClickL3 = useCallback(()=>{
+  // merge the transcription L2 into L3 
+  if (currentPageData?.length && stage===3) {
+    console.log(currentPageData);
+    console.log(stage)
+    console.log(updatedProjectData)
+    setUpdatedProjectData([{
+      start_time: currentPageData[0].start_time,
+      end_time: currentPageData[currentPageData.length - 1].end_time,
+      text: currentPageData[0].text,
+      acoustic_standardized_text: currentPageData[0].acoustic_standardized_text? currentPageData[0].acoustic_standardized_text : currentPageData.map((item) => item.acoustic_normalised_text).join(' ')
+    
+    }]);
+
+    console.log(updatedProjectData);
+  }
+}, [currentPageData, stage, updatedProjectData]); 
+
+useEffect(() => {
+  setSelectedSpeaker(speakerIdList?.[0]?.name);
+}, [stage]);
+  console.log("stage : " + stage);
   return (
     <>
       {" "}
@@ -570,7 +718,7 @@ else
         >
           <Grid className={classes.rightPanelParentGrid}>
             <SettingsButtonComponent
-              totalSegments={totalSegments}
+              totalSegments={stage ===3? updatedProjectData.length : totalSegments}
               setTransliteration={setTransliteration}
               enableTransliteration={enableTransliteration}
               setRTL_Typing={setRTL_Typing}
@@ -593,9 +741,11 @@ else
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
               annotationId={annotationId}
+              showMerge={true && stage===3}
+              onMergeClickL3={onMergeClickL3}
             />
           </Grid>
-          {showAcousticText  && <Grid
+          {ProjectDetails?.project_type && stage===2 && <Grid
             style={{
               display: "flex",
               direction: "row",
@@ -638,7 +788,7 @@ else
           }}>
 
           
-          {updatedProjectData?.map((item, index) => {
+          {stage!==3 && updatedProjectData?.map((item, index) => {
             return (
               <React.Fragment>
                 <Resizable
@@ -694,6 +844,7 @@ else
                           labelId="select-speaker"
                           label="Select Speaker"
                           value={item.speaker_id}
+                          defaultValue={stage==3 ? selectedSpeaker : ""}
                           onChange={(event) =>
                             handleSpeakerChange(event.target.value, index + idxOffset)
                           }
@@ -774,9 +925,12 @@ else
                       onClick={() => {
                         if (pauseOnType && player) {
                           player.pause();
-                          if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
-                            player.currentTime = item.startTime + 0.001;
-                          }
+                          // if (player.currentTime >= item.startTime || player.currentTime <= item.endTime) {
+                          //   player.currentTime = player.currentTime
+                          // }
+                          // else{
+                          //   player.currentTime = item.startTime + 0.001;
+                          // }
                         }
                       }}
                     >
@@ -786,7 +940,7 @@ else
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
-                            changeTranscriptHandler(event, index + idxOffset, false);
+                            changeTranscriptHandler(event, index + idxOffset, 0);
                           }}
                           enabled={enableTransliterationSuggestion}
                           onChangeText={() => { }}
@@ -828,7 +982,7 @@ else
                             // ref={el => textRefs.current[index] = el}
                             // onChange={(event) => {
                             onInput={(event) => {
-                              changeTranscriptHandler(event, index + idxOffset, false);
+                              changeTranscriptHandler(event, index + idxOffset, 0);
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
@@ -848,14 +1002,14 @@ else
                       </span> */}
                         </div>
                       )}
-                      {showAcousticText &&
+                      {stage==2 &&
                         (ProjectDetails?.tgt_language !== "en" &&
                           enableTransliteration ? (
                           <IndicTransliterate
                             lang={targetlang}
                             value={item.acoustic_normalised_text}
                             onChange={(event) => {
-                              changeTranscriptHandler(event, index + idxOffset, true);
+                              changeTranscriptHandler(event, index + idxOffset, 1);
                             }}
                             enabled={enableTransliterationSuggestion}
                             onChangeText={() => { }}
@@ -881,7 +1035,7 @@ else
                             <textarea
                               ref={el => textRefs.current[index + currentPageData?.length] = el}
                               onChange={(event) => {
-                                changeTranscriptHandler(event, index + idxOffset, true);
+                                changeTranscriptHandler(event, index + idxOffset, 1);
                               }}
                               onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
                               value={item.acoustic_normalised_text}
@@ -892,6 +1046,238 @@ else
                             />
                           </div>
                         ))}
+                    </CardContent>
+                  </Box>
+                </Resizable>
+                <div style={{
+                  color: "grey",
+                  zIndex: 100,
+                  marginTop: "-16px",
+                  borderRadius: "100%",
+                  border: "1px solid rgba(128, 128, 128, 0.5)",
+                  backgroundColor: "white",
+                  height: "32px", width: "32px",
+                  pointerEvents: "none",
+                }}>
+                  <UnfoldMoreOutlinedIcon sx={{mt: "3px"}}/> 
+                </div>
+              </React.Fragment>
+            );
+          })}
+
+
+{stage===3 && updatedProjectData?.map((item, index) => {
+            return (
+              <React.Fragment>
+                <Resizable
+                  bounds="parent"
+                  default={{ height: "240px" }}
+                  minHeight="240px"
+                  id={`${index}_resizable`}
+                  enable={{ top:false, right:false, bottom:true, left:false, topRight:false, bottomRight:false, bottomLeft:false, topLeft:false }}
+                  style={{ alignItems: "center", display: "flex", flexDirection: "column", marginTop: index === 0 ? "0px" : "-16px" }}
+                  onResizeStart={(e, dir, ref) => {
+                    parentScrollOffsetX.current = ref.parentElement?.scrollLeft || 0
+                    parentScrollOffsetY.current = ref.parentElement?.scrollTop || 0
+                  }}
+                  onResize={(e, dir, ref, d) => {
+                    ref.parentElement.scrollTo(parentScrollOffsetX.current, parentScrollOffsetY.current)
+                  }}
+                  handleStyles={{ bottom: {height: "24px"}}}
+                >
+                  <Box
+                    key={index}
+                    id={`sub_${index}`}
+                    style={{
+                      borderBottom: "1px solid lightgray",
+                      backgroundColor:
+                        index % 2 === 0
+                          ? "rgb(214, 238, 255)"
+                          : "rgb(233, 247, 239)",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      height: "100%",
+                    }}
+                  >
+                    <Box className={classes.topBox} style={{paddingLeft: "16px", paddingRight: "16px", paddingTop: "14px", paddingBottom: "10px"}}>
+                      <div style={{display:"block", height:"30px", width:"90px", lineHeight:"30px", borderRadius:"50%", fontSize:"medium", backgroundColor:"#2C2799", color:"white", marginRight:"20px", marginLeft:"5px"}}>
+                        {index+1}
+                      </div>
+
+                      <TimeBoxes
+                        handleTimeChange={handleTimeChange}
+                        time={item.start_time}
+                        index={index + idxOffset}
+                        type={"startTime"}
+                      />
+
+                      <FormControl
+                        sx={{ width: "50%", mr: "auto", float: "left", marginRight:"10px" }}
+                        size="small"
+                      >
+                        <InputLabel id="select-speaker">Select Speaker</InputLabel>
+                        <Select
+                          fullWidth
+                          labelId="select-speaker"
+                          label="Select Speaker"
+                          value={item.speaker_id}
+                          defaultValue={stage==3 ? selectedSpeaker : ""}
+                          onChange={(event) =>
+                            handleSpeakerChange(event.target.value, index + idxOffset)
+                          }
+                          style={{
+                            backgroundColor: "#fff",
+                            textAlign: "left",
+                            height: "32px"
+                          }}
+                          inputProps={{
+                            "aria-label": "Without label",
+                            style: { textAlign: "left" },
+                          }}
+                          MenuProps={MenuProps}
+                        >
+                          {speakerIdList?.map((speaker, index) => (
+                            <MenuItem key={index} value={speaker.name}>
+                              {speaker.name} ({speaker.gender})
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      {showAdditionalOptions ? <Tooltip title="Hide Additional Options" placement="bottom">
+                        <IconButton
+                          className={classes.optionIconBtn}
+                          style={{
+                            color: "#000",
+                            backgroundColor: "#fff",
+                            borderRadius: "50%",
+                            marginRight: "10px",
+                          }}
+                        onClick={() => {toggleAdditionalOptions()}}
+                        >
+                          <Remove/>
+                        </IconButton>
+                      </Tooltip> :
+                      <Tooltip title="Show Additional Options" placement="bottom">
+                      <IconButton
+                        className={classes.optionIconBtn}
+                        style={{
+                          color: "#000",
+                          backgroundColor: "#fff",
+                          borderRadius: "50%",
+                          marginRight: "10px",
+                        }}
+                        onClick={() => {toggleAdditionalOptions()}}
+                      >
+                        <Add/>
+                      </IconButton>
+                    </Tooltip>}    
+                      {showAdditionalOptions && 
+                        <ButtonComponent
+                          index={index + idxOffset}
+                          lastItem={(index + idxOffset) < updatedProjectData?.length - 1}
+                          onMergeClick={onMergeClick}
+                          onDelete={onDelete}
+                          addNewSubtitleBox={addNewSubtitleBox}
+                        />
+                      }
+
+                      <TimeBoxes
+                        handleTimeChange={handleTimeChange}
+                        time={item.end_time}
+                        index={index + idxOffset}
+                        type={"endTime"}
+                      />
+                    </Box>
+
+                    <CardContent
+                      sx={{
+                        display: "flex",
+                        padding: "8px 10px",
+                        height: "100%",
+                        gap:"8px"
+                      }}
+                      className={classes.cardContent}
+                      aria-describedby={"suggestionList"}
+                      onClick={() => {
+                        if (pauseOnType && player) {
+                          player.pause();
+                          if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
+                            player.currentTime = item.startTime + 0.001;
+                          }
+                        }
+                      }}
+                    >
+                      {ProjectDetails?.tgt_language !== "en" &&
+                        false ? (
+                        <IndicTransliterate
+                          lang={targetlang}
+                          onChange={(event) => {
+                            changeTranscriptHandler(event, index + idxOffset, 2);
+                          }}
+                          value={item.acoustic_standardized_text}
+                          enabled={enableTransliterationSuggestion}
+                          onChangeText={() => { }}
+                          onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                          containerStyles={{ width: "100%", height: "100%" }}
+                          onBlur={() => {
+                            setTimeout(() => {
+                              setShowPopOver(false);
+                            }, 200);
+                          }}
+                          style={{ fontSize: fontSize, height: "100%" }}
+                          renderComponent={(props) => {
+                            textRefs.current[index] = props.ref.current;
+                            return (
+                              <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                                <textarea
+                                  className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                    }`}
+                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                  onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                                  onBlur={() => {
+                                    setTimeout(() => {
+                                      setShowPopOver(false);
+                                    }, 200);
+                                  }}
+                                  {...props}
+                                />
+                                
+                                {/* <span id="charNum" className={classes.wordCount}>
+                        {targetLength(index)}
+                      </span> */}
+                              </div>
+                            )}}
+
+                        />
+                      ) : (
+                        <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                          <textarea
+                            // ref={el => textRefs.current[index] = el}
+                            // onChange={(event) => {
+                            onChange={(event) => {
+                              changeTranscriptHandler(event, index + idxOffset, 2);
+                            }}
+                            onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                            value={item.acoustic_standardized_text}
+                            dir={enableRTL_Typing ? "rtl" : "ltr"}
+                            className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                              }`}
+                            style={{ fontSize: fontSize, height: "100%"}}
+                            onBlur={() => {
+                              setTimeout(() => {
+                                setShowPopOver(false);
+                              }, 200);
+                            }}
+                          />
+                          
+                          {/* <span id="charNum" className={classes.wordCount}>
+                        {targetLength(index)}
+                      </span> */}
+                        </div>
+                      )}
+                      
                     </CardContent>
                   </Box>
                 </Resizable>

@@ -9,7 +9,7 @@ import TransliterationAPI from "../../../../redux/actions/api/Transliteration/Tr
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-const Transliteration = (props) => {
+const Transliteration = (props) => { 
   const { onCancelTransliteration ,setIsSpaceClicked,isSpaceClicked,setShowTransliterationModel} = props;
   const params = useParams();
   const classes = GlobalStyles();

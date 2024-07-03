@@ -27,7 +27,7 @@ const AnnotationTranscription = () => {
   return (
     <div style={{ margin: 0, padding: 0 }}>
       {ProjectDetails?.project_type === "StandardizedTranscriptionEditing" ? (
-        <AudioTranscriptionLandingPage />
+        <AudioTranscriptionLandingPage project_type={ProjectDetails?.project_type}  />
       ) : (
         <LSF />
       )}

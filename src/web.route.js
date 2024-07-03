@@ -26,7 +26,6 @@ import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
-import LSF from "./ui/pages/container/Label-Studio/LSF";
 import ReviewLSF from "./ui/pages/container/Label-Studio/ReviewLSF";
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
@@ -49,6 +48,7 @@ import AudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription
 import ReviewAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/ReviewAudioTranscriptionLandingPage";
 import SuperCheckerAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/SuperCheckerAudioTranscriptionLandingPage"
 import AnnotationTranscription from "./ui/pages/container/CL-Transcription/AnnotationTranscription";
+import ReviewerSupercheckerTranscription from "./ui/pages/container/CL-Transcription/ReviewerSupercheckerTranscription";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -186,15 +186,14 @@ const App = () => {
           path="projects/:projectId/task/:taskId"
           element={ProtectedRouteWrapper(
             // <Layout component={<LSF />} />
-            <Layout component={<AudioTranscriptionLandingPage />} />
-
+            <Layout component={<AnnotationTranscription />} />
             // <Layout component={<AnnotateTask />} />
           )}
         />
         <Route
           path="projects/:projectId/review/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<ReviewLSF />} />
+            <Layout component={<ReviewerSupercheckerTranscription />} />
           )}
         />
          <Route
@@ -206,7 +205,7 @@ const App = () => {
            <Route
           path="projects/:projectId/SuperChecker/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<SuperCheckerLSF />} />
+            <Layout component={<ReviewerSupercheckerTranscription />} />
           )}
           />
         <Route
@@ -291,7 +290,7 @@ const App = () => {
           path="projects/:projectId/AudioTranscriptionLandingPage/:taskId"
           element={ProtectedRouteWrapper(
             <Layout 
-            component={<AnnotationTranscription />} />
+            component={<AudioTranscriptionLandingPage />} />
           )}
         />
          <Route

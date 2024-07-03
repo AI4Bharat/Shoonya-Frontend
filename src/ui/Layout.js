@@ -94,7 +94,7 @@ const Layout= (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
-      className={location.pathname.includes("AudioTranscriptionLandingPage") || projectType==="StandardizedTranscriptionEditing" ? classes.Audioroot : classes.root}
+      className={location.pathname.includes("AudioTranscriptionLandingPage")  ? classes.Audioroot : classes.root}
       >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
