@@ -165,11 +165,16 @@ const UserDetail = (props) => {
         el.first_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;
-      }else if(
-        el.is_active?.toString()
-        ?.toLowerCase()
-        .includes(SearchUserDetail?.toLowerCase())
-      ){
+      // }else if(
+      //   el.is_active?.toString()
+      //   ?.toLowerCase()
+      //   .includes(SearchUserDetail?.toLowerCase())
+      // ){
+      //   return el;
+      }else if (
+        SearchUserDetail.toLowerCase() === "active" && el.is_active ||
+        SearchUserDetail.toLowerCase() === "inactive" && !el.is_active
+      ) {
         return el;
       } else if (
         el.last_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
@@ -434,5 +439,4 @@ const UserDetail = (props) => {
     </div>
   );
 };
-
 export default UserDetail;
