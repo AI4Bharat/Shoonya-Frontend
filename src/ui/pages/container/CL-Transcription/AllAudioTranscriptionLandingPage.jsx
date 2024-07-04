@@ -120,22 +120,25 @@ const AllAudioTranscriptionLandingPage = () => {
       }else{
         setWaveSurfer(true);
       }
-      const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
-        method: "GET",
-        headers: ProjectObj.getHeaders().headers
-      })
+      // const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
+      const fetchAudioData = await fetch(resp?.data?.audio_url
+      //, {
+      //   method: "GET",
+      //   headers: ProjectObj.getHeaders().headers}
+      )
       if (!fetchAudioData.ok){
         setAudioURL(resp?.data?.audio_url)
       }else{
         try {
-          var base64data = await fetchAudioData.json();
-          var binaryData = atob(base64data);
-          var buffer = new ArrayBuffer(binaryData.length);
-          var view = new Uint8Array(buffer);
-          for (var i = 0; i < binaryData.length; i++) {
-              view[i] = binaryData.charCodeAt(i);
-          }
-          var blob = new Blob([view], { type: 'audio/mpeg' });
+          // var base64data = await fetchAudioData.json();
+          // var binaryData = atob(base64data);
+          // var buffer = new ArrayBuffer(binaryData.length);
+          // var view = new Uint8Array(buffer);
+          // for (var i = 0; i < binaryData.length; i++) {
+          //     view[i] = binaryData.charCodeAt(i);
+          // }
+          // var blob = new Blob([view], { type: 'audio/mpeg' });
+          var blob = await fetchAudioData.blob();
           setAudioURL(URL.createObjectURL(blob));
         } catch {
           setAudioURL(resp?.data?.audio_url)
