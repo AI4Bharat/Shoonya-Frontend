@@ -1038,7 +1038,7 @@ useEffect(() => {
           selectedLanguages,
           ocrDomain
         ).then((res) => {
-          if (res.status !== 200) {
+          if (res?.status !== 200) {
             setSnackbarInfo({
               open: true,
               message: "Error in autosaving annotation",
@@ -1153,6 +1153,9 @@ useEffect(() => {
       tasksComplete(res?.id || null);
     });
   };
+  
+  const ProjectsData = localStorage.getItem("projectData");
+  const ProjectData = JSON.parse(ProjectsData);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -1226,6 +1229,26 @@ useEffect(() => {
             Auto-save enabled for this scenario.
           </Typography>
         </div>}
+        <div>
+          {ProjectDetails.revision_loop_count >
+            taskData?.revision_loop_count?.review_count
+            ? false
+            : true && (
+              <div style={{ textAlign: "left", marginBottom: "15px" }}>
+                <Typography variant="body" color="#f5222d">
+                  Note: The 'Revision Loop Count' limit has been reached for this
+                  task.
+                </Typography>
+              </div>
+            )}
+
+          {ProjectDetails.revision_loop_count - taskData?.revision_loop_count?.review_count !== 0 && (
+            <div style={{ textAlign: "left", marginBottom: "15px" }}>
+              <Typography variant="body" color="#f5222d">
+                Note: This task can be rejected {ProjectDetails.revision_loop_count - taskData?.revision_loop_count?.review_count} more times.
+              </Typography>
+            </div>)}
+        </div>
       {filterMessage && (
         <Alert severity="info" showIcon style={{ marginBottom: "1%" }}>
           {filterMessage}
@@ -1295,10 +1318,23 @@ useEffect(() => {
                   value="to_be_revised"
                   type="default"
                   onClick={handleReviseClick}
+                  disabled={
+                    ProjectDetails.revision_loop_count >
+                      taskData?.revision_loop_count?.review_count
+                      ? false
+                      : true
+                  }
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
-                    color: "#f5222d",
+                    color: (
+                      ProjectDetails.revision_loop_count >
+                        taskData?.revision_loop_count?.review_count
+                        ? false
+                        : true
+                    )
+                      ? "#B2BABB"
+                      : "#f5222d",
                     pt: 3,
                     pb: 3,
                     borderBottom: "None",
