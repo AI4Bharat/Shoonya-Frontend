@@ -14,6 +14,7 @@ export default class Sub {
     this.audio_speed = obj.audio_speed;
     this.speaker_id = obj.speaker_id;
     this.acoustic_normalised_text = obj.acoustic_normalised_text ?? "";
+    this.acoustic_standardized_text = obj.acoustic_standardized_text ? obj.acoustic_standardized_text : this.acoustic_normalised_text;
   }
 
   get check() {
