@@ -179,7 +179,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
         userAnnotation &&
         ["rejected"].includes(userAnnotation.annotation_status)
       ) {
-        filteredAnnotations = [userAnnotationData];
+        filteredAnnotations = [userAnnotation];
         disableSkip = true;
         disableButton = true;
         filterMessage =
