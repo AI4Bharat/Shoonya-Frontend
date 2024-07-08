@@ -588,7 +588,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       ["draft", "skipped", "rejected"].includes(value) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
-      if(value === "rejected") PatchAPIdata["result"] = [];
+      //if(value === "rejected") PatchAPIdata["result"] = [];
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
