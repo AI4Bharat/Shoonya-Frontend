@@ -229,7 +229,7 @@ const AudioTranscriptionLandingPage = ({project_type}) => {
         userAnnotation &&
         ["to_be_revised"].includes(userAnnotation.annotation_status)
       ) {
-        filteredAnnotations = [userAnnotation];
+        filteredAnnotations = [userAnnotationData];
         disableSkip = true;
         Message =
           "Skip button is disabled, since the task is being reviewed";
@@ -489,7 +489,6 @@ const AudioTranscriptionLandingPage = ({project_type}) => {
 
   useEffect(() => {
     let standardisedTranscription = "";
-
     const sub = annotations[0]?.result.filter((item) => {
       if ("standardised_transcription" in item) {
         standardisedTranscription = item.standardised_transcription;
