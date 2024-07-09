@@ -107,7 +107,7 @@ export const addSubtitleBox = (index, stage, updatedProjectData) => {
       speaker_id: "",
       target_text: "",
       acoustic_normalised_text: "",
-      acoustic_standardized_text: "",
+      ...(stage === 3 && {acoustic_standardized_text: ""})
     })
   );
   console.log(copySub)
@@ -241,7 +241,7 @@ export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic, 
   console.log(copySub)
   const sub = copySub[index];
 console.log(sub);
-  if (updateAcoustic === 1)
+  if (updateAcoustic === 1 || updateAcoustic === true)
     sub.acoustic_normalised_text = text;
   
   else if (populateAcoustic) {
@@ -251,7 +251,7 @@ console.log(sub);
   else if(updateAcoustic === 2)
     sub.acoustic_standardized_text = text;
 
-  else if(updateAcoustic === 0)
+  else if(updateAcoustic === 0 || updateAcoustic === false)
     sub.text = text;
 
   
