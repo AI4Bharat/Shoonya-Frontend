@@ -724,7 +724,7 @@ const AnnotationProject = (props) => {
                     xl={12}
                   >
                     <Typography gutterBottom component="div">
-                      Variable Parameters<span style={{ color: '#d93025' }}>*</span> :
+                      Variable Parameters :
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
