@@ -711,7 +711,7 @@ const AnnotationProject = (props) => {
               </>
             )}
 
-            {selectedType &&
+            {/* {selectedType &&
               variableParameters?.[selectedType]?.variable_parameters !==
               undefined && (
                 <>
@@ -724,7 +724,7 @@ const AnnotationProject = (props) => {
                     xl={12}
                   >
                     <Typography gutterBottom component="div">
-                      Variable Parameters :
+                      Variable Parameters<span style={{ color: '#d93025' }}>*</span> :
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -737,7 +737,7 @@ const AnnotationProject = (props) => {
                     />
                   </Grid>
                 </>
-              )}
+              )} */}
             {(selectedDomain === "Translation" ||
               selectedDomain === "Conversation") &&
               (selectedType === "TranslationEditing" ||
