@@ -20,7 +20,7 @@ import {
   Grid,
   Button,
   TextField,
-  Slider, Stack
+  Slider, Stack, CircularProgress
 } from "@mui/material";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -49,6 +49,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import configs from '../../../../config/config';
 
 const SuperCheckerAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -114,6 +115,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(false);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
+  const [audioURL, setAudioURL] = useState("");
 
   // useEffect(() => {
   //   let intervalId;
@@ -225,11 +227,36 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
         variant: "error",
       });
     }else{setTaskDetailList(resp);
-      if (resp?.data?.audio_duration < 700){
+      if (resp?.data?.audio_duration < 1000){
         setWaveSurfer(false);
       }else{
         setWaveSurfer(true);
-      }}
+      }
+      // const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
+      const fetchAudioData = await fetch(resp?.data?.audio_url
+      //, {
+      //   method: "GET",
+      //   headers: ProjectObj.getHeaders().headers}
+      )
+      if (!fetchAudioData.ok){
+        setAudioURL(resp?.data?.audio_url)
+      }else{
+        try {
+          // var base64data = await fetchAudioData.json();
+          // var binaryData = atob(base64data);
+          // var buffer = new ArrayBuffer(binaryData.length);
+          // var view = new Uint8Array(buffer);
+          // for (var i = 0; i < binaryData.length; i++) {
+          //     view[i] = binaryData.charCodeAt(i);
+          // }
+          // var blob = new Blob([view], { type: 'audio/mpeg' });
+          var blob = await fetchAudioData.blob();
+          setAudioURL(URL.createObjectURL(blob));
+        } catch {
+          setAudioURL(resp?.data?.audio_url)
+        }
+      }
+    }
     setLoading(false);
   };
 
@@ -561,7 +588,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
       ["draft", "skipped", "rejected"].includes(value) ||
       (["validated", "validated_with_changes"].includes(value) && L1Check && L2Check)
     ) {
-      if(value === "rejected") PatchAPIdata["result"] = [];
+      //if(value === "rejected") PatchAPIdata["result"] = [];
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
@@ -969,6 +996,7 @@ useEffect(() => {
               anchorEl={anchorEl}
               setAnchorEl={setAnchorEl}
             />
+            {audioURL ?
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
@@ -976,7 +1004,8 @@ useEffect(() => {
               onNextAnnotation={onNextAnnotation}
               AnnotationsTaskDetails={AnnotationsTaskDetails}
               taskData={taskDetailList}
-            />
+              audioUrl={audioURL}
+            /> : <Grid style={{ padding: "0px 20px 0px 20px" }}><audio controls preload='none' className={classes.videoPlayer}/></Grid>}
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -1248,7 +1277,7 @@ useEffect(() => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} />}
+        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} />) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
       </Grid>
     </>
   );

@@ -20,4 +20,6 @@ The project was created using [React 18.1.0](https://reactjs.org/docs/getting-st
 
 #### For more information please check [Shoonya](https://github.com/AI4Bharat/Shoonya)
 
-> Note: The page will reload when you make changes. You may also see any lint errors in the console.
+> Note:-
+> * The page will reload when you make changes. You may also see any lint errors in the console.
+> * Languages List will be taken from LanguageCode.js
