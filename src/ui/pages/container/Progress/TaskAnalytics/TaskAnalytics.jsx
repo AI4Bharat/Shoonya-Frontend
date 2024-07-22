@@ -56,27 +56,35 @@ const TaskAnalytics = (props) => {
     dispatch(APITransport(userObj));
   };
 
+  const audioProjectTypes=[
+    'AudioTranscription',
+    'AudioSegmentation',
+    'AudioTranscriptionEditing',
+    'AcousticNormalisedTranscriptionEditing'
+  ]
+  const translationProjectTypes=[
+    'MonolingualTranslation',
+    'TranslationEditing',
+    'SemanticTextualSimilarity_Scale5',
+    'ContextualTranslationEditing',
+    'SentenceSplitting',
+    'ContextualSentenceVerification',
+    'ContextualSentenceVerificationAndDomainClassification',
+  ]
+  const conversationProjectTypes=[
+    'ConversationTranslation',
+    'ConversationTranslationEditing',
+    'ConversationVerification'
+  ]
+  const ocrProjectTypes=[
+    'OCRTranscriptionEditing',
+  ]
+
   useEffect(() => {
-    let types = [
-      'AudioTranscription',
-      'AudioSegmentation',
-      'AudioTranscriptionEditing',
-      'AcousticNormalisedTranscriptionEditing',
-      'MonolingualTranslation',
-      'TranslationEditing',
-      'SemanticTextualSimilarity_Scale5',
-      'ContextualTranslationEditing',
-      'SentenceSplitting',
-      'ContextualSentenceVerification',
-      'ContextualSentenceVerificationAndDomainClassification',
-      'ConversationTranslation',
-      'ConversationTranslationEditing',
-      'ConversationVerification',
-      'OCRTranscriptionEditing',
-      'AllTypes'
-    ];
+    let types=[...audioProjectTypes,...translationProjectTypes,...conversationProjectTypes,...ocrProjectTypes,'AllTypes']
     setProjectTypes(types);
   }, []);
+
 
   useEffect(() => {
     getTaskAnalyticsdata();
