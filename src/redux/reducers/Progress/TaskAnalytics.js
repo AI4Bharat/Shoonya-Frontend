@@ -2,6 +2,7 @@ import C from "../../constants";
 
 let initialState = {
   data: [],
+  originalData: [],
 };
 
 const diffAnnotationReview = (payload) => {
@@ -28,7 +29,8 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case C.FETCH_TASK_ANALYTICS_DATA:
       const data = diffAnnotationReview(action.payload);
-      return { ...state, data };
+      return { ...state, originalData: action.payload, data };
+
 
     default:
       return {

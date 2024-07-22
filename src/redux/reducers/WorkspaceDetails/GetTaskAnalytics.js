@@ -2,6 +2,8 @@ import constants from "../../constants";
 
 let initialState = {
   data: [],
+  originalData: [],
+
 };
 
 const diffAnnotationReview = (payload) => {
@@ -24,7 +26,7 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case constants.WS_TASK_ANALYTICS:
       const data = diffAnnotationReview(action.payload);
-      return { ...state, data };
+      return { ...state, originalData: action.payload, data };
 
     default:
       return {
