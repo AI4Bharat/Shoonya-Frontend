@@ -113,22 +113,15 @@ const OrganizationReports = () => {
 
   useEffect(() => {
     if (radiobutton === "PaymentReports") {
-      setProjectTypes([
-        "AudioSegmentation",
-        "AudioTranscription",
-        "AudioTranscriptionEditing",
-        "ConversationTranslation",
-        "ConversationTranslationEditing",
-        "AcousticNormalisedTranscriptionEditing",
-        "AllAudioProjects",
-        "OCRTranscription",
-        "OCRTranscriptionEditing",
-        "ContextualTranslation",
-        "ContextualSentenceVerification",
-        "ContextualTranslationEditing"
-      ]);
+      let types = [];
+      Object.keys(ProjectTypes).forEach((key) => {
+        let subTypes = Object.keys(ProjectTypes[key]["project_types"]);
+        types.push(...subTypes);
+      });
+      types.push("AllAudioProjects")
+      setProjectTypes(types);
       setSelectedType("AllAudioProjects");
-    } else if (ProjectTypes) {
+        } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
         let subTypes = Object.keys(ProjectTypes[key]["project_types"]);
