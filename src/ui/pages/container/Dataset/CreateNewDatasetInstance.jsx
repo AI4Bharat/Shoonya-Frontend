@@ -5,6 +5,7 @@ import {
   Tab,
   Tabs,
   ThemeProvider,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -176,9 +177,17 @@ const CollectionProject = (props) => {
               lg={12}
               xl={12}
             >
+
               <Typography gutterBottom component="div">
-                Parent_Instance_Id:
-              </Typography>
+          <Tooltip 
+            title="Parent Data (A reference to database object referenced by integer ID field) - The parent data item id of this record. When a single sentence in a particular language is to be translated into another language, the source data item id is used as a 'Parent Data' and a separate child conversation data item is created for each language for which the source data item is to be translated into." 
+            placement="right"
+          >
+            <span>Parent_Instance_Id:</span>
+          </Tooltip>
+        </Typography>
+
+
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
               <OutlinedTextField
