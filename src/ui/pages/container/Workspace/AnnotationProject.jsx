@@ -711,7 +711,7 @@ const AnnotationProject = (props) => {
               </>
             )}
 
-            {selectedType &&
+            {/* {selectedType &&
               variableParameters?.[selectedType]?.variable_parameters !==
               undefined && (
                 <>
@@ -737,7 +737,7 @@ const AnnotationProject = (props) => {
                     />
                   </Grid>
                 </>
-              )}
+              )} */}
             {(selectedDomain === "Translation" ||
               selectedDomain === "Conversation") &&
               (selectedType === "TranslationEditing" ||
