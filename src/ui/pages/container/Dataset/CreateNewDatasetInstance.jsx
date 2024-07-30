@@ -22,6 +22,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CreateNewDatasetInstanceAPI from "../../../../redux/actions/api/Dataset/CreateNewDatasetInstance";
 import GetDatasetTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetType"
 import MenuItems from "../../component/common/MenuItems"
+import { Info } from "@mui/icons-material";
 
 const CollectionProject = (props) => {
   const { id } = useParams();
