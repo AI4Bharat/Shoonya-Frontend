@@ -421,6 +421,7 @@ const DetailsViewPage = (props) => {
                   columnSpacing={4}
                   rowSpacing={2}
                 >
+                  
                   <Grid item xs={12} sm={12}>
                     <Link to={`/create-annotation-project/${id}`}>
                       <Button
