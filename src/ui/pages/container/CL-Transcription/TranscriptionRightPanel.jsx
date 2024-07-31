@@ -744,6 +744,7 @@ const TranscriptionRightPanel = ({
                       {ProjectDetails?.tgt_language !== "en" &&
                         enableTransliteration ? (
                         <IndicTransliterate
+                          apiKey={process.env.REACT_APP_XLIT_APIKEY}
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
@@ -811,6 +812,7 @@ const TranscriptionRightPanel = ({
                         (ProjectDetails?.tgt_language !== "en" &&
                           enableTransliteration ? (
                           <IndicTransliterate
+                            apiKey={process.env.REACT_APP_XLIT_APIKEY}
                             lang={targetlang}
                             value={item.acoustic_normalised_text}
                             onChange={(event) => {

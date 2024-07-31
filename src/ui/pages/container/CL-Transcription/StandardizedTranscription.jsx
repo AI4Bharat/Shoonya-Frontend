@@ -937,6 +937,7 @@ useEffect(() => {
                       {ProjectDetails?.tgt_language !== "en" &&
                         false ? (
                         <IndicTransliterate
+                          apiKey={process.env.REACT_APP_XLIT_APIKEY}
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
@@ -1006,6 +1007,7 @@ useEffect(() => {
                         (ProjectDetails?.tgt_language !== "en" &&
                           enableTransliteration ? (
                           <IndicTransliterate
+                            apiKey={process.env.REACT_APP_XLIT_APIKEY}
                             lang={targetlang}
                             value={item.acoustic_normalised_text}
                             onChange={(event) => {
@@ -1212,6 +1214,7 @@ useEffect(() => {
                       {ProjectDetails?.tgt_language !== "en" &&
                         false ? (
                         <IndicTransliterate
+                          apiKey={process.env.REACT_APP_XLIT_APIKEY}
                           lang={targetlang}
                           onChange={(event) => {
                             changeTranscriptHandler(event, index + idxOffset, 2);

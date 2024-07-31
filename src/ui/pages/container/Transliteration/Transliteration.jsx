@@ -226,6 +226,7 @@ const Transliteration = (props) => {
       </Grid>
 
       <IndicTransliterate
+        apiKey={process.env.REACT_APP_XLIT_APIKEY}
         lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ? data[0]?.LangCode : "hi")}
         value={text}
         onChangeText={(val) => {
