@@ -147,6 +147,7 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
 
                 { targetData.length > 0 && targetlang !== "en" ? (
                  <IndicTransliterate
+                  apiKey={process.env.REACT_APP_XLIT_APIKEY}
                   lang={Targetlanguage.LangCode ? Targetlanguage.LangCode : (targetData.length > 0  ?  targetData[0]?.LangCode : "en" )}
                   value={targetText}
                   onChangeText={(targetText) => {
