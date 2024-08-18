@@ -25,16 +25,20 @@ const ScheduleMails = () => {
   const [reportLevel, setReportLevel] = useState(1);
   const [selectedProjectType, setSelectedProjectType] = useState("AllAudioProjects");
   const [projectTypes, setProjectTypes] = useState([
-    "AudioSegmentation",
-    "AudioTranscription",
-    "AudioTranscriptionEditing",
-    "ConversationTranslation",
-    "ConversationTranslationEditing",
-    "AcousticNormalisedTranscriptionEditing",
-    "AllAudioProjects",
-    "OCRTranscription",
-    "OCRTranscriptionEditing",
+        "AudioSegmentation",
+        "AudioTranscription",
+        "AudioTranscriptionEditing",
+        "ConversationTranslation",
+        "ConversationTranslationEditing",
+        "AcousticNormalisedTranscriptionEditing",
+        "AllAudioProjects",
+        "OCRTranscription",
+        "OCRTranscriptionEditing",
+        "ContextualTranslation",
+        "ContextualSentenceVerification",
+        "ContextualTranslationEditing"
   ]);
+  
   const [schedule, setSchedule] = useState("Daily");
   const [scheduleDay, setScheduleDay] = useState(1);
   const [workspaceId, setWorkspaceId] = useState(0);
