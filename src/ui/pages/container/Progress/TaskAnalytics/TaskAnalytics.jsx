@@ -78,6 +78,7 @@ const TaskAnalytics = (props) => {
   ]
   const ocrProjectTypes=[
     'OCRTranscriptionEditing',
+    'OCRSegmentCategorizationEditing' 
   ]
 
   useEffect(() => {
