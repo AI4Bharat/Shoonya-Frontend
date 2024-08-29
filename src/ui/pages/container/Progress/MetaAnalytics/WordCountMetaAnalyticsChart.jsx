@@ -15,6 +15,8 @@ import {
 
 export default function WordCountMetaAnalyticsChart(props) {
     const {analyticsData,graphCategory} = props
+    console.log(analyticsData);
+    
     const classes = DatasetStyle();
     const [totalWordCount, setTotalWordCount] = useState();
     const [totalAnnotationWordCount, setTotalAnnotationWordCount] = useState();
