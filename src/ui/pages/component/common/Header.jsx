@@ -52,8 +52,6 @@ import CustomizedSnackbars from "../common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
 import UpdateUIPrefsAPI from "../../../../redux/actions/api/UserManagement/UpdateUIPrefs";
-import TaskAnalyticsDataAPI from "../../../../redux/actions/api/Progress/TaskAnalytics";
-import MetaAnalyticsDataAPI from "../../../../redux/actions/api/Progress/MetaAnalytics";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -171,14 +169,7 @@ const Header = () => {
     getLoggedInUserData();
 
   }, []);
-  useEffect(() => {
-    const userObj = new TaskAnalyticsDataAPI('ContextualTranslationEditing');
-    dispatch(APITransport(userObj));
-    const userObj1 = new MetaAnalyticsDataAPI(1,'ContextualTranslationEditing');
-    dispatch(APITransport(userObj1));
 
-
-  }, []);
 
   /* useEffect(()=>{
     if(loggedInUserData?.prefer_cl_ui !== undefined){
