@@ -116,8 +116,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Tasks Count
-              </Typography>
+              Total Annotated Tasks              </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalTaskCount &&
                   new Intl.NumberFormat("en").format(totalTaskCount)}
@@ -125,7 +124,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Total Audio Files Annotated
+              Pending Review Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -134,7 +133,7 @@ function SingleSpeakerAudioTranscriptionEditing(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Total quality/ reviewed audio files
+              Review Completed Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewTasksCount &&
