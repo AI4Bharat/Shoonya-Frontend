@@ -762,15 +762,15 @@ console.log(unseenNotifications,'uuu');
     // },
   ];
 
-  if (ProjectDetails?.project_type?.includes("ContextualTranslationEditing")) {
-    appSettings.splice(1, 0, {
-      name: "Romanised Transliteration",
-      onclick: () => {
-        handleCloseSettingsMenu(); 
-        localStorage.setItem("showRomanisedTransliterationModel", "true" );
-      },
-    });
-  }
+  // if (ProjectDetails?.project_type?.includes("ContextualTranslationEditing")) {
+  //   appSettings.splice(1, 0, {
+  //     name: "Romanised Transliteration",
+  //     onclick: () => {
+  //       handleCloseSettingsMenu(); 
+  //       localStorage.setItem("showRomanisedTransliterationModel", "true" );
+  //     },
+  //   });
+  // }
   
   const helpMenu = [
     {
