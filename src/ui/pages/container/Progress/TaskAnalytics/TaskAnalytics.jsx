@@ -86,17 +86,10 @@ const TaskAnalytics = (props) => {
     setProjectTypes(types);
   }, []);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if(!taskAnalyticsData.length){
-        getTaskAnalyticsdata();
-      }
-    }, 500); 
-    return () => {
-        clearTimeout(handler);
-    };
-}, []);
 
+  useEffect(() => {
+    getTaskAnalyticsdata();
+  }, []);
 
   useEffect(() => {
     if (taskAnalyticsData.length > 0) {
@@ -210,8 +203,8 @@ const TaskAnalytics = (props) => {
             </Select>
           </FormControl>
           {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent="space-between" alignItems="center"> */}
-          <CustomButton label="Submit" sx={{ width: { xs: "100px", md: "120px" }, height: "40px" }} onClick={handleSubmit}  />
-          <Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
+          <CustomButton label="Submit" sx={{ width: "120px" }} onClick={handleSubmit} disabled={loading} />
+          <Box display="flex" alignItems="center">
             <CustomButton
               onClick={handleClick}
               disabled={loading}
