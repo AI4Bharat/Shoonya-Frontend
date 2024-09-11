@@ -87,6 +87,7 @@ const TranscriptionRightPanel = ({
   annotationId,
 }) => {
   const { taskId } = useParams();
+console.log(AnnotationsTaskDetails);
 
   const classes = AudioTranscriptionLandingStyle();
   const navigate = useNavigate();
@@ -105,6 +106,7 @@ const TranscriptionRightPanel = ({
   const [targetlang, settargetlang] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+console.log(subtitles,"sub");
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -565,6 +567,7 @@ const TranscriptionRightPanel = ({
               onSplitClick={onSplitClick}
               showPopOver={showPopOver}
               showSplit={true}
+              subtitles={subtitles}
               advancedWaveformSettings={advancedWaveformSettings}
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
               waveSurfer={waveSurfer}
