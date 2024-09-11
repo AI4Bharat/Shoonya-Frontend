@@ -171,14 +171,6 @@ const Header = () => {
     getLoggedInUserData();
 
   }, []);
-  useEffect(() => {
-    const userObj = new TaskAnalyticsDataAPI('ContextualTranslationEditing');
-    dispatch(APITransport(userObj));
-    const userObj1 = new MetaAnalyticsDataAPI(1,'ContextualTranslationEditing');
-    dispatch(APITransport(userObj1));
-
-
-  }, []);
 
   /* useEffect(()=>{
     if(loggedInUserData?.prefer_cl_ui !== undefined){
