@@ -104,16 +104,8 @@ export default function MetaAnalytics(props) {
       }, []);
 
       useEffect(() => {
-        const handler = setTimeout(() => {
-          if(!metaAnalyticsData.length){
-            getMetaAnalyticsdata();
-          }
-        }, 500); 
-        return () => {
-            clearTimeout(handler);
-        };
-    }, []);
-    
+        getMetaAnalyticsdata();
+      }, []);
       const handleSubmit = async () => {
         getMetaAnalyticsdata();
       }
@@ -239,8 +231,8 @@ export default function MetaAnalytics(props) {
             </Select>
           </FormControl>
 {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent="space-between" alignItems="center"> */}
-<CustomButton label="Submit" sx={{ width: { xs: "100px", md: "120px" }, height: "40px" }} onClick={handleSubmit}  />
-          <Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
+<CustomButton label="Submit" sx={{ width: "120px" }} onClick={handleSubmit} disabled={loading} />
+          <Box display="flex" alignItems="center">
             <CustomButton
               onClick={handleClick}
               disabled={loading}
