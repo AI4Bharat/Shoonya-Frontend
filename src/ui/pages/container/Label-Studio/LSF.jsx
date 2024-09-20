@@ -1097,10 +1097,8 @@ const LabelStudioWrapper = ({
               {/* ) : (
               <div style={{ minWidth: "160px" }} />
             )} */}
-            </Grid>
             {ProjectDetails?.project_type?.includes("OCR") && 
             <>
-            <Grid item >
               <Tooltip title="Clear all children bboxes">
                 <Button
                   type="default"
@@ -1119,9 +1117,9 @@ const LabelStudioWrapper = ({
                   Clear All Mergings
                 </Button>
               </Tooltip>
-            </Grid>
             </>
             }
+            </Grid>
           </Grid>
         </div>
       )}
