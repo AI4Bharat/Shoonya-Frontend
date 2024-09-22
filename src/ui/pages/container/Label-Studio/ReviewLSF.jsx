@@ -58,7 +58,7 @@ import CustomButton from "../../component/common/Button";
 import CircularProgress from '@mui/material/CircularProgress';
 import LanguageCode from "../../../../utils/LanguageCode";
 import PostTransliterationForLogging from "../../../../redux/actions/api/Annotation/PostTransliterationForLogging";
-import RomanisedTransliteration from "../Transliteration/RomanisedTransliteration";
+// import RomanisedTransliteration from "../Transliteration/RomanisedTransliteration";
 const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
@@ -265,18 +265,18 @@ const LabelStudioWrapper = ({
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
-  const [romanisedTransliterationData, setRomanisedTransliterationData] = useState({
-    timestamp: '',
-    error: '',
-    input: '',
-    romanised_transliteration: '',
-    success: false
-  });
-  const [showRomanisedTransliterationModel, setShowRomanisedTransliterationModel] = useState(true);
+  // const [romanisedTransliterationData, setRomanisedTransliterationData] = useState({
+  //   timestamp: '',
+  //   error: '',
+  //   input: '',
+  //   romanised_transliteration: '',
+  //   success: false
+  // });
+  // const [showRomanisedTransliterationModel, setShowRomanisedTransliterationModel] = useState(true);
   const [showSpinner , setShowSpinner] = useState(false);
-  const [originalRomanisedText, setOriginalRomanisedText] = useState("");
-  const [editedRomanisedText, setEditedRomanisedText] = useState("")
-  const [indicText, setIndicText] = useState("");
+  // const [originalRomanisedText, setOriginalRomanisedText] = useState("");
+  // const [editedRomanisedText, setEditedRomanisedText] = useState("")
+  // const [indicText, setIndicText] = useState("");
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
@@ -646,15 +646,15 @@ useEffect(() => {
                 (annotation) => annotation.annotation_type === 2
               )[0];
 
-              if(originalRomanisedText.length==0  && projectType.includes("ContextualTranslationEditing")){
-                setSnackbarInfo({
-                  open: true,
-                  message: "Please click on Check Transliteration button first",
-                  variant: "info",
-                });
-                // dont allow to move forward
-                hideLoader();
-              }
+              // if(originalRomanisedText.length==0  && projectType.includes("ContextualTranslationEditing")){
+              //   setSnackbarInfo({
+              //     open: true,
+              //     message: "Please click on Check Transliteration button first",
+              //     variant: "info",
+              //   });
+              //   // dont allow to move forward
+              //   hideLoader();
+              // }
               patchReview(
                 taskId,
                 review.id,
@@ -1062,7 +1062,7 @@ useEffect(() => {
           selectedLanguages,
           ocrDomain
         ).then((res) => {
-          if (res.status !== 200) {
+          if (res?.status !== 200) {
             setSnackbarInfo({
               open: true,
               message: "Error in autosaving annotation",
@@ -1185,143 +1185,144 @@ useEffect(() => {
   const fetchAnnotationTask = async () => {
     const res = await fetchAnnotation(taskId);
     // console.log(res);
-    if(res[0]?.result[0])
-    { 
-      setIndicText(res[0]?.result[0]?.value?.text[0]);
-    }
+    // if(res[0]?.result[0])
+    // { 
+    //   // setIndicText(res[0]?.result[0]?.value?.text[0]);
+    // }
     setTaskData(res);
     setAnnotations(res?.annotations);
   };
 
   // create a handleSubmitRomanisedText function
-  const handleSubmitRomanisedText = async () => {
-    if(taskData?.data?.input_text && taskData?.data?.output_language){
-      const language = LanguageCode.languages 
-      let output_lng_code = ''
+  // const handleSubmitRomanisedText = async () => {
+  //   if(taskData?.data?.input_text && taskData?.data?.output_language){
+  //     const language = LanguageCode.languages 
+  //     let output_lng_code = ''
 
-      language.filter((lang) => {
-        if(lang.label === taskData?.data?.output_language){
-          output_lng_code= lang.code
-        }
-      });
-      // Create a new instance of the class
-      const postTransliterationForLogging = new PostTransliterationForLogging(
-        taskData?.data?.input_text, 
-        indicText , 
-        originalRomanisedText, 
-        editedRomanisedText,
-        output_lng_code
-      );
+  //     language.filter((lang) => {
+  //       if(lang.label === taskData?.data?.output_language){
+  //         output_lng_code= lang.code
+  //       }
+  //     });
+  //     // Create a new instance of the class
+  //     const postTransliterationForLogging = new PostTransliterationForLogging(
+  //       taskData?.data?.input_text, 
+  //       indicText , 
+  //       originalRomanisedText, 
+  //       editedRomanisedText,
+  //       output_lng_code
+  //     );
 
-      const res = dispatch(APITransport(postTransliterationForLogging));
-      if(res){
-        setRomanisedTransliterationData(
-          {
-            timestamp: '',
-            error: '',
-            input: '',
-            romanised_transliteration: '',
-            success: false
-          }
-        )
-        setOriginalRomanisedText("");
-        setEditedRomanisedText("");
-        setSnackbarInfo({
-          open: true,
-          message: "Transliteration Logged",
-          variant: "success",
-        });
-        setShowSpinner(false)
+  //     const res = await dispatch(APITransport(postTransliterationForLogging));
+      
+  //     if(res?.success){   
+  //       setRomanisedTransliterationData(
+  //         {
+  //           timestamp: '',
+  //           error: '',
+  //           input: '',
+  //           romanised_transliteration: '',
+  //           success: false
+  //         }
+  //       )
+  //       setOriginalRomanisedText("");
+  //       setEditedRomanisedText("");
+  //       setSnackbarInfo({
+  //         open: true,
+  //         message: "Transliteration Logged",
+  //         variant: "success",
+  //       });
+  //       setShowSpinner(false)
 
-      }else{
-        setSnackbarInfo({
-          open: true,
-          message: "Error in logging transliteration",
-          variant: "error",
-        });
-        setShowSpinner(false)
-      }
-    }
-  }
+  //     }else{
+  //       setSnackbarInfo({
+  //         open: true,
+  //         message: "Error in logging transliteration",
+  //         variant: "error",
+  //       });
+  //       setShowSpinner(false)
+  //     }
+  //   }
+  // }
 
-  const handleTranslitrationOnClick = async () => {
-    setShowSpinner(true)
-    const language = LanguageCode.languages 
-    let output_lng_code = ''
+  // const handleTranslitrationOnClick = async () => {
+  //   setShowSpinner(true)
+  //   const language = LanguageCode.languages 
+  //   let output_lng_code = ''
 
-    language.filter((lang) => {
-      if(lang.label == taskData?.data?.output_language){
-        output_lng_code = lang.code
-      } 
-    })
-    try {
+  //   language.filter((lang) => {
+  //     if(lang.label == taskData?.data?.output_language){
+  //       output_lng_code = lang.code
+  //     } 
+  //   })
+  //   try {
 
-    const res = await fetchTransliteration(indicText, output_lng_code);
-    if(res?.success && res?.romanised_transliteration) {
-      setRomanisedTransliterationData(res);
-      if(res?.romanised_transliteration)
-      {
-        setOriginalRomanisedText(res.romanised_transliteration);
-      }
-      setSnackbarInfo({
-        open: true,
-        message: "Transliteration Done",
-        variant: "success",
-      });
-      setShowSpinner(false)
-    }
-  }
-  catch (error) {
-    setSnackbarInfo({
-      open: true,
-      message: "Error in fetching romanised text",
-      variant: "error",
-    });
-    setShowSpinner(false)
-  }
+  //   const res = await fetchTransliteration(indicText, output_lng_code);
+  //   if(res?.success && res?.romanised_transliteration) {
+  //     setRomanisedTransliterationData(res);
+  //     if(res?.romanised_transliteration)
+  //     {
+  //       setOriginalRomanisedText(res.romanised_transliteration);
+  //     }
+  //     setSnackbarInfo({
+  //       open: true,
+  //       message: "Transliteration Done",
+  //       variant: "success",
+  //     });
+  //     setShowSpinner(false)
+  //   }
+  // }
+  // catch (error) {
+  //   setSnackbarInfo({
+  //     open: true,
+  //     message: "Error in fetching romanised text",
+  //     variant: "error",
+  //   });
+  //   setShowSpinner(false)
+  // }
 
-  }
-  useEffect(() => {
-    if(originalRomanisedText) {
-      setEditedRomanisedText(originalRomanisedText);
-    }
-  }, [originalRomanisedText]);
+  // }
+  // useEffect(() => {
+  //   if(originalRomanisedText) {
+  //     setEditedRomanisedText(originalRomanisedText);
+  //   }
+  // }, [originalRomanisedText]);
 
-  useEffect(() => {
-    let annotation = lsfRef?.current?.store?.annotationStore?.selected;
-      let temp;
-      for (let i = 0; i < annotations?.length; i++) {
-        if (
-          !annotations[i]?.result?.length ||
-          annotation.serializeAnnotation()[0].id ===
-            annotations[i]?.result[0].id
-        ) {
-          temp = annotation.serializeAnnotation();
-          if (annotations[i]?.annotation_type !== 1) continue;
-          for (let i = 0; i < temp?.length; i++) {
-            if(temp[i].type === "relation"){
-              continue;
-            }else if (temp[i]?.value.text) {
-              temp[i].value.text = [temp[i].value.text[0]];
-            }
-          }          
-          if(temp[0]?.value?.text[0]?.length >0){
-            setIndicText(temp[0]?.value?.text[0])
-          }
-        }
-        }
-  }, [annotations, fetchTransliteration, handleSubmitRomanisedText]);
+  // useEffect(() => {
+  //   let annotation = lsfRef?.current?.store?.annotationStore?.selected;
+  //     let temp;
+  //     for (let i = 0; i < annotations?.length; i++) {
+  //       if (
+  //         !annotations[i]?.result?.length ||
+  //         annotation.serializeAnnotation()[0].id ===
+  //           annotations[i]?.result[0].id
+  //       ) {
+  //         temp = annotation.serializeAnnotation();
+  //         if (annotations[i]?.annotation_type !== 1) continue;
+  //         for (let i = 0; i < temp?.length; i++) {
+  //           if(temp[i].type === "relation"){
+  //             continue;
+  //           }else if (temp[i]?.value.text) {
+  //             temp[i].value.text = [temp[i].value.text[0]];
+  //           }
+  //         }          
+  //         if(temp[0]?.value?.text[0]?.length >0){
+  //           setIndicText(temp[0]?.value?.text[0])
+  //         }
+  //       }
+  //       }
+  // }, [annotations, fetchTransliteration, handleSubmitRomanisedText]);
 
-  const handleEditableRomanisedText =(e)=>{
-    setEditedRomanisedText(e.target.value)
-  }
+  // const handleEditableRomanisedText =(e)=>{
+  //   setEditedRomanisedText(e.target.value)
+  // }
 
   // call the handleTransliteration for first time if the indic text is present 
-  useEffect(() => {
-    if(indicText){
-      handleTranslitrationOnClick()
-    }
-  }, [indicText]);
+  // useEffect(() => {
+  //   if(indicText){
+  //     handleTranslitrationOnClick()
+  //   }
+  // }, [indicText]);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -1394,6 +1395,26 @@ useEffect(() => {
             Auto-save enabled for this scenario.
           </Typography>
         </div>}
+        <div>
+          {ProjectDetails.revision_loop_count >
+            taskData?.revision_loop_count?.review_count
+            ? false
+            : true && (
+              <div style={{ textAlign: "left", marginBottom: "15px" }}>
+                <Typography variant="body" color="#f5222d">
+                  Note: The 'Revision Loop Count' limit has been reached for this
+                  task.
+                </Typography>
+              </div>
+            )}
+
+          {ProjectDetails.revision_loop_count - taskData?.revision_loop_count?.review_count !== 0 && (
+            <div style={{ textAlign: "left", marginBottom: "15px" }}>
+              <Typography variant="body" color="#f5222d">
+                Note: This task can be rejected {ProjectDetails.revision_loop_count - taskData?.revision_loop_count?.review_count} more times.
+              </Typography>
+            </div>)}
+        </div>
       {filterMessage && (
         <Alert severity="info" showIcon style={{ marginBottom: "1%" }}>
           {filterMessage}
@@ -1463,10 +1484,23 @@ useEffect(() => {
                   value="to_be_revised"
                   type="default"
                   onClick={handleReviseClick}
+                  disabled={
+                    ProjectDetails.revision_loop_count >
+                      taskData?.revision_loop_count?.review_count
+                      ? false
+                      : true
+                  }
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
-                    color: "#f5222d",
+                    color: (
+                      ProjectDetails.revision_loop_count >
+                        taskData?.revision_loop_count?.review_count
+                        ? false
+                        : true
+                    )
+                      ? "#B2BABB"
+                      : "#f5222d",
                     pt: 3,
                     pb: 3,
                     borderBottom: "None",
@@ -1573,21 +1607,21 @@ useEffect(() => {
           {tagSuggestionList}
         </Popover>
          
-        {!loader &&  showRomanisedTransliterationModel && 
-          <RomanisedTransliteration
-            open = {localStorage.getItem("showRomanisedTransliterationModel") == "true"}
-            onClose = {() => {
-              setShowRomanisedTransliterationModel(false) 
-            }}
-            setShowRomanisedTransliterationModel = {setShowRomanisedTransliterationModel}
-            indicText={indicText}
-            originalRomanisedText={originalRomanisedText}
-            editedRomanisedText={editedRomanisedText}
-            handleEditableRomanisedText={handleEditableRomanisedText}
-            handleTranslitrationOnClick={handleTranslitrationOnClick}
-            handleSubmitRomanisedText={handleSubmitRomanisedText}
-            showSpinner={showSpinner}
-          />
+        {  
+          // <RomanisedTransliteration
+          //   minimizeTextbox = {showRomanisedTransliterationModel}
+          //   onClose = {() => {
+          //     setShowRomanisedTransliterationModel(!showRomanisedTransliterationModel) 
+          //   }}
+          //   setShowRomanisedTransliterationModel = {setShowRomanisedTransliterationModel}
+          //   indicText={indicText}
+          //   originalRomanisedText={originalRomanisedText}
+          //   editedRomanisedText={editedRomanisedText}
+          //   handleEditableRomanisedText={handleEditableRomanisedText}
+          //   handleTranslitrationOnClick={handleTranslitrationOnClick}
+          //   handleSubmitRomanisedText={handleSubmitRomanisedText}
+          //   showSpinner={showSpinner}
+          // />
         }
       </Box>
       {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 

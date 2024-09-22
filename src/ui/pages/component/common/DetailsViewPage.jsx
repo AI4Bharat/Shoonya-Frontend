@@ -421,7 +421,7 @@ const DetailsViewPage = (props) => {
                   columnSpacing={4}
                   rowSpacing={2}
                 >
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={12}>
                     <Link to={`/create-annotation-project/${id}`}>
                       <Button
                         className={classes.projectButton}
@@ -429,14 +429,14 @@ const DetailsViewPage = (props) => {
                       />
                     </Link>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  {/* <Grid item xs={12} sm={6}>
                     <Link to={`/create-collection-project/${id}`}>
                       <Button
                         className={classes.projectButton}
                         label={"Add New Collection Project"}
                       />
                     </Link>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
                 <div className={classes.workspaceTables}>
                   <ProjectTable />

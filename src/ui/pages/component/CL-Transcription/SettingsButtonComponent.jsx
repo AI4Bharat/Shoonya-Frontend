@@ -1,7 +1,7 @@
 import React, { memo, useState } from "react";
 import { useSelector } from "react-redux";
 import { fontMenu } from "../../../../utils/SubTitlesUtils";
-
+import VisibilityIcon from "@mui/icons-material/Visibility";
 //Styles
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 
@@ -30,6 +30,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 // import FormatLineSpacingIcon from "@mui/icons-material/FormatLineSpacingIcon";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
+import PreviewDialog from "./PreviewDialog";
 
 const anchorOrigin = {
   vertical: "top",
@@ -59,6 +60,7 @@ const SettingsButtonComponent = ({
   onSplitClick,
   showPopOver,
   showSplit,
+  subtitles,
   handleInfoButtonClick,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
@@ -72,10 +74,12 @@ const SettingsButtonComponent = ({
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   // const dispatch = useDispatch();
+console.log(subtitles);
 
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElLimit, setAnchorElLimit] = useState(null);
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
 
   return (
     <>
@@ -266,6 +270,7 @@ const SettingsButtonComponent = ({
             borderRadius: "50%",
             color: "#fff",
             marginX: "5px",
+            marginRight: "5px",
             "&:hover": {
               backgroundColor: "#271e4f",
             },
@@ -275,6 +280,23 @@ const SettingsButtonComponent = ({
           <FormatSizeIcon />
         </IconButton>
       </Tooltip>
+      <Tooltip title="Subtitle Preview" placement="bottom">
+          <IconButton
+            className={classes.rightPanelBtnGrp}
+            onClick={() => setOpenPreviewDialog(true)}
+            style={{
+              backgroundColor: "#2C2799",
+              borderRadius: "50%",
+              color: "#fff",
+              marginX: "5px",
+              "&:hover": {
+                backgroundColor: "#271e4f",
+              },}}
+          >
+            <VisibilityIcon className={classes.rightPanelSvg} />
+          </IconButton>
+        </Tooltip>
+
 
       <Menu
         sx={{ mt: "45px" }}
@@ -386,6 +408,18 @@ const SettingsButtonComponent = ({
           <RedoIcon />
         </IconButton>
       </Tooltip>
+      {openPreviewDialog && (
+        <PreviewDialog
+          openPreviewDialog={openPreviewDialog}
+          handleClose={() => setOpenPreviewDialog(false)}
+          subtitles={subtitles}
+          // taskType={taskData?.task_type}
+          // currentSubs={currentSubs}
+          // videoId={taskData?.video}
+          // targetLanguage={taskData?.target_language}
+        />
+      )}
+
     </>
   );
 };
