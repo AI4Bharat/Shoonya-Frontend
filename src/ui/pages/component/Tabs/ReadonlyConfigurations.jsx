@@ -1,4 +1,4 @@
-import { Card, Grid, ThemeProvider, Typography } from "@mui/material";
+import { Card, Grid, ThemeProvider, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
@@ -6,12 +6,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import CustomButton from "../../component/common/Button";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
+import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
 const ReadonlyConfigurations = (props) => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
+  const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
+  const [editedMetadata, setEditedMetadata] = useState("");
+
   const getWorkspaceDetails = () => {
     const workspaceObj = new GetWorkspacesDetailsAPI(ProjectDetails.workspace_id);
     dispatch(APITransport(workspaceObj));
@@ -21,7 +26,37 @@ useEffect(() => {
     getWorkspaceDetails();
 }, []);
 
-const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
+  const handleOpenMetadataDialog = () => {
+    setEditedMetadata(JSON.stringify(ProjectDetails.metadata_json, null, 2));
+    setMetadataDialogOpen(true);
+  };
+
+  const handleCloseMetadataDialog = () => {
+    setMetadataDialogOpen(false);
+  };
+
+  const handleMetadataChange = (e) => {
+    setEditedMetadata(e.target.value);
+  };
+
+  const handleSaveMetadata = () => {
+    try {
+      const parsedMetadata = JSON.parse(editedMetadata);
+      const patchProjectObj = new GetProjectDetailsAPI(
+        ProjectDetails.id,
+        "PATCH",
+        { metadata_json: parsedMetadata }
+      );
+
+      dispatch(APITransport(patchProjectObj));
+      setMetadataDialogOpen(false);
+      alert("Metadata update initiated. Please wait for confirmation.");
+      dispatch(APITransport(new GetProjectDetailsAPI(ProjectDetails.id)));
+    } catch (error) {
+      console.error("Invalid JSON format or network error", error);
+      alert("Invalid JSON format or network error. Please correct it.");
+    }
+  };
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -210,7 +245,68 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
             )}
           </div>
         )}
+
+        {/* Metadata Parameters Section */}
+        <div>
+          <Grid
+            item
+            xs={12}
+            md={12}
+            lg={12}
+            xl={12}
+            sm={12}
+            sx={{ mt: 4, display: "flex", alignItems: 'center' }}  
+          >
+            <Typography variant="subtitle1" style={{ flexDirection: "column", minWidth: '150px' }}>
+              Metadata Parameters:
+            </Typography>
+            <Typography variant="subtitle1" style={{ marginLeft: 25, marginRight: 10 }}> 
+              {ProjectDetails.metadata_json ? JSON.stringify(ProjectDetails.metadata_json, null, 2) : "No Metadata Available"}
+            </Typography>
+            
+            <Button
+              sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
+              variant="contained"
+              color="primary"
+              onClick={handleOpenMetadataDialog}
+            >
+              Edit Metadata
+            </Button>
+          </Grid>
+        </div>
       </Grid>
+
+      {/* Metadata Editing Dialog */}
+      <Dialog open={metadataDialogOpen} onClose={handleCloseMetadataDialog}>
+        <DialogTitle>Edit Metadata</DialogTitle>
+        <DialogContent>
+          <TextField
+            multiline
+            fullWidth
+            rows={10}
+            value={editedMetadata}
+            onChange={handleMetadataChange}
+          />
+        </DialogContent>
+        <DialogActions>
+        <Button
+              sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
+              variant="contained"
+              color="primary"
+              onClick={handleOpenMetadataDialog}
+            >
+              Cancel
+        </Button>
+        <Button
+              sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
+              variant="contained"
+              color="primary"
+              onClick={handleSaveMetadata}
+            >
+              Save
+        </Button>
+        </DialogActions>
+      </Dialog>
 
       <Grid container direction="row">
         {ProjectDetails && ProjectDetails?.variable_parameters?.output_language && (
