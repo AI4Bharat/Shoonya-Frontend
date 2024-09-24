@@ -646,7 +646,8 @@ const AdvancedOperation = (props) => {
               onChange={handleReviewToggle}
             />
           </Grid> */}
-           {userRole.Admin === loggedInUserData?.role ?<Grid item xs={12} sm={12} md={12} lg={12} xl={12}
+           {userRole.Admin === loggedInUserData?.role  ||
+            userRole.OrganizationOwner === loggedInUserData?.role?<Grid item xs={12} sm={12} md={12} lg={12} xl={12}
             sx={{ ml: 2 }}
           >
               <FormControl size="small" className={classes.formControl}>

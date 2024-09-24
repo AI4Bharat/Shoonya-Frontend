@@ -87,6 +87,7 @@ const TranscriptionRightPanel = ({
   annotationId,
 }) => {
   const { taskId } = useParams();
+console.log(AnnotationsTaskDetails);
 
   const classes = AudioTranscriptionLandingStyle();
   const navigate = useNavigate();
@@ -105,6 +106,7 @@ const TranscriptionRightPanel = ({
   const [targetlang, settargetlang] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+console.log(subtitles,"sub");
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -565,6 +567,7 @@ const TranscriptionRightPanel = ({
               onSplitClick={onSplitClick}
               showPopOver={showPopOver}
               showSplit={true}
+              subtitles={subtitles}
               advancedWaveformSettings={advancedWaveformSettings}
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
               waveSurfer={waveSurfer}
@@ -744,6 +747,7 @@ const TranscriptionRightPanel = ({
                       {ProjectDetails?.tgt_language !== "en" &&
                         enableTransliteration ? (
                         <IndicTransliterate
+                          apiKey={process.env.REACT_APP_XLIT_APIKEY}
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
@@ -811,6 +815,7 @@ const TranscriptionRightPanel = ({
                         (ProjectDetails?.tgt_language !== "en" &&
                           enableTransliteration ? (
                           <IndicTransliterate
+                            apiKey={process.env.REACT_APP_XLIT_APIKEY}
                             lang={targetlang}
                             value={item.acoustic_normalised_text}
                             onChange={(event) => {

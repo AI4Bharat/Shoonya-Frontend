@@ -489,7 +489,6 @@ const AudioTranscriptionLandingPage = ({project_type}) => {
 
   useEffect(() => {
     let standardisedTranscription = "";
-
     const sub = annotations[0]?.result.filter((item) => {
       if ("standardised_transcription" in item) {
         standardisedTranscription = item.standardised_transcription;
@@ -1119,6 +1118,7 @@ useEffect(() => {
             >
               {stdTranscriptionSettings.enableTransliteration ? (
                 <IndicTransliterate
+                  apiKey={process.env.REACT_APP_XLIT_APIKEY}
                   lang={stdTranscriptionSettings.targetlang}
                   value={stdTranscription}
                   onChange={(e) => {
