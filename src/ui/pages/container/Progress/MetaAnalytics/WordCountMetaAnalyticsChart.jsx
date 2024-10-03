@@ -212,7 +212,7 @@ export default function WordCountMetaAnalyticsChart(props) {
             </Box>
         <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Total Annotated Task
+                Total Annotated Word Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalWordCount &&
@@ -221,7 +221,7 @@ export default function WordCountMetaAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Pending Review Tasks
+                Pending Review  Word Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationWordCount &&
@@ -230,7 +230,7 @@ export default function WordCountMetaAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Review Completed Tasks
+                Review Completed Word Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewWordCount &&
