@@ -1,5 +1,5 @@
 // import { Grid } from "@material-ui/core";
-import { Button, Grid, ThemeProvider, Select, Box, MenuItem,Radio, InputLabel, FormControl, Card, Typography, Menu, styled } from "@mui/material";
+import { Button, Grid, ThemeProvider, Select, Box, MenuItem,Radio, InputLabel, FormControl,Checkbox, Card, Typography, Menu, styled, FormControlLabel, IconButton } from "@mui/material";
 import React from "react";
 // import ContextualTranslationEditing from "../TaskAnalytics/ContextualTranslationEditing";
 // import SemanticTextualSimilarityChart from "../TaskAnalytics/SemanticTextualSimilarityChart";
@@ -22,7 +22,7 @@ import TaskCountAnalyticsChart from "../TaskAnalytics/TaskCountAnalyticsChart";
 import exportFromJSON from 'export-from-json';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { KeyboardArrowDown } from "@material-ui/icons";
+import { FilterList, KeyboardArrowDown } from "@material-ui/icons";
 const StyledMenu = styled((props) => (
   <Menu
     elevation={3}
@@ -53,6 +53,11 @@ const TaskAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("ContextualTranslationEditing");
+  const [annotationChecked, setAnnotationChecked] = useState(true);
+  const [reviewChecked, setReviewChecked] = useState(true);
+  const [supercheckChecked, setSupercheckChecked] = useState(false);
+  const [showFilterBox, setShowFilterBox] = useState(false);
+
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
   const taskAnalyticsData = useSelector(
@@ -186,45 +191,112 @@ const TaskAnalytics = () => {
 
   };
 
+  const handleReviewChange = (e) => {
+    const isChecked = e.target.checked;
+    setReviewChecked(isChecked);
+    
+    if (isChecked) {
+      setAnnotationChecked(true);
+    }
+    else{
+      setSupercheckChecked(false)
+    }
+  };
+  
+  const handleSupercheckChange = (e) => {
+    const isChecked = e.target.checked;
+    setSupercheckChecked(isChecked);
+  
+    if (isChecked) {
+      setReviewChecked(true);
+      setAnnotationChecked(true);
+    }
+  };
+  const handleApply = () => {
+    getTaskAnalyticsdata();
+    setShowFilterBox(false); 
+  };
 
-  return (
+  const handleCancel = () => {
+    setSelectedType("ContextualTranslationEditing");
+    setAnnotationChecked(true);
+    setReviewChecked(true);
+    setSupercheckChecked(true);
+    setShowFilterBox(false); 
+  };
+
+  const toggleFilterBox = () => {
+    setShowFilterBox(!showFilterBox); 
+  };   
+   return (
     <>
-      {console.log(taskAnalyticsData[0])}
-      <Grid container columnSpacing={3} rowSpacing={2}  mb={1} gap={3}>
-      <Grid item xs={6} sm={6} md={6} lg={6} xl={6} display={"flex"} justifyContent="space-between" >
-      <FormControl  size="small">
-            <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
-              Project Type {" "}
-              {
-                <LightTooltip
-                  arrow
-                  placement="top"
-                  title={translate("tooltip.ProjectType")}>
-                  <InfoIcon
-                    fontSize="medium"
-                  />
-                </LightTooltip>
-              }
-            </InputLabel>
+      <Grid container columnSpacing={3} rowSpacing={2} mb={1} gap={3}>
+        <Grid item xs={2} sm={2} md={2} lg={2} xl={2} display={"flex"} justifyContent="space-between" >
+        <Box display="flex" justifyContent="flex-end" mb={2}>
+          <IconButton onClick={toggleFilterBox} aria-label="filter">
+            <FilterList fontSize="large" />
+          </IconButton>
+        </Box>
 
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={selectedType}
-              label="Project Type"
-              sx={{padding:"1px"}}
-              onChange={(e) => setSelectedType(e.target.value)}
-              MenuProps={MenuProps}
-            >
-              {projectTypes.map((type, index) => (
-                <MenuItem value={type} key={index}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-  <CustomButton label="Submit" sx={{ width: "120px" }} onClick={handleSubmit} disabled={loading} />
-          <Box display="flex" alignItems="center">
+        {showFilterBox && (
+          <Box border={1} borderRadius={2} padding={2} display="flex" flexDirection="column" gap={2}>
+
+            {/* Project Type Dropdown */}
+            <FormControl size="small">
+              <InputLabel id="demo-simple-select-label">Project Type</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={selectedType}
+                label="Project Type"
+                onChange={(e) => setSelectedType(e.target.value)}
+                MenuProps={MenuProps}
+              >
+                {projectTypes.map((type, index) => (
+                  <MenuItem value={type} key={index}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <Box display="flex" flexDirection="column">
+            <LightTooltip 
+ title={
+  <ul style={{ margin: 0, paddingLeft: '20px' }}>
+    <li>To View annotation count seperately.</li>
+    <li>To View combination of annotation and review counts.</li>
+    <li>To View combination of annotation, review, and supercheck counts.</li>
+  </ul>
+}      placement="top"
+    >
+      <InfoIcon fontSize="small" style={{ cursor: 'pointer', marginRight: 8 }} />
+    </LightTooltip>
+
+              <FormControlLabel
+                control={<Checkbox checked={annotationChecked}  />}
+                label="Annotation"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={reviewChecked} onChange={handleReviewChange} />}
+                label="Review"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={supercheckChecked} onChange={handleSupercheckChange} />}
+                label="Supercheck"
+              />
+            </Box>
+
+            <Box display="flex" justifyContent="flex-end" gap={2}>
+              <CustomButton label="Apply" onClick={handleApply}  />
+              <CustomButton label="Cancel" onClick={handleCancel} />
+            </Box>
+
+          </Box>
+        )}
+          {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent="space-between" alignItems="center"> */}
+          {/* <CustomButton label="Submit" sx={{ width: { xs: "100px", md: "120px" }, height: "40px" }} onClick={handleSubmit}  /> */}
+          <Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
             <CustomButton
               onClick={handleClick}
               disabled={loading}
@@ -245,16 +317,19 @@ const TaskAnalytics = () => {
               <MenuItem onClick={downloadJSON}>JSON</MenuItem>
             </StyledMenu>
           </Box>
-        {/* </Grid> */}
       </Grid>
         </Grid>
       
+
       {loading && <Spinner />}
       {taskAnalyticsData.length ?
         taskAnalyticsData.map((analyticsData,_index)=>{
           if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)){
             return (<Grid key={_index} style={{marginTop:"15px"}}>
-            <AudioTaskAnalyticsChart analyticsData={analyticsData}/>
+            <AudioTaskAnalyticsChart analyticsData={analyticsData}
+             annotationChecked={annotationChecked}
+             reviewChecked={reviewChecked}
+             supercheckChecked={supercheckChecked}/>
           </Grid>)}
           if(analyticsData.length && 
             (translationProjectTypes.includes(analyticsData[0].projectType) ||
@@ -263,7 +338,10 @@ const TaskAnalytics = () => {
               )
             ){
             return <Grid key={_index} style={{marginTop:"15px"}}>
-            <TaskCountAnalyticsChart analyticsData={analyticsData}/>
+            <TaskCountAnalyticsChart analyticsData={analyticsData}
+             annotationChecked={annotationChecked}
+             reviewChecked={reviewChecked}
+             supercheckChecked={supercheckChecked}/>
           </Grid>
           }
         })
