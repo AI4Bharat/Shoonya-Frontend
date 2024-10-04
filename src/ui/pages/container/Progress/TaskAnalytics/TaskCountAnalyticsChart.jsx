@@ -90,9 +90,9 @@ function TaskCountAnalyticsChart(props) {
                       : 0
                   }`}</p>):annotationChecked&&reviewChecked&&supercheckChecked?(<p style={{ color: "rgba(243, 156, 18 )" }}>
                     {`Annotation : ${
-                      payload[0].payload.diff_annotation_rev_sup
+                      payload[0].payload.diff_annotation_rev
                         ? new Intl.NumberFormat("en").format(
-                            payload[0].payload.diff_annotation_rev_sup
+                            payload[0].payload.diff_annotation_rev
                           )
                         : 0
                     }`}</p>):null}
@@ -371,14 +371,7 @@ function TaskCountAnalyticsChart(props) {
                 fill="rgba(243, 156, 18 )"
                  cursor="pointer"
               />):annotationChecked&&reviewChecked&&supercheckChecked?(<Bar
-                dataKey="diff_annotation_rev_sup"
-                barSize={30}
-                name="Annotation"
-                stackId="a"
-                fill="rgba(243, 156, 18 )"
-                 cursor="pointer"
-              />):annotationChecked&&supercheckChecked&&!reviewChecked?(<Bar
-                dataKey="diff_annotation_sup"
+                dataKey="diff_annotation_rev"
                 barSize={30}
                 name="Annotation"
                 stackId="a"
