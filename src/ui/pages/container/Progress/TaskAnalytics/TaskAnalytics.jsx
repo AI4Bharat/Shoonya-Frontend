@@ -1,6 +1,6 @@
 import React, { useEffect, useState,useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Grid, Button, FormControl, InputLabel, Select, MenuItem, Box, styled, Menu } from "@mui/material";
+import { Grid, Button, FormControl, InputLabel, Select, MenuItem, Box, styled, Menu,Checkbox ,FormControlLabel,IconButton} from "@mui/material";
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import TaskAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/TaskAnalytics";
 import AudioTaskAnalyticsChart from "./AudioTaskAnalyticsChart";
@@ -14,7 +14,7 @@ import { MenuProps } from "../../../../../utils/utils";
 import exportFromJSON from 'export-from-json';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { KeyboardArrowDown } from "@material-ui/icons";
+import { FilterList, KeyboardArrowDown } from "@material-ui/icons";
 const StyledMenu = styled((props) => (
   <Menu
     elevation={3}
@@ -47,6 +47,11 @@ const TaskAnalytics = (props) => {
   const taskAnalyticsData = useSelector((state) => state.getTaskAnalyticsData.data);
   const taskAnalyticsDataJson = useSelector((state) => state.getTaskAnalyticsData.originalData);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [annotationChecked, setAnnotationChecked] = useState(true);
+  const [reviewChecked, setReviewChecked] = useState(true);
+  const [supercheckChecked, setSupercheckChecked] = useState(false);
+  const [showFilterBox, setShowFilterBox] = useState(false);
+
   const open = Boolean(anchorEl);
 
 
@@ -174,37 +179,111 @@ const TaskAnalytics = (props) => {
     setAnchorEl(event.currentTarget);
 
   };
+  const handleReviewChange = (e) => {
+    const isChecked = e.target.checked;
+    setReviewChecked(isChecked);
+    
+    if (isChecked) {
+      setAnnotationChecked(true);
+    }
+    else{
+      setSupercheckChecked(false)
+    }
+  };
+  
+  const handleSupercheckChange = (e) => {
+    const isChecked = e.target.checked;
+    setSupercheckChecked(isChecked);
+  
+    if (isChecked) {
+      setReviewChecked(true);
+      setAnnotationChecked(true);
+    }
+  };
+  const handleApply = () => {
+    getTaskAnalyticsdata();
+    setShowFilterBox(false); 
+  };
 
-    return (
+  const handleCancel = () => {
+    setSelectedType("ContextualTranslationEditing");
+    setAnnotationChecked(true);
+    setReviewChecked(true);
+    setSupercheckChecked(true);
+    setShowFilterBox(false); 
+  };
+
+  const toggleFilterBox = () => {
+    setShowFilterBox(!showFilterBox); 
+  };    return (
     <>
       <Grid container columnSpacing={3} rowSpacing={2} mb={1} gap={3}>
-        <Grid item xs={6} sm={6} md={6} lg={6} xl={6} display={"flex"} justifyContent="space-between" >
-          <FormControl  size="small">
-            <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
-              Project Type {" "}
-              <LightTooltip arrow placement="top" title={translate("tooltip.ProjectType")}>
-                <InfoIcon fontSize="medium" />
-              </LightTooltip>
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={selectedType}
-              label="Project Type"
-              sx={{ padding: "1px" }}
-              onChange={(e) => setSelectedType(e.target.value)}
-              MenuProps={MenuProps}
-            >
-              {projectTypes.map((type, index) => (
-                <MenuItem value={type} key={index}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Grid item xs={2} sm={2} md={2} lg={2} xl={2} display={"flex"} justifyContent="space-between" >
+        <Box display="flex" justifyContent="flex-end" mb={2}>
+          <IconButton onClick={toggleFilterBox} aria-label="filter">
+            <FilterList fontSize="large" />
+          </IconButton>
+        </Box>
+
+        {showFilterBox && (
+          <Box border={1} borderRadius={2} padding={2} display="flex" flexDirection="column" gap={2}>
+
+            {/* Project Type Dropdown */}
+            <FormControl size="small">
+              <InputLabel id="demo-simple-select-label">Project Type</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={selectedType}
+                label="Project Type"
+                onChange={(e) => setSelectedType(e.target.value)}
+                MenuProps={MenuProps}
+              >
+                {projectTypes.map((type, index) => (
+                  <MenuItem value={type} key={index}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <Box display="flex" flexDirection="column">
+            <LightTooltip 
+ title={
+  <ul style={{ margin: 0, paddingLeft: '20px' }}>
+   <li>To View annotation count seperately.</li>
+    <li>To View combination of annotation and review counts.</li>
+    <li>To View combination of annotation, review, and supercheck counts.</li>
+  </ul>
+}      placement="top"
+    >
+      <InfoIcon fontSize="small" style={{ cursor: 'pointer', marginRight: 8 }} />
+    </LightTooltip>
+
+              <FormControlLabel
+                control={<Checkbox checked={annotationChecked}  />}
+                label="Annotation"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={reviewChecked} onChange={handleReviewChange} />}
+                label="Review"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={supercheckChecked} onChange={handleSupercheckChange} />}
+                label="Supercheck"
+              />
+            </Box>
+
+            <Box display="flex" justifyContent="flex-end" gap={2}>
+              <CustomButton label="Apply" onClick={handleApply}  />
+              <CustomButton label="Cancel" onClick={handleCancel} />
+            </Box>
+
+          </Box>
+        )}
           {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent="space-between" alignItems="center"> */}
-          <CustomButton label="Submit" sx={{ width: "120px" }} onClick={handleSubmit} disabled={loading} />
-          <Box display="flex" alignItems="center">
+          {/* <CustomButton label="Submit" sx={{ width: { xs: "100px", md: "120px" }, height: "40px" }} onClick={handleSubmit}  /> */}
+          <Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
             <CustomButton
               onClick={handleClick}
               disabled={loading}
@@ -225,7 +304,6 @@ const TaskAnalytics = (props) => {
               <MenuItem onClick={downloadJSON}>JSON</MenuItem>
             </StyledMenu>
           </Box>
-        {/* </Grid> */}
       </Grid>
         </Grid>
       
@@ -234,7 +312,10 @@ const TaskAnalytics = (props) => {
         taskAnalyticsData.map((analyticsData, _index) => {
           if (analyticsData.length && ['AudioTranscription', 'AudioSegmentation', 'AudioTranscriptionEditing', 'AcousticNormalisedTranscriptionEditing'].includes(analyticsData[0].projectType)) {
             return (<Grid key={_index} style={{ marginTop: "15px" }}>
-              <AudioTaskAnalyticsChart analyticsData={analyticsData} />
+              <AudioTaskAnalyticsChart analyticsData={analyticsData} 
+              annotationChecked={annotationChecked}
+              reviewChecked={reviewChecked}
+              supercheckChecked={supercheckChecked}/>
             </Grid>)
           }
           if (analyticsData.length &&
@@ -243,7 +324,10 @@ const TaskAnalytics = (props) => {
               ['OCRTranscriptionEditing','OCRSegmentCategorizationEditing'].includes(analyticsData[0].projectType))
           ) {
             return <Grid key={_index} style={{ marginTop: "15px" }}>
-              <TaskCountAnalyticsChart analyticsData={analyticsData} />
+              <TaskCountAnalyticsChart analyticsData={analyticsData} 
+              annotationChecked={annotationChecked}
+              reviewChecked={reviewChecked}
+              supercheckChecked={supercheckChecked}/>
             </Grid>
           }
         })
