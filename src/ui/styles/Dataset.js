@@ -278,6 +278,7 @@ const DatasetStyle = makeStyles({
   topBar: {
     display: "flex",
     alignItems: "center",
+    justifyContent:"space-around",
     backgroundColor: "#DEECFF",
     fontSize: "18px",
   },
@@ -287,10 +288,10 @@ const DatasetStyle = makeStyles({
     display: "flex",
     flexDirection: "column",
     textAlign: "center",
-    boxShadow: "3px 0 2px -2px #00000029",
+    // boxShadow: "3px 0 2px -2px #00000029",
   },
   toolTip: {
-    width: "200px", height: "180px", fontSize: "16px", backgroundColor: "white", color: "black", padding: "5px 10px 10px 10px", border: "1px solid gray"
+    width: "200px", height: "auto", fontSize: "16px", backgroundColor: "white", color: "black", padding: "5px 10px 10px 10px", border: "1px solid gray"
   },
 
     toolTips: {
