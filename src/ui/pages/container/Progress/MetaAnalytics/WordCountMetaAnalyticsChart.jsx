@@ -15,6 +15,8 @@ import {
 
 export default function WordCountMetaAnalyticsChart(props) {
     const {analyticsData,graphCategory} = props
+    console.log(analyticsData);
+    
     const classes = DatasetStyle();
     const [totalWordCount, setTotalWordCount] = useState();
     const [totalAnnotationWordCount, setTotalAnnotationWordCount] = useState();
@@ -212,7 +214,7 @@ export default function WordCountMetaAnalyticsChart(props) {
             </Box>
         <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Annotated Count
+                Total Word Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalWordCount &&
@@ -221,7 +223,7 @@ export default function WordCountMetaAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Pending Review  Count
+                Total Annotation Word Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationWordCount &&
@@ -230,7 +232,7 @@ export default function WordCountMetaAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Review Completed  Count
+                Total Quality/Reviewed Word Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewWordCount &&

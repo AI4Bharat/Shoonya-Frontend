@@ -232,8 +232,8 @@ export default function MetaAnalytics(props) {
               ))}
             </Select>
           </FormControl>
-          <CustomButton label="Submit" sx={{ width: "120px" }} onClick={handleSubmit}  />
-          <Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
+          <CustomButton label="Submit" sx={{ width: "120px" }} onClick={handleSubmit} disabled={loading} />
+          <Box display="flex" alignItems="center">
             <CustomButton
               onClick={handleClick}
               disabled={loading}
