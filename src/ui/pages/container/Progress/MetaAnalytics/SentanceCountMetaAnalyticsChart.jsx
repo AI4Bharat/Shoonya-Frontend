@@ -108,7 +108,7 @@ export default function SentanceCountMetaAnalyticsChart(props) {
             </Box>
         <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Annotated Sentence Count
+                Total Annotated Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalSentanceCount &&
@@ -117,7 +117,7 @@ export default function SentanceCountMetaAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Pending Review Sentence Count
+                Pending Review Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationSentanceCount &&
@@ -126,7 +126,7 @@ export default function SentanceCountMetaAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Review Completed Sentence Count
+                Review Completed Count
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewSentanceCount &&
