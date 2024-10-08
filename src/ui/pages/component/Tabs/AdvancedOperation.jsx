@@ -11,10 +11,13 @@ import {
   ListItemText,
   ListItemIcon,
   Card,
+  IconButton,
   Typography,
+  Popover
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,6 +51,7 @@ import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import ProjectPermission from "../../../../redux/actions/api/ProjectDetails/ProjectPermission";
 
 
 const ProgressType = [
@@ -93,8 +97,10 @@ const AdvancedOperation = (props) => {
   });
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [newDetails, setNewDetails] = useState();
   const [OpenExportProjectDialog, setOpenExportProjectDialog] = useState(false);
+  const [category ,setcategory] = useState()
   const [datasetId, setDatasetId] = useState("");
   const [projectType, setProjectType] = useState("");
   const [taskReviews, setTaskReviews] = useState("")
@@ -111,6 +117,16 @@ const AdvancedOperation = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
+  const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+  const [openNewPopover, setOpenNewPopover] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState({
+      view: [],
+      use: [],
+  });
+  const open1 = Boolean(anchorEl);
+  const newPopoverOpen = Boolean(newPopoverAnchorEl);
+  const Id1 = open1 ? 'simple-popover' : undefined;
+  const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
 
   const isSuperChecker =
     ((userRole.WorkspaceManager === loggedInUserData?.role ||
@@ -128,6 +144,8 @@ const AdvancedOperation = (props) => {
 
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(id);
+    const projectObj1 = new ProjectPermission();
+    dispatch(APITransport(projectObj1))
     dispatch(APITransport(projectObj));
   };
   useEffect(() => {
@@ -342,6 +360,7 @@ const AdvancedOperation = (props) => {
   };
 
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
+  const permissionList = useSelector((state) => state.ProjectPermission.data);
   const [isArchived, setIsArchived] = useState(false);
   const [downloadMetadataToggle, setDownloadMetadataToggle] = useState(true)
   const getArchiveProjectAPI = () => {
@@ -395,6 +414,34 @@ const AdvancedOperation = (props) => {
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
+  const handleNewPopoverOpen = (event,category) => {
+    setOpenNewPopover(true);
+    setNewPopoverAnchorEl(event);
+    setcategory(category)
+    console.log(category);
+    console.log(newPopoverAnchorEl);
+    
+};
+
+const handleNewPopoverClose = () => {
+    setOpenNewPopover(false);
+    setNewPopoverAnchorEl(null);
+    setSelectedOptions({ view: false, use: false });
+};
+
+const handleCheckboxChange = (name,checked) => {
+    
+    setSelectedOptions({
+        ...selectedOptions,
+        [name]: checked,
+    });
+};
+
+const handleApply = () => {
+    console.log("Selected Options:", selectedOptions);
+    handleNewPopoverClose();
+};
+
 
 
   const renderSnackBar = () => {
@@ -449,25 +496,36 @@ const AdvancedOperation = (props) => {
           columnSpacing={2}
         >
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Box display="flex" alignItems="center">
+
             <CustomButton
               sx={{
                 inlineSize: "max-content",
                 pl: 2,
-                borderRadius: 3,
+                borderRadius: "8px 0 0 8px",
                 ml: 2,
                 width: "300px",
               }}
               onClick={handlePublishProject}
               label="Publish Project"
             />
+              <IconButton
+                    color="primary"
+                    onClick={(event) => handleNewPopoverOpen(event, "publish")}   
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Box display="flex" alignItems="center">
             <CustomButton
               sx={{
                 inlineSize: "max-content",
                 p: 2,
-                borderRadius: 3,
+                borderRadius: "8px 0 0 8px",
                 ml: 2,
                 width: "300px",
               }}
@@ -476,6 +534,14 @@ const AdvancedOperation = (props) => {
               label={isArchived ? "Archived" : "Archive"}
               disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
             />
+             <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
           </Grid>
 
           <Grid
@@ -548,7 +614,7 @@ const AdvancedOperation = (props) => {
                 sx={{
                   inlineSize: "max-content",
                   p: 2,
-                  borderRadius: 3,
+                  borderRadius: "8px 0 0 8px",
                   ml: 2,
                   width: "300px",
 
@@ -559,11 +625,13 @@ const AdvancedOperation = (props) => {
           {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
+                        <Box display="flex" alignItems="center">
+
               <CustomButton
                 sx={{
                   inlineSize: "max-content",
                   p: 2,
-                  borderRadius: 3,
+                  borderRadius: "8px 0 0 8px",
                   ml: 2,
                   width: "300px",
                 }}
@@ -572,12 +640,22 @@ const AdvancedOperation = (props) => {
                 disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
 
               />
+               <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
             ) : (
+              <Box display="flex" alignItems="center">
+
               <CustomButton
                 sx={{
                   inlineSize: "max-content",
                   p: 2,
-                  borderRadius: 3,
+                  borderRadius: "8px 0 0 8px",
                   ml: 2,
                   width: "300px",
                 }}
@@ -586,16 +664,26 @@ const AdvancedOperation = (props) => {
                 disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
 
               />
+               <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
             )}
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectDetails.sampling_mode == "f" || ProjectDetails.sampling_mode == "b" ? (
+                            <Box display="flex" alignItems="center">
+
               <CustomButton
                 sx={{
                   inlineSize: "max-content",
                   p: 2,
-                  borderRadius: 3,
+                  borderRadius: "8px 0 0 8px",
                   ml: 2,
                   width: "300px",
                 }}
@@ -603,6 +691,14 @@ const AdvancedOperation = (props) => {
                 label="Pull New Data Items from Source Dataset"
                 disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
               />
+              <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
             ) : (
               " "
             )}
@@ -612,6 +708,7 @@ const AdvancedOperation = (props) => {
               taskStatus={taskStatus}
               SetTask={setTaskStatus}
               downloadMetadataToggle={downloadMetadataToggle}
+              permissionList={permissionList}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -650,6 +747,8 @@ const AdvancedOperation = (props) => {
             userRole.OrganizationOwner === loggedInUserData?.role?<Grid item xs={12} sm={12} md={12} lg={12} xl={12}
             sx={{ ml: 2 }}
           >
+                                        <Box display="flex" alignItems="center">
+
               <FormControl size="small" className={classes.formControl}>
                 <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
                   Project Stage
@@ -669,6 +768,14 @@ const AdvancedOperation = (props) => {
                   ))}
                 </Select>
               </FormControl>
+              <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
           </Grid>:null}
 
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
@@ -712,7 +819,65 @@ const AdvancedOperation = (props) => {
             />
           </Grid> */}
         </Grid>
-
+        <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
         <Dialog
           open={open}
           onClose={handleClose}

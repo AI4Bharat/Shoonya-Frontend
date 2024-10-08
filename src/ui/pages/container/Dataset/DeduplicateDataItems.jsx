@@ -20,6 +20,7 @@ import {
   DialogContentText,
   FormControlLabel,
   FormGroup,
+  IconButton
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
@@ -30,6 +31,7 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar"
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -70,6 +72,20 @@ export default function DeduplicateDataItems() {
     message: "",
     variant: "success",
 });
+const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+const [openNewPopover, setOpenNewPopover] = useState(false);
+const [selectedOptions, setSelectedOptions] = useState({
+    view: false,
+    use: false,
+});
+const open1 = Boolean(anchorEl);
+const newPopoverOpen = Boolean(newPopoverAnchorEl);
+const Id1 = open1 ? 'simple-popover' : undefined;
+const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
+
+
+
+
 
 
 useEffect(() => {
@@ -157,6 +173,29 @@ const handleok = async() => {
         setOpenDialog(false);
         setDataitems([])
 }
+const handleNewPopoverOpen = (event) => {
+  setOpenNewPopover(true);
+  setNewPopoverAnchorEl(event.currentTarget);
+};
+
+const handleNewPopoverClose = () => {
+  setOpenNewPopover(false);
+  setNewPopoverAnchorEl(null);
+  setSelectedOptions({ view: false, use: false });
+};
+
+const handleCheckboxChange = (name,checked) => {
+  
+  setSelectedOptions({
+      ...selectedOptions,
+      [name]: checked,
+  });
+};
+
+const handleApply = () => {
+  console.log("Selected Options:", selectedOptions);
+  handleNewPopoverClose();
+};
 
 const renderSnackBar = () => {
     return (
@@ -193,8 +232,10 @@ const renderSnackBar = () => {
   return (
     <div>
          {renderSnackBar()}
+         <Box display="flex" alignItems="center">
+
       <Button
-        sx={{ width: "200px" }}
+        sx={{ width: "200px" ,  borderRadius: "8px 0 0 8px",}}
         aria-describedby={id}
         variant="contained"
         color="error"
@@ -207,6 +248,74 @@ const renderSnackBar = () => {
       >
         Deduplicate Data Items
       </Button>
+      <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
+            <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
+
 
       <Popover
         id={id}

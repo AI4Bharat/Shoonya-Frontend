@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { styled } from '@mui/material/styles';
-import {CircularProgress} from "@mui/material";
+import {Box, Checkbox, CircularProgress, FormControlLabel, IconButton, Popover, Typography} from "@mui/material";
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -12,6 +12,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetDatasetDownloadTSV from "../../../../redux/actions/api/Dataset/GetDatasetDownloadTSV";
 import GetDatasetDownloadJSON from "../../../../redux/actions/api/Dataset/GetDatasetDownloadJSON";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -55,6 +56,17 @@ function DownloadDatasetButton(props) {
     message: "",
     variant: "success",
   });
+  const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+const [openNewPopover, setOpenNewPopover] = useState(false);
+const [selectedOptions, setSelectedOptions] = useState({
+    view: false,
+    use: false,
+});
+const open1 = Boolean(anchorEl);
+const newPopoverOpen = Boolean(newPopoverAnchorEl);
+const Id1 = open1 ? 'simple-popover' : undefined;
+const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
+
 
   useEffect(() => {
     setLoading(false);
@@ -102,6 +114,30 @@ function DownloadDatasetButton(props) {
       />
     );
   };
+  const handleNewPopoverOpen = (event) => {
+    setOpenNewPopover(true);
+    setNewPopoverAnchorEl(event.currentTarget);
+  };
+  
+  const handleNewPopoverClose = () => {
+    setOpenNewPopover(false);
+    setNewPopoverAnchorEl(null);
+    setSelectedOptions({ view: false, use: false });
+  };
+  
+  const handleCheckboxChange = (name,checked) => {
+    
+    setSelectedOptions({
+        ...selectedOptions,
+        [name]: checked,
+    });
+  };
+  
+  const handleApply = () => {
+    console.log("Selected Options:", selectedOptions);
+    handleNewPopoverClose();
+  };
+  
   return (
     <div>
       {renderSnackBar()}
@@ -109,8 +145,10 @@ function DownloadDatasetButton(props) {
       {loading ? (
 						<CircularProgress />
 					) : (<>
+           <Box display="flex" alignItems="center">
+
       <Button
-        sx={{  p: 2, borderRadius: 5,width:"190px" }}
+        sx={{  p: 2, borderRadius: "8px 0 0 8px",width:"190px" }}
         id="demo-customized-button"
         // aria-controls={open ? 'demo-customized-menu' : undefined}
         // aria-haspopup="true"
@@ -121,6 +159,76 @@ function DownloadDatasetButton(props) {
       >
         Download DataSet
       </Button>
+      <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
+      <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
+
+
+
       <StyledMenu
         sytle={{ width: "px" }}
         id="demo-customized-menu"

@@ -98,8 +98,7 @@ import commonReducer from "./CL-Transcription/Common";
 import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
 import patchAnnotation from "./CL-Transcription/PatchAnnotation"
 import updateUIPrefs from "./UserManagement/UpdateUIPrefs";
-
-
+import ProjectPermission from "./ProjectDetails/ProjectPermission"
 const index = {
     apiStatus,
     getProjects,
@@ -138,6 +137,7 @@ const index = {
     getWorkspaceProjectReports,
     downloadProjectCSV,
     getFilteredTasks,
+    ProjectPermission,
     postAnnotation,
     updateAnnotation,
     deleteAnnotation,

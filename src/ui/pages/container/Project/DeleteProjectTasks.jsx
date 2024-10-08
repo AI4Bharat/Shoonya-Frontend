@@ -4,7 +4,8 @@ import {
     Popover,
     Box,
     TextField,
-    Grid, Typography,Radio, Dialog, DialogActions, DialogContent, DialogContentText,
+    Grid, Typography,Radio, Dialog, DialogActions, DialogContent, DialogContentText,Checkbox,
+    IconButton
 } from "@mui/material";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -13,19 +14,29 @@ import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import DeleteProjectTasksAPI from "../../../../redux/actions/api/ProjectDetails/DeleteProjectTasks";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
-
 export default function DeleteProjectTasks() {
     const classes = DatasetStyle();
     const { id } = useParams();
     const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
+    const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
     const [projectTaskStartId, setProjectTaskStartId] = useState("");
     const [projectTaskEndId, setProjectTaskEndId] = useState("");
+    const [openNewPopover, setOpenNewPopover] = useState(false);
+    const [selectedOptions, setSelectedOptions] = useState({
+        view: false,
+        use: false,
+    });
+    const open1 = Boolean(anchorEl);
+    const newPopoverOpen = Boolean(newPopoverAnchorEl);
+    const Id1 = open1 ? 'simple-popover' : undefined;
+    const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
     const [loading, setLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [radiobutton, setRadiobutton] = useState(true)
@@ -159,15 +170,40 @@ export default function DeleteProjectTasks() {
         console.log(rsp_data);
         }
     };
+    const handleNewPopoverOpen = (event) => {
+        setOpenNewPopover(true);
+        setNewPopoverAnchorEl(event.currentTarget);
+    };
+
+    const handleNewPopoverClose = () => {
+        setOpenNewPopover(false);
+        setNewPopoverAnchorEl(null);
+        setSelectedOptions({ view: false, use: false });
+    };
+
+    const handleCheckboxChange = (name,checked) => {
+        
+        setSelectedOptions({
+            ...selectedOptions,
+            [name]: checked,
+        });
+    };
+
+    const handleApply = () => {
+        console.log("Selected Options:", selectedOptions);
+        handleNewPopoverClose();
+    };
 
     return (
         <div >
             {renderSnackBar()}
-            {userRole.Admin === loggedInUserData?.role ?<Button
+            {userRole.Admin === loggedInUserData?.role ?
+            <Box display="flex" alignItems="center">
+                <Button
                 sx={{
                     inlineSize: "max-content",
                     p: 2,
-                    borderRadius: 3,
+                    borderRadius: "8px 0 0 8px",
                     ml: 2,
                     width: "300px"
                 }}
@@ -175,9 +211,18 @@ export default function DeleteProjectTasks() {
                 variant="contained"
                 onClick={handleClick}
                 // disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
-                color="error">
+                color="error"
+                >
                 Delete Project Tasks
-            </Button>:null}
+            </Button>
+            <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>:null}
 
             <Popover
                 Id={Id}
@@ -362,6 +407,65 @@ export default function DeleteProjectTasks() {
                         {" "}
                         {translate("button.submit")}
                     </Button>
+                </Box>
+            </Popover>
+            <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
                 </Box>
             </Popover>
             <Dialog

@@ -1,4 +1,4 @@
-import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
+import { Box,Grid,Tab, Card,Tabs, Typography,Popover,Checkbox,FormControlLabel,Button, Divider,IconButton } from '@mui/material'
 import React from 'react'
 import { useState ,useEffect} from 'react'
 import BasicSettings from '../../component/Tabs/BasicSettings';
@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -36,10 +36,24 @@ const ProjectSetting = () => {
     const { id } = useParams();
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (e, v) => {
+        console.log("hello",v);
+        
         setTabValue(v)
     }
-    const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+    const [anchorEl, setAnchorEl] = useState(null);
 
+    const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+    const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+    const [openNewPopover, setOpenNewPopover] = useState(false);
+    const [selectedOptions, setSelectedOptions] = useState({
+        view: false,
+        use: false,
+    });
+    const open1 = Boolean(anchorEl);
+    const newPopoverOpen = Boolean(newPopoverAnchorEl);
+    const Id1 = open1 ? 'simple-popover' : undefined;
+    const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
+  
     const getProjectDetails = () => {
         const projectObj = new GetProjectDetailsAPI(id);
 
@@ -49,6 +63,32 @@ const ProjectSetting = () => {
     useEffect(() => {
         getProjectDetails();
     }, [])
+    const handleNewPopoverOpen = (event) => {
+        setOpenNewPopover(true);
+        setNewPopoverAnchorEl(event.currentTarget);
+    };
+    
+    const handleNewPopoverClose = () => {
+        setOpenNewPopover(false);
+        setNewPopoverAnchorEl(null);
+        setSelectedOptions({ view: false, use: false });
+    };
+    
+    const handleCheckboxChange = (name,checked) => {
+        
+        setSelectedOptions({
+            ...selectedOptions,
+            [name]: checked,
+        });
+    };
+    
+    const handleApply = () => {
+        console.log("Selected Options:", selectedOptions);
+        handleNewPopoverClose();
+    };
+    
+    
+    
     return (
         <Card
         sx={{
@@ -73,14 +113,33 @@ const ProjectSetting = () => {
                             Project Settings
                         </Typography>
                     </Grid>
-            <Box sx={{mb:2,}} >
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
-                    <Tab label="Basic " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label=" Advanced " sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Read-only " sx={{ fontSize: 17, fontWeight: '700' }} />
-                    <Tab label=" Logs " sx={{ fontSize: 17, fontWeight: '700' }} />
-                </Tabs>
-            </Box>
+                    
+                    <Box sx={{ mb: 2, position: 'relative' }}>
+  <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+    <Tab label="Basic" sx={{ fontSize: 17, fontWeight: '700', paddingRight: '20px' }} /> 
+    {/* Adding paddingRight to make room for the IconButton */}
+    <Tab label="Advanced" sx={{ fontSize: 17, fontWeight: '700' }} />
+    <Tab label="Read-only" sx={{ fontSize: 17, fontWeight: '700' }} />
+    <Tab label="Logs" sx={{ fontSize: 17, fontWeight: '700' }} />
+  </Tabs>
+
+  <IconButton
+    color="primary"
+    onClick={(e) => {
+      e.stopPropagation();
+      handleNewPopoverOpen(e);
+    }}
+    sx={{
+      color: "black",
+      position: 'absolute',
+      left: '40px',
+      top: '4px',  
+    }}
+  >
+    <PlayArrowIcon />
+  </IconButton>
+</Box>
+           
             <Divider/>
             <Box sx={{ p: 1 }}>
                 <TabPanel value={tabValue} index={0}>
@@ -97,6 +156,66 @@ const ProjectSetting = () => {
                 </TabPanel>
             </Box>
         </Box>
+        <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
+
         </Card>
     )
 }

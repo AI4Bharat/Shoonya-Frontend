@@ -5,7 +5,10 @@ import {
     Box,
     TextField,
     Grid, Typography, Radio, Dialog, DialogActions, DialogContent, DialogContentText,
+    Checkbox,
+    IconButton
 } from "@mui/material";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
@@ -27,7 +30,19 @@ export default function SuperCheckSettings(props) {
     const [supercheckLoopCount, setSupercheckLoopCount] = useState(ProjectDetails.revision_loop_count);
     const [supercheckvalue, setSupercheckvalue] = useState(ProjectDetails.k_value);
     const [loading, setLoading] = useState(false);
-
+    const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+    const [openNewPopover, setOpenNewPopover] = useState(false);
+    const [selectedOptions, setSelectedOptions] = useState({
+        view: false,
+        use: false,
+    });
+    const open1 = Boolean(anchorEl);
+    const newPopoverOpen = Boolean(newPopoverAnchorEl);
+    const Id1 = open1 ? 'simple-popover' : undefined;
+    const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
+   
+  
+  
 
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
@@ -92,10 +107,34 @@ export default function SuperCheckSettings(props) {
             />
         );
     };
-
+    const handleNewPopoverOpen = (event) => {
+        setOpenNewPopover(true);
+        setNewPopoverAnchorEl(event.currentTarget);
+    };
+    
+    const handleNewPopoverClose = () => {
+        setOpenNewPopover(false);
+        setNewPopoverAnchorEl(null);
+        setSelectedOptions({ view: false, use: false });
+    };
+    
+    const handleCheckboxChange = (name,checked) => {
+        
+        setSelectedOptions({
+            ...selectedOptions,
+            [name]: checked,
+        });
+    };
+    
+    const handleApply = () => {
+        console.log("Selected Options:", selectedOptions);
+        handleNewPopoverClose();
+    };
+    
     return (
         <div >
             {renderSnackBar()}
+            <Box display="flex" alignItems="center">
             <Button
                 sx={{
                     inlineSize: "max-content",
@@ -110,6 +149,74 @@ export default function SuperCheckSettings(props) {
             >
                 Super Check Settings
             </Button>
+            <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
+            <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
+
 
             <Popover
                 Id={Id}

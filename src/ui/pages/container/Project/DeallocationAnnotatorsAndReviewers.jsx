@@ -4,6 +4,7 @@ import {
   Button, Popover,Box,Grid,Typography,Radio,Select,MenuItem,Dialog, DialogActions, DialogContent, DialogContentText,  Checkbox,
   ListItemText,
   ListItemIcon,
+  IconButton
 } from "@mui/material";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -17,6 +18,7 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import  DeallocationAnnotatorsAndReviewersAPI from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import TextField from "@mui/material/TextField";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import { DeallocateTaskById } from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import { Tab, Tabs } from "@mui/material";
@@ -81,6 +83,17 @@ export default function DeallocationAnnotatorsAndReviewers() {
   const [superCheckStatus, setSuperCheckStatus] = useState([]);
   const [dealocateTasksBy, setDealocateTasksBy] = useState("taskId");
   const [dataIds, setdataIds] = useState("");
+  const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+  const [openNewPopover, setOpenNewPopover] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState({
+      view: false,
+      use: false,
+  });
+  const open1 = Boolean(anchorEl);
+  const newPopoverOpen = Boolean(newPopoverAnchorEl);
+  const Id1 = open1 ? 'simple-popover' : undefined;
+  const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
+ 
 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -271,23 +284,114 @@ export default function DeallocationAnnotatorsAndReviewers() {
       }
     }
   };
+  const handleNewPopoverOpen = (event) => {
+    setOpenNewPopover(true);
+    setNewPopoverAnchorEl(event.currentTarget);
+};
+
+const handleNewPopoverClose = () => {
+    setOpenNewPopover(false);
+    setNewPopoverAnchorEl(null);
+    setSelectedOptions({ view: false, use: false });
+};
+
+const handleCheckboxChange = (name,checked) => {
+    
+    setSelectedOptions({
+        ...selectedOptions,
+        [name]: checked,
+    });
+};
+
+const handleApply = () => {
+    console.log("Selected Options:", selectedOptions);
+    handleNewPopoverClose();
+};
+
 
   return (
     <div>
       {renderSnackBar()}
+      <Box display="flex" alignItems="center">
       <CustomButton
         sx={{
           inlineSize: "max-content",
           p: 2,
-          borderRadius: 3,
+          borderRadius: "8px 0 0 8px",
           ml: 2,
           width: "300px",
-          mb: 2,
         }}
         onClick={handleClickOpen}
         label="Deallocate User Tasks"
         color="error"
       />
+      <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
+            <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
 
       <Popover
         Id={Id}

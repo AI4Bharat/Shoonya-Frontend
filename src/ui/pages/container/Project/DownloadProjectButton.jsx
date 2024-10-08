@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { CSVDownload, CSVLink } from "react-csv";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import DownloadProjectCsvAPI from '../../../../redux/actions/api/ProjectDetails/DownloadCSVProject';
@@ -13,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import { Box, Checkbox, FormControlLabel, IconButton, Popover, Typography } from "@mui/material";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -39,11 +41,24 @@ const StyledMenu = styled((props) => (
 
 
 function DownloadProjectButton(props) {
-  const { taskStatus,SetTask,downloadMetadataToggle} = props;
+  const { taskStatus,SetTask,downloadMetadataToggle,permissionList} = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const [downloadres, setdownloadres] = useState(false);
+  const [view, setview] = useState();
+  const [use, setuse] = useState();
+
   const [loading, setLoading] = useState(false);
  const[taskValue ,setTaskValue]= useState(taskStatus)
+ const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+ const [openNewPopover, setOpenNewPopover] = useState(false);
+ const [selectedOptions, setSelectedOptions] = useState({
+  view: permissionList?.permission?.canViewDownloadButton || [],
+  use: permissionList?.permission?.canUseDownloadButton || []
+ });
+ const open1 = Boolean(anchorEl);
+ const newPopoverOpen = Boolean(newPopoverAnchorEl);
+ const Id1 = open1 ? 'simple-popover' : undefined;
+ const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
   const apiLoading = useSelector(state => state.apiStatus.loading);
   const open = Boolean(anchorEl);
   const { id } = useParams();
@@ -142,6 +157,26 @@ function DownloadProjectButton(props) {
     // }
    
   };
+  useEffect(() => {
+    if (permissionList) {
+        setview(permissionList?.permission?.can_view_download_project);
+        setuse(permissionList?.permission?.can_use_download_project);
+        const viewPermissions = permissionList?.permission?.can_view_download_project || [];
+    const usePermissions = permissionList?.permission?.can_use_download_project || [];
+    
+    // Initialize selected options based on permissions
+    setSelectedOptions({
+      view: viewPermissions,
+      use: usePermissions
+    });
+    }
+}, []);
+const canViewDownloadButton = (roleId) => {
+  return view && view.includes(roleId);
+};
+const canUseDownloadButton = (roleId) => {
+  return use && use.includes(roleId);
+};
 
   const handleDownloadTSVProject = async () => {
     // SetTask([]) //used to clear the selected task statuses
@@ -185,22 +220,71 @@ function DownloadProjectButton(props) {
       />
     );
   };
+  const handleNewPopoverOpen = (event) => {
+    setOpenNewPopover(true);
+    setNewPopoverAnchorEl(event.currentTarget);
+};
+
+const handleNewPopoverClose = () => {
+    setOpenNewPopover(false);
+    setNewPopoverAnchorEl(null);
+    setSelectedOptions({ view: false, use: false });
+};
+const handleCheckboxChange = (name, checked, roleNumber) => {
+  setSelectedOptions((prevOptions) => {
+    if (name === 'view') {
+      const updatedViewRoles = checked 
+        ? [...prevOptions.view, roleNumber] // Add role if checked
+        : prevOptions?.view?.filter((role) => role !== roleNumber); // Remove role if unchecked
+      
+      return {
+        ...prevOptions,
+        view: updatedViewRoles
+      };
+    } else if (name === 'use') {
+      const updatedUseRoles = checked
+        ? [...prevOptions.use, roleNumber] // Add role if checked
+        : prevOptions?.use?.filter((role) => role !== roleNumber); // Remove role if unchecked
+      
+      return {
+        ...prevOptions,
+        use: updatedUseRoles
+      };
+    }
+    return prevOptions;
+  });
+};
+
+console.log(selectedOptions);
+
+const handleApply = () => {
+    console.log("Selected Options:", selectedOptions);
+    handleNewPopoverClose();
+};
+
+console.log(view && view?.includes(4),view,canViewDownloadButton(loggedInUserData?.role));
   return (
     <div>
       {renderSnackBar()}
+      <Box display="flex" alignItems="center">
       <Button
-        sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2,width:"300px" }}
+        sx={{ inlineSize: "max-content", p: 2, borderRadius: "8px 0 0 8px", ml: 2,width:"300px" }}
         id="demo-customized-button"
-        // aria-controls={open ? 'demo-customized-menu' : undefined}
-        // aria-haspopup="true"
-        // aria-expanded={open ? 'true' : undefined}
         variant="contained"
-        disabled= {taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role? false: true } 
-        onClick={handleClick}
+        disabled={!(taskStatus.length > 0 && canViewDownloadButton(loggedInUserData?.role))}  
+        onClick={canUseDownloadButton(loggedInUserData?.role) ? handleClick : null}
         endIcon={<KeyboardArrowDownIcon />}
       >
         Download Project
       </Button>
+      <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
       <StyledMenu
         sytle={{ width: "20px" }}
         id="demo-customized-menu"
@@ -222,6 +306,65 @@ function DownloadProjectButton(props) {
           JSON
         </MenuItem>
       </StyledMenu>
+      <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                            checked={selectedOptions.view.includes(5)} 
+                                onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                            checked={selectedOptions.view.includes(4)} 
+                                onChange={(event) =>handleCheckboxChange('view', event.target.checked, 4)}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={canUseDownloadButton(5)}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={canUseDownloadButton(4)}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
     </div>
   );
 }

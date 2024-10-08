@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams,useNavigate } from "react-router-dom";
-import { Card, CircularProgress, Grid, Typography,Modal,Box } from "@mui/material";
+import { Card, CircularProgress, Grid, Typography,Modal,Box ,Checkbox,FormControlLabel,Button,
+  Popover,
+  IconButton
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -9,7 +12,6 @@ import UploaddataAPI from "../../../../redux/actions/api/Dataset/uploaddata";
 import GetFileTypesAPI from "../../../../redux/actions/api/Dataset/GetFileTypes";
 import CustomButton from "../../component/common/Button";
 //import Modal from "../../component/common/Modal";
-import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import MenuItems from "../../component/common/MenuItems";
 import { FileUploader } from "react-drag-drop-files";
@@ -18,6 +20,7 @@ import DownloadDatasetButton from "./DownloadDataSetButton";
 import DeleteDataItems from "./DeleteDataItems";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import DeduplicateDataItems from "../../container/Dataset/DeduplicateDataItems";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 
 const style = {
@@ -51,6 +54,16 @@ export default function DatasetSettings() {
     message: "",
     variant: "success",
   });
+  const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
+  const [openNewPopover, setOpenNewPopover] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState({
+      view: false,
+      use: false,
+  });
+  const open1 = Boolean(anchorEl);
+  const newPopoverOpen = Boolean(newPopoverAnchorEl);
+  const Id1 = open1 ? 'simple-popover' : undefined;
+  const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
 
   const GetFileTypes = useSelector((state) => state.GetFileTypes.data);
   const FileTypes = () => {
@@ -150,6 +163,31 @@ export default function DatasetSettings() {
       />
     );
   };
+  const handleNewPopoverOpen = (event) => {
+    setOpenNewPopover(true);
+    setNewPopoverAnchorEl(event.currentTarget);
+  };
+  
+  const handleNewPopoverClose = () => {
+    setOpenNewPopover(false);
+    setNewPopoverAnchorEl(null);
+    setSelectedOptions({ view: false, use: false });
+  };
+  
+  const handleCheckboxChange = (name,checked) => {
+    
+    setSelectedOptions({
+        ...selectedOptions,
+        [name]: checked,
+    });
+  };
+  
+  const handleApply = () => {
+    console.log("Selected Options:", selectedOptions);
+    handleNewPopoverClose();
+  };
+
+
 
   return (
     <Grid container direction="row" justifyContent="center" alignItems="center">
@@ -174,11 +212,21 @@ export default function DatasetSettings() {
                 <DownloadDatasetButton />
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+              <Box display="flex" alignItems="center">
                 <CustomButton
-                  sx={{ width: "150px" }}
+                  sx={{ width: "150px",borderRadius:"8px 0 0 8px" }}
                   label={translate("button.uploadData")}
                   onClick={handleUpload}
                 />
+                <IconButton
+                    color="primary"
+                    onClick={handleNewPopoverOpen} 
+                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020 !important",color:"white !important"}} 
+                >
+                    <ArrowForwardIosIcon />
+                </IconButton>
+                </Box>
+
               </Grid>
 
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
@@ -321,6 +369,66 @@ export default function DatasetSettings() {
            </>
           )}
         </Grid>
+        <Popover
+                id={newPopoverId}
+                open={newPopoverOpen}
+                anchorEl={newPopoverAnchorEl}
+                onClose={handleNewPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Typography variant="h6">View</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.orgOwner}
+                                onChange={() => handleCheckboxChange("view", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.view.manager}
+                                onChange={() => handleCheckboxChange("view", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.orgOwner}
+                                onChange={() => handleCheckboxChange("use", "orgOwner")}
+                            />
+                        }
+                        label="Org Owner"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={selectedOptions.use.manager}
+                                onChange={() => handleCheckboxChange("use", "manager")}
+                            />
+                        }
+                        label="Manager"
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleApply}>
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            </Popover>
+
       </Card>
     </Grid>
   );
