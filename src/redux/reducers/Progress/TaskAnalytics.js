@@ -13,7 +13,9 @@ const diffAnnotationReview = (payload) => {
         languages: (value?.language),
         annotation_cumulative_tasks_count: (value?.ann_cumulative_tasks_count),
         review_cumulative_tasks_count: (value?.rew_cumulative_tasks_count),
-        diff_annotation_review: (value?.ann_cumulative_tasks_count - value?.rew_cumulative_tasks_count)
+        sup_cumulative_tasks_count : (value?.sup_cumulative_tasks_count),
+        diff_annotation: (value?.ann_cumulative_tasks_count - value?.rew_cumulative_tasks_count-value?.sup_cumulative_tasks_count),
+        diff_rev:(value?.rew_cumulative_tasks_count-value?.sup_cumulative_tasks_count),
       };
     })
   })
