@@ -234,17 +234,16 @@ const handleCheckboxChange = (name, checked, roleNumber) => {
   setSelectedOptions((prevOptions) => {
     if (name === 'view') {
       const updatedViewRoles = checked 
-        ? [...prevOptions.view, roleNumber] // Add role if checked
-        : prevOptions?.view?.filter((role) => role !== roleNumber); // Remove role if unchecked
-      
+        ? [...prevOptions.view, roleNumber] 
+        : prevOptions?.view?.filter((role) => role !== roleNumber); 
       return {
         ...prevOptions,
         view: updatedViewRoles
       };
     } else if (name === 'use') {
       const updatedUseRoles = checked
-        ? [...prevOptions.use, roleNumber] // Add role if checked
-        : prevOptions?.use?.filter((role) => role !== roleNumber); // Remove role if unchecked
+        ? [...prevOptions.use, roleNumber] 
+        : prevOptions?.use?.filter((role) => role !== roleNumber); 
       
       return {
         ...prevOptions,
@@ -257,7 +256,7 @@ const handleCheckboxChange = (name, checked, roleNumber) => {
 
 console.log(selectedOptions);
 
-const handleApply = () => {
+const handleApply = (name) => {
     console.log("Selected Options:", selectedOptions);
     handleNewPopoverClose();
 };
@@ -307,64 +306,76 @@ console.log(view && view?.includes(4),view,canViewDownloadButton(loggedInUserDat
         </MenuItem>
       </StyledMenu>
       <Popover
-                id={newPopoverId}
-                open={newPopoverOpen}
-                anchorEl={newPopoverAnchorEl}
-                onClose={handleNewPopoverClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-            >
-                <Box sx={{ p: 2 }}>
-                    <Typography variant="h6">View</Typography>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                            checked={selectedOptions.view.includes(5)} 
-                                onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
-                            />
-                        }
-                        label="Org Owner"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                            checked={selectedOptions.view.includes(4)} 
-                                onChange={(event) =>handleCheckboxChange('view', event.target.checked, 4)}
-                            />
-                        }
-                        label="Manager"
-                    />
-                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={canUseDownloadButton(5)}
-                                onChange={() => handleCheckboxChange("use", "orgOwner")}
-                            />
-                        }
-                        label="Org Owner"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={canUseDownloadButton(4)}
-                                onChange={() => handleCheckboxChange("use", "manager")}
-                            />
-                        }
-                        label="Manager"
-                    />
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
-                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
-                            Cancel
-                        </Button>
-                        <Button variant="contained" color="primary" onClick={handleApply}>
-                            Apply
-                        </Button>
-                    </Box>
-                </Box>
-            </Popover>
+    id={newPopoverId}
+    open={newPopoverOpen}
+    anchorEl={newPopoverAnchorEl}
+    onClose={handleNewPopoverClose}
+    anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+    }}
+>
+    <Box sx={{ p: 2 }}>
+        {/* View Section */}
+        <Typography variant="h6">View</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.includes(5)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.includes(4)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("view")}>
+                Apply View
+            </Button>
+        </Box>
+
+        {/* Use Section */}
+        <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.includes(5)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.includes(4)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("use")}>
+                Apply Use
+            </Button>
+        </Box>
+    </Box>
+</Popover>
+
     </div>
   );
 }
