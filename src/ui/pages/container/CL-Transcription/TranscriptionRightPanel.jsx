@@ -73,6 +73,7 @@ import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 import { IconButton, Tooltip } from "@mui/material";
 import { Add, MoreVert, Remove } from "@material-ui/icons";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
+import configs from "../../../../config/config";
 
 const TranscriptionRightPanel = ({
   currentIndex,
@@ -804,6 +805,8 @@ const TranscriptionRightPanel = ({
                       {ProjectDetails?.tgt_language !== "en" &&
                         enableTransliteration ? (
                         <IndicTransliterate
+                          customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                          apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
@@ -871,6 +874,8 @@ const TranscriptionRightPanel = ({
                         (ProjectDetails?.tgt_language !== "en" &&
                           enableTransliteration ? (
                           <IndicTransliterate
+                            customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                            apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
                             lang={targetlang}
                             value={item.acoustic_normalised_text}
                             onChange={(event) => {

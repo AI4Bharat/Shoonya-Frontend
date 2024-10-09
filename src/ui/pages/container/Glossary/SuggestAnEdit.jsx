@@ -26,6 +26,7 @@ import {
   getTransliterationLanguages,
 } from "@ai4bharat/indic-transliterate";
 import "../../../../IndicTransliterate/index.css";
+import configs from "../../../../config/config";
 
 const SuggestAnEdit = ({
   openDialog,
@@ -147,6 +148,8 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
 
                 { targetData.length > 0 && targetlang !== "en" ? (
                  <IndicTransliterate
+                  customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                  apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
                   lang={Targetlanguage.LangCode ? Targetlanguage.LangCode : (targetData.length > 0  ?  targetData[0]?.LangCode : "en" )}
                   value={targetText}
                   onChangeText={(targetText) => {
