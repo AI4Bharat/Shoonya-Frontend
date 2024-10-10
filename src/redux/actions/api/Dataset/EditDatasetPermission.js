@@ -3,12 +3,12 @@ import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
-export default class EditProjectPermission extends API {
+export default class EditDatasetPermission extends API {
    constructor(name,roles, timeout = 2000) {
      super("POST", timeout, false);
      this.type = constants.EDIT_PROJECT_PERMISSION;
      this.roles = roles;
-     this.endpoint = `${super.apiEndPointAuto()}/organizations/project_permission/?permission_name=${name}&fetch_all=True`;
+     this.endpoint = `${super.apiEndPointAuto()}/organizations/dataset_permission/?permission_name=${name}&fetch_all=True`;
    }
  
    processResponse(res) {

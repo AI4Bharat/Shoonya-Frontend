@@ -52,6 +52,7 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import ProjectPermission from "../../../../redux/actions/api/ProjectDetails/ProjectPermission";
+import EditProjectPermission from "../../../../redux/actions/api/ProjectDetails/editProjectPermission";
 
 
 const ProgressType = [
@@ -89,6 +90,8 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
   color: theme.palette.text.secondary,
 }));
+
+
 const AdvancedOperation = (props) => {
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -107,6 +110,7 @@ const AdvancedOperation = (props) => {
   const { id } = useParams();
   const classes = DatasetStyle();
   const dispatch = useDispatch();
+  const permissionList = useSelector((state) => state.ProjectPermission.data);
   const apiMessage = useSelector((state) => state.apiStatus.message);
   const apiError = useSelector((state) => state.apiStatus.error);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
@@ -117,16 +121,169 @@ const AdvancedOperation = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
-  const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
-  const [openNewPopover, setOpenNewPopover] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState({
-      view: [],
-      use: [],
+  const [view, setview] = useState();
+  const [use, setuse] = useState();
+
+ const viewPermissions = permissionList?.permission?.can_view_supercheck_settings || [];
+ const usePermissions = permissionList?.permission?.can_use_supercheck_settings || [];
+ const [selectedOptions, setSelectedOptions] = useState({
+  view: viewPermissions,
+  use: usePermissions
+ });
+ const [publishPopoverOpen, setPublishPopoverOpen] = useState(false);
+
+const [archivePopoverOpen, setArchivePopoverOpen] = useState(false);
+
+const [exportPopoverOpen, setExportPopoverOpen] = useState(false);
+
+const [stagePopoverOpen, setStagePopoverOpen] = useState(false);
+
+const [PullPopoverOpen, setPullPopoverOpen] = useState(false);
+
+ const [anchorElPublish, setAnchorElPublish] = useState(null);
+ const [anchorElArchive, setAnchorElArchive] = useState(null);
+ const [anchorElExport, setAnchorElExport] = useState(null);
+ const [anchorElProjectStage, setAnchorElProjectStage] = useState(null);
+ const [anchorElPull, setAnchorElPull] = useState(null);
+
+ 
+ const openPublishPopover = Boolean(anchorElPublish);
+ const openArchivePopover = Boolean(anchorElArchive);
+ const openExportPopover = Boolean(anchorElExport);
+ const openPullPopover = Boolean(anchorElPull);
+ const openProjectStagePopover = Boolean(anchorElProjectStage);
+ 
+ const publishPopoverId = openPublishPopover ? 'publish-popover' : undefined;
+ const archivePopoverId = openArchivePopover ? 'archive-popover' : undefined;
+ const exportPopoverId = openExportPopover ? 'export-popover' : undefined;
+ const PullPopoverId = openPullPopover ? 'pull-popover' : undefined;
+ const projectStagePopoverId = openProjectStagePopover ? 'project-stage-popover' : undefined;
+ 
+ const handlePublishPopoverOpen = (event) => {
+  setPublishPopoverOpen(true)
+   setAnchorElPublish(event.currentTarget);
+ };
+ const handlePublishPopoverClose = () => {
+  setPublishPopoverOpen(false);
+  setAnchorElPublish(null);
+  const viewPermissions = permissionList?.permission?.can_view_publish_project || [];
+  const usePermissions = permissionList?.permission?.can_use_publish_project || [];    
+  setSelectedOptions({  view: viewPermissions,
+    use: usePermissions
+ });
+ };
+ 
+ const handlePullPopoverOpen = (event) => {
+  setPullPopoverOpen(true)
+   setAnchorElPull(event.currentTarget);
+ };
+ const handlePullPopoverClose = () => {
+  setPullPopoverOpen(false);
+  setAnchorElPull(null);
+  const viewPermissions = permissionList?.permission?.can_view_publish_project || [];
+  const usePermissions = permissionList?.permission?.can_use_publish_project || [];    
+  setSelectedOptions({  view: viewPermissions,
+    use: usePermissions
+ });
+ };
+ 
+
+ const handleArchivePopoverOpen = (event) => {
+  setArchivePopoverOpen(true)
+   setAnchorElArchive(event.currentTarget);
+ };
+ const handleArchivePopoverClose = () => {
+  setArchivePopoverOpen(false)
+  setAnchorElArchive(null);
+  const viewPermissions = permissionList?.permission?.can_view_archive_project || [];
+  const usePermissions = permissionList?.permission?.can_use_archive_project || [];    
+  setSelectedOptions({  view: viewPermissions,
+    use: usePermissions
+ });
+ };
+ 
+ const handleExportPopoverOpen = (event) => {
+  setExportPopoverOpen(true)
+  setAnchorElExport(event.currentTarget);
+
+ };
+ const handleExportPopoverClose = () => {
+   setArchivePopoverOpen(false);
+   setAnchorElExport(null);
+  const viewPermissions = permissionList?.permission?.can_view_export_project_into_dataset || [];
+  const usePermissions = permissionList?.permission?.can_use_export_project_into_dataset || [];    
+  setSelectedOptions({  view: viewPermissions,
+    use: usePermissions
+ });
+ };
+ 
+ const handleProjectStagePopoverOpen = (event) => {
+  setStagePopoverOpen(true)
+   setAnchorElProjectStage(event.currentTarget);
+ };
+ const handleProjectStagePopoverClose = () => {
+  setStagePopoverOpen(false)
+   setAnchorElProjectStage(null);
+   const viewPermissions = permissionList?.permission?.can_view_project_stage || [];
+   const usePermissions = permissionList?.permission?.can_use_project_stage || [];    
+   setSelectedOptions({  view: viewPermissions,
+     use: usePermissions
   });
-  const open1 = Boolean(anchorEl);
-  const newPopoverOpen = Boolean(newPopoverAnchorEl);
-  const Id1 = open1 ? 'simple-popover' : undefined;
-  const newPopoverId = newPopoverOpen ? 'new-popover' : undefined;
+ };
+ 
+ const handleCheckboxChange = (name, checked, roleNumber) => {
+  setSelectedOptions((prevOptions) => {
+    const updatedOptions = { ...prevOptions }; 
+    if (name === 'view') {
+      
+      const updatedViewRoles = checked 
+        ? updatedOptions[view]?.push(roleNumber)
+        : prevOptions?.view?.filter((role) => role !== roleNumber); 
+      return {
+        ...prevOptions,
+        view: updatedViewRoles
+      };
+    } else if (name === 'use') {
+      const updatedUseRoles = checked
+        ? updatedOptions[use]?.push(roleNumber)
+        : prevOptions?.use?.filter((role) => role !== roleNumber); 
+      
+      return {
+        ...prevOptions,
+        use: updatedUseRoles
+      };
+    }
+    return prevOptions;
+  });
+};
+
+
+const handleApply = (name) => {
+    const obj = new EditProjectPermission(`can_${name}_download_project`,selectedOptions?.view);
+    dispatch(APITransport(obj));
+};
+
+
+useEffect(() => {
+  if (permissionList && permissionList?.permission) {
+      setview(permissionList?.permission?.can_view_supercheck_settings);
+      setuse(permissionList?.permission?.can_use_supercheck_settings);
+      const viewPermissions = permissionList?.permission?.can_view_supercheck_settings || [];
+  const usePermissions = permissionList?.permission?.can_use_supercheck_settings || [];
+  setSelectedOptions({
+    view: viewPermissions,
+    use: usePermissions
+  });
+  }
+}, [permissionList]);
+const canViewDownloadButton = (roleId) => {
+return view && view.includes(roleId);
+};
+const canUseDownloadButton = (roleId) => {
+return use && use.includes(roleId);
+};
+
+
 
   const isSuperChecker =
     ((userRole.WorkspaceManager === loggedInUserData?.role ||
@@ -360,7 +517,6 @@ const AdvancedOperation = (props) => {
   };
 
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
-  const permissionList = useSelector((state) => state.ProjectPermission.data);
   const [isArchived, setIsArchived] = useState(false);
   const [downloadMetadataToggle, setDownloadMetadataToggle] = useState(true)
   const getArchiveProjectAPI = () => {
@@ -414,35 +570,6 @@ const AdvancedOperation = (props) => {
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
-  const handleNewPopoverOpen = (event,category) => {
-    setOpenNewPopover(true);
-    setNewPopoverAnchorEl(event);
-    setcategory(category)
-    console.log(category);
-    console.log(newPopoverAnchorEl);
-    
-};
-
-const handleNewPopoverClose = () => {
-    setOpenNewPopover(false);
-    setNewPopoverAnchorEl(null);
-    setSelectedOptions({ view: false, use: false });
-};
-
-const handleCheckboxChange = (name,checked) => {
-    
-    setSelectedOptions({
-        ...selectedOptions,
-        [name]: checked,
-    });
-};
-
-const handleApply = () => {
-    console.log("Selected Options:", selectedOptions);
-    handleNewPopoverClose();
-};
-
-
 
   const renderSnackBar = () => {
     return (
@@ -502,22 +629,97 @@ const handleApply = () => {
               sx={{
                 inlineSize: "max-content",
                 pl: 2,
-                borderRadius: "8px 0 0 8px",
+                borderRadius: loggedInUserData?.role === 6? "8px 0 0 8px" : 3,
                 ml: 2,
                 width: "300px",
               }}
-              onClick={handlePublishProject}
+              onClick={canUseDownloadButton(loggedInUserData?.role) ? handlePublishProject : null}
+              disabled={!( canViewDownloadButton(loggedInUserData?.role))&& loggedInUserData?.role!==6}  
               label="Publish Project"
             />
+                        {loggedInUserData?.role === 6 ?(
               <IconButton
                     color="primary"
-                    onClick={(event) => handleNewPopoverOpen(event, "publish")}   
+                    onClick={(event) => handlePublishPopoverOpen(event, "publish")}   
                     sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
                 >
                     <ArrowForwardIosIcon />
-                </IconButton>
+                </IconButton>):null}
             </Box>
           </Grid>
+          
+<Popover
+  id={publishPopoverId}
+  open={openPublishPopover}
+  anchorEl={anchorElPublish}
+  onClose={handlePublishPopoverClose}
+  anchorOrigin={{
+    vertical: 'bottom',
+    horizontal: 'left',
+  }}
+>
+  <Box sx={{ p: 2 }}>
+        <Typography variant="h6">View</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handlePublishPopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("view")}>
+                Apply View
+            </Button>
+        </Box>
+
+        {/* Use Section */}
+        <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handlePublishPopoverOpen}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("use")}>
+                Apply Use
+            </Button>
+        </Box>
+    </Box>
+
+</Popover>
+
+          
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <Box display="flex" alignItems="center">
@@ -525,24 +727,95 @@ const handleApply = () => {
               sx={{
                 inlineSize: "max-content",
                 p: 2,
-                borderRadius: "8px 0 0 8px",
+                borderRadius: loggedInUserData?.role === 6? "8px 0 0 8px" : 3,
                 ml: 2,
                 width: "300px",
               }}
               color="error"
-              onClick={handleClickOpen}
+              onClick={canUseDownloadButton(loggedInUserData?.role) ? handleClickOpen : null}
               label={isArchived ? "Archived" : "Archive"}
-              disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
-            />
-             <IconButton
+              disabled={!( canViewDownloadButton(loggedInUserData?.role))&& loggedInUserData?.role!==6}             />
+                         {loggedInUserData?.role === 6 ?(
+                          <IconButton
                     color="primary"
-                    onClick={handleNewPopoverOpen} 
+                    onClick={handleArchivePopoverOpen} 
                     sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
                 >
                     <ArrowForwardIosIcon />
-                </IconButton>
+                </IconButton>):null}
             </Box>
           </Grid>
+          <Popover
+   id={archivePopoverId}
+   open={openArchivePopover}
+   anchorEl={anchorElArchive}
+   onClose={handleArchivePopoverClose}
+  anchorOrigin={{
+    vertical: 'bottom',
+    horizontal: 'left',
+  }}
+>
+<Box sx={{ p: 2 }}>
+        {/* View Section */}
+        <Typography variant="h6">View</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleArchivePopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("view")}>
+                Apply View
+            </Button>
+        </Box>
+
+        {/* Use Section */}
+        <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleArchivePopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("use")}>
+                Apply Use
+            </Button>
+        </Box>
+    </Box>
+
+</Popover>
 
           <Grid
             item
@@ -622,7 +895,6 @@ const handleApply = () => {
                 onClick={handleDownloadProjectAnnotations}
                 label="Downoload Project Annotations" />
             </Grid>) : " "}
-          {/* <div className={classes.divider} ></div> */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
                         <Box display="flex" alignItems="center">
@@ -631,18 +903,18 @@ const handleApply = () => {
                 sx={{
                   inlineSize: "max-content",
                   p: 2,
-                  borderRadius: "8px 0 0 8px",
+                  borderRadius: loggedInUserData?.role === 6? "8px 0 0 8px" : 3,
                   ml: 2,
                   width: "300px",
                 }}
-                onClick={handleOpenExportProjectDialog}
+                disabled={!( canViewDownloadButton(loggedInUserData?.role))&& loggedInUserData?.role!==6}  
+                onClick={canUseDownloadButton(loggedInUserData?.role) ? handleOpenExportProjectDialog : null}
                 label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
 
               />
                <IconButton
                     color="primary"
-                    onClick={handleNewPopoverOpen} 
+                    onClick={handleExportPopoverOpen} 
                     sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
                 >
                     <ArrowForwardIosIcon />
@@ -666,18 +938,88 @@ const handleApply = () => {
               />
                <IconButton
                     color="primary"
-                    onClick={handleNewPopoverOpen} 
+                    onClick={handleExportPopoverOpen} 
                     sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
                 >
                     <ArrowForwardIosIcon />
                 </IconButton>
             </Box>
             )}
+            <Popover
+ id={exportPopoverId}
+ open={openExportPopover}
+ anchorEl={anchorElExport}
+ onClose={handleExportPopoverClose}
+   anchorOrigin={{
+    vertical: 'bottom',
+    horizontal: 'left',
+  }}
+>
+<Box sx={{ p: 2 }}>
+        {/* View Section */}
+        <Typography variant="h6">View</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleExportPopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("view")}>
+                Apply View
+            </Button>
+        </Box>
+
+        {/* Use Section */}
+        <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleExportPopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("use")}>
+                Apply Use
+            </Button>
+        </Box>
+    </Box>
+</Popover>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectDetails.sampling_mode == "f" || ProjectDetails.sampling_mode == "b" ? (
-                            <Box display="flex" alignItems="center">
+            <Box display="flex" alignItems="center">
 
               <CustomButton
                 sx={{
@@ -687,22 +1029,95 @@ const handleApply = () => {
                   ml: 2,
                   width: "300px",
                 }}
-                onClick={handlePullNewData}
+                onClick={canUseDownloadButton(loggedInUserData?.role) ? handlePullNewData : null}
                 label="Pull New Data Items from Source Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+                disabled={!( canViewDownloadButton(loggedInUserData?.role))&& loggedInUserData?.role!==6}  
               />
+              {loggedInUserData?.role === 6 ?(
               <IconButton
                     color="primary"
-                    onClick={handleNewPopoverOpen} 
+                    onClick={handlePullPopoverOpen} 
                     sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
                 >
                     <ArrowForwardIosIcon />
-                </IconButton>
+                </IconButton>)
+                :null}
             </Box>
             ) : (
               " "
             )}
+            
           </Grid>
+          <Popover
+    id={PullPopoverId}
+    open={PullPopoverOpen}
+    anchorEl={anchorElPull}
+    onClose={handlePullPopoverClose}
+    anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+    }}
+>
+    <Box sx={{ p: 2 }}>
+        {/* View Section */}
+        <Typography variant="h6">View</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handlePullPopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("view")}>
+                Apply View
+            </Button>
+        </Box>
+
+        {/* Use Section */}
+        <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handlePullPopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("use")}>
+                Apply Use
+            </Button>
+        </Box>
+    </Box>
+</Popover>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DownloadProjectButton
               taskStatus={taskStatus}
@@ -712,10 +1127,10 @@ const handleApply = () => {
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <DeleteProjectTasks />
+            <DeleteProjectTasks permissionList={permissionList}/>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <DeallocationAnnotatorsAndReviewers />
+            <DeallocationAnnotatorsAndReviewers permissionList={permissionList}/>
           </Grid>
 
         </Grid>
@@ -770,13 +1185,83 @@ const handleApply = () => {
               </FormControl>
               <IconButton
                     color="primary"
-                    onClick={handleNewPopoverOpen} 
+                    onClick={handleProjectStagePopoverOpen} 
                     sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
                 >
                     <ArrowForwardIosIcon />
                 </IconButton>
             </Box>
           </Grid>:null}
+          <Popover
+ id={projectStagePopoverId}
+ open={openProjectStagePopover}
+ anchorEl={anchorElProjectStage}
+ onClose={handleProjectStagePopoverClose}  anchorOrigin={{
+    vertical: 'bottom',
+    horizontal: 'left',
+  }}
+>
+<Box sx={{ p: 2 }}>
+        {/* View Section */}
+        <Typography variant="h6">View</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.view.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange('view', event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleProjectStagePopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("view")}>
+                Apply View
+            </Button>
+        </Box>
+
+        {/* Use Section */}
+        <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(5)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 5)}
+                />
+            }
+            label="Org Owner"
+        />
+        <FormControlLabel
+            control={
+                <Checkbox
+                    checked={selectedOptions.use.flat(Infinity).includes(4)} 
+                    onChange={(event) => handleCheckboxChange("use", event.target.checked, 4)}
+                />
+            }
+            label="Manager"
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="error" onClick={handleProjectStagePopoverClose}>
+                Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => handleApply("use")}>
+                Apply Use
+            </Button>
+        </Box>
+    </Box>
+
+</Popover>
 
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
             userRole.OrganizationOwner === loggedInUserData?.role ||
@@ -786,7 +1271,7 @@ const handleApply = () => {
           )) &&
             <Grid item xs={12} sm={12} md={12} lg={6} xl={6}
             >
-              <SuperCheckSettings ProjectDetails={ProjectDetails} />
+              <SuperCheckSettings ProjectDetails={ProjectDetails} permissionList={permissionList}/>
             </Grid>}
         </Grid>
 
@@ -819,65 +1304,6 @@ const handleApply = () => {
             />
           </Grid> */}
         </Grid>
-        <Popover
-                id={newPopoverId}
-                open={newPopoverOpen}
-                anchorEl={newPopoverAnchorEl}
-                onClose={handleNewPopoverClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-            >
-                <Box sx={{ p: 2 }}>
-                    <Typography variant="h6">View</Typography>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={selectedOptions.view.orgOwner}
-                                onChange={() => handleCheckboxChange("view", "orgOwner")}
-                            />
-                        }
-                        label="Org Owner"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={selectedOptions.view.manager}
-                                onChange={() => handleCheckboxChange("view", "manager")}
-                            />
-                        }
-                        label="Manager"
-                    />
-                    <Typography variant="h6" sx={{ mt: 2 }}>Use</Typography>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={selectedOptions.use.orgOwner}
-                                onChange={() => handleCheckboxChange("use", "orgOwner")}
-                            />
-                        }
-                        label="Org Owner"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={selectedOptions.use.manager}
-                                onChange={() => handleCheckboxChange("use", "manager")}
-                            />
-                        }
-                        label="Manager"
-                    />
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
-                        <Button variant="outlined" color="error" onClick={handleNewPopoverClose}>
-                            Cancel
-                        </Button>
-                        <Button variant="contained" color="primary" onClick={handleApply}>
-                            Apply
-                        </Button>
-                    </Box>
-                </Box>
-            </Popover>
         <Dialog
           open={open}
           onClose={handleClose}

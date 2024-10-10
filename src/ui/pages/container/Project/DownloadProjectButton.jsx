@@ -15,6 +15,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import { Box, Checkbox, FormControlLabel, IconButton, Popover, Typography } from "@mui/material";
+import EditProjectPermission from "../../../../redux/actions/api/ProjectDetails/editProjectPermission";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -51,9 +52,11 @@ function DownloadProjectButton(props) {
  const[taskValue ,setTaskValue]= useState(taskStatus)
  const [newPopoverAnchorEl, setNewPopoverAnchorEl] = useState(null);
  const [openNewPopover, setOpenNewPopover] = useState(false);
+ const viewPermissions = permissionList?.permission?.can_view_download_project || [];
+ const usePermissions = permissionList?.permission?.can_use_download_project || [];
  const [selectedOptions, setSelectedOptions] = useState({
-  view: permissionList?.permission?.canViewDownloadButton || [],
-  use: permissionList?.permission?.canUseDownloadButton || []
+  view: viewPermissions,
+  use: usePermissions
  });
  const open1 = Boolean(anchorEl);
  const newPopoverOpen = Boolean(newPopoverAnchorEl);
@@ -158,19 +161,17 @@ function DownloadProjectButton(props) {
    
   };
   useEffect(() => {
-    if (permissionList) {
+    if (permissionList && permissionList?.permission) {
         setview(permissionList?.permission?.can_view_download_project);
         setuse(permissionList?.permission?.can_use_download_project);
         const viewPermissions = permissionList?.permission?.can_view_download_project || [];
     const usePermissions = permissionList?.permission?.can_use_download_project || [];
-    
-    // Initialize selected options based on permissions
     setSelectedOptions({
       view: viewPermissions,
       use: usePermissions
     });
     }
-}, []);
+}, [permissionList]);
 const canViewDownloadButton = (roleId) => {
   return view && view.includes(roleId);
 };
@@ -228,13 +229,19 @@ const canUseDownloadButton = (roleId) => {
 const handleNewPopoverClose = () => {
     setOpenNewPopover(false);
     setNewPopoverAnchorEl(null);
-    setSelectedOptions({ view: false, use: false });
+    const viewPermissions = permissionList?.permission?.can_view_download_project || [];
+    const usePermissions = permissionList?.permission?.can_use_download_project || [];    
+    setSelectedOptions({  view: viewPermissions,
+      use: usePermissions
+   });
 };
 const handleCheckboxChange = (name, checked, roleNumber) => {
   setSelectedOptions((prevOptions) => {
+    const updatedOptions = { ...prevOptions }; 
     if (name === 'view') {
+      
       const updatedViewRoles = checked 
-        ? [...prevOptions.view, roleNumber] 
+        ? updatedOptions[view]?.push(roleNumber)
         : prevOptions?.view?.filter((role) => role !== roleNumber); 
       return {
         ...prevOptions,
@@ -242,7 +249,7 @@ const handleCheckboxChange = (name, checked, roleNumber) => {
       };
     } else if (name === 'use') {
       const updatedUseRoles = checked
-        ? [...prevOptions.use, roleNumber] 
+        ? updatedOptions[use]?.push(roleNumber)
         : prevOptions?.use?.filter((role) => role !== roleNumber); 
       
       return {
@@ -254,35 +261,37 @@ const handleCheckboxChange = (name, checked, roleNumber) => {
   });
 };
 
-console.log(selectedOptions);
+console.log(permissionList?.permission?.can_view_download_project,selectedOptions.view);
 
 const handleApply = (name) => {
-    console.log("Selected Options:", selectedOptions);
-    handleNewPopoverClose();
+    const obj = new EditProjectPermission(`can_${name}_download_project`,selectedOptions?.view);
+    dispatch(APITransport(obj));
 };
 
-console.log(view && view?.includes(4),view,canViewDownloadButton(loggedInUserData?.role));
+console.log(view && view?.includes(4),permissionList,view,canViewDownloadButton(loggedInUserData?.role),loggedInUserData?.role);
   return (
     <div>
       {renderSnackBar()}
       <Box display="flex" alignItems="center">
       <Button
-        sx={{ inlineSize: "max-content", p: 2, borderRadius: "8px 0 0 8px", ml: 2,width:"300px" }}
+        sx={{ inlineSize: "max-content", p: 2,borderRadius: loggedInUserData?.role === 6? "8px 0 0 8px" : 3, ml: 2,width:"300px" }}
         id="demo-customized-button"
         variant="contained"
-        disabled={!(taskStatus.length > 0 && canViewDownloadButton(loggedInUserData?.role))}  
+        disabled={!(taskStatus.length > 0 && canViewDownloadButton(loggedInUserData?.role))&& loggedInUserData?.role!==6}  
         onClick={canUseDownloadButton(loggedInUserData?.role) ? handleClick : null}
         endIcon={<KeyboardArrowDownIcon />}
       >
         Download Project
       </Button>
+      {loggedInUserData?.role === 6 ?(
       <IconButton
-                    color="primary"
-                    onClick={handleNewPopoverOpen} 
-                    sx={{   borderRadius: "0 8px 8px 0",backgroundColor:"#B00020",color:"white"}} 
-                >
-                    <ArrowForwardIosIcon />
-                </IconButton>
+        color="primary"
+        onClick={handleNewPopoverOpen} 
+        sx={{ borderRadius: "0 8px 8px 0", backgroundColor: "#B00020", color: "white" }} 
+      >
+        <ArrowForwardIosIcon />
+      </IconButton>
+    ):null}
             </Box>
       <StyledMenu
         sytle={{ width: "20px" }}
@@ -321,7 +330,7 @@ console.log(view && view?.includes(4),view,canViewDownloadButton(loggedInUserDat
         <FormControlLabel
             control={
                 <Checkbox
-                    checked={selectedOptions.view.includes(5)} 
+                    checked={selectedOptions.view.flat(Infinity).includes(5)} 
                     onChange={(event) => handleCheckboxChange('view', event.target.checked, 5)}
                 />
             }
@@ -330,7 +339,7 @@ console.log(view && view?.includes(4),view,canViewDownloadButton(loggedInUserDat
         <FormControlLabel
             control={
                 <Checkbox
-                    checked={selectedOptions.view.includes(4)} 
+                    checked={selectedOptions.view.flat(Infinity).includes(4)} 
                     onChange={(event) => handleCheckboxChange('view', event.target.checked, 4)}
                 />
             }
@@ -350,7 +359,7 @@ console.log(view && view?.includes(4),view,canViewDownloadButton(loggedInUserDat
         <FormControlLabel
             control={
                 <Checkbox
-                    checked={selectedOptions.use.includes(5)} 
+                    checked={selectedOptions.use.flat(Infinity).includes(5)} 
                     onChange={(event) => handleCheckboxChange("use", event.target.checked, 5)}
                 />
             }
@@ -359,7 +368,7 @@ console.log(view && view?.includes(4),view,canViewDownloadButton(loggedInUserDat
         <FormControlLabel
             control={
                 <Checkbox
-                    checked={selectedOptions.use.includes(4)} 
+                    checked={selectedOptions.use.flat(Infinity).includes(4)} 
                     onChange={(event) => handleCheckboxChange("use", event.target.checked, 4)}
                 />
             }

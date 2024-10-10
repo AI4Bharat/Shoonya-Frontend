@@ -3,18 +3,17 @@ import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
-export default class EditProjectPermission extends API {
-   constructor(name,roles, timeout = 2000) {
-     super("POST", timeout, false);
-     this.type = constants.EDIT_PROJECT_PERMISSION;
-     this.roles = roles;
-     this.endpoint = `${super.apiEndPointAuto()}/organizations/project_permission/?permission_name=${name}&fetch_all=True`;
+export default class DatasetPermission extends API {
+   constructor(projectId, timeout = 2000) {
+     super("GET", timeout, false);
+     this.type = constants.GET_DATASET_PERMISSION;
+     this.endpoint = `${super.apiEndPointAuto()}/organizations/dataset_permission/?fetch_all=True`;
    }
  
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-         this.EditProjectPermission = res;
+         this.DatasetPermission = res;
      }
  }
  
@@ -22,11 +21,7 @@ export default class EditProjectPermission extends API {
      return this.endpoint;
    }
 
-   getBody() {
-    return {
-      new_roles: [5]
-    }
-   }
+   getBody() {}
   
  
    getHeaders() {
@@ -40,7 +35,7 @@ export default class EditProjectPermission extends API {
    }
  
    getPayload() {
-     return this.EditProjectPermission;
+     return this.DatasetPermission;
    }
  }
  

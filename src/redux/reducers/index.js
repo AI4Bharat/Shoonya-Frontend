@@ -99,6 +99,7 @@ import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
 import patchAnnotation from "./CL-Transcription/PatchAnnotation"
 import updateUIPrefs from "./UserManagement/UpdateUIPrefs";
 import ProjectPermission from "./ProjectDetails/ProjectPermission"
+import DatasetPermission from './Dataset/DatasetPermission';
 const index = {
     apiStatus,
     getProjects,
@@ -138,6 +139,7 @@ const index = {
     downloadProjectCSV,
     getFilteredTasks,
     ProjectPermission,
+    DatasetPermission,
     postAnnotation,
     updateAnnotation,
     deleteAnnotation,
