@@ -9,6 +9,7 @@ import TransliterationAPI from "../../../../redux/actions/api/Transliteration/Tr
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import configs from "../../../../config/config";
 const Transliteration = (props) => {
   const { onCancelTransliteration ,setIsSpaceClicked,isSpaceClicked,setShowTransliterationModel} = props;
   const params = useParams();
@@ -226,6 +227,8 @@ const Transliteration = (props) => {
       </Grid>
 
       <IndicTransliterate
+        customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+        apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
         lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ? data[0]?.LangCode : "hi")}
         value={text}
         onChangeText={(val) => {

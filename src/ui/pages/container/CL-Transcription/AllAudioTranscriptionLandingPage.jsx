@@ -606,6 +606,8 @@ const AllAudioTranscriptionLandingPage = () => {
             >
               {stdTranscriptionSettings.enableTransliteration ? (
                 <IndicTransliterate
+                  customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                  apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
                   lang={stdTranscriptionSettings.targetlang}
                   value={stdTranscription}
                   onChange={(e) => {
