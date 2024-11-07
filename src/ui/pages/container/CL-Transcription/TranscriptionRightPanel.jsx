@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState, useRef, memo } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Resizable } from 're-resizable';
+import { Resizable } from "re-resizable";
 import {
   addSubtitleBox,
   getSubtitleRangeTranscript,
@@ -40,7 +40,7 @@ import {
   Select,
   useMediaQuery,
   Pagination,
-  Typography
+  Typography,
 } from "@mui/material";
 // import {
 //   ConfirmDialog,
@@ -63,7 +63,7 @@ import C from "../../../../redux/constants";
 import SettingsButtonComponent from "../../component/CL-Transcription/SettingsButtonComponent";
 import SaveTranscriptAPI from "../../../../redux/actions/CL-Transcription/SaveTranscript";
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
+import UnfoldMoreOutlinedIcon from "@mui/icons-material/UnfoldMoreOutlined";
 // import {
 //   APITransport,
 //   FetchTranscriptPayloadAPI,
@@ -116,8 +116,10 @@ const TranscriptionRightPanel = ({
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles;
   // const currentPageData = subtitles?.slice(startIndex, endIndex);
-  const idxOffset = (itemsPerPage * (page - 1));
-  const showAcousticText = ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" && ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
+  const idxOffset = itemsPerPage * (page - 1);
+  const showAcousticText =
+    ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" &&
+    ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -127,11 +129,20 @@ const TranscriptionRightPanel = ({
   const [selectionStart, setSelectionStart] = useState();
   const [currentIndexToSplitTextBlock, setCurrentIndexToSplitTextBlock] =
     useState();
-  const [enableTransliteration, setTransliteration] = useState(JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))?.enableTransliteration || false);
-  const [enableRTL_Typing, setRTL_Typing] = useState(JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))?.enableRTL_Typing || false);
+  const [enableTransliteration, setTransliteration] = useState(
+    JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))
+      ?.enableTransliteration || false
+  );
+  const [enableRTL_Typing, setRTL_Typing] = useState(
+    JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))
+      ?.enableRTL_Typing || false
+  );
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [fontSize, setFontSize] = useState(JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))?.fontSize || "large");
+  const [fontSize, setFontSize] = useState(
+    JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))
+      ?.fontSize || "large"
+  );
   const [currentOffset, setCurrentOffset] = useState(1);
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
@@ -160,7 +171,11 @@ const TranscriptionRightPanel = ({
   const langDictSet = new Set(langDict[targetlang]);
 
   useEffect(() => {
-    currentPageData?.length && (textRefs.current = textRefs.current.slice(0, (showAcousticText ? 2 : 1) * currentPageData.length));
+    currentPageData?.length &&
+      (textRefs.current = textRefs.current.slice(
+        0,
+        (showAcousticText ? 2 : 1) * currentPageData.length
+      ));
   }, [showAcousticText, currentPageData]);
 
   useEffect(() => {
@@ -199,7 +214,7 @@ const TranscriptionRightPanel = ({
   }, [currentPage]);
 
   useEffect(() => {
-    if(currentIndex >= startIndex) {
+    if (currentIndex >= startIndex) {
       // if(currentIndex >= startIndex && currentIndex <= endIndex) {
       const subtitleScrollEle = document.getElementById("subTitleContainer");
       subtitleScrollEle
@@ -267,34 +282,51 @@ const TranscriptionRightPanel = ({
   }, [currentIndex]);
 
   useEffect(() => {
-    if(showAcousticText) {
+    if (showAcousticText) {
       handleStdTranscriptionSettings({
         //set enable:true to enable standardised_transcription
         enable: false,
         showAcoustic: true,
         rtl: enableRTL_Typing,
-        enableTransliteration: ProjectDetails?.tgt_language !== "en" && enableTransliteration,
+        enableTransliteration:
+          ProjectDetails?.tgt_language !== "en" && enableTransliteration,
         enableTransliterationSuggestion,
         targetlang,
         fontSize,
       });
     }
-  }, [showAcousticText, ProjectDetails, enableRTL_Typing, enableTransliteration, enableTransliterationSuggestion, targetlang, fontSize]);
+  }, [
+    showAcousticText,
+    ProjectDetails,
+    enableRTL_Typing,
+    enableTransliteration,
+    enableTransliterationSuggestion,
+    targetlang,
+    fontSize,
+  ]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.altKey && event.key === "1") {
         event.preventDefault();
-        localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"enableTransliteration":!enableTransliteration}))
+        localStorage.setItem(
+          "userCustomTranscriptionSettings",
+          JSON.stringify({
+            ...JSON.parse(
+              localStorage.getItem("userCustomTranscriptionSettings")
+            ),
+            enableTransliteration: !enableTransliteration,
+          })
+        );
         setTransliteration(!enableTransliteration);
       }
     };
-  
-    document.addEventListener('keydown', handleKeyDown);
+
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [enableTransliteration, setTransliteration]);  
+  }, [enableTransliteration, setTransliteration]);
 
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
@@ -378,8 +410,7 @@ const TranscriptionRightPanel = ({
     // setEnableTransliterationSuggestion(true);
     if (value.includes("$$")) {
       setEnableTransliterationSuggestion(false);
-    }
-    else {
+    } else {
       setEnableTransliterationSuggestion(true);
     }
 
@@ -392,7 +423,9 @@ const TranscriptionRightPanel = ({
       setTagSuggestionsAnchorEl(currentTarget);
       setTextWithoutTripleDollar(textBeforeTab);
       setTextAfterTripleDollar(textAfterTab);
-      setCurrentTextRefIdx(index + (updateAcoustic ? currentPageData?.length : 0));
+      setCurrentTextRefIdx(
+        index + (updateAcoustic ? currentPageData?.length : 0)
+      );
       setCurrentSelection(event.target.selectionEnd);
       setTagSuggestionsAcoustic(updateAcoustic);
     }
@@ -431,8 +464,6 @@ const TranscriptionRightPanel = ({
       });
 
       setLoading(false);
-
-
     } else {
       setLoading(false);
       setSnackbarInfo({
@@ -574,8 +605,7 @@ const TranscriptionRightPanel = ({
   }, [taskData]);
 
   useEffect(() => {
-    if(subtitles !== undefined)
-    setTotalSegments(subtitles.length);
+    if (subtitles !== undefined) setTotalSegments(subtitles.length);
   }, [subtitles]);
 
   const toggleAdditionalOptions = () => {
@@ -586,13 +616,15 @@ const TranscriptionRightPanel = ({
     const autoGrowTextareas = (className) => {
       const textareas = document.querySelectorAll(`.${className}`);
       textareas.forEach((textarea, index) => {
-        document.getElementById(`${index}_resizable`).style.height=`${textarea.scrollHeight+99}px`;
+        document.getElementById(`${index}_resizable`).style.height = `${
+          textarea.scrollHeight + 99
+        }px`;
       });
     };
 
     const delay = 1500;
     const timer = setTimeout(() => {
-      autoGrowTextareas('auto-resizable-textarea');
+      autoGrowTextareas("auto-resizable-textarea");
     }, delay);
 
     return () => clearTimeout(timer);
@@ -626,6 +658,7 @@ const TranscriptionRightPanel = ({
               onSplitClick={onSplitClick}
               showPopOver={showPopOver}
               showSplit={true}
+              subtitles={subtitles}
               advancedWaveformSettings={advancedWaveformSettings}
               setAdvancedWaveformSettings={setAdvancedWaveformSettings}
               waveSurfer={waveSurfer}
@@ -635,30 +668,54 @@ const TranscriptionRightPanel = ({
               annotationId={annotationId}
             />
           </Grid>
-          {showAcousticText && <Grid
-            style={{
-              display: "flex",
-              direction: "row",
-              flexWrap: "wrap",
-              justifyContent: "space-around",
-              backgroundColor: "rgb(44, 39, 153, 0.2)"}}>
-            <Typography
-              variant="caption"
-              sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
+          {showAcousticText && (
+            <Grid
+              style={{
+                display: "flex",
+                direction: "row",
+                flexWrap: "wrap",
+                justifyContent: "space-around",
+                backgroundColor: "rgb(44, 39, 153, 0.2)",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  p: 1,
+                  color: "rgb(44, 39, 153)",
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                }}
+              >
                 Verbatim Transcription
               </Typography>
-            <Typography
-              variant="caption"
-              sx={{p:1, color:"rgb(44, 39, 153)", borderRadius : 2, fontWeight: 600, fontSize: "0.85rem" }}>
-                Semantic (L2) Transcription 
-            </Typography>
-          </Grid>}
-          </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  p: 1,
+                  color: "rgb(44, 39, 153)",
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                }}
+              >
+                Semantic (L2) Transcription
+              </Typography>
+            </Grid>
+          )}
+        </Box>
 
-          <Box id={"subTitleContainer"} className={classes.subTitleContainer} sx={{
-            height: showAcousticText ? "calc(102vh - 380px)" : "calc(102vh - 385px)",
+        <Box
+          id={"subTitleContainer"}
+          className={classes.subTitleContainer}
+          sx={{
+            height: showAcousticText
+              ? "calc(102vh - 380px)"
+              : "calc(102vh - 385px)",
             alignItems: "center",
-          }}>
+          }}
+        >
           {currentPageData?.map((item, index) => {
             return (
               <React.Fragment>
@@ -667,16 +724,35 @@ const TranscriptionRightPanel = ({
                   default={{ height: "240px" }}
                   minHeight="240px"
                   id={`${index}_resizable`}
-                  enable={{ top:false, right:false, bottom:true, left:false, topRight:false, bottomRight:false, bottomLeft:false, topLeft:false }}
-                  style={{ alignItems: "center", display: "flex", flexDirection: "column", marginTop: index === 0 ? "0px" : "-16px" }}
+                  enable={{
+                    top: false,
+                    right: false,
+                    bottom: true,
+                    left: false,
+                    topRight: false,
+                    bottomRight: false,
+                    bottomLeft: false,
+                    topLeft: false,
+                  }}
+                  style={{
+                    alignItems: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    marginTop: index === 0 ? "0px" : "-16px",
+                  }}
                   onResizeStart={(e, dir, ref) => {
-                    parentScrollOffsetX.current = ref.parentElement?.scrollLeft || 0
-                    parentScrollOffsetY.current = ref.parentElement?.scrollTop || 0
+                    parentScrollOffsetX.current =
+                      ref.parentElement?.scrollLeft || 0;
+                    parentScrollOffsetY.current =
+                      ref.parentElement?.scrollTop || 0;
                   }}
                   onResize={(e, dir, ref, d) => {
-                    ref.parentElement.scrollTo(parentScrollOffsetX.current, parentScrollOffsetY.current)
+                    ref.parentElement.scrollTo(
+                      parentScrollOffsetX.current,
+                      parentScrollOffsetY.current
+                    );
                   }}
-                  handleStyles={{ bottom: {height: "24px"}}}
+                  handleStyles={{ bottom: { height: "24px" } }}
                 >
                   <Box
                     key={index}
@@ -693,9 +769,30 @@ const TranscriptionRightPanel = ({
                       height: "100%",
                     }}
                   >
-                    <Box className={classes.topBox} style={{paddingLeft: "16px", paddingRight: "16px", paddingTop: "14px", paddingBottom: "10px"}}>
-                      <div style={{display:"block", height:"30px", width:"90px", lineHeight:"30px", borderRadius:"50%", fontSize:"medium", backgroundColor:"#2C2799", color:"white", marginRight:"20px", marginLeft:"5px"}}>
-                        {index+1}
+                    <Box
+                      className={classes.topBox}
+                      style={{
+                        paddingLeft: "16px",
+                        paddingRight: "16px",
+                        paddingTop: "14px",
+                        paddingBottom: "10px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "block",
+                          height: "30px",
+                          width: "90px",
+                          lineHeight: "30px",
+                          borderRadius: "50%",
+                          fontSize: "medium",
+                          backgroundColor: "#2C2799",
+                          color: "white",
+                          marginRight: "20px",
+                          marginLeft: "5px",
+                        }}
+                      >
+                        {index + 1}
                       </div>
 
                       <TimeBoxes
@@ -706,22 +803,32 @@ const TranscriptionRightPanel = ({
                       />
 
                       <FormControl
-                        sx={{ width: "50%", mr: "auto", float: "left", marginRight:"10px" }}
+                        sx={{
+                          width: "50%",
+                          mr: "auto",
+                          float: "left",
+                          marginRight: "10px",
+                        }}
                         size="small"
                       >
-                        <InputLabel id="select-speaker">Select Speaker</InputLabel>
+                        <InputLabel id="select-speaker">
+                          Select Speaker
+                        </InputLabel>
                         <Select
                           fullWidth
                           labelId="select-speaker"
                           label="Select Speaker"
                           value={item.speaker_id}
                           onChange={(event) =>
-                            handleSpeakerChange(event.target.value, index + idxOffset)
+                            handleSpeakerChange(
+                              event.target.value,
+                              index + idxOffset
+                            )
                           }
                           style={{
                             backgroundColor: "#fff",
                             textAlign: "left",
-                            height: "32px"
+                            height: "32px",
                           }}
                           inputProps={{
                             "aria-label": "Without label",
@@ -737,44 +844,57 @@ const TranscriptionRightPanel = ({
                         </Select>
                       </FormControl>
 
-                      {showAdditionalOptions ? <Tooltip title="Hide Additional Options" placement="bottom">
-                        <IconButton
-                          className={classes.optionIconBtn}
-                          style={{
-                            color: "#000",
-                            backgroundColor: "#fff",
-                            borderRadius: "50%",
-                            marginRight: "10px",
-                          }}
-                        onClick={() => {toggleAdditionalOptions()}}
+                      {showAdditionalOptions ? (
+                        <Tooltip
+                          title="Hide Additional Options"
+                          placement="bottom"
                         >
-                          <Remove/>
-                        </IconButton>
-                      </Tooltip> :
-                      <Tooltip title="Show Additional Options" placement="bottom">
-                      <IconButton
-                        className={classes.optionIconBtn}
-                        style={{
-                          color: "#000",
-                          backgroundColor: "#fff",
-                          borderRadius: "50%",
-                          marginRight: "10px",
-                        }}
-                        onClick={() => {toggleAdditionalOptions()}}
-                      >
-                        <Add/>
-                      </IconButton>
-                    </Tooltip>}
-                      
-                      {showAdditionalOptions && 
+                          <IconButton
+                            className={classes.optionIconBtn}
+                            style={{
+                              color: "#000",
+                              backgroundColor: "#fff",
+                              borderRadius: "50%",
+                              marginRight: "10px",
+                            }}
+                            onClick={() => {
+                              toggleAdditionalOptions();
+                            }}
+                          >
+                            <Remove />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip
+                          title="Show Additional Options"
+                          placement="bottom"
+                        >
+                          <IconButton
+                            className={classes.optionIconBtn}
+                            style={{
+                              color: "#000",
+                              backgroundColor: "#fff",
+                              borderRadius: "50%",
+                              marginRight: "10px",
+                            }}
+                            onClick={() => {
+                              toggleAdditionalOptions();
+                            }}
+                          >
+                            <Add />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+
+                      {showAdditionalOptions && (
                         <ButtonComponent
                           index={index + idxOffset}
-                          lastItem={(index + idxOffset) < subtitles?.length - 1}
+                          lastItem={index + idxOffset < subtitles?.length - 1}
                           onMergeClick={onMergeClick}
                           onDelete={onDelete}
                           addNewSubtitleBox={addNewSubtitleBox}
                         />
-                      }
+                      )}
 
                       <TimeBoxes
                         handleTimeChange={handleTimeChange}
@@ -789,31 +909,40 @@ const TranscriptionRightPanel = ({
                         display: "flex",
                         padding: "8px 10px",
                         height: "100%",
-                        gap:"8px"
+                        gap: "8px",
                       }}
                       className={classes.cardContent}
                       aria-describedby={"suggestionList"}
                       onClick={() => {
                         if (pauseOnType && player) {
                           player.pause();
-                          if (player.currentTime < item.startTime || player.currentTime > item.endTime) {
+                          if (
+                            player.currentTime < item.startTime ||
+                            player.currentTime > item.endTime
+                          ) {
                             player.currentTime = item.startTime + 0.001;
                           }
                         }
                       }}
                     >
                       {ProjectDetails?.tgt_language !== "en" &&
-                        enableTransliteration ? (
+                      enableTransliteration ? (
                         <IndicTransliterate
                           customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
-                          apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
+                          apiKey={`JWT ${localStorage.getItem(
+                            "shoonya_access_token"
+                          )}`}
                           lang={targetlang}
                           value={item.text}
                           onChange={(event) => {
-                            changeTranscriptHandler(event, index + idxOffset, false);
+                            changeTranscriptHandler(
+                              event,
+                              index + idxOffset,
+                              false
+                            );
                           }}
                           enabled={enableTransliterationSuggestion}
-                          onChangeText={() => { }}
+                          onChangeText={() => {}}
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                           containerStyles={{ width: "100%", height: "100%" }}
                           onBlur={() => {
@@ -825,12 +954,20 @@ const TranscriptionRightPanel = ({
                           renderComponent={(props) => {
                             textRefs.current[index] = props.ref.current;
                             return (
-                              <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                              <div
+                                className={classes.relative}
+                                style={{ width: "100%", height: "100%" }}
+                              >
                                 <textarea
-                                  className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
-                                    }`}
+                                  className={`${classes.customTextarea} ${
+                                    currentIndex === idxOffset + index
+                                      ? classes.boxHighlight
+                                      : ""
+                                  }`}
                                   dir={enableRTL_Typing ? "rtl" : "ltr"}
-                                  onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                                  onMouseUp={(e) =>
+                                    onMouseUp(e, index + idxOffset)
+                                  }
                                   onBlur={() => {
                                     setTimeout(() => {
                                       setShowPopOver(false);
@@ -842,23 +979,35 @@ const TranscriptionRightPanel = ({
                         {targetLength(index)}
                       </span> */}
                               </div>
-                            )}}
-
+                            );
+                          }}
                         />
                       ) : (
-                        <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                        <div
+                          className={classes.relative}
+                          style={{ width: "100%", height: "100%" }}
+                        >
                           <textarea
-                            ref={el => textRefs.current[index] = el}
+                            ref={(el) => (textRefs.current[index] = el)}
                             // onChange={(event) => {
                             onInput={(event) => {
-                              changeTranscriptHandler(event, index + idxOffset, false);
+                              changeTranscriptHandler(
+                                event,
+                                index + idxOffset,
+                                false
+                              );
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
-                            className={`auto-resizable-textarea ${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
-                              }`}
-                            style={{ fontSize: fontSize, height: "100%"}}
+                            className={`auto-resizable-textarea ${
+                              classes.customTextarea
+                            } ${
+                              currentIndex === idxOffset + index
+                                ? classes.boxHighlight
+                                : ""
+                            }`}
+                            style={{ fontSize: fontSize, height: "100%" }}
                             onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
@@ -872,46 +1021,80 @@ const TranscriptionRightPanel = ({
                       )}
                       {showAcousticText &&
                         (ProjectDetails?.tgt_language !== "en" &&
-                          enableTransliteration ? (
+                        enableTransliteration ? (
                           <IndicTransliterate
                             customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
-                            apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
+                            apiKey={`JWT ${localStorage.getItem(
+                              "shoonya_access_token"
+                            )}`}
                             lang={targetlang}
                             value={item.acoustic_normalised_text}
                             onChange={(event) => {
-                              changeTranscriptHandler(event, index + idxOffset, true);
+                              changeTranscriptHandler(
+                                event,
+                                index + idxOffset,
+                                true
+                              );
                             }}
                             enabled={enableTransliterationSuggestion}
-                            onChangeText={() => { }}
+                            onChangeText={() => {}}
                             containerStyles={{ width: "100%", height: "100%" }}
                             style={{ fontSize: fontSize, height: "100%" }}
                             renderComponent={(props) => {
-                              textRefs.current[index + currentPageData?.length] = props.ref.current;
+                              textRefs.current[
+                                index + currentPageData?.length
+                              ] = props.ref.current;
                               return (
-                              <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
-                                <textarea
-                                  className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
+                                <div
+                                  className={classes.relative}
+                                  style={{ width: "100%", height: "100%" }}
+                                >
+                                  <textarea
+                                    className={`${classes.customTextarea} ${
+                                      currentIndex === idxOffset + index
+                                        ? classes.boxHighlight
+                                        : ""
                                     }`}
-                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
-                                  onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
-                                  {...props}
-                                />
-                              </div>
-                            )}}
-
+                                    dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                    onFocus={() =>
+                                      showAcousticText &&
+                                      populateAcoustic(index + idxOffset)
+                                    }
+                                    {...props}
+                                  />
+                                </div>
+                              );
+                            }}
                           />
                         ) : (
-                          <div className={classes.relative} style={{ width: "100%", height: "100%" }}>
+                          <div
+                            className={classes.relative}
+                            style={{ width: "100%", height: "100%" }}
+                          >
                             <textarea
-                              ref={el => textRefs.current[index + currentPageData?.length] = el}
+                              ref={(el) =>
+                                (textRefs.current[
+                                  index + currentPageData?.length
+                                ] = el)
+                              }
                               onChange={(event) => {
-                                changeTranscriptHandler(event, index + idxOffset, true);
+                                changeTranscriptHandler(
+                                  event,
+                                  index + idxOffset,
+                                  true
+                                );
                               }}
-                              onFocus={() => showAcousticText && populateAcoustic(index + idxOffset)}
+                              onFocus={() =>
+                                showAcousticText &&
+                                populateAcoustic(index + idxOffset)
+                              }
                               value={item.acoustic_normalised_text}
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
-                              className={`${classes.customTextarea} ${currentIndex === (idxOffset + index) ? classes.boxHighlight : ""
-                                }`}
+                              className={`${classes.customTextarea} ${
+                                currentIndex === idxOffset + index
+                                  ? classes.boxHighlight
+                                  : ""
+                              }`}
                               style={{ fontSize: fontSize, height: "100%" }}
                             />
                           </div>
@@ -919,17 +1102,20 @@ const TranscriptionRightPanel = ({
                     </CardContent>
                   </Box>
                 </Resizable>
-                <div style={{
-                  color: "grey",
-                  zIndex: 100,
-                  marginTop: "-16px",
-                  borderRadius: "100%",
-                  border: "1px solid rgba(128, 128, 128, 0.5)",
-                  backgroundColor: "white",
-                  height: "32px", width: "32px",
-                  pointerEvents: "none",
-                }}>
-                  <UnfoldMoreOutlinedIcon sx={{mt: "3px"}}/> 
+                <div
+                  style={{
+                    color: "grey",
+                    zIndex: 100,
+                    marginTop: "-16px",
+                    borderRadius: "100%",
+                    border: "1px solid rgba(128, 128, 128, 0.5)",
+                    backgroundColor: "white",
+                    height: "32px",
+                    width: "32px",
+                    pointerEvents: "none",
+                  }}
+                >
+                  <UnfoldMoreOutlinedIcon sx={{ mt: "3px" }} />
                 </div>
               </React.Fragment>
             );
