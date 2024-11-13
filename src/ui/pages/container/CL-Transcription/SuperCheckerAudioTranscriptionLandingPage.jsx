@@ -147,7 +147,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   //   };
   // }, []);
 
-  const filterAnnotations = (annotations, user) => {
+  const filterAnnotations = (annotations, user, taskData) => {
     let disableSkip = false;
     let disableAutoSave = false;
     let filteredAnnotations = annotations;
@@ -159,7 +159,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     if (userAnnotation) {
       if (userAnnotation.annotation_status === "unvalidated") {
         filteredAnnotations =
-          userAnnotation.result.length > 0
+          userAnnotation.result.length > 0 &&
+          !taskData?.revision_loop_count?.super_check_count
             ? [userAnnotation]
             : annotations.filter(
                 (annotation) =>
@@ -192,7 +193,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   };
 
   useEffect(() => {
-    filterAnnotations(AnnotationsTaskDetails, userData);
+    filterAnnotations(AnnotationsTaskDetails, userData, taskDetailList);
   }, [AnnotationsTaskDetails, userData]);
   //console.log(disableSkip);
 
