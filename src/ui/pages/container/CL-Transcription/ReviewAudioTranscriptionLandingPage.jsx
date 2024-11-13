@@ -1,7 +1,10 @@
 // AudioTranscriptionLandingPage
-import ReactQuill, { Quill } from 'react-quill';
-import "../../../../ui/pages/container/Label-Studio/cl_ui.css"
-import 'quill/dist/quill.bubble.css';
+import ReactQuill, { Quill } from "react-quill";
+import "../../../../ui/pages/container/Label-Studio/cl_ui.css";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+
+import "quill/dist/quill.bubble.css";
 import React, {
   memo,
   useCallback,
@@ -20,16 +23,19 @@ import {
   Grid,
   Button,
   TextField,
-  Slider, Stack, CircularProgress
+  Slider,
+  Stack,
+  CircularProgress,
+  Portal,
 } from "@mui/material";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
-import Timeline2 from './wavesurfer';
+import Timeline2 from "./wavesurfer";
 import AudioPanel from "./AudioPanel";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import {isPlaying} from '../../../../utils/utils';
+import { isPlaying } from "../../../../utils/utils";
 import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import { useDispatch, useSelector } from "react-redux";
@@ -47,10 +53,10 @@ import ReviewStageButtons from "../../component/CL-Transcription/ReviewStageButt
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
-import LightTooltip from "../../component/common/Tooltip"
-import configs from '../../../../config/config';
-
+import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
+import LightTooltip from "../../component/common/Tooltip";
+import configs from "../../../../config/config";
+import CloseIcon from "@mui/icons-material/Close";
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
@@ -69,15 +75,51 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [showNotes, setShowNotes] = useState(false);
   const [annotationNotesValue, setAnnotationNotesValue] = useState(null);
   const [disableSkip, setdisableSkip] = useState(false);
-  const [annotationtext,setannotationtext] = useState('')
-  const [reviewtext,setreviewtext] = useState('')
-  const [supercheckertext,setsupercheckertext] = useState('')
+  const [annotationtext, setannotationtext] = useState("");
+  const [reviewtext, setreviewtext] = useState("");
+  const [supercheckertext, setsupercheckertext] = useState("");
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
   const [annotations, setAnnotations] = useState([]);
   const [stdTranscription, setStdTranscription] = useState("");
   const [showStdTranscript, setShowStdTranscript] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const dialogRef = useRef(null);
+
+  const annotationData = useSelector((state) => state.getAnnotationsTask.data);
+  const type1 = annotationData.filter((item) => item.annotation_type === 1);
+  const type2 = annotationData.filter((item) => item.annotation_type === 2);
+  const type3 = annotationData.filter((item) => item.annotation_type === 3);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("msfullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        "mozfullscreenchange",
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        "msfullscreenchange",
+        handleFullscreenChange
+      );
+    };
+  }, []);
+
   const [stdTranscriptionSettings, setStdTranscriptionSettings] = useState({
     enable: false,
     showAcoustic: false,
@@ -85,11 +127,11 @@ const ReviewAudioTranscriptionLandingPage = () => {
     enableTransliteration: false,
     enableTransliterationSuggestion: false,
     targetlang: "en",
-    fontSize: "Normal"
+    fontSize: "Normal",
   });
   const [anchorEl, setAnchorEl] = useState(null);
   const [speakerBox, setSpeakerBox] = useState("");
-  const[taskDetailList,setTaskDetailList] = useState()
+  const [taskDetailList, setTaskDetailList] = useState();
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -106,14 +148,16 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   const user = useSelector((state) => state.fetchLoggedInUserData.data);
   const player = useSelector((state) => state.commonReducer.player);
+  const subtitles = useSelector((state) => state.commonReducer.subtitles);
   const ref = useRef(0);
   const saveIntervalRef = useRef(null);
   const timeSpentIntervalRef = useRef(null);
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
-  const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
-  const [assignedUsers, setAssignedUsers] = useState(null);  
+  const [advancedWaveformSettings, setAdvancedWaveformSettings] =
+    useState(false);
+  const [assignedUsers, setAssignedUsers] = useState(null);
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
@@ -162,13 +206,13 @@ const ReviewAudioTranscriptionLandingPage = () => {
       if (userAnnotation.annotation_status === "unreviewed") {
         filteredAnnotations =
           userAnnotation.result.length > 0 &&
-            !taskData?.revision_loop_count?.review_count
+          !taskData?.revision_loop_count?.review_count
             ? [userAnnotation]
             : annotations.filter(
-              (annotation) =>
-                annotation.id === userAnnotation.parent_annotation &&
-                annotation.annotation_type === 1
-            );
+                (annotation) =>
+                  annotation.id === userAnnotation.parent_annotation &&
+                  annotation.annotation_type === 1
+              );
       } else if (
         userAnnotation &&
         ["rejected"].includes(userAnnotation.annotation_status)
@@ -273,7 +317,11 @@ const ReviewAudioTranscriptionLandingPage = () => {
     const hasEmptySpeaker = result?.some(
       (element) => element.speaker_id?.trim() === ""
     );
-    const hasEmptyTextL2 = (stdTranscriptionSettings.showAcoustic && result?.some((element) => element.acoustic_normalised_text?.trim() === ""));
+    const hasEmptyTextL2 =
+      stdTranscriptionSettings.showAcoustic &&
+      result?.some(
+        (element) => element.acoustic_normalised_text?.trim() === ""
+      );
     settextBox(hasEmptyText);
     setSpeakerBox(hasEmptySpeaker);
     setL2Check(!hasEmptyTextL2);
@@ -305,99 +353,125 @@ const ReviewAudioTranscriptionLandingPage = () => {
         message: "Audio Server is down, please try after sometime",
         variant: "error",
       });
-    }else{setTaskDetailList(resp);
-    if (resp?.data?.audio_duration < 1000){
-      setWaveSurfer(false);
-    }else{
-      setWaveSurfer(true);
-    }
-    // const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
-    const fetchAudioData = await fetch(resp?.data?.audio_url
-    //, {
-    //   method: "GET",
-    //   headers: ProjectObj.getHeaders().headers}
-    )
-    if (!fetchAudioData.ok){
-      setAudioURL(resp?.data?.audio_url)
-    }else{
-      try {
-        // var base64data = await fetchAudioData.json();
-        // var binaryData = atob(base64data);
-        // var buffer = new ArrayBuffer(binaryData.length);
-        // var view = new Uint8Array(buffer);
-        // for (var i = 0; i < binaryData.length; i++) {
-        //     view[i] = binaryData.charCodeAt(i);
-        // }
-        // var blob = new Blob([view], { type: 'audio/mpeg' });
-        var blob = await fetchAudioData.blob();
-        setAudioURL(URL.createObjectURL(blob));
-      } catch {
-        setAudioURL(resp?.data?.audio_url)
+    } else {
+      setTaskDetailList(resp);
+      if (resp?.data?.audio_duration < 1000) {
+        setWaveSurfer(false);
+      } else {
+        setWaveSurfer(true);
+      }
+      // const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
+      const fetchAudioData = await fetch(
+        resp?.data?.audio_url
+        //, {
+        //   method: "GET",
+        //   headers: ProjectObj.getHeaders().headers}
+      );
+      if (!fetchAudioData.ok) {
+        setAudioURL(resp?.data?.audio_url);
+      } else {
+        try {
+          // var base64data = await fetchAudioData.json();
+          // var binaryData = atob(base64data);
+          // var buffer = new ArrayBuffer(binaryData.length);
+          // var view = new Uint8Array(buffer);
+          // for (var i = 0; i < binaryData.length; i++) {
+          //     view[i] = binaryData.charCodeAt(i);
+          // }
+          // var blob = new Blob([view], { type: 'audio/mpeg' });
+          var blob = await fetchAudioData.blob();
+          setAudioURL(URL.createObjectURL(blob));
+        } catch {
+          setAudioURL(resp?.data?.audio_url);
+        }
       }
     }
-  }
     setLoading(false);
   };
 
   const [isActive, setIsActive] = useState(true);
   const [lastInteraction, setLastInteraction] = useState(Date.now());
-  const inactivityThreshold = 120000; 
+  const inactivityThreshold = 120000;
 
   const handleAutosave = async () => {
     setAutoSaveTrigger(false);
-    if(AnnotationsTaskDetails[0]?.annotation_status !== "accepted" && AnnotationsTaskDetails[0]?.annotation_status !== "accepted_with_minor_changes" && AnnotationsTaskDetails[0]?.annotation_status !== "accepted_with_major_changes"){
-    if(!autoSave) return;
-    const currentAnnotation = AnnotationsTaskDetails?.find((a) => a.completed_by === user.id && a.annotation_type === 2);
-    if(!currentAnnotation) return;
-    const reqBody = {
-      task_id: taskId,
-      auto_save: true,
-      lead_time:
-        (new Date() - loadtime) / 1000 + Number(currentAnnotation?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-    };
-    if(result.length && taskDetails?.review_user === user.id) {
-      try{
-        const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
-        const res = await fetch(obj.apiEndPoint(), {
-          method: "PATCH",
-          body: JSON.stringify(obj.getBody()),
-          headers: obj.getHeaders().headers,
-        });
-        if (!res.ok) {
-          const data = await res.json();
+    if (
+      AnnotationsTaskDetails[0]?.annotation_status !== "accepted" &&
+      AnnotationsTaskDetails[0]?.annotation_status !==
+        "accepted_with_minor_changes" &&
+      AnnotationsTaskDetails[0]?.annotation_status !==
+        "accepted_with_major_changes"
+    ) {
+      if (!autoSave) return;
+      const currentAnnotation = AnnotationsTaskDetails?.find(
+        (a) => a.completed_by === user.id && a.annotation_type === 2
+      );
+      if (!currentAnnotation) return;
+      const reqBody = {
+        task_id: taskId,
+        auto_save: true,
+        lead_time:
+          (new Date() - loadtime) / 1000 +
+          Number(currentAnnotation?.lead_time ?? 0),
+        result: stdTranscriptionSettings.enable
+          ? [...result, { standardised_transcription: stdTranscription }]
+          : result,
+      };
+      if (result.length && taskDetails?.review_user === user.id) {
+        try {
+          const obj = new SaveTranscriptAPI(currentAnnotation?.id, reqBody);
+          const res = await fetch(obj.apiEndPoint(), {
+            method: "PATCH",
+            body: JSON.stringify(obj.getBody()),
+            headers: obj.getHeaders().headers,
+          });
+          if (!res.ok) {
+            const data = await res.json();
+            setSnackbarInfo({
+              open: true,
+              message: data.message,
+              variant: "error",
+            });
+            return res;
+          }
+        } catch (err) {
           setSnackbarInfo({
             open: true,
-            message: data.message,
+            message: "Error in autosaving " + err,
             variant: "error",
           });
-          return res;
         }
       }
-      catch(err) {
-        setSnackbarInfo({
-          open: true,
-          message: "Error in autosaving "+err,
-          variant: "error",
-        });
-      }
     }
-  }
   };
-  
+
   useEffect(() => {
     autoSaveTrigger && handleAutosave();
-  }, [autoSaveTrigger, autoSave, handleAutosave, user, result, taskId, annotations, taskDetails, stdTranscription, stdTranscriptionSettings]);
-  
+  }, [
+    autoSaveTrigger,
+    autoSave,
+    handleAutosave,
+    user,
+    result,
+    taskId,
+    annotations,
+    taskDetails,
+    stdTranscription,
+    stdTranscriptionSettings,
+  ]);
+
   useEffect(() => {
-    if(!autoSave) return;
+    if (!autoSave) return;
 
     const handleUpdateTimeSpent = (time = 60) => {
       // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
       // dispatch(APITransport(apiObj));
     };
 
-    saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
+    saveIntervalRef.current = setInterval(
+      () => setAutoSaveTrigger(true),
+      60 * 1000
+    );
     timeSpentIntervalRef.current = setInterval(
       handleUpdateTimeSpent,
       60 * 1000
@@ -423,11 +497,11 @@ const ReviewAudioTranscriptionLandingPage = () => {
       }
     };
 
-    document.addEventListener('mousemove', handleInteraction);
-    document.addEventListener('keydown', handleInteraction);
+    document.addEventListener("mousemove", handleInteraction);
+    document.addEventListener("keydown", handleInteraction);
     const interval = setInterval(checkInactivity, 1000);
 
-    if(!isActive){
+    if (!isActive) {
       handleUpdateTimeSpent(ref.current);
       clearInterval(saveIntervalRef.current);
       clearInterval(timeSpentIntervalRef.current);
@@ -437,7 +511,10 @@ const ReviewAudioTranscriptionLandingPage = () => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Tab is active, restart the autosave interval
-        saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
+        saveIntervalRef.current = setInterval(
+          () => setAutoSaveTrigger(true),
+          60 * 1000
+        );
         timeSpentIntervalRef.current = setInterval(
           handleUpdateTimeSpent,
           60 * 1000
@@ -455,8 +532,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      document.removeEventListener('mousemove', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener("mousemove", handleInteraction);
+      document.removeEventListener("keydown", handleInteraction);
       clearInterval(interval);
       clearInterval(saveIntervalRef.current);
       clearInterval(timeSpentIntervalRef.current);
@@ -499,15 +576,16 @@ const ReviewAudioTranscriptionLandingPage = () => {
   // }, [AnnotationsTaskDetails]);
 
   useEffect(() => {
-
     let standardisedTranscription = "";
 
-    const sub = annotations[0]?.result?.filter((item) => {
-      if ("standardised_transcription" in item) {
-        standardisedTranscription = item.standardised_transcription;
-        return false;
-      } else return true;
-    }).map((item) => new Sub(item));
+    const sub = annotations[0]?.result
+      ?.filter((item) => {
+        if ("standardised_transcription" in item) {
+          standardisedTranscription = item.standardised_transcription;
+          return false;
+        } else return true;
+      })
+      .map((item) => new Sub(item));
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
     setStdTranscription(standardisedTranscription);
@@ -558,8 +636,8 @@ const ReviewAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskDetails).then(res => setAssignedUsers(res));
-    }
+      getTaskAssignedUsers(taskDetails).then((res) => setAssignedUsers(res));
+    };
     taskDetails?.id && showAssignedUsers();
   }, [taskDetails]);
 
@@ -611,51 +689,52 @@ const ReviewAudioTranscriptionLandingPage = () => {
       annotation_status: labellingMode,
     };
 
-    let apiObj = new GetNextProjectAPI(projectId, nextAPIData)
-    var rsp_data = []
+    let apiObj = new GetNextProjectAPI(projectId, nextAPIData);
+    var rsp_data = [];
     fetch(apiObj.apiEndPoint(), {
-      method: 'post',
+      method: "post",
       body: JSON.stringify(apiObj.getBody()),
-      headers: apiObj.getHeaders().headers
-    }).then(async response => {
-      rsp_data = await response.json();
-      setLoading(false)
-      if (response.ok) {
-        setNextData(rsp_data);
-        tasksComplete(rsp_data?.id || null);
-        getAnnotationsTaskData(rsp_data.id);
-        getTaskData(rsp_data.id);
-      } 
-    }).catch((error) => {
-      setSnackbarInfo({
-        open: true,
-        message: "No more tasks to label",
-        variant: "info",
+      headers: apiObj.getHeaders().headers,
+    })
+      .then(async (response) => {
+        rsp_data = await response.json();
+        setLoading(false);
+        if (response.ok) {
+          setNextData(rsp_data);
+          tasksComplete(rsp_data?.id || null);
+          getAnnotationsTaskData(rsp_data.id);
+          getTaskData(rsp_data.id);
+        }
+      })
+      .catch((error) => {
+        setSnackbarInfo({
+          open: true,
+          message: "No more tasks to label",
+          variant: "info",
+        });
+        setTimeout(() => {
+          localStorage.removeItem("labelAll");
+          window.location.replace(`/#/projects/${projectId}`);
+        }, 1000);
       });
-      setTimeout(() => {
-        localStorage.removeItem("labelAll");
-        window.location.replace(`/#/projects/${projectId}`);
-      }, 1000);
-    });
+  };
 
-  }
-
-  const handleReviewClick = async (
-    value,
-    id,
-    lead_time,
-    parentannotation,
-  ) => {
+  const handleReviewClick = async (value, id, lead_time, parentannotation) => {
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
       task_id: taskId,
       annotation_status: value,
-      review_notes: JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
+      review_notes: JSON.stringify(
+        reviewNotesRef.current.getEditor().getContents()
+      ),
       lead_time:
         (new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
-      result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-      ...((value === "to_be_revised" || value === "accepted" ||
+      result: stdTranscriptionSettings.enable
+        ? [...result, { standardised_transcription: stdTranscription }]
+        : result,
+      ...((value === "to_be_revised" ||
+        value === "accepted" ||
         value === "accepted_with_minor_changes" ||
         value === "accepted_with_major_changes") && {
         parent_annotation: parentannotation,
@@ -664,7 +743,13 @@ const ReviewAudioTranscriptionLandingPage = () => {
     const L1Check = !textBox && !speakerBox && result?.length > 0;
     if (
       ["draft", "skipped", "to_be_revised"].includes(value) ||
-      (["accepted", "accepted_with_minor_changes", "accepted_with_major_changes"].includes(value) && L1Check && L2Check)
+      ([
+        "accepted",
+        "accepted_with_minor_changes",
+        "accepted_with_major_changes",
+      ].includes(value) &&
+        L1Check &&
+        L2Check)
     ) {
       const TaskObj = new PatchAnnotationAPI(id, PatchAPIdata);
       const res = await fetch(TaskObj.apiEndPoint(), {
@@ -677,16 +762,19 @@ const ReviewAudioTranscriptionLandingPage = () => {
         if (localStorage.getItem("labelAll") || value === "skipped") {
           onNextAnnotation(resp.task);
         }
-          setSnackbarInfo({
-            open: true,
-            message: resp?.message,
-            variant: "success",
-          });
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
       } else {
         setAutoSave(true);
         setSnackbarInfo({
           open: true,
-          message: resp?.message ? resp?.message : "This task is having duplicate annotation. Please deallocate this task",          variant: "error",
+          message: resp?.message
+            ? resp?.message
+            : "This task is having duplicate annotation. Please deallocate this task",
+          variant: "error",
         });
       }
     } else {
@@ -724,41 +812,51 @@ const ReviewAudioTranscriptionLandingPage = () => {
         let superCheckerAnnotation = annotations.find(
           (annotation) => annotation.parent_annotation === userAnnotation.id
         );
-        annotationNotesRef.current.value = normalAnnotation?.annotation_notes ?? "";
+        annotationNotesRef.current.value =
+          normalAnnotation?.annotation_notes ?? "";
         reviewNotesRef.current.value = userAnnotation?.review_notes ?? "";
-        superCheckerNotesRef.current.value = superCheckerAnnotation?.supercheck_notes ?? "";
+        superCheckerNotesRef.current.value =
+          superCheckerAnnotation?.supercheck_notes ?? "";
         try {
-          const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+          const newDelta2 =
+            annotationNotesRef.current.value !== ""
+              ? JSON.parse(annotationNotesRef.current.value)
+              : "";
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
-          if(err){
+          if (err) {
             const newDelta2 = annotationNotesRef.current.value;
-            annotationNotesRef.current.getEditor().setText(newDelta2);  
+            annotationNotesRef.current.getEditor().setText(newDelta2);
           }
         }
-        
+
         try {
-          const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+          const newDelta1 =
+            reviewNotesRef.current.value != ""
+              ? JSON.parse(reviewNotesRef.current.value)
+              : "";
           reviewNotesRef.current.getEditor().setContents(newDelta1);
         } catch (err) {
-          if(err){
+          if (err) {
             const newDelta1 = reviewNotesRef.current.value;
-            reviewNotesRef.current.getEditor().setText(newDelta1); 
+            reviewNotesRef.current.getEditor().setText(newDelta1);
           }
         }
         try {
-          const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+          const newDelta3 =
+            superCheckerNotesRef.current.value != ""
+              ? JSON.parse(superCheckerNotesRef.current.value)
+              : "";
           superCheckerNotesRef.current.getEditor().setContents(newDelta3);
         } catch (err) {
-          if(err){
+          if (err) {
             const newDelta3 = superCheckerNotesRef.current.value;
-            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
+            superCheckerNotesRef.current.getEditor().setText(newDelta3);
           }
         }
-        setannotationtext(annotationNotesRef.current.getEditor().getText())
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
-        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-
+        setannotationtext(annotationNotesRef.current.getEditor().getText());
+        setreviewtext(reviewNotesRef.current.getEditor().getText());
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText());
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -779,38 +877,48 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 (annotation) =>
                   annotation.parent_annotation === correctAnnotation.id
               )?.supercheck_notes ?? "";
-              try {
-                const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
-                annotationNotesRef.current.getEditor().setContents(newDelta2);
-              } catch (err) {
-                if(err){
-                  const newDelta2 = annotationNotesRef.current.value;
-                  annotationNotesRef.current.getEditor().setText(newDelta2);  
-                }
+            try {
+              const newDelta2 =
+                annotationNotesRef.current.value !== ""
+                  ? JSON.parse(annotationNotesRef.current.value)
+                  : "";
+              annotationNotesRef.current.getEditor().setContents(newDelta2);
+            } catch (err) {
+              if (err) {
+                const newDelta2 = annotationNotesRef.current.value;
+                annotationNotesRef.current.getEditor().setText(newDelta2);
               }
-              
-              try {
-                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-                reviewNotesRef.current.getEditor().setContents(newDelta1);
-              } catch (err) {
-                if(err){
-                  const newDelta1 = reviewNotesRef.current.value;
-                  reviewNotesRef.current.getEditor().setText(newDelta1); 
-                }
+            }
+
+            try {
+              const newDelta1 =
+                reviewNotesRef.current.value != ""
+                  ? JSON.parse(reviewNotesRef.current.value)
+                  : "";
+              reviewNotesRef.current.getEditor().setContents(newDelta1);
+            } catch (err) {
+              if (err) {
+                const newDelta1 = reviewNotesRef.current.value;
+                reviewNotesRef.current.getEditor().setText(newDelta1);
               }
-              try {
-                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-              } catch (err) {
-                if(err){
-                  const newDelta3 = superCheckerNotesRef.current.value;
-                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
-                }
+            }
+            try {
+              const newDelta3 =
+                superCheckerNotesRef.current.value != ""
+                  ? JSON.parse(superCheckerNotesRef.current.value)
+                  : "";
+              superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            } catch (err) {
+              if (err) {
+                const newDelta3 = superCheckerNotesRef.current.value;
+                superCheckerNotesRef.current.getEditor().setText(newDelta3);
               }
-                   setannotationtext(annotationNotesRef.current.getEditor().getText())
-            setreviewtext(reviewNotesRef.current.getEditor().getText())
-            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-    
+            }
+            setannotationtext(annotationNotesRef.current.getEditor().getText());
+            setreviewtext(reviewNotesRef.current.getEditor().getText());
+            setsupercheckertext(
+              superCheckerNotesRef.current.getEditor().getText()
+            );
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -824,39 +932,49 @@ const ReviewAudioTranscriptionLandingPage = () => {
                 (annotation) =>
                   annotation.parent_annotation === reviewerAnnotations[0]?.id
               )?.supercheck_notes ?? "";
-              try {
-                const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
-                annotationNotesRef.current.getEditor().setContents(newDelta2);
-              } catch (err) {
-                if(err){
-                  const newDelta2 = annotationNotesRef.current.value;
-                  annotationNotesRef.current.getEditor().setText(newDelta2);  
-                }
+            try {
+              const newDelta2 =
+                annotationNotesRef.current.value !== ""
+                  ? JSON.parse(annotationNotesRef.current.value)
+                  : "";
+              annotationNotesRef.current.getEditor().setContents(newDelta2);
+            } catch (err) {
+              if (err) {
+                const newDelta2 = annotationNotesRef.current.value;
+                annotationNotesRef.current.getEditor().setText(newDelta2);
               }
-              
-              try {
-                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-                reviewNotesRef.current.getEditor().setContents(newDelta1);
-              } catch (err) {
-                if(err){
-                  const newDelta1 = reviewNotesRef.current.value;
-                  reviewNotesRef.current.getEditor().setText(newDelta1); 
-                }
+            }
+
+            try {
+              const newDelta1 =
+                reviewNotesRef.current.value != ""
+                  ? JSON.parse(reviewNotesRef.current.value)
+                  : "";
+              reviewNotesRef.current.getEditor().setContents(newDelta1);
+            } catch (err) {
+              if (err) {
+                const newDelta1 = reviewNotesRef.current.value;
+                reviewNotesRef.current.getEditor().setText(newDelta1);
               }
-              try {
-                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-              } catch (err) {
-                if(err){
-                  const newDelta3 = superCheckerNotesRef.current.value;
-                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
-                }
+            }
+            try {
+              const newDelta3 =
+                superCheckerNotesRef.current.value != ""
+                  ? JSON.parse(superCheckerNotesRef.current.value)
+                  : "";
+              superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            } catch (err) {
+              if (err) {
+                const newDelta3 = superCheckerNotesRef.current.value;
+                superCheckerNotesRef.current.getEditor().setText(newDelta3);
               }
-      
-            setannotationtext(annotationNotesRef.current.getEditor().getText())
-            setreviewtext(reviewNotesRef.current.getEditor().getText())
-            setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-    
+            }
+
+            setannotationtext(annotationNotesRef.current.getEditor().getText());
+            setreviewtext(reviewNotesRef.current.getEditor().getText());
+            setsupercheckertext(
+              superCheckerNotesRef.current.getEditor().getText()
+            );
           }
         } else {
           let normalAnnotation = annotations.find(
@@ -867,47 +985,56 @@ const ReviewAudioTranscriptionLandingPage = () => {
           reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
           superCheckerNotesRef.current.value =
             normalAnnotation.supercheck_notes ?? "";
-            try {
-              const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
-              annotationNotesRef.current.getEditor().setContents(newDelta2);
-            } catch (err) {
-              if(err){
-                const newDelta2 = annotationNotesRef.current.value;
-                annotationNotesRef.current.getEditor().setText(newDelta2);  
-              }
+          try {
+            const newDelta2 =
+              annotationNotesRef.current.value !== ""
+                ? JSON.parse(annotationNotesRef.current.value)
+                : "";
+            annotationNotesRef.current.getEditor().setContents(newDelta2);
+          } catch (err) {
+            if (err) {
+              const newDelta2 = annotationNotesRef.current.value;
+              annotationNotesRef.current.getEditor().setText(newDelta2);
             }
-            
-            try {
-              const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-              reviewNotesRef.current.getEditor().setContents(newDelta1);
-            } catch (err) {
-              if(err){
-                const newDelta1 = reviewNotesRef.current.value;
-                reviewNotesRef.current.getEditor().setText(newDelta1); 
-              }
+          }
+
+          try {
+            const newDelta1 =
+              reviewNotesRef.current.value != ""
+                ? JSON.parse(reviewNotesRef.current.value)
+                : "";
+            reviewNotesRef.current.getEditor().setContents(newDelta1);
+          } catch (err) {
+            if (err) {
+              const newDelta1 = reviewNotesRef.current.value;
+              reviewNotesRef.current.getEditor().setText(newDelta1);
             }
-            try {
-              const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-              superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-            } catch (err) {
-              if(err){
-                const newDelta3 = superCheckerNotesRef.current.value;
-                superCheckerNotesRef.current.getEditor().setText(newDelta3); 
-              }
+          }
+          try {
+            const newDelta3 =
+              superCheckerNotesRef.current.value != ""
+                ? JSON.parse(superCheckerNotesRef.current.value)
+                : "";
+            superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+          } catch (err) {
+            if (err) {
+              const newDelta3 = superCheckerNotesRef.current.value;
+              superCheckerNotesRef.current.getEditor().setText(newDelta3);
             }
-              setannotationtext(annotationNotesRef.current.getEditor().getText())
-          setreviewtext(reviewNotesRef.current.getEditor().getText())
-          setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-  
+          }
+          setannotationtext(annotationNotesRef.current.getEditor().getText());
+          setreviewtext(reviewNotesRef.current.getEditor().getText());
+          setsupercheckertext(
+            superCheckerNotesRef.current.getEditor().getText()
+          );
         }
       }
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     taskDetailList && setNotes(taskDetailList, AnnotationsTaskDetails);
-
-  },[taskDetailList,AnnotationsTaskDetails]);
+  }, [taskDetailList, AnnotationsTaskDetails]);
 
   const resetNotes = () => {
     setShowNotes(false);
@@ -919,19 +1046,22 @@ const ReviewAudioTranscriptionLandingPage = () => {
   }, [taskId]);
   const modules = {
     toolbar: [
-
       [{ size: [] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }],
-      [{ 'script': 'sub' }, { 'script': 'super' }],
-    ]
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }],
+      [{ script: "sub" }, { script: "super" }],
+    ],
   };
 
   const formats = [
-    'size',
-    'bold', 'italic', 'underline', 'strike',
-    'color',
-    'script']
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "script",
+  ];
 
   const renderSnackBar = () => {
     return (
@@ -948,165 +1078,251 @@ const ReviewAudioTranscriptionLandingPage = () => {
   };
 
   const [wave, setWave] = useState(true);
-  const [waveColor, setWaveColor] = useState('rgba(156, 39, 176, 1)');
-  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
-  const [paddingColor, setPaddingColor] = useState('#f2f2f2');
+  const [waveColor, setWaveColor] = useState("rgba(156, 39, 176, 1)");
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+  const [paddingColor, setPaddingColor] = useState("#f2f2f2");
   const [cursor, setCursor] = useState(true);
-  const [cursorColor, setCursorColor] = useState('#ff0000');
+  const [cursorColor, setCursorColor] = useState("#ff0000");
   const [progress, setProgress] = useState(true);
-  const [progressColor, setProgressColor] = useState('rgba(0, 150, 136, 1)');
+  const [progressColor, setProgressColor] = useState("rgba(0, 150, 136, 1)");
   const [grid, setGrid] = useState(false);
-  const [gridColor, setGridColor] = useState('rgba(255, 255, 255, 0.05)');
+  const [gridColor, setGridColor] = useState("rgba(255, 255, 255, 0.05)");
   const [ruler, setRuler] = useState(true);
-  const [rulerColor, setRulerColor] = useState('rgba(0, 0, 0, 1)');
+  const [rulerColor, setRulerColor] = useState("rgba(0, 0, 0, 1)");
   const [scrollbar, setScrollbar] = useState(true);
-  const [scrollbarColor, setScrollbarColor] = useState('rgba(255, 255, 255, 0.25)');
+  const [scrollbarColor, setScrollbarColor] = useState(
+    "rgba(255, 255, 255, 0.25)"
+  );
   const [rulerAtTop, setRulerAtTop] = useState(true);
   const [scrollable, setScrollable] = useState(true);
   const [duration, setDuration] = useState(10);
   const [padding, setPadding] = useState(1);
   // const [pixelRatio, setPixelRatio] = useState(window.devicePixelRatio + 1);
-  const [pixelRatio, setPixelRatio] = useState(Number(Math.ceil(window.devicePixelRatio)))
+  const [pixelRatio, setPixelRatio] = useState(
+    Number(Math.ceil(window.devicePixelRatio))
+  );
   const [waveScale, setWaveScale] = useState(1);
   const [waveSize, setWaveSize] = useState(1);
   const [wavWorker, setWavWorker] = useState(true);
 
   const [waveformSettings, setWaveformSettings] = useState({
-    "wave": wave, 
-    "waveColor": waveColor, 
-    "backgroundColor": backgroundColor, 
-    "paddingColor": paddingColor,
-    "cursor": cursor, 
-    "cursorColor": cursorColor, 
-    "progress": progress, 
-    "progressColor": progressColor, 
-    "grid": grid, "gridColor": gridColor, 
-    "ruler": ruler,
-    "rulerColor": rulerColor, 
-    "scrollbar": scrollbar, 
-    "scrollbarColor": scrollbarColor, 
-    "rulerAtTop": rulerAtTop, 
-    "scrollable": scrollable, 
-    "duration": duration, 
-    "padding": padding,
-    "pixelRatio": pixelRatio, 
-    "waveScale": waveScale, 
-    "waveSize": waveSize,
-    "worker" : wavWorker
+    wave: wave,
+    waveColor: waveColor,
+    backgroundColor: backgroundColor,
+    paddingColor: paddingColor,
+    cursor: cursor,
+    cursorColor: cursorColor,
+    progress: progress,
+    progressColor: progressColor,
+    grid: grid,
+    gridColor: gridColor,
+    ruler: ruler,
+    rulerColor: rulerColor,
+    scrollbar: scrollbar,
+    scrollbarColor: scrollbarColor,
+    rulerAtTop: rulerAtTop,
+    scrollable: scrollable,
+    duration: duration,
+    padding: padding,
+    pixelRatio: pixelRatio,
+    waveScale: waveScale,
+    waveSize: waveSize,
+    worker: wavWorker,
   });
 
-useEffect(() => {
-  setWaveformSettings({
-    "wave":wave, 
-    "waveColor":waveColor, 
-    "backgroundColor":backgroundColor, 
-    "paddingColor":paddingColor,
-    "cursor":cursor, 
-    "cursorColor":cursorColor, 
-    "progress":progress, 
-    "progressColor":progressColor, 
-    "grid":grid, 
-    "gridColor":gridColor, 
-    "ruler":ruler,
-    "rulerColor":rulerColor, 
-    "scrollbar":scrollbar, 
-    "scrollbarColor":scrollbarColor, 
-    "rulerAtTop": rulerAtTop, 
-    "scrollable":scrollable, 
-    "duration":duration, 
-    "padding":padding,
-    "pixelRatio":pixelRatio, 
-    "waveScale":waveScale, 
-    "waveSize":waveSize,
-    "worker" : wavWorker
-  })
-}, [wave, waveColor, backgroundColor, paddingColor, cursor, cursorColor, progress, progressColor, grid, gridColor, ruler, rulerColor, scrollbar, scrollbarColor, rulerAtTop, scrollable, duration, padding, pixelRatio, waveScale, waveSize, wavWorker]);
+  useEffect(() => {
+    setWaveformSettings({
+      wave: wave,
+      waveColor: waveColor,
+      backgroundColor: backgroundColor,
+      paddingColor: paddingColor,
+      cursor: cursor,
+      cursorColor: cursorColor,
+      progress: progress,
+      progressColor: progressColor,
+      grid: grid,
+      gridColor: gridColor,
+      ruler: ruler,
+      rulerColor: rulerColor,
+      scrollbar: scrollbar,
+      scrollbarColor: scrollbarColor,
+      rulerAtTop: rulerAtTop,
+      scrollable: scrollable,
+      duration: duration,
+      padding: padding,
+      pixelRatio: pixelRatio,
+      waveScale: waveScale,
+      waveSize: waveSize,
+      worker: wavWorker,
+    });
+  }, [
+    wave,
+    waveColor,
+    backgroundColor,
+    paddingColor,
+    cursor,
+    cursorColor,
+    progress,
+    progressColor,
+    grid,
+    gridColor,
+    ruler,
+    rulerColor,
+    scrollbar,
+    scrollbarColor,
+    rulerAtTop,
+    scrollable,
+    duration,
+    padding,
+    pixelRatio,
+    waveScale,
+    waveSize,
+    wavWorker,
+  ]);
 
-const [waveSurferHeight, setWaveSurferHeigth] = useState(140);
-const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
-const [waveSurferWaveColor, setWaveSurferWaveColor] = useState('#ff4e00');
-const [waveSurferProgressColor, setWaveSurferProgressColor] = useState("#dd5e98");
-const [waveSurferCursorColor, setWaveSurferCursorColor] = useState("#935ae8");
-const [waveSurferCursorWidth, setWaveSurferCursorWidth] = useState(1);
-const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
-const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
-const [waveSurferBarRadius, setWaveSurferBarRadius] = useState(0);
-const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(1.5);
-  
-const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
-  "height": waveSurferHeight,
-  "minPxPerSec": waveSurferMinPxPerSec,
-  "waveColor": waveSurferWaveColor,
-  "progressColor": waveSurferProgressColor,
-  "cursorColor": waveSurferCursorColor,
-  "cursorWidth": waveSurferCursorWidth,
-  "barWidth": waveSurferBarWidth,
-  "barGap": waveSurferBarGap,
-  "barRadius": waveSurferBarRadius,
-  "barHeight": waveSurferBarHeight
-});
+  const [waveSurferHeight, setWaveSurferHeigth] = useState(140);
+  const [waveSurferMinPxPerSec, setWaveSurferMinPxPerSec] = useState(100);
+  const [waveSurferWaveColor, setWaveSurferWaveColor] = useState("#ff4e00");
+  const [waveSurferProgressColor, setWaveSurferProgressColor] =
+    useState("#dd5e98");
+  const [waveSurferCursorColor, setWaveSurferCursorColor] = useState("#935ae8");
+  const [waveSurferCursorWidth, setWaveSurferCursorWidth] = useState(1);
+  const [waveSurferBarWidth, setWaveSurferBarWidth] = useState(2);
+  const [waveSurferBarGap, setWaveSurferBarGap] = useState(0);
+  const [waveSurferBarRadius, setWaveSurferBarRadius] = useState(0);
+  const [waveSurferBarHeight, setWaveSurferBarHeight] = useState(1.5);
 
-useEffect(() => {
-  setWaveSurferWaveformSettings({
-    "height": waveSurferHeight,
-    "minPxPerSec": waveSurferMinPxPerSec,
-    "waveColor": waveSurferWaveColor,
-    "progressColor": waveSurferProgressColor,
-    "cursorColor": waveSurferCursorColor,
-    "cursorWidth": waveSurferCursorWidth,
-    "barWidth": waveSurferBarWidth,
-    "barGap": waveSurferBarGap,
-    "barRadius": waveSurferBarRadius,
-    "barHeight": waveSurferBarHeight
-  })
-}, [waveSurferHeight, waveSurferMinPxPerSec, waveSurferWaveColor, waveSurferProgressColor, waveSurferCursorColor, waveSurferCursorWidth, waveSurferBarWidth, waveSurferBarGap, waveSurferBarRadius, waveSurferBarHeight])
+  const [waveSurferWaveformSettings, setWaveSurferWaveformSettings] = useState({
+    height: waveSurferHeight,
+    minPxPerSec: waveSurferMinPxPerSec,
+    waveColor: waveSurferWaveColor,
+    progressColor: waveSurferProgressColor,
+    cursorColor: waveSurferCursorColor,
+    cursorWidth: waveSurferCursorWidth,
+    barWidth: waveSurferBarWidth,
+    barGap: waveSurferBarGap,
+    barRadius: waveSurferBarRadius,
+    barHeight: waveSurferBarHeight,
+  });
 
-useEffect(() => {
-  if(showNotes === true){
-    setAdvancedWaveformSettings(false);
-  }
-}, [showNotes]);
+  useEffect(() => {
+    setWaveSurferWaveformSettings({
+      height: waveSurferHeight,
+      minPxPerSec: waveSurferMinPxPerSec,
+      waveColor: waveSurferWaveColor,
+      progressColor: waveSurferProgressColor,
+      cursorColor: waveSurferCursorColor,
+      cursorWidth: waveSurferCursorWidth,
+      barWidth: waveSurferBarWidth,
+      barGap: waveSurferBarGap,
+      barRadius: waveSurferBarRadius,
+      barHeight: waveSurferBarHeight,
+    });
+  }, [
+    waveSurferHeight,
+    waveSurferMinPxPerSec,
+    waveSurferWaveColor,
+    waveSurferProgressColor,
+    waveSurferCursorColor,
+    waveSurferCursorWidth,
+    waveSurferBarWidth,
+    waveSurferBarGap,
+    waveSurferBarRadius,
+    waveSurferBarHeight,
+  ]);
 
+  useEffect(() => {
+    if (showNotes === true) {
+      setAdvancedWaveformSettings(false);
+    }
+  }, [showNotes]);
 
-useEffect(() => {
-  if(advancedWaveformSettings === true){
-    setShowNotes(false);
-  }
-}, [advancedWaveformSettings]);
+  useEffect(() => {
+    if (advancedWaveformSettings === true) {
+      setShowNotes(false);
+    }
+  }, [advancedWaveformSettings]);
 
-useEffect(() => {
-  const handleKeyDown = (event) => {
-    if (event.shiftKey && event.key === ' ') {
-      event.preventDefault();
-      if(player){
-        console.log(isPlaying(player));
-        if(isPlaying(player)){
-          player.pause();
-        }else{
-          player.play();
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.shiftKey && event.key === " ") {
+        event.preventDefault();
+        if (player) {
+          console.log(isPlaying(player));
+          if (isPlaying(player)) {
+            player.pause();
+          } else {
+            player.play();
+          }
         }
       }
-    }
-    if (event.shiftKey && event.key === 'ArrowLeft') {
-      event.preventDefault();
-      if(player){
-        player.currentTime = player.currentTime - 1.25;
+      if (event.shiftKey && event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (player) {
+          player.currentTime = player.currentTime - 1.25;
+        }
       }
-    }
-    if (event.shiftKey && event.key === 'ArrowRight') {
-      event.preventDefault();
-      if(player){
-        player.currentTime = player.currentTime + 1.25;
+      if (event.shiftKey && event.key === "ArrowRight") {
+        event.preventDefault();
+        if (player) {
+          player.currentTime = player.currentTime + 1.25;
+        }
       }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [player]);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
+
+  const handleOpenPopover = (position) => {
+    const offsetPosition = {
+      top: position.top - 0,
+      left: position.left - 900,
+    };
+    setPopoverPosition(offsetPosition);
+    setPopoverOpen(true);
+  };
+
+  const handleClosePopover = () => {
+    setPopoverOpen(false);
+  };
+  const handleFullscreenToggle = () => {
+    const elem = dialogRef.current;
+    if (!isFullscreen) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        /* Firefox */
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) {
+        /* Chrome, Safari and Opera */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        /* IE/Edge */
+        elem.msRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        /* IE/Edge */
+        document.msExitFullscreen();
+      }
+      setIsFullscreen(false);
     }
   };
 
-  window.addEventListener('keydown', handleKeyDown);
-  return () => {
-    window.removeEventListener('keydown', handleKeyDown);
-  };
-}, [player]);
-  
   return (
     <>
       {loading && <Spinner />}
@@ -1118,7 +1334,7 @@ useEffect(() => {
             startIcon={<ArrowBackIcon />}
             variant="contained"
             color="primary"
-            sx={{ ml: 1 ,mt:2}}
+            sx={{ ml: 1, mt: 2 }}
             onClick={() => {
               localStorage.removeItem("labelAll");
               navigate(`/projects/${projectId}`);
@@ -1133,12 +1349,12 @@ useEffect(() => {
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
-            <Typography sx={{mt: 2, ml: 4, color: "grey"}}>
+            <Typography sx={{ mt: 2, ml: 4, color: "grey" }}>
               Task #{taskDetails?.id}
-              <LightTooltip
-                title={assignedUsers ? assignedUsers : ""}
-              >
-                <InfoOutlinedIcon sx={{mb: "-4px", ml: "2px", color: "grey"}}/>
+              <LightTooltip title={assignedUsers ? assignedUsers : ""}>
+                <InfoOutlinedIcon
+                  sx={{ mb: "-4px", ml: "2px", color: "grey" }}
+                />
               </LightTooltip>
             </Typography>
             <ReviewStageButtons
@@ -1149,18 +1365,41 @@ useEffect(() => {
               disableSkip={disableSkip}
               disableBtns={disableBtns}
               disableButton={disableButton}
-              anchorEl={anchorEl} setAnchorEl={setAnchorEl}
+              anchorEl={anchorEl}
+              setAnchorEl={setAnchorEl}
             />
-            {audioURL ? <AudioPanel
-              setCurrentTime={setCurrentTime}
-              setPlaying={setPlaying}
-              onNextAnnotation={onNextAnnotation}
-              AnnotationsTaskDetails={AnnotationsTaskDetails}
-              taskData={taskDetailList}
-              audioUrl={audioURL}
-            /> : <Grid style={{ padding: "0px 20px 0px 20px" }}><audio controls preload='none'className={classes.videoPlayer}/></Grid>}
-            <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
-             <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+            {audioURL ? (
+              <AudioPanel
+                setCurrentTime={setCurrentTime}
+                setPlaying={setPlaying}
+                onNextAnnotation={onNextAnnotation}
+                AnnotationsTaskDetails={AnnotationsTaskDetails}
+                taskData={taskDetailList}
+                audioUrl={audioURL}
+              />
+            ) : (
+              <Grid style={{ padding: "0px 20px 0px 20px" }}>
+                <audio
+                  controls
+                  preload="none"
+                  className={classes.videoPlayer}
+                />
+              </Grid>
+            )}
+            <Grid
+              container
+              spacing={1}
+              sx={{ pt: 1, pl: 2, pr: 3 }}
+              justifyContent="flex-end"
+            >
+              <Stack
+                spacing={2}
+                direction="row"
+                sx={{ mb: 1 }}
+                alignItems="center"
+                justifyContent="flex-end"
+                width="fit-content"
+              >
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Timeline Scale:
                 </Typography>
@@ -1170,15 +1409,25 @@ useEffect(() => {
                   }}
                   color="primary"
                   aria-label="Scale"
-                  min={2} max={player ? Math.floor(player.duration * 2) : 100} step={1}
+                  min={2}
+                  max={player ? Math.floor(player.duration * 2) : 100}
+                  step={1}
                   value={duration}
                   onChange={(e) => {
                     setDuration(e.target.value);
                     player.currentTime += 0.01;
                     player.currentTime -= 0.01;
-                  }}/>
+                  }}
+                />
               </Stack>
-              <Stack spacing={2} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+              <Stack
+                spacing={2}
+                direction="row"
+                sx={{ mb: 1, ml: 3 }}
+                alignItems="center"
+                justifyContent="flex-end"
+                width="fit-content"
+              >
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Playback Speed:
                 </Typography>
@@ -1189,33 +1438,39 @@ useEffect(() => {
                   color="primary"
                   aria-label="Playback Spped"
                   marks
-                  min={0.25} max={2.0} step={0.25}
+                  min={0.25}
+                  max={2.0}
+                  step={0.25}
                   defaultValue={1.0}
                   valueLabelDisplay="auto"
                   onChange={(e) => {
                     player.playbackRate = e.target.value;
-                  }}/>
+                  }}
+                />
               </Stack>
             </Grid>
             <Grid container spacing={1} sx={{ ml: 3 }}>
               <Grid item>
-              <Button
-                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-                variant="contained"
-                color={
-                  annotationtext.trim().length === 0 &&
+                <Button
+                  endIcon={
+                    showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />
+                  }
+                  variant="contained"
+                  color={
+                    annotationtext.trim().length === 0 &&
+                    supercheckertext.trim().length === 0
+                      ? "primary"
+                      : "success"
+                  }
+                  onClick={handleCollapseClick}
+                >
+                  Notes{" "}
+                  {annotationtext.trim().length === 0 &&
                   supercheckertext.trim().length === 0
-                    ? "primary"
-                    : "success"
-                }
-                onClick={handleCollapseClick}
-              >
-                Notes{" "}
-                {annotationtext.trim().length === 0 &&
-                supercheckertext.trim().length === 0 ? "" : "*"}
+                    ? ""
+                    : "*"}
+                </Button>
 
-              </Button>
-              
                 {/*  <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
               {translate("alert.notes")}
           </Alert> 
@@ -1268,58 +1523,65 @@ useEffect(() => {
               style={{ width: "99%", marginTop: "1%" }}
             // ref={quillRef}
             /> */}
-                
               </Grid>
-              {stdTranscriptionSettings.enable &&
+              {stdTranscriptionSettings.enable && (
                 <Grid item>
                   <Button
-                    endIcon={showStdTranscript ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                    endIcon={
+                      showStdTranscript ? (
+                        <ArrowRightIcon />
+                      ) : (
+                        <ArrowDropDownIcon />
+                      )
+                    }
                     variant="contained"
                     color="primary"
                     onClick={() => {
                       setShowStdTranscript(!showStdTranscript);
                       setShowNotes(false);
                     }}
-                  // style={{ marginBottom: "20px" }}
+                    // style={{ marginBottom: "20px" }}
                   >
                     Standardised Transcription
                   </Button>
-                </Grid>}
+                </Grid>
+              )}
             </Grid>
             <div
-                className={classes.collapse}
-                style={{
-                  display: showNotes ? "block" : "none",
-                  paddingBottom: "16px",
-                  height: "175px", overflow: "scroll"
-                }}
-              >
-                <ReactQuill
-                  ref={annotationNotesRef}
-                  modules={modules}
-                  bounds={"#note"}
-                  theme="bubble"
-                  formats={formats}
-                  placeholder="Annotation Notes"
-                  readOnly={true}
-                ></ReactQuill>
-                <ReactQuill
-                  ref={reviewNotesRef}
-                  modules={modules}
-                  bounds={"#note"}
-                  theme="bubble"
-                  formats={formats}
-                  placeholder="Review Notes"
-                ></ReactQuill>
-                <ReactQuill
-                  ref={superCheckerNotesRef}
-                  modules={modules}
-                  bounds={"#note"}
-                  theme="bubble"
-                  formats={formats}
-                  placeholder="SuperChecker Notes"
-                  readOnly={true}
-                ></ReactQuill>
+              className={classes.collapse}
+              style={{
+                display: showNotes ? "block" : "none",
+                paddingBottom: "16px",
+                height: "175px",
+                overflow: "scroll",
+              }}
+            >
+              <ReactQuill
+                ref={annotationNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                theme="bubble"
+                formats={formats}
+                placeholder="Annotation Notes"
+                readOnly={true}
+              ></ReactQuill>
+              <ReactQuill
+                ref={reviewNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                theme="bubble"
+                formats={formats}
+                placeholder="Review Notes"
+              ></ReactQuill>
+              <ReactQuill
+                ref={superCheckerNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                theme="bubble"
+                formats={formats}
+                placeholder="SuperChecker Notes"
+                readOnly={true}
+              ></ReactQuill>
             </div>
             <div
               className={classes.collapse}
@@ -1327,20 +1589,22 @@ useEffect(() => {
                 display: showStdTranscript ? "block" : "none",
                 paddingBottom: "16px",
                 overflow: "auto",
-                height: "max-content"
+                height: "max-content",
               }}
             >
               {stdTranscriptionSettings.enableTransliteration ? (
                 <IndicTransliterate
                   customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
-                  apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
+                  apiKey={`JWT ${localStorage.getItem("shoonya_access_token")}`}
                   lang={stdTranscriptionSettings.targetlang}
                   value={stdTranscription}
                   onChange={(e) => {
                     setStdTranscription(e.target.value);
                   }}
-                  onChangeText={() => { }}
-                  enabled={stdTranscriptionSettings.enableTransliterationSuggestion}
+                  onChangeText={() => {}}
+                  enabled={
+                    stdTranscriptionSettings.enableTransliterationSuggestion
+                  }
                   containerStyles={{
                     width: "100%",
                   }}
@@ -1350,7 +1614,10 @@ useEffect(() => {
                         className={classes.customTextarea}
                         dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
                         rows={4}
-                        style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px" }}
+                        style={{
+                          fontSize: stdTranscriptionSettings.fontSize,
+                          height: "120px",
+                        }}
                         {...props}
                       />
                     </div>
@@ -1380,59 +1647,385 @@ useEffect(() => {
                 display: advancedWaveformSettings ? "block" : "none",
                 marginTop: "15%",
                 overflow: "auto",
-                height: "max-content"
+                height: "max-content",
               }}
+            >
+              <table
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  fontSize: "large",
+                }}
               >
-                  <table style={{width: "100%", textAlign: 'center', fontSize: 'large'}}>
-                  { waveSurfer ? 
+                {waveSurfer ? (
                   <>
-                  <tr>
-                    <td colSpan={2}>Height:&nbsp;&nbsp;<input type='range' min={10} max={512} step={1} value={waveSurferHeight} onChange={(e) => {setWaveSurferHeigth(e.target.value)}}></input></td>
-                    {/* <td>Width:&nbsp;&nbsp;<input type='range' min={10} max={2000} step={1} value={waveSurferWidth} onChange={(e) => {setWaveSurferWidth(e.target.value)}}></input></td> */}
-                    <td colSpan={2}>Min PX Per Sec:&nbsp;&nbsp;<input type='range' min={1} max={1000} step={1} value={waveSurferMinPxPerSec} onChange={(e) => {setWaveSurferMinPxPerSec(e.target.value)}}></input></td>
-                  </tr>
-                  <tr>
-                    <td>Wave Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferWaveColor} onChange={(e) => {setWaveSurferWaveColor(e.target.value)}}></input></td>
-                    <td>Progress Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferProgressColor} onChange={(e) => {setWaveSurferProgressColor(e.target.value)}}></input></td>
-                    <td>Cursor Color:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveSurferCursorColor} onChange={(e) => {setWaveSurferCursorColor(e.target.value)}}></input></td>
-                    <td>Cursor Width:&nbsp;&nbsp;<input type='range' min={0} max={10} step={1} value={waveSurferCursorWidth} onChange={(e) => {setWaveSurferCursorWidth(e.target.value)}}></input></td>
-                  </tr>
-                  <tr>
-                    <td>Bar Width:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarWidth} onChange={(e) => {setWaveSurferBarWidth(e.target.value)}}></input></td>
-                    <td>Bar Gap:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarGap} onChange={(e) => {setWaveSurferBarGap(e.target.value)}}></input></td>
-                    <td>Bar Radius:&nbsp;&nbsp;<input type='range' min={1} max={30} step={1} value={waveSurferBarRadius} onChange={(e) => {setWaveSurferBarRadius(e.target.value)}}></input></td>
-                    <td>Bar Height:&nbsp;&nbsp;<input type='range' min={0.1} max={4} step={0.1} value={waveSurferBarHeight} onChange={(e) => {setWaveSurferBarHeight(e.target.value)}}></input></td>
-                  </tr>
+                    <tr>
+                      <td colSpan={2}>
+                        Height:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={10}
+                          max={512}
+                          step={1}
+                          value={waveSurferHeight}
+                          onChange={(e) => {
+                            setWaveSurferHeigth(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      {/* <td>Width:&nbsp;&nbsp;<input type='range' min={10} max={2000} step={1} value={waveSurferWidth} onChange={(e) => {setWaveSurferWidth(e.target.value)}}></input></td> */}
+                      <td colSpan={2}>
+                        Min PX Per Sec:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={1}
+                          max={1000}
+                          step={1}
+                          value={waveSurferMinPxPerSec}
+                          onChange={(e) => {
+                            setWaveSurferMinPxPerSec(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Wave Color:&nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={waveSurferWaveColor}
+                          onChange={(e) => {
+                            setWaveSurferWaveColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Progress Color:&nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={waveSurferProgressColor}
+                          onChange={(e) => {
+                            setWaveSurferProgressColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Cursor Color:&nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={waveSurferCursorColor}
+                          onChange={(e) => {
+                            setWaveSurferCursorColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Cursor Width:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={0}
+                          max={10}
+                          step={1}
+                          value={waveSurferCursorWidth}
+                          onChange={(e) => {
+                            setWaveSurferCursorWidth(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Bar Width:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={1}
+                          max={30}
+                          step={1}
+                          value={waveSurferBarWidth}
+                          onChange={(e) => {
+                            setWaveSurferBarWidth(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Bar Gap:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={1}
+                          max={30}
+                          step={1}
+                          value={waveSurferBarGap}
+                          onChange={(e) => {
+                            setWaveSurferBarGap(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Bar Radius:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={1}
+                          max={30}
+                          step={1}
+                          value={waveSurferBarRadius}
+                          onChange={(e) => {
+                            setWaveSurferBarRadius(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Bar Height:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={0.1}
+                          max={4}
+                          step={0.1}
+                          value={waveSurferBarHeight}
+                          onChange={(e) => {
+                            setWaveSurferBarHeight(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                    </tr>
                   </>
-                  :
+                ) : (
                   <>
-                  <tr>
-                    <td>Wave:&nbsp;&nbsp;<input type='checkbox' checked={wave} onChange={() => {setWave(!wave)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={waveColor} onChange={(e) => {setWaveColor(e.target.value)}}></input></td>
-                    <td>Background:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={backgroundColor} onChange={(e) => {setBackgroundColor(e.target.value)}}></input></td>
-                    <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={paddingColor} onChange={(e) => {setPaddingColor(e.target.value)}}></input></td>
-                    <td>Cursor:&nbsp;&nbsp;<input type='checkbox' checked={cursor} onChange={() => {setCursor(!cursor)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={cursorColor} onChange={(e) => {setCursorColor(e.target.value)}}></input></td>
-                    <td>Progress:&nbsp;&nbsp;<input type='checkbox' checked={progress} onChange={() => {setProgress(!progress)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={progressColor} onChange={(e) => {setProgressColor(e.target.value)}}></input></td>
-                  </tr>
-                  <tr>
-                    <td>Grid:&nbsp;&nbsp;<input type='checkbox' checked={grid} onChange={() => {setGrid(!grid)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={gridColor} onChange={(e) => {setGridColor(e.target.value)}}></input></td>
-                    <td>Ruler:&nbsp;&nbsp;<input type='checkbox' checked={ruler} onChange={() => {setRuler(!ruler)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={rulerColor} onChange={(e) => {setRulerColor(e.target.value)}}></input></td>
-                    <td colSpan={2}>Scrollbar:&nbsp;&nbsp;<input type='checkbox' checked={scrollbar} onChange={() => {setScrollbar(!scrollbar)}}></input>&nbsp;&nbsp;<input type='color' style={{width: "25px", padding: "0px"}} value={scrollbarColor} onChange={(e) => {setScrollbarColor(e.target.value)}}></input></td>
-                    <td>Ruler At Top:&nbsp;&nbsp;<input type='checkbox' checked={rulerAtTop} onChange={() => {setRulerAtTop(!rulerAtTop)}}></input></td>
-                    <td>Scrollable:&nbsp;&nbsp;<input type='checkbox' checked={scrollable} onChange={() => {setScrollable(!scrollable)}}></input></td>
-                    <td>Wav worker:&nbsp;&nbsp;<input type='checkbox' checked={wavWorker} onChange={() => {setWavWorker(!wavWorker)}}></input></td>
-
-                  </tr>
-                  <tr>
-                    <td colSpan={2}>Padding:&nbsp;&nbsp;<input type='range' min={0} max={20} step={1} value={padding} onChange={(e) => {setPadding(e.target.value)}}></input>&nbsp;{padding}</td>
-                    <td colSpan={2}>Pixel Ratio:&nbsp;&nbsp;<input type='range' min={1} max={2} step={1} value={pixelRatio} onChange={(e) => {setPixelRatio(e.target.value)}}></input>&nbsp;{pixelRatio}</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>Wave Scale:&nbsp;&nbsp;<input type='range' min={0.1} max={2} step={0.1} value={waveScale} onChange={(e) => {setWaveScale(e.target.value)}}></input>&nbsp;{waveScale}</td>
-                    <td colSpan={3}>Wave Size:&nbsp;&nbsp;<input type='range' min={1} max={10} step={1} value={waveSize} onChange={(e) => {setWaveSize(e.target.value)}}></input>&nbsp;{waveSize}</td>
-                  </tr>
+                    <tr>
+                      <td>
+                        Wave:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={wave}
+                          onChange={() => {
+                            setWave(!wave);
+                          }}
+                        ></input>
+                        &nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={waveColor}
+                          onChange={(e) => {
+                            setWaveColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Background:&nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={backgroundColor}
+                          onChange={(e) => {
+                            setBackgroundColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td colSpan={2}>
+                        Padding:&nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={paddingColor}
+                          onChange={(e) => {
+                            setPaddingColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Cursor:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={cursor}
+                          onChange={() => {
+                            setCursor(!cursor);
+                          }}
+                        ></input>
+                        &nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={cursorColor}
+                          onChange={(e) => {
+                            setCursorColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Progress:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={progress}
+                          onChange={() => {
+                            setProgress(!progress);
+                          }}
+                        ></input>
+                        &nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={progressColor}
+                          onChange={(e) => {
+                            setProgressColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Grid:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={grid}
+                          onChange={() => {
+                            setGrid(!grid);
+                          }}
+                        ></input>
+                        &nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={gridColor}
+                          onChange={(e) => {
+                            setGridColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Ruler:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={ruler}
+                          onChange={() => {
+                            setRuler(!ruler);
+                          }}
+                        ></input>
+                        &nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={rulerColor}
+                          onChange={(e) => {
+                            setRulerColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td colSpan={2}>
+                        Scrollbar:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={scrollbar}
+                          onChange={() => {
+                            setScrollbar(!scrollbar);
+                          }}
+                        ></input>
+                        &nbsp;&nbsp;
+                        <input
+                          type="color"
+                          style={{ width: "25px", padding: "0px" }}
+                          value={scrollbarColor}
+                          onChange={(e) => {
+                            setScrollbarColor(e.target.value);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Ruler At Top:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={rulerAtTop}
+                          onChange={() => {
+                            setRulerAtTop(!rulerAtTop);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Scrollable:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={scrollable}
+                          onChange={() => {
+                            setScrollable(!scrollable);
+                          }}
+                        ></input>
+                      </td>
+                      <td>
+                        Wav worker:&nbsp;&nbsp;
+                        <input
+                          type="checkbox"
+                          checked={wavWorker}
+                          onChange={() => {
+                            setWavWorker(!wavWorker);
+                          }}
+                        ></input>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2}>
+                        Padding:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={0}
+                          max={20}
+                          step={1}
+                          value={padding}
+                          onChange={(e) => {
+                            setPadding(e.target.value);
+                          }}
+                        ></input>
+                        &nbsp;{padding}
+                      </td>
+                      <td colSpan={2}>
+                        Pixel Ratio:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={1}
+                          max={2}
+                          step={1}
+                          value={pixelRatio}
+                          onChange={(e) => {
+                            setPixelRatio(e.target.value);
+                          }}
+                        ></input>
+                        &nbsp;{pixelRatio}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        Wave Scale:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={0.1}
+                          max={2}
+                          step={0.1}
+                          value={waveScale}
+                          onChange={(e) => {
+                            setWaveScale(e.target.value);
+                          }}
+                        ></input>
+                        &nbsp;{waveScale}
+                      </td>
+                      <td colSpan={3}>
+                        Wave Size:&nbsp;&nbsp;
+                        <input
+                          type="range"
+                          min={1}
+                          max={10}
+                          step={1}
+                          value={waveSize}
+                          onChange={(e) => {
+                            setWaveSize(e.target.value);
+                          }}
+                        ></input>
+                        &nbsp;{waveSize}
+                      </td>
+                    </tr>
                   </>
-                  }
-                </table>
+                )}
+              </table>
             </div>
           </Box>
         </Grid>
@@ -1451,6 +2044,7 @@ useEffect(() => {
             waveSurfer={waveSurfer}
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
+            handleOpenPopover={handleOpenPopover}
           />
         </Grid>
       </Grid>
@@ -1459,10 +2053,136 @@ useEffect(() => {
         width={"100%"}
         position="fixed"
         bottom={1}
-      // style={fullscreen ? { visibility: "hidden" } : {}}
+        // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList} waveformSettings={waveformSettings}/>) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
+        {audioURL ? (
+          waveSurfer ? (
+            <Timeline2
+              key={taskDetails?.data?.audio_url}
+              details={taskDetails}
+              waveformSettings={waveSurferWaveformSettings}
+            />
+          ) : (
+            <Timeline
+              currentTime={currentTime}
+              playing={playing}
+              taskID={taskDetailList}
+              waveformSettings={waveformSettings}
+            />
+          )
+        ) : (
+          <div style={{ marginLeft: "49%", marginBottom: "2%" }}>
+            <CircularProgress />
+          </div>
+        )}
       </Grid>
+      {popoverOpen && (
+        <Portal>
+          <Box
+            ref={dialogRef}
+            sx={{
+              position: "fixed",
+              top: popoverPosition.top,
+              left: popoverPosition.left,
+              backgroundColor: "white",
+              boxShadow: 3,
+              padding: 2,
+              borderRadius: "8px",
+              minWidth: isFullscreen ? "100%" : "400px",
+              width: isFullscreen ? "100%" : "400px",
+              height: isFullscreen ? "100%" : "500px",
+              zIndex: 1300,
+              overflow: "auto",
+            }}
+          >
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography variant="h4" flexGrow={1}>
+                Subtitles
+              </Typography>
+              <IconButton onClick={handleFullscreenToggle}>
+                {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+              </IconButton>
+              <IconButton onClick={handleClosePopover}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Box sx={{ height: "410px", overflowY: "auto" }}>
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      {type1.length > 0 && (
+                        <th>
+                          <Typography variant="h6">Annotation</Typography>
+                        </th>
+                      )}
+                      {type2.length > 0 && (
+                        <th>
+                          <Typography variant="h6">Review</Typography>
+                        </th>
+                      )}
+                      {type3.length > 0 && (
+                        <th>
+                          <Typography variant="h6">SuperCheck</Typography>
+                        </th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {/* Render different types */}
+                      <td>
+                        {type1.length > 0 &&
+                          type1[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                      <td>
+                        {type2.length > 0 &&
+                          type2[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                      <td>
+                        {type3.length > 0 &&
+                          type3[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
+            </Box>
+          </Box>
+        </Portal>
+      )}
     </>
   );
 };
