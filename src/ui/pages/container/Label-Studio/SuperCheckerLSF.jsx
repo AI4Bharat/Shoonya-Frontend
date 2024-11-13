@@ -110,7 +110,8 @@ const filterAnnotations = (annotations, user, taskData) => {
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unvalidated") {
-      filteredAnnotations = userAnnotation.result.length > 0 ?
+      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.super_check_count?
+
         [userAnnotation] : annotations.filter(
           (annotation) =>
             annotation.id === userAnnotation.parent_annotation &&
