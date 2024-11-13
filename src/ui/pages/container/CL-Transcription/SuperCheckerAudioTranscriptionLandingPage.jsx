@@ -57,6 +57,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import configs from "../../../../config/config";
+import Draggable from "react-draggable";
 
 const SuperCheckerAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -1122,6 +1123,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const handleClosePopover = () => {
     setPopoverOpen(false);
   };
+
   const handleFullscreenToggle = () => {
     const elem = dialogRef.current;
     if (!isFullscreen) {
@@ -1885,7 +1887,8 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
               borderRadius: "8px",
               minWidth: isFullscreen ? "100%" : "400px",
               width: isFullscreen ? "100%" : "500px",
-              height: isFullscreen ? "100%" : "500px",
+              height: isFullscreen ? "100%" : "450px",
+              maxWidth: isFullscreen ? "100%" : "600px",
               zIndex: 1300,
               overflow: "auto",
             }}

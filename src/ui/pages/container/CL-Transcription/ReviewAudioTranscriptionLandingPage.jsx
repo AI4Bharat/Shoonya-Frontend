@@ -1281,7 +1281,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const handleOpenPopover = (position) => {
     const offsetPosition = {
       top: position.top - 0,
-      left: position.left - 900,
+      left: position.left - 1000,
     };
     setPopoverPosition(offsetPosition);
     setPopoverOpen(true);
@@ -2089,8 +2089,9 @@ const ReviewAudioTranscriptionLandingPage = () => {
               padding: 2,
               borderRadius: "8px",
               minWidth: isFullscreen ? "100%" : "400px",
-              width: isFullscreen ? "100%" : "400px",
-              height: isFullscreen ? "100%" : "500px",
+              width: isFullscreen ? "100%" : "500px",
+              height: isFullscreen ? "100%" : "450px",
+              maxWidth: isFullscreen ? "100%" : "600px",
               zIndex: 1300,
               overflow: "auto",
             }}
