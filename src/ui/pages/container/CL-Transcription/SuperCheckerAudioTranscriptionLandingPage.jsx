@@ -190,7 +190,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
 
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, userData,taskDetailList);
-  }, [AnnotationsTaskDetails, userData]);
+  }, [AnnotationsTaskDetails, userData,taskDetailList]);
   //console.log(disableSkip);
 
   const handleCollapseClick = () => {
