@@ -20,7 +20,7 @@ import {
   Grid,
   Button,
   Slider, Stack, CircularProgress
-} from "@mui/material";
+  ,Portal} from "@mui/material";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
@@ -49,6 +49,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import configs from '../../../../config/config';
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import CloseIcon from "@mui/icons-material/Close";
 
 const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -114,7 +117,95 @@ const AudioTranscriptionLandingPage = () => {
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
   const [audioURL, setAudioURL] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const dialogRef = useRef(null);
 
+  const type1 = AnnotationsTaskDetails.filter(
+    (item) => item.annotation_type === 1
+  );
+  const type2 = AnnotationsTaskDetails.filter(
+    (item) => item.annotation_type === 2
+  );
+  const type3 = AnnotationsTaskDetails.filter(
+    (item) => item.annotation_type === 3
+  );
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("msfullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        "mozfullscreenchange",
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        "msfullscreenchange",
+        handleFullscreenChange
+      );
+    };
+  }, []);
+
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
+
+  const handleOpenPopover = (position) => {
+    const offsetPosition = {
+      top: position.top - 0,
+      left: position.left - 1000,
+    };
+    setPopoverPosition(offsetPosition);
+    setPopoverOpen(true);
+  };
+
+  const handleClosePopover = () => {
+    setPopoverOpen(false);
+  };
+
+  const handleFullscreenToggle = () => {
+    const elem = dialogRef.current;
+    if (!isFullscreen) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        /* Firefox */
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) {
+        /* Chrome, Safari and Opera */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        /* IE/Edge */
+        elem.msRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        /* IE/Edge */
+        document.msExitFullscreen();
+      }
+      setIsFullscreen(false);
+    }
+  };
   // useEffect(() => {
   //   let intervalId;
 
@@ -1228,6 +1319,7 @@ useEffect(() => {
             waveSurfer={waveSurfer}
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
+            handleOpenPopover={handleOpenPopover}
           />
         </Grid>
       </Grid>
@@ -1240,6 +1332,114 @@ useEffect(() => {
       >
         {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>} 
       </Grid>
+      {popoverOpen && (
+        <Portal>
+          <Box
+            ref={dialogRef}
+            sx={{
+              position: "fixed",
+              top: popoverPosition.top,
+              left: popoverPosition.left,
+              backgroundColor: "white",
+              boxShadow: 3,
+              padding: 2,
+              borderRadius: "8px",
+              minWidth: isFullscreen ? "100%" : "400px",
+              width: isFullscreen ? "100%" : "500px",
+              height: isFullscreen ? "100%" : "450px",
+              maxWidth: isFullscreen ? "100%" : "600px",
+              zIndex: 1300,
+              overflow: "auto",
+            }}
+          >
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography variant="h4" flexGrow={1}>
+                Subtitles
+              </Typography>
+              <IconButton onClick={handleFullscreenToggle}>
+                {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+              </IconButton>
+              <IconButton onClick={handleClosePopover}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Box sx={{ height: "410px", overflowY: "auto" }}>
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      {type1.length > 0 && (
+                        <th>
+                          <Typography variant="h6">Annotation</Typography>
+                        </th>
+                      )}
+                      {type2.length > 0 && (
+                        <th>
+                          <Typography variant="h6">Review</Typography>
+                        </th>
+                      )}
+                      {type3.length > 0 && (
+                        <th>
+                          <Typography variant="h6">SuperCheck</Typography>
+                        </th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {/* Render different types */}
+                      <td>
+                        {type1.length > 0 &&
+                          type1[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                      <td>
+                        {type2.length > 0 &&
+                          type2[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                      <td>
+                        {type3.length > 0 &&
+                          type3[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
+            </Box>
+          </Box>
+        </Portal>
+      )}
     </>
   );
 };

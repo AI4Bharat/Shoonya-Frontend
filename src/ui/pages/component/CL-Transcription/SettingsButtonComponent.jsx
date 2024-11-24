@@ -70,6 +70,7 @@ const SettingsButtonComponent = ({
   pauseOnType,
   setPauseOnType,
   annotationId,
+  handleOpenPopover,
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   // const dispatch = useDispatch();
@@ -77,8 +78,14 @@ const SettingsButtonComponent = ({
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElLimit, setAnchorElLimit] = useState(null);
-  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
-
+  const handleClick = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect(); 
+    const position = {
+      top: rect.top + window.scrollY, 
+      left: rect.left + window.scrollX,
+    };
+    handleOpenPopover(position); 
+  };
   return (
     <>
       <div
@@ -310,7 +317,7 @@ const SettingsButtonComponent = ({
       <Tooltip title="Subtitle Preview" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
-          onClick={() => setOpenPreviewDialog(true)}
+          onClick={handleClick}
           style={{
             backgroundColor: "#2C2799",
             borderRadius: "50%",
@@ -443,17 +450,7 @@ const SettingsButtonComponent = ({
           <RedoIcon />
         </IconButton>
       </Tooltip>
-      {openPreviewDialog && (
-        <PreviewDialog
-          openPreviewDialog={openPreviewDialog}
-          handleClose={() => setOpenPreviewDialog(false)}
-          subtitles={subtitles}
-          // taskType={taskData?.task_type}
-          // currentSubs={currentSubs}
-          // videoId={taskData?.video}
-          // targetLanguage={taskData?.target_language}
-        />
-      )}
+
     </>
   );
 };

@@ -87,6 +87,7 @@ const TranscriptionRightPanel = ({
   waveSurfer,
   setWaveSurfer,
   annotationId,
+  handleOpenPopover
 }) => {
   const { taskId } = useParams();
 
@@ -666,6 +667,8 @@ const TranscriptionRightPanel = ({
               pauseOnType={pauseOnType}
               setPauseOnType={setPauseOnType}
               annotationId={annotationId}
+              handleOpenPopover={handleOpenPopover}
+
             />
           </Grid>
           {showAcousticText && (
