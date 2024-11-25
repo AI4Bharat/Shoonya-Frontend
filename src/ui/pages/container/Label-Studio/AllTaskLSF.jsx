@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
-import LabelStudio from "@heartexlabs/label-studio";
+import LabelStudio from "./lsf-build/static/js/main";
 import { Tooltip, Button, Alert, Card, TextField, Box, Grid } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
