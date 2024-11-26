@@ -529,12 +529,12 @@ const MembersTable = (props) => {
         // console.log(rsp_data);
       }}
     else if(memberOrReviewer === "superchecker"){
-      if(pin === "0104"){
+      // if(pin === "0104"){
         handleProjectReviewer(elId);
         setConfirmationDialog(false);
-      }else{
-        window.alert("Incorrect pin entered");
-      }
+      // }else{
+        // window.alert("Incorrect pin entered");
+      // }
     }
   };
   return (
