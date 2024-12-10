@@ -269,50 +269,57 @@ const DetailsViewPage = (props) => {
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
       {renderSnackBar()}
-      <Grid
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Grid container direction="row" sx={{ maxWidth: "100%" }}>
         <Card className={classes.workspaceCard}>
           {pageType === componentType.Type_Organization && (
-            <Typography variant="h2" gutterBottom component="div">
+            <Typography
+              variant="h2"
+              gutterBottom
+              component="div"
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+              }}
+            >
               {title}
             </Typography>
           )}
           {pageType === componentType.Type_Workspace && (
-            <Grid
-              container
-              direction="row"
-              justifyContent="center"
+            <Box
+              display="flex"
               alignItems="center"
+              justifyContent="space-between"
               sx={{ mb: 3 }}
             >
-              <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
-                <Typography variant="h3">{title}</Typography>
-              </Grid>
+              <Box flex="1" textAlign="center" sx={{ marginLeft: "3rem" }}>
+                <Typography variant="h2">{title}</Typography>
+              </Box>
 
               {(userRole.Annotator !== userDetails?.role ||
                 userRole.Reviewer !== userDetails?.role ||
                 userRole.SuperChecker !== userDetails?.role) && (
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Tooltip title={translate("label.showProjectSettings")}>
-                    <IconButton
-                      onClick={handleOpenSettings}
-                      sx={{ marginLeft: "140px" }}
-                    >
-                      <SettingsOutlinedIcon
-                        color="primary.dark"
-                        fontSize="large"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
+                <Tooltip title={translate("label.showProjectSettings")}>
+                  <IconButton onClick={handleOpenSettings}>
+                    <SettingsOutlinedIcon
+                      color="primary.dark"
+                      fontSize="large"
+                    />
+                  </IconButton>
+                </Tooltip>
               )}
-            </Grid>
+            </Box>
           )}
-          <Typography variant="body1" gutterBottom component="div">
+          <Typography
+            variant="body1"
+            gutterBottom
+            component="div"
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
             Created by : {createdBy}
           </Typography>
           <Box>
@@ -320,79 +327,175 @@ const DetailsViewPage = (props) => {
               value={value}
               onChange={handleChange}
               aria-label="basic tabs example"
+              variant="fullWidth"
+              TabIndicatorProps={{
+                style: { display: "none" },
+              }}
             >
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.projects")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 0 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 0 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.workspaces")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 0 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 0 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.members")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 1 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 1 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.members")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 1 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 1 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.managers")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 2 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 2 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.invites")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 2 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 2 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.reports")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 3 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 3 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.reports")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 3 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 3 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
-           
                 <Tab
-                label={ <div style={{display:"flex",marginTop:"5px"}}> {translate("label.analytics")} <KeyboardArrowDownIcon style={{paddingBottom:"1px"}} /> </div>}
-                aria-controls="menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
-                sx={{ fontSize: 16, fontWeight: "700"}}  
+                  label={
+                    <div style={{ display: "flex", marginTop: "5px" }}>
+                      {" "}
+                      {translate("label.analytics")}{" "}
+                      <KeyboardArrowDownIcon style={{ paddingBottom: "1px" }} />{" "}
+                    </div>
+                  }
+                  aria-controls="menu"
+                  aria-haspopup="true"
+                  onClick={handleMenuOpen}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 4 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 4 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
-            
               )}
-                
+
               {pageType === componentType.Type_Organization && (
-                
                 <Tab
                   label={"Organization " + translate("label.settings")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                /> 
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 4 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 4 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
+                />
               )}
-               
             </Tabs>
           </Box>
           <Menu
@@ -401,10 +504,31 @@ const DetailsViewPage = (props) => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem selected={selectmenu=== "TaskAnalytics"} onClick={() => handleClickMenu("TaskAnalytics")}> Task Analytics </MenuItem>
-            <MenuItem selected={ selectmenu=== "MetaAnalytics"} onClick={() => handleClickMenu("MetaAnalytics")}>Meta Analytics</MenuItem>
-            <MenuItem selected={selectmenu=== "AdvanceAnalytics"} onClick={() => handleClickMenu("AdvanceAnalytics")}>Advance Analytics</MenuItem>
-            <MenuItem selected={selectmenu=== "PerformanceAnalytics"} onClick={() => handleClickMenu("PerformanceAnalytics")}>Performance Analytics</MenuItem>
+            <MenuItem
+              selected={selectmenu === "TaskAnalytics"}
+              onClick={() => handleClickMenu("TaskAnalytics")}
+            >
+              {" "}
+              Task Analytics{" "}
+            </MenuItem>
+            <MenuItem
+              selected={selectmenu === "MetaAnalytics"}
+              onClick={() => handleClickMenu("MetaAnalytics")}
+            >
+              Meta Analytics
+            </MenuItem>
+            <MenuItem
+              selected={selectmenu === "AdvanceAnalytics"}
+              onClick={() => handleClickMenu("AdvanceAnalytics")}
+            >
+              Advance Analytics
+            </MenuItem>
+            <MenuItem
+              selected={selectmenu === "PerformanceAnalytics"}
+              onClick={() => handleClickMenu("PerformanceAnalytics")}
+            >
+              Performance Analytics
+            </MenuItem>
           </Menu>
           <TabPanel
             value={value}
@@ -421,7 +545,6 @@ const DetailsViewPage = (props) => {
                   columnSpacing={4}
                   rowSpacing={2}
                 >
-                  
                   <Grid item xs={12} sm={12}>
                     <Link to={`/create-annotation-project/${id}`}>
                       <Button
@@ -463,7 +586,7 @@ const DetailsViewPage = (props) => {
           <TabPanel value={value} index={1}>
             {pageType === componentType.Type_Workspace && (
               <>
-              <Grid
+                <Grid
                   container
                   direction="row"
                   justifyContent="center"
@@ -472,22 +595,20 @@ const DetailsViewPage = (props) => {
                   rowSpacing={2}
                 >
                   <Grid item xs={12} sm={6}>
-                  <CustomButton
-                    className={classes.annotatorsButton}
-                    label={"Add Members to Workspace"}
-                    sx={{ width: "100%", mb: 2 }}
-                    onClick={handleAnnotatorDialogOpen}
-                  />
-
-
+                    <CustomButton
+                      className={classes.annotatorsButton}
+                      label={"Add Members to Workspace"}
+                      sx={{ width: "100%", mb: 2 }}
+                      onClick={handleAnnotatorDialogOpen}
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                  <CustomButton
-                    className={classes.annotatorsButton}
-                    label={"Invite Users to Organisation"}
-                    sx={{ width: "100%", mb: 2 }}
-                    onClick={handleUserDialogOpen}
-                  />
+                    <CustomButton
+                      className={classes.annotatorsButton}
+                      label={"Invite Users to Organisation"}
+                      sx={{ width: "100%", mb: 2 }}
+                      onClick={handleUserDialogOpen}
+                    />
                   </Grid>
                 </Grid>
                 <AnnotatorsTable
@@ -500,24 +621,28 @@ const DetailsViewPage = (props) => {
                   id={id}
                 />
                 <InviteUsersDialog
-                handleDialogClose={handleUserDialogClose}
-                isOpen={addUserDialogOpen}
-                selectedUsers={selectedUsers}
-                setSelectedUsers={setSelectedUsers}
-                userType={userType}
-                setUserType={setUserType}
-                addBtnClickHandler={()=>addBtnClickHandler()}
-                loading={loading}
-                selectedEmails={selectedEmails}
-                setSelectedEmails={setSelectedEmails}
-                csvFile={csvFile}
-                setCsvFile={setCsvFile}
-                btn={btn}
-                setbtn={setbtn}
-                value={value}
-                setvalue={setValue}
-                popUpLabel={userDetails?.role === userRole.WorkspaceManager ? "Request admin to add users to organization" : "Invite users to organization" }
-              />
+                  handleDialogClose={handleUserDialogClose}
+                  isOpen={addUserDialogOpen}
+                  selectedUsers={selectedUsers}
+                  setSelectedUsers={setSelectedUsers}
+                  userType={userType}
+                  setUserType={setUserType}
+                  addBtnClickHandler={() => addBtnClickHandler()}
+                  loading={loading}
+                  selectedEmails={selectedEmails}
+                  setSelectedEmails={setSelectedEmails}
+                  csvFile={csvFile}
+                  setCsvFile={setCsvFile}
+                  btn={btn}
+                  setbtn={setbtn}
+                  value={value}
+                  setvalue={setValue}
+                  popUpLabel={
+                    userDetails?.role === userRole.WorkspaceManager
+                      ? "Request admin to add users to organization"
+                      : "Invite users to organization"
+                  }
+                />
               </>
             )}
             {pageType === componentType.Type_Organization && (
@@ -554,10 +679,14 @@ const DetailsViewPage = (props) => {
             {pageType === componentType.Type_Workspace && <WorkspaceReports />}
           </TabPanel>
           <TabPanel value={value} index={4}>
-            {pageType === componentType.Type_Workspace && selectmenu=== "TaskAnalytics" && <TaskAnalytics />}
-            {pageType === componentType.Type_Workspace && selectmenu=== "MetaAnalytics" && <MetaAnalytics />}
-            {pageType === componentType.Type_Workspace && selectmenu=== "AdvanceAnalytics" && <ProgressAnalytics />}
-            {pageType === componentType.Type_Workspace && selectmenu=== "PerformanceAnalytics" && <PerformanceAnalytics /> }
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "TaskAnalytics" && <TaskAnalytics />}
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "MetaAnalytics" && <MetaAnalytics />}
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "AdvanceAnalytics" && <ProgressAnalytics />}
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "PerformanceAnalytics" && <PerformanceAnalytics />}
             {pageType === componentType.Type_Organization && (
               <OrganizationSettings />
             )}

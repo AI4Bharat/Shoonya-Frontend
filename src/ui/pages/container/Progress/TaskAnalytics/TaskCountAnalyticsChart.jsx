@@ -27,6 +27,7 @@ function TaskCountAnalyticsChart(props) {
   const [totalAnnotationTasksCount, setTotalAnnotationTasksCount] = useState();
   const [totalReviewTasksCount, setTotalReviewTasksCount] = useState();
   const [totalSupercheckCount, setTotalSupercheckCount] = useState();
+  const [difftotal,setdifftotal] = useState();
   const [data, setData] = useState([]);
   const [annRev,setAnnRev] = useState();
 
@@ -49,7 +50,7 @@ function TaskCountAnalyticsChart(props) {
       allSuperCheckCumulativeTasksCount += element.sup_cumulative_tasks_count;
       languages = element.languages;
     });
-
+    setdifftotal(allAnnotatorCumulativeTasksCount-allReviewCumulativeTasksCount)
     setTotalAnnotationTasksCount(allAnnotatorCumulativeTasksCount);
     setTotalReviewTasksCount(allReviewCumulativeTasksCount);
     setTotalSupercheckCount(allSuperCheckCumulativeTasksCount)
@@ -209,8 +210,8 @@ function TaskCountAnalyticsChart(props) {
                 Pending Review Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalAnnotationTasksCount &&
-                  new Intl.NumberFormat("en").format(totalAnnotationTasksCount)}
+                {difftotal &&
+                  new Intl.NumberFormat("en").format(difftotal)}
               </Typography>
             </Box>:null}
 
