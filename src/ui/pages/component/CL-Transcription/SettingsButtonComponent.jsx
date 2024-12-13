@@ -25,6 +25,7 @@ import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import MergeIcon from "@mui/icons-material/MergeType";
+import HashIcon from "@mui/icons-material/FormatSize";
 // import { FindAndReplace } from "common";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 // import FormatLineSpacingIcon from "@mui/icons-material/FormatLineSpacingIcon";
@@ -53,6 +54,7 @@ const SettingsButtonComponent = ({
   saveTranscriptHandler,
   setOpenConfirmDialog,
   durationError,
+  handleDoubleHashes,
   onUndo,
   onRedo,
   undoStack,
@@ -229,6 +231,10 @@ console.log(subtitles);
               />
             }
           />
+        </MenuItem>
+        <MenuItem onClick={() => handleDoubleHashes()}>
+          <HashIcon sx={{ marginRight: "10px" }} />
+          <Typography variant="body2">Apply Double Hashes</Typography>
         </MenuItem>
         <MenuItem>
         <Popup contentStyle={{

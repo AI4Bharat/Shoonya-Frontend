@@ -308,6 +308,30 @@ console.log(subtitles,"sub");
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
+  const handleDoubleHashes = () => {
+    const textVal = document.getElementsByClassName(classes.boxHighlight)[0];
+    const cursorStart = textVal.selectionStart;
+    const cursorEnd = textVal.selectionEnd;
+    const selectedText = textVal.value.substring(cursorStart, cursorEnd);
+  
+    if (selectedText !== "") {
+      const doubleHashedText = `##${selectedText}##`;
+  
+      const beforeText = textVal.value.substring(0, cursorStart);
+      const afterText = textVal.value.substring(cursorEnd);
+  
+      textVal.value = beforeText + doubleHashedText + afterText;
+  
+      textVal.setSelectionRange(
+        cursorStart + 2, 
+        cursorStart + doubleHashedText.length - 2 
+      );
+  
+      textVal.focus();
+    }
+  };
+  
+
   const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const {
       target: { value },
@@ -558,6 +582,7 @@ console.log(subtitles,"sub");
               enableRTL_Typing={enableRTL_Typing}
               setFontSize={setFontSize}
               fontSize={fontSize}
+              handleDoubleHashes={handleDoubleHashes}
               saveTranscriptHandler={saveTranscriptHandler}
               setOpenConfirmDialog={setOpenConfirmDialog}
               onUndo={onUndo}
