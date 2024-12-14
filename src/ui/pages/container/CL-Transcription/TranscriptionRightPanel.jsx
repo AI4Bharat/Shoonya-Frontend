@@ -152,6 +152,7 @@ const TranscriptionRightPanel = ({
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState(0);
   const [tagSuggestionsAnchorEl, setTagSuggestionsAnchorEl] = useState(null);
   const [tagSuggestionsAcoustic, setTagSuggestionsAcoustic] = useState(false);
+  const [hash, sethash] = useState(false);
   const [tagSuggestionList, setTagSuggestionList] = useState([]);
   const [textWithoutTripleDollar, setTextWithoutTripleDollar] = useState("");
   const [textAfterTripleDollar, setTextAfterTripleDollar] = useState("");
@@ -518,6 +519,46 @@ const TranscriptionRightPanel = ({
     // eslint-disable-next-line
     [limit, currentOffset]
   );
+  const replaceSelectedText = (text, index, id) => {
+    const textarea = document.getElementsByClassName(classes.boxHighlight)[id];
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const beforeSelection = textarea.value.substring(0, start);
+    const afterSelection = textarea.value.substring(end, textarea.value.length);
+
+    textarea.value = beforeSelection + text + afterSelection;
+    textarea.selectionStart = start + text.length;
+    textarea.selectionEnd = start + text.length;
+
+    textarea.focus();
+
+    const sub = onSubtitleChange(textarea.value, index, id);
+    dispatch(setSubtitles(sub, C.SUBTITLES));
+  };
+
+  const handleDoubleHashes = () => {
+   
+  const elementsWithBoxHighlightClass = document.getElementsByClassName(
+    classes.boxHighlight
+  );
+
+  let index = "";
+  for (let i = 0; i < elementsWithBoxHighlightClass.length; i++) {
+    const textVal = elementsWithBoxHighlightClass[i];
+    const cursorStart = textVal.selectionStart;
+    const cursorEnd = textVal.selectionEnd;
+    const selectedText = textVal.value.substring(cursorStart, cursorEnd);
+
+    if (selectedText !== "") {
+      index = i;
+      const doubleHashedText = `##${selectedText}##`;
+
+      replaceSelectedText(doubleHashedText, currentIndexToSplitTextBlock, index);
+    }
+  }
+
+  };
+
 
   const addNewSubtitleBox = useCallback(
     (index) => {
@@ -650,6 +691,9 @@ const TranscriptionRightPanel = ({
               enableRTL_Typing={enableRTL_Typing}
               setFontSize={setFontSize}
               fontSize={fontSize}
+              handleDoubleHashes={handleDoubleHashes}
+              sethash={sethash}
+              hash={hash}
               saveTranscriptHandler={saveTranscriptHandler}
               setOpenConfirmDialog={setOpenConfirmDialog}
               onUndo={onUndo}
