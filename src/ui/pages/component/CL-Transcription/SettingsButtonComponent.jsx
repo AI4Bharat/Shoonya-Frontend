@@ -23,6 +23,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import CheckIcon from "@mui/icons-material/Check";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
+import TagIcon from '@mui/icons-material/Tag';
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 // import { FindAndReplace } from "common";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -54,6 +55,9 @@ const SettingsButtonComponent = ({
   saveTranscriptHandler,
   setOpenConfirmDialog,
   durationError,
+  handleDoubleHashes,
+  sethash,
+hash,
   onUndo,
   onRedo,
   undoStack,
@@ -223,6 +227,14 @@ const SettingsButtonComponent = ({
         </MenuItem>
         <MenuItem>
           <FormControlLabel
+            label="Double Hash"
+            control={<Checkbox checked={hash} onChange={() => {
+              sethash(!hash);
+            }} />}
+          />
+        </MenuItem>
+        <MenuItem>
+          <FormControlLabel
             label="Advanced Settings"
             control={
               <Checkbox
@@ -296,7 +308,27 @@ const SettingsButtonComponent = ({
         className={classes.rightPanelDivider}
         style={{ border: "1px solid grey", height: "auto", margin: "0 5px" }}
       />
+{hash && (
+      
+        <Tooltip title="Double Hash" placement="bottom">
+          <IconButton
+            className={classes.rightPanelBtnGrp}
+            style={{
+              backgroundColor: "#2C2799",
+              borderRadius: "50%",
+              color: "#fff",
+              marginLeft: "5px",
+              "&:hover": {
+                backgroundColor: "#271e4f",
+              },
+            }}
+            onClick={() => handleDoubleHashes()}
+          >
+            <TagIcon className={classes.rightPanelSvg} />
+          </IconButton>
+        </Tooltip>
 
+      )}
       <Tooltip title="Font Size" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
@@ -304,7 +336,7 @@ const SettingsButtonComponent = ({
             backgroundColor: "#2C2799",
             borderRadius: "50%",
             color: "#fff",
-            marginX: "5px",
+            marginLeft: "5px",
             "&:hover": {
               backgroundColor: "#271e4f",
             },
