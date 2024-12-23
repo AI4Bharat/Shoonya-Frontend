@@ -311,7 +311,7 @@ ProjectDetails,
         className={classes.rightPanelDivider}
         style={{ border: "1px solid grey", height: "auto", margin: "0 5px" }}
       />
-{hash && (
+{ProjectDetails.title.toLowerCase().includes("yt_transcription") && hash && (
       
         <Tooltip title="Double Hash" placement="bottom">
           <IconButton
