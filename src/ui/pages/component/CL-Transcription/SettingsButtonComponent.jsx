@@ -58,6 +58,7 @@ const SettingsButtonComponent = ({
   handleDoubleHashes,
   sethash,
 hash,
+ProjectDetails,
   onUndo,
   onRedo,
   undoStack,
@@ -225,14 +226,16 @@ hash,
             }
           />
         </MenuItem>
-        <MenuItem>
+        {ProjectDetails.title.toLowerCase().includes("yt_transcription")&&<MenuItem>
           <FormControlLabel
             label="Double Hash"
             control={<Checkbox checked={hash} onChange={() => {
-              sethash(!hash);
+              const newValue = !hash;
+              sethash(newValue);
+              sessionStorage.setItem("hash", JSON.stringify(newValue));
             }} />}
           />
-        </MenuItem>
+        </MenuItem>}
         <MenuItem>
           <FormControlLabel
             label="Advanced Settings"
