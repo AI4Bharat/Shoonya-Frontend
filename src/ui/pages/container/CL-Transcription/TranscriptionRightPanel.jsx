@@ -694,6 +694,7 @@ const TranscriptionRightPanel = ({
               handleDoubleHashes={handleDoubleHashes}
               sethash={sethash}
               hash={hash}
+              ProjectDetails={ProjectDetails}
               saveTranscriptHandler={saveTranscriptHandler}
               setOpenConfirmDialog={setOpenConfirmDialog}
               onUndo={onUndo}
