@@ -226,7 +226,7 @@ ProjectDetails,
             }
           />
         </MenuItem>
-        {ProjectDetails.title.toLowerCase().includes("yt_transcription")&&<MenuItem>
+        {ProjectDetails?.title?.toLowerCase()?.includes("yt_transcription")&&<MenuItem>
           <FormControlLabel
             label="Double Hash"
             control={<Checkbox checked={hash} onChange={() => {
@@ -311,7 +311,7 @@ ProjectDetails,
         className={classes.rightPanelDivider}
         style={{ border: "1px solid grey", height: "auto", margin: "0 5px" }}
       />
-{ProjectDetails.title.toLowerCase().includes("yt_transcription") && hash && (
+{ProjectDetails?.title?.toLowerCase()?.includes("yt_transcription") && hash && (
       
         <Tooltip title="Double Hash" placement="bottom">
           <IconButton
