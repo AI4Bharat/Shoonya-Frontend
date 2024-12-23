@@ -229,7 +229,9 @@ hash,
           <FormControlLabel
             label="Double Hash"
             control={<Checkbox checked={hash} onChange={() => {
-              sethash(!hash);
+              const newValue = !hash;
+              sethash(newValue);
+              sessionStorage.setItem("hash", JSON.stringify(newValue));
             }} />}
           />
         </MenuItem>

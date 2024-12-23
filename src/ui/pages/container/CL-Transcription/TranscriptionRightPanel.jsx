@@ -152,7 +152,7 @@ const TranscriptionRightPanel = ({
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState(0);
   const [tagSuggestionsAnchorEl, setTagSuggestionsAnchorEl] = useState(null);
   const [tagSuggestionsAcoustic, setTagSuggestionsAcoustic] = useState(false);
-  const [hash, sethash] = useState(false);
+  const [hash, sethash] = useState(() => JSON.parse(sessionStorage.getItem("hash")) || false);
   const [tagSuggestionList, setTagSuggestionList] = useState([]);
   const [textWithoutTripleDollar, setTextWithoutTripleDollar] = useState("");
   const [textAfterTripleDollar, setTextAfterTripleDollar] = useState("");
