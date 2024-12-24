@@ -4,7 +4,7 @@ import { useQuill } from 'react-quilljs';
 import ReactQuill, { Quill } from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.snow.css';
-import LabelStudio from "./lsf-build/static/js/main";
+import * as LabelStudio from "./lsf-build/static/js/main";
 import {
   Tooltip,
   Button,
