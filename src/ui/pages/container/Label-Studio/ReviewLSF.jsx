@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill, { Quill } from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.bubble.css';
-import LabelStudio from "@heartexlabs/label-studio";
+import LabelStudio from "./lsf-build/static/js/main";
 import {
   Tooltip,
   Button,
