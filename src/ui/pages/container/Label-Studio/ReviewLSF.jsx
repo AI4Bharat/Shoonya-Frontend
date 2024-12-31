@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill, { Quill } from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.bubble.css';
-import LabelStudio from "./lsf-build/static/js/main";
+import LabelStudio1 from "./lsf-build/static/js/main";
+import LabelStudio2 from "@heartexlabs/label-studio";
 import {
   Tooltip,
   Button,
@@ -234,6 +235,7 @@ const LabelStudioWrapper = ({
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const review_status = useRef();
+  const LabelStudio = useRef();
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
@@ -355,6 +357,7 @@ useEffect(() => {
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
+    LabelStudio.current = projectType?.includes("OCR") ? LabelStudio1 : LabelStudio2;
 
     const [filteredAnnotations, disableLSFControls, disableSkip] = filterAnnotations(
       annotations,
