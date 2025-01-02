@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "./editor.css";
 import "quill/dist/quill.snow.css";
-import LabelStudio from "@heartexlabs/label-studio";
+import LabelStudio1 from "./lsf-build/static/js/main";
+import LabelStudio2 from "@heartexlabs/label-studio";
 import {
   Tooltip,
   Button,
@@ -174,6 +175,7 @@ const LabelStudioWrapper = ({
   );
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const LabelStudio = useRef();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
   const [snackbar, setSnackbarInfo] = useState({
@@ -291,6 +293,7 @@ const LabelStudioWrapper = ({
       );
     isAudioProject.current = AUDIO_PROJECT_SAVE_CHECK.includes(projectType);
     //console.log("labelConfig", labelConfig);
+    LabelStudio.current = projectType?.includes("OCR") ? LabelStudio1 : LabelStudio2;
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -357,7 +360,7 @@ const LabelStudioWrapper = ({
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
-      lsfRef.current = new LabelStudio(rootRef.current, {
+      lsfRef.current = new LabelStudio.current(rootRef.current, {
         /* all the options according to the docs */
         config: labelConfig,
 
