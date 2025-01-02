@@ -428,7 +428,7 @@ useEffect(() => {
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
-      lsfRef.current = new LabelStudio(rootRef.current, {
+      lsfRef.current = new LabelStudio.current(rootRef.current, {
         /* all the options according to the docs */
         config: labelConfig,
 
