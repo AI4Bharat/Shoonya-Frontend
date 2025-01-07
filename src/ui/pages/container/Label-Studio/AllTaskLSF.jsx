@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
-import LabelStudio from "@heartexlabs/label-studio";
+import LabelStudio1 from "./lsf-build/static/js/main";
+import LabelStudio2 from "@heartexlabs/label-studio";
 import { Tooltip, Button, Alert, Card, TextField, Box, Grid } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -37,6 +38,7 @@ import { labelConfigJS } from './labelConfigJSX';
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
+  const LabelStudio = useRef();
   const rootRef = useRef();
   const dispatch = useDispatch();
   const ProjectDetails = useSelector(state => state.getProjectDetails.data);
@@ -143,6 +145,7 @@ useEffect(() => {
     let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
+    LabelStudio.current = ProjectDetails?.project_type?.includes("OCR") ? LabelStudio1 : LabelStudio2;
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -196,7 +199,7 @@ useEffect(() => {
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
-      lsfRef.current = new LabelStudio(rootRef.current, {
+      lsfRef.current = new LabelStudio.current(rootRef.current, {
         /* all the options according to the docs */
         config: labelConfig,
 
