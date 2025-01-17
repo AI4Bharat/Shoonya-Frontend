@@ -402,7 +402,6 @@ const TranscriptionRightPanel = ({
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
   const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
-    
     const {
       target: { value },
       currentTarget,
@@ -1013,38 +1012,6 @@ const TranscriptionRightPanel = ({
                                       ? classes.boxHighlight
                                       : ""
                                   }`}
-                                  onKeyDown={(event) => {
-
-                                    if ( event.shiftKey && event.key == "<") {
-                                      const textArea = textRefs.current[index];
-                                      console.log("helo");
-      
-                                      if (textArea) {
-                                        const start = textArea.selectionStart;
-                                        const end = textArea.selectionEnd;
-                                
-                                        const newStart = Math.max(start - 1, 0);
-                                        textArea.setSelectionRange(newStart, end);
-                                        event.preventDefault(); 
-                                      }
-                                    }
-                                    else if (event.shiftKey && event.key == ">") {
-                                      const textArea = textRefs.current[index];
-                                      if (textArea) {
-                                        const start = textArea.selectionStart;
-                                        const end = textArea.selectionEnd;
-                                    
-                                        const newEnd = Math.min(end + 1, textArea.value.length);
-                                        textArea.setSelectionRange(start, newEnd);
-                                  
-                                    
-                                        event.preventDefault(); 
-                                      }
-                                    }
-                                  }}
-                                
-      
-                                      
                                   dir={enableRTL_Typing ? "rtl" : "ltr"}
                                   onMouseUp={(e) =>
                                     onMouseUp(e, index + idxOffset)
@@ -1078,36 +1045,6 @@ const TranscriptionRightPanel = ({
                                 false
                               );
                             }}
-                            onKeyDown={(event) => {
-
-                              if ( event.shiftKey && event.key == "<") {
-                                const textArea = textRefs.current[index];
-                                console.log("helo");
-
-                                if (textArea) {
-                                  const start = textArea.selectionStart;
-                                  const end = textArea.selectionEnd;
-                          
-                                  const newStart = Math.max(start - 1, 0);
-                                  textArea.setSelectionRange(newStart, end);
-                                  event.preventDefault(); 
-                                }
-                              }
-                              else if (event.shiftKey && event.key == ">") {
-                                const textArea = textRefs.current[index];
-                                if (textArea) {
-                                  const start = textArea.selectionStart;
-                                  const end = textArea.selectionEnd;
-                              
-                                  const newEnd = Math.min(end + 1, textArea.value.length);
-                                  textArea.setSelectionRange(start, newEnd);
-                            
-                              
-                                  event.preventDefault(); 
-                                }
-                              }
-                            }}
-                          
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
@@ -1166,37 +1103,6 @@ const TranscriptionRightPanel = ({
                                         ? classes.boxHighlight
                                         : ""
                                     }`}
-                                    onKeyDown={(event) => {
-
-                                      if (event.shiftKey && event.key == "<") {
-                                        const textArea = textRefs.current[index];
-                                        console.log("helo");
-        
-                                        if (textArea) {
-                                          const start = textArea.selectionStart;
-                                          const end = textArea.selectionEnd;
-                                  
-                                          const newStart = Math.max(start - 1, 0);
-                                          textArea.setSelectionRange(newStart, end);
-                                          event.preventDefault(); 
-                                        }
-                                      }
-                                      else if ( event.shiftKey && event.key == ">") {
-                                        const textArea = textRefs.current[index];
-                                        if (textArea) {
-                                          const start = textArea.selectionStart;
-                                          const end = textArea.selectionEnd;
-                                      
-                                          const newEnd = Math.min(end + 1, textArea.value.length);
-                                          textArea.setSelectionRange(start, newEnd);
-                                    
-                                      
-                                          event.preventDefault(); 
-                                        }
-                                      }
-                                    }}
-                                  
-                                          
                                     dir={enableRTL_Typing ? "rtl" : "ltr"}
                                     onFocus={() =>
                                       showAcousticText &&
@@ -1226,36 +1132,7 @@ const TranscriptionRightPanel = ({
                                   true
                                 );
                               }}
-                              onKeyDown={(event) => {
-
-                                if ( event.shiftKey && event.key == "<") {
-                                  const textArea = textRefs.current[index];
-                                  console.log("helo");
-  
-                                  if (textArea) {
-                                    const start = textArea.selectionStart;
-                                    const end = textArea.selectionEnd;
-                            
-                                    const newStart = Math.max(start - 1, 0);
-                                    textArea.setSelectionRange(newStart, end);
-                                    event.preventDefault(); 
-                                  }
-                                }
-                                else if (event.shiftKey && event.key == ">") {
-                                  const textArea = textRefs.current[index];
-                                  if (textArea) {
-                                    const start = textArea.selectionStart;
-                                    const end = textArea.selectionEnd;
-                                
-                                    const newEnd = Math.min(end + 1, textArea.value.length);
-                                    textArea.setSelectionRange(start, newEnd);
-                                    event.preventDefault(); 
-                                  }
-                                }
-                              }}
-                            
-                                    
-                          onFocus={() =>
+                              onFocus={() =>
                                 showAcousticText &&
                                 populateAcoustic(index + idxOffset)
                               }
