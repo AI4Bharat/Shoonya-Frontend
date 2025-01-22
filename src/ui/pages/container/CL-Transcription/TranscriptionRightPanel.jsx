@@ -1018,7 +1018,7 @@ const TranscriptionRightPanel = ({
                           }}
 
                           onKeyDown={(event) => {
-                            console.log(event,"log");
+                            console.log(event,"log",document.activeElement);
                               
                             if ( event.shiftKey && event.key == "ArrowLeft") {
                               const textArea = textRefs.current[index];
