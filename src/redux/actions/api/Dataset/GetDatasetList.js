@@ -26,7 +26,7 @@
 
         }
       }
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/?${queryString}`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}instances/optimized-list/?${queryString}`;
    }
   }
    processResponse(res) {

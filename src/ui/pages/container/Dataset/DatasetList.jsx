@@ -21,21 +21,20 @@ export default function DatasetList() {
   const classes = DatasetStyle();
   const navigate = useNavigate();
   const [radiobutton, setRadiobutton] = useState(true);
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(false);
   const datasetList = useSelector((state) => state.getDatasetList.data);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
-  const loggedInUserData = useSelector(
-    (state) => state.fetchLoggedInUserData.data
-  );
 
   const [selectedFilters, setsSelectedFilters] = useState({
     dataset_visibility: "",
     dataset_type: "",
   });
 
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
+
   const getDashboardprojectData = () => {
-    setLoading(true);
     const projectObj = new GetDatasetsAPI(selectedFilters);
     dispatch(APITransport(projectObj));
   };
@@ -45,10 +44,8 @@ export default function DatasetList() {
   }, [selectedFilters]);
 
   useEffect(() => {
-    if (!apiLoading && datasetList) {
-      setLoading(false);
-    }
-  }, [apiLoading, datasetList]);
+    setLoading(apiLoading);
+  }, [apiLoading]);
 
   const handleProjectlist = () => {
     setRadiobutton(true);
@@ -68,7 +65,7 @@ export default function DatasetList() {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
+      {(loading || !datasetList || datasetList.length === 0) && <Spinner />}
 
       <Grid container className={classes.root}>
         <Grid item style={{ flexGrow: "0" }}>
