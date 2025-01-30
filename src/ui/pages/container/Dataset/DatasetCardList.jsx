@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import CustomButton from "../../component/common/Button";
-import { ThemeProvider,Tooltip, Button } from "@mui/material";
+import { ThemeProvider,Tooltip, Button, Box } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import { useDispatch, useSelector } from "react-redux";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import DatasetFilterList from "./DatasetFilterList";
+import InfoIcon from '@mui/icons-material/Info';
+import { tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
 
 
 const DatasetCardList = (props) => {
@@ -111,15 +114,51 @@ const DatasetCardList = (props) => {
         })
       : [];
 
+        const areFiltersApplied = (filters) => {
+    return Object.values(filters).some((value) => value !== "");
+  };
+
+  const filtersApplied = areFiltersApplied(selectedFilters);
+  console.log("filtersApplied", filtersApplied);
+
+  const CustomTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: '#e0e0e0',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 300,
+    fontSize: theme.typography.pxToRem(12),
+  },
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#e0e0e0",
+  },
+}));
+
   const renderToolBar = () => {
     return (
-      <>
+      <div style={{ position: "relative" }}>
+        {filtersApplied && <InfoIcon color="primary" fontSize="small" sx={{position:"absolute", top:-4, right:-4}}/>}
         <Button style={{ minWidth: "25px" }} onClick={handleShowFilter}>
-          <Tooltip title={"Filter Table"}>
-            <FilterListIcon sx={{ color: "#515A5A" }} />
-          </Tooltip>
+        <CustomTooltip
+      title={
+        filtersApplied ? (
+          <Box style={{ fontFamily: 'Roboto, sans-serif' }} sx={{ padding: '5px', maxWidth: '300px', fontSize: '12px', display:"flex",flexDirection:"column", gap:"5px" }}>
+            {selectedFilters.dataset_type && <div><strong>Dataset Type:</strong> {selectedFilters.dataset_type}</div>}
+            {selectedFilters.dataset_visibility && <div><strong>Dataset Visibility:</strong> {selectedFilters.dataset_visibility}</div>}
+        </Box>
+      ) : (
+      <span style={{ fontFamily: 'Roboto, sans-serif' }}>
+        Filter Table
+      </span>
+      )  
+      }
+      disableInteractive
+    >
+      <FilterListIcon sx={{ color: '#515A5A' }} />
+    </CustomTooltip>
         </Button>
-      </>
+      </div>
     );
   };
 
