@@ -35,6 +35,7 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 import SuperCheckerTasks from "../../component/Project/SuperCheckerTasks";
 import SuperChecker from "../../component/Project/SuperChecker";
 import ProjectAnalytics from "../../component/Project/ProjectAnalytics";
+import { setValue } from "../../../../redux/actions/Tasks/projectTabActions";
 
 const menuOptions = [
   { name: "Tasks", isChecked: false, component: () => null },
@@ -180,9 +181,9 @@ const Projects = () => {
   }, [ProjectDetails.id]);
   const [loading, setLoading] = useState(false);
   const [annotationreviewertype, setAnnotationreviewertype] = useState();
-  const [value, setValue] = React.useState(0);
+  const value = useSelector((state) => state.projectTab.value);
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    dispatch(setValue(newValue));
   };
   const apiLoading = useSelector((state) => state.apiStatus.loading);
 
