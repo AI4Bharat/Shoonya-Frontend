@@ -3,7 +3,7 @@ import { makeStyles } from "@mui/styles";
 const headerStyle = makeStyles({
   parentContainer: {
     marginBottom: window.innerHeight * 0.13,
-    width: window.innerWidth * 0.98,
+    // width: window.innerWidth * 0.98,
   },
   AudioparentContainers: {
     marginBottom: window.innerHeight * 0.1,

@@ -54,7 +54,7 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -138,14 +138,13 @@ const Projects = () => {
     dispatch(APITransport(projectObj));
   };
 
-
   useEffect(() => {
     getProjectDetails();
     const projectStatus = ProjectDetails.is_archived
       ? "Archived"
       : ProjectDetails.is_published
-        ? "Published"
-         :"Draft";
+      ? "Published"
+      : "Draft";
     setProjectData([
       {
         name: "Project ID",
@@ -187,31 +186,34 @@ const Projects = () => {
   const apiLoading = useSelector((state) => state.apiStatus.loading);
 
   const isAnnotators =
-    (userRole.WorkspaceManager === loggedInUserData?.role ||
-      userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role || ProjectDetails?.project_stage === 1 ||
-      ProjectDetails?.annotators?.some((user) => user.id === userDetails.id));
+    userRole.WorkspaceManager === loggedInUserData?.role ||
+    userRole.OrganizationOwner === loggedInUserData?.role ||
+    userRole.Admin === loggedInUserData?.role ||
+    ProjectDetails?.project_stage === 1 ||
+    ProjectDetails?.annotators?.some((user) => user.id === userDetails.id);
 
   const isReviewer =
-    ((userRole.WorkspaceManager === loggedInUserData?.role ||
-      userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role) ? (ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3) :
-    ProjectDetails?.annotation_reviewers?.some(
-      (reviewer) => reviewer.id === userDetails?.id
-    ));
+    userRole.WorkspaceManager === loggedInUserData?.role ||
+    userRole.OrganizationOwner === loggedInUserData?.role ||
+    userRole.Admin === loggedInUserData?.role
+      ? ProjectDetails?.project_stage == 2 || ProjectDetails?.project_stage == 3
+      : ProjectDetails?.annotation_reviewers?.some(
+          (reviewer) => reviewer.id === userDetails?.id
+        );
   const isSuperChecker =
-    ((userRole.WorkspaceManager === loggedInUserData?.role ||
-      userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
-    ProjectDetails?.review_supercheckers?.some(
-      (superchecker) => superchecker.id === userDetails?.id
-    ));
+    userRole.WorkspaceManager === loggedInUserData?.role ||
+    userRole.OrganizationOwner === loggedInUserData?.role ||
+    userRole.Admin === loggedInUserData?.role
+      ? ProjectDetails?.project_stage == 3
+      : false ||
+        ProjectDetails?.review_supercheckers?.some(
+          (superchecker) => superchecker.id === userDetails?.id
+        );
 
   const allTask =
     userRole.WorkspaceManager === loggedInUserData?.role ||
     userRole.OrganizationOwner === loggedInUserData?.role ||
     userRole.Admin === loggedInUserData?.role;
-
 
   useEffect(() => {
     setLoading(apiLoading);
@@ -245,11 +247,9 @@ const Projects = () => {
     navigate(`/projects/${id}/projectsetting`);
   };
 
-
-  let projectValue = "Unassigned Super Check Tasks"
-  const filterdata = projectData.filter(item => item.name !== projectValue)
-  const projectFilterData = isSuperChecker ? projectData : filterdata
-
+  let projectValue = "Unassigned Super Check Tasks";
+  const filterdata = projectData.filter((item) => item.name !== projectValue);
+  const projectFilterData = isSuperChecker ? projectData : filterdata;
 
   const TabPanData = [
     {
@@ -319,10 +319,7 @@ const Projects = () => {
     },
     {
       tabEle: (
-        <Tab
-          label="Super Checkers "
-          sx={{ fontSize: 16, fontWeight: "700" }}
-        />
+        <Tab label="Super Checkers " sx={{ fontSize: 16, fontWeight: "700" }} />
       ),
       tabPanelEle: (
         <MembersTable
@@ -332,7 +329,6 @@ const Projects = () => {
         />
       ),
       showTab: isSuperChecker,
-
     },
 
     {
@@ -356,7 +352,7 @@ const Projects = () => {
           isSuperChecker={isSuperChecker}
         />
       ),
-      showTab: (isAnnotators || isReviewer || isSuperChecker)
+      showTab: isAnnotators || isReviewer || isSuperChecker,
     },
     {
       tabEle: (
@@ -379,7 +375,7 @@ const Projects = () => {
           isSuperChecker={isSuperChecker}
         />
       ),
-      showTab: (isAnnotators || isReviewer || isSuperChecker)
+      showTab: isAnnotators || isReviewer || isSuperChecker,
     },
 
     {
@@ -396,8 +392,8 @@ const Projects = () => {
   const renderTabs = () => {
     return (
       <>
-        <Grid>
-          <Box>
+        <Grid sx={{ overflow: "auto" }}>
+          <Box sx={{ width: "fit-content" }}>
             <Tabs
               value={value}
               onChange={handleChange}
@@ -412,15 +408,12 @@ const Projects = () => {
         {filteredTabPanData.map((el, i, array) => {
           return (
             <>
-
               <TabPanel value={value} index={i}>
                 {el.tabPanelEle}
-
               </TabPanel>
             </>
-          )
+          );
         })}
-
       </>
     );
   };
@@ -437,45 +430,76 @@ const Projects = () => {
       >
         <Card
           sx={{
-            // width: window.innerWidth * 0.8,
             width: "100%",
             minHeight: 500,
-            padding: 5,
+
+            padding: {
+              xs: 2,
+              sm: 3,
+              md: 4,
+              lg: 5,
+            },
           }}
         >
           <Grid
             container
             direction="row"
-            justifyContent="center"
+            justifyContent="space-between"
             alignItems="center"
-            sx={{ mb: 3 }}
+            sx={{ mb: { xs: 1, md: 3 } }}
           >
-            <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
-              <Typography variant="h3">{ProjectDetails.title}</Typography>
+            <Grid item sx={{ width: "80%" }}>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontSize: { xs: "18px", sm: "22px", md: "26px", lg: "30px" },
+                }}
+              >
+                {ProjectDetails.title}
+              </Typography>
             </Grid>
 
             {(userRole.WorkspaceManager === loggedInUserData?.role ||
               userRole.OrganizationOwner === loggedInUserData?.role ||
               userRole.Admin === loggedInUserData?.role) && (
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Tooltip title={translate("label.showProjectSettings")}>
-                    <IconButton
-                      onClick={handleOpenSettings}
-                      sx={{ marginLeft: "140px" }}
-                    >
-                      <SettingsOutlinedIcon
-                        color="primary.dark"
-                        fontSize="large"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              )}
+              <Grid
+                item
+                sx={{
+                  width: "20%",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                }}
+              >
+                <Tooltip title={translate("label.showProjectSettings")}>
+                  <IconButton
+                    onClick={handleOpenSettings}
+                    sx={{
+                      width: "20%",
+                    }}
+                  >
+                    <SettingsOutlinedIcon
+                      color="primary.dark"
+                      fontSize="32px"
+                    />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            )}
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mb: 2 }}>
-            <Grid container spacing={2}>
+          <Grid
+            item
+            sx={{
+              mb: 2,
+              width: "100%",
+              display: "flex",
+              alignContent: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Grid container spacing={1}>
               {projectFilterData?.map((des, i) => (
-                <Grid item xs={isSuperChecker?3:4} sm={isSuperChecker?3:4} md={isSuperChecker?3:4} lg={isSuperChecker?3:4} xl={isSuperChecker?3:4}>
+                <Grid item xs={12} md={6} lg={4} sx={{ width: "100%" }}>
                   <ProjectDescription
                     name={des.name}
                     value={des.value}
