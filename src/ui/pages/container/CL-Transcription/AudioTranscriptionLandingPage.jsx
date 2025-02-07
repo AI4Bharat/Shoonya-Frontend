@@ -969,10 +969,19 @@ useEffect(() => {
 
 useEffect(() => {
   const handleKeyDown = (event) => {
+      const activeElement = document.activeElement;
+  const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
+  console.log(activeElement);
+
+  if (isTextAreaFocused) {
+    return;
+  }
+
+
+    
     if (event.shiftKey && event.key === ' ') {
       event.preventDefault();
       if(player){
-        // console.log(isPlaying(player));
         if(isPlaying(player)){
           player.pause();
         }else{
@@ -993,11 +1002,11 @@ useEffect(() => {
       }
     }
   };
-
   window.addEventListener('keydown', handleKeyDown);
   return () => {
     window.removeEventListener('keydown', handleKeyDown);
   };
+  
 }, [player]);  
 
   return (

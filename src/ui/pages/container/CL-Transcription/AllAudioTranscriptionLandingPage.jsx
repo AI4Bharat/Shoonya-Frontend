@@ -509,37 +509,47 @@ const AllAudioTranscriptionLandingPage = () => {
     }
   }, [advancedWaveformSettings]);
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.shiftKey && event.key === ' ') {
-        event.preventDefault();
-        if (player) {
-          if (isPlaying(player)) {
-            player.pause();
-          } else {
-            player.play();
-          }
-        }
-      }
-      if (event.shiftKey && event.key === 'ArrowLeft') {
-        event.preventDefault();
-        if (player) {
-          player.currentTime = player.currentTime - 1.25;
-        }
-      }
-      if (event.shiftKey && event.key === 'ArrowRight') {
-        event.preventDefault();
-        if (player) {
-          player.currentTime = player.currentTime + 1.25;
-        }
-      }
-    };
+useEffect(() => {
+  const handleKeyDown = (event) => {
+      const activeElement = document.activeElement;
+  const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
+  console.log(activeElement);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [player]);
+  if (isTextAreaFocused) {
+    return;
+  }
+
+
+    
+    if (event.shiftKey && event.key === ' ') {
+      event.preventDefault();
+      if(player){
+        if(isPlaying(player)){
+          player.pause();
+        }else{
+          player.play();
+        }
+      }
+    }
+    if (event.shiftKey && event.key === 'ArrowLeft') {
+      event.preventDefault();
+      if(player){
+        player.currentTime = player.currentTime - 1.25;
+      }
+    }
+    if (event.shiftKey && event.key === 'ArrowRight') {
+      event.preventDefault();
+      if(player){
+        player.currentTime = player.currentTime + 1.25;
+      }
+    }
+  };
+  window.addEventListener('keydown', handleKeyDown);
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+  
+}, [player]);  
 
   return (
     <>
@@ -709,6 +719,7 @@ const AllAudioTranscriptionLandingPage = () => {
                   containerStyles={{
                     width: "100%",
                   }}
+                  
                   renderComponent={(props) => (
                     <div className={classes.relative} style={{ width: "100%" }}>
                       <textarea
