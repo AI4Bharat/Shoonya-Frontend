@@ -889,13 +889,19 @@ useEffect(() => {
     if (event.shiftKey && event.key === ' ') {
       event.preventDefault();
       if(player){
-        // console.log(isPlaying(player));
         if(isPlaying(player)){
           player.pause();
         }else{
           player.play();
         }
       }
+    }
+    const activeElement = document.activeElement;
+    const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
+    console.log(activeElement);
+  
+    if (isTextAreaFocused) {
+      return;
     }
     if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
