@@ -34,36 +34,45 @@ const DashBoard = () => {
     }
 
     return (
-      
-        < >
-            <Box sx={{mb:2,}} >
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="admin-tabs">
-                    <Tab label="Task Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label="Annotation Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label="User Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label="Queued Tasks Status" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+        <>
+            <Box>
+                <Tabs
+                    value={tabValue}
+                    onChange={handleTabChange}
+                    aria-label="admin-tabs"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{ padding: {xs:"16px", sm:"32px"} }} 
+                >
+                    <Tab label="Task Details" />
+                    <Tab label="Annotation Details" />
+                    <Tab label="User Details" />
+                    <Tab label="Queued Tasks Status" />
                 </Tabs>
             </Box>
-            <Box sx={{ p: 1}}>
+            <Box sx={{ p: 2 }}>
                 <TabPanel value={tabValue} index={0}>
-                <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '32px'}}>
-                    <TaskDetails  />  
-                </Paper>
-                </TabPanel> 
-                <TabPanel value={tabValue} index={1}>
-                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '32px'}}>
-                        <AnnotationDetails  />  
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", padding: '24px' }}>
+                        <TaskDetails />
                     </Paper>
-                </TabPanel> 
+                </TabPanel>
+                <TabPanel value={tabValue} index={1}>
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", padding: '24px' }}>
+                        <AnnotationDetails />
+                    </Paper>
+                </TabPanel>
                 <TabPanel value={tabValue} index={2}>
-                    <UserDetail  />  
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", padding: '24px' }}>
+                        <UserDetail />
+                    </Paper>
                 </TabPanel>
                 <TabPanel value={tabValue} index={3}>
-                    <QueuedTasksDetails  />  
-                </TabPanel> 
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", padding: '24px' }}>
+                        <QueuedTasksDetails />
+                    </Paper>
+                </TabPanel>
             </Box>
         </>
-       
     )
 }
 

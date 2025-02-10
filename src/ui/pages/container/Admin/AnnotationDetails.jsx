@@ -90,6 +90,7 @@ function AnnotationDetails() {
                 borderLeft: '2px solid #ccc',
                 marginLeft: '1.375em',
                 paddingLeft: '2em',
+                wordBreak: 'normal'
             },
         }),
         nestedNode: ({ style }, nodeType, keyPath) => ({
@@ -98,6 +99,7 @@ function AnnotationDetails() {
                 borderLeft: '2px solid #ccc',
                 marginLeft: keyPath.length > 1 ? '1.375em' : 0,
                 textIndent: '-0.375em',
+                wordBreak: 'normal',
             },
             
         }),
@@ -115,15 +117,18 @@ function AnnotationDetails() {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
-                <Box sx={{display: 'flex', gap: '2em', alignItems: 'center'}}>
+                <Box sx={{ display: 'flex', gap: { xs: '1em', sm: '2em' }, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, wordBreak:"normal" }}>
                     <TextField
                         id="annotation-id"
                         label="Annotation ID"
                         variant="outlined"
                         value={annotationId}
                         onChange={(event) => setAnnotationId(event.target.value)}
+                        sx={{
+                            width:{xs:"100%",sm:"400px"}
+                        }}
                     />
-                    <Button variant="contained" onClick={fetchAnnotationDetails}>
+                    <Button variant="contained" onClick={fetchAnnotationDetails} sx={{width:{xs:"100%",sm:"200px"}}}>
                         Fetch Annotation Details
                     </Button>
                 </Box>
@@ -135,19 +140,21 @@ function AnnotationDetails() {
             )}
             {annotationDetails && 
                 <Grid item xs={12}>
-                    <JSONTree
-                        data={annotationDetails}
-                        hideRoot={true}
-                        invertTheme={true}
-                        labelRenderer={([key]) => <strong>{typeof key === "string" ? snakeToTitleCase(key) : key}</strong>}
-                        valueRenderer={(raw) => <span>{typeof raw === "string" && raw.match(/^"(.*)"$/) ? raw.slice(1, -1) :  raw}</span>}
-                        theme={theme}
-                    />
-                    {annotationDetails &&(
-                        <Link to ={`/projects/${annotationDetails.project_id}`}>
-                            <Button variant="contained">Project Page</Button>
-                        </Link>
-                    )}
+                    <Box sx={{ fontSize: { xs: '0.75rem', sm: '1rem' }, display:"flex", flexDirection:"column", gap:"15px"}}>
+                        <JSONTree
+                            data={annotationDetails}
+                            hideRoot={true}
+                            invertTheme={true}
+                            labelRenderer={([key]) => <strong>{typeof key === "string" ? snakeToTitleCase(key) : key}</strong>}
+                            valueRenderer={(raw) => <span>{typeof raw === "string" && raw.match(/^"(.*)"$/) ? raw.slice(1, -1) :  raw}</span>}
+                            theme={theme}
+                        />
+                        {annotationDetails &&(
+                            <Link to ={`/projects/${annotationDetails.project_id}`}>
+                                <Button variant="contained">Project Page</Button>
+                            </Link>
+                        )}
+                    </Box>
                 </Grid>
             }
         </Grid>

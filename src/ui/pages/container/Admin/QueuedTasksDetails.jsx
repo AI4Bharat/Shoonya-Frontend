@@ -163,6 +163,7 @@ const columns = [
     selectableRows: "none",
     search: false,
     jumpToPage: true,
+    responsive:"standard"
   };
   const renderSnackBar = () => {
     return (

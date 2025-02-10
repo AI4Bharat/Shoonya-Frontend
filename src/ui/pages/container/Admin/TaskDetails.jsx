@@ -152,6 +152,7 @@ function TaskDetails() {
                 borderLeft: '2px solid #ccc',
                 marginLeft: '1.375em',
                 paddingLeft: '2em',
+                wordBreak: 'normal'
             },
         }),
         nestedNode: ({ style }, nodeType, keyPath) => ({
@@ -160,6 +161,7 @@ function TaskDetails() {
                 borderLeft: '2px solid #ccc',
                 marginLeft: keyPath.length > 1 ? '1.375em' : 0,
                 textIndent: '-0.375em',
+                wordBreak: 'normal',
             },
             
         }),
@@ -185,7 +187,7 @@ function TaskDetails() {
                 {...other}
             >
                 {value === index && (
-                    <Box p={2}>
+                    <Box>
                         <Typography>{children}</Typography>
                     </Box>
                 )}
@@ -196,15 +198,18 @@ function TaskDetails() {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
-                <Box sx={{display: 'flex', gap: '2em', alignItems: 'center'}}>
+            <Box sx={{ display: 'flex', gap: { xs: '1em', sm: '2em' }, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, wordBreak:"normal" }}>
                     <TextField
                         id="task-id"
                         label="Task ID"
                         variant="outlined"
                         value={taskId}
                         onChange={(event) => setTaskId(event.target.value)}
+                        sx={{
+                            width:{xs:"100%",sm:"400px"}
+                        }}
                     />
-                    <Button variant="contained" onClick={fetchTaskDetails}>
+                    <Button variant="contained" onClick={fetchTaskDetails} sx={{width:{xs:"100%",sm:"200px"}}}>
                         Fetch Task Details
                     </Button>
                 </Box>
@@ -224,6 +229,7 @@ function TaskDetails() {
 
                 <Grid item xs={12}>
                     <TabPanel value={tabValue} index={0}>
+                    <Box sx={{fontSize: { xs: '0.75rem', sm: '1rem' }, display:"flex", flexDirection:"column", gap:"15px"}}>
                         <JSONTree
                             data={taskDetails}
                             hideRoot={true}
@@ -237,8 +243,10 @@ function TaskDetails() {
                                 <Button variant="contained">Project Page</Button>
                             </Link>
                         )}
+                        </Box>
                     </TabPanel>
                     <TabPanel value={tabValue} index={1}>
+                        <Box sx={{ fontSize: { xs: '0.75rem', sm: '1rem' } }}>
                         <JSONTree
                             data={annotations}
                             hideRoot={true}
@@ -247,6 +255,7 @@ function TaskDetails() {
                             valueRenderer={(raw) => <span>{typeof raw === "string" && raw.match(/^"(.*)"$/) ? raw.slice(1, -1) :  raw}</span>}
                             theme={theme}
                         />
+                        </Box>
                     </TabPanel>
                 </Grid>
             </>}
