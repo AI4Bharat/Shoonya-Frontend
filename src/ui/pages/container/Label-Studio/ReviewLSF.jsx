@@ -53,7 +53,7 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
-import { labelConfigJS } from "./labelConfigJSX";
+import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 
 
 const StyledMenu = styled((props) => (
@@ -281,7 +281,7 @@ const LabelStudioWrapper = ({
 useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
-    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
@@ -578,7 +578,9 @@ useEffect(() => {
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;         
-          console.log(temp);
+          if (projectType.includes("OCRTranscriptionEditing")){
+            addLabelsToBboxes(temp);
+          }
           temp.map((curr) => {
             if(curr.type !== "relation"){
               ids.add(curr.id);
@@ -621,7 +623,6 @@ useEffect(() => {
             if (taskData.annotation_status !== "freezed") {
               setAutoSave(false);
               showLoader();
-              let temp = annotation.serializeAnnotation();
 
               for (let i = 0; i < temp.length; i++) {
                 if(temp[i].type === "relation"){

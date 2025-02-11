@@ -51,7 +51,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
-import { labelConfigJS } from "./labelConfigJSX";
+import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 
 const filterAnnotations = (
   annotations,
@@ -222,7 +222,7 @@ const LabelStudioWrapper = ({
   useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
-    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
@@ -397,6 +397,9 @@ const LabelStudioWrapper = ({
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;
+          if (projectType.includes("OCRTranscriptionEditing")){
+            addLabelsToBboxes(temp);
+          }
           temp.map((curr) => {
             if(curr.type !== "relation"){
               ids.add(curr.id);
@@ -440,7 +443,7 @@ const LabelStudioWrapper = ({
             showLoader();
             if (taskData.annotation_status !== "freezed") {
               postAnnotation(
-                annotation.serializeAnnotation(),
+                temp,
                 taskData.id,
                 userData.id,
                 load_time.current,
@@ -498,8 +501,10 @@ const LabelStudioWrapper = ({
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;
+          if (projectType.includes("OCRTranscriptionEditing")){
+            addLabelsToBboxes(temp);
+          }
           temp.map((curr) => {
-            // console.log(curr);
             if(curr.type !== "relation"){
               ids.add(curr.id);
             }
@@ -542,13 +547,12 @@ const LabelStudioWrapper = ({
               for (let i = 0; i < annotations.length; i++) {
                 if (
                   !annotations[i].result?.length ||
-                  !annotation.serializeAnnotation().length ||
-                  annotation.serializeAnnotation()[0].id ===
+                  !temp.length ||
+                  temp[0].id ===
                     annotations[i].result[0].id
                 ) {
                   setAutoSave(false);
                   showLoader();
-                  let temp = annotation.serializeAnnotation();
                   for (let i = 0; i < temp.length; i++) {
                     if(temp[i].type === "relation"){
                       continue;
