@@ -54,3 +54,40 @@ export const labelConfigJS = `<View>
     <Relation value="c" selected="true"/>
 </Relations>
 </View>`;
+
+export function addLabelsToBboxes(data) {
+    const bboxIdToLabel = new Map();
+    data.forEach(item => {
+        if (item.type === "labels" && item.value.labels) {
+            const bboxId = item.id;
+            bboxIdToLabel.set(bboxId, item.value.labels[0]);
+        }
+    });
+
+    data.forEach(item => {
+        if (item.type === "rectangle" && !bboxIdToLabel.has(item.id)) {
+            const labelItem = {
+                original_width: item.original_width,
+                original_height: item.original_height,
+                image_rotation: item.image_rotation,
+                value: {
+                    x: item.value.x,
+                    y: item.value.y,
+                    width: item.value.width,
+                    height: item.value.height,
+                    rotation: item.value.rotation,
+                    labels: ["Body"]
+                },
+                id: item.id,
+                from_name: "annotation_labels",
+                to_name: "image_url",
+                type: "labels",
+                origin: "manual"
+            };
+            data.push(labelItem);
+            bboxIdToLabel.set(item.id, "Body");
+        }
+    });
+
+    return data;
+}
