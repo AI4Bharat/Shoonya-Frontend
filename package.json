@@ -95,5 +95,10 @@
   },
   "alias": {
     "LabelStudio": false
+  },
+  "resolution":{
+    "@ai4bharat/indic-transliterate": {
+      "react": "^18.0.0"
+    }
   }
 }
