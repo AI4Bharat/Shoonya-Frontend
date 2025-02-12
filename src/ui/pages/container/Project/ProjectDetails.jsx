@@ -392,7 +392,7 @@ const Projects = () => {
   const renderTabs = () => {
     return (
       <>
-        <Grid sx={{ overflow: "auto" }}>
+        <Grid sx={{ overflow: "auto", marginBottom: 2 }}>
           <Box sx={{ width: "fit-content" }}>
             <Tabs
               value={value}
@@ -420,7 +420,6 @@ const Projects = () => {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {/* <Header /> */}
       {loading && <Spinner />}
       <Grid
         container
@@ -432,7 +431,6 @@ const Projects = () => {
           sx={{
             width: "100%",
             minHeight: 500,
-
             padding: {
               xs: 2,
               sm: 3,
