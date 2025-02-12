@@ -12,7 +12,7 @@ import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/C
 import LightTooltip from "../../component/common/Tooltip";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
-
+import {JsonTable} from 'react-json-to-html';
 import {
   getProjectsandTasks,
   postAnnotation,
@@ -33,7 +33,7 @@ import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
-
+import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 //used just in postAnnotation to support draft status update.
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
@@ -59,7 +59,11 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const [predictions, setPredictions] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
   const { projectId, taskId } = useParams();
-  const userData = useSelector(state=>state.fetchLoggedInUserData.data)
+  const userData = useSelector(state=>state.fetchLoggedInUserData.data);
+  const filterdataitemsList = useSelector(
+    (state) => state.datasetSearchPopup.data
+  );
+  const [parentMetadata, setParentMetadata] = useState(undefined);
   const [assignedUsers, setAssignedUsers] = useState(null);
   let loaded = useRef();
 
@@ -71,8 +75,18 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   // debugger
 
 useEffect(() => {
+    if(filterdataitemsList.results !== undefined){
+      if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
+        setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
+      }
+    }
+}, [filterdataitemsList.results]);
+
+useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
+    const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
+    dispatch(APITransport(inputData));
     let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
@@ -537,6 +551,27 @@ useEffect(() => {
                 Next
               </Button>
             </Tooltip>
+            {parentMetadata !== undefined &&
+            <>
+            <Tooltip title="Show Parent Image">
+                <Button
+                  type="default"
+                  onClick={() => {window.open(parentMetadata.image_url, "_blank")}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Parent Image
+                </Button>
+              </Tooltip>
+            </>
+            }
 
         </>
 
@@ -553,6 +588,16 @@ useEffect(() => {
       >
         <div className="label-studio-root" ref={rootRef}></div>
       </Box>
+      {parentMetadata !== undefined &&
+        <>
+          <div style={{textAlign:"center", display:"flex", justifyContent:"center"}}>
+            <div>
+              <h3>Parent MetaData</h3>
+              <JsonTable json={parentMetadata}/>
+            </div>
+          </div>
+        </>
+        }
       {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
