@@ -52,6 +52,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
+import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 
 const filterAnnotations = (
   annotations,
@@ -170,6 +171,9 @@ const LabelStudioWrapper = ({
   const rootRef = useRef();
   const dispatch = useDispatch();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const filterdataitemsList = useSelector(
+    (state) => state.datasetSearchPopup.data
+  );
   const annotation_status = useRef(
     ProjectDetails.project_stage == 2 ? "labeled" : "labeled"
   );
@@ -201,6 +205,10 @@ const LabelStudioWrapper = ({
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
 
+  useEffect(() => {
+    console.log(filterdataitemsList.results);
+  }, [filterdataitemsList.results]);
+
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
@@ -222,6 +230,8 @@ const LabelStudioWrapper = ({
   useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
+    const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
+    dispatch(APITransport(inputData));
     let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
