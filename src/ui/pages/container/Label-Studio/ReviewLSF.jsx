@@ -37,7 +37,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import keymap from "./keymap";
-
+import {JsonTable} from 'react-json-to-html';
 import {
   getProjectsandTasks,
   getNextProject,
@@ -53,8 +53,8 @@ import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
-import { labelConfigJS } from "./labelConfigJSX";
-
+import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
+import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -255,6 +255,10 @@ const LabelStudioWrapper = ({
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const filterdataitemsList = useSelector(
+    (state) => state.datasetSearchPopup.data
+  );
+  const [parentMetadata, setParentMetadata] = useState(undefined);
   let loaded = useRef();
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
@@ -277,11 +281,21 @@ const LabelStudioWrapper = ({
       navigate(`/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${taskId}`);
     }
   }, [userData]); */
+
+useEffect(() => {
+  if(filterdataitemsList.results !== undefined){
+    if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
+      setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
+    }
+  }
+}, [filterdataitemsList.results]);
   
 useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
-    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
+    dispatch(APITransport(inputData));
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
@@ -578,7 +592,9 @@ useEffect(() => {
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;         
-          console.log(temp);
+          if (projectType.includes("OCRTranscriptionEditing")){
+            addLabelsToBboxes(temp);
+          }
           temp.map((curr) => {
             if(curr.type !== "relation"){
               ids.add(curr.id);
@@ -621,7 +637,6 @@ useEffect(() => {
             if (taskData.annotation_status !== "freezed") {
               setAutoSave(false);
               showLoader();
-              let temp = annotation.serializeAnnotation();
 
               for (let i = 0; i < temp.length; i++) {
                 if(temp[i].type === "relation"){
@@ -1359,6 +1374,27 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             }
+            {parentMetadata !== undefined &&
+            <>
+            <Tooltip title="Show Parent Image">
+                <Button
+                  type="default"
+                  onClick={() => {window.open(parentMetadata.image_url, "_blank")}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Parent Image
+                </Button>
+              </Tooltip>
+            </>
+            }
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
@@ -1408,6 +1444,16 @@ useEffect(() => {
           {tagSuggestionList}
         </Popover>
       </Box>
+      {parentMetadata !== undefined &&
+      <>
+        <div style={{textAlign:"center", display:"flex", justifyContent:"center"}}>
+          <div>
+            <h3>Parent MetaData</h3>
+            <JsonTable json={parentMetadata}/>
+          </div>
+        </div>
+      </>
+      }
       {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>

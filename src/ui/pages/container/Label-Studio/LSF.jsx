@@ -27,7 +27,7 @@ import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTrans
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 // import keymap from "@label-studio/keymap";
 import keymap from "./keymap";
-
+import {JsonTable} from 'react-json-to-html';
 import {
   getProjectsandTasks,
   postAnnotation,
@@ -51,7 +51,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
-import { labelConfigJS } from "./labelConfigJSX";
+import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
+import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 
 const filterAnnotations = (
   annotations,
@@ -170,6 +171,9 @@ const LabelStudioWrapper = ({
   const rootRef = useRef();
   const dispatch = useDispatch();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+  const filterdataitemsList = useSelector(
+    (state) => state.datasetSearchPopup.data
+  );
   const annotation_status = useRef(
     ProjectDetails.project_stage == 2 ? "labeled" : "labeled"
   );
@@ -190,6 +194,7 @@ const LabelStudioWrapper = ({
   const [taskData, setTaskData] = useState(undefined);
   const [predictions, setPredictions] = useState([]);
   const [annotations, setAnnotations] = useState([]);
+  const [parentMetadata, setParentMetadata] = useState(undefined);
   const load_time = useRef();
   const [autoSave, setAutoSave] = useState(true);
   let isAudioProject = useRef();
@@ -200,6 +205,14 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  useEffect(() => {
+    if(filterdataitemsList.results !== undefined){
+      if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
+        setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
+      }
+    }
+  }, [filterdataitemsList.results]);
 
   const [showTagSuggestionsAnchorEl, setShowTagSuggestionsAnchorEl] =
     useState(null);
@@ -222,7 +235,9 @@ const LabelStudioWrapper = ({
   useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
-    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
+    dispatch(APITransport(inputData));
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
@@ -397,6 +412,9 @@ const LabelStudioWrapper = ({
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;
+          if (projectType.includes("OCRTranscriptionEditing")){
+            addLabelsToBboxes(temp);
+          }
           temp.map((curr) => {
             if(curr.type !== "relation"){
               ids.add(curr.id);
@@ -440,7 +458,7 @@ const LabelStudioWrapper = ({
             showLoader();
             if (taskData.annotation_status !== "freezed") {
               postAnnotation(
-                annotation.serializeAnnotation(),
+                temp,
                 taskData.id,
                 userData.id,
                 load_time.current,
@@ -498,8 +516,10 @@ const LabelStudioWrapper = ({
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;
+          if (projectType.includes("OCRTranscriptionEditing")){
+            addLabelsToBboxes(temp);
+          }
           temp.map((curr) => {
-            // console.log(curr);
             if(curr.type !== "relation"){
               ids.add(curr.id);
             }
@@ -542,13 +562,12 @@ const LabelStudioWrapper = ({
               for (let i = 0; i < annotations.length; i++) {
                 if (
                   !annotations[i].result?.length ||
-                  !annotation.serializeAnnotation().length ||
-                  annotation.serializeAnnotation()[0].id ===
+                  !temp.length ||
+                  temp[0].id ===
                     annotations[i].result[0].id
                 ) {
                   setAutoSave(false);
                   showLoader();
-                  let temp = annotation.serializeAnnotation();
                   for (let i = 0; i < temp.length; i++) {
                     if(temp[i].type === "relation"){
                       continue;
@@ -1122,6 +1141,27 @@ const LabelStudioWrapper = ({
               </Tooltip>
             </>
             }
+            {parentMetadata !== undefined &&
+            <>
+            <Tooltip title="Show Parent Image">
+                <Button
+                  type="default"
+                  onClick={() => {window.open(parentMetadata.image_url, "_blank")}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Parent Image
+                </Button>
+              </Tooltip>
+            </>
+            }
             </Grid>
           </Grid>
         </div>
@@ -1144,6 +1184,16 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
+      {parentMetadata !== undefined &&
+      <>
+        <div style={{textAlign:"center", display:"flex", justifyContent:"center"}}>
+          <div>
+            <h3>Parent MetaData</h3>
+            <JsonTable json={parentMetadata}/>
+          </div>
+        </div>
+      </>
+      }
       {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
             <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
