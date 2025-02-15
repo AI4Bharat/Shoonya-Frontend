@@ -1,4 +1,4 @@
-import { Card, Grid, ThemeProvider, Typography } from "@mui/material";
+import { Box, Card, Grid, ThemeProvider, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
@@ -27,7 +27,6 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
     <ThemeProvider theme={themeDefault}>
       <Grid
         container
-        direction="row"
         // justifyContent='center'
         // alignItems='center'
       >
@@ -48,10 +47,6 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
             <Grid
               item
               xs={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sm={12}
               // sx={{mt:2}}
             >
               <Typography variant="h6">Sampling Parameters</Typography>
@@ -60,20 +55,16 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
             <Grid
               item
               xs={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sm={12}
-              sx={{ mt: 2, display: "flex" }}
+              display="flex"
+              gap={4}
             >
               <Typography
                 variant="subtitle1"
-                style={{ flexDirection: "column" }}
               >
                 Sampling Mode :
               </Typography>
 
-              <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+              <Typography variant="subtitle1">
                 {ProjectDetails.sampling_mode == "f" && "Full"}
                 {ProjectDetails.sampling_mode == "b" && "Batch"}
                 {ProjectDetails.sampling_mode == "r" && "Random"}
@@ -84,20 +75,16 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
             <Grid
               item
               xs={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sm={12}
-              sx={{ mt: 2, display: "flex" }}
+              display="flex"
+              gap={4}
             >
               <Typography
                 variant="subtitle1"
-                style={{ flexDirection: "column" }}
               >
                 Batch Size  :
               </Typography>
 
-              <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+              <Typography variant="subtitle1">
               {ProjectDetails.sampling_parameters_json?.batch_size}
               </Typography>
               
@@ -106,20 +93,16 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
             <Grid
               item
               xs={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sm={12}
-              sx={{ mt: 2, display: "flex" }}
+              display="flex"
+              gap={4}
             >
               <Typography
                 variant="subtitle1"
-                style={{ flexDirection: "column" }}
               >
                  Batch Number  :
               </Typography>
 
-              <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+              <Typography variant="subtitle1">
               {ProjectDetails.sampling_parameters_json?.batch_number}
               </Typography>
             </Grid>)}
@@ -128,20 +111,22 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
               <Grid
                 item
                 xs={12}
-                md={12}
-                lg={12}
-                xl={12}
-                sm={12}
-                sx={{ mt: 2, display: "flex" }}
+                display="flex"
+                flexDirection={{xs:"column",md:"row"}}
+                gap={1}
               >
                 <Typography
                   variant="subtitle1"
-                  style={{ flexDirection: "column" }}
                 >
                   Dataset Instance :
                 </Typography>
 
-                <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+                <Box
+                  display="flex"
+                  gap={4}
+                  marginLeft={4}
+                >
+                <Typography variant="subtitle1">
                   {dataset?.instance_name}
                 </Typography>
                 <Link
@@ -149,30 +134,36 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
                     style={{ textDecoration: "none" }}
                     >
                     <CustomButton
-                        sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
+                        sx = {{ 
+                          borderRadius: 2
+                        }}
                         label="View Dataset"
                     />
                 </Link>
+                </Box>
               </Grid>
             ))}
 
              <Grid
                 item
                 xs={12}
-                md={12}
-                lg={12}
-                xl={12}
-                sm={12}
-                sx={{ mt: 2, display: "flex" }}
+                display="flex"
+                flexDirection={{xs:"column",md:"row"}}
+                gap={1}
               >
                 <Typography
                   variant="subtitle1"
-                  style={{ flexDirection: "column" }}
                 >
                   Workspace Name :
                 </Typography>
 
-                <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+                <Box
+                  display="flex"
+                  gap={1}
+                  marginLeft={4}
+                  alignItems="center"
+                >
+                <Typography variant="subtitle1">
                 {workspaceDetails.workspace_name}
                 </Typography>
                 <Link
@@ -184,26 +175,23 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
                         label="View Workspace"
                     />
                 </Link>
+                </Box>
               </Grid>
 
             {ProjectDetails.filter_string && (
               <Grid
                 item
                 xs={12}
-                md={12}
-                lg={12}
-                xl={12}
-                sm={12}
-                sx={{ mt: 2, display: "flex" }}
+                display="flex"
+                gap={4}
               >
                 <Typography
                   variant="subtitle1"
-                  style={{ flexDirection: "column" }}
                 >
                   Filter String :
                 </Typography>
 
-                <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+                <Typography variant="subtitle1">
                   {ProjectDetails.filter_string}
                 </Typography>
               </Grid>
@@ -212,29 +200,28 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
         )}
       </Grid>
 
-      <Grid container direction="row">
+      <Grid container>
         {ProjectDetails && ProjectDetails?.variable_parameters?.output_language && (
           <div>
-            <Grid item xs={12} md={12} lg={12} xl={12} sm={12} sx={{ mt: 2 }}>
+            <Grid 
+              item 
+              xs={12}
+              >
               <Typography variant="h6">Variable Parameters</Typography>
             </Grid>
 
             <Grid
               item
               xs={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sm={12}
-              sx={{ mt: 2, display: "flex" }}
+              display="flex"
+              gap={4}
             >
               <Typography
                 variant="subtitle1"
-                style={{ flexDirection: "column" }}
               >
                 Output Language :
               </Typography>
-              <Typography variant="subtitle1" style={{ marginLeft: 25 }}>
+              <Typography variant="subtitle1">
                 {ProjectDetails?.variable_parameters?.output_language}
               </Typography>
             </Grid>

@@ -166,7 +166,9 @@ export default function DeleteDataItems() {
         <div >
             {renderSnackBar()}
             <Button
-                sx={{ width: "150px" }}
+                sx = {{ 
+                    width: "100%" 
+                }}                
                 aria-describedby={id}
                 variant="contained"
                 color="error"
