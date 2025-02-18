@@ -284,9 +284,10 @@ const LabelStudioWrapper = ({
 
 useEffect(() => {
   if(filterdataitemsList.results !== undefined){
-    if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
+      if ("metadata_json" in filterdataitemsList.results[0]) {
+        if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
       setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
-    }
+    }}
   }
 }, [filterdataitemsList.results]);
   
