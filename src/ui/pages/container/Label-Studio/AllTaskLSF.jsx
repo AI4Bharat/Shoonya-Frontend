@@ -76,9 +76,10 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
 
 useEffect(() => {
     if(filterdataitemsList.results !== undefined){
+      if ("metadata_json" in filterdataitemsList.results[0]) {
       if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
         setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
-      }
+      }}
     }
 }, [filterdataitemsList.results]);
 
