@@ -294,8 +294,10 @@ useEffect(() => {
 useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
-    const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
-    dispatch(APITransport(inputData));
+    if(labelConfig?.project_type?.includes("OCRTranscriptionEditing")){
+      const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
+      dispatch(APITransport(inputData));
+    }
     let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
