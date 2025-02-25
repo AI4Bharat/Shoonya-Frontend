@@ -51,6 +51,7 @@ const options = {
 };
 
 const addLabel = {
+  dataset:"Add Members to Dataset",
   organization: "Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
@@ -59,6 +60,8 @@ const addLabel = {
 
 
 const MembersTable = (props) => {
+  console.log(props.type);
+  
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const { orgId, id } = useParams();
   const navigate = useNavigate();
@@ -248,6 +251,7 @@ const MembersTable = (props) => {
       });
     }
   };
+console.log(apiLoading,"load");
 
   const handleResendUser = async(email) => {
     const projectObj = new ResendUserInviteAPI(email=[email]);
@@ -353,6 +357,7 @@ const MembersTable = (props) => {
     });
     return temp;
   };
+  
   const data =
     dataSource && dataSource.length > 0
       ? pageSearch().map((el, i) => {
