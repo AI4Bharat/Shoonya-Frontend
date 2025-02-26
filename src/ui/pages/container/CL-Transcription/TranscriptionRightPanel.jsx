@@ -762,6 +762,7 @@ const TranscriptionRightPanel = ({
               ? "calc(102vh - 380px)"
               : "calc(102vh - 385px)",
             alignItems: "center",
+            width: "100%"
           }}
         >
           {currentPageData?.map((item, index) => {
@@ -782,10 +783,9 @@ const TranscriptionRightPanel = ({
                     bottomLeft: false,
                     topLeft: false,
                   }}
+                  size={{width:"100%"}}
                   style={{
                     alignItems: "center",
-                    display: "flex",
-                    flexDirection: "column",
                     marginTop: index === 0 ? "0px" : "-16px",
                   }}
                   onResizeStart={(e, dir, ref) => {
@@ -799,6 +799,7 @@ const TranscriptionRightPanel = ({
                       parentScrollOffsetX.current,
                       parentScrollOffsetY.current
                     );
+                    ref.style.width = "100%";
                   }}
                   handleStyles={{ bottom: { height: "24px" } }}
                 >
@@ -815,29 +816,32 @@ const TranscriptionRightPanel = ({
                       flexDirection: "column",
                       justifyContent: "space-between",
                       height: "100%",
+                      width: "100%"
                     }}
                   >
                     <Box
-                      className={classes.topBox}
                       style={{
-                        paddingLeft: "16px",
-                        paddingRight: "16px",
-                        paddingTop: "14px",
-                        paddingBottom: "10px",
+                        padding: "25px 16px 10px",
+                      }}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap:"20px"
                       }}
                     >
                       <div
                         style={{
-                          display: "block",
-                          height: "30px",
-                          width: "90px",
-                          lineHeight: "30px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: "40px",
+                          width: "40px",
                           borderRadius: "50%",
                           fontSize: "medium",
                           backgroundColor: "#2C2799",
                           color: "white",
-                          marginRight: "20px",
-                          marginLeft: "5px",
                         }}
                       >
                         {index + 1}
@@ -852,10 +856,8 @@ const TranscriptionRightPanel = ({
 
                       <FormControl
                         sx={{
-                          width: "50%",
-                          mr: "auto",
+                          width: "110px",
                           float: "left",
-                          marginRight: "10px",
                         }}
                         size="small"
                       >

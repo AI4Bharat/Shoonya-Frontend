@@ -15,6 +15,8 @@ const AudioTranscriptionLandingStyle = makeStyles({
     margin: "auto",
     display: "flex",
     flexDirection: "column",
+    gap: "20px",
+    padding: "20px",
     position: "relative",
   },
 

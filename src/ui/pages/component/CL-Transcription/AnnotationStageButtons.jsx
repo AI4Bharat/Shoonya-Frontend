@@ -30,7 +30,7 @@ const AnnotationStageButtons = ({
 
   return (
     <>
-      <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+      <Grid container spacing={1}>
         {!disableBtns &&
           taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
