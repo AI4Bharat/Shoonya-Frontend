@@ -265,7 +265,7 @@ const Header = () => {
   // on click to call api notification from line No. 889
   const handleOpenNotification = (event) => {
     setAnchorElNotification(event.currentTarget);
-    fetchNotifications();// Fetch all notifications on click
+    // fetchNotifications();// Fetch all notifications on click
   };
 
   const handleCloseNotification = () => {
