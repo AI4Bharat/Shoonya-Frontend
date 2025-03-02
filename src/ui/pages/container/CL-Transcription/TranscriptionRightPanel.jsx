@@ -824,16 +824,18 @@ const TranscriptionRightPanel = ({
                         padding: "25px 16px 10px",
                       }}
                       sx={{
+                        width:"100%",
+                        overflowX:"auto",
+                        overflowY:"hidden",
                         display: "flex",
-                        justifyContent: "center",
                         alignItems: "center",
-                        flexWrap: "wrap",
                         gap:"20px"
                       }}
                     >
                       <div
                         style={{
                           display: "flex",
+                          flexShrink:"0",
                           alignItems: "center",
                           justifyContent: "center",
                           height: "40px",
@@ -858,6 +860,7 @@ const TranscriptionRightPanel = ({
                         sx={{
                           width: "110px",
                           float: "left",
+                          flexShrink:"0",
                         }}
                         size="small"
                       >

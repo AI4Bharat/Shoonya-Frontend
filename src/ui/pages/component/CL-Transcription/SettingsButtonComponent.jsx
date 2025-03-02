@@ -15,6 +15,7 @@ import {
   Tooltip,
   Typography,
   MenuItem,
+  Box,
 } from "@mui/material";
 import FormatSizeIcon from "@mui/icons-material/FormatSize";
 import SaveIcon from "@mui/icons-material/Save";
@@ -93,11 +94,19 @@ ProjectDetails,
   };
   return (
     <>
-      <div
-        style={{
-          marginLeft: "15px",
-          position: "absolute",
+      <Box
+        sx={{
+          marginLeft: {
+            xs:0,
+            sm:"15px"
+          },
+          position:{
+            xs:"relative", 
+            sm:"absolute"
+          },
           left: "0",
+        }}
+        style={{
           display: "block",
           height: "40px",
           width: "40px",
@@ -110,7 +119,7 @@ ProjectDetails,
         }}
       >
         {totalSegments}
-      </div>
+      </Box>
 
       {showSplit && (
         <Tooltip title="Split Subtitle" placement="bottom">
