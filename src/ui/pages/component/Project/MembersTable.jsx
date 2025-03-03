@@ -20,7 +20,11 @@ import { ThemeProvider, Grid,
   DialogActions,
   DialogContent,
   DialogTitle,
-  DialogContentText } from "@mui/material";
+  DialogContentText, 
+  Box,
+  TablePagination,
+  Select,
+  MenuItem} from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveProjectMemberAPI from "../../../../redux/actions/api/ProjectDetails/RemoveProjectMember";
 import RemoveProjectReviewerAPI from "../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer";
@@ -367,7 +371,7 @@ const MembersTable = (props) => {
             <>  
                  {!hideViewButton && (
                 <CustomButton
-                  sx={{ p: 1, borderRadius: 2 }}
+                  sx={{ m: 1, borderRadius: 2 }}
                   onClick={() => {
                     navigate(`/profile/${el.id}`);
                   }}
@@ -443,7 +447,7 @@ const MembersTable = (props) => {
               {
                 rejectButton && (
                   <CustomButton
-                    sx={{ p: 1, m: 1, borderRadius: 2, backgroundColor: "#cf5959"}}
+                    sx={{  m: 1, borderRadius: 2, backgroundColor: "#cf5959"}}
                     color="error"
                     onClick={() => handleRejectUser(el.id)}
                     label={"Reject"}
@@ -456,6 +460,75 @@ const MembersTable = (props) => {
           ];
         })
       : [];
+
+      const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap", 
+              justifyContent: { 
+                xs: "space-between", 
+                md: "flex-end" 
+              }, 
+              alignItems: "center",
+              padding: "10px",
+              gap: { 
+                xs: "10px", 
+                md: "20px" 
+              }, 
+            }}
+          >
+      
+            {/* Pagination Controls */}
+            <TablePagination
+              component="div"
+              count={count}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => changePage(newPage)}
+              onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+              sx={{
+                "& .MuiTablePagination-actions": {
+                marginLeft: "0px",
+              },
+              "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
+                marginRight: "10px",
+              },
+              }}
+            />
+      
+            {/* Jump to Page */}
+            <div>
+              <label style={{ 
+                marginRight: "5px", 
+                fontSize:"0.83rem", 
+              }}>
+              Jump to Page:
+              </label>
+              <Select
+                value={page + 1}
+                onChange={(e) => changePage(Number(e.target.value) - 1)}
+                sx={{
+                  fontSize: "0.8rem",
+                  padding: "4px",
+                  height: "32px",
+                }}
+              >
+                {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+                  <MenuItem key={i} value={i + 1}>
+                    {i + 1}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+          </Box>
+        );
+      };
+      
+    
+    
+
   const options = {
     textLabels: {
       body: {
@@ -482,6 +555,18 @@ const MembersTable = (props) => {
     selectableRows: "none",
     search: false,
     jumpToPage: true,
+    responsive: "vertical",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
+
+
   };
 
   // console.log('columns',columns)
