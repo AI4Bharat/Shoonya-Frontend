@@ -1,27 +1,8 @@
 import {
-  AppBar,
-  Avatar,
-  Box,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  Grid,
-  Button,
-  Stack,
-  IconButton,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Tooltip,
-  Typography,
-  Tabs,
-  Tab,
-  Badge,
-  Popover,
-  Chip
+  AppBar, Avatar, Box, Checkbox, Divider, FormControlLabel, Grid, Button, Stack, IconButton, Menu, MenuItem,
+  Toolbar, Tooltip, Typography, Tabs, Tab, Badge, Popover, Chip
 } from "@mui/material";
 import { useEffect, useState } from "react";
-
 import { formatDistanceToNow, format } from 'date-fns';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
@@ -52,6 +33,7 @@ import CustomizedSnackbars from "../common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
 import UpdateUIPrefsAPI from "../../../../redux/actions/api/UserManagement/UpdateUIPrefs";
+import axios from "axios";
 
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -72,10 +54,15 @@ const Header = () => {
     message: "",
     variant: "success",
   });
+
+
+  //below one is for Unreaded notification count countinue from line No. 157
+  const [notificationCount, setNotificationCount] = useState(0);
+
   //const[checkClUI,setCheckClUI]=useState(null)
   const [moreHorizonAnchorEl, setMoreHorizonAnchorEl] = useState(null);
 
-  if(localStorage.getItem("source") !== undefined){
+  if (localStorage.getItem("source") !== undefined) {
     localStorage.setItem("source", "shoonya-frontend");
   }
 
@@ -115,7 +102,6 @@ const Header = () => {
   const fetchNotifications = () => {
     let apiObj = new NotificationAPI();
     const endpoint = unread == null ? apiObj.apiEndPoint() : `${apiObj.apiEndPoint()}?seen=${unread}`;
-
     fetch(endpoint, {
       method: "get",
       body: JSON.stringify(apiObj.getBody()),
@@ -126,48 +112,83 @@ const Header = () => {
           const data = await response?.json();
           setnotification(data);
           console.log(Notification?.length, data);
+          // Count unread notifications (assuming they have a 'seen' property)
+          // const count = data.filter((notification) => !notification.seen).length;
+          // setUnreadCount(count);
+          console.log("Notification Count:", data.length);
         } else {
           console.error("Error fetching notifications:", response.status, response.statusText);
           setnotification([]);
+          // setUnreadCount(0);
         }
       })
       .catch((error) => {
         console.error("Error fetching notifications:", error);
       });
   };
-  const markAsRead =  (notificationId) => {
+  // Call fetchNotifications when the component mounts
+  useEffect(() => {
+    // fetchNotifications();
+    console.log("Component mounted");
+  }, []);
+
+  const markAsRead = (notificationId) => {
     const task = new NotificationPatchAPI(notificationId);
     setSelectedNotificationId(notificationId);
-     dispatch(APITransport(task));
-     fetchNotifications()
+    dispatch(APITransport(task));
+    fetchNotifications()
 
   };
 
-  const markAllAsRead =  () => {
+  const markAllAsRead = () => {
     const notificationIds = Notification.map((notification) => notification.id);
     const tasks = new NotificationPatchAPI(notificationIds);
     setSelectedNotificationId(notificationIds)
-     dispatch(APITransport(tasks));
-     fetchNotifications()
+    dispatch(APITransport(tasks));
+    fetchNotifications()
 
   };
 
-  const handleMarkAllAsReadClick =  () => {
+  const handleMarkAllAsReadClick = () => {
     markAllAsRead();
   };
 
-  const handleMarkAsRead =  (notificationId) => {
+  const handleMarkAsRead = (notificationId) => {
     markAsRead(notificationId);
   };
 
-
+  //below one is for Unreaded notification count countinue from line No. 57 and after this from line No. 889
+  const fetchUnreadCount = async () => {
+    try {
+      let apiObj = new NotificationAPI();
+      const endpoint = `${apiObj.apiEndPoint()}unread`;
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: apiObj.getHeaders().headers,
+      });
+      if (!response.ok) {
+        throw new Error(`Error fetching unread notifications: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      // Assuming the response contains a total_count field
+      setNotificationCount(data.total_count || 0);
+    } catch (error) {
+      console.error("Error fetching unread notifications:", error);
+      setNotificationCount(0);
+    }
+  };
+  // Fetch unread notifications on mount
   useEffect(() => {
-    fetchNotifications();
-  }, [unread,selectedNotificationId]);
+    fetchUnreadCount();
+  }, []);
+
+// // from below if we comment that , default call of Notification API is stoped 
+  // useEffect(() => {
+  //   fetchNotifications();
+  // }, [unread, selectedNotificationId]);
 
   useEffect(() => {
     getLoggedInUserData();
-
   }, []);
 
 
@@ -216,11 +237,11 @@ const Header = () => {
     setSelectedNotificationId(null);
   };
 
-const handleopenproject=(id,type)=>{
-  if(type=="publish_project"){
-    navigate(`/projects/${id}`);
+  const handleopenproject = (id, type) => {
+    if (type == "publish_project") {
+      navigate(`/projects/${id}`);
+    }
   }
-}
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -240,8 +261,11 @@ const handleopenproject=(id,type)=>{
   const handleCloseSettingsMenu = () => {
     setAnchorElSettings(null);
   };
+
+  // on click to call api notification from line No. 889
   const handleOpenNotification = (event) => {
     setAnchorElNotification(event.currentTarget);
+    // fetchNotifications();// Fetch all notifications on click
   };
 
   const handleCloseNotification = () => {
@@ -281,15 +305,19 @@ const handleopenproject=(id,type)=>{
       });
     }
   };
-  const handleTabChange = async (index) => {
-    if (index === 0) {
-      await setunread(null);
-    } else if (index === 1) {
-      await setunread("False");
-    }
-
-
+  // const handleTabChange = async (index) => {
+  //   if (index === 0) {
+  //     await setunread(null);
+  //   } else if (index === 1) {
+  //     await setunread("False");
+  //   }
+  // };
+  const handleTabChange = (newValue) => {
+    setValue(newValue);
+    setunread(newValue === 0 ? "False" : null);
+    fetchNotifications();
   };
+
   const handleTagsChange = (event) => {
     if (event.target.checked) {
       localStorage.setItem("enableTags", true);
@@ -315,8 +343,8 @@ const handleopenproject=(id,type)=>{
       />
     );
   };
-  const unseenNotifications = Notification?.length > 0 && Notification?.filter(notification => notification?.seen_json ==null || !notification?.seen_json[loggedInUserData.id]);
-console.log(unseenNotifications,'uuu');
+  const unseenNotifications = Notification?.length > 0 && Notification?.filter(notification => notification?.seen_json == null || !notification?.seen_json[loggedInUserData.id]);
+  console.log(unseenNotifications, 'uuu');
 
   const renderTabs = () => {
     if (
@@ -857,10 +885,9 @@ console.log(unseenNotifications,'uuu');
                   <Grid item xs={3} sm={3} md={2}>
                     <Tooltip title="Notifications">
                       <IconButton onClick={handleOpenNotification}>
-                        <Badge badgeContent={unseenNotifications?.length>0 ?unseenNotifications?.length: null} color="primary">
+                        <Badge badgeContent={notificationCount > 0 ? notificationCount : null} color="primary">
                           <NotificationsIcon color="primary.dark" fontSize="large" />
                         </Badge>
-
                       </IconButton>
                     </Tooltip>
                   </Grid>
@@ -1024,10 +1051,13 @@ console.log(unseenNotifications,'uuu');
                 >
                   <Stack direction="row" style={{ justifyContent: "space-between", padding: "0 10px 0 10px" }} >
                     <Typography variant="h4">Notifications</Typography>
-                    {Notification && Notification?.length > 0 && unseenNotifications?.length > 0 ? <Tooltip title="Mark all as read"><IconButton aria-label="More" onClick={handleMarkAllAsReadClick}>
-                      <GradingSharpIcon color="primary"/>
-                    </IconButton> </Tooltip>: null}
+                    {Notification && Notification?.length > 0 && unseenNotifications?.length > 0 ? <Tooltip title="Mark all as read">
+                      <IconButton aria-label="More" onClick={handleMarkAllAsReadClick}>
+                        <GradingSharpIcon color="primary" />
+                      </IconButton>
+                    </Tooltip> : null}
                   </Stack>
+
                   <Stack direction="row" spacing={2} style={{ padding: "0 0 10px 10px" }}>
                     <Tabs value={value} onChange={handleChange} sx={{
                       '& .MuiTabs-indicator': {
@@ -1038,34 +1068,39 @@ console.log(unseenNotifications,'uuu');
                       <Tab label="Unread" onClick={() => handleTabChange(1)} />
                     </Tabs>
                   </Stack>
+
                   {Notification && Notification?.length > 0 ? (
                     <>
                       {Notification.map((notification, index) => (
                         <div key={index} style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
-                          <div style={{ marginRight: '10px' ,cursor:"pointer"}}>
+                          <div style={{ marginRight: '10px', cursor: "pointer" }}>
                             <FiberManualRecordIcon color={notification?.seen_json
                               ? notification?.seen_json[loggedInUserData.id]
                                 ? 'action'
                                 : 'primary'
                               : "primary"} />
                           </div>
-                          <Link style={{ color: "rgba(0, 0, 0, 0.87)", display: 'flex', flexDirection: 'column', width: '100%' ,cursor:"pointer",textDecoration:"none" }} to={notification.on_click}>
+                          <Link style={{ color: "rgba(0, 0, 0, 0.87)", display: 'flex', flexDirection: 'column', width: '100%', cursor: "pointer", textDecoration: "none" }} to={notification.on_click}>
                             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                               <Typography variant="subtitle2">{`ID: ${notification?.title?.split('-')[0]}`}</Typography>
                               <Typography style={{ paddingLeft: "10px" }} variant="subtitle2">{`TITLE: ${notification?.notification_type}`}</Typography>
-                              <Typography style={{ padding: "5px 5px 0px 5px" }} variant="caption" color="action">{`${formatDistanceToNow(new Date(notification?.created_at), { addSuffix: true })}`}</Typography>
+                              <Typography style={{ padding: "5px 5px 0px 5px" }} variant="caption" color="action">{`${formatDistanceToNow(new Date(notification?.created_at), { addSuffix: true })}`}
+                              </Typography>
                             </div>
-                           
+
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
                               <Typography style={{ justifyContent: "flex-start", width: '100%' }} variant="body2">{notification?.title?.split('-')[1]}</Typography>
-                              {notification?.seen_json==null || !notification?.seen_json[loggedInUserData.id] ?
-                              <Tooltip title="Mark as read"><IconButton aria-label="More" onClick={() => handleMarkAsRead(notification?.id)}>
-                                <CheckCircleOutlineRoundedIcon color="primary"/>
-                              </IconButton></Tooltip>:null}
+                              {notification?.seen_json == null || !notification?.seen_json[loggedInUserData.id] ?
+                                <Tooltip title="Mark as read">
+                                <IconButton aria-label="More" onClick={() => handleMarkAsRead(notification?.id)}>
+                                  <CheckCircleOutlineRoundedIcon color="primary" />
+                                </IconButton>
+                                </Tooltip> : null}
                             </div>
-                            <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}</Typography>
-                            {index !== Notification?.length - 1 && <Divider />} 
-                          </Link>  
+                            <Typography variant="caption" color="action">{`Sent on: ${format(new Date(notification?.created_at), 'MMM d, yyyy')}`}
+                            </Typography>
+                            {index !== Notification?.length - 1 && <Divider />}
+                          </Link>
                         </div>
                       ))}
                     </>
@@ -1109,7 +1144,7 @@ console.log(unseenNotifications,'uuu');
                   }}
                 >
 
-                    <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
+                  <MenuItem onClick={handleMarkAsRead}>Mark as Read</MenuItem>
 
                 </Popover>
 
