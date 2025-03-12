@@ -1,10 +1,16 @@
 import MUIDataTable from "mui-datatables";
-import { Fragment, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {  useParams } from "react-router-dom";
 import GetDataitemsById from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Grid, Typography, ThemeProvider,Box, IconButton, } from "@mui/material";
+import { ThemeProvider } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import TablePagination from "@mui/material/TablePagination";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
@@ -107,6 +113,15 @@ useEffect(() => {
               filter: false,
               sort: false,
               align: "center",
+              setCellProps: () => ({ 
+                style: {
+                fontSize: "16px",
+                padding: "16px",
+                whiteSpace: "normal", 
+                overflowWrap: "break-word",
+                wordBreak: "break-word",  
+              } 
+              }),
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
                 if ((key.includes("json")) && value !== null ) {
@@ -221,6 +236,70 @@ const handleSearchClose = () => {
       </Grid>
     );
   };
+  const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap", 
+          justifyContent: { 
+            xs: "space-between", 
+            md: "flex-end" 
+          }, 
+          alignItems: "center",
+          padding: "10px",
+          gap: { 
+            xs: "10px", 
+            md: "20px" 
+          }, 
+        }}
+      >
+
+        {/* Pagination Controls */}
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, newPage) => changePage(newPage)}
+          onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+          sx={{
+            "& .MuiTablePagination-actions": {
+            marginLeft: "0px",
+          },
+          "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
+            marginRight: "10px",
+          },
+          }}
+        />
+
+        {/* Jump to Page */}
+        <div>
+          <label style={{ 
+            marginRight: "5px", 
+            fontSize:"0.83rem", 
+          }}>
+          Jump to Page:
+          </label>
+          <Select
+            value={page + 1}
+            onChange={(e) => changePage(Number(e.target.value) - 1)}
+            sx={{
+              fontSize: "0.8rem",
+              padding: "4px",
+              height: "32px",
+            }}
+          >
+            {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+              <MenuItem key={i} value={i + 1}>
+                {i + 1}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      </Box>
+    );
+  };
 
   const options = {
     count: totalDataitems,
@@ -264,6 +343,16 @@ const handleSearchClose = () => {
     jumpToPage: true,
     serverSide: true,
     customToolbar: renderToolBar,
+    responsive: "vertical",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
   };
 
   return (

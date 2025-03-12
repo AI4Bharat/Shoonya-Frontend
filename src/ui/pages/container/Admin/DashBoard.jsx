@@ -37,7 +37,7 @@ const DashBoard = () => {
       
         < >
             <Box sx={{mb:2,}} >
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="admin-tabs">
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="admin-tabs" variant='scrollable'>
                     <Tab label="Task Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Annotation Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="User Details" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
