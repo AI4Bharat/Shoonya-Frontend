@@ -1,260 +1,126 @@
-import { Button, Card, CircularProgress, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel, InputAdornment } from "@mui/material";
-import OutlinedTextField from "../../component/common/OutlinedTextField";
-import themeDefault from "../../../theme/theme";
-import { useNavigate, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
-import UpdateProfileAPI from "../../../../redux/actions/api/UserManagement/UpdateProfile";
-import UpdateEmailAPI from "../../../../redux/actions/api/UserManagement/UpdateEmail";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import Snackbar from "../../component/common/Snackbar";
-import UpdateEmailDialog from "../../component/common/UpdateEmailDialog"
-import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
-import {participationType} from '../../../../config/dropDownValues';
-import { MenuProps } from "../../../../utils/utils";
-import CustomButton from "../../component/common/Button";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { format } from "date-fns";
+import { useDispatch } from "react-redux";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import {  LinearProgress } from "@mui/material";
+import GetUserAnalyticsAPI from "../../../../redux/actions/api/UserManagement/GetUserAnalytics";
 
-const MyProfile = () => {
-  const { id } = useParams();
-  const [newDetails, setNewDetails] = useState();
-  const [initLangs, setInitLangs] = useState([]);
-  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: ''});
-  const [email, setEmail] = useState("");
-  const [originalEmail, setOriginalEmail] = useState("");
-  const [enableVerifyEmail, setEnableVerifyEmail] = useState(false);
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [emailVerifyLoading, setEmailVerifyLoading] = useState(false);
-  const navigate = useNavigate();
+const ReportBarGraphs = ({ id }) => {
+  const [selectRange, setSelectRange] = useState([{ startDate: new Date(), endDate: new Date() }]);
+  const [analyticsData, setAnalyticsData] = useState([]);
+  const [loadingStates, setLoadingStates] = useState({});
+  const [allLoaded, setAllLoaded] = useState(false);
 
-  // const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-  const userDetails = useSelector((state) => state.fetchUserById.data);
-  const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
   const dispatch = useDispatch();
-  const LanguageList = useSelector(state => state.fetchLanguages.data);
-  console.log(userDetails)
-  const getLanguageList = () => {
-      const langObj = new FetchLanguagesAPI();
 
-      dispatch(APITransport(langObj));
-  }
+  const projectTypes = ["MultipleInteractionEvaluation", "ModelInteractionEvaluation", "InstructionDrivenChat"];
+  const reportTypes = ["annotation", "review"];
 
   useEffect(() => {
-    getLanguageList();
-  }, []);
+    const handleProgressSubmit = async () => {
+      const promises = [];
+      const newLoadingStates = {};
 
-  useEffect(() => {
-    if (LanguageList) {
-      setInitLangs(LanguageList.language);
-    }
-  }, [LanguageList]);
+      projectTypes.forEach((projectType) => {
+        newLoadingStates[projectType] = false;
+      });
+      setLoadingStates(newLoadingStates);
 
-  useEffect(() => {
-    setNewDetails({
-      username: userDetails.username,
-      first_name: userDetails.first_name,
-      last_name: userDetails.last_name,
-      languages: userDetails.languages,
-      phone: userDetails.phone,
-      availability_status:userDetails.availability_status,
-      participation_type: userDetails.participation_type
-    });
-    setEmail(userDetails.email);
-    setOriginalEmail(userDetails.email);
-  }, [userDetails]);
+      const projectResults = {};
+
+      for (const projectType of projectTypes) {
+        projectResults[projectType] = { annotation: {}, review: {} };
+
+        for (const reportType of reportTypes) {
+          const reviewdata = {
+            user_id: `${id}`,
+            project_type: projectType,
+            reports_type: reportType,
+            start_date: "2023-12-18",
+            end_date: format(selectRange[0].endDate, "yyyy-MM-dd"),
+          };
+    const progressObj = new GetUserAnalyticsAPI(reviewdata);
+
+          promises.push(
+            fetch(progressObj.apiEndPoint(), {
+              method: "POST",
+              body: JSON.stringify(progressObj.getBody()),
+              headers: progressObj.getHeaders().headers,
+            }).then(async (response) => {
+        
+                const totalSummary = response?.payload?.total_summary || [];
+                if (totalSummary.length > 0 && reportType=="annotation") {
+                  projectResults[projectType][reportType] = {
+                    annotatedTasks: totalSummary[0]?.["Annotated Tasks"] || 0,
+                    avgAnnotationTime: totalSummary[0]?.["Avg Annotation Time (sec)"] || 0,
+                  };
+                }else if (totalSummary.length > 0 && reportType=="review") {
+                  projectResults[projectType][reportType] = {
+                    reviewedtasks: totalSummary[0]?.["Reviewed Tasks"] || 0,
+                    avgAnnotationTime: totalSummary[0]?.["Avg Annotation Time (sec)"] || 0,
+                  }
+                }
+
+              })
+              .catch((error) => {
+                console.error(`Error loading ${projectType} - ${reportType}:`, error);
+              })
+              .finally(() => {
+                newLoadingStates[projectType] = true;
+                setLoadingStates({ ...newLoadingStates });
+              })
+          );
+        }
+      }
+
+      await Promise.all(promises);
+
+      const formattedData = projectTypes.map((projectType) => ({
+        name: projectType,
+        annotation: projectResults[projectType].annotation.annotatedTasks || 0,
+        review: projectResults[projectType].review.reviewedtasks || 0,
+        avgAnnotationTime: projectResults[projectType].annotation.avgAnnotationTime || 0,
+      }));
+
+      setAnalyticsData(formattedData);
+      setAllLoaded(Object.values(newLoadingStates).every((status) => status));
+    };
+
+    handleProgressSubmit();
+  }, [dispatch, selectRange]);
+console.log(analyticsData);
 
   return (
-    <ThemeProvider theme={themeDefault}>
-      {/* <Header /> */}
-      <Grid
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Card
-          sx={{
-            // width: window.innerWidth * 0.8,
-            width: "100%",
-            minHeight: 500,
-            padding: 5,
-            border: 0,
-          }}
-        >
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <Typography variant="h3" align="center">
-                Profile Details
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                fullWidth
-                label="First Name"
-                name="first_name"
-                value={newDetails?.first_name}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                fullWidth
-                label="Last Name"
-                name="last_name"
-                value={newDetails?.last_name}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                fullWidth
-                label="Email"
-                value={email}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                fullWidth
-                label="Phone"
-                name="phone"
-                value={newDetails?.phone}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                fullWidth
-                label="Role"
-                value={UserMappedByRole(userDetails.role)?.name}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                required
-                fullWidth
-                label="Username"
-                name="username"
-                value={newDetails?.username}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                fullWidth
-                label="Organization"
-                value={userDetails.organization?.title}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-            </Grid>
-            
-            {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-            <InputLabel id="availability-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Availability Status</InputLabel>
-              <Select
-                fullWidth
-                labelId="availability-label"
-                name="availability_status"
-                value={newDetails?.availability_status}
-                InputLabelProps={{ shrink: true }}
-              >
-                <MenuItem value="1">Available</MenuItem>
-                <MenuItem value="2">Unavailable</MenuItem>
-              </Select>
-            </Grid> */}
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <InputLabel id="lang-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Languages</InputLabel>
-              <Select
-                disabled
-                multiple
-                fullWidth
-                labelId="lang-label"
-                name="languages"
-                value={newDetails?.languages? newDetails.languages : []}
-                style={{zIndex: "0"}}
-                MenuProps={MenuProps}
-                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                )}
-              >
-                {initLangs?.length && initLangs.map((lang) => (
-                  <MenuItem
-                    key={lang}
-                    value={lang}
-                  >
-                    {lang}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <OutlinedTextField
-                disabled
-                fullWidth
-                label="Availability Status"
-                name="availability_status"
-                value={newDetails?.availability_status}
-                InputLabelProps={{ shrink: true }}
-              ></OutlinedTextField>
-              </Grid>
-              <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-              <InputLabel id="lang-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Participation Type</InputLabel>
-              <Select
-                disabled
-                fullWidth
-                labelId="lang-label"
-                name="participation_type"
-                value={newDetails?.participation_type? newDetails.participation_type : []}
-                style={{zIndex: "0"}}
-                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-              >
-                {participationType?.length && participationType.map((type,i) => (
-                  <MenuItem
-                    key={i+1}
-                    value={i+1}
-                  >
-                    {type}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Grid>
-            <Grid 
-                container 
-                direction="row"
-                justifyContent="flex-end"
-                style={{marginTop: 20}}
+    <div style={{ padding: "20px" }}>
+      {allLoaded ? (
+        <div style={{ width: "100%", height: "350px" }}>
+          <ResponsiveContainer>
+            <BarChart
+              data={analyticsData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
-                {LoggedInUserId === userDetails.id &&
-                    <Grid item>
-                        <CustomButton
-                        label="Edit Profile"
-                        onClick={() => navigate("/edit-profile")}
-                        />
-                    </Grid> }
-            </Grid>
-          </Grid>
-        </Card>
-      </Grid>
-      <Snackbar 
-        {...snackbarState} 
-        handleClose={()=> setSnackbarState({...snackbarState, open: false})} 
-        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-        hide={2000}
-      />
-    </ThemeProvider>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name"   tick={{ fontSize: 10, textAnchor: "middle", angle: -5 }}
+              interval={0} 
+              />
+              <YAxis />
+
+              <Tooltip />
+              <Legend verticalAlign="top" />
+              <Bar dataKey="annotation" fill="#8884d8" name="Annotation"                 stackId="a"
+              />
+              <Bar dataKey="review" fill="#82ca9d" name="Review"                stackId="a"
+ />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+<div style={{ width: "100%", height: "50%px" }}> {/* Explicit height for the progress bar */}
+        <LinearProgress  />
+      </div>      )}
+    </div>
   );
 };
 
-export default MyProfile;
+export default ReportBarGraphs;

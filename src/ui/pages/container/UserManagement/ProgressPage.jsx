@@ -93,7 +93,8 @@ const ProfilePage = () => {
         {renderSnackBar()}
           {userDetails && (
             <>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ p: 2 }}>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{mx: { xs: 2, sm: 3, md: 4 },
+          fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" }}}>
                 <Paper variant="outlined" sx={{ minWidth: 275, borderRadius: "5px" ,backgroundColor:'ButtonHighlight', textAlign:'center'}}>
                   <CardContent>
                     <Typography variant="h4">{userDetails.organization.title}</Typography>
@@ -102,7 +103,8 @@ const ProfilePage = () => {
               </Grid>
               {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role ) )) ?
               <>
-              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 , display:'flex', justifyContent:'center' }}>
+              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p:1,display:'flex', justifyContent:'center' ,
+          fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" }}}>
                   
                   <Card>
                     <CardContent>
@@ -111,7 +113,8 @@ const ProfilePage = () => {
                     </CardContent>
                   </Card> 
               </Grid>
-              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
+              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p:1,
+          fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" } }}>
                 <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
                   <CardContent>
                     <Typography variant="h4" sx={{mb: 1}}>{LoggedInUserId===userDetails.id?  "My Progress": `Progress of ${userDetails?.first_name} ${userDetails?.last_name}` }</Typography>

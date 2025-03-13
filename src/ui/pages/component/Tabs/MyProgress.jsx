@@ -76,7 +76,6 @@ const MyProgress = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const [totalsummary, setTotalsummary] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedWorkspaces, setSelectedWorkspaces] = useState([]);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const Workspaces = useSelector((state) => state.getWorkspaces.data);
   const UserAnalytics = useSelector((state) => state.getUserAnalytics.data.project_summary);
@@ -88,8 +87,6 @@ const MyProgress = () => {
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
     dispatch(APITransport(typesObj));
-    // const workspacesObj = new GetWorkspacesAPI(1, 9999);
-    // dispatch(APITransport(workspacesObj));
 
   }, []);
   useEffect(() => {
@@ -329,7 +326,6 @@ const MyProgress = () => {
         direction="row"
         justifyContent="start"
         alignItems="center"
-      // sx={{ marginLeft: "50px" }}
       >
         <Grid >
           <Typography gutterBottom component="div" sx={{ marginTop: "15px", fontSize: "16px" }}>
@@ -395,28 +391,6 @@ const MyProgress = () => {
               Pick Dates
             </Button>
           </Grid>
-          {/* <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>
-                Workspace
-              </InputLabel>
-              <Select
-                labelId="workspace-label"
-                id="workspace-select"
-                value={selectedWorkspaces}
-                multiple
-                label="Project Type"
-                // onSelect={(e,)}
-                onChange={(e) => setSelectedWorkspaces(e.target.value)}
-              >
-                {Workspaces.map((Workspaces, index) => (
-                  <MenuItem value={Workspaces.id} key={Workspaces.id}>
-                    {Workspaces.workspace_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid> */}
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
               fullWidth
