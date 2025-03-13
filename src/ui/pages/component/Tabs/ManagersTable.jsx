@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 import GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import {useDispatch,useSelector} from 'react-redux';
 import CustomButton from "../common/Button";
-import { ThemeProvider, Grid,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    DialogContentText } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContentText from "@mui/material/DialogContentText";
+import Box from "@mui/material/Box";
+import TablePagination from "@mui/material/TablePagination";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveWorkspaceManagerAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceManager";
 import CustomizedSnackbars from "../../component/common/Snackbar";
@@ -113,7 +118,16 @@ const handleRemoveWorkspaceManager = async(userid)=>{
                 filter: false,
                 sort: false,
                 align : "center"
-            }
+            },
+            setCellProps: () => ({ 
+              style: {
+              fontSize: "16px",
+              padding: "16px",
+              whiteSpace: "normal", 
+              overflowWrap: "break-word",
+              wordBreak: "break-word",  
+            } 
+            }),
         },
         
         
@@ -126,20 +140,16 @@ const handleRemoveWorkspaceManager = async(userid)=>{
             }
         }];
        
-        // const data = [
-        //     ["Shoonya User", "user123@tarento.com", 0, ]
-        // ];
-
         const data =  workspaceManagers &&  workspaceManagers.length > 0 ? pageSearch().map((el,i)=>{
             return [
                 el.username, 
                 el.email,
                <>
-                <Link to={`/profile/${el.id}`} style={{ textDecoration: "none" }}>
+                  <Link to={`/profile/${el.id}`} style={{ textDecoration: "none" }}>
                     <CustomButton
-                        sx={{borderRadius : 2,marginRight: 2}}
+                        sx={{borderRadius : 2,m:1}}
                         label = "View"
-                    />
+                  />
                    
                 </Link>
                  <CustomButton
@@ -150,7 +160,71 @@ const handleRemoveWorkspaceManager = async(userid)=>{
              </>
                     ]
         }) : [];
-
+        const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap", 
+                justifyContent: { 
+                  xs: "space-between", 
+                  md: "flex-end" 
+                }, 
+                alignItems: "center",
+                padding: "10px",
+                gap: { 
+                  xs: "10px", 
+                  md: "20px" 
+                }, 
+              }}
+            >
+  
+              {/* Pagination Controls */}
+              <TablePagination
+                component="div"
+                count={count}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={(_, newPage) => changePage(newPage)}
+                onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+                sx={{
+                  "& .MuiTablePagination-actions": {
+                  marginLeft: "0px",
+                },
+                "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
+                  marginRight: "10px",
+                },
+                }}
+              />
+  
+              {/* Jump to Page */}
+              <div>
+                <label style={{ 
+                  marginRight: "5px", 
+                  fontSize:"0.83rem", 
+                }}>
+                Jump to Page:
+                </label>
+                <Select
+                  value={page + 1}
+                  onChange={(e) => changePage(Number(e.target.value) - 1)}
+                  sx={{
+                    fontSize: "0.8rem",
+                    padding: "4px",
+                    height: "32px",
+                  }}
+                >
+                  {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+                    <MenuItem key={i} value={i + 1}>
+                      {i + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </div>
+            </Box>
+          );
+        };
+  
         const options = {
             textLabels: {
               body: {
@@ -177,6 +251,16 @@ const handleRemoveWorkspaceManager = async(userid)=>{
             selectableRows: "none",
             search: false,
             jumpToPage: true,
+            responsive: "vertical",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
           };
           const renderSnackBar = () => {
             return (

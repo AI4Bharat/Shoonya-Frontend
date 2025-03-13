@@ -58,11 +58,34 @@ const labelChart = function(context) {
   }
   return label;
 };
+const getWidth = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth;
+  }
+};
+
+const width = getWidth();
+
+const categoryPercentage = width < 600 ? 0.2 : width < 900 ? 0.5 : 0.6;
+const barPercentage = width < 600 ? 0.3 : width < 900 ? 0.6 : 0.7;
+const chartHeight = width < 600 ? "300px" : width < 900 ? "350px" : "400px";
+const rotationAngle = width < 600 ? 90 : 45; // No rotation for small screens
+const fontSize = width < 600 ? 10 : 12;
+const chartWidth = width < 600 ? "1200px" : "100%"; // Wider width for small screens
 
 const defaultOptions = {
   responsive: true,
+  maintainAspectRatio: false,
+  indexAxis: "x",
   scales: {
     x: {
+        categoryPercentage,
+        barPercentage,
+        ticks: {
+          maxRotation: rotationAngle,
+          minRotation: rotationAngle,
+          autoSkip: false,
+        },
       grid: {
         display: false,
       },
@@ -73,7 +96,7 @@ const defaultOptions = {
         color: 'black',
         font: {
           family: 'Roboto',
-          size: 16,
+          size: fontSize,
           weight: 'bold',
           lineHeight: 1.2,
         },
@@ -1114,8 +1137,19 @@ function ProgressAnalytics() {
                   Download Report As Image
                 </Button>
               </Grid>
-              <div id="chart-container">
+              <div style={{
+                  overflow:"auto",
+                  width:"100%",
+                  padding:"0.2rem"
+                }}>
+              <div id="chart-container"
+                style={{
+                  width: chartWidth,
+                  height: chartHeight,
+                }}
+              >
                 <Bar options={options} data={chartData} />
+              </div>
               </div>
             </>
           }
