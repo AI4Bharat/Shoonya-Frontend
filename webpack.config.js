@@ -5,7 +5,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const PurgeCSSPlugin = require("purgecss-webpack-plugin");
+const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -53,15 +53,17 @@ module.exports = {
     ],
   },
   optimization: {
+    usedExports: true,  
     minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
           compress: {
-            drop_console: true,
-            dead_code: true,
-            passes: 3,
-          },
+            drop_console: true,  // Removes console.log
+            drop_debugger: true, // Removes debugger statements
+            dead_code: true,     // Removes unused code
+            passes: 3,           // Apply multiple optimizations
+            },
           output: {
             comments: false,
           },
@@ -72,9 +74,10 @@ module.exports = {
     ],
     splitChunks: {
       chunks: "all",
-      minSize: 30 * 1024,
-      maxSize: 250 * 1024,
-      maxInitialRequests: 10,
+    minSize: 30 * 1024,
+    maxSize: 200 * 1024, // Reduce chunk size
+    automaticNameDelimiter: "-",
+    maxInitialRequests: 5,
     },
     runtimeChunk: "single",
   },
@@ -82,11 +85,16 @@ module.exports = {
     new CleanWebpackPlugin(), // Cleans up dist folder before each build
     new CompressionPlugin({
       algorithm: "brotliCompress", // Use Brotli for better compression
+      threshold: 10240, // Compress files larger than 10KB
+      minRatio: 0.8,
       test: /\.(js|css|html|svg)$/,
     }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: isProduction ? "disabled" : "server", // Enable bundle analysis in dev
-    }),
+    // new BundleAnalyzerPlugin({
+    //   analyzerMode: "static", // Change to 'server' if needed
+    //   reportFilename: "bundle-report.html", // Output report filename
+    //   generateStatsFile: true, // Enable stats.json generation
+    //   statsFilename: "stats.json", // Ensure it saves stats.json
+    // }),
     new PurgeCSSPlugin({
       paths: glob.sync(`${path.resolve(__dirname, "src")}/**/*`, { nodir: true }),
     }),
