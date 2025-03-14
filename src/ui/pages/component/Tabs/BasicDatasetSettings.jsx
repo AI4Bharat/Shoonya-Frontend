@@ -167,7 +167,7 @@ const BasicDatasetSettings = (props) => {
                         <OutlinedTextField
                             fullWidth
                             name="instance_name"
-                            InputProps={{ style: { fontSize: "14px", width: "500px" } }}
+                            InputProps={{ style: { fontSize: "14px" } }}
                             // value={ProjectDetails.title}
                             value={newDetails?.instance_name}
                             onChange={handleDatasetName} />
@@ -207,7 +207,7 @@ const BasicDatasetSettings = (props) => {
                         <OutlinedTextField
                             fullWidth
                             name="instance_description"
-                            InputProps={{ style: { fontSize: "14px", width: "500px" } }}
+                            InputProps={{ style: { fontSize: "14px" } }}
                             value={newDetails?.instance_description}
                             onChange={handleDatasetName}
                         />
@@ -221,16 +221,33 @@ const BasicDatasetSettings = (props) => {
                     xl={12}
                     sm={12}
                     sx={{
-                        m: 7,
-                        // justifyContent: "center",
-
+                        mt: 4,
+                        justifyContent: { 
+                            xs: "space-between", 
+                            md: "normal" 
+                        },
                     }}
                 >
-                    <CustomButton sx={{ inlineSize: "max-content", marginRight: "10px", width: "80px" }}
+                    <CustomButton sx={{ 
+                        width: { 
+                            xs: "100%", 
+                            sm: "300px" 
+                        }, 
+                        marginBottom: { 
+                            xs: 2, 
+                            md: 0 
+                        }, 
+                        marginRight: { 
+                            md: 2 
+                        }}}
                         onClick={() => navigate(`/dataset/:id/`)}
                         // onClick={handleCancel}
                         label="Cancel" />
-                    <CustomButton sx={{ inlineSize: "max-content", width: "80px" }}
+                    <CustomButton sx={{ 
+                        width: { 
+                            xs: "100%", 
+                            sm: "300px" 
+                        }}}
                         onClick={handleSave}
                         label="Save" />
                 </Grid>

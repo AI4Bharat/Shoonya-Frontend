@@ -279,12 +279,8 @@ export default function DeallocationAnnotatorsAndReviewers() {
       {renderSnackBar()}
      <CustomButton
         sx={{
-          inlineSize: "max-content",
-          p: 2,
           borderRadius: 3,
-          ml: 2,
-          width: "300px",
-          mb: 2,
+          width: "100%",
         }}
         onClick={handleClickOpen}
         label="Deallocate User Tasks"
