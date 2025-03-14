@@ -34,7 +34,7 @@ import CustomButton from "../common/Button";
 import headerStyle from "../../../styles/header";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationPatchAPI from "../../../../redux/actions/api/Notification/NotificationPatchApi";
-import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
+import Shoonya_Logo from "../../../../assets/Shoonya_Logo.webp";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";

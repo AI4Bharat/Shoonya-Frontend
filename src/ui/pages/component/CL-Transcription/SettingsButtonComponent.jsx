@@ -1,36 +1,22 @@
 import React, { memo, useState } from "react";
-import { useSelector } from "react-redux";
 import { fontMenu } from "../../../../utils/SubTitlesUtils";
-
-//Styles
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
-
-//Components
-import {
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  IconButton,
-  Menu,
-  Tooltip,
-  Typography,
-  MenuItem,
-} from "@mui/material";
+import Checkbox from "@mui/material/Checkbox";
+import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import MenuItem from "@mui/material/MenuItem";
 import FormatSizeIcon from "@mui/icons-material/FormatSize";
-import SaveIcon from "@mui/icons-material/Save";
-import VerifiedIcon from "@mui/icons-material/Verified";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CheckIcon from "@mui/icons-material/Check";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import TagIcon from '@mui/icons-material/Tag';
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
-// import { FindAndReplace } from "common";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import PreviewDialog from "./PreviewDialog";
-
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-// import FormatLineSpacingIcon from "@mui/icons-material/FormatLineSpacingIcon";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 
