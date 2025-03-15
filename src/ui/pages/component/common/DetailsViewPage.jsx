@@ -331,6 +331,13 @@ const DetailsViewPage = (props) => {
               TabIndicatorProps={{
                 style: { display: "none" },
               }}
+              sx={{
+                "@media (min-width: 600px)": {
+                  flexDirection: "row",
+                  borderBottom: "1px solid #ddd",
+                  borderRight: "none",
+                },
+              }}
             >
               {pageType === componentType.Type_Workspace && (
                 <Tab

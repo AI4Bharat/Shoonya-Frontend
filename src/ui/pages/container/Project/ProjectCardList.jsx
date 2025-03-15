@@ -14,6 +14,9 @@ import {  useSelector } from "react-redux";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
+import { styled } from '@mui/material/styles';
+import InfoIcon from '@mui/icons-material/Info';
+import { tooltipClasses } from '@mui/material/Tooltip';
 
 const ProjectCardList = (props) => {
   const { projectData, selectedFilters, setsSelectedFilters } = props;
@@ -198,13 +201,49 @@ const ProjectCardList = (props) => {
         })
       : [];
 
+  const areFiltersApplied = (filters) => {
+    return Object.values(filters).some((value) => value !== "");
+  };
+
+  const filtersApplied = areFiltersApplied(selectedFilters);
+
+  const CustomTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+    ))(({ theme }) => ({
+      [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#e0e0e0',
+        color: 'rgba(0, 0, 0, 0.87)',
+        maxWidth: 350,
+        fontSize: theme.typography.pxToRem(12),
+      },
+      [`& .${tooltipClasses.arrow}`]: {
+        color: "#e0e0e0",
+      },
+}));
+
   const renderToolBar = () => {
     return (
       <>
-        <Button style={{ minWidth: "25px" }} onClick={handleShowFilter}>
-          <Tooltip title={"Filter Table"}>
-            <FilterListIcon sx={{ color: "#515A5A" }} />
-          </Tooltip>
+        <Button style={{position: "relative", minWidth: "25px" }} onClick={handleShowFilter}>
+        {filtersApplied && <InfoIcon color="primary" fontSize="small" sx={{position:"absolute", top:-4, right:-4}}/>}        
+          <CustomTooltip
+            title={
+              filtersApplied ? (
+                <Box style={{ fontFamily: 'Roboto, sans-serif' }} sx={{ padding: '5px', maxWidth: '350px', fontSize: '12px', display:"flex",flexDirection:"column", gap:"5px" }}>
+                  {selectedFilters.project_type && <div><strong>Project Type:</strong> {selectedFilters.project_type}</div>}
+                  {selectedFilters.project_user_type && <div><strong>Project User Type:</strong> {selectedFilters.project_user_type}</div>}
+                  {selectedFilters.archived_projects && <div><strong>Archived Projects:</strong> {selectedFilters.archived_projects}</div>}
+              </Box>
+            ) : (
+            <span style={{ fontFamily: 'Roboto, sans-serif' }}>
+              Filter Table
+            </span>
+            )  
+            }
+            disableInteractive
+          >
+            <FilterListIcon sx={{ color: '#515A5A' }} />
+          </CustomTooltip>
         </Button>
       </>
     );
