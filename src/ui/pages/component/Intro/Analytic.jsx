@@ -40,11 +40,8 @@ const Analytic = () => {
     return (
       
         <>
-            <Box sx={{mb:2,ml:"5px" , display: "flex", justifyContent: "center" }} >
-                <Tabs text_align = "center" value={tabValue} onChange={handleTabChange} aria-label="user-tabs" sx={{mb:2,mt:11,ml:3}}>
-                    <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700',marginRight: '28px !important' }} />
-                    {/* <Tab label="Meta Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} /> */}
-                </Tabs>
+            <Box sx={{mb:2,ml:"5px" , display: "flex", justifyContent: "center" ,mt:6,}} >
+               
             </Box>
             <Box sx={{ p: 1}}>
                 <TabPanel value={tabValue} index={0} >

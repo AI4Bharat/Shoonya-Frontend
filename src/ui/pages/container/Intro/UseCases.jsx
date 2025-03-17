@@ -157,13 +157,13 @@ const useCasesData = [
   },
   {
     title: "OCR",
-    description: "Supports various annotations like OCR, audio transcription, text translation, etc.",
+    description: "Supports various annotations OCR.",
     image: "https://via.placeholder.com/400",
     link: "", // Placeholder for "Coming Soon"
   },
   {
     title: "Conversation",
-    description: "Has clearly defined user roles with specific permissions.",
+    description: "Supports various annotations Conversation. ",
     image: "https://via.placeholder.com/400",
     link: "", // Placeholder for "Coming Soon"
   },
