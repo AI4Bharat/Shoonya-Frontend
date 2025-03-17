@@ -17,6 +17,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 
+
 const Projectcard = (props) => {
   const { projectData, selectedFilters, setsSelectedFilters } = props;
   const classes = DatasetStyle();
@@ -77,11 +78,6 @@ const Projectcard = (props) => {
           }
     });
   };
-  const areFiltersApplied = (filters) => {
-    return Object.values(filters).some((value) => value !== "");
-  };
-
-  const filtersApplied = areFiltersApplied(selectedFilters);
 
   const areFiltersApplied = (filters) => {
     return Object.values(filters).some((value) => value !== "");
@@ -105,7 +101,7 @@ const Projectcard = (props) => {
 
   return (
     <React.Fragment>
-      <Grid sx={{ textAlign: "end", margin: "-20px 10px 10px 0px" }}>
+        <Grid sx={{textAlign:"end",margin:"-20px 10px 10px 0px"}}>
         <Button style={{ minWidth: "25px" }} onClick={handleShowFilter}>
         {filtersApplied && <InfoIcon color="primary" fontSize="small" sx={{position:"absolute", top:-4, right:-4}}/>}
           <CustomTooltip
