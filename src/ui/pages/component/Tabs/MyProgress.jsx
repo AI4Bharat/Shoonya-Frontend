@@ -15,23 +15,12 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-// import Snackbar from "../common/Snackbar";
-// import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
-// import { LocalizationProvider } from "@mui/x-date-pickers";
-// import { DateRangePicker } from "@mui/x-date-pickers-pro";
-// import {
-//   addDays,
-//   addWeeks,
-//   format,
-//   lastDayOfWeek,
-//   startOfMonth,
-//   startOfWeek,
-// } from "date-fns";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
+import Skeleton from "@mui/material/Skeleton";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetUserAnalyticsAPI from "../../../../redux/actions/api/UserManagement/GetUserAnalytics";
 import MUIDataTable from "mui-datatables";
@@ -54,14 +43,6 @@ const MyProgress = () => {
     endDate: new Date(),
     key: "selection"
   }]);
-  console.log(UserDetails?.date_joined, "UserDetails?.date_joined")
-  // const [rangeValue, setRangeValue] = useState([
-  //   format(
-  //     Date.parse(UserDetails?.date_joined, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
-  //     "yyyy-MM-dd"
-  //   ),
-  //   Date.now(),
-  // ]);
   const [showPicker, setShowPicker] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
@@ -85,6 +66,44 @@ const MyProgress = () => {
   const dispatch = useDispatch();
 
   const classes = DatasetStyle();
+    const [isBrowser, setIsBrowser] = useState(false);
+    const tableRef = useRef(null);
+    const [displayWidth, setDisplayWidth] = useState(0);
+  
+    useEffect(() => {
+      const handleResize = () => {
+        setDisplayWidth(window.innerWidth);
+      };
+  
+      if (typeof window !== 'undefined') {
+        handleResize();
+        window.addEventListener('resize', handleResize);
+      }
+  
+      return () => {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('resize', handleResize);
+        }
+      };
+    }, []);
+  
+    useEffect(() => {
+      setIsBrowser(true);
+      
+      // Force responsive mode after component mount
+      const applyResponsiveMode = () => {
+        if (tableRef.current) {
+          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+          if (tableWrapper) {
+            tableWrapper.classList.add('MuiDataTable-vertical');
+          }
+        }
+      };
+      
+      // Apply after a short delay to ensure DOM is ready
+      const timer = setTimeout(applyResponsiveMode, 100);
+      return () => clearTimeout(timer);
+    }, []);
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
     dispatch(APITransport(typesObj));
@@ -289,6 +308,7 @@ const MyProgress = () => {
     jumpToPage: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -559,12 +579,28 @@ const MyProgress = () => {
         </Grid>}
         {UserAnalytics?.length > 0 ? (
           <ThemeProvider theme={tableTheme}>
-            <MUIDataTable
-              title={radiobutton === "AnnotatationReports" ? "Annotation Report" : radiobutton === "ReviewerReports" ? "Reviewer Report" : "Super Checker Report"}
+            <div ref={tableRef}>
+                      {isBrowser ? (
+                        <MUIDataTable
+                          key={`table-${displayWidth}`}
+                          title={radiobutton === "AnnotatationReports" ? "Annotation Report" : radiobutton === "ReviewerReports" ? "Reviewer Report" : "Super Checker Report"}
               data={reportData}
               columns={columns.filter((col) => selectedColumns.includes(col.name))}
               options={tableOptions}
-            />
+                        />
+                      ) : (
+                        <Skeleton
+                          variant="rectangular"
+                          height={400}
+                          sx={{
+                            mx: 2,
+                            my: 3,
+                            borderRadius: '4px',
+                            transform: 'none'
+                          }}
+                        />
+                      )}
+                    </div>
           </ThemeProvider>
         ) : <Grid
           container

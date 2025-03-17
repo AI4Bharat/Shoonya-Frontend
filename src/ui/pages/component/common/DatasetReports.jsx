@@ -1,6 +1,6 @@
 // DatasetReports
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MUIDataTable from "mui-datatables";
 import {
   ThemeProvider,
@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import TablePagination from "@mui/material/TablePagination";
-
+import Skeleton from "@mui/material/Skeleton";
 import tableTheme from "../../../theme/tableTheme";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -52,6 +52,44 @@ const DatasetReports = () => {
     message: "",
     variant: "success",
   });
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== 'undefined') {
+      handleResize();
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
+  
+  useEffect(() => {
+    setIsBrowser(true);
+    
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+        if (tableWrapper) {
+          tableWrapper.classList.add('MuiDataTable-vertical');
+        }
+      }
+    };
+    
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -193,6 +231,7 @@ const DatasetReports = () => {
       },
     },
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -354,14 +393,30 @@ const DatasetReports = () => {
         </Grid>
       </Grid>
       {showSpinner ? <div></div> : reportRequested && (
-        <ThemeProvider theme={tableTheme}>
-          <MUIDataTable
-            title={DatasetReports.length > 0 ? "Reports" : ""}
-            data={reportData}
-            columns={columns.filter((col) => selectedColumns.includes(col.name))}
-            options={options}
-          />
-        </ThemeProvider>)
+              <ThemeProvider theme={tableTheme}>
+                <div ref={tableRef}>
+                  {isBrowser ? (
+                    <MUIDataTable
+                      key={`table-${displayWidth}`}
+                      title={DatasetReports.length > 0 ? "Reports" : ""}
+                      data={reportData}
+                      columns={columns.filter((col) => selectedColumns.includes(col.name))}
+                      options={options}
+                    />
+                  ) : (
+                    <Skeleton
+                      variant="rectangular"
+                      height={400}
+                      sx={{
+                        mx: 2,
+                        my: 3,
+                        borderRadius: '4px',
+                        transform: 'none'
+                      }}
+                    />
+                  )}
+                </div>
+              </ThemeProvider>)
       }
     </React.Fragment>
   );
