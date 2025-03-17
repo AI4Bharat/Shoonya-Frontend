@@ -19,11 +19,15 @@ export default function ProjectList() {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [selectedFilters, setsSelectedFilters] = useState({
-    project_type: "",
-    project_user_type: "",
-    archived_projects: "",
-  });
+  const [selectedFilters, setsSelectedFilters] = useState(() => {
+    const savedFilters = localStorage.getItem("projectSelectedFilters");
+    return savedFilters
+      ? JSON.parse(savedFilters)
+      : {
+          project_type: "",
+          project_user_type: "",
+          archived_projects: "",
+        }});
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const projectData = useSelector((state) => state.getProjects.data);
   
@@ -39,6 +43,13 @@ export default function ProjectList() {
 
   useEffect(() => {
     getDashboardprojectData();
+  }, [selectedFilters]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "projectSelectedFilters",
+      JSON.stringify(selectedFilters),
+    );
   }, [selectedFilters]);
 
   const handleProjectlist = () => {

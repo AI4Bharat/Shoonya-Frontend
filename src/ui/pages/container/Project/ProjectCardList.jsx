@@ -2,30 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import CustomButton from "../../component/common/Button";
-import { Grid, ThemeProvider, Tooltip, Button, Box, tooltipClasses } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import TablePagination from "@mui/material/TablePagination";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { ThemeProvider } from "@mui/material/styles";
 import tableTheme from "../../../theme/tableTheme";
-import Search from "../../component/common/Search";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
-import InfoIcon from "@mui/icons-material/Info";
 import { styled } from '@mui/material/styles';
-
-const CustomTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "#e0e0e0",
-    color: "rgba(0, 0, 0, 0.87)",
-    maxWidth: 300,
-    fontSize: theme.typography.pxToRem(12),
-    border: "1px solid #ccc"
-  },
-  [`& .${tooltipClasses.arrow}`]: {
-    color: "#e0e0e0"
-  }
-}));
+import InfoIcon from '@mui/icons-material/Info';
+import { tooltipClasses } from '@mui/material/Tooltip';
 
 const ProjectCardList = (props) => {
   const { projectData, selectedFilters, setsSelectedFilters } = props;
@@ -112,8 +103,14 @@ const ProjectCardList = (props) => {
         sort: false,
         align: "center",
 
-        setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px", padding: "16px" },
+        setCellProps: () => ({ 
+          style: {
+            height: "70px", fontSize: "16px",
+          padding: "16px",
+          whiteSpace: "normal", 
+          overflowWrap: "break-word",
+          wordBreak: "break-word",  
+        } 
         }),
       },
     },
@@ -210,65 +207,109 @@ const ProjectCardList = (props) => {
 
   const filtersApplied = areFiltersApplied(selectedFilters);
 
+  const CustomTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+    ))(({ theme }) => ({
+      [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#e0e0e0',
+        color: 'rgba(0, 0, 0, 0.87)',
+        maxWidth: 350,
+        fontSize: theme.typography.pxToRem(12),
+      },
+      [`& .${tooltipClasses.arrow}`]: {
+        color: "#e0e0e0",
+      },
+}));
+
   const renderToolBar = () => {
     return (
-      <div>
-        <Button
-          style={{ minWidth: "25px", position: "relative" }}
-          onClick={handleShowFilter}
-        >
-          {filtersApplied && (
-            <InfoIcon
-              color="primary"
-              fontSize="small"
-              sx={{ position: "absolute", top: -4, right: -4 }}
-            />
-          )}
+      <>
+        <Button style={{position: "relative", minWidth: "25px" }} onClick={handleShowFilter}>
+        {filtersApplied && <InfoIcon color="primary" fontSize="small" sx={{position:"absolute", top:-4, right:-4}}/>}        
           <CustomTooltip
             title={
               filtersApplied ? (
-                <Box
-                  style={{ fontFamily: "Roboto, sans-serif" }}
-                  sx={{
-                    padding: "5px",
-                    maxWidth: "300px",
-                    fontSize: "12px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "5px",
-                  }}
-                >
-                  {selectedFilters.project_type && (
-                    <div>
-                      <strong>Project Type:</strong>{" "}
-                      {selectedFilters.project_type}
-                    </div>
-                  )}
-                  {selectedFilters.project_user_type && (
-                    <div>
-                      <strong>Project User Type:</strong>{" "}
-                      {selectedFilters.project_user_type}
-                    </div>
-                  )}
-                  {selectedFilters.archived_projects && (
-                    <div>
-                      <strong>Archived Projects:</strong>{" "}
-                      {selectedFilters.archived_projects}
-                    </div>
-                  )}
-                </Box>
-              ) : (
-                <span style={{ fontFamily: "Roboto, sans-serif" }}>
-                  Filter Table
-                </span>
-              )
+                <Box style={{ fontFamily: 'Roboto, sans-serif' }} sx={{ padding: '5px', maxWidth: '350px', fontSize: '12px', display:"flex",flexDirection:"column", gap:"5px" }}>
+                  {selectedFilters.project_type && <div><strong>Project Type:</strong> {selectedFilters.project_type}</div>}
+                  {selectedFilters.project_user_type && <div><strong>Project User Type:</strong> {selectedFilters.project_user_type}</div>}
+                  {selectedFilters.archived_projects && <div><strong>Archived Projects:</strong> {selectedFilters.archived_projects}</div>}
+              </Box>
+            ) : (
+            <span style={{ fontFamily: 'Roboto, sans-serif' }}>
+              Filter Table
+            </span>
+            )  
             }
             disableInteractive
           >
-            <FilterListIcon sx={{ color: "#515A5A" }} />
+            <FilterListIcon sx={{ color: '#515A5A' }} />
           </CustomTooltip>
         </Button>
       </div>
+    );
+  };
+  const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap", 
+          justifyContent: { 
+            xs: "space-between", 
+            md: "flex-end" 
+          }, 
+          alignItems: "center",
+          padding: "10px",
+          gap: { 
+            xs: "10px", 
+            md: "20px" 
+          }, 
+        }}
+      >
+
+        {/* Pagination Controls */}
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, newPage) => changePage(newPage)}
+          onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+          sx={{
+            "& .MuiTablePagination-actions": {
+            marginLeft: "0px",
+          },
+          "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
+            marginRight: "10px",
+          },
+          }}
+        />
+
+        {/* Jump to Page */}
+        <div>
+          <label style={{ 
+            marginRight: "5px", 
+            fontSize:"0.83rem", 
+          }}>
+          Jump to Page:
+          </label>
+          <Select
+            value={page + 1}
+            onChange={(e) => changePage(Number(e.target.value) - 1)}
+            sx={{
+              fontSize: "0.8rem",
+              padding: "4px",
+              height: "32px",
+            }}
+          >
+            {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+              <MenuItem key={i} value={i + 1}>
+                {i + 1}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      </Box>
     );
   };
 
@@ -299,6 +340,16 @@ const ProjectCardList = (props) => {
     search: false,
     jumpToPage: true,
     customToolbar: renderToolBar,
+    responsive: "vertical",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
   };
   // const renderSearch = () => {
   //     return (

@@ -2,14 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
-import { Box, Button, Grid, ThemeProvider, Card, Radio, Typography, FormGroup, Checkbox, ListItemText, ListItemIcon, Paper } from "@mui/material";
+import Box from "@mui/material/Box";
+import tableTheme from "../../../theme/tableTheme";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import Radio from "@mui/material/Radio";
+import Typography from "@mui/material/Typography";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import tableTheme from "../../../theme/tableTheme";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import TablePagination from "@mui/material/TablePagination";
+import { ThemeProvider } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
@@ -244,6 +251,72 @@ const OrganizationReports = () => {
     )
   }
 
+    const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap", 
+          justifyContent: { 
+            xs: "space-between", 
+            md: "flex-end" 
+          }, 
+          alignItems: "center",
+          padding: "10px",
+          gap: { 
+            xs: "10px", 
+            md: "20px" 
+          }, 
+        }}
+      >
+
+        {/* Pagination Controls */}
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, newPage) => changePage(newPage)}
+          onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+          sx={{
+            "& .MuiTablePagination-actions": {
+            marginLeft: "0px",
+          },
+          "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
+            marginRight: "10px",
+          },
+          }}
+        />
+
+        {/* Jump to Page */}
+        <div>
+          <label style={{ 
+            marginRight: "5px", 
+            fontSize:"0.83rem", 
+          }}>
+          Jump to Page:
+          </label>
+          <Select
+            value={page + 1}
+            onChange={(e) => changePage(Number(e.target.value) - 1)}
+            sx={{
+              fontSize: "0.8rem",
+              padding: "4px",
+              height: "32px",
+            }}
+          >
+            {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+              <MenuItem key={i} value={i + 1}>
+                {i + 1}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      </Box>
+    );
+  };
+
+
   const options = {
     filterType: 'checkbox',
     selectableRows: "none",
@@ -254,6 +327,16 @@ const OrganizationReports = () => {
     viewColumns: false,
     jumpToPage: true,
     customToolbar: renderToolBar,
+    responsive: "vertical",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
   };
 
 

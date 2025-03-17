@@ -197,9 +197,20 @@ export default function MetaAnalytics(props) {
       };
   return (
     <div>
-      <Grid container columnSpacing={3} rowSpacing={2}  mb={1} gap={3}>
-      <Grid item xs={6} sm={6} md={6} lg={6} xl={6} display={"flex"} justifyContent="space-between" >
-      <FormControl  size="small">
+      <Grid container columnSpacing={3} rowSpacing={2}  mb={1} gap={1}>
+      <Grid
+      container
+      item
+      xs={12}
+      sm={12}
+      md={12}
+      lg={4}
+      xl={4}
+      spacing={1}
+      alignItems="center"
+    >
+      {/* Project Type Dropdown */}
+      <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>      <FormControl  size="small">
             <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
               Project Type {" "}
               {
@@ -230,33 +241,43 @@ export default function MetaAnalytics(props) {
               ))}
             </Select>
           </FormControl>
-{/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent="space-between" alignItems="center"> */}
-<CustomButton label="Submit" sx={{ width: "120px" }} onClick={handleSubmit}  />
-<Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
-<CustomButton
-              onClick={handleClick}
-              disabled={loading}
-              sx={{ marginRight: 1 }}
-              endIcon={<KeyboardArrowDown />}
-              label="Download"
-            >
-              Download
-            </CustomButton>
-            <StyledMenu
-              id="demo-customized-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={downloadCSV}>CSV</MenuItem>
-              <MenuItem onClick={downloadPDF}>PDF</MenuItem>
-              <MenuItem onClick={downloadJSON}>JSON</MenuItem>
-            </StyledMenu>
-          </Box>
-        {/* </Grid> */}
+          </Grid>
       </Grid>
-        </Grid>
-      {loading && <Spinner />}
+   <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+   <Box display="flex" justifyContent="space-between" alignItems="center">
+      <CustomButton
+        label="Submit"
+        sx={{ width: "35%", height: "40px" }}
+        onClick={handleSubmit}
+        size="small"
+      />
+
+      {/* Download Button */}
+      <Box display="flex" alignItems="center" sx={{ width: "45%" }}>
+        <CustomButton
+          onClick={handleClick}
+          disabled={loading}
+          sx={{ width: "100%", height: "40px" }}
+          endIcon={<KeyboardArrowDown />}
+          label="Download"
+        >
+          Download
+        </CustomButton>
+        <StyledMenu
+          id="demo-customized-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={downloadCSV}>CSV</MenuItem>
+          <MenuItem onClick={downloadPDF}>PDF</MenuItem>
+          <MenuItem onClick={downloadJSON}>JSON</MenuItem>
+        </StyledMenu>
+      </Box>
+    </Box>
+
+    </Grid>
+  </Grid>      {loading && <Spinner />}
 
       {metaAnalyticsData.length ?
         metaAnalyticsData.map((analyticsData,_index)=>{

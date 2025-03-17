@@ -98,6 +98,7 @@ import commonReducer from "./CL-Transcription/Common";
 import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
 import patchAnnotation from "./CL-Transcription/PatchAnnotation"
 import updateUIPrefs from "./UserManagement/UpdateUIPrefs";
+import projectTabReducer from "./ProjectDetails/ProjectTabReducer";
 
 
 const index = {
@@ -204,6 +205,7 @@ const index = {
     patchAnnotation,
     updateUIPrefs,
     getManagerSuggestions,
+    projectTab:projectTabReducer
 };
 
 export default index;
