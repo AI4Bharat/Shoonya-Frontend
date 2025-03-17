@@ -13,6 +13,24 @@ import { useNavigate } from "react-router-dom";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
+import InfoIcon from '@mui/icons-material/Info';
+import { tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
+
+const CustomTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "#e0e0e0",
+    color: "rgba(0, 0, 0, 0.87)",
+    maxWidth: 300,
+    fontSize: theme.typography.pxToRem(12),
+    border: "1px solid #ccc"
+  },
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#e0e0e0"
+  }
+}));
 
 
 const Projectcard = (props) => {
@@ -75,15 +93,64 @@ const Projectcard = (props) => {
           }
     });
   };
+  const areFiltersApplied = (filters) => {
+    return Object.values(filters).some((value) => value !== "");
+  };
+
+  const filtersApplied = areFiltersApplied(selectedFilters);
 
   return (
     <React.Fragment>
-        <Grid sx={{textAlign:"end",margin:"-20px 10px 10px 0px"}}>
+      <Grid sx={{ textAlign: "end", margin: "-20px 10px 10px 0px" }}>
         <Button style={{ minWidth: "25px" }} onClick={handleShowFilter}>
-        <Tooltip title={"Filter Table"}>
-          <FilterListIcon sx={{ color: "#515A5A" }} />
-        </Tooltip>
-      </Button>
+          {filtersApplied && (
+            <InfoIcon
+              color="primary"
+              fontSize="small"
+              sx={{ position: "absolute", top: -4, right: -4 }}
+            />
+          )}
+          <CustomTooltip
+            title={
+              filtersApplied ? (
+                <Box
+                  sx={{
+                    fontFamily: "Roboto, sans-serif",
+                    padding: "5px",
+                    maxWidth: "300px",
+                    fontSize: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "5px"
+                  }}
+                >
+                  {selectedFilters.project_type && (
+                    <div>
+                      <strong>Project Type:</strong> {selectedFilters.project_type}
+                    </div>
+                  )}
+                  {selectedFilters.project_user_type && (
+                    <div>
+                      <strong>Project User Type:</strong> {selectedFilters.project_user_type}
+                    </div>
+                  )}
+                  {selectedFilters.archived_projects && (
+                    <div>
+                      <strong>Archived Projects:</strong> {selectedFilters.archived_projects}
+                    </div>
+                  )}
+                </Box>
+              ) : (
+                <span style={{ fontFamily: "Roboto, sans-serif" }}>
+                  Filter Table
+                </span>
+              )
+            }
+            disableInteractive
+          >
+            <FilterListIcon sx={{ color: "#515A5A" }} />
+          </CustomTooltip>
+        </Button>
       </Grid>
       {pageSearch().length > 0 ? (
         <Box sx={{ margin: "0 auto", pb: 5 }}>
