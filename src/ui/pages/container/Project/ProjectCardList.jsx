@@ -245,7 +245,7 @@ const ProjectCardList = (props) => {
             <FilterListIcon sx={{ color: '#515A5A' }} />
           </CustomTooltip>
         </Button>
-      </div>
+      </>
     );
   };
   const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
