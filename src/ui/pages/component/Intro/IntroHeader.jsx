@@ -31,9 +31,17 @@ function IntroHeader(props) {
     setMobileOpen((prevState) => !prevState);
   };
 
+
+
   const handleClickUseCases = () => {
     navigate("/useCases");
   };
+
+
+  const handleClickinstallitionguide = () => {
+    navigate("/installiationGuide");
+  };
+  
   const handleClickAnalytics = () => {
     navigate("/analytic");
   }
@@ -97,6 +105,20 @@ function IntroHeader(props) {
            use Cases
           </Button>
         </Grid>
+
+        <Grid>
+          <Button
+            onClick={handleClickinstallitionguide}
+            sx={{
+              color: "#51504f",
+              textTransform: "capitalize",
+              fontSize: "16px",
+              fontFamily: "roboto,sans-serif",
+            }}
+          >
+           Installiation Guide
+          </Button>
+        </Grid>
         
       </Grid>
     </Box>
@@ -121,7 +143,8 @@ function IntroHeader(props) {
             <Grid>
               <a
                 target="_blank"
-                href="https://www.youtube.com/@shoonya-bhashini"
+                // href="https://www.youtube.com/@shoonya-bhashini"
+                href="https://youtu.be/N4PBSB2fQto?si=67p3_73EuNytXxHc"
               >
                 <Button
                   sx={{
@@ -176,6 +199,19 @@ function IntroHeader(props) {
               >
                 Use Cases
               </Button>
+              
+          <Button
+            onClick={handleClickinstallitionguide}
+            sx={{
+              color: "#51504f",
+              textTransform: "capitalize",
+              fontSize: "16px",
+              fontFamily: "roboto,sans-serif",
+            }}
+          >
+           Installiation Guide
+          </Button>
+          
               <Button
                 onClick={handleClickAnalytics}
                 sx={{

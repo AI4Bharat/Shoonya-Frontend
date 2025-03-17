@@ -26,7 +26,6 @@ const Partners = () => {
               marginBottom: "50px",
             }}
           >
-            Partners
           </Typography>
 
           {/* <Grid

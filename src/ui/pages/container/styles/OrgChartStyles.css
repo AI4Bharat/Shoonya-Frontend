@@ -1,0 +1,81 @@
+/* .org-chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .orgchart .node {
+    background: #4a90e2 !important; /* Blue theme *
+    color: white !important;
+    font-weight: bold;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+    text-align: center;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .orgchart .node:hover {
+    background: #357abd !important; /* Darker shade on hover *
+    transform: scale(1.08);
+  }
+  
+  .orgchart .lines {
+    border-color: #4a90e2 !important;
+  }
+  
+  /* Add spacing to the header *
+  .org-chart-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+   */
+
+/* Remove grid background */
+.orgchart {
+  background: none !important;
+}
+
+/* Increase node size */
+.orgchart .node {
+  background: #4a90e2 !important; /* Blue theme */
+  color: white !important;
+  font-weight: bold;
+  border-radius: 10px !important;
+  padding: 12px !important;  /* Increase padding */
+  font-size: 1.2rem !important;  /* Increase text size */
+  min-width: 130px !important; /* Increase width */
+  transition: 0.3s;
+  text-align: center;
+}
+
+/* Hover effect */
+.orgchart .node:hover {
+  background: #357abd !important; /* Darker shade on hover */
+  transform: scale(1.05);
+}
+
+/* Adjust connection lines */
+.orgchart .lines {
+  border-color: #4a90e2 !important;
+  stroke-width: 2px !important;
+}
+
+/* Reduce vertical space between levels */
+.orgchart td {
+  padding: 5px 0 !important;  /* Reduce space between rows */
+}
+
+/* Reduce horizontal space between sibling nodes */
+.orgchart .node-container {
+  margin: -100px 0px !important; /* Overlap nodes slightly */
+}
+
+/* Adjust node connector lines */
+.orgchart .lines {
+  margin-top: -30px !important; /* Moves nodes closer together */
+}

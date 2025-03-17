@@ -37,7 +37,7 @@ const Footer = () => {
           </a>
           <a
             target="_blank"
-            href="https://www.youtube.com/@shoonya-bhashini"
+            href="https://youtu.be/vkjCmCWejMM?si=bwihyf0h1t--9J2r"
           >
             <img
               src={YouTube}
