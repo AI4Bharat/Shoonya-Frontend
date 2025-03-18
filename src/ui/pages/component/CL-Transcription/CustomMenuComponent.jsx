@@ -1,24 +1,20 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import {
-  fontMenu,
   playbackSpeed,
-  themeMenu,
-  placementMenu,
+
 } from "../../../../utils/SubTitlesUtils";
 
-//Components
-import { Menu, MenuItem, Typography } from "@mui/material";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Typography from "@mui/material/Typography";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import CheckIcon from "@mui/icons-material/Check";
 
 const CustomMenuComponent = ({ anchorElSettings, handleClose, contianer }) => {
   const player = useSelector((state) => state.commonReducer.player);
 
-  const [anchorElFonts, setAnchorElFonts] = useState(null);
-  const [anchorElTheme, setAnchorElTheme] = useState(null);
   const [anchorElPlayback, setAnchorElPlayback] = useState(null);
-  const [anchorElPlacement, setAnchorElPlacement] = useState(null);
 
   const settingsMenu = [
     {

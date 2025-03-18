@@ -1,17 +1,9 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { onSubtitleChange } from "../../../../utils/SubTitlesUtils";
-
-//Styles
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
-
-//Components
 import { Grid, IconButton, Popover, Tooltip, Typography, Autocomplete, TextField } from "@mui/material";
-
-//Icons
 import CloseIcon from "@mui/icons-material/Close";
-
-//Redux
 import C from "../../../../redux/constants";
 import { setSubtitles } from "../../../../redux/actions/Common";
 
@@ -24,7 +16,6 @@ const TagsSuggestionList = React.forwardRef((props, ref) => {
     setTagSuggestionsAnchorEl,
     textWithoutTripleDollar,
     textAfterTripleDollar,
-    // saveTranscriptHandler,
     setEnableTransliterationSuggestion,
     TabsSuggestionData,
     tagSuggestionsAcoustic,
