@@ -1,10 +1,7 @@
-import React, { memo, useRef } from "react";
-import { useSelector } from "react-redux";
+import React, { memo } from "react";
 
-//Styles
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 
-//Components
 import { IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MergeIcon from "@mui/icons-material/Merge";
