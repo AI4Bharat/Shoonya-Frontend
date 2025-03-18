@@ -240,6 +240,7 @@ const Header = () => {
     setAnchorElSettings(null);
   };
   const handleOpenNotification = (event) => {
+    event.stopPropagation(); // Prevent event bubbling
     setAnchorElNotification(event.currentTarget);
   };
 

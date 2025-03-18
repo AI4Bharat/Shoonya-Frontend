@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Drawer,
   IconButton,
@@ -11,6 +11,9 @@ import {
   Typography,
   Box,
   FormControlLabel,
+  Modal,
+  Tabs,
+  Tab,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -18,19 +21,15 @@ import CloseIcon from "@material-ui/icons/Close";
 import { NavLink, Link } from "react-router-dom";
 import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
 import headerStyle from "../../../styles/header";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Modal from "@mui/material/Modal";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import GradingSharpIcon from "@mui/icons-material/GradingSharp";
-import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
-import Tooltip from "@mui/material/Tooltip";
-import { Menu, Close } from "@mui/icons-material";
 import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import NotificationPatchAPI from "../../../../redux/actions/api/Notification/NotificationPatchApi";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import Tooltip from "@mui/material/Tooltip";
+import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 
 const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -40,8 +39,8 @@ const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     width: "50%",
     padding: "0",
-    overflowX: "hidden",
     transition: "all 0.3s ease-in-out",
+    overflowX: "hidden",
   },
   menuButton: {
     color: theme.palette.primary.main,
@@ -114,7 +113,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   appBar: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ffffff !important",
     padding: "8px 0",
     boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
     transition: "all 0.3s ease",
@@ -137,40 +136,44 @@ const useStyles = makeStyles((theme) => ({
       color: "#1a3a7a",
     },
   },
-}));
-
-const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "80%", // Increased width to better fit tabs
-    bgcolor: "background.paper",
-    border: "1px solid #ddd",
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "90%"
+  },
+  modalContent: {
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(4),
+    outline: "none",
     borderRadius: "8px",
-    boxShadow: 24,
-    p: 4,
-  };
-  
+    width: "80%",
+  },
+  tabContent: {
+    padding: theme.spacing(2),
+  },
+  titleContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+}));
 
 function MobileNavbar(props) {
   const { loggedInUserData, appSettings, userSettings, tabs, appInfo } = props;
   const [openDrawer, setOpenDrawer] = useState(false);
   const headerClasses = headerStyle();
   const classes = useStyles();
-  const [openModal, setOpenModal] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  const [openNotifications, setOpenNotifications] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
   const [Notification, setnotification] = useState();
-  const [selectedNotificationId, setSelectedNotificationId] = useState(null);
-  const [unread, setunread] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [unread, setunread] = useState(null);
+  const [selectedNotificationId, setSelectedNotificationId] = useState(null);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
-  const fetchNotifications = () => {
+  const fetchNotifications = useCallback(() => {
     let apiObj = new NotificationAPI();
     const endpoint =
       unread == null
@@ -193,7 +196,7 @@ function MobileNavbar(props) {
       .catch((error) => {
         console.error("Error fetching notifications:", error);
       });
-  };
+  }, [unread]);
 
   const markAsRead = (notificationId) => {
     const task = new NotificationPatchAPI(notificationId);
@@ -220,15 +223,19 @@ function MobileNavbar(props) {
 
   useEffect(() => {
     fetchNotifications();
-  }, [unread, selectedNotificationId]);
+  }, [unread, selectedNotificationId, fetchNotifications]);
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
+  const handleNotificationClick = () => {
+    setOpenNotifications(true);
     setOpenDrawer(false);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseNotifications = () => {
+    setOpenNotifications(false);
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
   };
 
   const unseenNotifications =
@@ -269,21 +276,24 @@ function MobileNavbar(props) {
       >
         <Box
           style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            height: "100%",
-            position: "relative",
+            // display: "flex",
+            // flexDirection: "column",
+            // justifyContent: "space-between",
+            // height: "100%",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            pb: 2,
           }}
         >
-          <IconButton
-            className={classes.closeButton}
-            onClick={() => setOpenDrawer(false)}
-          >
-            <CloseIcon />
-          </IconButton>
+          <Box style={{ position: "sticky", top: "0px", zIndex: 10 }}>
+            <IconButton
+              className={classes.closeButton}
+              onClick={() => setOpenDrawer(false)}
+            >
+              <CloseIcon />
+            </IconButton>
 
-          <Box>
             <NavLink
               to={`/profile/${loggedInUserData.id}`}
               onClick={() => setOpenDrawer(false)}
@@ -293,7 +303,7 @@ function MobileNavbar(props) {
                 <Avatar alt="user_profile_pic" className={classes.avatar}>
                   {loggedInUserData?.username?.[0]}
                 </Avatar>
-                <Box sx={{ ml: 2 }}>
+                <Box style={{ marginLeft: "20px" }}>
                   <Typography
                     variant="h6"
                     style={{
@@ -313,7 +323,9 @@ function MobileNavbar(props) {
                 </Box>
               </Box>
             </NavLink>
+          </Box>
 
+          <Box>
             <Typography className={classes.sectionTitle}>
               Organization
             </Typography>
@@ -342,7 +354,7 @@ function MobileNavbar(props) {
                   className={classes.listItem}
                   onClick={() => {
                     if (setting.name === "Notifications") {
-                      handleOpenModal();
+                      handleNotificationClick();
                     } else {
                       setting.onclick();
                     }
@@ -365,7 +377,7 @@ function MobileNavbar(props) {
             </List>
           </Box>
 
-          <Box style={{ marginBottom: 16 }}>
+          <Box style={{ marginBottom: "16px" }}>
             <Typography className={classes.sectionTitle}>
               App Settings
             </Typography>
@@ -396,7 +408,7 @@ function MobileNavbar(props) {
             </List>
           </Box>
 
-          <Box style={{ marginBottom: 16 }}>
+          <Box style={{ marginBottom: "16px" }}>
             <Typography className={classes.sectionTitle}>
               User Settings
             </Typography>
@@ -461,45 +473,175 @@ function MobileNavbar(props) {
         </Grid>
       </AppBar>
 
-      {/* Modal for Notification */}
       <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="notification-modal-title"
-        aria-describedby="notification-modal-description"
+        className={classes.modal}
+        open={openNotifications}
+        onClose={handleCloseNotifications}
       >
-        <Box>
-          <Typography
-            id="notification-modal-title"
-            variant="h6"
-            component="h2"
+        <div className={classes.modalContent}>
+          <Box className={classes.titleContainer}>
+            <Typography variant="h6">Notifications</Typography>
+            {Notification &&
+              Notification.length > 0 &&
+              unseenNotifications?.length > 0 && (
+                <Tooltip title="Mark all as read">
+                  <IconButton onClick={handleMarkAllAsReadClick}>
+                    <GradingSharpIcon
+                      className={classes.icon}
+                      color="primary"
+                    />
+                  </IconButton>
+                </Tooltip>
+              )}
+          </Box>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            indicatorColor="primary"
           >
-            Notifications
-          </Typography>
-
-          <Tabs value={activeTab} onChange={handleTabChange}>
             <Tab label="All" />
             <Tab label="Unread" />
           </Tabs>
+          <div className={classes.tabContent}>
+            {tabValue === 0 && (
+              <Box style={{ maxHeight: "400px", overflowY: "auto" }}>
+                {Notification && Notification.length > 0 ? (
+                  Notification.map((notification, index) => (
+                    <Box
+                      key={index}
+                      style={{
+                        padding: "20px",
+                        margin: "10px",
+                        borderRadius: "8px",
+                        backgroundColor:
+                          notification?.seen_json &&
+                          notification?.seen_json[loggedInUserData.id]
+                            ? `theme.palette.background.paper`
+                            : "#D7EAF9",
+                        border: "1px solid",
+                        borderColor: "#c1c1c1",
+                        position: "relative",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        navigate(notification.on_click);
+                      }}
+                    >
+                      <Typography variant="body1" style={{fontWeight: 700}}>
+                        {notification.title || "Notification"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {notification.message || "No message content"}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        style={{ display: "block", marginTop: "16px" }}
+                      >
+                        {new Date(notification.created_at).toLocaleString()}
+                      </Typography>
 
-          {activeTab === 0 && (
-            <Box>
-              {/* Content for All notifications */}
-              <Typography variant="body2">
-                All notifications will appear here
-              </Typography>
-            </Box>
-          )}
+                      {(!notification?.seen_json ||
+                        !notification?.seen_json[loggedInUserData.id]) && (
+                        <Tooltip title="Mark as read">
+                          <IconButton
+                            size="small"
+                            style={{
+                              position: "absolute",
+                              bottom: "8px",
+                              right: "8px",
+                            }}
+                            onClick={() => handleMarkAsRead(notification.id)}
+                          >
+                            <CheckCircleOutlineRoundedIcon color="primary" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
+                  ))
+                ) : (
+                  <Typography
+                    variant="body2"
+                    style={{ textAlign: "center", paddingY: "3rem" }}
+                  >
+                    No notifications available
+                  </Typography>
+                )}
+              </Box>
+            )}
+            {tabValue === 1 && (
+              <Box style={{ maxHeight: "400px", overflowY: "auto" }}>
+                {unseenNotifications && unseenNotifications.length > 0 ? (
+                  unseenNotifications.map((notification, index) => (
+                    <Box
+                      key={index}
+                      style={{
+                        padding: "2rem",
+                        marginBottom: "1rem",
+                        borderRadius: "8px",
+                        backgroundColor: "#D7EAF9",
+                        border: "1px solid",
+                        borderColor: "#c1c1c1",
+                        position: "relative",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        navigate(notification.on_click);
+                      }}
+                    >
+                      <Typography variant="body1" style={{fontWeight: 700}}>
+                        {notification.title || "Notification"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {notification.message || "No message content"}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        style={{ display: "block", marginTop: "1rem" }}
+                      >
+                        {new Date(notification.created_at).toLocaleString()}
+                      </Typography>
 
-          {activeTab === 1 && (
-            <Box>
-              {/* Content for Unread notifications */}
-              <Typography variant="body2">
-                Unread notifications will appear here
-              </Typography>
-            </Box>
-          )}
-        </Box>
+                      <Tooltip title="Mark as read">
+                        <IconButton
+                          size="small"
+                          style={{
+                            position: "absolute",
+                            bottom: "8px",
+                            right: "8px",
+                          }}
+                          onClick={() => handleMarkAsRead(notification.id)}
+                        >
+                          <CheckCircleOutlineRoundedIcon color="primary" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ))
+                ) : (
+                  <Box
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      paddingY: "3rem",
+                    }}
+                  >
+                    <NotificationsOffIcon
+                      style={{ fontSize: "50px", color: "gray" }}
+                    />
+                    <Typography
+                      variant="body2"
+                      style={{ textAlign: "center", marginTop: "1rem" }}
+                    >
+                      No unread notifications
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            )}
+          </div>
+        </div>
       </Modal>
     </>
   );
