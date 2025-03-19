@@ -18,11 +18,13 @@ import DatasetLogs from './DatasetLogs';
 import DatasetDescription from './DatasetDescription';
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import DatasetReports from '../../component/common/DatasetReports';
+import Spinner from '../../component/common/Spinner';
 
 const DatasetDetails = () => {
 
     const { datasetId } = useParams();
     console.log(datasetId)
+      const [loading, setLoading] = useState(false);
     const [selectedTab, setSelectedTab] = useState(0);
     const [datasetData, setDatasetData] = useState(
         [
@@ -31,17 +33,24 @@ const DatasetDetails = () => {
             { name: "dataset Type", value: null },    
         ]
     )
+  const apiLoading = useSelector((state) => state.apiStatus.loading);
 
     const dispatch = useDispatch();
     let navigate = useNavigate();
     const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
+
     const DatasetMembers = useSelector((state) => state.getDatasetMembers.data);
     const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     
+
+      useEffect(() => {
+        setLoading(apiLoading);
+      }, [apiLoading]);
+
     useEffect(() => {
 		dispatch(APITransport(new GetDatasetDetailsAPI(datasetId)));
 		dispatch(APITransport(new GetDatasetMembersAPI(datasetId)));
-	}, [dispatch, datasetId]);
+	}, [datasetId,loading]);
     useEffect(() => {
        
         setDatasetData([
@@ -69,6 +78,8 @@ const DatasetDetails = () => {
 
     return (
         <ThemeProvider theme={themeDefault}>
+            {loading && <Spinner />}
+            
             <Grid
                 container
                 direction='row'
@@ -172,7 +183,7 @@ const DatasetDetails = () => {
                         <DataitemsTable />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={1}>
-                        <MembersTable dataSource={DatasetMembers} hideButton />
+                        <MembersTable dataSource={DatasetMembers} type="dataset"  />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={2}>
                         <DatasetProjectsTable datasetId={datasetId} />
