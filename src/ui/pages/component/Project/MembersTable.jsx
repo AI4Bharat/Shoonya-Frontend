@@ -53,6 +53,7 @@ const options = {
 };
 
 const addLabel = {
+  dataset:"Add Members to Dataset",
   organization: "Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
