@@ -1,12 +1,10 @@
 import React from "react";
-import {
-  Grid,
-  Tooltip,
-  Button,
-  Alert,
-  MenuItem,
-  Menu,
-} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";

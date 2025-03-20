@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://backend.dev.shoonya.ai4bharat.org" crossorigin="anonymous">
     <link href="//fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
     <link href="//fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -17,7 +19,10 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
       -->
-    <link rel="stylesheet" href="/styles/main.css">
+      <link rel="shortcut icon" href="/favicon.ico">
+
+      <link rel="preload" as="style" href="/styles/main.css">
+      <link rel="stylesheet" href="/styles/main.css" media="print" onload="this.onload=null;this.removeAttribute('media');">
     <title>Label Studio</title>
   <script defer src="main.js"></script><link href="main.css" rel="stylesheet"></head>
   <body>

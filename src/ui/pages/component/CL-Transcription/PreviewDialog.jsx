@@ -1,96 +1,29 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  Box,
-  IconButton,
-  DialogTitle,
-  Typography,
-  CircularProgress,
-} from "@mui/material";
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import DialogTitle from "@mui/material/DialogTitle";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import React, {  useEffect, useState, useRef } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
-//   import { FetchpreviewTaskAPI, setSnackBar } from "redux/actions";
-import { useDispatch, useSelector } from "react-redux";
-//   import Loader from "./Spinner";
-//   import TimeBoxes from "./TimeBoxes";
-
+import { useSelector } from "react-redux";
 const PreviewDialog = ({
   openPreviewDialog,
   handleClose,
   subtitles,
-  // videoId,
-  // taskType,
-  // currentSubs,
-  // targetLanguage,
 }) => {
-  const dispatch = useDispatch();
   const [isFullscreen, setIsFullscreen] = useState(false);
   console.log(subtitles);
   const annotationData = useSelector((state) => state.getAnnotationsTask.data);
 
-  const [previewdata, setPreviewdata] = useState([]);
-  const [selectedSubtitleIndex, setSelectedSubtitleIndex] = useState();
   const [loading, setLoading] = useState(false);
 
   const dialogRef = useRef(null);
 
-  // const fetchPreviewData = useCallback(async () => {
-  //   setLoading(true)
-  //   const taskObj = new FetchpreviewTaskAPI(videoId, taskType, targetLanguage);
-  //   try {
-  //     const res = await fetch(taskObj.apiEndPoint(), {
-  //       method: "GET",
-  //       headers: taskObj.getHeaders().headers,
-  //     });
-
-  //     const response = await res.json();
-  //       setPreviewdata(response.data.payload);
-  //       setLoading(false)
-  //   } catch (error) {
-  //     setLoading(false)
-  //     dispatch(
-  //       setSnackBar({
-  //         open: true,
-  //         message: "Something went wrong!!",
-  //         variant: "error",
-  //       })
-  //     );
-  //   }
-  // }, [ dispatch,videoId, taskType, targetLanguage]);
-
-  // useEffect(() => {
-  //   if (openPreviewDialog) {
-  //     fetchPreviewData();
-  //   }
-  // }, [fetchPreviewData, openPreviewDialog]);
-
-  // useEffect(() => {
-  //   if (
-  //     openPreviewDialog &&
-  //     selectedSubtitleIndex !== null &&
-  //     !loading
-  //   ) {
-  //     // setTimeout(() => {
-  //       const subtitleId = sub-${selectedSubtitleIndex};
-  //       const subtitleElement = document.getElementById(subtitleId);
-  //       if (subtitleElement) {
-  //         subtitleElement.scrollIntoView({ behavior: "smooth", block: "start" });
-  //       }
-  //     // }, 5000);
-  //   }
-  // }, [openPreviewDialog, selectedSubtitleIndex,loading]);
-
-  // useEffect(() => {
-  //   if (currentSubs) {
-  //     const selectedIndex = previewdata.findIndex((el) =>
-  //       el.text === currentSubs.text && el.target_text === currentSubs.target_text
-  //     );
-  //     setSelectedSubtitleIndex(selectedIndex);
-  //   }
-  // }, [currentSubs, previewdata,loading,isFullscreen]);
 
   const handleFullscreenToggle = () => {
     const elem = dialogRef.current;

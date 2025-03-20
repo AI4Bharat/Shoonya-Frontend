@@ -23,7 +23,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box p={4}>
+                <Box p={2}>
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -63,16 +63,14 @@ const ProjectSetting = () => {
               <Grid
                         item
                         xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                        sx={{mb:3,}}
+                        sx = {{
+                            mb : 3
+                        }}
                     >
                         <Typography variant="h3" gutterBottom component="div"sx={{fontWeight: '1.6875rem'}}>
                             Project Settings
                         </Typography>
-                    </Grid>
+               </Grid>
             <Box sx={{mb:2,}} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
                     <Tab label="Basic " sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
@@ -82,7 +80,7 @@ const ProjectSetting = () => {
                 </Tabs>
             </Box>
             <Divider/>
-            <Box sx={{ p: 1 }}>
+            <Box sx={{ p: 0 }}>
                 <TabPanel value={tabValue} index={0}>
                 <BasicSettings   ProjectDetails={ProjectDetails}/>  
                 </TabPanel>

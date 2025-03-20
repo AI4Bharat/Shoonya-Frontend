@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import { NavLink } from "react-router-dom";
-import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
+import Shoonya_Logo from "../../../../assets/Shoonya_Logo.webp";
 import headerStyle from "../../../styles/header";
 
 const useStyles = makeStyles(() => ({

@@ -25,7 +25,9 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
 import { ThemeProvider } from "@mui/material/styles";
-
+import { styled } from "@mui/styles";
+import { tooltipClasses } from "@mui/material/Tooltip";
+import InfoIcon from '@mui/icons-material/Info';
 import tableTheme from "../../../theme/tableTheme";
 import ColumnList from "../common/ColumnList";
 import DatasetStyle from "../../../styles/Dataset";
@@ -409,6 +411,25 @@ setLabellingStarted(true);
     );
 }
 
+const areFiltersApplied = (filters) => {
+  return Object.values(filters).some((value) => value !== "");
+};
+
+const filtersApplied = areFiltersApplied(selectedFilters);
+
+const CustomTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "#e0e0e0",
+    color: "rgba(0, 0, 0, 0.87)",
+    maxWidth: 300,
+    fontSize: theme.typography.pxToRem(12),
+  },
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#e0e0e0",
+  },
+}));
 
   const renderToolBar = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -458,11 +479,28 @@ setLabellingStarted(true);
                 setColumns={setSelectedColumns}
                 selectedColumns={selectedColumns}
             />
-        <Tooltip title="Filter Table">
-          <Button onClick={handleShowFilter}>
-            <FilterListIcon />
-          </Button>
-        </Tooltip>
+                <Box sx={{ position: "relative", display: "inline-block" }} onClick={handleShowFilter}>
+         {filtersApplied && (
+          <InfoIcon color="primary" fontSize="small" sx={{ position: "absolute", top: -4, right: -4 }} />
+        )}
+        <Button style={{ minWidth: "25px" }} onClick={handleShowFilter}>
+        <CustomTooltip
+          title={
+            filtersApplied ? (
+              <Box sx={{ padding: '5px', maxWidth: '300px', fontSize: '12px', display: "flex", flexDirection: "column", gap: "5px" }}>
+                {selectedFilters.supercheck_status && <div><strong>Supercheck Status:</strong> {selectedFilters.supercheck_status}</div>}
+                {selectedFilters.req_user !== -1 && <div><strong>Assigned User:</strong> {selectedFilters.req_user}</div>}
+              </Box>
+            ) : (
+              <span style={{ fontFamily: 'Roboto, sans-serif' }}>Filter Table</span>
+            )
+          }
+          disableInteractive
+        >
+            <FilterListIcon sx={{ color: '#515A5A' }} />
+        </CustomTooltip>
+        </Button>
+        </Box>
       </Box>
     );
   };

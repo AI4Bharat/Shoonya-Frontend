@@ -17,7 +17,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box p={4}>
+                <Box p={2}>
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -36,7 +36,7 @@ const DatasetSettingTabs = () => {
             // width: window.innerWidth * 0.8,
             width: "100%",
             minHeight: 500,
-            padding: 5
+            padding: 2
         }}
     >
       
@@ -44,10 +44,6 @@ const DatasetSettingTabs = () => {
               <Grid
                         item
                         xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
                         sx={{mb:3,}}
                     >
                         <Typography variant="h3" gutterBottom component="div"sx={{fontWeight: '1.6875rem'}}>

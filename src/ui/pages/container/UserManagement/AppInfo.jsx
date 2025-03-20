@@ -28,7 +28,7 @@ export default function AppInfo() {
       <ThemeProvider theme={themeDefault}>
         <Grid container className={classes.appInfo}>
           <img
-            src={"Shoonya_Logo.png"}
+            src={"Shoonya_Logo.webp"}
             alt="logo"
             className={classes.infoLogo}
           />{" "}
