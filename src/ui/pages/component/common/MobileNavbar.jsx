@@ -19,7 +19,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloseIcon from "@material-ui/icons/Close";
 import { NavLink, Link } from "react-router-dom";
-import Shoonya_Logo from "../../../../assets/Shoonya_Logo.png";
+import Shoonya_Logo from "../../../../assets/Shoonya_Logo.webp";
 import headerStyle from "../../../styles/header";
 import GradingSharpIcon from "@mui/icons-material/GradingSharp";
 import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
