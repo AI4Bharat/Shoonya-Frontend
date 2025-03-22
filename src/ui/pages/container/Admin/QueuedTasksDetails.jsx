@@ -109,7 +109,14 @@ const QueuedTasksDetails = (props) => {
     filter: false,
     sort: false,
     align: "center",
-    setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+    setCellProps: () => ({ 
+          style: {
+          padding: "16px",
+          whiteSpace: "normal", 
+          overflowWrap: "break-word",
+          wordBreak: "break-word",  
+        } 
+        }),
 };
 
 function createColumn(name, label, options = {}) {
@@ -260,7 +267,13 @@ const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage 
     <div>
       {renderSnackBar()}
       {apiLoading && <Spinner />}
-      <Grid sx={{ mb: 1 }}>
+      <Grid 
+        container
+        justifyContent="center"  
+        sx={{ 
+          mb: 2,
+          padding: "10px",
+        }}>
         <Search />
       </Grid>
       <ThemeProvider theme={tableTheme}>

@@ -43,35 +43,34 @@ const DashBoard = () => {
                     aria-label="admin-tabs" 
                     variant='scrollable' 
                     scrollButtons='auto'
-                    sx = {{ 
-                        padding : {
-                            xs:"16px", 
-                            sm:"32px"
-                    }}}>
+                    sx={{ 
+                        '& .MuiTab-root': { fontSize: 17, fontWeight: '700', marginRight: '32px' },
+                        padding:"20px"
+                    }}>
                     <Tab label="Task Details"/>
                     <Tab label="Annotation Details"/>
                     <Tab label="User Details"/>
                     <Tab label="Queued Tasks Status"/>
                 </Tabs>
             </Box>
-            <Box sx={{ p: 2}}>
+            <Box sx={{ p: 1}}>
                 <TabPanel value={tabValue} index={0}>
-                <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '24px'}}>
+                <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '16px'}}>
                     <TaskDetails  />  
                 </Paper>
                 </TabPanel> 
                 <TabPanel value={tabValue} index={1}>
-                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '24px'}}>
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '16px'}}>
                         <AnnotationDetails  />  
                     </Paper>
                 </TabPanel> 
                 <TabPanel value={tabValue} index={2}>
-                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '24px'}}>
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight'}}>
                         <UserDetail  />  
                     </Paper>
                 </TabPanel>
                 <TabPanel value={tabValue} index={3}>
-                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight', padding: '24px'}}>
+                    <Paper variant="outlined" sx={{ borderRadius: "5px", backgroundColor: 'ButtonHighlight'}}>
                         <QueuedTasksDetails  /> 
                     </Paper> 
                 </TabPanel> 
