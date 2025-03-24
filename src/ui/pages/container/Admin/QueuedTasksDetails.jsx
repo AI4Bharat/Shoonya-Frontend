@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MUIDataTable from "mui-datatables";
 import { useNavigate } from "react-router-dom";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -15,6 +15,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import Spinner from "../../component/common/Spinner";
 import GetQueuedTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetQueuedTaskDetails";
+import Skeleton from "@mui/material/Skeleton";
 
 const QueuedTasksDetails = (props) => {
   const dispatch = useDispatch();
@@ -38,6 +39,44 @@ const QueuedTasksDetails = (props) => {
     const UserObj = new GetQueuedTaskDetailsAPI();
     dispatch(APITransport(UserObj));
   };
+    const [isBrowser, setIsBrowser] = useState(false);
+    const tableRef = useRef(null);
+    const [displayWidth, setDisplayWidth] = useState(0);
+  
+    useEffect(() => {
+      const handleResize = () => {
+        setDisplayWidth(window.innerWidth);
+      };
+  
+      if (typeof window !== 'undefined') {
+        handleResize();
+        window.addEventListener('resize', handleResize);
+      }
+  
+      return () => {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('resize', handleResize);
+        }
+      };
+    }, []);
+  
+    useEffect(() => {
+      setIsBrowser(true);
+      
+      // Force responsive mode after component mount
+      const applyResponsiveMode = () => {
+        if (tableRef.current) {
+          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+          if (tableWrapper) {
+            tableWrapper.classList.add('MuiDataTable-vertical');
+          }
+        }
+      };
+      
+      // Apply after a short delay to ensure DOM is ready
+      const timer = setTimeout(applyResponsiveMode, 100);
+      return () => clearTimeout(timer);
+    }, []);
 
   useEffect(() => {
     getUserDetail();
@@ -232,6 +271,7 @@ const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage 
     search: false,
     jumpToPage: true,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -264,12 +304,28 @@ const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage 
         <Search />
       </Grid>
       <ThemeProvider theme={tableTheme}>
-        {tableData.length ? <MUIDataTable
-          title="Queued Task Details"
+        {tableData.length ? <div ref={tableRef}>
+                  {isBrowser ? (
+                    <MUIDataTable
+                      key={`table-${displayWidth}`}
+                      title="Queued Task Details"
           data={tableData}
           columns={columns}
           options={options}
-        />:
+                    />
+                  ) : (
+                    <Skeleton
+                      variant="rectangular"
+                      height={400}
+                      sx={{
+                        mx: 2,
+                        my: 3,
+                        borderRadius: '4px',
+                        transform: 'none'
+                      }}
+                    />
+                  )}
+                </div>:
         <Box sx={{display: 'flex', gap: '2em', alignItems: 'center', justifyContent:'center'}}>
             {!apiLoading && <Typography>
               No Queued Tasks to Display

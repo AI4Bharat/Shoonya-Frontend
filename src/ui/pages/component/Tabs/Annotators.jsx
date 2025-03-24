@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +15,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Box from "@mui/material/Box";
+import Skeleton from "@mui/material/Skeleton";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -48,7 +49,44 @@ const AnnotatorsTable = (props) => {
 
     const workspaceAnnotators = useSelector(state => state.getWorkspacesAnnotatorsData.data);
     const workspaceDtails = useSelector(state=>state.getWorkspaceDetails.data);
-
+      const [isBrowser, setIsBrowser] = useState(false);
+      const tableRef = useRef(null);
+      const [displayWidth, setDisplayWidth] = useState(0);
+    
+      useEffect(() => {
+        const handleResize = () => {
+          setDisplayWidth(window.innerWidth);
+        };
+    
+        if (typeof window !== 'undefined') {
+          handleResize();
+          window.addEventListener('resize', handleResize);
+        }
+    
+        return () => {
+          if (typeof window !== 'undefined') {
+            window.removeEventListener('resize', handleResize);
+          }
+        };
+      }, []);
+    
+      useEffect(() => {
+        setIsBrowser(true);
+        
+        // Force responsive mode after component mount
+        const applyResponsiveMode = () => {
+          if (tableRef.current) {
+            const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+            if (tableWrapper) {
+              tableWrapper.classList.add('MuiDataTable-vertical');
+            }
+          }
+        };
+        
+        // Apply after a short delay to ensure DOM is ready
+        const timer = setTimeout(applyResponsiveMode, 100);
+        return () => clearTimeout(timer);
+      }, []);
 
     useEffect(() => {
         getWorkspaceAnnotatorsData();
@@ -327,6 +365,7 @@ const AnnotatorsTable = (props) => {
         search: false,
         jumpToPage: true,
         responsive: "vertical",
+        enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -409,12 +448,28 @@ const AnnotatorsTable = (props) => {
                 <Search />
             </Grid>
             <ThemeProvider theme={tableTheme}>
-                <MUIDataTable
-                    // title={""}
-                    data={data}
-                    columns={columns}
-                    options={options}
-                />
+                <div ref={tableRef}>
+                          {isBrowser ? (
+                            <MUIDataTable
+                              key={`table-${displayWidth}`}
+                              title={""}
+                              data={data}
+                              columns={columns}
+                              options={options}
+                            />
+                          ) : (
+                            <Skeleton
+                              variant="rectangular"
+                              height={400}
+                              sx={{
+                                mx: 2,
+                                my: 3,
+                                borderRadius: '4px',
+                                transform: 'none'
+                              }}
+                            />
+                          )}
+                        </div>
             </ThemeProvider>
         </div>
 
