@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 import GetWorkspacesManagersDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceManagers";
@@ -21,7 +21,6 @@ import tableTheme from "../../../theme/tableTheme";
 import RemoveWorkspaceManagerAPI from "../../../../redux/actions/api/WorkspaceDetails/RemoveWorkspaceManager";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
-import Skeleton from "@mui/material/Skeleton";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
@@ -43,44 +42,6 @@ const ManagersTable = (props) => {
        
         dispatch(APITransport(workspaceObjs));
     }
-      const [isBrowser, setIsBrowser] = useState(false);
-      const tableRef = useRef(null);
-      const [displayWidth, setDisplayWidth] = useState(0);
-    
-      useEffect(() => {
-        const handleResize = () => {
-          setDisplayWidth(window.innerWidth);
-        };
-    
-        if (typeof window !== 'undefined') {
-          handleResize();
-          window.addEventListener('resize', handleResize);
-        }
-    
-        return () => {
-          if (typeof window !== 'undefined') {
-            window.removeEventListener('resize', handleResize);
-          }
-        };
-      }, []);
-    
-      useEffect(() => {
-        setIsBrowser(true);
-        
-        // Force responsive mode after component mount
-        const applyResponsiveMode = () => {
-          if (tableRef.current) {
-            const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
-            if (tableWrapper) {
-              tableWrapper.classList.add('MuiDataTable-vertical');
-            }
-          }
-        };
-        
-        // Apply after a short delay to ensure DOM is ready
-        const timer = setTimeout(applyResponsiveMode, 100);
-        return () => clearTimeout(timer);
-      }, []);
     
     useEffect(()=>{
         getWorkspaceManagersData();
@@ -291,7 +252,6 @@ const handleRemoveWorkspaceManager = async(userid)=>{
             search: false,
             jumpToPage: true,
             responsive: "vertical",
-            enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -388,29 +348,13 @@ const handleRemoveWorkspaceManager = async(userid)=>{
                 <Search />
             </Grid>
             <ThemeProvider theme={tableTheme}>
-        <div ref={tableRef}>
-          {isBrowser ? (
-            <MUIDataTable
-              key={`table-${displayWidth}`}
-              title={""}
-              data={data}
-              columns={columns}
-              options={options}
-            />
-          ) : (
-            <Skeleton
-              variant="rectangular"
-              height={400}
-              sx={{
-                mx: 2,
-                my: 3,
-                borderRadius: '4px',
-                transform: 'none'
-              }}
-            />
-          )}
-        </div>
-      </ThemeProvider>
+				<MUIDataTable
+                    // title={""}
+                    data={data}
+                    columns={columns}
+                    options={options}
+                />
+            </ThemeProvider>
         </div>
        
     )

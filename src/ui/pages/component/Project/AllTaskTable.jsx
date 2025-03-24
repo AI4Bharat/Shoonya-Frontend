@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +20,6 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
 import SearchIcon from '@mui/icons-material/Search';
-import Skeleton from "@mui/material/Skeleton";
 import AllTaskSearchPopup from './AllTaskSearchPopup';
 
 const excludeCols = [
@@ -79,44 +78,6 @@ const AllTaskTable = (props) => {
     const taskObjs = new GetAllTasksAPI(id, currentPageNumber,selectedFilters, currentRowPerPage);
     dispatch(APITransport(taskObjs));
   };
-    const [isBrowser, setIsBrowser] = useState(false);
-    const tableRef = useRef(null);
-    const [displayWidth, setDisplayWidth] = useState(0);
-  
-    useEffect(() => {
-      const handleResize = () => {
-        setDisplayWidth(window.innerWidth);
-      };
-  
-      if (typeof window !== 'undefined') {
-        handleResize();
-        window.addEventListener('resize', handleResize);
-      }
-  
-      return () => {
-        if (typeof window !== 'undefined') {
-          window.removeEventListener('resize', handleResize);
-        }
-      };
-    }, []);
-  
-    useEffect(() => {
-      setIsBrowser(true);
-      
-      // Force responsive mode after component mount
-      const applyResponsiveMode = () => {
-        if (tableRef.current) {
-          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
-          if (tableWrapper) {
-            tableWrapper.classList.add('MuiDataTable-vertical');
-          }
-        }
-      };
-      
-      // Apply after a short delay to ensure DOM is ready
-      const timer = setTimeout(applyResponsiveMode, 100);
-      return () => clearTimeout(timer);
-    }, []);
 
   useEffect(() => {
     GetAllTasksdata();
@@ -352,7 +313,6 @@ const handleSearchClose = () => {
     serverSide: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
-    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -367,28 +327,12 @@ const handleSearchClose = () => {
   return (
     <div>
       <ThemeProvider theme={tableTheme}>
-        <div ref={tableRef}>
-          {isBrowser ? (
-            <MUIDataTable
-              key={`table-${displayWidth}`}
-              title={""}
-              data={tasks}
-              columns={columns}
-              options={options}
-            />
-          ) : (
-            <Skeleton
-              variant="rectangular"
-              height={400}
-              sx={{
-                mx: 2,
-                my: 3,
-                borderRadius: '4px',
-                transform: 'none'
-              }}
-            />
-          )}
-        </div>
+        <MUIDataTable
+          // title={""}
+          data={tasks}
+          columns={columns}
+          options={options}
+        />
       </ThemeProvider>
       {popoverOpen && (
         <AllTasksFilterList
