@@ -993,6 +993,61 @@ const TranscriptionRightPanel = ({
                           onChangeText={() => {}}
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                           containerStyles={{ width: "100%", height: "100%" }}
+                          onDoubleClick={(event)=>{
+                            const textarea = textRefs.current[index]
+                            console.log(textarea);
+                            if(textarea){
+                              const start = textarea.selectionStart
+                              const end = textarea.selectionEnd
+                              const selectedText = textarea.value.substring(start,end)
+
+                              if (selectedText.trim().length > 0) {
+                                const trimmedText = selectedText.trim();
+                                if (trimmedText !== selectedText) {
+                                  const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                  const newStart = start + leadingSpaces;
+                                  const newEnd = newStart + trimmedText.length;
+
+                                  textarea.setSelectionRange(newStart, newEnd);
+                                }
+                              }
+
+                            }
+
+
+                          }}
+
+                          onKeyDown={(event) => {
+                            console.log(event,"log",document.activeElement);
+
+                            if ( event.shiftKey && event.key == "ArrowLeft") {
+                              const textArea = textRefs.current[index];
+                              console.log("helo");
+
+                              if (textArea) {
+                                const start = textArea.selectionStart;
+                                const end = textArea.selectionEnd;
+
+                                const newStart = Math.max(start - 1, 0);
+                                textArea.setSelectionRange(newStart, end);
+                                event.preventDefault(); 
+                              }
+                            }
+                            else if (event.shiftKey && event.key == "ArrowRight") {
+                              const textArea = textRefs.current[index];
+                              if (textArea) {
+                                const start = textArea.selectionStart;
+                                const end = textArea.selectionEnd;
+
+                                const newEnd = Math.min(end + 1, textArea.value.length);
+                                textArea.setSelectionRange(start, newEnd);
+
+
+                                event.preventDefault(); 
+                              }
+                            }
+                          }}
+
                           onBlur={() => {
                             setTimeout(() => {
                               setShowPopOver(false);
@@ -1013,6 +1068,62 @@ const TranscriptionRightPanel = ({
                                       : ""
                                   }`}
                                   dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                  onDoubleClick={(event)=>{
+                                    const textarea = textRefs.current[index]
+                                    console.log(textarea);
+                                    if(textarea){
+                                      const start = textarea.selectionStart
+                                      const end = textarea.selectionEnd
+                                      const selectedText = textarea.value.substring(start,end)
+        
+                                      if (selectedText.trim().length > 0) {
+                                        const trimmedText = selectedText.trim();
+                                        if (trimmedText !== selectedText) {
+                                          const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                          const newStart = start + leadingSpaces;
+                                          const newEnd = newStart + trimmedText.length;
+        
+                                          textarea.setSelectionRange(newStart, newEnd);
+                                        }
+                                      }
+        
+                                    }
+        
+        
+                                  }}
+        
+                                  onKeyDown={(event) => {
+                                    console.log(event,"log",document.activeElement);
+        
+                                    if ( event.shiftKey && event.key == "ArrowLeft") {
+                                      const textArea = textRefs.current[index];
+                                      console.log("helo");
+        
+                                      if (textArea) {
+                                        const start = textArea.selectionStart;
+                                        const end = textArea.selectionEnd;
+        
+                                        const newStart = Math.max(start - 1, 0);
+                                        textArea.setSelectionRange(newStart, end);
+                                        event.preventDefault(); 
+                                      }
+                                    }
+                                    else if (event.shiftKey && event.key == "ArrowRight") {
+                                      const textArea = textRefs.current[index];
+                                      if (textArea) {
+                                        const start = textArea.selectionStart;
+                                        const end = textArea.selectionEnd;
+        
+                                        const newEnd = Math.min(end + 1, textArea.value.length);
+                                        textArea.setSelectionRange(start, newEnd);
+        
+        
+                                        event.preventDefault(); 
+                                      }
+                                    }
+                                  }}
+        
+
                                   onMouseUp={(e) =>
                                     onMouseUp(e, index + idxOffset)
                                   }
@@ -1045,6 +1156,63 @@ const TranscriptionRightPanel = ({
                                 false
                               );
                             }}
+                            onDoubleClick={(event)=>{
+                              const textarea = textRefs.current[index]
+                              console.log(textarea);
+                              if(textarea){
+                                const start = textarea.selectionStart
+                                const end = textarea.selectionEnd
+                                const selectedText = textarea.value.substring(start,end)
+  
+                                if (selectedText.trim().length > 0) {
+                                  const trimmedText = selectedText.trim();
+                                  if (trimmedText !== selectedText) {
+                                    const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                    const newStart = start + leadingSpaces;
+                                    const newEnd = newStart + trimmedText.length;
+  
+                                    textarea.setSelectionRange(newStart, newEnd);
+                                  }
+                                }
+  
+                              }
+  
+  
+                            }}
+  
+                            onKeyDown={(event) => {
+                              console.log(event,"log",document.activeElement);
+  
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
+                                const textArea = textRefs.current[index];
+                                console.log("helo");
+  
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newStart = Math.max(start - 1, 0);
+                                  textArea.setSelectionRange(newStart, end);
+                                  event.preventDefault(); 
+                                }
+                              }
+                              else if (event.shiftKey && event.key == "ArrowRight") {
+                                const textArea = textRefs.current[index];
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newEnd = Math.min(end + 1, textArea.value.length);
+                                  textArea.setSelectionRange(start, newEnd);
+  
+  
+                                  event.preventDefault(); 
+                                }
+                              }
+                            }}
+  
+
+
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             value={item.text}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
@@ -1084,6 +1252,62 @@ const TranscriptionRightPanel = ({
                                 true
                               );
                             }}
+                            onDoubleClick={(event)=>{
+                              const textarea = textRefs.current[index]
+                              console.log(textarea);
+                              if(textarea){
+                                const start = textarea.selectionStart
+                                const end = textarea.selectionEnd
+                                const selectedText = textarea.value.substring(start,end)
+  
+                                if (selectedText.trim().length > 0) {
+                                  const trimmedText = selectedText.trim();
+                                  if (trimmedText !== selectedText) {
+                                    const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                    const newStart = start + leadingSpaces;
+                                    const newEnd = newStart + trimmedText.length;
+  
+                                    textarea.setSelectionRange(newStart, newEnd);
+                                  }
+                                }
+  
+                              }
+  
+  
+                            }}
+  
+                            onKeyDown={(event) => {
+                              console.log(event,"log",document.activeElement);
+  
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
+                                const textArea = textRefs.current[index];
+                                console.log("helo");
+  
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newStart = Math.max(start - 1, 0);
+                                  textArea.setSelectionRange(newStart, end);
+                                  event.preventDefault(); 
+                                }
+                              }
+                              else if (event.shiftKey && event.key == "ArrowRight") {
+                                const textArea = textRefs.current[index];
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newEnd = Math.min(end + 1, textArea.value.length);
+                                  textArea.setSelectionRange(start, newEnd);
+  
+  
+                                  event.preventDefault(); 
+                                }
+                              }
+                            }}
+  
+
                             enabled={enableTransliterationSuggestion}
                             onChangeText={() => {}}
                             containerStyles={{ width: "100%", height: "100%" }}
@@ -1103,6 +1327,63 @@ const TranscriptionRightPanel = ({
                                         ? classes.boxHighlight
                                         : ""
                                     }`}
+                                    onDoubleClick={(event)=>{
+                                      const textarea = textRefs.current[index]
+                                      console.log(textarea);
+                                      if(textarea){
+                                        const start = textarea.selectionStart
+                                        const end = textarea.selectionEnd
+                                        const selectedText = textarea.value.substring(start,end)
+          
+                                        if (selectedText.trim().length > 0) {
+                                          const trimmedText = selectedText.trim();
+                                          if (trimmedText !== selectedText) {
+                                            const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                            const newStart = start + leadingSpaces;
+                                            const newEnd = newStart + trimmedText.length;
+          
+                                            textarea.setSelectionRange(newStart, newEnd);
+                                          }
+                                        }
+          
+                                      }
+          
+          
+                                    }}
+          
+                                    onKeyDown={(event) => {
+                                      console.log(event,"log",document.activeElement);
+          
+                                      if ( event.shiftKey && event.key == "ArrowLeft") {
+                                        const textArea = textRefs.current[index];
+                                        console.log("helo");
+          
+                                        if (textArea) {
+                                          const start = textArea.selectionStart;
+                                          const end = textArea.selectionEnd;
+          
+                                          const newStart = Math.max(start - 1, 0);
+                                          textArea.setSelectionRange(newStart, end);
+                                          event.preventDefault(); 
+                                        }
+                                      }
+                                      else if (event.shiftKey && event.key == "ArrowRight") {
+                                        const textArea = textRefs.current[index];
+                                        if (textArea) {
+                                          const start = textArea.selectionStart;
+                                          const end = textArea.selectionEnd;
+          
+                                          const newEnd = Math.min(end + 1, textArea.value.length);
+                                          textArea.setSelectionRange(start, newEnd);
+          
+          
+                                          event.preventDefault(); 
+                                        }
+                                      }
+                                    }}
+          
+        
+      
                                     dir={enableRTL_Typing ? "rtl" : "ltr"}
                                     onFocus={() =>
                                       showAcousticText &&
@@ -1125,6 +1406,61 @@ const TranscriptionRightPanel = ({
                                   index + currentPageData?.length
                                 ] = el)
                               }
+                              onDoubleClick={(event)=>{
+                                const textarea = textRefs.current[index]
+                                console.log(textarea);
+                                if(textarea){
+                                  const start = textarea.selectionStart
+                                  const end = textarea.selectionEnd
+                                  const selectedText = textarea.value.substring(start,end)
+    
+                                  if (selectedText.trim().length > 0) {
+                                    const trimmedText = selectedText.trim();
+                                    if (trimmedText !== selectedText) {
+                                      const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                      const newStart = start + leadingSpaces;
+                                      const newEnd = newStart + trimmedText.length;
+    
+                                      textarea.setSelectionRange(newStart, newEnd);
+                                    }
+                                  }
+    
+                                }
+    
+    
+                              }}
+    
+                              onKeyDown={(event) => {
+                                console.log(event,"log",document.activeElement);
+    
+                                if ( event.shiftKey && event.key == "ArrowLeft") {
+                                  const textArea = textRefs.current[index];
+                                  console.log("helo");
+    
+                                  if (textArea) {
+                                    const start = textArea.selectionStart;
+                                    const end = textArea.selectionEnd;
+    
+                                    const newStart = Math.max(start - 1, 0);
+                                    textArea.setSelectionRange(newStart, end);
+                                    event.preventDefault(); 
+                                  }
+                                }
+                                else if (event.shiftKey && event.key == "ArrowRight") {
+                                  const textArea = textRefs.current[index];
+                                  if (textArea) {
+                                    const start = textArea.selectionStart;
+                                    const end = textArea.selectionEnd;
+    
+                                    const newEnd = Math.min(end + 1, textArea.value.length);
+                                    textArea.setSelectionRange(start, newEnd);
+    
+    
+                                    event.preventDefault(); 
+                                  }
+                                }
+                              }}
+
                               onChange={(event) => {
                                 changeTranscriptHandler(
                                   event,
