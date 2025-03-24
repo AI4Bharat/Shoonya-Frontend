@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { Card, CircularProgress, Grid, Typography,Modal,Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
@@ -8,6 +8,9 @@ import GetDatasetDownloadCSV from "../../../../redux/actions/api/Dataset/GetData
 import UploaddataAPI from "../../../../redux/actions/api/Dataset/uploaddata";
 import GetFileTypesAPI from "../../../../redux/actions/api/Dataset/GetFileTypes";
 import CustomButton from "../../component/common/Button";
+//import Modal from "../../component/common/Modal";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 import MenuItems from "../../component/common/MenuItems";
 import { FileUploader } from "react-drag-drop-files";
 import Switch from "@mui/material/Switch";
@@ -38,12 +41,14 @@ export default function DatasetSettings() {
   const { datasetId } = useParams();
   // console.log('current',datasetId)
   const dispatch = useDispatch();
+  const fileRef = useRef();
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(false);
   const [file, setFile] = useState([]);
   const [filetype, setFiletype] = useState("");
   const [type, setType] = useState([]);
   const [switchs, setswitchs] = useState("True");
+  const [anchorEl, setAnchorEl] = useState(null);
   console.log(file, filetype, switchs, "switchs");
   const [snackbar, setSnackbarInfo] = useState({
     open: false,

@@ -5,6 +5,7 @@ import {
   Box,
   TextField,
   Grid,
+  Typography,
   ListItemIcon,
   ListItemText,
   Checkbox,
@@ -12,14 +13,19 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Radio,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
+  FormControlLabel,
+  FormGroup,
 } from "@mui/material";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
+import { useDispatch, useSelector } from "react-redux";
 import removeDuplicatesDatasetInstanceAPI from "../../../../redux/actions/api/Dataset/removeDuplicatesDatasetInstance";
+import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { snakeToTitleCase } from "../../../../utils/utils";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar"
@@ -47,6 +53,7 @@ const MenuProps = {
 };
 export default function DeduplicateDataItems() {
   const classes = DatasetStyle();
+  const dispatch = useDispatch();
   const { datasetId } = useParams();
 
   const [anchorEl, setAnchorEl] = useState(null);

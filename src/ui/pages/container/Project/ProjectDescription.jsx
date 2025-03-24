@@ -1,9 +1,13 @@
 
 import DatasetStyle from "../../../styles/Dataset";
+import { useHistory, useParams } from 'react-router';
 import {
     Grid,
+    Link,
     Typography,
     Card,
+    Box,
+    CardMedia,
     CardContent,
     ThemeProvider
 } from '@mui/material';
@@ -15,6 +19,7 @@ import themeDefault from "../../../theme/theme";
 const ProjectDescription = (props) => {
     const { name, value, index } = props;
 
+    // const history = useHistory();
 
     const classes = DatasetStyle();
     return (
