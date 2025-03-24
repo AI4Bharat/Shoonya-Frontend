@@ -66,7 +66,8 @@ export default function ProjectList() {
       {/* <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ position: "static", bottom: "-51px", left: "20px" }} > */}
       <Grid container className={classes.root}>
         <Grid item style={{ flexGrow: "0" }}>
-          <Typography variant="h6" sx={{ paddingBottom: "7px" }}>
+          <Typography variant="h6" sx={{ paddingBottom: "7px", paddingLeft: "15px" }}
+          >
             View :{" "}
           </Typography>
         </Grid>
@@ -111,13 +112,10 @@ export default function ProjectList() {
                     </FormControl>
                 </Grid>
             </Grid> */}
-        <Grid xs={3} item className={classes.fixedWidthContainer}>
+        <Grid xs={3} item className={classes.fixedWidthContainer} sx={{mt:1,mb:1,mr:2,ml:2}}>
           <Search />
         </Grid>
       </Grid>
-      {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Search />
-            </Grid> */}
       <Box>
         <Box sx={{ marginTop: "20px" }}>
           {radiobutton ? (

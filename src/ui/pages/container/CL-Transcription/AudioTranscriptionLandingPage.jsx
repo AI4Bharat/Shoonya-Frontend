@@ -3,8 +3,6 @@ import ReactQuill, { Quill } from 'react-quill';
 import "../../../../ui/pages/container/Label-Studio/cl_ui.css"
 import 'quill/dist/quill.bubble.css';
 import React, {
-  memo,
-  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -12,16 +10,17 @@ import React, {
 } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Typography,
-  Grid,
-  Button,
-  Slider, Stack, CircularProgress
-  ,Portal} from "@mui/material";
-import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
+import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import Slider from "@mui/material/Slider";
+import Stack from "@mui/material/Stack";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
+import Portal from "@mui/material/Portal";
+
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
 import Timeline2 from './wavesurfer';

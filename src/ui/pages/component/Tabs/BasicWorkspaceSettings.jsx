@@ -12,7 +12,6 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 // import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
 // import GetSaveButtonAPI from "../../../../redux/actions/api/Dataset/DatasetEditUpdate";
 import GetWorkspaceSaveButtonAPI from "../../../../redux/actions/api/WorkspaceDetails/WorkspaceEditUpdate";
-import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import CustomButton from "../common/Button";
 import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../common/Spinner";

@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import CustomCard from "../../component/common/Card";
-import { Grid, Typography, Link, ThemeProvider } from "@mui/material";
+import React, {  useState } from "react";
+import {  ThemeProvider } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
-import { translate } from "../../../../config/localisation";
 import LoginStyle from "../../../styles/loginStyle";
 import themeDefault from "../../../theme/theme";
-import { useNavigate } from "react-router-dom";
 import AppInfo from "./AppInfo";
 import ForgotPasswordAPI from "../../../../redux/actions/api/UserManagement/ForgotPassword";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch } from "react-redux";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 
