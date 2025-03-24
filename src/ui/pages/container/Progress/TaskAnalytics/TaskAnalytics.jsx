@@ -221,12 +221,12 @@ const TaskAnalytics = (props) => {
         <Grid item xs={2} sm={2} md={2} lg={2} xl={2} display={"flex"} justifyContent="space-between" >
         <Box display="flex" justifyContent="flex-end" mb={2}>
           <IconButton onClick={toggleFilterBox} aria-label="filter">
-            <FilterList fontSize="large" />
+            <FilterList fontSize="medium" />
           </IconButton>
         </Box>
 
         {showFilterBox && (
-          <Box border={1} borderRadius={2} padding={2} display="flex" flexDirection="column" gap={2}>
+          <Box border={1} borderRadius={2} padding={3} display="flex" flexDirection="column" gap={3}>
 
             {/* Project Type Dropdown */}
             <FormControl size="small">
@@ -274,9 +274,9 @@ const TaskAnalytics = (props) => {
               />
             </Box>
 
-            <Box display="flex" justifyContent="flex-end" gap={2}>
-              <CustomButton label="Apply" onClick={handleApply}  />
-              <CustomButton label="Cancel" onClick={handleCancel} />
+            <Box display="flex" flexDirection={"column"} width={"100%"} gap={2}>
+              <CustomButton label="Apply"  onClick={handleApply}  />
+              <CustomButton label="Cancel"  onClick={handleCancel} />
             </Box>
 
           </Box>
