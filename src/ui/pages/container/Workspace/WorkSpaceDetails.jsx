@@ -1,16 +1,10 @@
-import { Box, Card, Grid, Tab, Tabs, ThemeProvider, Typography } from "@mui/material";
-import React, { useState, useEffect } from "react";
-import Header from "../../component/common/Header";
+import { ThemeProvider } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import React, {useEffect } from "react";
 import themeDefault from '../../../theme/theme'
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import Button from "../../component/common/Button"
-import OutlinedTextField from "../../component/common/OutlinedTextField";
+import {  useParams } from 'react-router-dom';
 import DatasetStyle from "../../../styles/Dataset";
-import TextareaAutosize from '@mui/material/TextareaAutosize';
-// import ProjectTable from './Tabs/ProjectTable';
-// import AnnotatorsTable from "./Tabs/Annotators";
-// import ManagersTable from "./Tabs/ManagersTable";
-// import SettingsTable from "./Tabs/SettingsTable";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 import componentType from "../../../../config/pageType";

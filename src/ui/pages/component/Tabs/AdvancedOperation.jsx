@@ -33,8 +33,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DownloadProjectButton from "../../container/Project/DownloadProjectButton";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Spinner from "../../component/common/Spinner";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import TaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/TaskReviews";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";

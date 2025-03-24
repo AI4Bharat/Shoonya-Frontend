@@ -7,7 +7,6 @@ import CustomButton from "../common/Button";
 import { useParams } from 'react-router-dom';
 import DatasetStyle from "../../../styles/Dataset";
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 import Dialog from "@mui/material/Dialog";
 import { Button,Grid } from "@mui/material";
 import DialogActions from "@mui/material/DialogActions";

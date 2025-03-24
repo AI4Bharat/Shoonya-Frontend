@@ -30,18 +30,15 @@ import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSug
 import Spinner from "../../component/common/Spinner";
 
 //Components
-import {
-  Box,
-  CardContent,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  useMediaQuery,
-  Pagination,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import CardContent from "@mui/material/CardContent";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Typography from "@mui/material/Typography";
 // import {
 //   ConfirmDialog,
 //   CustomizedSnackbars,
