@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MUIDataTable from "mui-datatables";
 import { ThemeProvider } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -20,6 +20,7 @@ import GetDatasetLogsAPI from "../../../../redux/actions/api/Dataset/GetDatasetL
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import Skeleton from "@mui/material/Skeleton";
 
 const DatasetLogs = (props) => {
   const { datasetId } = props;
@@ -35,6 +36,44 @@ const DatasetLogs = (props) => {
     endDate: new Date(),
     key: "selection"
   }]);
+    const [isBrowser, setIsBrowser] = useState(false);
+    const tableRef = useRef(null);
+    const [displayWidth, setDisplayWidth] = useState(0);
+  
+    useEffect(() => {
+      const handleResize = () => {
+        setDisplayWidth(window.innerWidth);
+      };
+  
+      if (typeof window !== 'undefined') {
+        handleResize();
+        window.addEventListener('resize', handleResize);
+      }
+  
+      return () => {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('resize', handleResize);
+        }
+      };
+    }, []);
+  
+    useEffect(() => {
+      setIsBrowser(true);
+      
+      // Force responsive mode after component mount
+      const applyResponsiveMode = () => {
+        if (tableRef.current) {
+          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+          if (tableWrapper) {
+            tableWrapper.classList.add('MuiDataTable-vertical');
+          }
+        }
+      };
+      
+      // Apply after a short delay to ensure DOM is ready
+      const timer = setTimeout(applyResponsiveMode, 100);
+      return () => clearTimeout(timer);
+    }, []);
 
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
@@ -160,6 +199,7 @@ const DatasetLogs = (props) => {
       viewColumns: true,
       jumpToPage: true,
       responsive: "vertical",
+      enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -224,12 +264,28 @@ const DatasetLogs = (props) => {
       </Grid>
       { showSpinner ? <Spinner/> : (
         <ThemeProvider theme={tableTheme}>
-          <MUIDataTable
-            title={""}
-            data={datasetLogs}
-            columns={columns}
-            options={options}
-          />
+          <div ref={tableRef}>
+                    {isBrowser ? (
+                      <MUIDataTable
+                        key={`table-${displayWidth}`}
+                        title={""}
+                        data={datasetLogs}
+                        columns={columns}
+                        options={options}
+                      />
+                    ) : (
+                      <Skeleton
+                        variant="rectangular"
+                        height={400}
+                        sx={{
+                          mx: 2,
+                          my: 3,
+                          borderRadius: '4px',
+                          transform: 'none'
+                        }}
+                      />
+                    )}
+                  </div>
         </ThemeProvider>)
       }
     </React.Fragment>

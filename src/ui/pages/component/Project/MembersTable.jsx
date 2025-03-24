@@ -1,6 +1,6 @@
 // MembersTable
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MUIDataTable from "mui-datatables";
 import CustomButton from "../common/Button";
@@ -39,6 +39,7 @@ import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import RejectManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/RejectManagerSuggestions";
 import ApproveManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/ApproveManagerSuggestions";
 import { getManagerSuggestions } from "../Tabs/Invites";
+import Skeleton from "@mui/material/Skeleton";
 
 
 const options = {
@@ -100,6 +101,45 @@ const MembersTable = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
+    const [isBrowser, setIsBrowser] = useState(false);
+    const tableRef = useRef(null);
+    const [displayWidth, setDisplayWidth] = useState(0);
+  
+    useEffect(() => {
+      const handleResize = () => {
+        setDisplayWidth(window.innerWidth);
+      };
+  
+      if (typeof window !== 'undefined') {
+        handleResize();
+        window.addEventListener('resize', handleResize);
+      }
+  
+      return () => {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('resize', handleResize);
+        }
+      };
+    }, []);
+  
+    useEffect(() => {
+      setIsBrowser(true);
+      
+      // Force responsive mode after component mount
+      const applyResponsiveMode = () => {
+        if (tableRef.current) {
+          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+          if (tableWrapper) {
+            tableWrapper.classList.add('MuiDataTable-vertical');
+          }
+        }
+      };
+      
+      // Apply after a short delay to ensure DOM is ready
+      const timer = setTimeout(applyResponsiveMode, 100);
+      return () => clearTimeout(timer);
+    }, []);
+  
 
   const columns = [
     {
@@ -562,6 +602,7 @@ const MembersTable = (props) => {
     search: false,
     jumpToPage: true,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -728,13 +769,28 @@ const MembersTable = (props) => {
         </Grid>
 
       <ThemeProvider theme={tableTheme} sx={{ marginTop: "20px" }}>
-        <MUIDataTable
-          title={""}
-          data={data}
-          columns={columns}
-          options={options}
-          // filter={false}
-        />
+        <div ref={tableRef}>
+          {isBrowser ? (
+            <MUIDataTable
+              key={`table-${displayWidth}`}
+              title={""}
+              data={data}
+              columns={columns}
+              options={options}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              height={400}
+              sx={{
+                mx: 2,
+                my: 3,
+                borderRadius: '4px',
+                transform: 'none'
+              }}
+            />
+          )}
+        </div>
       </ThemeProvider>
     </React.Fragment>
   );

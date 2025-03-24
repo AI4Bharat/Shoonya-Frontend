@@ -1,6 +1,6 @@
 // ReportsTable
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import MUIDataTable from "mui-datatables";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -29,6 +29,7 @@ import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import tableTheme from "../../../theme/tableTheme";
+import Skeleton from "@mui/material/Skeleton";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 
@@ -64,6 +65,44 @@ const ReportsTable = (props) => {
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
     );
+      const [isBrowser, setIsBrowser] = useState(false);
+      const tableRef = useRef(null);
+      const [displayWidth, setDisplayWidth] = useState(0);
+    
+      useEffect(() => {
+        const handleResize = () => {
+          setDisplayWidth(window.innerWidth);
+        };
+    
+        if (typeof window !== 'undefined') {
+          handleResize();
+          window.addEventListener('resize', handleResize);
+        }
+    
+        return () => {
+          if (typeof window !== 'undefined') {
+            window.removeEventListener('resize', handleResize);
+          }
+        };
+      }, []);
+    
+      useEffect(() => {
+        setIsBrowser(true);
+        
+        // Force responsive mode after component mount
+        const applyResponsiveMode = () => {
+          if (tableRef.current) {
+            const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+            if (tableWrapper) {
+              tableWrapper.classList.add('MuiDataTable-vertical');
+            }
+          }
+        };
+        
+        // Apply after a short delay to ensure DOM is ready
+        const timer = setTimeout(applyResponsiveMode, 100);
+        return () => clearTimeout(timer);
+      }, []);
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -192,6 +231,7 @@ const ReportsTable = (props) => {
             },
         },
         responsive: "vertical",
+        enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -372,12 +412,28 @@ const ReportsTable = (props) => {
                     <ThemeProvider theme={tableTheme}>
                         {
                             showSpinner ? <CircularProgress sx={{ mx: "auto", display: "block" }} /> : reportRequested && (
-                                <MUIDataTable
-                                    title={radiobutton === "AnnotatationReports" ? "Annotation Report" : (radiobutton === "ReviewerReports" ? "Reviewer Report" : "Super Checker Report")}
-                                    data={ProjectReport}
-                                    columns={columns.filter(col => selectedColumns.includes(col.name))}
-                                    options={options}
-                                />
+                                <div ref={tableRef}>
+                                          {isBrowser ? (
+                                            <MUIDataTable
+                                              key={`table-${displayWidth}`}
+                                              title={radiobutton === "AnnotatationReports" ? "Annotation Report" : (radiobutton === "ReviewerReports" ? "Reviewer Report" : "Super Checker Report")}
+                                              data={ProjectReport}
+                                              columns={columns.filter(col => selectedColumns.includes(col.name))}
+                                              options={options}
+                                            />
+                                          ) : (
+                                            <Skeleton
+                                              variant="rectangular"
+                                              height={400}
+                                              sx={{
+                                                mx: 2,
+                                                my: 3,
+                                                borderRadius: '4px',
+                                                transform: 'none'
+                                              }}
+                                            />
+                                          )}
+                                        </div>
                             )
                         }
 
