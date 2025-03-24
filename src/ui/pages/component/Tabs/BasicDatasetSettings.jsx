@@ -1,5 +1,5 @@
 
-import { Grid, ThemeProvider, Typography, Autocomplete, TextField } from "@mui/material";
+import { Grid, ThemeProvider, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,7 +11,6 @@ import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatas
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 // import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
 import GetSaveButtonAPI from "../../../../redux/actions/api/Dataset/DatasetEditUpdate";
-import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import CustomButton from "../common/Button";
 import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../common/Spinner";
@@ -24,12 +23,10 @@ const BasicDatasetSettings = (props) => {
         message: "",
         variant: "success",
     });
-    const [value, setValue] = useState();
     const [loading, setLoading] = useState(false);
     const [newDetails, setNewDetails] = useState();
     const { datasetId } = useParams();
     const navigate = useNavigate();
-    const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiLoading = useSelector(state => state.apiStatus.loading);
     const DatasetDetails = useSelector(state => state.getDatasetDetails.data);

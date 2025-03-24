@@ -1,19 +1,13 @@
 import React, { useState } from "react";
-import {
-    Button,
-    Popover,
-    Box,
-    TextField,
-    Grid, Typography, Radio, Dialog, DialogActions, DialogContent, DialogContentText,
-} from "@mui/material";
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
+import Button from "@mui/material/Button";
+import Popover from "@mui/material/Popover";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import SuperCheckSettingsAPI from "../../../../redux/actions/api/ProjectDetails/SuperCheckSettings";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 
@@ -22,7 +16,6 @@ export default function SuperCheckSettings(props) {
     const{ProjectDetails}=props
     const classes = DatasetStyle();
     const { id } = useParams();
-    const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
     const [supercheckLoopCount, setSupercheckLoopCount] = useState(ProjectDetails.revision_loop_count);
     const [supercheckvalue, setSupercheckvalue] = useState(ProjectDetails.k_value);
