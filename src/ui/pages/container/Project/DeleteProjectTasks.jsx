@@ -167,11 +167,8 @@ export default function DeleteProjectTasks() {
             {renderSnackBar()}
             <Button
                 sx={{
-                    inlineSize: "max-content",
-                    p: 2,
                     borderRadius: 3,
-                    ml: 2,
-                    width: "300px"
+                    width: "100%"
                 }}
                 aria-describedby={Id}
                 variant="contained"

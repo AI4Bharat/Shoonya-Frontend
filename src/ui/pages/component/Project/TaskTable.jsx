@@ -1,7 +1,7 @@
 // TaskTable
 
 import MUIDataTable from "mui-datatables";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useRef } from "react";
 import { Link, useParams, useNavigate,useLocation } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import CustomButton from "../common/Button";
@@ -9,7 +9,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
@@ -24,6 +24,8 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
 import { ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
+import InfoIcon from "@mui/icons-material/Info";
 import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -39,6 +41,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
+import Skeleton from "@mui/material/Skeleton";
 import ColumnList from "../common/ColumnList";
 import Spinner from "../../component/common/Spinner";
 import OutlinedTextField from "../common/OutlinedTextField";
@@ -172,6 +175,44 @@ const TaskTable = (props) => {
   const [columns, setColumns] = useState([]);
   const [labellingStarted, setLabellingStarted] = useState(false);
   const [loading, setLoading] = useState(false);
+    const [isBrowser, setIsBrowser] = useState(false);
+    const tableRef = useRef(null);
+    const [displayWidth, setDisplayWidth] = useState(0);
+  
+    useEffect(() => {
+      const handleResize = () => {
+        setDisplayWidth(window.innerWidth);
+      };
+  
+      if (typeof window !== 'undefined') {
+        handleResize();
+        window.addEventListener('resize', handleResize);
+      }
+  
+      return () => {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('resize', handleResize);
+        }
+      };
+    }, []);
+  
+    useEffect(() => {
+      setIsBrowser(true);
+      
+      // Force responsive mode after component mount
+      const applyResponsiveMode = () => {
+        if (tableRef.current) {
+          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+          if (tableWrapper) {
+            tableWrapper.classList.add('MuiDataTable-vertical');
+          }
+        }
+      };
+      
+      // Apply after a short delay to ensure DOM is ready
+      const timer = setTimeout(applyResponsiveMode, 100);
+      return () => clearTimeout(timer);
+    }, []);
   const getTaskListData = () => {
     const taskObj = new GetTasksByProjectIdAPI(
       id,
@@ -615,6 +656,26 @@ const TaskTable = (props) => {
     setSearchAnchor(null);
   };
 
+  const areFiltersApplied = (filters) => {
+    return Object.values(filters).some((value) => value !== "");
+  };
+
+  const filtersApplied = areFiltersApplied(selectedFilters);
+  
+  const CustomTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: '#e0e0e0',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 300,
+      fontSize: theme.typography.pxToRem(12),
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+      color: "#e0e0e0",
+    },
+  }));
+
   const renderToolBar = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
@@ -775,11 +836,73 @@ const TaskTable = (props) => {
           setColumns={setSelectedColumns}
           selectedColumns={selectedColumns}
         />
-        <Tooltip title="Filter Table">
-          <Button onClick={handleShowFilter}>
-            <FilterListIcon />
+  
+        <div
+          style={{ display: "inline-block", position: "relative" }}
+          onClick={handleShowFilter}
+        >
+          {filtersApplied && (
+            <InfoIcon
+              color="primary"
+              fontSize="small"
+              sx={{ position: "absolute", top: -4, right: -4 }}
+            />
+          )}
+          <Button style={{ minWidth: "25px" }} onClick={handleShowFilter}>
+            <CustomTooltip
+              title={
+                filtersApplied ? (
+                  <Box
+                    sx={{
+                      padding: "5px",
+                      maxWidth: "300px",
+                      fontSize: "12px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                    }}
+                  >
+                    {selectedFilters.annotation_status && (
+                      <div>
+                        <strong>Annotation Status:</strong>{" "}
+                        {selectedFilters.annotation_status}
+                      </div>
+                    )}
+                    {selectedFilters.review_status && (
+                      <div>
+                        <strong>Review Status:</strong>{" "}
+                        {selectedFilters.review_status}
+                      </div>
+                    )}
+                    {selectedFilters.req_user !== -1 && (
+                      <div>
+                        <strong>Assigned User:</strong>{" "}
+                        {selectedFilters.req_user}
+                      </div>
+                    )}
+                    {pull !== "All" && (
+                      <div>
+                        <strong>Pull Status:</strong> {pull}
+                      </div>
+                    )}
+                    {rejected && (
+                      <div>
+                        <strong>Rejected:</strong> {rejected ? "Yes" : "No"}
+                      </div>
+                    )}
+                  </Box>
+                ) : (
+                  <span style={{ fontFamily: "Roboto, sans-serif" }}>
+                    Filter Table
+                  </span>
+                )
+              }
+              disableInteractive
+            >
+              <FilterListIcon sx={{ color: "#515A5A" }} />
+            </CustomTooltip>
           </Button>
-        </Tooltip>
+        </div>
       </Box>
     );
   };
@@ -908,6 +1031,7 @@ const TaskTable = (props) => {
     serverSide: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -1190,13 +1314,28 @@ const TaskTable = (props) => {
           />
         ))}
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable
-          title={""}
-          data={tasks}
-          columns={columns}
-          options={options}
-        // filter={false}
-        />
+        <div ref={tableRef}>
+                  {isBrowser ? (
+                    <MUIDataTable
+                      key={`table-${displayWidth}`}
+                      title={""}
+                      data={tasks}
+                      columns={columns}
+                      options={options}
+                    />
+                  ) : (
+                    <Skeleton
+                      variant="rectangular"
+                      height={400}
+                      sx={{
+                        mx: 2,
+                        my: 3,
+                        borderRadius: '4px',
+                        transform: 'none'
+                      }}
+                    />
+                  )}
+                </div>
       </ThemeProvider>
       {searchOpen && (
         <SearchPopup

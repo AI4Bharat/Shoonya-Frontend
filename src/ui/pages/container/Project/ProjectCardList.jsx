@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import CustomButton from "../../component/common/Button";
@@ -13,6 +13,7 @@ import tableTheme from "../../../theme/tableTheme";
 import {  useSelector } from "react-redux";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import Skeleton from "@mui/material/Skeleton";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
 import { styled } from '@mui/material/styles';
 import InfoIcon from '@mui/icons-material/Info';
@@ -23,8 +24,46 @@ const ProjectCardList = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
-
   const SearchProject = useSelector((state) => state.SearchProjectCards.data);
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== 'undefined') {
+      handleResize();
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+    
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+        if (tableWrapper) {
+          tableWrapper.classList.add('MuiDataTable-vertical');
+        }
+      }
+    };
+    
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
 
   const handleShowFilter = (event) => {
     setAnchorEl(event.currentTarget);
@@ -341,6 +380,7 @@ const ProjectCardList = (props) => {
     jumpToPage: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -359,13 +399,29 @@ const ProjectCardList = (props) => {
 
   return (
     <>
-      <ThemeProvider theme={tableTheme} sx={{ mt: 4 }}>
-        <MUIDataTable
-          title={""}
-          data={data}
-          columns={columns}
-          options={options}
-        />
+      <ThemeProvider theme={tableTheme}>
+        <div ref={tableRef}>
+          {isBrowser ? (
+            <MUIDataTable
+              key={`table-${displayWidth}`}
+              title={""}
+              data={data}
+              columns={columns}
+              options={options}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              height={400}
+              sx={{
+                mx: 2,
+                my: 3,
+                borderRadius: '4px',
+                transform: 'none'
+              }}
+            />
+          )}
+        </div>
       </ThemeProvider>
       <ProjectFilterList
         id={filterId}
