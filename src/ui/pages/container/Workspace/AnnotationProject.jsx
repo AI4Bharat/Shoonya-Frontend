@@ -11,7 +11,7 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import {  useNavigate, useParams } from "react-router-dom";
 import Button from "../../component/common/Button";
@@ -19,7 +19,6 @@ import ColumnList from "../../component/common/ColumnList";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import MUIDataTable from "mui-datatables";
-import Skeleton from "@mui/material/Skeleton";
 import MenuItems from "../../component/common/MenuItems";
 import { useDispatch, useSelector } from "react-redux";
 import CreateProjectAPI from "../../../../redux/actions/api/ProjectDetails/CreateProject";
@@ -245,45 +244,6 @@ const AnnotationProject = (props) => {
     );
   };
 
-    const [isBrowser, setIsBrowser] = useState(false);
-    const tableRef = useRef(null);
-    const [displayWidth, setDisplayWidth] = useState(0);
-  
-    useEffect(() => {
-      const handleResize = () => {
-        setDisplayWidth(window.innerWidth);
-      };
-  
-      if (typeof window !== 'undefined') {
-        handleResize();
-        window.addEventListener('resize', handleResize);
-      }
-  
-      return () => {
-        if (typeof window !== 'undefined') {
-          window.removeEventListener('resize', handleResize);
-        }
-      };
-    }, []);
-  
-    useEffect(() => {
-      setIsBrowser(true);
-      
-      // Force responsive mode after component mount
-      const applyResponsiveMode = () => {
-        if (tableRef.current) {
-          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
-          if (tableWrapper) {
-            tableWrapper.classList.add('MuiDataTable-vertical');
-          }
-        }
-      };
-      
-      // Apply after a short delay to ensure DOM is ready
-      const timer = setTimeout(applyResponsiveMode, 100);
-      return () => clearTimeout(timer);
-    }, []);
-
   const options = {
     count: totalDataitems,
     rowsPerPage: currentRowPerPage,
@@ -327,7 +287,6 @@ const AnnotationProject = (props) => {
     serverSide: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
-    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -1189,31 +1148,15 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <ThemeProvider theme={tableTheme}>
-                    <div ref={tableRef}>
-                              {isBrowser ? (
-                                <MUIDataTable
-                                  key={`table-${displayWidth}`}
-                                  title={""}
+                    <MUIDataTable
+                      title={""}
                       data={tableData}
                       columns={columns.filter((column) =>
                         selectedColumns.includes(column.name)
 
                       )}
                       options={options}
-                                />
-                              ) : (
-                                <Skeleton
-                                  variant="rectangular"
-                                  height={400}
-                                  sx={{
-                                    mx: 2,
-                                    my: 3,
-                                    borderRadius: '4px',
-                                    transform: 'none'
-                                  }}
-                                />
-                              )}
-                            </div>
+                    />
                   </ThemeProvider>
                 </Grid>
                 <Grid

@@ -1,4 +1,4 @@
-import React, {  useEffect, useRef, useState } from "react";
+import React, {  useEffect } from "react";
 import CustomButton from "../common/Button";
 import { Link, useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
@@ -13,7 +13,6 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import tableTheme from "../../../theme/tableTheme";
 import Search from "../../component/common/Search";
-import Skeleton from "@mui/material/Skeleton";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
 
 const ProjectTable = (props) => {
@@ -25,44 +24,6 @@ const ProjectTable = (props) => {
 
     dispatch(APITransport(workspaceObjs));
   };
-    const [isBrowser, setIsBrowser] = useState(false);
-    const tableRef = useRef(null);
-    const [displayWidth, setDisplayWidth] = useState(0);
-  
-    useEffect(() => {
-      const handleResize = () => {
-        setDisplayWidth(window.innerWidth);
-      };
-  
-      if (typeof window !== 'undefined') {
-        handleResize();
-        window.addEventListener('resize', handleResize);
-      }
-  
-      return () => {
-        if (typeof window !== 'undefined') {
-          window.removeEventListener('resize', handleResize);
-        }
-      };
-    }, []);
-  
-    useEffect(() => {
-      setIsBrowser(true);
-      
-      // Force responsive mode after component mount
-      const applyResponsiveMode = () => {
-        if (tableRef.current) {
-          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
-          if (tableWrapper) {
-            tableWrapper.classList.add('MuiDataTable-vertical');
-          }
-        }
-      };
-      
-      // Apply after a short delay to ensure DOM is ready
-      const timer = setTimeout(applyResponsiveMode, 100);
-      return () => clearTimeout(timer);
-    }, []);
 
   useEffect(() => {
     getWorkspaceProjectData();
@@ -300,7 +261,6 @@ const ProjectTable = (props) => {
     search: false,
     jumpToPage: true,
     responsive: "vertical",
-    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -318,28 +278,12 @@ const ProjectTable = (props) => {
         <Search />
       </Grid>
       <ThemeProvider theme={tableTheme}>
-        <div ref={tableRef}>
-                  {isBrowser ? (
-                    <MUIDataTable
-                      key={`table-${displayWidth}`}
-                      title={""}
-                      data={data}
-                      columns={columns}
-                      options={options}
-                    />
-                  ) : (
-                    <Skeleton
-                      variant="rectangular"
-                      height={400}
-                      sx={{
-                        mx: 2,
-                        my: 3,
-                        borderRadius: '4px',
-                        transform: 'none'
-                      }}
-                    />
-                  )}
-                </div>
+        <MUIDataTable
+          // title={""}
+          data={data}
+          columns={columns}
+          options={options}
+        />
       </ThemeProvider>
     </div>
   );

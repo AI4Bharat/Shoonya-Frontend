@@ -1,13 +1,6 @@
-import { Box, Divider, Grid, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import Header from "../../component/common/Header";
-import ProjectCard from "../../component/common/ProjectCard";
+import { Box } from "@mui/material";
+import React  from "react";
 import WorkspaceTable from "../../component/common/WorkspaceTable";
-import DatasetStyle from "../../../styles/Dataset";
-import GetProjectsAPI from "../../../../redux/actions/api/Dashboard/GetProjects";
-import {useDispatch,useSelector} from 'react-redux';
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 
 export default function WorkSpaces(props) {
  

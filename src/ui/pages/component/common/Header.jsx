@@ -240,7 +240,6 @@ const Header = () => {
     setAnchorElSettings(null);
   };
   const handleOpenNotification = (event) => {
-    event.stopPropagation(); // Prevent event bubbling
     setAnchorElNotification(event.currentTarget);
   };
 
@@ -597,61 +596,40 @@ const Header = () => {
   };
 
   const tabs = [
-    // Guest Workspaces tab - only shown for guest users who are Annotators, Reviewers, or SuperCheckers
-    loggedInUserData?.guest_user && 
-    (userRole.Annotator === loggedInUserData?.role ||
-     userRole.Reviewer === loggedInUserData?.role ||
-     userRole.SuperChecker === loggedInUserData?.role) ? (
-      <Typography key="guest" variant="body1">
-        <NavLink
-          to="/guest_workspaces"
-          className={({ isActive }) =>
-            isActive ? classes.highlightedMenu : classes.headerMenu
-          }
-          activeClassName={classes.highlightedMenu}
-        >
-          Guest Workspaces
-        </NavLink>
-      </Typography>
-    ) : null,
-  
-    // Organization tab - only shown for Organization Owners and Admins
-    (userRole.OrganizationOwner === loggedInUserData?.role ||
-     userRole.Admin === loggedInUserData?.role) ? (
-      <Typography key="organization" variant="body1">
-        <NavLink
-          to={
-            loggedInUserData && loggedInUserData?.organization
-              ? `/my-organization/${loggedInUserData?.organization.id}`
-              : `/my-organization/1`
-          }
-          className={({ isActive }) =>
-            isActive ? classes.highlightedMenu : classes.headerMenu
-          }
-          activeClassName={classes.highlightedMenu}
-        >
-          Organization
-        </NavLink>
-      </Typography>
-    ) : null,
-  
-    // Workspaces tab - only shown for Workspace Managers
-    (userRole.WorkspaceManager === loggedInUserData?.role) ? (
-      <Typography key="workspaces" variant="body1">
-        <NavLink
-          to="/workspaces"
-          className={({ isActive }) =>
-            isActive ? classes.highlightedMenu : classes.headerMenu
-          }
-          activeClassName={classes.highlightedMenu}
-        >
-          Workspaces
-        </NavLink>
-      </Typography>
-    ) : null,
-  
-    // Projects tab - shown for all roles
-    <Typography key="projects" variant="body1">
+    <Typography variant="body1">
+      <NavLink
+        hidden={
+          userRole.Annotator === loggedInUserData?.role ||
+          userRole.Reviewer === loggedInUserData?.role ||
+          userRole.SuperChecker === loggedInUserData?.role ||
+          userRole.WorkspaceManager === loggedInUserData?.role
+        }
+        to={
+          loggedInUserData && loggedInUserData.organization
+            ? `/my-organization/${loggedInUserData.organization.id}`
+            : `/my-organization/1`
+        }
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Organization
+      </NavLink>
+    </Typography>,
+    <Typography variant="body1">
+      <NavLink
+        hidden={userRole.WorkspaceManager !== loggedInUserData?.role}
+        to="/workspaces"
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Workspaces
+      </NavLink>
+    </Typography>,
+    <Typography variant="body1">
       <NavLink
         to="/projects"
         className={({ isActive }) =>
@@ -662,26 +640,23 @@ const Header = () => {
         Projects
       </NavLink>
     </Typography>,
-  
-    // Datasets tab - only shown for Workspace Managers, Organization Owners, and Admins
-    (userRole.WorkspaceManager === loggedInUserData?.role ||
-     userRole.OrganizationOwner === loggedInUserData?.role ||
-     userRole.Admin === loggedInUserData?.role) ? (
-      <Typography key="datasets" variant="body1">
-        <NavLink
-          to="/datasets"
-          className={({ isActive }) =>
-            isActive ? classes.highlightedMenu : classes.headerMenu
-          }
-          activeClassName={classes.highlightedMenu}
-        >
-          Datasets
-        </NavLink>
-      </Typography>
-    ) : null,
-  
-    // Analytics tab - shown for all roles
-    <Typography key="analytics" variant="body1">
+    <Typography variant="body1">
+      <NavLink
+        hidden={
+          userRole.Annotator === loggedInUserData?.role ||
+          userRole.Reviewer === loggedInUserData?.role ||
+          userRole.SuperChecker === loggedInUserData?.role
+        }
+        to="/datasets"
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Datasets
+      </NavLink>
+    </Typography>,
+    <Typography variant="body1">
       <NavLink
         to="/analytics"
         className={({ isActive }) =>
@@ -692,25 +667,19 @@ const Header = () => {
         Analytics
       </NavLink>
     </Typography>,
-  
-    // Admin tab - only shown for Admins
-    (userRole.Admin === loggedInUserData?.role) ? (
-      <Typography key="admin" variant="body1">
-        <NavLink
-          to="/admin"
-          className={({ isActive }) =>
-            isActive ? classes.highlightedMenu : classes.headerMenu
-          }
-          activeClassName={classes.highlightedMenu}
-        >
-          Admin
-        </NavLink>
-      </Typography>
-    ) : null,
+    <Typography variant="body1">
+      <NavLink
+        to="/admin"
+        hidden={userRole.Admin !== loggedInUserData?.role}
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Admin
+      </NavLink>
+    </Typography>,
   ];
-
-  // Filter out null values
-  const filteredTabs = tabs.filter(tab => tab !== null);
 
   const userSettings = [
     {
@@ -794,20 +763,6 @@ const Header = () => {
     // },
   ];
 
-  const appInfo = [
-    {
-      name: "Help",
-      onclick: () => {
-        const url = "https://github.com/AI4Bharat/Shoonya/wiki/Shoonya-FAQ";
-        window.open(url, "_blank");
-      },
-    },
-
-    {
-      name: "Notifications",
-    },
-  ];
-
   const handleTransliterationModelClose = () => {
     setShowTransliterationModel(false);
   };
@@ -823,10 +778,9 @@ const Header = () => {
       >
         {isMobile ? (
           <MobileNavbar
-            tabs={filteredTabs}
+            tabs={tabs}
             userSettings={userSettings}
             appSettings={appSettings}
-            appInfo={appInfo}
             loggedInUserData={loggedInUserData}
           />
         ) : (
@@ -910,7 +864,7 @@ const Header = () => {
                         >
                           <NotificationsIcon
                             color="primary.dark"
-                            fontSize="large"
+                            fontSize="36px"
                           />
                         </Badge>
                       </IconButton>

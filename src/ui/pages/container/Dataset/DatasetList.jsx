@@ -82,7 +82,7 @@ export default function DatasetList() {
 
       <Grid container className={classes.root}>
         <Grid item style={{ flexGrow: "0" }}>
-          <Typography variant="h6" sx={{ paddingBottom: "8px" }}>
+          <Typography variant="h6" sx={{ paddingBottom: "7px", paddingLeft: "15px" }}>
             View :{" "}
           </Typography>
         </Grid>
@@ -109,7 +109,7 @@ export default function DatasetList() {
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid xs={3} item className={classes.fixedWidthContainer}>
+        <Grid xs={3} item className={classes.fixedWidthContainer}  sx={{mt:1,mb:1,mr:2,ml:2}}>
           <Search />
         </Grid>
       </Grid>

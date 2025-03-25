@@ -1,5 +1,5 @@
 import MUIDataTable from "mui-datatables";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {  useParams } from "react-router-dom";
 import GetDataitemsById from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -18,7 +18,8 @@ import ColumnList from "./ColumnList";
 import SearchIcon from '@mui/icons-material/Search';
 import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
 import Spinner from "../../component/common/Spinner";
-import Skeleton from "@mui/material/Skeleton";
+
+
 
 const excludeKeys = [
   "parent_data_id",
@@ -49,9 +50,7 @@ const DataitemsTable = () => {
   const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
   const apiLoading = useSelector(state => state.apiStatus.loading);
-  const [isBrowser, setIsBrowser] = useState(false);
-  const tableRef = useRef(null);
-  const [displayWidth, setDisplayWidth] = useState(0);
+
   const [loading, setLoading] = useState(false);
   const [selectedFilters, setsSelectedFilters] = useState({});
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -63,41 +62,6 @@ const DataitemsTable = () => {
   const [searchAnchor, setSearchAnchor] = useState(null);
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
-
-    useEffect(() => {
-      const handleResize = () => {
-        setDisplayWidth(window.innerWidth);
-      };
-  
-      if (typeof window !== 'undefined') {
-        handleResize();
-        window.addEventListener('resize', handleResize);
-      }
-  
-      return () => {
-        if (typeof window !== 'undefined') {
-          window.removeEventListener('resize', handleResize);
-        }
-      };
-    }, []);
-  
-    useEffect(() => {
-      setIsBrowser(true);
-      
-      // Force responsive mode after component mount
-      const applyResponsiveMode = () => {
-        if (tableRef.current) {
-          const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
-          if (tableWrapper) {
-            tableWrapper.classList.add('MuiDataTable-vertical');
-          }
-        }
-      };
-      
-      // Apply after a short delay to ensure DOM is ready
-      const timer = setTimeout(applyResponsiveMode, 100);
-      return () => clearTimeout(timer);
-    }, []);
 
   useEffect(()=>{
     try{
@@ -380,7 +344,6 @@ const handleSearchClose = () => {
     serverSide: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
-    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -394,29 +357,13 @@ const handleSearchClose = () => {
 
   return (
    <>  
-      <ThemeProvider theme={tableTheme}>
-        <div ref={tableRef}>
-          {isBrowser ? (
-            <MUIDataTable
-              key={`table-${displayWidth}`}
-              title={""}
-              data={dataitems}
-              columns={columns}
-              options={options}
-            />
-          ) : (
-            <Skeleton
-              variant="rectangular"
-              height={400}
-              sx={{
-                mx: 2,
-                my: 3,
-                borderRadius: '4px',
-                transform: 'none'
-              }}
-            />
-          )}
-        </div>
+       <ThemeProvider theme={tableTheme}>
+        <MUIDataTable
+          title={""}
+          data={dataitems}
+          columns={columns}
+          options={options}
+        />
       </ThemeProvider>
                   {searchOpen && <DatasetSearchPopup
                     open={searchOpen}

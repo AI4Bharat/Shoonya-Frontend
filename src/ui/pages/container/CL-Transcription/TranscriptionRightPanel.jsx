@@ -30,18 +30,15 @@ import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSug
 import Spinner from "../../component/common/Spinner";
 
 //Components
-import {
-  Box,
-  CardContent,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  useMediaQuery,
-  Pagination,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import CardContent from "@mui/material/CardContent";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Typography from "@mui/material/Typography";
 // import {
 //   ConfirmDialog,
 //   CustomizedSnackbars,
@@ -991,6 +988,61 @@ const TranscriptionRightPanel = ({
                           }}
                           enabled={enableTransliterationSuggestion}
                           onChangeText={() => {}}
+                          onDoubleClick={(event)=>{
+                            const textarea = textRefs.current[index]
+                            console.log(textarea);
+                            if(textarea){
+                              const start = textarea.selectionStart
+                              const end = textarea.selectionEnd
+                              const selectedText = textarea.value.substring(start,end)
+
+                              if (selectedText.trim().length > 0) {
+                                const trimmedText = selectedText.trim();
+                                if (trimmedText !== selectedText) {
+                                  const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                  const newStart = start + leadingSpaces;
+                                  const newEnd = newStart + trimmedText.length;
+
+                                  textarea.setSelectionRange(newStart, newEnd);
+                                }
+                              }
+
+                            }
+
+
+                          }}
+
+                          onKeyDown={(event) => {
+                            console.log(event,"log",document.activeElement);
+
+                            if ( event.shiftKey && event.key == "ArrowLeft") {
+                              const textArea = textRefs.current[index];
+                              console.log("helo");
+
+                              if (textArea) {
+                                const start = textArea.selectionStart;
+                                const end = textArea.selectionEnd;
+
+                                const newStart = Math.max(start - 1, 0);
+                                textArea.setSelectionRange(newStart, end);
+                                event.preventDefault(); 
+                              }
+                            }
+                            else if (event.shiftKey && event.key == "ArrowRight") {
+                              const textArea = textRefs.current[index];
+                              if (textArea) {
+                                const start = textArea.selectionStart;
+                                const end = textArea.selectionEnd;
+
+                                const newEnd = Math.min(end + 1, textArea.value.length);
+                                textArea.setSelectionRange(start, newEnd);
+
+
+                                event.preventDefault(); 
+                              }
+                            }
+                          }}
+
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                           containerStyles={{ width: "100%", height: "100%" }}
                           onBlur={() => {
@@ -1013,6 +1065,61 @@ const TranscriptionRightPanel = ({
                                       : ""
                                   }`}
                                   dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                  onDoubleClick={(event)=>{
+                                    const textarea = textRefs.current[index]
+                                    console.log(textarea);
+                                    if(textarea){
+                                      const start = textarea.selectionStart
+                                      const end = textarea.selectionEnd
+                                      const selectedText = textarea.value.substring(start,end)
+        
+                                      if (selectedText.trim().length > 0) {
+                                        const trimmedText = selectedText.trim();
+                                        if (trimmedText !== selectedText) {
+                                          const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                          const newStart = start + leadingSpaces;
+                                          const newEnd = newStart + trimmedText.length;
+        
+                                          textarea.setSelectionRange(newStart, newEnd);
+                                        }
+                                      }
+        
+                                    }
+        
+        
+                                  }}
+        
+                                  onKeyDown={(event) => {
+                                    console.log(event,"log",document.activeElement);
+        
+                                    if ( event.shiftKey && event.key == "ArrowLeft") {
+                                      const textArea = textRefs.current[index];
+                                      console.log("helo");
+        
+                                      if (textArea) {
+                                        const start = textArea.selectionStart;
+                                        const end = textArea.selectionEnd;
+        
+                                        const newStart = Math.max(start - 1, 0);
+                                        textArea.setSelectionRange(newStart, end);
+                                        event.preventDefault(); 
+                                      }
+                                    }
+                                    else if (event.shiftKey && event.key == "ArrowRight") {
+                                      const textArea = textRefs.current[index];
+                                      if (textArea) {
+                                        const start = textArea.selectionStart;
+                                        const end = textArea.selectionEnd;
+        
+                                        const newEnd = Math.min(end + 1, textArea.value.length);
+                                        textArea.setSelectionRange(start, newEnd);
+        
+        
+                                        event.preventDefault(); 
+                                      }
+                                    }
+                                  }}
+        
                                   onMouseUp={(e) =>
                                     onMouseUp(e, index + idxOffset)
                                   }
@@ -1046,6 +1153,61 @@ const TranscriptionRightPanel = ({
                               );
                             }}
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
+                            onDoubleClick={(event)=>{
+                              const textarea = textRefs.current[index]
+                              console.log(textarea);
+                              if(textarea){
+                                const start = textarea.selectionStart
+                                const end = textarea.selectionEnd
+                                const selectedText = textarea.value.substring(start,end)
+  
+                                if (selectedText.trim().length > 0) {
+                                  const trimmedText = selectedText.trim();
+                                  if (trimmedText !== selectedText) {
+                                    const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                    const newStart = start + leadingSpaces;
+                                    const newEnd = newStart + trimmedText.length;
+  
+                                    textarea.setSelectionRange(newStart, newEnd);
+                                  }
+                                }
+  
+                              }
+  
+  
+                            }}
+  
+                            onKeyDown={(event) => {
+                              console.log(event,"log",document.activeElement);
+  
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
+                                const textArea = textRefs.current[index];
+                                console.log("helo");
+  
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newStart = Math.max(start - 1, 0);
+                                  textArea.setSelectionRange(newStart, end);
+                                  event.preventDefault(); 
+                                }
+                              }
+                              else if (event.shiftKey && event.key == "ArrowRight") {
+                                const textArea = textRefs.current[index];
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newEnd = Math.min(end + 1, textArea.value.length);
+                                  textArea.setSelectionRange(start, newEnd);
+  
+  
+                                  event.preventDefault(); 
+                                }
+                              }
+                            }}
+  
                             value={item.text}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
                             className={`auto-resizable-textarea ${
@@ -1077,6 +1239,61 @@ const TranscriptionRightPanel = ({
                             )}`}
                             lang={targetlang}
                             value={item.acoustic_normalised_text}
+                            onDoubleClick={(event)=>{
+                              const textarea = textRefs.current[index]
+                              console.log(textarea);
+                              if(textarea){
+                                const start = textarea.selectionStart
+                                const end = textarea.selectionEnd
+                                const selectedText = textarea.value.substring(start,end)
+  
+                                if (selectedText.trim().length > 0) {
+                                  const trimmedText = selectedText.trim();
+                                  if (trimmedText !== selectedText) {
+                                    const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                    const newStart = start + leadingSpaces;
+                                    const newEnd = newStart + trimmedText.length;
+  
+                                    textarea.setSelectionRange(newStart, newEnd);
+                                  }
+                                }
+  
+                              }
+  
+  
+                            }}
+  
+                            onKeyDown={(event) => {
+                              console.log(event,"log",document.activeElement);
+  
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
+                                const textArea = textRefs.current[index];
+                                console.log("helo");
+  
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newStart = Math.max(start - 1, 0);
+                                  textArea.setSelectionRange(newStart, end);
+                                  event.preventDefault(); 
+                                }
+                              }
+                              else if (event.shiftKey && event.key == "ArrowRight") {
+                                const textArea = textRefs.current[index];
+                                if (textArea) {
+                                  const start = textArea.selectionStart;
+                                  const end = textArea.selectionEnd;
+  
+                                  const newEnd = Math.min(end + 1, textArea.value.length);
+                                  textArea.setSelectionRange(start, newEnd);
+  
+  
+                                  event.preventDefault(); 
+                                }
+                              }
+                            }}
+  
                             onChange={(event) => {
                               changeTranscriptHandler(
                                 event,
@@ -1104,6 +1321,61 @@ const TranscriptionRightPanel = ({
                                         : ""
                                     }`}
                                     dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                    onDoubleClick={(event)=>{
+                                      const textarea = textRefs.current[index]
+                                      console.log(textarea);
+                                      if(textarea){
+                                        const start = textarea.selectionStart
+                                        const end = textarea.selectionEnd
+                                        const selectedText = textarea.value.substring(start,end)
+          
+                                        if (selectedText.trim().length > 0) {
+                                          const trimmedText = selectedText.trim();
+                                          if (trimmedText !== selectedText) {
+                                            const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                            const newStart = start + leadingSpaces;
+                                            const newEnd = newStart + trimmedText.length;
+          
+                                            textarea.setSelectionRange(newStart, newEnd);
+                                          }
+                                        }
+          
+                                      }
+          
+          
+                                    }}
+          
+                                    onKeyDown={(event) => {
+                                      console.log(event,"log",document.activeElement);
+          
+                                      if ( event.shiftKey && event.key == "ArrowLeft") {
+                                        const textArea = textRefs.current[index];
+                                        console.log("helo");
+          
+                                        if (textArea) {
+                                          const start = textArea.selectionStart;
+                                          const end = textArea.selectionEnd;
+          
+                                          const newStart = Math.max(start - 1, 0);
+                                          textArea.setSelectionRange(newStart, end);
+                                          event.preventDefault(); 
+                                        }
+                                      }
+                                      else if (event.shiftKey && event.key == "ArrowRight") {
+                                        const textArea = textRefs.current[index];
+                                        if (textArea) {
+                                          const start = textArea.selectionStart;
+                                          const end = textArea.selectionEnd;
+          
+                                          const newEnd = Math.min(end + 1, textArea.value.length);
+                                          textArea.setSelectionRange(start, newEnd);
+          
+          
+                                          event.preventDefault(); 
+                                        }
+                                      }
+                                    }}
+          
                                     onFocus={() =>
                                       showAcousticText &&
                                       populateAcoustic(index + idxOffset)
@@ -1132,6 +1404,61 @@ const TranscriptionRightPanel = ({
                                   true
                                 );
                               }}
+                              onDoubleClick={(event)=>{
+                                const textarea = textRefs.current[index]
+                                console.log(textarea);
+                                if(textarea){
+                                  const start = textarea.selectionStart
+                                  const end = textarea.selectionEnd
+                                  const selectedText = textarea.value.substring(start,end)
+    
+                                  if (selectedText.trim().length > 0) {
+                                    const trimmedText = selectedText.trim();
+                                    if (trimmedText !== selectedText) {
+                                      const leadingSpaces = selectedText.length - selectedText.trimStart().length;
+                                      const newStart = start + leadingSpaces;
+                                      const newEnd = newStart + trimmedText.length;
+    
+                                      textarea.setSelectionRange(newStart, newEnd);
+                                    }
+                                  }
+    
+                                }
+    
+    
+                              }}
+    
+                              onKeyDown={(event) => {
+                                console.log(event,"log",document.activeElement);
+    
+                                if ( event.shiftKey && event.key == "ArrowLeft") {
+                                  const textArea = textRefs.current[index];
+                                  console.log("helo");
+    
+                                  if (textArea) {
+                                    const start = textArea.selectionStart;
+                                    const end = textArea.selectionEnd;
+    
+                                    const newStart = Math.max(start - 1, 0);
+                                    textArea.setSelectionRange(newStart, end);
+                                    event.preventDefault(); 
+                                  }
+                                }
+                                else if (event.shiftKey && event.key == "ArrowRight") {
+                                  const textArea = textRefs.current[index];
+                                  if (textArea) {
+                                    const start = textArea.selectionStart;
+                                    const end = textArea.selectionEnd;
+    
+                                    const newEnd = Math.min(end + 1, textArea.value.length);
+                                    textArea.setSelectionRange(start, newEnd);
+    
+    
+                                    event.preventDefault(); 
+                                  }
+                                }
+                              }}
+    
                               onFocus={() =>
                                 showAcousticText &&
                                 populateAcoustic(index + idxOffset)
