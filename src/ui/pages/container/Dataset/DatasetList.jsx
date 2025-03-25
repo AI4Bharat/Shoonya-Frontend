@@ -109,7 +109,7 @@ export default function DatasetList() {
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid xs={3} item className={classes.fixedWidthContainer}  sx={{mt:1,mb:1,mr:2,ml:2}}>
+        <Grid xs={3} item   sx={{mt:1,mb:1,mr:2,ml:2,width:200}}>
           <Search />
         </Grid>
       </Grid>
@@ -119,8 +119,7 @@ export default function DatasetList() {
           sx={{
             p: 2,
             borderRadius: 3,
-            mt: 2,
-            mb: 2,
+            m:1,
             justifyContent: "flex-end",
           }}
           onClick={handleCreateProject}
@@ -139,7 +138,7 @@ export default function DatasetList() {
           onClick={handleAutomateButton}
           label="Automate Datasets"
         />
-        <Box sx={{ p: 1 }}>
+        <Box sx={{ p: 1,overflow:"hidden" }}>
           {radiobutton ? (
             <DatasetCardList
               datasetList={datasetList}
