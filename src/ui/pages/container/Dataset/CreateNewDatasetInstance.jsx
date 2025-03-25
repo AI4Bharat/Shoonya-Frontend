@@ -1,13 +1,13 @@
 import {
-  Box,
-  Card,
-  Grid,
-  Tab,
-  Tabs,
+
   ThemeProvider,
-  Tooltip,
-  Typography,
+
 } from "@mui/material";
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+
 import React, { useEffect, useState } from "react";
 import Header from "../../component/common/Header";
 import themeDefault from "../../../theme/theme";

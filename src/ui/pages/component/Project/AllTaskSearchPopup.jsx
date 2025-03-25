@@ -1,19 +1,16 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Divider,
-  Typography,
-  Popover,
-  Box,
-  TextField
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+
 import { translate } from "../../../../config/localisation";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import DatasetStyle from "../../../styles/Dataset";
-import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
 // import { translate } from "../../../../assets/localisation";
 
 const AllTaskSearchPopup = (props) => {
@@ -22,7 +19,6 @@ const AllTaskSearchPopup = (props) => {
     const { datasetId } = useParams();
   const { currentFilters, updateFilters, searchedCol ,onchange} = props;
   const [searchValue, setSearchValue] = useState(currentFilters["search_"+searchedCol]);
-  const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",

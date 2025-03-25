@@ -12,18 +12,16 @@ import React, {
 } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Typography,
-  Grid,
-  Button,
-  TextField,
-  Slider, Stack, CircularProgress,
-  Portal
-} from "@mui/material";
-import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import Slider from "@mui/material/Slider";
+import Stack from "@mui/material/Stack";
+import CircularProgress from "@mui/material/CircularProgress";
+import Portal from "@mui/material/Portal";
+
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
 import Timeline2 from './wavesurfer';
@@ -1175,6 +1173,13 @@ useEffect(() => {
           player.play();
         }
       }
+    }
+    const activeElement = document.activeElement;
+    const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
+    console.log(activeElement);
+
+    if (isTextAreaFocused) {
+      return;
     }
     if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();

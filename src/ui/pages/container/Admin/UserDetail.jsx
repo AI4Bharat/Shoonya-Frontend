@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MUIDataTable from "mui-datatables";
 import { useNavigate } from "react-router-dom";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -190,6 +190,15 @@ const UserDetail = (props) => {
         sort: false,
         align: "center",
       },
+      setCellProps: () => ({ 
+         style: {
+          padding: "16px",
+          minWidth: "170px",
+          whiteSpace: "normal",
+          overflowWrap: "break-word",
+          wordBreak: "break-word", 
+        }
+        }),
     },
     {
       name: "username",
@@ -199,6 +208,15 @@ const UserDetail = (props) => {
         sort: false,
         align: "center",
       },
+      setCellProps: () => ({ 
+          style: {
+          padding: "16px",
+          minWidth: "170px",
+          whiteSpace: "normal", 
+          overflowWrap: "break-word",
+          wordBreak: "break-word",  
+        } 
+        }),
     },
     {
       name: "first_name",
@@ -208,6 +226,7 @@ const UserDetail = (props) => {
         sort: false,
         align: "center",
       },
+      setCellProps: () => ({ style: { padding: "16px" } }),
     },
     {
       name: "last_name",
@@ -216,7 +235,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -226,7 +245,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -236,7 +255,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "40px" , paddingRight: "30px" } }),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -246,6 +265,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -255,7 +275,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" , paddingRight: "30px"} }),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -265,7 +285,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: {paddingLeft: "10px" , paddingRight: "20px"}} ),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
   ];
@@ -436,16 +456,34 @@ const UserDetail = (props) => {
     <div>
       {renderSnackBar()}
       {loading && <Spinner />}
-      <Grid sx={{ mb: 1 }}>
+      <Grid 
+        container
+        justifyContent="center" 
+        sx={{ 
+          mb: 2,
+          padding: "10px",
+      }}>
         <Search />
       </Grid>
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable
-          title="User Details"
-          data={data}
-          columns={columns}
-          options={options}
-        />
+            <Box
+                sx={{
+                  "& .MuiTableCell-root": {
+                    padding: "16px",
+                    minWidth: "170px",
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere", 
+                  }
+                }}
+              >
+                <MUIDataTable
+                          title="User Details"
+                          data={data}
+                          columns={columns}
+                          options={options}
+                          />
+              </Box>
       </ThemeProvider>
 
       {openDialog && (

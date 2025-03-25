@@ -6,15 +6,17 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 import MUIDataTable from "mui-datatables";
 import {
-  Box,
-  Button,
-  Grid,
-  CircularProgress,
-  Card,
-  Radio,
-  Typography,
+
   ThemeProvider,
 } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
+import Card from "@mui/material/Card";
+import Radio from "@mui/material/Radio";
+import Typography from "@mui/material/Typography";
+
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";

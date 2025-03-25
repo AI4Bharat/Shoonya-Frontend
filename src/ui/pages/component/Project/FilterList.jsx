@@ -1,27 +1,21 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Divider,
-  Grid,
-  Typography,
-  Popover,
-  FormGroup,
-  Checkbox,
-  FormControlLabel,
-  Radio,
-  Autocomplete,
-  RadioGroup,
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  NativeSelect
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
+import FormGroup from "@mui/material/FormGroup";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { Stack } from "@mui/material";
 // import { translate } from "../../../../assets/localisation";
 
@@ -29,7 +23,6 @@ const FilterList = (props) => {
   const classes = DatasetStyle();
   const { filterStatusData, currentFilters, updateFilters, pull, setpull, rejected, setRejected, pullvalue } = props;
   const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status ? currentFilters?.annotation_status : currentFilters.review_status);
-  const [selectAnnotator, setSelectAnnotator] = useState("All");
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);

@@ -1,17 +1,12 @@
 import React, { useState ,useEffect} from "react";
-import {
-  Button,
-  Divider,
-  Grid,
-  Typography,
-  Popover,
-  FormGroup,
-  Checkbox,
-  FormControlLabel,
-  Radio,
-  Autocomplete,
-  Box
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
+import FormGroup from "@mui/material/FormGroup";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Box from "@mui/material/Box";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
