@@ -1,6 +1,6 @@
 // OrganizationReports
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import Box from "@mui/material/Box";
 import tableTheme from "../../../theme/tableTheme";
@@ -8,7 +8,6 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Radio from "@mui/material/Radio";
-import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -111,44 +110,6 @@ const OrganizationReports = () => {
   let ProgressTypeValue = "Annotation Stage"
   const filterdata = ProgressType.filter(item => item !== ProgressTypeValue)
   const FilterProgressType = reportTypes === "Reviewer" ? filterdata : ProgressType
-  const [isBrowser, setIsBrowser] = useState(false);
-  const tableRef = useRef(null);
-  const [displayWidth, setDisplayWidth] = useState(0);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setDisplayWidth(window.innerWidth);
-    };
-
-    if (typeof window !== 'undefined') {
-      handleResize();
-      window.addEventListener('resize', handleResize);
-    }
-
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('resize', handleResize);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    setIsBrowser(true);
-
-    // Force responsive mode after component mount
-    const applyResponsiveMode = () => {
-      if (tableRef.current) {
-        const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
-        if (tableWrapper) {
-          tableWrapper.classList.add('MuiDataTable-vertical');
-        }
-      }
-    };
-
-    // Apply after a short delay to ensure DOM is ready
-    const timer = setTimeout(applyResponsiveMode, 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
@@ -367,7 +328,6 @@ const OrganizationReports = () => {
     jumpToPage: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
-    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -776,28 +736,12 @@ const OrganizationReports = () => {
       </Box>}
       {showSpinner ? <div></div> : reportRequested && (
         <ThemeProvider theme={tableTheme}>
-          <div ref={tableRef}>
-                    {isBrowser ? (
-                      <MUIDataTable
-                        key={`table-${displayWidth}`}
-                        title={ProjectReports.length > 0 ? "Reports" : ""}
-                        data={reportData}
-                        columns={columns.filter((col) => selectedColumns.includes(col.name))}
-                        options={options}
-                      />
-                    ) : (
-                      <Skeleton
-                        variant="rectangular"
-                        height={400}
-                        sx={{
-                          mx: 2,
-                          my: 3,
-                          borderRadius: '4px',
-                          transform: 'none'
-                        }}
-                      />
-                    )}
-                  </div>
+          <MUIDataTable
+            title={ProjectReports.length > 0 ? "Reports" : ""}
+            data={reportData}
+            columns={columns.filter((col) => selectedColumns.includes(col.name))}
+            options={options}
+          />
         </ThemeProvider>)
       }
       {/*<Grid
