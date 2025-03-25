@@ -12,6 +12,9 @@ import Paper from '@mui/material/Paper';
 import MyProgress from '../../component/Tabs/MyProgress';
 import RecentTasks from '../../component/Tabs/RecentTasks';
 import Spinner from "../../component/common/Spinner";
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
+import UserMappedByRole from '../../../../utils/UserMappedByRole/UserMappedByRole';
 import ToggleMailsAPI from '../../../../redux/actions/api/UserManagement/ToggleMails';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
@@ -88,47 +91,48 @@ const ProfilePage = () => {
   }, [UserDetails]);
 
   return (
-      <Grid container spacing={2}>
-        {loading && <Spinner />}
-        {renderSnackBar()}
-          {userDetails && (
-            <>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ p: 2 }}>
-                <Paper variant="outlined" sx={{ minWidth: 275, borderRadius: "5px" ,backgroundColor:'ButtonHighlight', textAlign:'center'}}>
-                  <CardContent>
-                    <Typography variant="h4">{userDetails.organization.title}</Typography>
+    <Grid container>
+      {loading && <Spinner />}
+      {renderSnackBar()}
+      {userDetails && (
+        <>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mx: { xs: 2, sm: 3, md: 4 }, fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" } }}>
+            <Paper variant="outlined" sx={{ minWidth: 275, borderRadius: "5px", backgroundColor: "ButtonHighlight", textAlign: "center" }}>
+              <CardContent>
+                <Typography variant="h4">{userDetails?.organization?.title}</Typography>
+              </CardContent>
+            </Paper>
+          </Grid>
+  
+          {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role) || (LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role))) ? (
+            <Grid container sx={{ margin: "none" }}>
+              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ py: 2, fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" } }}>
+                <Card sx={{ borderRadius: "5px", fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" } }}>
+                  <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, fontSize: { xs: "1rem", sm: "1.2rem" } }}>Recent Tasks</Typography>
+                    <RecentTasks />
                   </CardContent>
-                </Paper>
+                </Card>
               </Grid>
-              {((userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role || userRole.Admin === loggedInUserData?.role )||(LoggedInUserId === userDetails?.id && (userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role || userRole.SuperChecker === loggedInUserData?.role ) )) ?
-              <>
-              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 , display:'flex', justifyContent:'center' }}>
-                  
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h4" sx={{mb: 1}}>Recent Tasks</Typography>
-                      <RecentTasks />
-                    </CardContent>
-                  </Card> 
-              </Grid>
-              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ p: 2 }}>
-                <Card sx={{ minWidth: 275, borderRadius: "5px" }}>
-                  <CardContent>
-                    <Typography variant="h4" sx={{mb: 1}}>{LoggedInUserId===userDetails.id?  "My Progress": `Progress of ${userDetails?.first_name} ${userDetails?.last_name}` }</Typography>
+  
+              <Grid item xs={12} sm={12} md={6} lg={6} xl={6} sx={{ py: 2, fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" } }}>
+                <Card sx={{ borderRadius: "5px", fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" } }}>
+                  <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, fontSize: { xs: "1rem", sm: "1.2rem" } }}>{LoggedInUserId === userDetails?.id ? "My Progress" : `Progress of ${userDetails?.first_name} ${userDetails?.last_name}`}</Typography>
                     <MyProgress />
                   </CardContent>
                 </Card>
-              
               </Grid>
-              </>:
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ p: 1, display:'flex', justifyContent:'center', color: 'red'  }}>
-                  <Typography variant="h4" sx={{mb: 1}}>{"Not Authorised to View Details"}</Typography>
-              </Grid>
-              }
-              </>
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ p: 1, display: "flex", justifyContent: "center", color: "red" }}>
+              <Typography variant="h6" sx={{ fontSize: { xs: "1rem", sm: "1.2rem" }, fontWeight: 500 }}>Not Authorised to View Details</Typography>
+            </Grid>
           )}
-      </Grid>
-  )
-}
+        </>
+      )}
+    </Grid>
+  );
+};  
 
 export default ProfilePage;
