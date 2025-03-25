@@ -20,11 +20,11 @@ const StyledMenu = styled((props) => (
     elevation={3}
     anchorOrigin={{
       vertical: 'bottom',
-      horizontal: 'right',
+      horizontal: 'center',
     }}
     transformOrigin={{
       vertical: 'top',
-      horizontal: 'right',
+      horizontal: 'center',
     }}
     {...props}
   />
@@ -32,9 +32,7 @@ const StyledMenu = styled((props) => (
   '& .MuiPaper-root': {
     borderRadius: 6,
     marginTop: theme.spacing(1),
-    minWidth: 100,
-
-
+    minWidth: 280,
   },
 }));
 
@@ -218,8 +216,16 @@ const TaskAnalytics = (props) => {
   };    return (
     <>
       <Grid container columnSpacing={3} rowSpacing={2} mb={1} gap={3}>
-        <Grid item xs={2} sm={2} md={2} lg={2} xl={2} display={"flex"} justifyContent="space-between" >
-        <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Grid item xs={12} sm={6} md={5} lg={4} 
+          sx={{
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"space-between",
+            gap:2,
+            flexDirection:{xs:"column", sm:"row"}
+          }}
+          >
+        <Box display="flex" justifyContent="flex-end">
           <IconButton onClick={toggleFilterBox} aria-label="filter">
             <FilterList fontSize="medium" />
           </IconButton>
@@ -283,13 +289,13 @@ const TaskAnalytics = (props) => {
         )}
           {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent="space-between" alignItems="center"> */}
           {/* <CustomButton label="Submit" sx={{ width: { xs: "100px", md: "120px" }, height: "40px" }} onClick={handleSubmit}  /> */}
-          <Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
+          <Box display="flex" sx={{ width: "100%" }} alignItems="center">
             <CustomButton
               onClick={handleClick}
               disabled={loading}
-              sx={{ marginRight: 1 }}
               endIcon={<KeyboardArrowDown />}
               label="Download"
+              fullWidth
             >
               Download
             </CustomButton>
