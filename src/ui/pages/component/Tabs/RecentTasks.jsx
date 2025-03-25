@@ -8,27 +8,26 @@ import MenuItem from "@mui/material/MenuItem";
 import { ThemeProvider } from "@mui/material/styles";
 import LightTooltip from "../common/Tooltip";
 import InfoIcon from "@mui/icons-material/Info";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import { useSelector, useDispatch } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 import FetchRecentTasksAPI from "../../../../redux/actions/api/UserManagement/FetchRecentTasks";
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import MUIDataTable from "mui-datatables";
 import { translate } from "../../../../config/localisation";
 import SearchIcon from "@mui/icons-material/Search";
-import AllTaskSearchPopup from '../Project/AllTaskSearchPopup';
+import AllTaskSearchPopup from "../Project/AllTaskSearchPopup";
 
-
-const TASK_TYPES = ["annotation", "review", "supercheck"]
+const TASK_TYPES = ["annotation", "review", "supercheck"];
 
 const RecentTasks = () => {
-
   const { id } = useParams();
   const dispatch = useDispatch();
   const [taskType, setTaskType] = useState(TASK_TYPES[0]);
-  const [text, settext] = useState("")
+  const [text, settext] = useState("");
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -42,37 +41,88 @@ const RecentTasks = () => {
   const [currentRowPerPage, setCurrentRowPerPage] = useState(10);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
 
-  const RecentTasks = useSelector((state) => state.getRecentTasks.data)
+  const RecentTasks = useSelector((state) => state.getRecentTasks.data);
   const filterData = {
-    Status: ["incomplete", "annotated", "reviewed", "super_checked", "exported"],
+    Status: [
+      "incomplete",
+      "annotated",
+      "reviewed",
+      "super_checked",
+      "exported",
+    ],
   };
   const [selectedFilters, setsSelectedFilters] = useState({});
 
   const GetAllTasksdata = () => {
-    const taskObjs = new FetchRecentTasksAPI(id, taskType, currentPageNumber, selectedFilters, currentRowPerPage);
+    const taskObjs = new FetchRecentTasksAPI(
+      id,
+      taskType,
+      currentPageNumber,
+      selectedFilters,
+      currentRowPerPage
+    );
     dispatch(APITransport(taskObjs));
   };
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector(
+          ".MuiDataTable-responsiveBase"
+        );
+        if (tableWrapper) {
+          tableWrapper.classList.add("MuiDataTable-vertical");
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     GetAllTasksdata();
   }, [id, taskType, currentPageNumber, currentRowPerPage, selectedFilters]);
 
-
   useEffect(() => {
     if (RecentTasks && RecentTasks?.results?.results?.length > 0) {
       const data = RecentTasks?.results?.results?.map((el) => {
-        if (typeof el === 'object') {
+        if (typeof el === "object") {
           return Object.keys(el).map((key) => el[key]);
         }
         return [];
       });
       let colList = [];
       console.log(...Object.keys(RecentTasks.results.results[0]));
-      if (RecentTasks.results.results.length > 0 && typeof RecentTasks.results.results[0] === 'object') {
-
-        colList.push(
-          ...Object.keys(RecentTasks.results.results[0])
-        );
+      if (
+        RecentTasks.results.results.length > 0 &&
+        typeof RecentTasks.results.results[0] === "object"
+      ) {
+        colList.push(...Object.keys(RecentTasks.results.results[0]));
       }
       const cols = colList.map((col) => {
         return {
@@ -100,11 +150,11 @@ const RecentTasks = () => {
 
   const handleSearchClose = () => {
     setSearchAnchor(null);
-  }
+  };
   const handleShowSearch = (col, event) => {
     setSearchAnchor(event.currentTarget);
     setSearchedCol(col);
-  }
+  };
   const customColumnHead = (col) => {
     let tooltipText = "";
 
@@ -132,19 +182,25 @@ const RecentTasks = () => {
           alignItems: "center",
         }}
       >
-
         {col.label}
-        {col.label === "Updated at" || col.label === "Created at" || col.label === "Annotated at" ? (
+        {col.label === "Updated at" ||
+        col.label === "Created at" ||
+        col.label === "Annotated at" ? (
           <LightTooltip arrow placement="top" title={tooltipText}>
             <InfoIcon sx={{ color: "grey" }} fontSize="medium" />
           </LightTooltip>
         ) : null}
-        {<IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
-          <SearchIcon id={col.name + "_btn"} />
-        </IconButton>}
+        {
+          <IconButton
+            sx={{ borderRadius: "100%" }}
+            onClick={(e) => handleShowSearch(col.name, e)}
+          >
+            <SearchIcon id={col.name + "_btn"} />
+          </IconButton>
+        }
       </Box>
     );
-  }
+  };
 
   useEffect(() => {
     const newCols = columns.map((col) => {
@@ -156,26 +212,30 @@ const RecentTasks = () => {
     setColumns(newCols);
   }, [selectedColumns]);
 
-
-  const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+  const CustomFooter = ({
+    count,
+    page,
+    rowsPerPage,
+    changeRowsPerPage,
+    changePage,
+  }) => {
     return (
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap", 
-          justifyContent: { 
-            xs: "space-between", 
-            md: "flex-end" 
-          }, 
+          flexWrap: "wrap",
+          justifyContent: {
+            xs: "space-between",
+            md: "flex-end",
+          },
           alignItems: "center",
           padding: "10px",
-          gap: { 
-            xs: "10px", 
-            md: "20px" 
-          }, 
+          gap: {
+            xs: "10px",
+            md: "20px",
+          },
         }}
       >
-
         {/* Pagination Controls */}
         <TablePagination
           component="div"
@@ -186,21 +246,24 @@ const RecentTasks = () => {
           onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
           sx={{
             "& .MuiTablePagination-actions": {
-            marginLeft: "0px",
-          },
-          "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
-            marginRight: "10px",
-          },
+              marginLeft: "0px",
+            },
+            "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input":
+              {
+                marginRight: "10px",
+              },
           }}
         />
 
         {/* Jump to Page */}
         <div>
-          <label style={{ 
-            marginRight: "5px", 
-            fontSize:"0.83rem", 
-          }}>
-          Jump to Page:
+          <label
+            style={{
+              marginRight: "5px",
+              fontSize: "0.83rem",
+            }}
+          >
+            Jump to Page:
           </label>
           <Select
             value={page + 1}
@@ -221,7 +284,6 @@ const RecentTasks = () => {
       </Box>
     );
   };
-
 
   const tableOptions = {
     count: RecentTasks?.count,
@@ -254,6 +316,7 @@ const RecentTasks = () => {
     jumpToPage: true,
     serverSide: true,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -268,32 +331,68 @@ const RecentTasks = () => {
   return (
     <ThemeProvider theme={themeDefault}>
       <Box>
-        <Tabs value={taskType} onChange={(e, newVal) => setTaskType(newVal)} aria-label="basic tabs example" sx={{ mb: 2 }}>
-          <Tab label={translate("label.recentTasks.annotation")} value="annotation" sx={{ fontSize: 16, fontWeight: '700' }} />
-          <Tab label={translate("label.recentTasks.review")} value="review" sx={{ fontSize: 16, fontWeight: '700' }} />
-          <Tab label="Super Check" value="supercheck" sx={{ fontSize: 16, fontWeight: '700' }} />
+        <Tabs
+          value={taskType}
+          onChange={(e, newVal) => setTaskType(newVal)}
+          aria-label="basic tabs example"
+          sx={{ mb: 2 }}
+        >
+          <Tab
+            label={translate("label.recentTasks.annotation")}
+            value="annotation"
+            sx={{ fontSize: 16, fontWeight: "700" }}
+          />
+          <Tab
+            label={translate("label.recentTasks.review")}
+            value="review"
+            sx={{ fontSize: 16, fontWeight: "700" }}
+          />
+          <Tab
+            label="Super Check"
+            value="supercheck"
+            sx={{ fontSize: 16, fontWeight: "700" }}
+          />
         </Tabs>
       </Box>
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable
-          data={tasks}
-          columns={columns}
-          options={tableOptions}
-        />
+        <div ref={tableRef}>
+          {isBrowser ? (
+            <MUIDataTable
+              key={`table-${displayWidth}`}
+              title={""}
+              data={tasks}
+              columns={columns}
+              options={tableOptions}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              height={400}
+              sx={{
+                mx: 2,
+                my: 3,
+                borderRadius: "4px",
+                transform: "none",
+              }}
+            />
+          )}
+        </div>
       </ThemeProvider>
 
-      {searchOpen && <AllTaskSearchPopup
-        open={searchOpen}
-        anchorEl={searchAnchor}
-        handleClose={handleSearchClose}
-        updateFilters={setsSelectedFilters}
-        //filterStatusData={filterData}
-        currentFilters={selectedFilters}
-        searchedCol={searchedCol}
-        onchange={GetAllTasksdata}
-      />}
+      {searchOpen && (
+        <AllTaskSearchPopup
+          open={searchOpen}
+          anchorEl={searchAnchor}
+          handleClose={handleSearchClose}
+          updateFilters={setsSelectedFilters}
+          //filterStatusData={filterData}
+          currentFilters={selectedFilters}
+          searchedCol={searchedCol}
+          onchange={GetAllTasksdata}
+        />
+      )}
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default RecentTasks
+export default RecentTasks;
