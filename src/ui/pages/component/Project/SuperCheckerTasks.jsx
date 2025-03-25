@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useParams,useLocation } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,7 +43,7 @@ import SetTaskFilter from "../../../../redux/actions/Tasks/SetTaskFilter";
 import roles from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
-
+import Skeleton from "@mui/material/Skeleton";
 
 const excludeCols = [
   "context",
@@ -122,6 +122,45 @@ const SuperCheckerTasks = (props) => {
     (state) => state.getTasksByProjectId.data.result
   );
   localStorage.setItem("projectData", JSON.stringify(ProjectDetails));
+
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== 'undefined') {
+      handleResize();
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+        if (tableWrapper) {
+          tableWrapper.classList.add('MuiDataTable-vertical');
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const getTaskListData = () => {
     const taskObj = new GetTasksByProjectIdAPI(
@@ -614,6 +653,7 @@ const CustomTooltip = styled(({ className, ...props }) => (
     serverSide: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -868,27 +908,31 @@ const renderSnackBar = () => {
           )
         ) : (
           <></>
-          // <CustomButton
-          //   sx={{
-          //     p: 1,
-          //     width: "98%",
-          //     borderRadius: 2,
-          //     mb: 3,
-          //     ml: "1%",
-          //     mr: "1%",
-          //     mt: "1%",
-          //   }}
-          //   label={"Add New Item"}
-          // />
         ))}
       
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable
-          // title={""}
-          data={tasks}
-          columns={columns}
-          options={options}
-        />
+      <div ref={tableRef}>
+          {isBrowser ? (
+            <MUIDataTable
+              key={`table-${displayWidth}`}
+              title={""}
+              data={tasks}
+              columns={columns}
+              options={options}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              height={400}
+              sx={{
+                mx: 2,
+                my: 3,
+                borderRadius: '4px',
+                transform: 'none'
+              }}
+            />
+          )}
+        </div>
       </ThemeProvider>
       {popoverOpen && (
         <SuperCheckerFilter
