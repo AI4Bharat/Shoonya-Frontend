@@ -125,7 +125,6 @@ const Header = () => {
         if (response.ok) {
           const data = await response?.json();
           setnotification(data);
-          console.log(Notification?.length, data);
         } else {
           console.error(
             "Error fetching notifications:",
@@ -170,13 +169,6 @@ const Header = () => {
     getLoggedInUserData();
   }, []);
 
-  /* useEffect(()=>{
-    if(loggedInUserData?.prefer_cl_ui !== undefined){
-      setCheckClUI(loggedInUserData?.prefer_cl_ui)
-    }
-  },[loggedInUserData]) */
-
-  // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
   const onLogoutClick = () => {
     handleCloseUserMenu();
     dispatch(Logout());
@@ -185,7 +177,6 @@ const Header = () => {
     navigate("/");
   };
 
-  // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
   const keyPress = (e) => {
     if (e.code === "Escape" && showTransliterationModel) {
       handleTransliterationModelClose();
@@ -240,6 +231,7 @@ const Header = () => {
     setAnchorElSettings(null);
   };
   const handleOpenNotification = (event) => {
+    event.stopPropagation(); // prevent event bubbling
     setAnchorElNotification(event.currentTarget);
   };
 
@@ -319,7 +311,6 @@ const Header = () => {
         notification?.seen_json == null ||
         !notification?.seen_json[loggedInUserData.id]
     );
-  console.log(unseenNotifications, "uuu");
 
   const renderTabs = () => {
     if (
@@ -333,34 +324,6 @@ const Header = () => {
           direction="row"
           sx={{ width: "fit-content", gap: "5px" }}
         >
-          {/* <Typography variant="body1">
-            <NavLink
-              hidden={loggedInUserData.role === 1}
-              to={
-                loggedInUserData && loggedInUserData.organization
-                  ? `/my-organization/${loggedInUserData.organization.id}`
-                  : `/my-organization/1`
-              }
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Organization
-            </NavLink>
-          </Typography> */}
-          {/* <Typography variant="body1">
-            <NavLink
-              hidden={loggedInUserData.role === 1 || loggedInUserData.role === 3}
-              to="/workspaces"
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Workspaces
-            </NavLink>
-          </Typography> */}
           <Typography variant="body1">
             <NavLink
               to="/projects"
@@ -383,18 +346,6 @@ const Header = () => {
               Analytics
             </NavLink>
           </Typography>
-          {/* <Typography variant="body1">
-            <NavLink
-              hidden={loggedInUserData.role === 1}
-              to="/datasets"
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Datasets
-            </NavLink>
-          </Typography> */}
         </Grid>
       );
     } else if (userRole.WorkspaceManager === loggedInUserData?.role) {
@@ -404,21 +355,6 @@ const Header = () => {
           direction="row"
           sx={{ width: "fit-content", gap: "5px" }}
         >
-          {/* <Typography variant="body1">
-            <NavLink
-              to={
-                loggedInUserData && loggedInUserData.organization
-                  ? `/my-organization/${loggedInUserData.organization.id}`
-                  : `/my-organization/1`
-              }
-              className={({ isActive }) =>
-                isActive ? classes.highlightedMenu : classes.headerMenu
-              }
-              activeClassName={classes.highlightedMenu}
-            >
-              Organization
-            </NavLink>
-          </Typography> */}
           <Typography variant="body1">
             <NavLink
               to="/workspaces"
@@ -590,96 +526,110 @@ const Header = () => {
           </Typography>
         </Grid>
       );
-    } else {
+    } 
+    else {
       return null;
     }
   };
 
   const tabs = [
-    <Typography variant="body1">
-      <NavLink
-        hidden={
-          userRole.Annotator === loggedInUserData?.role ||
-          userRole.Reviewer === loggedInUserData?.role ||
-          userRole.SuperChecker === loggedInUserData?.role ||
-          userRole.WorkspaceManager === loggedInUserData?.role
-        }
-        to={
-          loggedInUserData && loggedInUserData.organization
-            ? `/my-organization/${loggedInUserData.organization.id}`
-            : `/my-organization/1`
-        }
-        className={({ isActive }) =>
-          isActive ? classes.highlightedMenu : classes.headerMenu
-        }
-        activeClassName={classes.highlightedMenu}
-      >
-        Organization
-      </NavLink>
-    </Typography>,
-    <Typography variant="body1">
-      <NavLink
-        hidden={userRole.WorkspaceManager !== loggedInUserData?.role}
-        to="/workspaces"
-        className={({ isActive }) =>
-          isActive ? classes.highlightedMenu : classes.headerMenu
-        }
-        activeClassName={classes.highlightedMenu}
-      >
-        Workspaces
-      </NavLink>
-    </Typography>,
-    <Typography variant="body1">
-      <NavLink
-        to="/projects"
-        className={({ isActive }) =>
-          isActive ? classes.highlightedMenu : classes.headerMenu
-        }
-        activeClassName={classes.highlightedMenu}
-      >
-        Projects
-      </NavLink>
-    </Typography>,
-    <Typography variant="body1">
-      <NavLink
-        hidden={
-          userRole.Annotator === loggedInUserData?.role ||
-          userRole.Reviewer === loggedInUserData?.role ||
-          userRole.SuperChecker === loggedInUserData?.role
-        }
-        to="/datasets"
-        className={({ isActive }) =>
-          isActive ? classes.highlightedMenu : classes.headerMenu
-        }
-        activeClassName={classes.highlightedMenu}
-      >
-        Datasets
-      </NavLink>
-    </Typography>,
-    <Typography variant="body1">
-      <NavLink
-        to="/analytics"
-        className={({ isActive }) =>
-          isActive ? classes.highlightedMenu : classes.headerMenu
-        }
-        activeClassName={classes.highlightedMenu}
-      >
-        Analytics
-      </NavLink>
-    </Typography>,
-    <Typography variant="body1">
-      <NavLink
-        to="/admin"
-        hidden={userRole.Admin !== loggedInUserData?.role}
-        className={({ isActive }) =>
-          isActive ? classes.highlightedMenu : classes.headerMenu
-        }
-        activeClassName={classes.highlightedMenu}
-      >
-        Admin
-      </NavLink>
-    </Typography>,
-  ];
+    // Organization tab - only shown for Organization Owners and Admins
+    (userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role) ? (
+       <Typography key="organization" variant="body1">
+         <NavLink
+           to={
+             loggedInUserData && loggedInUserData?.organization
+               ? `/my-organization/${loggedInUserData?.organization.id}`
+               : `/my-organization/1`
+           }
+           className={({ isActive }) =>
+             isActive ? classes.highlightedMenu : classes.headerMenu
+           }
+           activeClassName={classes.highlightedMenu}
+         >
+           Organization
+         </NavLink>
+       </Typography>
+     ) : null,
+   
+     // Workspaces tab - only shown for Workspace Managers
+     (userRole.WorkspaceManager === loggedInUserData?.role) ? (
+       <Typography key="workspaces" variant="body1">
+         <NavLink
+           to="/workspaces"
+           className={({ isActive }) =>
+             isActive ? classes.highlightedMenu : classes.headerMenu
+           }
+           activeClassName={classes.highlightedMenu}
+         >
+           Workspaces
+         </NavLink>
+       </Typography>
+     ) : null,
+   
+     // Projects tab - shown for all roles
+     <Typography key="projects" variant="body1">
+       <NavLink
+         to="/projects"
+         className={({ isActive }) =>
+           isActive ? classes.highlightedMenu : classes.headerMenu
+         }
+         activeClassName={classes.highlightedMenu}
+       >
+         Projects
+       </NavLink>
+     </Typography>,
+   
+     // Datasets tab - only shown for Workspace Managers, Organization Owners, and Admins
+     (userRole.WorkspaceManager === loggedInUserData?.role ||
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role) ? (
+       <Typography key="datasets" variant="body1">
+         <NavLink
+           to="/datasets"
+           className={({ isActive }) =>
+             isActive ? classes.highlightedMenu : classes.headerMenu
+           }
+           activeClassName={classes.highlightedMenu}
+         >
+           Datasets
+         </NavLink>
+       </Typography>
+     ) : null,
+   
+     // Analytics tab - shown for all roles
+     <Typography key="analytics" variant="body1">
+       <NavLink
+         to="/analytics"
+         className={({ isActive }) =>
+           isActive ? classes.highlightedMenu : classes.headerMenu
+         }
+         activeClassName={classes.highlightedMenu}
+       >
+         Analytics
+       </NavLink>
+     </Typography>,
+   
+     // Admin tab - only shown for Admins
+     (userRole.Admin === loggedInUserData?.role) ? (
+       <Typography key="admin" variant="body1">
+         <NavLink
+           to="/admin"
+           className={({ isActive }) =>
+             isActive ? classes.highlightedMenu : classes.headerMenu
+           }
+           activeClassName={classes.highlightedMenu}
+         >
+           Admin
+         </NavLink>
+       </Typography>
+     ) : null,
+   ];
+   
+   // Filter out null values
+   const filteredTabs = tabs.filter(tab => tab !== null);
+   
 
   const userSettings = [
     {
@@ -763,6 +713,20 @@ const Header = () => {
     // },
   ];
 
+  const appInfo = [
+    {
+      name: "Help",
+      onclick: () => {
+        const url = "https://github.com/AI4Bharat/Shoonya/wiki/Shoonya-FAQ";
+        window.open(url, "_blank");
+      },
+    },
+
+    {
+      name: "Notifications",
+    },
+  ];
+
   const handleTransliterationModelClose = () => {
     setShowTransliterationModel(false);
   };
@@ -778,9 +742,10 @@ const Header = () => {
       >
         {isMobile ? (
           <MobileNavbar
-            tabs={tabs}
+            tabs={filteredTabs}
             userSettings={userSettings}
             appSettings={appSettings}
+            appInfo={appInfo}
             loggedInUserData={loggedInUserData}
           />
         ) : (
@@ -821,20 +786,6 @@ const Header = () => {
                   </Typography>
                 </a>
               </Grid>
-
-              {/* <Grid
-                container
-                direction="row"
-                // justifyContent="space-evenly"
-                // spacing={0}
-                columnGap={2}
-                rowGap={2}
-                xs={12}
-                sm={12}
-                md={7}
-              >
-                {tabs.map((tab) => tab)}
-              </Grid> */}
               {renderTabs()}
               {renderSnackBar()}
               <Grid container sx={{ width: "fit-content" }}>
