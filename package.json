@@ -1,6 +1,7 @@
 {
   "homepage": "https://beta.shoonya.ai4bharat.org/",
   "name": "shoonya-new-frontend",
+  "sideEffects": false,
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -60,6 +61,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "analyze": "NODE_ENV=production webpack --profile --json > build/stats.json && webpack-bundle-analyzer build/stats.json",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"

@@ -37,9 +37,15 @@ const Search = (props) => {
                         <SearchIcon fontSize="small" />
                     </Grid>
                     <InputBase
-                        sx={{ ml: 4 }}
+                        sx={{
+                          ml: 4,
+                          p: 0.2,
+                          "& input::placeholder": {
+                            fontSize: "1rem", 
+                          },
+                        }}
                         inputRef={ref}
-                        placeholder="Search..."
+                        placeholder="Search"
                         value={searchValue}
                         onChange={(e) => handleChangeName(e.target.value)}
 

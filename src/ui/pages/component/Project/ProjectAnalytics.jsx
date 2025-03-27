@@ -1,6 +1,7 @@
 // ReportsTable
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
@@ -115,6 +116,47 @@ const ProjectAnalytics = (props) => {
     "#0c5922",
     "#743411",
   ];
+
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector(
+          ".MuiDataTable-responsiveBase"
+        );
+        if (tableWrapper) {
+          tableWrapper.classList.add("MuiDataTable-vertical");
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value);
@@ -506,44 +548,69 @@ const ProjectAnalytics = (props) => {
                       width: "45%",
                     }}
                   >
-                    <MUIDataTable
-                      // title={"Project Analytics"}
-                      data={tableData}
-                      columns={[
-                        {
-                          name: "name",
-                          label: "Name",
-                        },
-                        {
-                          name: "task_count",
-                          label: "Task Count",
-                        },
-                        {
-                          name: "color",
-                          label: "Color",
-                          options: {
-                            customBodyRender: (
-                              value,
-                              tableMeta,
-                              updateValue
-                            ) => {
-                              return (
-                                <Paper sx={{backgroundColor:`${colorList[value]}`,height:"10px",width:"80px"}}/>
-                              );
-                            },
-                          },
-                        },
-                      ]}
-                      options={{
-                        ...options,
-                        filter: false,
-                        search: false,
-                        print: false,
-                        viewColumns: false,
-                        download: false,
-                        selectableRows: false,
-                      }}
-                    />
+                    <ThemeProvider theme={tableTheme}>
+                      <div ref={tableRef}>
+                        {isBrowser ? (
+                          <MUIDataTable
+                            // title={"Project Analytics"}
+                            data={tableData}
+                            columns={[
+                              {
+                                name: "name",
+                                label: "Name",
+                              },
+                              {
+                                name: "task_count",
+                                label: "Task Count",
+                              },
+                              {
+                                name: "color",
+                                label: "Color",
+                                options: {
+                                  responsive: "vertical",
+                                  enableNestedDataAccess: ".",
+                                  customBodyRender: (
+                                    value,
+                                    tableMeta,
+                                    updateValue
+                                  ) => {
+                                    return (
+                                      <Paper
+                                        sx={{
+                                          backgroundColor: `${colorList[value]}`,
+                                          height: "10px",
+                                          width: "80px",
+                                        }}
+                                      />
+                                    );
+                                  },
+                                },
+                              },
+                            ]}
+                            options={{
+                              ...options,
+                              filter: false,
+                              search: false,
+                              print: false,
+                              viewColumns: false,
+                              download: false,
+                              selectableRows: false,
+                            }}
+                          />
+                        ) : (
+                          <Skeleton
+                            variant="rectangular"
+                            height={400}
+                            sx={{
+                              mx: 2,
+                              my: 3,
+                              borderRadius: "4px",
+                              transform: "none",
+                            }}
+                          />
+                        )}
+                      </div>
+                    </ThemeProvider>
                   </div>
                 </div>
               )
