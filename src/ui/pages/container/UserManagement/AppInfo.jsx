@@ -6,6 +6,7 @@ import {
   ThemeProvider,
   Box,
 } from "@mui/material";
+import Shoonya_Logo from "../../../../assets/Shoonya_Logo.webp";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { translate } from "../../../../config/localisation";
@@ -28,7 +29,7 @@ export default function AppInfo() {
       <ThemeProvider theme={themeDefault}>
         <Grid container className={classes.appInfo}>
           <img
-            src={"Shoonya_Logo.webp"}
+            src={Shoonya_Logo}
             alt="logo"
             className={classes.infoLogo}
           />{" "}
