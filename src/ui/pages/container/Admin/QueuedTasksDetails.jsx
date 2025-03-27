@@ -151,10 +151,8 @@ const QueuedTasksDetails = (props) => {
     align: "center",
     setCellProps: () => ({ 
           style: {
-          padding: "16px",
-          whiteSpace: "normal", 
-          overflowWrap: "break-word",
-          wordBreak: "break-word",  
+          padding: "30px",
+
         } 
         }),
 };
@@ -319,10 +317,7 @@ const QueuedTasksDetails = (props) => {
       <Grid 
         container
         justifyContent="center"  
-        sx={{ 
-          mb: 2,
-          padding: "10px",
-        }}>
+        >
         <Search />
       </Grid>
       <ThemeProvider theme={tableTheme}>
