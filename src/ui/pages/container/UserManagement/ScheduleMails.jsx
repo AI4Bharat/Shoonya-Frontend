@@ -9,10 +9,11 @@ import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import themeDefault from "../../../theme/theme";
-import { useParams } from 'react-router-dom';
-import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import { useSelector, useDispatch } from "react-redux";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetWorkspaceAPI from "../../../../redux/actions/api/Organization/GetWorkspace";
 import CreateScheduledMailsAPI from "../../../../redux/actions/api/UserManagement/CreateScheduledMails";
 import GetScheduledMailsAPI from "../../../../redux/actions/api/UserManagement/GetScheduledMails";
@@ -29,17 +30,22 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const ScheduleMails = () => {
   const { id } = useParams();
-  const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
+  const [snackbarState, setSnackbarState] = useState({
+    open: false,
+    message: "",
+    variant: "",
+  });
   const [reportLevel, setReportLevel] = useState(1);
-  const [selectedProjectType, setSelectedProjectType] = useState("AllAudioProjects");
+  const [selectedProjectType, setSelectedProjectType] =
+    useState("AllAudioProjects");
   const [projectTypes, setProjectTypes] = useState([
-         "AllAudioProjects",
-        "AudioSegmentation",
-        "AudioTranscription",
-        "AudioTranscriptionEditing",
-        "StandardizedTranscriptionEditing",
-        "AcousticNormalisedTranscriptionEditing",
-        "MonolingualTranslation",
+    "AllAudioProjects",
+    "AudioSegmentation",
+    "AudioTranscription",
+    "AudioTranscriptionEditing",
+    "StandardizedTranscriptionEditing",
+    "AcousticNormalisedTranscriptionEditing",
+    "MonolingualTranslation",
     "TranslationEditing",
     "SemanticTextualSimilarity(Scale5)",
     "ContextualTranslationEditing",
@@ -54,9 +60,9 @@ const ScheduleMails = () => {
     "ContextualSentenceVerificationandDomainClassification",
     "ConversationTranslation",
     "ConversationTranslationEditing",
-    "ConversationVerification"
+    "ConversationVerification",
   ]);
-  
+
   const [schedule, setSchedule] = useState("Daily");
   const [scheduleDay, setScheduleDay] = useState(1);
   const [workspaceId, setWorkspaceId] = useState(0);
@@ -68,14 +74,53 @@ const ScheduleMails = () => {
   const classes = DatasetStyle();
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-  const workspaceData = useSelector(state => state.GetWorkspace.data);
-  const scheduledMails = useSelector(state => state.getScheduledMails.data);
-  //const [requested, setRequested] = useState({ get: false, create: false, update: false, delete: false });
+  const workspaceData = useSelector((state) => state.GetWorkspace.data);
+  const scheduledMails = useSelector((state) => state.getScheduledMails.data);
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector(
+          ".MuiDataTable-responsiveBase"
+        );
+        if (tableWrapper) {
+          tableWrapper.classList.add("MuiDataTable-vertical");
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const getWorkspaceData = () => {
     const workspaceObj = new GetWorkspaceAPI();
     dispatch(APITransport(workspaceObj));
-  }
+  };
 
   const getScheduledMails = () => {
     const scheduledMailsObj = new GetScheduledMailsAPI(id);
@@ -83,7 +128,12 @@ const ScheduleMails = () => {
   };
 
   const createScheduledMail = () => {
-    if (!reportLevel || !schedule || !selectedProjectType || (reportLevel === 2 && workspaceId === 0)) {
+    if (
+      !reportLevel ||
+      !schedule ||
+      !selectedProjectType ||
+      (reportLevel === 2 && workspaceId === 0)
+    ) {
       setSnackbarState({
         open: true,
         message: "Invalid input",
@@ -133,15 +183,17 @@ const ScheduleMails = () => {
         getScheduledMails();
       })
       .catch((err) => {
-        setSnackbarState({ open: true, message: err.status === 500 ? "Unexpected error occurred" : err.message, variant: "error" });
+        setSnackbarState({
+          open: true,
+          message:
+            err.status === 500 ? "Unexpected error occurred" : err.message,
+          variant: "error",
+        });
       });
   };
 
   const updateScheduledMail = (mail) => {
-    const scheduledMailsObj = new UpdateScheduledMailsAPI(
-      id,
-      mail.id,
-    );
+    const scheduledMailsObj = new UpdateScheduledMailsAPI(id, mail.id);
     fetch(scheduledMailsObj.apiEndPoint(), {
       method: "PATCH",
       headers: scheduledMailsObj.getHeaders().headers,
@@ -160,15 +212,17 @@ const ScheduleMails = () => {
         getScheduledMails();
       })
       .catch((err) => {
-        setSnackbarState({ open: true, message: err.status === 500 ? "Unexpected error occurred" : err.message, variant: "error" });
+        setSnackbarState({
+          open: true,
+          message:
+            err.status === 500 ? "Unexpected error occurred" : err.message,
+          variant: "error",
+        });
       });
   };
 
   const deleteScheduledMail = (mail) => {
-    const scheduledMailsObj = new DeleteScheduledMailsAPI(
-      id,
-      mail.id,
-    );
+    const scheduledMailsObj = new DeleteScheduledMailsAPI(id, mail.id);
     fetch(scheduledMailsObj.apiEndPoint(), {
       method: "POST",
       headers: scheduledMailsObj.getHeaders().headers,
@@ -187,7 +241,12 @@ const ScheduleMails = () => {
         getScheduledMails();
       })
       .catch((err) => {
-        setSnackbarState({ open: true, message: err.status === 500 ? "Unexpected error occurred" : err.message, variant: "error" });
+        setSnackbarState({
+          open: true,
+          message:
+            err.status === 500 ? "Unexpected error occurred" : err.message,
+          variant: "error",
+        });
       });
   };
 
@@ -237,11 +296,13 @@ const ScheduleMails = () => {
           >
             <CustomButton
               label={mail["Status"] === "Enabled" ? "Pause" : "Resume"}
-              onClick={() => updateScheduledMail(mail)} />
+              onClick={() => updateScheduledMail(mail)}
+            />
             <CustomButton
               label="Delete"
               sx={{ backgroundColor: "#EC0000" }}
-              onClick={() => deleteScheduledMail(mail)} />
+              onClick={() => deleteScheduledMail(mail)}
+            />
           </Box>
         );
         return mail;
@@ -259,36 +320,39 @@ const ScheduleMails = () => {
 
   const renderToolBar = () => {
     return (
-      <Box
-        className={classes.ToolbarContainer}
-      >
+      <Box className={classes.ToolbarContainer}>
         <ColumnList
           columns={columns}
           setColumns={setSelectedColumns}
           selectedColumns={selectedColumns}
         />
       </Box>
-    )
-  }
-  const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+    );
+  };
+  const CustomFooter = ({
+    count,
+    page,
+    rowsPerPage,
+    changeRowsPerPage,
+    changePage,
+  }) => {
     return (
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap", 
-          justifyContent: { 
-            xs: "space-between", 
-            md: "flex-end" 
-          }, 
+          flexWrap: "wrap",
+          justifyContent: {
+            xs: "space-between",
+            md: "flex-end",
+          },
           alignItems: "center",
           padding: "10px",
-          gap: { 
-            xs: "10px", 
-            md: "20px" 
-          }, 
+          gap: {
+            xs: "10px",
+            md: "20px",
+          },
         }}
       >
-
         {/* Pagination Controls */}
         <TablePagination
           component="div"
@@ -299,21 +363,24 @@ const ScheduleMails = () => {
           onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
           sx={{
             "& .MuiTablePagination-actions": {
-            marginLeft: "0px",
-          },
-          "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
-            marginRight: "10px",
-          },
+              marginLeft: "0px",
+            },
+            "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input":
+              {
+                marginRight: "10px",
+              },
           }}
         />
 
         {/* Jump to Page */}
         <div>
-          <label style={{ 
-            marginRight: "5px", 
-            fontSize:"0.83rem", 
-          }}>
-          Jump to Page:
+          <label
+            style={{
+              marginRight: "5px",
+              fontSize: "0.83rem",
+            }}
+          >
+            Jump to Page:
           </label>
           <Select
             value={page + 1}
@@ -336,7 +403,7 @@ const ScheduleMails = () => {
   };
 
   const tableOptions = {
-    filterType: 'checkbox',
+    filterType: "checkbox",
     selectableRows: "none",
     download: true,
     filter: false,
@@ -346,6 +413,7 @@ const ScheduleMails = () => {
     jumpToPage: true,
     customToolbar: renderToolBar,
     responsive: "vertical",
+    enableNestedDataAccess: ".",
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
         count={count}
@@ -382,7 +450,9 @@ const ScheduleMails = () => {
 
             <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
-                <InputLabel id="report-level-label" sx={{ fontSize: "16px" }}>Report Level</InputLabel>
+                <InputLabel id="report-level-label" sx={{ fontSize: "16px" }}>
+                  Report Level
+                </InputLabel>
                 <Select
                   style={{ zIndex: "0" }}
                   inputProps={{ "aria-label": "Without label" }}
@@ -393,9 +463,10 @@ const ScheduleMails = () => {
                   label="Report Level"
                   onChange={(e) => setReportLevel(e.target.value)}
                 >
-                  {(userRole.OrganizationOwner === userDetails?.role || userRole.Admin === userDetails?.role) &&
+                  {(userRole.OrganizationOwner === userDetails?.role ||
+                    userRole.Admin === userDetails?.role) && (
                     <MenuItem value={1}>Organization</MenuItem>
-                  }
+                  )}
                   <MenuItem value={2}>Workspace</MenuItem>
                 </Select>
               </FormControl>
@@ -403,7 +474,9 @@ const ScheduleMails = () => {
 
             <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
-                <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>Workspace</InputLabel>
+                <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>
+                  Workspace
+                </InputLabel>
                 <Select
                   style={{ zIndex: "0" }}
                   inputProps={{ "aria-label": "Without label" }}
@@ -413,7 +486,10 @@ const ScheduleMails = () => {
                   value={workspaceId}
                   label="Workspace"
                   onChange={(e) => setWorkspaceId(e.target.value)}
-                  disabled={reportLevel === 1 || !(workspaceData && workspaceData.length > 0)}
+                  disabled={
+                    reportLevel === 1 ||
+                    !(workspaceData && workspaceData.length > 0)
+                  }
                 >
                   {workspaces.map((w, index) => (
                     <MenuItem value={w.id} key={index}>
@@ -426,7 +502,9 @@ const ScheduleMails = () => {
 
             <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
-                <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>Project Type</InputLabel>
+                <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
+                  Project Type
+                </InputLabel>
                 <Select
                   style={{ zIndex: "0" }}
                   inputProps={{ "aria-label": "Without label" }}
@@ -448,7 +526,9 @@ const ScheduleMails = () => {
 
             <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <FormControl fullWidth size="small">
-                <InputLabel id="schedule-label" sx={{ fontSize: "16px" }}>Schedule</InputLabel>
+                <InputLabel id="schedule-label" sx={{ fontSize: "16px" }}>
+                  Schedule
+                </InputLabel>
                 <Select
                   style={{ zIndex: "0" }}
                   inputProps={{ "aria-label": "Without label" }}
@@ -465,74 +545,102 @@ const ScheduleMails = () => {
                 </Select>
               </FormControl>
             </Grid>
-            {schedule === "Weekly" && <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="weekday-label" sx={{ fontSize: "16px" }}>Day of Week</InputLabel>
-                <Select
-                  style={{ zIndex: "0" }}
-                  inputProps={{ "aria-label": "Without label" }}
-                  MenuProps={MenuProps}
-                  labelId="weekday-label"
-                  id="weekday-select"
-                  value={scheduleDay}
-                  label="Day of Week"
-                  onChange={(e) => setScheduleDay(e.target.value)}
-                >
-                  <MenuItem value={0}>Sunday</MenuItem>
-                  <MenuItem value={1}>Monday</MenuItem>
-                  <MenuItem value={2}>Tuesday</MenuItem>
-                  <MenuItem value={3}>Wednesday</MenuItem>
-                  <MenuItem value={4}>Thursday</MenuItem>
-                  <MenuItem value={5}>Friday</MenuItem>
-                  <MenuItem value={6}>Saturday</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>}
-            {schedule === "Monthly" && <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="month-day-label" sx={{ fontSize: "16px" }}>Day of Month</InputLabel>
-                <Select
-                  style={{ zIndex: "0" }}
-                  inputProps={{ "aria-label": "Without label" }}
-                  MenuProps={MenuProps}
-                  labelId="month-day-label"
-                  id="month-day-select"
-                  value={scheduleDay}
-                  label="Day of Month"
-                  onChange={(e) => setScheduleDay(e.target.value)}
-                >
-                  {Array.from(Array(28).keys()).map((day, index) => (
-                    <MenuItem value={day + 1} key={index}>
-                      {day + 1}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>}
+            {schedule === "Weekly" && (
+              <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="weekday-label" sx={{ fontSize: "16px" }}>
+                    Day of Week
+                  </InputLabel>
+                  <Select
+                    style={{ zIndex: "0" }}
+                    inputProps={{ "aria-label": "Without label" }}
+                    MenuProps={MenuProps}
+                    labelId="weekday-label"
+                    id="weekday-select"
+                    value={scheduleDay}
+                    label="Day of Week"
+                    onChange={(e) => setScheduleDay(e.target.value)}
+                  >
+                    <MenuItem value={0}>Sunday</MenuItem>
+                    <MenuItem value={1}>Monday</MenuItem>
+                    <MenuItem value={2}>Tuesday</MenuItem>
+                    <MenuItem value={3}>Wednesday</MenuItem>
+                    <MenuItem value={4}>Thursday</MenuItem>
+                    <MenuItem value={5}>Friday</MenuItem>
+                    <MenuItem value={6}>Saturday</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
+            {schedule === "Monthly" && (
+              <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="month-day-label" sx={{ fontSize: "16px" }}>
+                    Day of Month
+                  </InputLabel>
+                  <Select
+                    style={{ zIndex: "0" }}
+                    inputProps={{ "aria-label": "Without label" }}
+                    MenuProps={MenuProps}
+                    labelId="month-day-label"
+                    id="month-day-select"
+                    value={scheduleDay}
+                    label="Day of Month"
+                    onChange={(e) => setScheduleDay(e.target.value)}
+                  >
+                    {Array.from(Array(28).keys()).map((day, index) => (
+                      <MenuItem value={day + 1} key={index}>
+                        {day + 1}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
             <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-              <CustomButton
-                label="+ Add"
-                onClick={createScheduledMail}
-              />
+              <CustomButton label="+ Add" onClick={createScheduledMail} />
             </Grid>
-            {showSpinner ? <div></div> : tableData && (
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <ThemeProvider theme={tableTheme}>
-                  <MUIDataTable
-                    title={""}
-                    data={tableData}
-                    columns={columns.filter((col) => selectedColumns.includes(col.name))}
-                    options={tableOptions}
-                  />
-                </ThemeProvider></Grid>)
-            }
+            {showSpinner ? (
+              <div></div>
+            ) : (
+              tableData && (
+                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                  <ThemeProvider theme={tableTheme}>
+                    <div ref={tableRef}>
+                      {isBrowser ? (
+                        <MUIDataTable
+                          key={`table-${displayWidth}`}
+                          title={""}
+                          data={tableData}
+                          columns={columns.filter((col) =>
+                            selectedColumns.includes(col.name)
+                          )}
+                          options={tableOptions}
+                        />
+                      ) : (
+                        <Skeleton
+                          variant="rectangular"
+                          height={400}
+                          sx={{
+                            mx: 2,
+                            my: 3,
+                            borderRadius: "4px",
+                            transform: "none",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </ThemeProvider>
+                </Grid>
+              )
+            )}
           </Grid>
         </Card>
       </Grid>
       <Snackbar
         {...snackbarState}
         handleClose={() => setSnackbarState({ ...snackbarState, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         hide={2000}
       />
     </ThemeProvider>
