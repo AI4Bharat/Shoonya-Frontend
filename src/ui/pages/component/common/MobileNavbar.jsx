@@ -168,8 +168,9 @@ function MobileNavbar(props) {
                   style={{
                     fontSize: "28px",
                     fontWeight: "lighter",
-                    fontFamily: 'Rowdies,cursive,Roboto,sans-serif'
-
+                    fontFamily: 'Rowdies,cursive,Roboto,sans-serif',
+                    color:"#373939",
+                    marginLeft:2
                   }}
                 >
                   Shoonya
