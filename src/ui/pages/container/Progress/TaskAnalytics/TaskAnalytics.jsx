@@ -218,6 +218,7 @@ const TaskAnalytics = (props) => {
       <Grid container columnSpacing={3} rowSpacing={2} mb={1} gap={3}>
         <Grid item xs={12} sm={6} md={5} lg={4} 
           sx={{
+            position:"relative",
             display:"flex",
             alignItems:"center",
             justifyContent:"space-between",
@@ -232,7 +233,21 @@ const TaskAnalytics = (props) => {
         </Box>
 
         {showFilterBox && (
-          <Box border={1} borderRadius={2} padding={3} display="flex" flexDirection="column" gap={3}>
+          <Box 
+            border={1} 
+            borderRadius={2} 
+            padding={3} 
+            display="flex" 
+            flexDirection="column" 
+            gap={3}
+            sx={{
+              position:"absolute",
+              top:{ xs:"60px", sm:"15px"},
+              left:{xs:"auto",sm:"70px"},
+              backgroundColor:"white",
+              zIndex:1
+            }}
+            >
 
             {/* Project Type Dropdown */}
             <FormControl size="small">
