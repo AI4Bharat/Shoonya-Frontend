@@ -1,28 +1,25 @@
-import {
-  Box,
-  Chip,
-  Grid,
-  ThemeProvider,
-  Typography,
-  Card,
-  IconButton,
-  InputLabel,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+import TablePagination from "@mui/material/TablePagination";
+import Typography from "@mui/material/Typography";
+import { ThemeProvider } from "@mui/material/styles";
 import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import themeDefault from "../../../theme/theme";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../component/common/Button";
 import ColumnList from "../../component/common/ColumnList";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import MUIDataTable from "mui-datatables";
-import StandardTextField from "../../component/common/StandardTextField";
-import NativeSelect from "@mui/material/NativeSelect";
 import MenuItems from "../../component/common/MenuItems";
 import { useDispatch, useSelector } from "react-redux";
 import CreateProjectAPI from "../../../../redux/actions/api/ProjectDetails/CreateProject";
@@ -33,10 +30,7 @@ import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/
 import GetDataitemsByIdAPI from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { snakeToTitleCase } from "../../../../utils/utils";
-import CustomizedSnackbars from "../../component/common/Snackbar";
 import Spinner from "../../component/common/Spinner";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import SearchIcon from "@mui/icons-material/Search";
 import DatasetSearchPopup from "../../container/Dataset/DatasetSearchPopup";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
@@ -49,14 +43,14 @@ const isNum = (str) => {
 const projectStage = [
   { name: "Annotation Stage", value: 1 },
   { name: "Review Stage", value: 2 },
-  { name: "Super-Check Stage", value: 3 }
+  { name: "Super-Check Stage", value: 3 },
 ];
 
 const CreateAnnotationsAutomatically = [
   { name: "None", value: "none" },
   { name: "Annotation", value: "annotation" },
   { name: "Review", value: "review" },
-  { name: "Supercheck", value: "supercheck" }
+  { name: "Supercheck", value: "supercheck" },
 ];
 
 const AnnotationProject = (props) => {
@@ -114,7 +108,8 @@ const AnnotationProject = (props) => {
   const [tableData, setTableData] = useState([]);
   const [searchAnchor, setSearchAnchor] = useState(null);
   const [selectedFilters, setsSelectedFilters] = useState({});
-  const [createannotationsAutomatically, setsCreateannotationsAutomatically] = useState("none");
+  const [createannotationsAutomatically, setsCreateannotationsAutomatically] =
+    useState("none");
   const [acousticEnabledStage, setAcousticEnabledStage] = useState(null);
 
   const searchOpen = Boolean(searchAnchor);
@@ -186,6 +181,120 @@ const AnnotationProject = (props) => {
       </Box>
     );
   };
+  const CustomFooter = ({
+    count,
+    page,
+    rowsPerPage,
+    changeRowsPerPage,
+    changePage,
+  }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: {
+            xs: "space-between",
+            md: "flex-end",
+          },
+          alignItems: "center",
+          padding: "10px",
+          gap: {
+            xs: "10px",
+            md: "20px",
+          },
+        }}
+      >
+        {/* Pagination Controls */}
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, newPage) => changePage(newPage)}
+          onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+          sx={{
+            "& .MuiTablePagination-actions": {
+              marginLeft: "0px",
+            },
+            "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input":
+              {
+                marginRight: "10px",
+              },
+          }}
+        />
+
+        {/* Jump to Page */}
+        <div>
+          <label
+            style={{
+              marginRight: "5px",
+              fontSize: "0.83rem",
+            }}
+          >
+            Jump to Page:
+          </label>
+          <Select
+            value={page + 1}
+            onChange={(e) => changePage(Number(e.target.value) - 1)}
+            sx={{
+              fontSize: "0.8rem",
+              padding: "4px",
+              height: "32px",
+            }}
+          >
+            {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+              <MenuItem key={i} value={i + 1}>
+                {i + 1}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      </Box>
+    );
+  };
+
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector(
+          ".MuiDataTable-responsiveBase"
+        );
+        if (tableWrapper) {
+          tableWrapper.classList.add("MuiDataTable-vertical");
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   const options = {
     count: totalDataitems,
     rowsPerPage: currentRowPerPage,
@@ -228,6 +337,17 @@ const AnnotationProject = (props) => {
     jumpToPage: true,
     serverSide: true,
     customToolbar: renderToolBar,
+    responsive: "vertical",
+    enableNestedDataAccess: ".",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
   };
 
   useEffect(() => {
@@ -270,28 +390,28 @@ const AnnotationProject = (props) => {
 
           if (
             ProjectDomains[domain]["project_types"][project_type][
-            "input_dataset"
+              "input_dataset"
             ]
           ) {
             tempDatasetTypes[project_type] =
               ProjectDomains[domain]["project_types"][project_type][
-              "input_dataset"
+                "input_dataset"
               ]["class"];
             tempColumnFields[project_type] =
               ProjectDomains[domain]["project_types"][project_type][
-              "input_dataset"
+                "input_dataset"
               ]["fields"];
           }
           let temp =
             ProjectDomains[domain]["project_types"][project_type][
-            "output_dataset"
+              "output_dataset"
             ]["fields"]["variable_parameters"];
           if (temp) {
             tempVariableParameters[project_type] = {
               variable_parameters: temp,
               output_dataset:
                 ProjectDomains[domain]["project_types"][project_type][
-                "output_dataset"
+                  "output_dataset"
                 ]["class"],
             };
           }
@@ -369,8 +489,8 @@ const AnnotationProject = (props) => {
               align: "center",
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
-                if ((keys.includes("json")) && value !== null ) {
-                  const data = JSON.stringify(value)
+                if (keys.includes("json") && value !== null) {
+                  const data = JSON.stringify(value);
                   const metadata = data.replace(/\\/g, "");
                   return metadata;
                 } else {
@@ -424,9 +544,7 @@ const AnnotationProject = (props) => {
     }
   }, [selectedType]);
 
-
   useEffect(() => {
-
     if (batchSize && batchNumber) {
       setSamplingParameters({
         batch_size: batchSize,
@@ -529,9 +647,6 @@ const AnnotationProject = (props) => {
     return temp;
   };
 
-
-
-
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
@@ -557,7 +672,9 @@ const AnnotationProject = (props) => {
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
       project_stage: taskReviews,
-      ...(createannotationsAutomatically !== "none" && { automatic_annotation_creation_mode: createannotationsAutomatically }),
+      ...(createannotationsAutomatically !== "none" && {
+        automatic_annotation_creation_mode: createannotationsAutomatically,
+      }),
       acoustic_enabled_stage: acousticEnabledStage,
     };
 
@@ -576,8 +693,8 @@ const AnnotationProject = (props) => {
   };
 
   const handleChangeCreateAnnotationsAutomatically = (e) => {
-    setsCreateannotationsAutomatically(e.target.value)
-  }
+    setsCreateannotationsAutomatically(e.target.value);
+  };
 
   return (
     <ThemeProvider theme={themeDefault}>
@@ -713,7 +830,7 @@ const AnnotationProject = (props) => {
 
             {selectedType &&
               variableParameters?.[selectedType]?.variable_parameters !==
-              undefined && (
+                undefined && (
                 <>
                   <Grid
                     className={classes.projectsettingGrid}
@@ -918,7 +1035,7 @@ const AnnotationProject = (props) => {
                       ) : (
                         <>
                           {parameter.data["name"] === "DecimalField" ||
-                            parameter.data["name"] === "IntegerField" ? (
+                          parameter.data["name"] === "IntegerField" ? (
                             <OutlinedTextField
                               fullWidth
                               defaultValue={
@@ -1008,12 +1125,12 @@ const AnnotationProject = (props) => {
                                     confirmed
                                       ? undefined
                                       : () => {
-                                        setSelectedInstances(
-                                          selectedInstances.filter(
-                                            (instance) => instance !== key
-                                          )
-                                        );
-                                      }
+                                          setSelectedInstances(
+                                            selectedInstances.filter(
+                                              (instance) => instance !== key
+                                            )
+                                          );
+                                        }
                                   }
                                 />
                               ))}
@@ -1080,15 +1197,30 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <ThemeProvider theme={tableTheme}>
-                    <MUIDataTable
-                      title={""}
-                      data={tableData}
-                      columns={columns.filter((column) =>
-                        selectedColumns.includes(column.name)
-
+                    <div ref={tableRef}>
+                      {isBrowser ? (
+                        <MUIDataTable
+                          key={`table-${displayWidth}`}
+                          title={""}
+                          data={tableData}
+                          columns={columns.filter((column) =>
+                            selectedColumns.includes(column.name)
+                          )}
+                          options={options}
+                        />
+                      ) : (
+                        <Skeleton
+                          variant="rectangular"
+                          height={400}
+                          sx={{
+                            mx: 2,
+                            my: 3,
+                            borderRadius: "4px",
+                            transform: "none",
+                          }}
+                        />
                       )}
-                      options={options}
-                    />
+                    </div>
                   </ThemeProvider>
                 </Grid>
                 <Grid
@@ -1297,36 +1429,40 @@ const AnnotationProject = (props) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                {selectedType === "AcousticNormalisedTranscriptionEditing" && <>
-                  <Grid
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                    className={classes.projectsettingGrid}
-                  >
-                    <Typography gutterBottom component="div" label="Required">
-                      Acoustic Enabled Stage:
-                    </Typography>
-                  </Grid>
-                  <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                    <FormControl fullWidth className={classes.formControl}>
-                      <Select
-                        labelId="acoustic-label"
-                        id="acoustic-select"
-                        value={acousticEnabledStage}
-                        onChange={(e) => setAcousticEnabledStage(e.target.value)}
-                      >
-                        {projectStage.map((type, index) => (
-                          <MenuItem value={type.value} key={index}>
-                            {type.name.split(/(?<=^\S+)\s/)[0]}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </>}
+                {selectedType === "AcousticNormalisedTranscriptionEditing" && (
+                  <>
+                    <Grid
+                      xs={12}
+                      sm={12}
+                      md={12}
+                      lg={12}
+                      xl={12}
+                      className={classes.projectsettingGrid}
+                    >
+                      <Typography gutterBottom component="div" label="Required">
+                        Acoustic Enabled Stage:
+                      </Typography>
+                    </Grid>
+                    <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                      <FormControl fullWidth className={classes.formControl}>
+                        <Select
+                          labelId="acoustic-label"
+                          id="acoustic-select"
+                          value={acousticEnabledStage}
+                          onChange={(e) =>
+                            setAcousticEnabledStage(e.target.value)
+                          }
+                        >
+                          {projectStage.map((type, index) => (
+                            <MenuItem value={type.value} key={index}>
+                              {type.name.split(/(?<=^\S+)\s/)[0]}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </>
+                )}
               </>
             )}
 
@@ -1360,13 +1496,13 @@ const AnnotationProject = (props) => {
                 onClick={handleCreateProject}
                 disabled={
                   title &&
-                    description &&
-                    selectedDomain &&
-                    selectedType &&
-                    selectedInstances &&
-                    domains &&
-                    samplingMode &&
-                    selectedVariableParameters
+                  description &&
+                  selectedDomain &&
+                  selectedType &&
+                  selectedInstances &&
+                  domains &&
+                  samplingMode &&
+                  selectedVariableParameters
                     ? false
                     : true
                 }

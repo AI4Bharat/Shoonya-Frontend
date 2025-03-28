@@ -1,6 +1,7 @@
 // MembersTable
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import { useDispatch, useSelector } from "react-redux";
 import MUIDataTable from "mui-datatables";
 import CustomButton from "../common/Button";
@@ -9,18 +10,20 @@ import { PersonAddAlt } from "@mui/icons-material";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import AddUsersDialog from "../common/AddUsersDialog";
 import InviteUsersDialog from "../common/InviteUsersDialog";
-import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
-import AddMembersToProjectAPI from "../../../../redux/actions/api/ProjectDetails/AddMembersToProject";
-import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import addUserTypes from "../../../../constants/addUserTypes";
 import { useNavigate, useParams } from "react-router-dom";
-import { ThemeProvider, Grid,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  DialogContentText } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContentText from "@mui/material/DialogContentText";
+import Box from "@mui/material/Box";
+import TablePagination from "@mui/material/TablePagination";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import tableTheme from "../../../theme/tableTheme";
 import RemoveProjectMemberAPI from "../../../../redux/actions/api/ProjectDetails/RemoveProjectMember";
 import RemoveProjectReviewerAPI from "../../../../redux/actions/api/ProjectDetails/RemoveProjectReviewer";
@@ -51,6 +54,7 @@ const options = {
 };
 
 const addLabel = {
+  dataset:"Add Members to Dataset",
   organization: "Invite Users to Organization",
   [addUserTypes.PROJECT_ANNOTATORS]: "Add Annotators to Project",
   [addUserTypes.PROJECT_REVIEWER]: "Add Reviewers to Project",
@@ -97,7 +101,44 @@ const MembersTable = (props) => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== 'undefined') {
+      handleResize();
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+        if (tableWrapper) {
+          tableWrapper.classList.add('MuiDataTable-vertical');
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
   const columns = [
     {
       name: "Name",
@@ -117,7 +158,17 @@ const MembersTable = (props) => {
       options: {
         filter: false,
         sort: false,
+        setCellProps: () => ({ 
+          style: {
+            height: "70px", fontSize: "16px",
+          padding: "16px",
+          whiteSpace: "normal", 
+          overflowWrap: "break-word",
+          wordBreak: "break-word",  
+        } 
+        }),
       },
+      
     },
     {
       name: "Role",
@@ -367,7 +418,7 @@ const MembersTable = (props) => {
             <>  
                  {!hideViewButton && (
                 <CustomButton
-                  sx={{ p: 1, borderRadius: 2 }}
+                  sx={{ m: 1, borderRadius: 2 }}
                   onClick={() => {
                     navigate(`/profile/${el.id}`);
                   }}
@@ -417,7 +468,7 @@ const MembersTable = (props) => {
 
            {projectlist(el.id) &&(
                 <CustomButton
-                    sx={{ borderRadius: 2}}
+                    sx={{ m:1, borderRadius: 2}}
                     label="Add"
                     onClick={() => handleRemoveFrozenUsers(el.id)}
                     disabled = {ProjectDetails.is_archived}
@@ -426,7 +477,7 @@ const MembersTable = (props) => {
 
               {reSendButton && (
                 <CustomButton
-                  sx={{ p: 1, m: 1, borderRadius: 2 }}
+                  sx={{  m: 1, borderRadius: 2 }}
                   onClick={() => handleResendUser(el.email)}
                   label={"Resend"}
                 />
@@ -434,7 +485,7 @@ const MembersTable = (props) => {
               {
                 approveButton && (
                   <CustomButton
-                    sx={{ p: 1, m: 1, borderRadius: 2 }}
+                    sx={{  m: 1, borderRadius: 2 }}
                     onClick={() => handleApproveUser(el.id)}
                     label={"Approve"}
                   />
@@ -443,7 +494,7 @@ const MembersTable = (props) => {
               {
                 rejectButton && (
                   <CustomButton
-                    sx={{ p: 1, m: 1, borderRadius: 2, backgroundColor: "#cf5959"}}
+                    sx={{  m: 1, borderRadius: 2, backgroundColor: "#cf5959"}}
                     color="error"
                     onClick={() => handleRejectUser(el.id)}
                     label={"Reject"}
@@ -456,6 +507,72 @@ const MembersTable = (props) => {
           ];
         })
       : [];
+
+      const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap", 
+              justifyContent: { 
+                xs: "space-between", 
+                md: "flex-end" 
+              }, 
+              alignItems: "center",
+              padding: "10px",
+              gap: { 
+                xs: "10px", 
+                md: "20px" 
+              }, 
+            }}
+          >
+
+            {/* Pagination Controls */}
+            <TablePagination
+              component="div"
+              count={count}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => changePage(newPage)}
+              onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+              sx={{
+                "& .MuiTablePagination-actions": {
+                marginLeft: "0px",
+              },
+              "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
+                marginRight: "10px",
+              },
+              }}
+            />
+
+            {/* Jump to Page */}
+            <div>
+              <label style={{ 
+                marginRight: "5px", 
+                fontSize:"0.83rem", 
+              }}>
+              Jump to Page:
+              </label>
+              <Select
+                value={page + 1}
+                onChange={(e) => changePage(Number(e.target.value) - 1)}
+                sx={{
+                  fontSize: "0.8rem",
+                  padding: "4px",
+                  height: "32px",
+                }}
+              >
+                {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+                  <MenuItem key={i} value={i + 1}>
+                    {i + 1}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+          </Box>
+        );
+      };
+
   const options = {
     textLabels: {
       body: {
@@ -482,6 +599,17 @@ const MembersTable = (props) => {
     selectableRows: "none",
     search: false,
     jumpToPage: true,
+    responsive: "vertical",
+    enableNestedDataAccess: ".",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
   };
 
   // console.log('columns',columns)
@@ -639,13 +767,28 @@ const MembersTable = (props) => {
         </Grid>
 
       <ThemeProvider theme={tableTheme} sx={{ marginTop: "20px" }}>
-        <MUIDataTable
-          title={""}
-          data={data}
-          columns={columns}
-          options={options}
-          // filter={false}
-        />
+      <div ref={tableRef}>
+          {isBrowser ? (
+            <MUIDataTable
+              key={`table-${displayWidth}`}
+              title={""}
+              data={data}
+              columns={columns}
+              options={options}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              height={400}
+              sx={{
+                mx: 2,
+                my: 3,
+                borderRadius: '4px',
+                transform: 'none'
+              }}
+            />
+          )}
+        </div>
       </ThemeProvider>
     </React.Fragment>
   );

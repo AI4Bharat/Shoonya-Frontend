@@ -25,7 +25,11 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 600,
+  width: { 
+    xs: "90%", 
+    sm: "80%", 
+    md: "600px" 
+  },
   bgcolor: "background.paper",
   //border: "2px solid #000",
   boxShadow: 24,
@@ -157,7 +161,7 @@ export default function DatasetSettings() {
       <Card
         sx={{
           width: "100%",
-          padding: 4,
+          padding: 2,
         }}
       >
         <Grid container direction="row" columnSpacing={1} rowSpacing={2} justifyContent="center" alignItems="center">
@@ -165,7 +169,7 @@ export default function DatasetSettings() {
             <CircularProgress />
           ) : (
             <>
-              <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+              <Grid item xs={12} sm={5} lg={3}>
                 {/* <CustomButton
 								label={translate("button.downloadDataset")}
 								onClick={handleClick}
@@ -173,18 +177,18 @@ export default function DatasetSettings() {
 
                 <DownloadDatasetButton />
               </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+              <Grid item xs={12} sm={5} lg={3}>
                 <CustomButton
-                  sx={{ width: "150px" }}
+                  sx={{ width: "100%" }}
                   label={translate("button.uploadData")}
                   onClick={handleUpload}
                 />
               </Grid>
 
-              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+              <Grid item xs={12} sm={5} lg={3}>
                 <DeleteDataItems />
               </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+              <Grid item xs={12} sm={5} lg={3}>
                 <DeduplicateDataItems />
               </Grid>
 
@@ -274,7 +278,7 @@ export default function DatasetSettings() {
                           mt: 3,
                         }}
                       >
-                        <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+                        <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
                           <Typography
                             variant="subtitle1"
                             gutterBottom
@@ -283,7 +287,7 @@ export default function DatasetSettings() {
                             Delete Duplicate Records :
                           </Typography>
                         </Grid>
-                        <Grid item xs={6} md={8} lg={8} xl={8} sm={6}>
+                        <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
                           <Switch
                             {...label}
                             defaultChecked
@@ -304,12 +308,15 @@ export default function DatasetSettings() {
                         sx={{ justifyContent: "flex-end", mt: 2 }}
                       >
                         <CustomButton
+                          sx = {{
+                            width:"100px" 
+                          }}
                           label={"Upload"}
                           disabled={file.length == 0 ? true : false}
                           onClick={handleUploadFile}
                         />
                         <CustomButton
-                          sx={{ ml: 1 }}
+                          sx={{ ml: 1, width:"100px" }}
                           label={"Close"}
                           onClick={() => handleModalClose()}
                         />

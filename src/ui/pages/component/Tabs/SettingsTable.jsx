@@ -1,7 +1,8 @@
 import React from 'react';
 import Button from "../../../component/common/Button";
 import DatasetStyle from "../../../../styles/Dataset";
-import { Box, Card, Grid, Tab, Tabs,CardContent, ThemeProvider, Typography } from "@mui/material";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 export default function SettingsTable() {
     const classes = DatasetStyle();

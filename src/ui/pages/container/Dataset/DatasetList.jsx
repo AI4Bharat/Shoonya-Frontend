@@ -25,9 +25,11 @@ export default function DatasetList() {
   const datasetList = useSelector((state) => state.getDatasetList.data);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
 
-  const [selectedFilters, setsSelectedFilters] = useState({
-    dataset_visibility: "",
-    dataset_type: "",
+  const [selectedFilters, setsSelectedFilters] = useState(() => {
+  const savedFilters = localStorage.getItem("datasetSelectedFilters");
+    return savedFilters
+      ? JSON.parse(savedFilters)
+      : { dataset_visibility: "", dataset_type: "" };
   });
   const getDashboardprojectData = () => {
     const projectObj = new GetDatasetsAPI(selectedFilters);
@@ -41,6 +43,13 @@ export default function DatasetList() {
 
   useEffect(() => {
     getDashboardprojectData();
+  }, [selectedFilters]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "datasetSelectedFilters",
+      JSON.stringify(selectedFilters),
+    );
   }, [selectedFilters]);
 
   const handleProjectlist = () => {
@@ -73,7 +82,7 @@ export default function DatasetList() {
 
       <Grid container className={classes.root}>
         <Grid item style={{ flexGrow: "0" }}>
-          <Typography variant="h6" sx={{ paddingBottom: "8px" }}>
+          <Typography variant="h6" sx={{ paddingBottom: "7px", paddingLeft: "15px" }}>
             View :{" "}
           </Typography>
         </Grid>
@@ -100,7 +109,7 @@ export default function DatasetList() {
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid xs={3} item className={classes.fixedWidthContainer}>
+        <Grid xs={3} item   sx={{mt:1,mb:1,mr:2,ml:2,width:200}}>
           <Search />
         </Grid>
       </Grid>
@@ -110,8 +119,7 @@ export default function DatasetList() {
           sx={{
             p: 2,
             borderRadius: 3,
-            mt: 2,
-            mb: 2,
+            m:1,
             justifyContent: "flex-end",
           }}
           onClick={handleCreateProject}
@@ -130,7 +138,7 @@ export default function DatasetList() {
           onClick={handleAutomateButton}
           label="Automate Datasets"
         />
-        <Box sx={{ p: 1 }}>
+        <Box sx={{ p: 1,overflow:"hidden" }}>
           {radiobutton ? (
             <DatasetCardList
               datasetList={datasetList}

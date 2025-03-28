@@ -1,25 +1,22 @@
 import {
-  Box,
-  Card,
-  Grid,
-  Tab,
-  Tabs,
+
   ThemeProvider,
-  Typography,
-  IconButton,
-  Tooltip,
-  Menu,
-  MenuItem,
 } from "@mui/material";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import React, { useState, useEffect } from "react";
-import Header from "../../component/common/Header";
 import themeDefault from "../../../theme/theme";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Button from "../../component/common/Button";
-import OutlinedTextField from "../../component/common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
 import componentType from "../../../../config/pageType";
 import ProjectTable from "../Tabs/ProjectTable";
 import AnnotatorsTable from "../Tabs/Annotators";
@@ -27,7 +24,6 @@ import ManagersTable from "../Tabs/ManagersTable";
 import Workspaces from "../Tabs/Workspaces";
 import CustomButton from "../../component/common/Button";
 import { translate } from "../../../../config/localisation";
-import MembersTable from "../Project/MembersTable";
 import Members from "../Tabs/Members";
 import Invites from "../Tabs/Invites";
 import OrganizationSettings from "../Tabs/OrganizationSettings";
@@ -330,6 +326,13 @@ const DetailsViewPage = (props) => {
               variant="fullWidth"
               TabIndicatorProps={{
                 style: { display: "none" },
+              }}
+              sx={{
+                "@media (min-width: 600px)": {
+                  flexDirection: "row",
+                  borderBottom: "1px solid #ddd",
+                  borderRight: "none",
+                },
               }}
             >
               {pageType === componentType.Type_Workspace && (

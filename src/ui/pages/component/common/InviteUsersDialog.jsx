@@ -1,32 +1,22 @@
-import { Add, AddShoppingCart } from "@material-ui/icons";
-import Papa from 'papaparse'
-import {
-  Autocomplete,
-  Button,
-  CircularProgress,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  IconButton,
-  Stack,
-  Input,
-  InputAdornment
-} from "@mui/material";
+import { Add } from "@material-ui/icons";
+import Autocomplete from "@mui/material/Autocomplete";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Stack from "@mui/material/Stack";
 import AddIcon from '@mui/icons-material/Add';
 import CustomButton from "./Button";
-import { useDispatch, useSelector } from "react-redux";
 import DatasetStyle from "../../../styles/Dataset";
-import { useState } from "react";
 import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
-import { FileUploader } from "react-drag-drop-files";
 
 const InviteUsersDialog = ({
   handleDialogClose,

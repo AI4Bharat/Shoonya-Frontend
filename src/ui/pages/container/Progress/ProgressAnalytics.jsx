@@ -20,14 +20,13 @@ import Spinner from "../../component/common/Spinner";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { addDays, isSameDay, format, minutesToSeconds, hoursToSeconds, secondsToHours } from 'date-fns/esm';
-import { DateRangePicker, defaultStaticRanges, } from "react-date-range";
-import { useTheme } from "@material-ui/core/styles";
+import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import colorsData from '../../../../utils/Colors_JSON/Colors_JSON';
 import axios from "axios";
 import html2canvas from 'html2canvas';
-import locale, { modifiedStaticRanges } from "../../../../utils/Date_Range/getDateRangeFormat";
+import  { modifiedStaticRanges } from "../../../../utils/Date_Range/getDateRangeFormat";
 import { MenuProps } from "../../../../utils/utils";
 import { jsPDF } from "jspdf";
 ChartJS.register(
@@ -60,10 +59,34 @@ const labelChart = function(context) {
   return label;
 };
 
+const getWidth = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth;
+  }
+};
+
+const width = getWidth();
+
+const categoryPercentage = width < 600 ? 0.2 : width < 900 ? 0.5 : 0.6;
+const barPercentage = width < 600 ? 0.3 : width < 900 ? 0.6 : 0.7;
+const chartHeight = width < 600 ? "300px" : width < 900 ? "350px" : "400px";
+const rotationAngle = width < 600 ? 90 : 45; 
+const fontSize = width < 600 ? 10 : 12;
+const chartWidth = width < 600 ? "1200px" : "100%"; 
+
 const defaultOptions = {
   responsive: true,
+  maintainAspectRatio: false,
+  indexAxis: "x",
   scales: {
     x: {
+      categoryPercentage,
+      barPercentage,
+      ticks: {
+        maxRotation: rotationAngle,
+        minRotation: rotationAngle,
+        autoSkip: false,
+      },
       grid: {
         display: false,
       },
@@ -74,14 +97,15 @@ const defaultOptions = {
         color: 'black',
         font: {
           family: 'Roboto',
-          size: 16,
+          size: fontSize,
           weight: 'bold',
           lineHeight: 1.2,
         },
         padding: { top: 20, left: 0, right: 0, bottom: 0 }
-      }
+      },
     },
     y: {
+      beginAtZero: true,
       stacked: true,
       display: true,
       title: {
@@ -777,7 +801,6 @@ function ProgressList() {
         } else if (type === "pdf") {
           const pdf = new jsPDF();
           pdf.addImage(imgData, 'JPEG', 10, 10, 180, 150);
-          // pdf.output('dataurlnewwindow');
           pdf.save("download.pdf");
         }
       })
@@ -793,7 +816,6 @@ function ProgressList() {
           padding: 3
         }}
       >
-
         <Box >
           <Grid
             container
@@ -879,8 +901,6 @@ function ProgressList() {
                   </Select>
                 </FormControl>
               </Grid>
-
-
               <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
@@ -896,7 +916,6 @@ function ProgressList() {
                       </LightTooltip>
                     }
                   </InputLabel>
-
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
@@ -948,9 +967,7 @@ function ProgressList() {
                     value={baseperiod}
                     onChange={handleProgressType}
                   >
-
-
-                    {ProgressType.map((item, index) => (
+                   {ProgressType.map((item, index) => (
 
                       <LightTooltip title={ProgressTypedata[index].title} value={item.ProgressTypename} key={index} placement="left" arrow >
                         <MenuItem value={item.ProgressTypename} key={index} sx={{ textTransform: "capitalize"}}>{item.ProgressTypename}</MenuItem>
@@ -985,8 +1002,7 @@ function ProgressList() {
                           fontSize="medium"
                         />
                       </LightTooltip>
-                    }
-                    
+                    }                   
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
@@ -1018,9 +1034,7 @@ function ProgressList() {
               <Grid container sx={{marginLeft:"17px"}}>
             <CustomButton label="Submit" sx={{ width:"120px", mt: 3 }} onClick={handleSubmit}
               disabled={(baseperiod || comparisonperiod) ? false : true} />
-         
-        </Grid>
-
+            </Grid>
               {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
@@ -1029,8 +1043,6 @@ function ProgressList() {
                     inputRanges={[]}
                     staticRanges={[
                       ...modifiedStaticRanges,
-                      // ...defaultStaticRanges,
-                      // ...locale,
                       {
                         label: "This Year",
                         range: () => ({
@@ -1067,12 +1079,10 @@ function ProgressList() {
                     ranges={baseperiodDatepicker}
                     direction="horizontal"
                     preventSnapRefocus={true}
-                    // calendarFocus="backwards"
-                    // weekStartsOn={2}
-
                   />
                 </Card>
-              </Box>}
+              </Box>
+              }
               {showPickers && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
                 <Card sx={{ overflowX: "scroll" }}>
                   <DateRangePicker
@@ -1081,7 +1091,6 @@ function ProgressList() {
                     inputRanges={[]}
                     staticRanges={[
                       ...modifiedStaticRanges,
-                      // ...defaultStaticRanges,
                       {
                         label: "This Year",
                         range: () => ({
@@ -1119,12 +1128,10 @@ function ProgressList() {
                     ranges={comparisonperiodDatepicker}
                     direction="horizontal"
                     preventSnapRefocus={true}
-                    // calendarFocus="backwards"
                   />
                 </Card>
               </Box>}
-            </Grid>
-           
+            </Grid>         
           </Grid>
           {showBarChar &&
             <>
@@ -1136,12 +1143,22 @@ function ProgressList() {
                   Download Report As Image
                 </Button>
               </Grid>
-              <div id="chart-container">
+              <div style={{
+                  overflow:"auto",
+                  width:"100%",
+                  padding:"0.2rem"
+                }}>
+              <div id="chart-container"
+                style={{
+                  width: chartWidth,
+                  height: chartHeight,
+                }}
+              >
                 <Bar options={options} data={chartData} />
+              </div>
               </div>
             </>
           }
-
         </Box>
       </Card>
     </ThemeProvider>

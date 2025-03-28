@@ -1,6 +1,7 @@
 {
   "homepage": "https://beta.shoonya.ai4bharat.org/",
   "name": "shoonya-new-frontend",
+  "sideEffects": false,
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -14,26 +15,19 @@
     "@mui/material": "^5.7.0",
     "@mui/styles": "^5.8.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.6",
-    "@mui/x-date-pickers-pro": "^5.0.0-alpha.6",
     "@react-hook/media-query": "^1.1.1",
     "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.2.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^0.27.2",
     "chart.js": "^3.9.1",
     "date-fns": "^2.28.0",
-    "draft-js": "^0.11.7",
     "duration-time-conversion": "^1.0.6",
     "export-from-json": "^1.7.4",
-    "faker": "^5.5.3",
-    "file-saver": "^2.0.5",
     "history": "^5.3.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "material-ui-dropzone": "^3.5.0",
     "moment": "^2.29.4",
     "mui-datatables": "^4.2.2",
-    "mui-rte": "^2.0.1",
     "papaparse": "^5.4.1",
     "quill": "^1.3.7",
     "re-resizable": "^6.9.11",
@@ -50,7 +44,6 @@
     "react-quilljs": "^1.3.3",
     "react-redux": "^8.0.2",
     "react-router-dom": "^6.3.0",
-    "react-scoped-css": "^0.0.23",
     "react-scripts": "5.0.1",
     "reactjs-popup": "^2.0.6",
     "recharts": "^2.1.13",
@@ -91,7 +84,18 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^4.0.0"
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "babel-loader": "^10.0.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "compression-webpack-plugin": "^11.1.0",
+    "css-minimizer-webpack-plugin": "^7.0.2",
+    "gh-pages": "^4.0.0",
+    "purgecss-webpack-plugin": "^7.0.2",
+    "terser-webpack-plugin": "^5.3.14",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
   },
   "alias": {
     "LabelStudio": false

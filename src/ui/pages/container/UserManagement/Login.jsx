@@ -16,19 +16,15 @@ import CustomCard from "../../component/common/Card";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import IconButton from "@material-ui/core/IconButton";
-import InputLabel from "@material-ui/core/InputLabel";
 import Visibility from "@material-ui/icons/Visibility";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import Logo from "../../../../assets/logo.svg";
 import AppInfo from "./AppInfo";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LoginStyle from "../../../styles/loginStyle";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
-
-
 
 const Login = () => {
   const classes = LoginStyle();
@@ -69,14 +65,14 @@ const Login = () => {
   const keyRelease = () => {
     setIsPressed(false);
   };
-  console.log(userRole.Annotator === loggedInUserData?.role, "userroles")
+  console.log(userRole.Annotator === loggedInUserData?.role, "userroles");
   useEffect(() => {
     window.addEventListener("keydown", keyPress);
     window.addEventListener("keyup", keyRelease);
     return () => {
       window.removeEventListener("keydown", keyPress);
       window.removeEventListener("keyup", keyRelease);
-    }
+    };
   }, [keyPress, keyRelease]);
 
   // useEffect(() => {
@@ -133,11 +129,13 @@ const Login = () => {
   //     });
   // };
 
-
   const createToken = async () => {
     // setLoading(true);
 
-    const apiObj = new LoginAPI(credentials.email.toLowerCase(), credentials.password);
+    const apiObj = new LoginAPI(
+      credentials.email.toLowerCase(),
+      credentials.password
+    );
     const res = await fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
@@ -152,15 +150,18 @@ const Login = () => {
       localStorage.setItem("shoonya_access_token", rsp_data.access);
       localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
       localStorage.setItem("email_id", credentials.email.toLowerCase());
-      localStorage.setItem("userCustomTranscriptionSettings", JSON.stringify({}))
+      localStorage.setItem(
+        "userCustomTranscriptionSettings",
+        JSON.stringify({})
+      );
       getLoggedInUserData();
       // setLoading(false);
-    } else{
+    } else {
       setSnackbarInfo({
         open: true,
         message: rsp_data?.message,
         variant: "error",
-      })
+      });
     }
 
     // setLoading(false);
@@ -230,18 +231,23 @@ const Login = () => {
   };
   const renderCardContent = () => (
     <CustomCard title={"Sign in to Shoonya"} cardContent={TextFields()}>
-      <Grid container spacing={2} style={{ width: "100%" ,cursor: "pointer"}}>
+      <Grid container spacing={2} style={{ width: "100%", cursor: "pointer" }}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} textAlign={"right"}>
           <Link onClick={() => navigate("/forgot-password")}>
             {translate("forgotPassword")}
           </Link>
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <CustomButton style={{
-            backgroundColor: "#2C2799",
-            borderRadius: "20px",
-            color: "#FFFFFF"
-          }} fullWidth onClick={createToken} label={"Login"} />
+          <CustomButton
+            style={{
+              backgroundColor: "#2C2799",
+              borderRadius: "20px",
+              color: "#FFFFFF",
+            }}
+            fullWidth
+            onClick={createToken}
+            label={"Login"}
+          />
         </Grid>
         {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
         <div className={classes.createLogin}>
@@ -256,8 +262,6 @@ const Login = () => {
       </Grid>
     </CustomCard>
   );
-
-
 
   const renderSnackBar = () => {
     return (
@@ -275,24 +279,14 @@ const Login = () => {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      <Grid container>
-        <Grid
-          item
-          xs={12}
-          sm={4}
-          md={3}
-          lg={3}
-          color={"primary"}
-          className={classes.appInfo}
-        >
+      <Grid container className={classes.pageWrpr}>
+        <Grid item className={classes.appInfoWrpr}>
           <AppInfo />
         </Grid>
-        <Grid item xs={12} sm={9} md={9} lg={9} className={classes.parent}>
-          <form autoComplete="off">{renderCardContent()}
-          </form>
+        <Grid className={classes.formWrpr}>
+          <form autoComplete="off">{renderCardContent()}</form>
         </Grid>
         {renderSnackBar()}
-
       </Grid>
     </ThemeProvider>
   );

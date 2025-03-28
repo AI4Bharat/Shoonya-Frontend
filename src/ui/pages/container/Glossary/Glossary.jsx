@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 //Themes
-import {
-  Box,
-  Grid,
-  ThemeProvider,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Tooltip,
-  IconButton,
-  DialogContentText,
-  Button,
-  Popover,
-  Typography,
-  Divider,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Popover from "@mui/material/Popover";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import TablePagination from "@mui/material/TablePagination";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { ThemeProvider } from "@mui/material/styles";
 import tableTheme from "../../../theme/tableTheme";
 import MUIDataTable from "mui-datatables";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -26,7 +23,6 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LanguageCode from "../../../../utils/LanguageCode";
 import Search from "../../component/common/Search";
-import { useParams } from "react-router-dom";
 import ThumbsUpDownOutlinedIcon from "@mui/icons-material/ThumbsUpDownOutlined";
 import ThumbUpOffAltOutlinedIcon from "@mui/icons-material/ThumbUpOffAltOutlined";
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
@@ -56,15 +52,15 @@ export default function Glossary(props) {
   const [targetlang, settargetlang] = useState("");
   const [Sourcelang, setSourcelang] = useState("");
   const [hashCode, setHashCode] = useState("");
-  const[tgtText,setTgtText] = useState("");
-  const[srcText,setSrcText] = useState("");
-  const[domain,setDomain] = useState("");
-  const[level,setLevel] = useState("");
-  const[collectionSource,setCollectionSource] = useState("");
+  const [tgtText, setTgtText] = useState("");
+  const [srcText, setSrcText] = useState("");
+  const [domain, setDomain] = useState("");
+  const [level, setLevel] = useState("");
+  const [collectionSource, setCollectionSource] = useState("");
   const [sourceText, setSourceText] = useState();
   const [targetText, settargetText] = useState();
-  const[domainValue,setDomainValue] = useState()
-  const[glossaryData,setGlossarydata] = useState()
+  const [domainValue, setDomainValue] = useState();
+  const [glossaryData, setGlossarydata] = useState();
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -75,12 +71,51 @@ export default function Glossary(props) {
   const language = LanguageCode.languages;
 
   useEffect(() => {
-    searchGlossary()
+    searchGlossary();
   }, [taskData]);
 
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
 
-  const searchGlossary = () =>{
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector(
+          ".MuiDataTable-responsiveBase"
+        );
+        if (tableWrapper) {
+          tableWrapper.classList.add("MuiDataTable-vertical");
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const searchGlossary = () => {
     if (taskData && taskData.data) {
       const filtereddata = language.filter(
         (el) => el.label === taskData.data?.input_language
@@ -99,16 +134,13 @@ export default function Glossary(props) {
       const GlossaryObj = new GlossarysentenceAPI(Glossarysentencedata);
       dispatch(APITransport(GlossaryObj));
     }
-
-  }
-
-
+  };
 
   useEffect(() => {
-    setSourceText(srcText)
-    settargetText(tgtText)
-    setDomainValue(domain)
-  }, [srcText,tgtText,domain])
+    setSourceText(srcText);
+    settargetText(tgtText);
+    setDomainValue(domain);
+  }, [srcText, tgtText, domain]);
 
   const handleCopyText = (text) => {
     navigator.clipboard.writeText(text);
@@ -141,7 +173,6 @@ export default function Glossary(props) {
   };
   const handleClickOpen = () => {
     setOpenDialog(true);
-    
   };
 
   const handleClickOpenSuggestAnEdit = () => {
@@ -149,13 +180,20 @@ export default function Glossary(props) {
     setAnchorEl(null);
   };
 
-  const handleThumbsUpDown = (hashcode,srcText,tgtText,domain,collectionSource,level) => {
+  const handleThumbsUpDown = (
+    hashcode,
+    srcText,
+    tgtText,
+    domain,
+    collectionSource,
+    level
+  ) => {
     setHashCode(hashcode);
     setSrcText(srcText);
     setTgtText(tgtText);
     setDomain(domain);
     setCollectionSource(collectionSource);
-    setLevel(level)
+    setLevel(level);
   };
 
   const OnClickUpVote = async () => {
@@ -193,7 +231,7 @@ export default function Glossary(props) {
       item_id: hashCode,
       action: -1,
     };
-    
+
     const GlossaryObj = new UpVoteAndDownVoteAPI(DownVotedata);
     //dispatch(APITransport(GlossaryObj));
     const res = await fetch(GlossaryObj.apiEndPoint(), {
@@ -218,8 +256,7 @@ export default function Glossary(props) {
     setAnchorEl(null);
   };
 
-
-  const submitSuggestAnEditHandler = async() =>{
+  const submitSuggestAnEditHandler = async () => {
     const SuggestAnEditData = {
       new: {
         glossary: [
@@ -251,10 +288,8 @@ export default function Glossary(props) {
         message: resp?.message,
         variant: "success",
       });
-      searchGlossary()
-    }
-  
-     else {
+      searchGlossary();
+    } else {
       setSnackbarInfo({
         open: true,
         message: resp?.message,
@@ -262,10 +297,7 @@ export default function Glossary(props) {
       });
     }
     setSuggestAnEditDialog(false);
-  }
-
-
-  
+  };
 
   const columns = [
     {
@@ -361,8 +393,6 @@ export default function Glossary(props) {
     },
   ];
 
-
-
   const pageSearch = () => {
     return Glossarysentence[0]?.glossaryPhrases.filter((el) => {
       if (SearchWorkspaceMembers == "") {
@@ -389,40 +419,124 @@ export default function Glossary(props) {
     });
   };
 
-
-      useEffect(() => {
-      
-        const data= Glossarysentence[0]?.glossaryPhrases &&
-        Glossarysentence[0]?.glossaryPhrases.length > 0
-          ? pageSearch().map((el, i) => {
-              return [
-                el.srcText,
-                el.tgtText,
-                el.domain,
-                el.collectionSource,
-                <>
-                  <Button onClick={() => handleCopyText(el.tgtText)}>
-                    <Tooltip title="Copy">
-                      <ContentCopyIcon fontSize="small" />
+  useEffect(() => {
+    const data =
+      Glossarysentence[0]?.glossaryPhrases &&
+      Glossarysentence[0]?.glossaryPhrases.length > 0
+        ? pageSearch().map((el, i) => {
+            return [
+              el.srcText,
+              el.tgtText,
+              el.domain,
+              el.collectionSource,
+              <>
+                <Button onClick={() => handleCopyText(el.tgtText)}>
+                  <Tooltip title="Copy">
+                    <ContentCopyIcon fontSize="small" />
+                  </Tooltip>
+                </Button>
+                <span
+                  onClick={() =>
+                    handleThumbsUpDown(
+                      el.hash,
+                      el.srcText,
+                      el.tgtText,
+                      el.domain,
+                      el.collectionSource,
+                      el.level
+                    )
+                  }
+                >
+                  <Button
+                    aria-describedby={id}
+                    onClick={handleClickThumbsUpDown}
+                  >
+                    <Tooltip title="Rate this translation">
+                      <ThumbsUpDownOutlinedIcon fontSize="medium" />
                     </Tooltip>
                   </Button>
-                  <span onClick={() => handleThumbsUpDown(el.hash,el.srcText,el.tgtText,el.domain,el.collectionSource,el.level)}>
-                    <Button aria-describedby={id} onClick={handleClickThumbsUpDown}>
-                      <Tooltip title="Rate this translation">
-                        <ThumbsUpDownOutlinedIcon fontSize="medium" />
-                      </Tooltip>
-                    </Button>
-                  </span>
-                </>,
-                el.hash,
-                el.level,
-              ];
-            })
-          : [];
-          setGlossarydata(data)
-      }, [Glossarysentence, SearchWorkspaceMembers])
+                </span>
+              </>,
+              el.hash,
+              el.level,
+            ];
+          })
+        : [];
+    setGlossarydata(data);
+  }, [Glossarysentence, SearchWorkspaceMembers]);
 
-    
+  const CustomFooter = ({
+    count,
+    page,
+    rowsPerPage,
+    changeRowsPerPage,
+    changePage,
+  }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: {
+            xs: "space-between",
+            md: "flex-end",
+          },
+          alignItems: "center",
+          padding: "10px",
+          gap: {
+            xs: "10px",
+            md: "20px",
+          },
+        }}
+      >
+        {/* Pagination Controls */}
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, newPage) => changePage(newPage)}
+          onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+          sx={{
+            "& .MuiTablePagination-actions": {
+              marginLeft: "0px",
+            },
+            "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input":
+              {
+                marginRight: "10px",
+              },
+          }}
+        />
+
+        {/* Jump to Page */}
+        <div>
+          <label
+            style={{
+              marginRight: "5px",
+              fontSize: "0.83rem",
+            }}
+          >
+            Jump to Page:
+          </label>
+          <Select
+            value={page + 1}
+            onChange={(e) => changePage(Number(e.target.value) - 1)}
+            sx={{
+              fontSize: "0.8rem",
+              padding: "4px",
+              height: "32px",
+            }}
+          >
+            {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+              <MenuItem key={i} value={i + 1}>
+                {i + 1}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      </Box>
+    );
+  };
 
   const options = {
     textLabels: {
@@ -451,6 +565,17 @@ export default function Glossary(props) {
     selectableRows: "none",
     search: false,
     jumpToPage: true,
+    responsive: "vertical",
+    enableNestedDataAccess: ".",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
   };
 
   const renderSnackBar = () => {
@@ -520,7 +645,10 @@ export default function Glossary(props) {
               {translate("button.Your feedback")}
             </Typography>
             <Divider sx={{ padding: "15px 0px 0px 0px" }} />
-            <Button sx={{ ml: 2, mt: 1 }} onClick={handleClickOpenSuggestAnEdit}>
+            <Button
+              sx={{ ml: 2, mt: 1 }}
+              onClick={handleClickOpenSuggestAnEdit}
+            >
               <EditOutlinedIcon fontSize="medium" />
               <Typography variant="subtitle2">
                 {translate("button.Suggest an edit")}
@@ -545,29 +673,50 @@ export default function Glossary(props) {
         <AddGlossary
           openDialog={openDialog}
           handleCloseDialog={() => handleCloseDialog()}
-         // addBtnClickHandler={AddGlossaryHandler}
+          // addBtnClickHandler={AddGlossaryHandler}
           targetlang={targetlang}
           Sourcelang={Sourcelang}
         />
       )}
 
       {SuggestAnEditDialog && (
-      <SuggestAnEdit 
+        <SuggestAnEdit
           openDialog={SuggestAnEditDialog}
           handleCloseDialog={() => handleCloseDialog()}
           addBtnClickHandler={submitSuggestAnEditHandler}
           sourceText={sourceText}
           targetText={targetText}
-         settargetText={settargetText}
-         domainValue={domainValue}
-         setDomainValue={setDomainValue}
+          settargetText={settargetText}
+          domainValue={domainValue}
+          setDomainValue={setDomainValue}
           data={taskData.data}
           targetlang={targetlang}
-      />
+        />
       )}
 
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable data={glossaryData} columns={columns} options={options} />
+        <div ref={tableRef}>
+          {isBrowser ? (
+            <MUIDataTable
+              key={`table-${displayWidth}`}
+              title={""}
+              data={glossaryData}
+              columns={columns}
+              options={options}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              height={400}
+              sx={{
+                mx: 2,
+                my: 3,
+                borderRadius: "4px",
+                transform: "none",
+              }}
+            />
+          )}
+        </div>
       </ThemeProvider>
     </>
   );

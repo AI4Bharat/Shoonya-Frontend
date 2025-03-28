@@ -1,20 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Skeleton from "@mui/material/Skeleton";
 import MUIDataTable from "mui-datatables";
 import { useNavigate } from "react-router-dom";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { ThemeProvider, Grid, IconButton } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import TablePagination from "@mui/material/TablePagination";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { ThemeProvider } from "@mui/material/styles";
 import tableTheme from "../../../theme/tableTheme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";
 import GetUserDetailAPI from "../../../../redux/actions/api/Admin/UserDetail";
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import UserInfo from "./UserInfo";
 import Spinner from "../../component/common/Spinner";
 import GetUserDetailUpdateAPI from "../../../../redux/actions/api/Admin/EditProfile";
-import { el } from "date-fns/locale";
 
 const UserDetail = (props) => {
   const dispatch = useDispatch();
@@ -27,7 +33,7 @@ const UserDetail = (props) => {
   });
   const [openDialog, setOpenDialog] = useState(false);
   const [id, setId] = useState("");
-  const [userName,setUserName] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [active, setActive] = useState();
   const [firstName, setFirstName] = useState("");
@@ -47,6 +53,46 @@ const UserDetail = (props) => {
     const UserObj = new GetUserDetailAPI();
     dispatch(APITransport(UserObj));
   };
+  const [isBrowser, setIsBrowser] = useState(false);
+  const tableRef = useRef(null);
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDisplayWidth(window.innerWidth);
+    };
+
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    // Force responsive mode after component mount
+    const applyResponsiveMode = () => {
+      if (tableRef.current) {
+        const tableWrapper = tableRef.current.querySelector(
+          ".MuiDataTable-responsiveBase"
+        );
+        if (tableWrapper) {
+          tableWrapper.classList.add("MuiDataTable-vertical");
+        }
+      }
+    };
+
+    // Apply after a short delay to ensure DOM is ready
+    const timer = setTimeout(applyResponsiveMode, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     getUserDetail();
@@ -67,7 +113,7 @@ const UserDetail = (props) => {
     languages,
     participation_type,
     role,
-    is_active,
+    is_active
   ) => {
     setOpenDialog(true);
     setId(id);
@@ -87,7 +133,7 @@ const UserDetail = (props) => {
 
   const handleUpdateEditProfile = async () => {
     const data = {
-      email:email,
+      email: email,
       username: userName,
       first_name: firstName,
       last_name: lastName,
@@ -96,7 +142,7 @@ const UserDetail = (props) => {
       role: Role,
       is_active: active,
     };
-  
+
     const UserObj = new GetUserDetailUpdateAPI(id, data);
     //  dispatch(APITransport(UserObj));
     const res = await fetch(UserObj.apiEndPoint(), {
@@ -131,19 +177,20 @@ const UserDetail = (props) => {
         el.email?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;
-      }else if(
+      } else if (
         el.username?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
-      ){
+      ) {
         return el;
       } else if (
         el.first_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;
-      }else if(
-        el.is_active?.toString()
-        ?.toLowerCase()
-        .includes(SearchUserDetail?.toLowerCase())
-      ){
+      } else if (
+        el.is_active
+          ?.toString()
+          ?.toLowerCase()
+          .includes(SearchUserDetail?.toLowerCase())
+      ) {
         return el;
       } else if (
         el.last_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
@@ -185,6 +232,15 @@ const UserDetail = (props) => {
         sort: false,
         align: "center",
       },
+      setCellProps: () => ({ 
+         style: {
+          padding: "16px",
+          minWidth: "170px",
+          whiteSpace: "normal",
+          overflowWrap: "break-word",
+          wordBreak: "break-word", 
+        }
+        }),
     },
     {
       name: "username",
@@ -194,6 +250,15 @@ const UserDetail = (props) => {
         sort: false,
         align: "center",
       },
+      setCellProps: () => ({ 
+          style: {
+          padding: "16px",
+          minWidth: "170px",
+          whiteSpace: "normal", 
+          overflowWrap: "break-word",
+          wordBreak: "break-word",  
+        } 
+        }),
     },
     {
       name: "first_name",
@@ -203,6 +268,7 @@ const UserDetail = (props) => {
         sort: false,
         align: "center",
       },
+      setCellProps: () => ({ style: { padding: "16px" } }),
     },
     {
       name: "last_name",
@@ -211,7 +277,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -221,7 +287,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" } }),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -230,8 +296,8 @@ const UserDetail = (props) => {
       options: {
         filter: false,
         sort: false,
-        align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "40px" , paddingRight: "30px" } }),
+          align: "center",
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -241,6 +307,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -250,7 +317,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: { paddingLeft: "30px" , paddingRight: "30px"} }),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
     {
@@ -260,7 +327,7 @@ const UserDetail = (props) => {
         filter: false,
         sort: false,
         align: "center",
-        setCellProps: () => ({ style: {paddingLeft: "10px" , paddingRight: "20px"}} ),
+        setCellProps: () => ({ style: { padding: "16px" } }),
       },
     },
   ];
@@ -280,37 +347,109 @@ const UserDetail = (props) => {
             el.languages.join(", "),
             el.participation_type,
             userRoleFromList ? userRoleFromList : el.role,
-            el.is_active==true?"Active":"Not Active",
+            el.is_active == true ? "Active" : "Not Active",
             <>
-              <div style={{display:"flex", flexDirection:"row"}}>
-              <IconButton size="small" color="primary">
-                <VisibilityIcon onClick={()=>navigate(`/profile/${el.id}`)} />
-              </IconButton>
-              <IconButton size="small" color="primary">
-                <EditOutlinedIcon
-                  onClick={() =>
-                    handleEditChange(
-                      el.id,
-                      el.email,
-                      el.username,
-                      el.first_name,
-                      el.last_name,
-                      el.languages,
-                      el.participation_type,
-                      el.role,
-                      el.is_active,
-                    )
-                  }
-                />
-              </IconButton>
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <IconButton size="small" color="primary">
+                  <VisibilityIcon
+                    onClick={() => navigate(`/profile/${el.id}`)}
+                  />
+                </IconButton>
+                <IconButton size="small" color="primary">
+                  <EditOutlinedIcon
+                    onClick={() =>
+                      handleEditChange(
+                        el.id,
+                        el.email,
+                        el.username,
+                        el.first_name,
+                        el.last_name,
+                        el.languages,
+                        el.participation_type,
+                        el.role,
+                        el.is_active
+                      )
+                    }
+                  />
+                </IconButton>
               </div>
             </>,
           ];
         })
       : [];
 
-    
- 
+  const CustomFooter = ({
+    count,
+    page,
+    rowsPerPage,
+    changeRowsPerPage,
+    changePage,
+  }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: {
+            xs: "space-between",
+            md: "flex-end",
+          },
+          alignItems: "center",
+          padding: "10px",
+          gap: {
+            xs: "10px",
+            md: "20px",
+          },
+        }}
+      >
+        {/* Pagination Controls */}
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, newPage) => changePage(newPage)}
+          onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+          sx={{
+            "& .MuiTablePagination-actions": {
+              marginLeft: "0px",
+            },
+            "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input":
+              {
+                marginRight: "10px",
+              },
+          }}
+        />
+
+        {/* Jump to Page */}
+        <div>
+          <label
+            style={{
+              marginRight: "5px",
+              fontSize: "0.83rem",
+            }}
+          >
+            Jump to Page:
+          </label>
+          <Select
+            value={page + 1}
+            onChange={(e) => changePage(Number(e.target.value) - 1)}
+            sx={{
+              fontSize: "0.8rem",
+              padding: "4px",
+              height: "32px",
+            }}
+          >
+            {Array.from({ length: Math.ceil(count / rowsPerPage) }, (_, i) => (
+              <MenuItem key={i} value={i + 1}>
+                {i + 1}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      </Box>
+    );
+  };
 
   const options = {
     textLabels: {
@@ -338,6 +477,16 @@ const UserDetail = (props) => {
     selectableRows: "none",
     search: false,
     jumpToPage: true,
+    responsive: "vertical",
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
+      <CustomFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+      />
+    ),
   };
   const renderSnackBar = () => {
     return (
@@ -357,16 +506,37 @@ const UserDetail = (props) => {
     <div>
       {renderSnackBar()}
       {loading && <Spinner />}
-      <Grid sx={{ mb: 1 }}>
+      <Grid 
+        container
+        justifyContent="center" 
+        >
         <Search />
       </Grid>
       <ThemeProvider theme={tableTheme}>
-        <MUIDataTable
-          title="User Details"
-          data={data}
-          columns={columns}
-          options={options}
-        />
+
+        <div ref={tableRef}>
+          {isBrowser ? (
+            <MUIDataTable
+              key={`table-${displayWidth}`}
+              title="User Details"
+              data={data}
+              columns={columns}
+              options={options}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              height={400}
+              sx={{
+                mx: 2,
+                my: 3,
+                borderRadius: "4px",
+                transform: "none",
+              }}
+            />
+          )}
+        </div>
+
       </ThemeProvider>
 
       {openDialog && (
@@ -376,7 +546,7 @@ const UserDetail = (props) => {
           submit={() => handleUpdateEditProfile()}
           Email={email}
           FirstName={firstName}
-          userName = {userName}
+          userName={userName}
           setUserName={setUserName}
           active={active}
           setActive={setActive}

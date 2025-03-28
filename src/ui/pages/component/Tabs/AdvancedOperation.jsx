@@ -33,8 +33,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DownloadProjectButton from "../../container/Project/DownloadProjectButton";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Spinner from "../../component/common/Spinner";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import TaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/TaskReviews";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
@@ -436,40 +434,32 @@ const AdvancedOperation = (props) => {
       <div className={classes.rootdiv}>
         <Grid
           container
-          // direction="row"
-          direction="column"
-          xs={12}
-          md={12}
-          lg={4}
-          xl={4}
-          sm={12}
-          spacing={1}
-          rowGap={2}
-          sx={{ float: "left" }}
-          columnSpacing={2}
+          columns={16}
+          justifyContent="space-between"
+          alignItems="flex-start"
         >
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Grid
+          container
+          xs={12}
+          sm={3}
+          gap={4}
+        >
+          <Grid item xs={12}>
             <CustomButton
               sx={{
-                inlineSize: "max-content",
-                pl: 2,
                 borderRadius: 3,
-                ml: 2,
-                width: "300px",
+                width: "100%",
               }}
               onClick={handlePublishProject}
               label="Publish Project"
             />
           </Grid>
 
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12}>
             <CustomButton
               sx={{
-                inlineSize: "max-content",
-                p: 2,
                 borderRadius: 3,
-                ml: 2,
-                width: "300px",
+                width: "100%",
               }}
               color="error"
               onClick={handleClickOpen}
@@ -481,14 +471,9 @@ const AdvancedOperation = (props) => {
           <Grid
             item
             xs={12}
-            sm={12}
-            md={12}
-            lg={12}
-            xl={12}
-            sx={{ ml: 2, height: "20px", mb: 2 }}
           >
-                        {userRole.WorkspaceManager === loggedInUserData?.role ? null :
-<FormControl size="small" className={classes.formControl}>
+          {userRole.WorkspaceManager === loggedInUserData?.role ? null :
+            <FormControl size="small" sx={{ width : "100%" }}>
               <InputLabel
                 id="Select-Task-Statuses"
                 sx={{ fontSize: "16px", padding: "3px" }}
@@ -523,49 +508,35 @@ const AdvancedOperation = (props) => {
 
         <Grid
           container
-          // direction="row"
           xs={12}
-          md={12}
-          lg={4}
-          xl={4}
-          sm={12}
-          spacing={1}
-          rowGap={2}
-          sx={{ float: "left" }}
-          columnSpacing={2}
+          sm={4}
+          gap={4}
+          sx={{
+            mt:{ 
+              xs : 4, 
+              sm : 0
+            },
+          }}
         >
           {ProjectDetails.project_type == 'ContextualTranslationEditing' ? (
             <Grid
               item
               xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-
             >
               <CustomButton
                 sx={{
-                  inlineSize: "max-content",
-                  p: 2,
                   borderRadius: 3,
-                  ml: 2,
-                  width: "300px",
-
+                  width: "100%",
                 }}
                 onClick={handleDownloadProjectAnnotations}
                 label="Downoload Project Annotations" />
             </Grid>) : " "}
-          {/* <div className={classes.divider} ></div> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
               <CustomButton
                 sx={{
-                  inlineSize: "max-content",
-                  p: 2,
                   borderRadius: 3,
-                  ml: 2,
-                  width: "300px",
+                  width: "100%",
                 }}
                 onClick={handleOpenExportProjectDialog}
                 label="Export Project into Dataset"
@@ -575,11 +546,8 @@ const AdvancedOperation = (props) => {
             ) : (
               <CustomButton
                 sx={{
-                  inlineSize: "max-content",
-                  p: 2,
                   borderRadius: 3,
-                  ml: 2,
-                  width: "300px",
+                  width: "100%",
                 }}
                 onClick={handleExportProject}
                 label="Export Project into Dataset"
@@ -589,15 +557,12 @@ const AdvancedOperation = (props) => {
             )}
           </Grid>
 
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12}>
             {ProjectDetails.sampling_mode == "f" || ProjectDetails.sampling_mode == "b" ? (
               <CustomButton
                 sx={{
-                  inlineSize: "max-content",
-                  p: 2,
                   borderRadius: 3,
-                  ml: 2,
-                  width: "300px",
+                  width: "100%",
                 }}
                 onClick={handlePullNewData}
                 label="Pull New Data Items from Source Dataset"
@@ -607,17 +572,17 @@ const AdvancedOperation = (props) => {
               " "
             )}
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12}>
             <DownloadProjectButton
               taskStatus={taskStatus}
               SetTask={setTaskStatus}
               downloadMetadataToggle={downloadMetadataToggle}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12}>
             <DeleteProjectTasks />
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12}>
             <DeallocationAnnotatorsAndReviewers />
           </Grid>
 
@@ -625,16 +590,15 @@ const AdvancedOperation = (props) => {
 
         <Grid
           container
-          // direction="row"
           xs={12}
-          md={12}
-          lg={4}
-          xl={4}
-          sm={12}
-          spacing={1}
-          rowGap={2}
-          columnSpacing={2}
-          sx={{ mb: "10px" }}
+          sm={3}
+          gap={4}
+          sx={{
+            marginTop:{
+              xs : 4,
+              sm : 0
+            }
+          }}
         >
           {/* <div className={classes.divider} ></div> */}
           {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -646,10 +610,8 @@ const AdvancedOperation = (props) => {
               onChange={handleReviewToggle}
             />
           </Grid> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}
-            sx={{ ml: 2 }}
-          >
-              <FormControl size="small" className={classes.formControl}>
+          <Grid item xs={12}>
+              <FormControl size="small" sx={{ width : "100%" }}>
                 <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
                   Project Stage
                 </InputLabel>
@@ -677,10 +639,10 @@ const AdvancedOperation = (props) => {
           ProjectDetails?.review_supercheckers?.some(
             (superchecker) => superchecker.id === loggedInUserData?.id
           )) &&
-            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}
-            >
+            <Grid item xs={12}>
               <SuperCheckSettings ProjectDetails={ProjectDetails} />
             </Grid>}
+        </Grid>
         </Grid>
 
 
