@@ -509,10 +509,7 @@ const UserDetail = (props) => {
       <Grid 
         container
         justifyContent="center" 
-        sx={{ 
-          mb: 2,
-          padding: "10px",
-      }}>
+        >
         <Search />
       </Grid>
       <ThemeProvider theme={tableTheme}>
