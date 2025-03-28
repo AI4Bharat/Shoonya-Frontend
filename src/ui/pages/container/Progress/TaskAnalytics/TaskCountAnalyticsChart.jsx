@@ -173,7 +173,7 @@ function TaskCountAnalyticsChart(props) {
               <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Total Annotated Tasks
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
                   new Intl.NumberFormat("en").format(totalAnnotationTasksCount)}
               </Typography>
@@ -181,7 +181,7 @@ function TaskCountAnalyticsChart(props) {
               <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Total Annotated Tasks
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {annRev &&
                   new Intl.NumberFormat("en").format(annRev)}
               </Typography>
@@ -189,7 +189,7 @@ function TaskCountAnalyticsChart(props) {
               <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Total Annotated Tasks
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalTaskCount &&
                   new Intl.NumberFormat("en").format(totalTaskCount)}
               </Typography>
@@ -198,18 +198,18 @@ function TaskCountAnalyticsChart(props) {
 
 
             {annotationChecked&&reviewChecked&&!supercheckChecked?<Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.6rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Pending Review Tasks
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
                   new Intl.NumberFormat("en").format(totalAnnotationTasksCount)}
               </Typography>
             </Box>:annotationChecked&&reviewChecked&&supercheckChecked?<Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.6rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Pending Review Tasks
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {difftotal &&
                   new Intl.NumberFormat("en").format(difftotal)}
               </Typography>
@@ -218,18 +218,18 @@ function TaskCountAnalyticsChart(props) {
 
 
             {annotationChecked&&reviewChecked&&!supercheckChecked?<Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.6rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Review Completed Task
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalReviewTasksCount &&
                   new Intl.NumberFormat("en").format(totalReviewTasksCount)}
               </Typography>
             </Box>:annotationChecked&&reviewChecked&&supercheckChecked?<Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.6rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Pending Supercheck Tasks
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalReviewTasksCount &&
                   new Intl.NumberFormat("en").format(totalReviewTasksCount)}
               </Typography>
@@ -238,10 +238,10 @@ function TaskCountAnalyticsChart(props) {
 
 
             {annotationChecked&&reviewChecked&&supercheckChecked?<Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.6rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
               SuperCheck Completed Tasks
               </Typography>
-              <Typography style={{ fontSize: "0.99rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalSupercheckCount &&
                   new Intl.NumberFormat("en").format(totalSupercheckCount)}
               </Typography>

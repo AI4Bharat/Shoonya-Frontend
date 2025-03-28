@@ -214,7 +214,7 @@ export default function WordCountMetaAnalyticsChart(props) {
               <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Total Annotated Count
               </Typography>
-              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalWordCount &&
                   new Intl.NumberFormat("en").format(totalWordCount)}
               </Typography>
@@ -223,7 +223,7 @@ export default function WordCountMetaAnalyticsChart(props) {
               <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Pending Review  Count
               </Typography>
-              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalAnnotationWordCount &&
                   new Intl.NumberFormat("en").format(totalAnnotationWordCount)}
               </Typography>
@@ -232,7 +232,7 @@ export default function WordCountMetaAnalyticsChart(props) {
               <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Review Completed  Count
               </Typography>
-              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalReviewWordCount &&
                   new Intl.NumberFormat("en").format(totalReviewWordCount)}
               </Typography>
