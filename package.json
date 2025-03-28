@@ -1,6 +1,7 @@
 {
   "homepage": "https://beta.shoonya.ai4bharat.org/",
   "name": "shoonya-new-frontend",
+  "sideEffects": false,
   "version": "0.1.0",
   "private": true,
   "dependencies": {

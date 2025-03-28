@@ -27,7 +27,10 @@ module.exports = {
           loader: "babel-loader",
           options: {
             presets: ["@babel/preset-env", "@babel/preset-react"],
+            plugins: ["@babel/plugin-transform-runtime"], // Reduce duplication in bundle
+
           },
+
         },
       },
       {
@@ -75,9 +78,22 @@ module.exports = {
     splitChunks: {
       chunks: "all",
     minSize: 30 * 1024,
-    maxSize: 200 * 1024, // Reduce chunk size
+    maxSize: 150 * 1024, // Reduce chunk size
     automaticNameDelimiter: "-",
     maxInitialRequests: 5,
+    cacheGroups: {
+      vendor: {
+        test: /[\\/]node_modules[\\/]/,
+        name: "vendors",
+        chunks: "all",
+      },
+      commons: {
+        test: /[\\/]src[\\/]/,
+        name: "commons",
+        chunks: "all",
+        minChunks: 2,
+      },
+    },
     },
     runtimeChunk: "single",
   },
@@ -85,7 +101,7 @@ module.exports = {
     new CleanWebpackPlugin(), // Cleans up dist folder before each build
     new CompressionPlugin({
       algorithm: "brotliCompress", // Use Brotli for better compression
-      threshold: 10240, // Compress files larger than 10KB
+      threshold: 1024, // Compress files larger than 10KB
       minRatio: 0.8,
       test: /\.(js|css|html|svg)$/,
     }),
@@ -110,5 +126,11 @@ module.exports = {
     port: 3000, // Local dev server
     hot: true, // Enable HMR (Hot Module Replacement)
     open: true, // Auto-open browser
+    watchFiles: ["src/**/*"], // Watch only necessary files
+    watchOptions: {
+      ignored: /node_modules/, // Ignore unnecessary files
+      aggregateTimeout: 300, // Delay rebuilds slightly for efficiency
+      poll: 1000, // Set polling interval
+    },  
   },
 };
