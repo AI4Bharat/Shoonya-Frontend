@@ -344,7 +344,7 @@ const MembersTable = (props) => {
       if (res.ok) {
         setSnackbarInfo({
           open: true,
-          message: resp?.message || "Users added successfully!",
+          message: resp?.message,
           variant: "success",
         });
         const orgObj = new GetOragnizationUsersAPI(id);
