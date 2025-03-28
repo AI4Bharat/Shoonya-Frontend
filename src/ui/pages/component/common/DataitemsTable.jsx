@@ -324,7 +324,7 @@ const DataitemsTable = () => {
               options: {
                 filter: false,
                 sort: false,
-                display: isDefaultColumn ? "true" : "false",
+                display: isDefaultColumn ? true : false,
                 viewColumns: true,
                 align: "center",
                 customHeadLabelRender: customColumnHead,
