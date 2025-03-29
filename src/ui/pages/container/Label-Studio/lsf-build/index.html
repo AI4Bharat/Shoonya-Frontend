@@ -32,7 +32,9 @@
 
     <div id="header">
       <a id="logo" href="/">
-        <img src="/images/ls_logo.svg" alt="label studio logo">
+        <img src="/images/ls_logo.svg" alt="label studio logo"                     height= "40"
+        width= "40"                
+>
       </a>
       <ul id="nav">
         <li><a href="https://labelstud.io/guide">Docs</a></li>
@@ -46,11 +48,13 @@
     </div>
     <footer class="footer">
       <span>
-        Made with <img src="/images/3nowhite.svg" height="16" /> by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
+        Made with <img src="/images/3nowhite.svg" height="16"                     height= "40"
+        width= "40"                
+/> by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
       </span>
     </footer>
 
-    <script>
+    <script defer>
       (function (d, o) {
           d.domReady = function (n, a) {
               o.addEventListener && o.addEventListener("DOMContentLoaded", function e(t) {
@@ -61,7 +65,7 @@
           }
       })(window, document);
     </script>
-    <script>
+    <script defer>
       domReady(function () {
         var ls = new LabelStudio("label-studio", {
           description: "Description",

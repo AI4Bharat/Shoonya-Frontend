@@ -778,6 +778,8 @@ const Header = () => {
                   <img
                     src={Shoonya_Logo}
                     alt="logo"
+                    height= "40"
+                    width= "40"                
                     className={classes.headerLogo}
                   />
 

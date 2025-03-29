@@ -299,6 +299,8 @@ function MobileNavbar(props) {
               <img
                 src={Shoonya_Logo}
                 alt="Shoonya"
+                height= "40"
+                width= "40"                
                 className={classes.mobileNav_headerLogo}
               />
             </Link>

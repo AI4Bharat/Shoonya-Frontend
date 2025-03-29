@@ -20,6 +20,7 @@ const themeDefault = createTheme({
     },
   },
   typography: {
+    fontDisplay:"swap",
     fontFamily: '"Roboto"',
     fontWeight: "400",
     h1: {
