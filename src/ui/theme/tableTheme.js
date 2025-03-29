@@ -15,7 +15,6 @@ const tableTheme = createTheme({
         label: {
           textTransform: "none",
           fontFamily: '"Roboto", "Segoe UI"',
-          fontDisplay:"swap",
           fontSize: "16px",
           letterSpacing: "0.16px",
           textAlign: "center",
@@ -44,15 +43,6 @@ const tableTheme = createTheme({
         },
         checkboxFormControl: {
           minWidth: "120px",
-        },
-      },
-    },
-    MuiTableBodyCell: {
-      styleOverrides: {
-        root: {
-          minHeight: "50px", // Prevents content from shifting
-          fontDisplay:"swap",
-
         },
       },
     },
