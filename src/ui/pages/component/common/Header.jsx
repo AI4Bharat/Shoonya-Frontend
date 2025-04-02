@@ -958,7 +958,15 @@ const Header = () => {
                 </Menu>
 
                 <Menu
-                  sx={{ mt: "45px", display: "flex" }}
+                  sx={{ 
+                    mt: "45px", 
+                    display: "flex",
+                    "& .MuiPaper-root": {
+                      maxHeight: "750px", // Fixed height
+                      width: "800px",     // Fixed width
+                      overflow: "auto"    // Better than just "scroll"
+                    }
+                  }}
                   id="menu-appbar"
                   anchorEl={anchorElNotification}
                   anchorOrigin={{
@@ -998,7 +1006,7 @@ const Header = () => {
                   <Stack
                     direction="row"
                     spacing={2}
-                    style={{ padding: "0 0 10px 10px" }}
+                    style={{ paddingBottom: "10px", paddingLeft: "10px" }}
                   >
                     <Tabs
                       value={value}
@@ -1019,30 +1027,23 @@ const Header = () => {
                       {Notification.map((notification, index) => (
                         <Box
                           key={index}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            padding: "10px",
-                          }}
+                          className={classes.nav_notif_container}
                         >
-                          <Box
-                            sx={{ marginRight: "10px", cursor: "pointer" }}
-                          >
-                            <FiberManualRecordIcon
-                              color={
-                                notification?.seen_json
-                                  ? notification?.seen_json[loggedInUserData.id]
-                                    ? "action"
-                                    : "primary"
+                          <FiberManualRecordIcon
+                            color={
+                              notification?.seen_json
+                                ? notification?.seen_json[loggedInUserData.id]
+                                  ? "action"
                                   : "primary"
-                              }
-                            />
-                          </Box>
+                                : "primary"
+                            }
+                          />
                           <Link
                             style={{
                               color: "rgba(0, 0, 0, 0.87)",
                               textDecoration: "none",
-                              width: "100%"
+                              width: "100%",
+                              marginLeft: "15px"
                             }}
                             to={notification.on_click}
                           >
