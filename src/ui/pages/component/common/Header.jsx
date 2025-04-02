@@ -526,110 +526,108 @@ const Header = () => {
           </Typography>
         </Grid>
       );
-    } 
-    else {
+    } else {
       return null;
     }
   };
 
   const tabs = [
     // Organization tab - only shown for Organization Owners and Admins
-    (userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role) ? (
-       <Typography key="organization" variant="body1">
-         <NavLink
-           to={
-             loggedInUserData && loggedInUserData?.organization
-               ? `/my-organization/${loggedInUserData?.organization.id}`
-               : `/my-organization/1`
-           }
-           className={({ isActive }) =>
-             isActive ? classes.highlightedMenu : classes.headerMenu
-           }
-           activeClassName={classes.highlightedMenu}
-         >
-           Organization
-         </NavLink>
-       </Typography>
-     ) : null,
-   
-     // Workspaces tab - only shown for Workspace Managers
-     (userRole.WorkspaceManager === loggedInUserData?.role) ? (
-       <Typography key="workspaces" variant="body1">
-         <NavLink
-           to="/workspaces"
-           className={({ isActive }) =>
-             isActive ? classes.highlightedMenu : classes.headerMenu
-           }
-           activeClassName={classes.highlightedMenu}
-         >
-           Workspaces
-         </NavLink>
-       </Typography>
-     ) : null,
-   
-     // Projects tab - shown for all roles
-     <Typography key="projects" variant="body1">
-       <NavLink
-         to="/projects"
-         className={({ isActive }) =>
-           isActive ? classes.highlightedMenu : classes.headerMenu
-         }
-         activeClassName={classes.highlightedMenu}
-       >
-         Projects
-       </NavLink>
-     </Typography>,
-   
-     // Datasets tab - only shown for Workspace Managers, Organization Owners, and Admins
-     (userRole.WorkspaceManager === loggedInUserData?.role ||
-      userRole.OrganizationOwner === loggedInUserData?.role ||
-      userRole.Admin === loggedInUserData?.role) ? (
-       <Typography key="datasets" variant="body1">
-         <NavLink
-           to="/datasets"
-           className={({ isActive }) =>
-             isActive ? classes.highlightedMenu : classes.headerMenu
-           }
-           activeClassName={classes.highlightedMenu}
-         >
-           Datasets
-         </NavLink>
-       </Typography>
-     ) : null,
-   
-     // Analytics tab - shown for all roles
-     <Typography key="analytics" variant="body1">
-       <NavLink
-         to="/analytics"
-         className={({ isActive }) =>
-           isActive ? classes.highlightedMenu : classes.headerMenu
-         }
-         activeClassName={classes.highlightedMenu}
-       >
-         Analytics
-       </NavLink>
-     </Typography>,
-   
-     // Admin tab - only shown for Admins
-     (userRole.Admin === loggedInUserData?.role) ? (
-       <Typography key="admin" variant="body1">
-         <NavLink
-           to="/admin"
-           className={({ isActive }) =>
-             isActive ? classes.highlightedMenu : classes.headerMenu
-           }
-           activeClassName={classes.highlightedMenu}
-         >
-           Admin
-         </NavLink>
-       </Typography>
-     ) : null,
-   ];
-   
-   // Filter out null values
-   const filteredTabs = tabs.filter(tab => tab !== null);
-   
+    userRole.OrganizationOwner === loggedInUserData?.role ||
+    userRole.Admin === loggedInUserData?.role ? (
+      <Typography key="organization" variant="body1">
+        <NavLink
+          to={
+            loggedInUserData && loggedInUserData?.organization
+              ? `/my-organization/${loggedInUserData?.organization.id}`
+              : `/my-organization/1`
+          }
+          className={({ isActive }) =>
+            isActive ? classes.highlightedMenu : classes.headerMenu
+          }
+          activeClassName={classes.highlightedMenu}
+        >
+          Organization
+        </NavLink>
+      </Typography>
+    ) : null,
+
+    // Workspaces tab - only shown for Workspace Managers
+    userRole.WorkspaceManager === loggedInUserData?.role ? (
+      <Typography key="workspaces" variant="body1">
+        <NavLink
+          to="/workspaces"
+          className={({ isActive }) =>
+            isActive ? classes.highlightedMenu : classes.headerMenu
+          }
+          activeClassName={classes.highlightedMenu}
+        >
+          Workspaces
+        </NavLink>
+      </Typography>
+    ) : null,
+
+    // Projects tab - shown for all roles
+    <Typography key="projects" variant="body1">
+      <NavLink
+        to="/projects"
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Projects
+      </NavLink>
+    </Typography>,
+
+    // Datasets tab - only shown for Workspace Managers, Organization Owners, and Admins
+    userRole.WorkspaceManager === loggedInUserData?.role ||
+    userRole.OrganizationOwner === loggedInUserData?.role ||
+    userRole.Admin === loggedInUserData?.role ? (
+      <Typography key="datasets" variant="body1">
+        <NavLink
+          to="/datasets"
+          className={({ isActive }) =>
+            isActive ? classes.highlightedMenu : classes.headerMenu
+          }
+          activeClassName={classes.highlightedMenu}
+        >
+          Datasets
+        </NavLink>
+      </Typography>
+    ) : null,
+
+    // Analytics tab - shown for all roles
+    <Typography key="analytics" variant="body1">
+      <NavLink
+        to="/analytics"
+        className={({ isActive }) =>
+          isActive ? classes.highlightedMenu : classes.headerMenu
+        }
+        activeClassName={classes.highlightedMenu}
+      >
+        Analytics
+      </NavLink>
+    </Typography>,
+
+    // Admin tab - only shown for Admins
+    userRole.Admin === loggedInUserData?.role ? (
+      <Typography key="admin" variant="body1">
+        <NavLink
+          to="/admin"
+          className={({ isActive }) =>
+            isActive ? classes.highlightedMenu : classes.headerMenu
+          }
+          activeClassName={classes.highlightedMenu}
+        >
+          Admin
+        </NavLink>
+      </Typography>
+    ) : null,
+  ];
+
+  // Filter out null values
+  const filteredTabs = tabs.filter((tab) => tab !== null);
 
   const userSettings = [
     {
@@ -674,29 +672,6 @@ const Header = () => {
         />
       ),
     },
-    /* {
-      name: "Use Chitralekha Transcription Flow",
-      control: (
-        <Checkbox
-          onChange={handleTranscriptionFlowChange}
-          checked={checkClUI} 
-        />
-      ),
-    }, */
-    // {
-    //   name: "Enable Tags Dropdown",
-    //   control: (
-    //     <Checkbox
-    //       onChange={handleTagsChange}
-    //       defaultChecked={localStorage.getItem("enableTags") === "true"}
-    //     />
-    //   ),
-    // },
-
-    // {
-    //   name: "Help",
-    //   onclick: () => {},
-    // },
   ];
   const helpMenu = [
     {
@@ -706,11 +681,6 @@ const Header = () => {
         window.open(url, "_blank");
       },
     },
-
-    // {
-    //   name: "Feedback",
-    //   onclick: () => {},
-    // },
   ];
 
   const appInfo = [
@@ -765,15 +735,16 @@ const Header = () => {
                   width: "fit-content",
                 }}
               >
-                <a
+                <Link
+                  to="/projects"
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
                     gap: "10px",
+                    textDecoration: "none",
                   }}
-                  onClick={() => navigate("/projects")}
                 >
                   <img
                     src={Shoonya_Logo}
@@ -784,7 +755,7 @@ const Header = () => {
                   <Typography variant="h4" className={classes.headerTitle}>
                     Shoonya
                   </Typography>
-                </a>
+                </Link>
               </Grid>
               {renderTabs()}
               {renderSnackBar()}
@@ -890,7 +861,9 @@ const Header = () => {
                   </Grid>
                 </Grid>
                 <Menu
-                  sx={{ mt: "45px" }}
+                  sx={{ 
+                    mt: "45px",
+                  }}
                   id="menu-appbar"
                   anchorEl={anchorElSettings}
                   anchorOrigin={{
@@ -985,7 +958,7 @@ const Header = () => {
                 </Menu>
 
                 <Menu
-                  sx={{ mt: "45px", display: "flex", flexDirection: "row" }}
+                  sx={{ mt: "45px", display: "flex" }}
                   id="menu-appbar"
                   anchorEl={anchorElNotification}
                   anchorOrigin={{
@@ -1009,9 +982,9 @@ const Header = () => {
                     }}
                   >
                     <Typography variant="h4">Notifications</Typography>
-                    {Notification &&
+                    {(Notification &&
                     Notification?.length > 0 &&
-                    unseenNotifications?.length > 0 ? (
+                    unseenNotifications?.length > 0) && (
                       <Tooltip title="Mark all as read">
                         <IconButton
                           aria-label="More"
@@ -1020,7 +993,7 @@ const Header = () => {
                           <GradingSharpIcon color="primary" />
                         </IconButton>{" "}
                       </Tooltip>
-                    ) : null}
+                    )}
                   </Stack>
                   <Stack
                     direction="row"
@@ -1044,16 +1017,16 @@ const Header = () => {
                   {Notification && Notification?.length > 0 ? (
                     <>
                       {Notification.map((notification, index) => (
-                        <div
+                        <Box
                           key={index}
-                          style={{
+                          sx={{
                             display: "flex",
                             alignItems: "center",
                             padding: "10px",
                           }}
                         >
-                          <div
-                            style={{ marginRight: "10px", cursor: "pointer" }}
+                          <Box
+                            sx={{ marginRight: "10px", cursor: "pointer" }}
                           >
                             <FiberManualRecordIcon
                               color={
@@ -1064,60 +1037,45 @@ const Header = () => {
                                   : "primary"
                               }
                             />
-                          </div>
+                          </Box>
                           <Link
                             style={{
                               color: "rgba(0, 0, 0, 0.87)",
-                              display: "flex",
-                              flexDirection: "column",
-                              width: "100%",
-                              cursor: "pointer",
                               textDecoration: "none",
+                              width: "100%"
                             }}
                             to={notification.on_click}
                           >
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                width: "100%",
-                              }}
+                            <Typography variant="subtitle2">{`${notification?.title}`}</Typography>
+                            <Typography
+                              variant="subtitle2"
+                              color="text.secondary"
                             >
-                              <Typography variant="subtitle2">{`ID: ${
-                                notification?.title?.split("-")[0]
-                              }`}</Typography>
-                              <Typography
-                                style={{ paddingLeft: "10px" }}
-                                variant="subtitle2"
-                              >{`TITLE: ${notification?.notification_type}`}</Typography>
-                              <Typography
-                                style={{ padding: "5px 5px 0px 5px" }}
-                                variant="caption"
-                                color="action"
-                              >{`${formatDistanceToNow(
-                                new Date(notification?.created_at),
-                                { addSuffix: true }
-                              )}`}</Typography>
-                            </div>
+                              {`Modification Type: ${notification?.notification_type}` ||
+                                "No modification type"}
+                            </Typography>
+                            <br />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >{`${formatDistanceToNow(
+                              new Date(notification?.created_at),
+                              { addSuffix: true }
+                            )}`}</Typography>
 
-                            <div
-                              style={{
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
                                 display: "flex",
-                                flexDirection: "row",
                                 justifyContent: "space-between",
                               }}
                             >
-                              <Typography
-                                style={{
-                                  justifyContent: "flex-start",
-                                  width: "100%",
-                                }}
-                                variant="body2"
-                              >
-                                {notification?.title?.split("-")[1]}
-                              </Typography>
-                              {notification?.seen_json == null ||
-                              !notification?.seen_json[loggedInUserData.id] ? (
+                              {`Sent on: ${format(
+                                new Date(notification?.created_at),
+                                "MMM d, yyyy"
+                              )}`}
+                              {(notification?.seen_json == null || !notification?.seen_json[loggedInUserData.id]) && (
                                 <Tooltip title="Mark as read">
                                   <IconButton
                                     aria-label="More"
@@ -1128,18 +1086,11 @@ const Header = () => {
                                     <CheckCircleOutlineRoundedIcon color="primary" />
                                   </IconButton>
                                 </Tooltip>
-                              ) : null}
-                            </div>
-                            <Typography
-                              variant="caption"
-                              color="action"
-                            >{`Sent on: ${format(
-                              new Date(notification?.created_at),
-                              "MMM d, yyyy"
-                            )}`}</Typography>
+                              )}
+                            </Typography>
                             {index !== Notification?.length - 1 && <Divider />}
                           </Link>
-                        </div>
+                        </Box>
                       ))}
                     </>
                   ) : (
