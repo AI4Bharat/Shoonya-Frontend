@@ -198,6 +198,7 @@ const Login = () => {
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <OutlinedTextField
             fullWidth
+            className="input-email"
             name="email"
             onChange={handleFieldChange}
             value={credentials["email"]}
@@ -208,6 +209,7 @@ const Login = () => {
           <OutlinedTextField
             fullWidth
             name="password"
+            className="input-password"
             type={values.showPassword ? "text" : "password"}
             onChange={handleFieldChange}
             value={credentials["password"]}
