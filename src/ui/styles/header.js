@@ -39,6 +39,7 @@ const headerStyle = makeStyles({
     color: "#373939",
     display: "inline-block",
     letterSpacing: "1px",
+    fontDisplay:"swap",
     fontSize: "28px",
     fontWeight: "bold",
     fontFamily: 'Rowdies,"cursive", Roboto, sans-serif',
