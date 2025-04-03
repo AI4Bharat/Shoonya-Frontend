@@ -328,7 +328,9 @@ const MembersTable = (props) => {
 
   const addBtnClickHandler = async () => {
     setLoading(true);
-    const addMembersObj = new InviteUsersToOrgAPI(
+  
+    try {
+        const addMembersObj = new InviteUsersToOrgAPI(
         orgId,
         selectedUsers,
         userType
@@ -347,13 +349,16 @@ const MembersTable = (props) => {
         });
         const orgObj = new GetOragnizationUsersAPI(id);
         dispatch(APITransport(orgObj));
-      }else {
-        setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "error",
-        });
+      } else {
+        throw new Error(resp?.message || "Something went wrong!");
       }
+    } catch (error) {
+      setSnackbarInfo({
+        open: true,
+        message: error.message,
+        variant: "error",
+      });
+    } finally {
       handleUserDialogClose();
     setLoading(false);
     setSelectedUsers([ ]);
@@ -361,7 +366,9 @@ const MembersTable = (props) => {
     setCsvFile(null);
     setbtn(null)
     setUserType(Object.keys(UserRolesList)[0])
+    }
   };
+
   const handleRemoveFrozenUsers = async (FrozenUserId) => {
     const projectObj = new RemoveFrozenUserAPI(id, { ids: [FrozenUserId] });
     //dispatch(APITransport(projectObj));
