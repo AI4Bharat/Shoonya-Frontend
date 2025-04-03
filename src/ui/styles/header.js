@@ -99,6 +99,13 @@ const headerStyle = makeStyles({
       height: "26px",
     },
   },
+  nav_notif_container: {
+    display: "flex",
+    alignItems: "center",
+    padding: "10px",
+    marginRight: "10px",
+    cursor: "pointer"
+  },
   drawer: {
     width: "50%",
     flexShrink: 0,
