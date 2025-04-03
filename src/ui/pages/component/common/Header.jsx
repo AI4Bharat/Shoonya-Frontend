@@ -526,15 +526,17 @@ const Header = () => {
           </Typography>
         </Grid>
       );
-    } else {
+
+    else {
       return null;
     }
   };
 
   const tabs = [
     // Organization tab - only shown for Organization Owners and Admins
-    userRole.OrganizationOwner === loggedInUserData?.role ||
-    userRole.Admin === loggedInUserData?.role ? (
+    (userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role) ? (
+
       <Typography key="organization" variant="body1">
         <NavLink
           to={
@@ -553,7 +555,7 @@ const Header = () => {
     ) : null,
 
     // Workspaces tab - only shown for Workspace Managers
-    userRole.WorkspaceManager === loggedInUserData?.role ? (
+    (userRole.WorkspaceManager === loggedInUserData?.role) ? (
       <Typography key="workspaces" variant="body1">
         <NavLink
           to="/workspaces"
@@ -581,9 +583,9 @@ const Header = () => {
     </Typography>,
 
     // Datasets tab - only shown for Workspace Managers, Organization Owners, and Admins
-    userRole.WorkspaceManager === loggedInUserData?.role ||
-    userRole.OrganizationOwner === loggedInUserData?.role ||
-    userRole.Admin === loggedInUserData?.role ? (
+    (userRole.WorkspaceManager === loggedInUserData?.role ||
+      userRole.OrganizationOwner === loggedInUserData?.role ||
+      userRole.Admin === loggedInUserData?.role) ? (
       <Typography key="datasets" variant="body1">
         <NavLink
           to="/datasets"
@@ -611,7 +613,7 @@ const Header = () => {
     </Typography>,
 
     // Admin tab - only shown for Admins
-    userRole.Admin === loggedInUserData?.role ? (
+    (userRole.Admin === loggedInUserData?.role) ? (
       <Typography key="admin" variant="body1">
         <NavLink
           to="/admin"
@@ -627,7 +629,7 @@ const Header = () => {
   ];
 
   // Filter out null values
-  const filteredTabs = tabs.filter((tab) => tab !== null);
+  const filteredTabs = tabs.filter(tab => tab !== null);
 
   const userSettings = [
     {
@@ -750,9 +752,15 @@ const Header = () => {
                     src={Shoonya_Logo}
                     alt="logo"
                     className={classes.headerLogo}
+                    loading="eager"
+                    style={{
+                      display: 'block',
+                      aspectRatio: '200/60',
+                      backgroundColor: '#f5f5f5' // Fallback color
+                    }}
                   />
 
-                  <Typography variant="h4" className={classes.headerTitle}>
+                  <Typography variant="h4" className={classes.headerTitle} sx={{ minHeight: 5, minWidth: 8, fontDisplay: "swap" }}>
                     Shoonya
                   </Typography>
                 </Link>
@@ -1152,7 +1160,7 @@ const Header = () => {
         topTranslate={"40"}
         leftTranslate={"-50"}
         isTransliteration={true}
-        // sx={{width: "400px"}}
+      // sx={{width: "400px"}}
       >
         <Transliteration
           onCancelTransliteration={() => handleTransliterationModelClose}
