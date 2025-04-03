@@ -20,11 +20,11 @@ const StyledMenu = styled((props) => (
     elevation={3}
     anchorOrigin={{
       vertical: 'bottom',
-      horizontal: 'right',
+      horizontal: 'center',
     }}
     transformOrigin={{
       vertical: 'top',
-      horizontal: 'right',
+      horizontal: 'center',
     }}
     {...props}
   />
@@ -32,9 +32,7 @@ const StyledMenu = styled((props) => (
   '& .MuiPaper-root': {
     borderRadius: 6,
     marginTop: theme.spacing(1),
-    minWidth: 100,
-
-
+    minWidth: 280,
   },
 }));
 
@@ -218,15 +216,38 @@ const TaskAnalytics = (props) => {
   };    return (
     <>
       <Grid container columnSpacing={3} rowSpacing={2} mb={1} gap={3}>
-        <Grid item xs={2} sm={2} md={2} lg={2} xl={2} display={"flex"} justifyContent="space-between" >
-        <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Grid item xs={12} sm={6} md={5} lg={4} 
+          sx={{
+            position:"relative",
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"space-between",
+            gap:2,
+            flexDirection:{xs:"column", sm:"row"}
+          }}
+          >
+        <Box display="flex" justifyContent="flex-end">
           <IconButton onClick={toggleFilterBox} aria-label="filter">
-            <FilterList fontSize="large" />
+            <FilterList fontSize="medium" />
           </IconButton>
         </Box>
 
         {showFilterBox && (
-          <Box border={1} borderRadius={2} padding={2} display="flex" flexDirection="column" gap={2}>
+          <Box 
+            border={1} 
+            borderRadius={2} 
+            padding={3} 
+            display="flex" 
+            flexDirection="column" 
+            gap={3}
+            sx={{
+              position:"absolute",
+              top:{ xs:"60px", sm:"15px"},
+              left:{xs:"auto",sm:"70px"},
+              backgroundColor:"white",
+              zIndex:1
+            }}
+            >
 
             {/* Project Type Dropdown */}
             <FormControl size="small">
@@ -274,22 +295,22 @@ const TaskAnalytics = (props) => {
               />
             </Box>
 
-            <Box display="flex" justifyContent="flex-end" gap={2}>
-              <CustomButton label="Apply" onClick={handleApply}  />
-              <CustomButton label="Cancel" onClick={handleCancel} />
+            <Box display="flex" flexDirection={"column"} width={"100%"} gap={2}>
+              <CustomButton label="Apply"  onClick={handleApply}  />
+              <CustomButton label="Cancel"  onClick={handleCancel} />
             </Box>
 
           </Box>
         )}
           {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} container justifyContent="space-between" alignItems="center"> */}
           {/* <CustomButton label="Submit" sx={{ width: { xs: "100px", md: "120px" }, height: "40px" }} onClick={handleSubmit}  /> */}
-          <Box display="flex"   sx={{ width: { xs: "100px", md: "120px" }, height: "40px", marginRight: 1 }}alignItems="center">
+          <Box display="flex" sx={{ width: "100%" }} alignItems="center">
             <CustomButton
               onClick={handleClick}
               disabled={loading}
-              sx={{ marginRight: 1 }}
               endIcon={<KeyboardArrowDown />}
               label="Download"
+              fullWidth
             >
               Download
             </CustomButton>

@@ -210,7 +210,8 @@ export default function MetaAnalytics(props) {
       alignItems="center"
     >
       {/* Project Type Dropdown */}
-      <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>      <FormControl  size="small">
+      <Grid item xs={12} sm={6}>      
+        <FormControl  size="small" fullWidth>
             <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
               Project Type {" "}
               {
@@ -230,9 +231,9 @@ export default function MetaAnalytics(props) {
               id="demo-simple-select"
               value={selectedType}
               label="Project Type"
-              sx={{padding:"1px"}}
               onChange={(e) => setSelectedType(e.target.value)}
               MenuProps={MenuProps}
+              fullWidth
             >
               {projectTypes.map((type, index) => (
                 <MenuItem value={type} key={index}>
@@ -244,16 +245,16 @@ export default function MetaAnalytics(props) {
           </Grid>
       </Grid>
    <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-   <Box display="flex" justifyContent="space-between" alignItems="center">
+   <Box display="flex" flexDirection={{xs:"column", sm:"row"}} justifyContent="space-between" alignItems="center" gap={2}>
       <CustomButton
         label="Submit"
-        sx={{ width: "35%", height: "40px" }}
+        sx={{ width: "100%", height: "40px" }}
         onClick={handleSubmit}
         size="small"
       />
 
       {/* Download Button */}
-      <Box display="flex" alignItems="center" sx={{ width: "45%" }}>
+      <Box display="flex" alignItems="center" sx={{ width: "100%" }}>
         <CustomButton
           onClick={handleClick}
           disabled={loading}
