@@ -13,12 +13,12 @@ import {  ThemeProvider,  } from "@mui/material";
 // import Snackbar from "./pages/component/common/Snackbar";
 import themeDefault from './theme/theme'
 import GlobalStyles from "./styles/LayoutStyles";
-import BackButton from "./pages/component/common/BackButton";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { translate } from "../config/localisation";
 import { authenticateUser } from "../utils/utils";
 const Header = React.lazy(() => import("./pages/component/common/Header"));
 
+const BackButton = React.lazy(() => import("./pages/component/common/BackButton"));
+const ArrowBackIcon = React.lazy(() => import("@mui/icons-material/ArrowBack"));
 
 const Layout= (props) => {
   // const Component = props.component;

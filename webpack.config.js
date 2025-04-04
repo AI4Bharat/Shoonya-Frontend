@@ -6,6 +6,7 @@ const CompressionPlugin = require("compression-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
+const Critters = require('critters-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -35,8 +36,22 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
-      },
+        use: [
+          "style-loader",
+          "css-loader",
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  ["autoprefixer", { overrideBrowserslist: [">1%", "last 2 versions"] }]
+                ]
+              }
+            }
+          }
+        ]
+      }
+      ,
       {
         test: /\.(png|jpe?g)$/,
         use: [
@@ -57,6 +72,8 @@ module.exports = {
   },
   optimization: {
     usedExports: true,  
+    sideEffects: false, // Enable tree-shaking
+
     minimize: true,
     minimizer: [
       new TerserPlugin({
@@ -111,8 +128,25 @@ module.exports = {
     //   generateStatsFile: true, // Enable stats.json generation
     //   statsFilename: "stats.json", // Ensure it saves stats.json
     // }),
+    new Critters({
+      preload: 'swap',
+      fonts: true,
+    }),
+    
     new PurgeCSSPlugin({
       paths: glob.sync(`${path.resolve(__dirname, "src")}/**/*`, { nodir: true }),
+      safelist: {
+        standard: [/^slick-/], // Add any necessary safelist patterns
+        deep: [/modal-backdrop/, /tooltip/], // For dynamic classes
+        greedy: [/dropdown-menu$/] // For parent selectors
+      },
+      // Add these for better coverage
+      extractors: [
+        {
+          extractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
+          extensions: ['html', 'js', 'jsx'],
+        },
+      ],
     }),
   ],
   resolve: {

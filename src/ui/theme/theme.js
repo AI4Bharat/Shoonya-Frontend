@@ -238,8 +238,9 @@ const themeDefault = createTheme({
         root: {
           padding: ".5rem .5rem .5rem .8rem",
           textTransform: "capitalize",
-        },
+          fontDisplay:"swap"
 
+        },
         stackedParent: {
           "@media (max-width: 400px)": {
             display: "table-row",
