@@ -47,6 +47,8 @@ import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
 import ShoonyaPortal from "./ui/pages/component/Intro/ShoonyaPortal";
 import UseCases from "./ui/pages/container/Intro/UseCases";
 import InstallationGuide from "./ui/pages/container/Intro/installation";
+import OrganizationChart from "./ui/pages/container/Intro/OrganizationChart";
+
 
 import Thanks from "./ui/pages/container/Intro/Thanks";
 import Analytic from "./ui/pages/component/Intro/Analytic";
@@ -158,6 +160,7 @@ const App = () => {
       <Route path="/Thanks" element={<Layout component={<Thanks />} />} />
         <Route path="/useCases" element={<Layout component={<UseCases />} />} />
         <Route path="/installiationGuide" element={<Layout component={<InstallationGuide />} />} />
+        <Route path="/OrganizationChart" element={<Layout component={<OrganizationChart />} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />

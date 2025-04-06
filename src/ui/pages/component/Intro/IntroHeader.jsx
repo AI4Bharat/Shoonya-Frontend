@@ -41,6 +41,10 @@ function IntroHeader(props) {
   const handleClickinstallitionguide = () => {
     navigate("/installiationGuide");
   };
+
+  const handleClickshoonyaworking = () => {
+    navigate("/OrganizationChart");
+  };
   
   const handleClickAnalytics = () => {
     navigate("/analytic");
@@ -117,6 +121,20 @@ function IntroHeader(props) {
             }}
           >
            Installiation Guide
+          </Button>
+        </Grid>
+
+        <Grid>
+          <Button
+            onClick={handleClickshoonyaworking}
+            sx={{
+              color: "#51504f",
+              textTransform: "capitalize",
+              fontSize: "16px",
+              fontFamily: "roboto,sans-serif",
+            }}
+          >
+           Shoonya Working
           </Button>
         </Grid>
         
@@ -224,6 +242,18 @@ function IntroHeader(props) {
               >
                 Analytics
               </Button>
+
+          <Button
+            onClick={handleClickshoonyaworking}
+            sx={{
+              color: "#51504f",
+              textTransform: "capitalize",
+              fontSize: "16px",
+              fontFamily: "roboto,sans-serif",
+            }}
+          >
+           Shoonya Working
+          </Button>
 
             </Grid>
           </Box>

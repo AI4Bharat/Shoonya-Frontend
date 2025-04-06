@@ -14,7 +14,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import Carousel from "react-material-ui-carousel";
 import Timeline from "../../container/Intro/versions";
-import OrgChart from "../../container/Intro/OrganizationChart";
+// import OrgChart from "../../container/Intro/OrganizationChart";
 
 const ChitralekhaPortal = () => {
   const classes = IntroDatasetStyle();
@@ -179,7 +179,7 @@ const ChitralekhaPortal = () => {
       <Principles />
       <Features />
       <Timeline />
-      <OrgChart />
+      {/* <OrgChart /> */}
       <Partners />
       <Footer />
     </div>
