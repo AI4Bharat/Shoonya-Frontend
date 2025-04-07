@@ -447,16 +447,16 @@ export default function PerformanceAnalytics() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={2} sm={2} md={2} lg={2} xl={2}>
+          <Grid item xs={12} sm={6} md={2}>
             <Button
               endIcon={showPicker ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              fullWidth
               variant="contained"
               color="primary"
               onClick={handleCloseDatepicker}
               sx={{
                 backgroundColor: "rgba(243, 156, 18)",
                 "&:hover": { backgroundColor: "rgba(243, 156, 18 )" },
-                marginLeft: "20px",
               }}
             >
               Pick Dates
@@ -473,12 +473,11 @@ export default function PerformanceAnalytics() {
             </Button>
           </Grid> */}
         </Grid>
-        <Grid container mt={4}>
+        <Grid container mt={2} xs={12} sm={6} md={3}>
             <Button
               fullWidth
               variant="contained"
-              onClick={handleSubmit}
-              sx={{ width: "130px" }}
+              onClick={handleSubmit}  
             >
               Submit
             </Button>

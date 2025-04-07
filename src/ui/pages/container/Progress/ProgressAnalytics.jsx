@@ -1032,7 +1032,7 @@ function ProgressList() {
                 </Button>
               </Grid>}
               <Grid container sx={{marginLeft:"17px"}}>
-            <CustomButton label="Submit" sx={{ width:"120px", mt: 3 }} onClick={handleSubmit}
+            <CustomButton label="Submit" sx={{ width:{xs:"100%", sm:"200px"}, mt: 3 }} onClick={handleSubmit}
               disabled={(baseperiod || comparisonperiod) ? false : true} />
             </Grid>
               {showPicker && <Box sx={{ mt: 2, mb: 2, display: "flex", justifyContent: "center", width: "100%" }} ref={ref}>
