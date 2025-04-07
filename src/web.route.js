@@ -1,13 +1,10 @@
 import {
   BrowserRouter as Router,
   HashRouter,
-  Link,
   Navigate,
   Route,
   Routes,
-  useRoutes,
 } from "react-router-dom";
-// import Landing from "./ui/pages/container/Landing/index";
 import Login from "./ui/pages/container/UserManagement/Login";
 import ForgotPassword from "./ui/pages/container/UserManagement/ForgotPassword";
 import Dashboard from "./ui/pages/container/Project/ProjectList";
@@ -21,7 +18,6 @@ import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList";
 import Layout from "./ui/Layout";
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
 import CollectionProject from "./ui/pages/container/Workspace/CollectionProject";
-import AnnotateTask from "./ui/pages/container/Project/AnnotateTask";
 import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
@@ -37,10 +33,8 @@ import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmFo
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
 import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 import ProgressList from "./ui/pages/container/Progress/ProgressList"
-import browserhistory from "./web.history";
 import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
 import AllAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AllAudioTranscriptionLandingPage";
-// import DatasetSettings from "./ui/pages/container/Dataset/DatasetSettings";
 import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
 import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
 import DashBoard from "./ui/pages/container/Admin/DashBoard";

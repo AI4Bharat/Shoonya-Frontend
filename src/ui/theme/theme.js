@@ -2,6 +2,31 @@ import { createTheme } from "@mui/material/styles";
 import Card from "../../assets/Card.svg";
 
 const themeDefault = createTheme({
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '@global': {
+          '@font-face': [
+            {
+              fontFamily: 'Roboto',
+              src: `url('/fonts/Roboto-Regular.woff2') format('woff2')`,
+              fontWeight: 400,
+              fontStyle: 'normal',
+              fontDisplay: 'swap',
+            },
+            {
+              fontFamily: 'Roboto',
+              src: `url('/fonts/Roboto-Bold.woff2') format('woff2')`,
+              fontWeight: 700,
+              fontStyle: 'normal',
+              fontDisplay: 'swap',
+            },
+          ],
+        },
+      },
+    },
+  },
+
   palette: {
     primary: {
       // light: "#60568d",
@@ -26,7 +51,7 @@ const themeDefault = createTheme({
     h1: {
       fontSize: "3.125rem",
       fontFamily: '"Roboto" ,sans-serif',
-      fontWeight: "500",
+      fontWeight: "400",
       lineHeight: 1.2,
       "@media (max-width:550px)": {
         fontSize: "2rem",
@@ -35,7 +60,7 @@ const themeDefault = createTheme({
     h2: {
       fontSize: "2.5rem",
       fontFamily: '"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontWeight: "400",
       lineHeight: 1.2,
       "@media (max-width:550px)": {
         fontSize: "1.5rem",
@@ -63,7 +88,7 @@ const themeDefault = createTheme({
     h5: {
       fontSize: "1.3125rem",
       fontFamily: '"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontWeight: "400",
       lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: "1rem",
@@ -72,7 +97,7 @@ const themeDefault = createTheme({
     h6: {
       fontSize: "1.125rem",
       fontFamily: '"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontWeight: "400",
       paddingTop: "4px",
       lineHeight: 1.3,
       "@media (max-width:550px)": {
@@ -111,7 +136,7 @@ const themeDefault = createTheme({
     subtitle2: {
       fontSize: "1rem",
       fontFamily: '"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontWeight: "400",
       lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: ".7rem",
