@@ -25,11 +25,23 @@ module.exports = {
 
     }),
     new CompressionPlugin({
-      algorithm: "brotliCompress", // Use Brotli for better compression
-      threshold: 1024, // Compress files larger than 10KB
+      filename: '[path][base].gz',
+      algorithm: 'gzip',
+      test: /\.(js|css|html|svg|json)$/,
+      threshold: 1024, // Compress all files > 1KB
       minRatio: 0.8,
-      test: /\.(js|css|html|svg)$/,
+      deleteOriginalAssets: false
     }),
+    new CompressionPlugin({
+      filename: '[path][base].br',
+      algorithm: 'brotliCompress',
+      test: /\.(js|css|html|svg|json)$/,
+      compressionOptions: { level: 11 },
+      threshold: 1024,
+      minRatio: 0.8,
+      deleteOriginalAssets: false
+    })
+
 
   ],
   performance: {
