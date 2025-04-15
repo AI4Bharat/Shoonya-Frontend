@@ -104,6 +104,8 @@ module.exports = {
                   drop_debugger: true, // Removes debugger statements
                   dead_code: true,     // Removes unused code
                   passes: 3,           // Apply multiple optimizations
+                   pure_funcs: ['console.log', 'console.info'], // Delete console
+
                   },
                 output: {
                   comments: false,
