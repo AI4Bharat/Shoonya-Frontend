@@ -1,66 +1,62 @@
-
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-   mode: 'production',
-  //mode: 'development',
-  //devtool: 'inline-source-map',
-  devtool: 'source-map',
+  mode: "production",
+  devtool: "source-map",
+  // mode: 'development',
+  // devtool: 'inline-source-map',
 
-  entry: './src/index.js',
+  entry: "./src/index.js",
   output: {
-    filename: '[name].[contenthash].js',
-    path: path.resolve(__dirname, 'dist'),
-    clean:true
+    filename: "[name].[contenthash].js",
+    path: path.resolve(__dirname, "dist"),
+    clean: true,
   },
   plugins: [
     new MiniCssExtractPlugin({ filename: "[name].[contentHash].css" }),
 
     new HtmlWebpackPlugin({
-      template: './public/index.html',
-
+      template: "./public/index.html",
     }),
     new CompressionPlugin({
-      filename: '[path][base].gz',
-      algorithm: 'gzip',
+      filename: "[path][base].gz",
+      algorithm: "gzip",
       test: /\.(js|css|html|svg|json)$/,
       threshold: 1024, // Compress all files > 1KB
       minRatio: 0.8,
-      deleteOriginalAssets: false
+      deleteOriginalAssets: false,
     }),
     new CompressionPlugin({
-      filename: '[path][base].br',
-      algorithm: 'brotliCompress',
+      filename: "[path][base].br",
+      algorithm: "brotliCompress",
       test: /\.(js|css|html|svg|json)$/,
       compressionOptions: { level: 11 },
       threshold: 1024,
       minRatio: 0.8,
-      deleteOriginalAssets: false
-    })
-
-
+      deleteOriginalAssets: false,
+    }),
   ],
   performance: {
     hints: "warning",
     assetFilter: function (assetFilename) {
       return assetFilename.endsWith(".js.gz");
     },
-  },  
+  },
   devServer: {
-    static: './dist',
-   hot: true,
-   compress: true,
+    static: "./dist",
+    hot: true,
+    compress: true,
   },
 
   module: {
     rules: [
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.scss$/,
@@ -69,15 +65,15 @@ module.exports = {
 
       {
         test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
-        type: 'asset/resource',
+        type: "asset/resource",
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
+        type: "asset/resource",
       },
       {
         test: /\.(csv|tsv)$/i,
-        use: ['csv-loader'],
+        use: ["csv-loader"],
       },
       {
         test: /\.(js|jsx)$/,
@@ -89,68 +85,44 @@ module.exports = {
             plugins: ["@babel/plugin-transform-runtime"],
           },
         },
-      }
-      
-
+      },
     ],
   },
   optimization: {
     usedExports: true,
     minimizer: [
-            new TerserPlugin({
-              terserOptions: {
-                compress: {
-                  drop_console: true,  // Removes console.log
-                  drop_debugger: true, // Removes debugger statements
-                  dead_code: true,     // Removes unused code
-                  passes: 3,           // Apply multiple optimizations
-                   pure_funcs: ['console.log', 'console.info'], // Delete console
-
-                  },
-                output: {
-                  comments: false,
-                },
-              },
-              parallel: true,
-            }),
-            // new CssMinimizerPlugin(),
-          ],
-    moduleIds: 'deterministic',
-    runtimeChunk: 'single',
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true, // Removes console.log
+            drop_debugger: true, // Removes debugger statements
+            dead_code: true, // Removes unused code
+            passes: 3, // Apply multiple optimizations
+            pure_funcs: ["console.log", "console.info"], // Delete console
+          },
+          output: {
+            comments: false,
+          },
+        },
+        parallel: true,
+      }),
+      // new CssMinimizerPlugin(),
+    ],
+    moduleIds: "deterministic",
     splitChunks: {
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
+          name: "vendors",
+          chunks: "all",
         },
       },
-
     },
     runtimeChunk: {
       name: "manifest",
     },
-
-
   },
-
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -173,11 +145,6 @@ module.exports = {
 //       ./src/ui/styles/LayoutStyles.js 2.5 KiB [built] [code generated]
 //     + 6 modules
 
-
-
-
-
-
 // assets by status 343 KiB [cached] 5 assets
 // Entrypoint main = manifest.945f63cb8938d2856dc6.js vendors.24d0506d247c2cb0a192.js main.a8020f082f83da5cf22c.js 4 auxiliary assets
 // orphan modules 2.3 MiB [orphan] 1155 modules
@@ -187,24 +154,6 @@ module.exports = {
 //   modules by path ./src/ 115 KiB (javascript) 839 bytes (asset)
 //     ./src/index.js + 113 modules 115 KiB [built] [code generated]
 //     ./src/assets/Card.svg 839 bytes (asset) 42 bytes (javascript) [built] [code generated]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // const path = require("path");
 // const glob = require("glob");
@@ -279,7 +228,7 @@ module.exports = {
 //     ],
 //   },
 //   optimization: {
-//     usedExports: true,  
+//     usedExports: true,
 //     sideEffects: false, // Enable tree-shaking
 
 //     minimize: true,
@@ -324,12 +273,12 @@ module.exports = {
 //   },
 //   plugins: [
 //     new CleanWebpackPlugin(), // Cleans up dist folder before each build
-    // new CompressionPlugin({
-    //   algorithm: "brotliCompress", // Use Brotli for better compression
-    //   threshold: 1024, // Compress files larger than 10KB
-    //   minRatio: 0.8,
-    //   test: /\.(js|css|html|svg)$/,
-    // }),
+// new CompressionPlugin({
+//   algorithm: "brotliCompress", // Use Brotli for better compression
+//   threshold: 1024, // Compress files larger than 10KB
+//   minRatio: 0.8,
+//   test: /\.(js|css|html|svg)$/,
+// }),
 //     // new BundleAnalyzerPlugin({
 //     //   analyzerMode: "static", // Change to 'server' if needed
 //     //   reportFilename: "bundle-report.html", // Output report filename
@@ -340,7 +289,7 @@ module.exports = {
 //     //   preload: 'swap',
 //     //   fonts: true,
 //     // }),
-    
+
 //     new PurgeCSSPlugin({
 //       paths: glob.sync(`${path.resolve(__dirname, "src")}/**/*`, { nodir: true }),
 //       safelist: {
@@ -373,6 +322,6 @@ module.exports = {
 //       ignored: /node_modules/, // Ignore unnecessary files
 //       aggregateTimeout: 300, // Delay rebuilds slightly for efficiency
 //       poll: 1000, // Set polling interval
-//     },  
+//     },
 //   },
 // };
