@@ -61,6 +61,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "webpack":"webpack",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
