@@ -13,10 +13,12 @@ module.exports = {
 
   entry: './src/index.js',
   output: {
-    filename: '[name].[contenthash].js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: "[name].[hash].js",
+    chunkFilename: "[name].[hash].js",
+    publicPath: "/",
     clean:true
   },
+
   resolve: {
     extensions: ['.js', '.jsx']
    },
