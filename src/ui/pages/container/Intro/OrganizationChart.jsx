@@ -206,6 +206,7 @@
 
 
 
+import { id } from "date-fns/locale";
 import React, { useState } from "react";
 import Tree from "react-d3-tree";
 
@@ -479,29 +480,199 @@ const orgData = {
         },
       ],
     },
+    {
+      id: "Members",
+      name: "📂 Members",
+      children: [
+        {
+          id: "Invite Members",
+          name: "👩👨Invite Members",
+          children: [
+            {
+              id: "Enter Email Ids",
+              name: "📋 Enter Email Ids/Import Email Ids through CSV",
+            },
+            {
+              id: "Select Role",
+              name: "🏷️ Select Role"
+            },
+            {
+              id: "View",
+              name: "View Status of Members"
+            },
+          ]
+        },
+        {
+          id: "Invites",
+          name: "📋 Invites",
+          children: [
+            {
+              id: "Invited Users",
+              name: "👩👨 Invited Users",
+              children: [
+                {
+                  id: "View",
+                  name: "View Status of Invited Users"
+                },
+                {
+                  id: "Resend",
+                  name: "Resend Invite"
+                },
+              ]
+            },
+            {
+              id: "Managers Suggestion Users",
+              name: "👨👩 Managers Suggestion Users",
+            },
+          ],
+        },
+      ]
+    },
+    {
+      id: "Invites",
+      name: "📋 Invites",
+      children: [
+        {
+          id: "Invited Users",
+          name: "👩👨 Invited Users",
+          children: [
+            {
+              id: "View",
+              name: "View Status of Invited Users"
+            },
+            {
+              id: "Resend",
+              name: "Resend Invite"
+            },
+          ]
+        },
+        {
+          id: "Managers Suggestion Users",
+          name: "👨👩 Managers Suggestion Users",
+        },
+      ],
+    },
+    {
+      Id: "Reports",
+      name: "📋 Reports",
+      children: [
+        {
+          id: "Reports",
+          name: "Select Report Type :",
+          children: [
+            {
+              id: "Users Reports",
+              name: "📋 Users Reports",
+              children: [
+                {
+                  id: "Projects Type",
+                  name: "📋 Projects Type",
+                },
+                {
+                  id: "Reeports",
+                  name: "📋 Reports Type",
+                },
+                {
+                  id: "Projects Filter",
+                  name: "📋 Projects Filter",
+                },
+                {
+                  id: "Target Languages",
+                  name: "📋 Target Languages",
+                },
+                {
+                  id: "Pic Dates",
+                  name: "📅 Pick Dates",
+                },
+                {
+                  id: "Submit",
+                  name: "Submit",
+                },
+                {
+                  id: "Email CSV",
+                  name: "Email CSV",
+                },
+              ],
+            },
+            {
+              id: "Projects Reports",
+              name: "📋 Projects Reports",
+              children: [
+                {
+                  id: "Types",
+                  name: "Types",
+                },
+                {
+                  id: "Projects Type",
+                  name: "📋 Projects Type",
+                },
+                {
+                  id: "Target Languages",
+                  name: "📋 Target Languages",
+                },
+                {
+                  id: "Submit",
+                  name: "Submit",
+                },
+                {
+                  id: "Email CSV",
+                  name: "Email CSV",
+                },
+              ],
+            },
+            {
+              id: "Payment Reports",
+              name: "💰 Payment Reports",
+              children: [
+                {
+                  id: "Projects Type",
+                  name: "📋 Projects Type",
+                },
+                {
+                  id: "Praticipants Types",
+                  name: "Praticipants Types",
+                },
+                {
+                  id: "Pic Dates",
+                  name: "📅 Pick Dates",
+                },
+                {
+                  id: "Email CSV",
+                  name: "Email CSV",
+                },
+              ],
+            },
+          ],
+        }
+      ],
+    },
+    {id: "Organization Settings",
+      name: "⚙️ Organization Settings",
+    }
   ],
 };
 export default function OrganizationChart() {
   const [translate, setTranslate] = useState({ x: 500, y: 200 });
 
   return (
-    <div style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" , marginTop: "70px" }}>
-    <h2 style={{ textAlign: "center", margin: "20px 0" }}>
-      Shoonya Working Chart
-    </h2>
-  
-    <div style={{ flex: 1, position: "relative", paddingTop: "40px" }}> {/* 👈 Push tree down */}
-      <Tree
-        data={orgData}
-        translate={translate}
-        orientation="vertical"
-        zoomable
-        initialDepth={1}
-        nodeSize={{ x: 300, y: 90 }}
-        separation={{ siblings: 2, nonSiblings: 2 }}
-      />
+    <div style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column", marginTop: "70px" }}>
+      <h2 style={{ textAlign: "center", margin: "20px 0" }}>
+        Shoonya Working Chart
+      </h2>
+
+      <div style={{ flex: 1, position: "relative", paddingTop: "40px" }}> {/* 👈 Push tree down */}
+        <Tree
+          data={orgData}
+          translate={translate}
+          orientation="vertical"
+          // pathFunc="elbow"
+          zoomable
+          initialDepth={1}
+          nodeSize={{ x: 300, y: 90 }}
+          separation={{ siblings: 2, nonSiblings: 2 }}
+        />
+      </div>
     </div>
-  </div>
-  
+
   );
 }
