@@ -3,7 +3,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const addProductionOptimizations = (config) => {
+const addOptimizations = (config) => {
   if (config.mode === "production") {
     // Add MiniCssExtractPlugin
     config.plugins.push(
