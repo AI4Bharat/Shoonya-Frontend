@@ -2,6 +2,7 @@ const { override, addWebpackPlugin, addWebpackModuleRule } = require("customize-
 const TerserPlugin = require("terser-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const addOptimizations = (config) => {
   if (config.mode === "production") {
@@ -30,7 +31,8 @@ const addOptimizations = (config) => {
         threshold: 1024,
         minRatio: 0.8,
         deleteOriginalAssets: false,
-      })
+      }),
+      new BundleAnalyzerPlugin(),
     );
 
     // Set optimization settings
@@ -58,7 +60,7 @@ const addOptimizations = (config) => {
       splitChunks: {
         cacheGroups: {
           vendor: {
-            test: /[\\/]node_modules[\\/]/,
+            test: /[\\/]node_modules[\\/](?!label-studio)/,
             name: "vendors",
             chunks: "all",
           },
@@ -96,6 +98,6 @@ const addExtraRules = () => (config) => {
 };
 
 module.exports = override(
-  addProductionOptimizations,
+  addOptimizations,
   addExtraRules()
 );
