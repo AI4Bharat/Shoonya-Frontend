@@ -60,7 +60,8 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "cross-env NODE_ENV=production react-app-rewired build",
+    "build:dev": "cross-env REACT_APP_CUSTOM_ENV=development react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
@@ -88,6 +89,7 @@
     "@babel/preset-react": "^7.26.3",
     "babel-loader": "^10.0.0",
     "compression-webpack-plugin": "^11.1.0",
+    "cross-env": "^7.0.3",
     "css-minimizer-webpack-plugin": "^7.0.2",
     "customize-cra": "^1.0.0",
     "gh-pages": "^4.0.0",

@@ -3,8 +3,10 @@ const TerserPlugin = require("terser-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const addProductionOptimizations = (config) => {
-  if (config.mode === "production") {
+const addOptimizations = (config) => {
+  const isDevBuild = process.env.REACT_APP_CUSTOM_ENV === 'development';
+  config.mode = isDevBuild ? 'development' : 'production';
+  if (config.mode === "production" || config.mode === "development") {
     // Add MiniCssExtractPlugin
     config.plugins.push(
       new MiniCssExtractPlugin({
@@ -96,6 +98,6 @@ const addExtraRules = () => (config) => {
 };
 
 module.exports = override(
-  addProductionOptimizations,
+  addOptimizations,
   addExtraRules()
 );
