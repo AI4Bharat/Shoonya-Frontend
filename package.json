@@ -59,9 +59,10 @@
     "wfplayer": "^2.2.6"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "webpack":"webpack",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -88,7 +89,6 @@
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
-    "@craco/craco": "^7.1.0",
     "babel-loader": "^10.0.0",
     "compression-webpack-plugin": "^11.1.0",
     "css-minimizer-webpack-plugin": "^7.0.2",
