@@ -1,9 +1,23 @@
-import React from 'react'
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 // import { Grid ,ThemeProvider} from "@material-ui/core";
-import { Button, Grid, ThemeProvider, Select, Box, MenuItem, Radio, InputLabel, FormControl, Card, Typography, Menu, styled } from "@mui/material";
-import WorkspaceMetaAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetMetaAnalytics"
+import {
+  Button,
+  Grid,
+  ThemeProvider,
+  Select,
+  Box,
+  MenuItem,
+  Radio,
+  InputLabel,
+  FormControl,
+  Card,
+  Typography,
+  Menu,
+  styled,
+} from "@mui/material";
+import WorkspaceMetaAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetMetaAnalytics";
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 // import ContextualTranslationEditing from "../MetaAnalytics/ContextualTranslationEditing";
 // import SemanticTextualSimilarity_Scale5 from "../MetaAnalytics/SemanticTextualSimilarity_Scale5";
@@ -12,93 +26,99 @@ import SingleSpeakerAudioTranscriptionEditing from "../MetaAnalytics/SingleSpeak
 // import AudioSegmentation from "../MetaAnalytics/AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
 import themeDefault from "../../../../theme/theme";
-import LightTooltip from '../../../component/common/Tooltip';
+import LightTooltip from "../../../component/common/Tooltip";
 import { translate } from "../../../../../config/localisation";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
 import { MenuProps } from "../../../../../utils/utils";
 import CustomButton from "../../../component/common/Button";
-import AudioDurationChart from '../MetaAnalytics/AudioDurationMetaAnalyticsChart';
-import WordCountMetaAnalyticsChart from '../MetaAnalytics/WordCountMetaAnalyticsChart';
-import SentanceCountMetaAnalyticsChart from '../MetaAnalytics/SentanceCountMetaAnalyticsChart';
-import exportFromJSON from 'export-from-json';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import AudioDurationChart from "../MetaAnalytics/AudioDurationMetaAnalyticsChart";
+import WordCountMetaAnalyticsChart from "../MetaAnalytics/WordCountMetaAnalyticsChart";
+import SentanceCountMetaAnalyticsChart from "../MetaAnalytics/SentanceCountMetaAnalyticsChart";
+import exportFromJSON from "export-from-json";
 import { KeyboardArrowDown } from "@material-ui/icons";
 const StyledMenu = styled((props) => (
   <Menu
     elevation={3}
     anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
+      vertical: "bottom",
+      horizontal: "right",
     }}
     transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
+      vertical: "top",
+      horizontal: "right",
     }}
     {...props}
   />
 ))(({ theme }) => ({
-  '& .MuiPaper-root': {
+  "& .MuiPaper-root": {
     borderRadius: 6,
     marginTop: theme.spacing(1),
     minWidth: 100,
-
-
   },
 }));
-
-
 
 export default function MetaAnalytics(props) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState("ContextualTranslationEditing");
+  const [selectedType, setSelectedType] = useState(
+    "ContextualTranslationEditing"
+  );
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
-  const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
-  const metaAnalyticsData = useSelector(
-    (state) => state.wsMetaAnalytics.data
+  const workspaceDetails = useSelector(
+    (state) => state.getWorkspaceDetails.data
   );
-  const metaAnalyticsDataJson = useSelector((state) => state.wsMetaAnalytics.originalData);
+  const metaAnalyticsData = useSelector((state) => state.wsMetaAnalytics.data);
+  const metaAnalyticsDataJson = useSelector(
+    (state) => state.wsMetaAnalytics.originalData
+  );
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-
   const getMetaAnalyticsdata = () => {
     setLoading(true);
-    const userObj = new WorkspaceMetaAnalyticsAPI(workspaceDetails?.id, selectedType);
+    const userObj = new WorkspaceMetaAnalyticsAPI(
+      workspaceDetails?.id,
+      selectedType
+    );
     dispatch(APITransport(userObj));
   };
   const audioProjectTypes = [
-    'AudioTranscription',
-    'AudioSegmentation',
-    'AudioTranscriptionEditing',
-    'AcousticNormalisedTranscriptionEditing'
-  ]
+    "AudioTranscription",
+    "AudioSegmentation",
+    "AudioTranscriptionEditing",
+    "AcousticNormalisedTranscriptionEditing",
+  ];
   const translationProjectTypes = [
-    'MonolingualTranslation',
-    'TranslationEditing',
-    'SemanticTextualSimilarity_Scale5',
-    'ContextualTranslationEditing',
-    'SentenceSplitting',
-    'ContextualSentenceVerification',
-    'ContextualSentenceVerificationAndDomainClassification',
-  ]
+    "MonolingualTranslation",
+    "TranslationEditing",
+    "SemanticTextualSimilarity_Scale5",
+    "ContextualTranslationEditing",
+    "SentenceSplitting",
+    "ContextualSentenceVerification",
+    "ContextualSentenceVerificationAndDomainClassification",
+  ];
 
   const conversationProjectTypes = [
-    'ConversationTranslation',
-    'ConversationTranslationEditing',
-    'ConversationVerification'
-  ]
+    "ConversationTranslation",
+    "ConversationTranslationEditing",
+    "ConversationVerification",
+  ];
 
   const ocrProjectTypes = [
-    'OCRTranscriptionEditing',
-    'OCRSegmentCategorizationEditing'
-  ]
+    "OCRTranscriptionEditing",
+    "OCRSegmentCategorizationEditing",
+  ];
 
   useEffect(() => {
-    let types = [...audioProjectTypes, ...translationProjectTypes, ...conversationProjectTypes, ...ocrProjectTypes, 'AllTypes']
+    let types = [
+      ...audioProjectTypes,
+      ...translationProjectTypes,
+      ...conversationProjectTypes,
+      ...ocrProjectTypes,
+      "AllTypes",
+    ];
     setProjectTypes(types);
   }, []);
 
@@ -108,12 +128,11 @@ export default function MetaAnalytics(props) {
 
   const handleSubmit = async () => {
     getMetaAnalyticsdata();
-  }
+  };
 
   useEffect(() => {
     if (metaAnalyticsData.length > 0) {
       setLoading(false);
-
     }
   }, [metaAnalyticsData]);
   const handleClose = () => {
@@ -121,23 +140,30 @@ export default function MetaAnalytics(props) {
   };
   const downloadCSV = () => {
     if (metaAnalyticsDataJson) {
-      const transformedData = Object.keys(metaAnalyticsDataJson).flatMap(projectType => {
-        return metaAnalyticsDataJson[projectType].map(data => ({
-          projectType,
-          language: data.language,
-          Ann_Cumulative_sentence_Count: data.annotation_cumulative_sentance_count,
-          Rew_Cumulative_sentence_Count: data.review_cumulative_sentance_count,
-          Ann_Cumulative_word_Count: data.ann_cumulative_word_count,
-          Rew_Cumulative_word_Count: data.rew_cumulative_word_count
-        }));
-      });
+      const transformedData = Object.keys(metaAnalyticsDataJson).flatMap(
+        (projectType) => {
+          return metaAnalyticsDataJson[projectType].map((data) => ({
+            projectType,
+            language: data.language,
+            Ann_Cumulative_sentence_Count:
+              data.annotation_cumulative_sentance_count,
+            Rew_Cumulative_sentence_Count:
+              data.review_cumulative_sentance_count,
+            Ann_Cumulative_word_Count: data.ann_cumulative_word_count,
+            Rew_Cumulative_word_Count: data.rew_cumulative_word_count,
+          }));
+        }
+      );
 
-      const fileName = 'meta_analytics';
+      const fileName = "meta_analytics";
       const exportType = exportFromJSON.types.csv;
       exportFromJSON({ data: transformedData, fileName, exportType });
     }
   };
-  const downloadPDF = () => {
+
+  const downloadPDF = async () => {
+    const { jsPDF } = await import("jspdf");
+
     const doc = new jsPDF();
     let yOffset = 10;
     const pageHeight = doc.internal.pageSize.height;
@@ -154,7 +180,7 @@ export default function MetaAnalytics(props) {
         yOffset += 10;
 
         doc.setFontSize(12);
-        dataArray.forEach((data, i) => {
+        dataArray.forEach((data) => {
           doc.text(`Language: ${data.languages || 'N/A'}`, 10, yOffset);
           doc.text(`Ann Cumulative word Count: ${data.annotation_cumulative_word_count || 'N/A'}`, 10, yOffset + 5);
           doc.text(`Rew Cumulative word Count: ${data.review_cumulative_word_count || 'N/A'}`, 10, yOffset + 10);
@@ -170,31 +196,34 @@ export default function MetaAnalytics(props) {
       }
     });
 
-    doc.save('meta_analytics.pdf');
+    doc.save("meta_analytics.pdf");
   };
+
   const downloadJSON = () => {
     if (metaAnalyticsDataJson) {
-      const transformedData = Object.keys(metaAnalyticsDataJson).flatMap(projectType => {
-        return metaAnalyticsDataJson[projectType].map(data => ({
-          projectType,
-          language: data.language,
-          Ann_Cumulative_sentence_Count: data.annotation_cumulative_sentance_count,
-          Rew_Cumulative_sentence_Count: data.review_cumulative_sentance_count,
-          Ann_Cumulative_word_Count: data.ann_cumulative_word_count,
-          Rew_Cumulative_word_Count: data.rew_cumulative_word_count
+      const transformedData = Object.keys(metaAnalyticsDataJson).flatMap(
+        (projectType) => {
+          return metaAnalyticsDataJson[projectType].map((data) => ({
+            projectType,
+            language: data.language,
+            Ann_Cumulative_sentence_Count:
+              data.annotation_cumulative_sentance_count,
+            Rew_Cumulative_sentence_Count:
+              data.review_cumulative_sentance_count,
+            Ann_Cumulative_word_Count: data.ann_cumulative_word_count,
+            Rew_Cumulative_word_Count: data.rew_cumulative_word_count,
+          }));
+        }
+      );
 
-        }));
-      });
-
-      const fileName = 'meta_analytics';
+      const fileName = "meta_analytics";
       const exportType = exportFromJSON.types.json;
       exportFromJSON({ data: transformedData, fileName, exportType });
     }
-  }; const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-
   };
-
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   return (
     <div>
@@ -212,16 +241,18 @@ export default function MetaAnalytics(props) {
         >
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
             <FormControl size="small">
-              <InputLabel id="demo-simple-select-label" sx={{ fontSize: "16px" }}>
-                Project Type {" "}
+              <InputLabel
+                id="demo-simple-select-label"
+                sx={{ fontSize: "16px" }}
+              >
+                Project Type{" "}
                 {
                   <LightTooltip
                     arrow
                     placement="top"
-                    title={translate("tooltip.ProjectType")}>
-                    <InfoIcon
-                      fontSize="medium"
-                    />
+                    title={translate("tooltip.ProjectType")}
+                  >
+                    <InfoIcon fontSize="medium" />
                   </LightTooltip>
                 }
               </InputLabel>
@@ -245,7 +276,11 @@ export default function MetaAnalytics(props) {
           </Grid>
         </Grid>
         <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <CustomButton
               label="Submit"
               sx={{ width: "35%", height: "40px" }}
@@ -276,37 +311,60 @@ export default function MetaAnalytics(props) {
               </StyledMenu>
             </Box>
           </Box>
-
         </Grid>
       </Grid>
       {loading && <Spinner />}
-      {metaAnalyticsData.length ?
-        metaAnalyticsData.map((analyticsData, _index) => {
-          if (analyticsData.length && audioProjectTypes.includes(analyticsData[0].projectType)) {
-            return (<Grid key={_index} style={{ marginTop: "15px" }}>
-              <AudioDurationChart analyticsData={analyticsData} />
-              <AudioDurationChart analyticsData={analyticsData} graphCategory='rawAudioDuration' />
-              <WordCountMetaAnalyticsChart analyticsData={analyticsData} graphCategory='audioWordCount' />
-            </Grid>)
-          }
-          if (analyticsData.length &&
-            (translationProjectTypes.includes(analyticsData[0].projectType) ||
-              conversationProjectTypes.includes(analyticsData[0].projectType)
-            )
-          ) {
-            return <Grid key={_index} style={{ marginTop: "15px" }}>
-              <WordCountMetaAnalyticsChart analyticsData={analyticsData} />
-              {analyticsData[0].projectType.includes("Conversation") && <SentanceCountMetaAnalyticsChart analyticsData={analyticsData} />}
-            </Grid>
-          }
-          if (analyticsData.length && ocrProjectTypes.includes(analyticsData[0].projectType)) {
-            return (<Grid key={_index} style={{ marginTop: "15px" }}>
-              <WordCountMetaAnalyticsChart analyticsData={analyticsData} graphCategory='ocrWordCount' />
-            </Grid>)
-          }
-        })
-        : ''
-      }
+      {metaAnalyticsData.length
+        ? metaAnalyticsData.map((analyticsData, _index) => {
+            if (
+              analyticsData.length &&
+              audioProjectTypes.includes(analyticsData[0].projectType)
+            ) {
+              return (
+                <Grid key={_index} style={{ marginTop: "15px" }}>
+                  <AudioDurationChart analyticsData={analyticsData} />
+                  <AudioDurationChart
+                    analyticsData={analyticsData}
+                    graphCategory="rawAudioDuration"
+                  />
+                  <WordCountMetaAnalyticsChart
+                    analyticsData={analyticsData}
+                    graphCategory="audioWordCount"
+                  />
+                </Grid>
+              );
+            }
+            if (
+              analyticsData.length &&
+              (translationProjectTypes.includes(analyticsData[0].projectType) ||
+                conversationProjectTypes.includes(analyticsData[0].projectType))
+            ) {
+              return (
+                <Grid key={_index} style={{ marginTop: "15px" }}>
+                  <WordCountMetaAnalyticsChart analyticsData={analyticsData} />
+                  {analyticsData[0].projectType.includes("Conversation") && (
+                    <SentanceCountMetaAnalyticsChart
+                      analyticsData={analyticsData}
+                    />
+                  )}
+                </Grid>
+              );
+            }
+            if (
+              analyticsData.length &&
+              ocrProjectTypes.includes(analyticsData[0].projectType)
+            ) {
+              return (
+                <Grid key={_index} style={{ marginTop: "15px" }}>
+                  <WordCountMetaAnalyticsChart
+                    analyticsData={analyticsData}
+                    graphCategory="ocrWordCount"
+                  />
+                </Grid>
+              );
+            }
+          })
+        : ""}
     </div>
-  )
+  );
 }

@@ -25,10 +25,8 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import colorsData from '../../../../../utils/Colors_JSON/Colors_JSON';
 import axios from "axios";
-import html2canvas from 'html2canvas';
 import { modifiedStaticRanges } from "../../../../../utils/Date_Range/getDateRangeFormat";
 import { MenuProps } from "../../../../../utils/utils";
-import { jsPDF } from "jspdf";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -762,41 +760,35 @@ function ProgressAnalytics() {
   var now = new Date()
   var currentYear = now.getFullYear()
 
-
-
   const ToolTipdata1 = TooltipData.map((el, i) => el.name);
 
-  const downloadReportClick = (type) => {
-    const srcElement = document.getElementById('chart-container');
-    html2canvas(srcElement)
-      .then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        if (type === "img") {
-          let anchorEle = document.createElement("a");
-          anchorEle.href = imgData;
-          anchorEle.download = "Image.png";
-          anchorEle.click();
-        } else if (type === "pdf") {
-          const pdf = new jsPDF();
-          pdf.addImage(imgData, 'JPEG', 10, 10, 180, 150);
-          // pdf.output('dataurlnewwindow');
-          pdf.save("download.pdf");
-        }
-      })
-  }
+  const downloadReportClick = async (type) => {
+    const srcElement = document.getElementById("chart-container");
+  
+    if (!srcElement) return;
+  
+    const html2canvas = (await import("html2canvas")).default;
+  
+    const canvas = await html2canvas(srcElement);
+    const imgData = canvas.toDataURL("image/png");
+  
+    if (type === "img") {
+      const anchorEle = document.createElement("a");
+      anchorEle.href = imgData;
+      anchorEle.download = "Image.png";
+      anchorEle.click();
+    } else if (type === "pdf") {
+      const { jsPDF } = await import("jspdf");
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, "JPEG", 10, 10, 180, 150);
+      pdf.save("download.pdf");
+    }
+  };
+  
 
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
-      {/* <Card
-        sx={{
-          width: "100%",
-          minHeight: 500,
-          padding: 3
-        }}
-      > */}
-
-        {/* <Box > */}
           <Grid
             container
             direction="row"
