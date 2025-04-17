@@ -58,12 +58,11 @@
     "wfplayer": "^2.2.6"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "webpack":"webpack",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
+    "predeploy": "react-app-rewired build",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
