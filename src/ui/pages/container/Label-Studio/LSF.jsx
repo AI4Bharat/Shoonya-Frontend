@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "./editor.css";
 import "quill/dist/quill.snow.css";
-import LabelStudio1 from "./lsf-build/static/js/main";
-import LabelStudio2 from "@heartexlabs/label-studio";
 import {
   Tooltip,
   Button,
@@ -53,6 +51,8 @@ import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+const LabelStudio1 = window.LabelStudio1;
+const LabelStudio2 = window.LabelStudio2;
 
 const filterAnnotations = (
   annotations,

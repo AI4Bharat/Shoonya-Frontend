@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill, { Quill } from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.bubble.css';
-import LabelStudio1 from "./lsf-build/static/js/main";
-import LabelStudio2 from "@heartexlabs/label-studio";
 import {
   Tooltip,
   Button,
@@ -55,6 +53,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+const LabelStudio1 = window.LabelStudio1;
+const LabelStudio2 = window.LabelStudio2;
 
 const StyledMenu = styled((props) => (
   <Menu
