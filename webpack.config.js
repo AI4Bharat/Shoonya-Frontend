@@ -17,35 +17,51 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     clean:true
   },
+  resolve: {
+    extensions: ['.js', '.jsx']
+   },
+
   plugins: [
-    new MiniCssExtractPlugin({ filename: "[name].[contentHash].css" }),
+    new MiniCssExtractPlugin({       filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css'
+ }),
 
     new HtmlWebpackPlugin({
       template: './public/index.html',
 
     }),
     new CompressionPlugin({
-      algorithm: "brotliCompress", // Use Brotli for better compression
-      threshold: 1024, // Compress files larger than 10KB
+      filename: '[path][base].gz',
+      algorithm: 'gzip',
+      test: /\.(js|css|html|svg|json)$/,
+      threshold: 1024, 
       minRatio: 0.8,
-      test: /\.(js|css|html|svg)$/,
+      deleteOriginalAssets: false
     }),
+    new CompressionPlugin({
+      filename: '[path][base].br',
+      algorithm: 'brotliCompress',
+      test: /\.(js|css|html|svg|json)$/,
+      compressionOptions: { level: 11 },
+      threshold: 1024,
+      minRatio: 0.8,
+      deleteOriginalAssets: false
+    })
+
 
   ],
   performance: {
-    hints: "warning",
-    assetFilter: function (assetFilename) {
-      return assetFilename.endsWith(".js.gz");
-    },
-  },  
-  devServer: {
-    static: './dist',
-   hot: true,
-   compress: true,
+    maxAssetSize: 244 * 1024, // 244KB
+    maxEntrypointSize: 244 * 1024,
+    hints: 'warning',
+    assetFilter: function(assetFilename) {
+      return assetFilename.endsWith('.js.gz') || assetFilename.endsWith('.css.gz');
+    }
   },
 
   module: {
     rules: [
+    
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
@@ -59,6 +75,7 @@ module.exports = {
         test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
         type: 'asset/resource',
       },
+      
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
@@ -73,7 +90,8 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
+            presets: ["@babel/preset-env"
+      , "@babel/preset-react"],
             plugins: ["@babel/plugin-transform-runtime"],
           },
         },
@@ -92,6 +110,8 @@ module.exports = {
                   drop_debugger: true, // Removes debugger statements
                   dead_code: true,     // Removes unused code
                   passes: 3,           // Apply multiple optimizations
+                   pure_funcs: ['console.log', 'console.info'], // Delete console
+
                   },
                 output: {
                   comments: false,
@@ -104,6 +124,8 @@ module.exports = {
     moduleIds: 'deterministic',
     runtimeChunk: 'single',
     splitChunks: {
+      maxSize: 244 * 1024, // 244KB target
+      minSize: 30 * 1024, // 30KB minimum
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
