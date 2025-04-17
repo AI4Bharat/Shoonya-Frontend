@@ -97,7 +97,16 @@ const addExtraRules = () => (config) => {
   return config;
 };
 
+const addExternals = () => (config) => {
+  config.externals = {
+    ...(config.externals || {}),
+    "@heartexlabs/label-studio": "LabelStudio",
+  };
+  return config;
+};
+
 module.exports = override(
   addOptimizations,
-  addExtraRules()
+  addExtraRules(),
+  addExternals() 
 );
