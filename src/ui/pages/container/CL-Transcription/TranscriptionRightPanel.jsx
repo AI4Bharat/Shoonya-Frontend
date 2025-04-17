@@ -1087,7 +1087,7 @@ const TranscriptionRightPanel = ({
                           onKeyDown={(event) => {
                             console.log(event,"log",document.activeElement);
 
-                            if ( event.shiftKey && event.key == "ArrowLeft") {
+                            if ( event.shiftKey && event.key == "<") {
                               const textArea = textRefs.current[index];
                               console.log("helo");
 
@@ -1100,7 +1100,7 @@ const TranscriptionRightPanel = ({
                                 event.preventDefault(); 
                               }
                             }
-                            else if (event.shiftKey && event.key == "ArrowRight") {
+                            else if (event.shiftKey && event.key == ">") {
                               const textArea = textRefs.current[index];
                               if (textArea) {
                                 const start = textArea.selectionStart;
@@ -1164,7 +1164,7 @@ const TranscriptionRightPanel = ({
                                   onKeyDown={(event) => {
                                     console.log(event,"log",document.activeElement);
         
-                                    if ( event.shiftKey && event.key == "ArrowLeft") {
+                                    if ( event.shiftKey && event.key == "<") {
                                       const textArea = textRefs.current[index];
                                       console.log("helo");
         
@@ -1177,7 +1177,7 @@ const TranscriptionRightPanel = ({
                                         event.preventDefault(); 
                                       }
                                     }
-                                    else if (event.shiftKey && event.key == "ArrowRight") {
+                                    else if (event.shiftKey && event.key == ">") {
                                       const textArea = textRefs.current[index];
                                       if (textArea) {
                                         const start = textArea.selectionStart;
@@ -1252,7 +1252,7 @@ const TranscriptionRightPanel = ({
                             onKeyDown={(event) => {
                               console.log(event,"log",document.activeElement);
   
-                              if ( event.shiftKey && event.key == "ArrowLeft") {
+                              if ( event.shiftKey && event.key == "<") {
                                 const textArea = textRefs.current[index];
                                 console.log("helo");
   
@@ -1265,7 +1265,7 @@ const TranscriptionRightPanel = ({
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.shiftKey && event.key == "ArrowRight") {
+                              else if (event.shiftKey && event.key == ">") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1338,7 +1338,7 @@ const TranscriptionRightPanel = ({
                             onKeyDown={(event) => {
                               console.log(event,"log",document.activeElement);
   
-                              if ( event.shiftKey && event.key == "ArrowLeft") {
+                              if ( event.shiftKey && event.key == "<") {
                                 const textArea = textRefs.current[index];
                                 console.log("helo");
   
@@ -1351,7 +1351,7 @@ const TranscriptionRightPanel = ({
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.shiftKey && event.key == "ArrowRight") {
+                              else if (event.shiftKey && event.key == ">") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1420,7 +1420,7 @@ const TranscriptionRightPanel = ({
                                     onKeyDown={(event) => {
                                       console.log(event,"log",document.activeElement);
           
-                                      if ( event.shiftKey && event.key == "ArrowLeft") {
+                                      if ( event.shiftKey && event.key == "<") {
                                         const textArea = textRefs.current[index];
                                         console.log("helo");
           
@@ -1433,7 +1433,7 @@ const TranscriptionRightPanel = ({
                                           event.preventDefault(); 
                                         }
                                       }
-                                      else if (event.shiftKey && event.key == "ArrowRight") {
+                                      else if (event.shiftKey && event.key == ">") {
                                         const textArea = textRefs.current[index];
                                         if (textArea) {
                                           const start = textArea.selectionStart;
@@ -1503,7 +1503,7 @@ const TranscriptionRightPanel = ({
                               onKeyDown={(event) => {
                                 console.log(event,"log",document.activeElement);
     
-                                if ( event.shiftKey && event.key == "ArrowLeft") {
+                                if ( event.shiftKey && event.key == "<") {
                                   const textArea = textRefs.current[index];
                                   console.log("helo");
     
@@ -1516,7 +1516,7 @@ const TranscriptionRightPanel = ({
                                     event.preventDefault(); 
                                   }
                                 }
-                                else if (event.shiftKey && event.key == "ArrowRight") {
+                                else if (event.shiftKey && event.key == ">") {
                                   const textArea = textRefs.current[index];
                                   if (textArea) {
                                     const start = textArea.selectionStart;
