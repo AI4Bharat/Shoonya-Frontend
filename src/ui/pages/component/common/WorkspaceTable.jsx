@@ -18,7 +18,6 @@ import MenuItem from "@mui/material/MenuItem";
 
 
 const WorkspaceTable = (props) => {
-    const classes = DatasetStyle();
     const dispatch = useDispatch();
     const { showManager, showCreatedBy } = props;
     const workspaceData = useSelector(state => state.GetWorkspace.data);

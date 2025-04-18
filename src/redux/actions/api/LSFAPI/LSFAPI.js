@@ -186,7 +186,6 @@ const patchSuperChecker = async (
   languages,
   ocr_domain
 ) => {
-  console.log(superchecknotes,"superchecknotes")
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),

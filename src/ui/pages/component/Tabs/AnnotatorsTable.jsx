@@ -76,10 +76,6 @@ const AnnotatorsTable = (props) => {
   useEffect(() => {
     getWorkspaceAnnotatorsData();
   }, []);
-  // const orgId = workspaceAnnotators &&  workspaceAnnotators
-  console.log("workspaceAnnotators", workspaceAnnotators);
-
-  // getWorkspacesProjectData
 
   const columns = [
     {
@@ -136,7 +132,6 @@ const AnnotatorsTable = (props) => {
     workspaceAnnotators && workspaceAnnotators.length > 0
       ? workspaceAnnotators.map((el, i) => {
           const userRole = el.role && UserMappedByRole(el.role).element;
-          console.log("userRole", userRole);
           return [
             el.username,
             el.email,

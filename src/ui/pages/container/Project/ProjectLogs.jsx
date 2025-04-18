@@ -23,7 +23,6 @@ import Spinner from "../../component/common/Spinner";
 
 const ProjectLogs = () => {
   const { id } = useParams();
-  console.log(useParams(), "useParams");
   const [taskName, setTaskName] = useState(
     "projects.tasks.export_project_in_place"
   );

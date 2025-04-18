@@ -1,4 +1,7 @@
-import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Typography from "@mui/material/Typography";
 import React from 'react'
 import { useState } from 'react'
 import ProgressAnalytics from './ProgressAnalytics';

@@ -1,16 +1,20 @@
 // AnnotateTask
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Box, Button, Card, Divider, Grid, TextField, Tooltip, Typography } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import CustomButton from "../../component/common/Button";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { translate } from "../../../../config/localisation";
 import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails";
 import PostAnnotationAPI from "../../../../redux/actions/api/Annotation/PostAnnotation";
-//import DeleteAnnotationAPI from "../../../../redux/actions/api/Annotation/DeleteAnnotation";
-//import GetTaskPredictionAPI from "../../../../redux/actions/api/Tasks/GetTaskPrediction";
 import GetNextTaskAPI from "../../../../redux/actions/api/Tasks/GetNextTask";
 import UpdateTaskAPI from "../../../../redux/actions/api/Tasks/UpdateTask";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';

@@ -9,9 +9,8 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
 import React, { useEffect, useState } from "react";
-import Header from "../../component/common/Header";
 import themeDefault from "../../../theme/theme";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import Spinner from "../../component/common/Spinner";
@@ -116,26 +115,9 @@ const CollectionProject = (props) => {
     );
 };
 
-  console.log(loggedInUserData,"loggedInUserData")
   return (
     <ThemeProvider theme={themeDefault}>
-      {/* <Header /> */}
-      {/* <Grid
-                  container
-                  direction='row'
-                  justifyContent='left'
-                  alignItems='left'
-  
-  
-              >
-                  <Grid
-                      item
-                      xs={5}
-                      sm={5}
-                      md={5}
-                      lg={5}
-                      xl={5}
-                  > */}
+
 
       <Grid container direction="row"  >
         {loading && <Spinner /> }

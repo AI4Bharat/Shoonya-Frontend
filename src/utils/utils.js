@@ -50,7 +50,6 @@ export const isPlaying = (player) => {
 export const onSubtitleChange = (text, index) => {
   const subtitles = store.getState().commonReducer.subtitles;
   const copySub = [...subtitles];
-  console.log(copySub,"texttext")
 
   copySub.forEach((element, i) => {
     if (index === i) {

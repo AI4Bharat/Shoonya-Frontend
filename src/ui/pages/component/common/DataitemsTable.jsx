@@ -226,7 +226,6 @@ const DataitemsTable = () => {
       localStorage.setItem("DataitemsList", JSON.stringify(columns));
       localStorage.setItem("Dataitem", JSON.stringify(dataitemsList));
     } catch {
-      console.log("Local storage set item quota exceeded");
     }
   }, [columns, dataitemsList]);
 
