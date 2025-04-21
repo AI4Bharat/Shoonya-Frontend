@@ -432,7 +432,6 @@ export const isPlaying = (player) => {
 
 export const getSelectionStart = (index) => {
   const subtitles = store.getState().commonReducer.subtitles;
-  console.log(subtitles)
   return subtitles[index].text.length;
 };
 

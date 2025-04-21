@@ -2,18 +2,18 @@ import React from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import CustomButton from "../../../component/common/Button";
-// import { Grid ,ThemeProvider} from "@material-ui/core";
-import { Button, Grid, ThemeProvider, Select, Box, MenuItem,Radio, InputLabel, FormControl, Card, Typography, Menu, styled } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Select from "@mui/material/Select";
+import Box from "@mui/material/Box";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Menu from "@mui/material/Menu";
+import { styled } from "@mui/material/styles";
 import MetaAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/MetaAnalytics"
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import AudioDurationChart from './AudioDurationMetaAnalyticsChart';
-// import ContextualTranslationEditing from "./ContextualTranslationEditing";
-// import SemanticTextualSimilarity_Scale5 from "./SemanticTextualSimilarity_Scale5";
-import SingleSpeakerAudioTranscriptionEditing from "./SingleSpeakerAudioTranscriptionEditing";
-// import AudioTranscription from "./AudioTranscription";
-// import AudioSegmentation from "./AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
-import themeDefault from "../../../../theme/theme";
 import LightTooltip from '../../../component/common/Tooltip';
 import { translate } from "../../../../../config/localisation";
 import InfoIcon from '@mui/icons-material/Info';
@@ -22,7 +22,6 @@ import WordCountMetaAnalyticsChart from './WordCountMetaAnalyticsChart';
 import SentanceCountMetaAnalyticsChart from './SentanceCountMetaAnalyticsChart';
 import exportFromJSON from 'export-from-json';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { KeyboardArrowDown } from "@material-ui/icons";
 const StyledMenu = styled((props) => (
   <Menu

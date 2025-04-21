@@ -2,7 +2,13 @@ import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
 import LabelStudio1 from "./lsf-build/static/js/main";
 import LabelStudio2 from "@heartexlabs/label-studio";
-import { Tooltip, Button, Alert, Card, TextField, Box, Grid } from "@mui/material";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Alert from "@mui/material/Alert";
+import Card from "@mui/material/Card";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -26,7 +32,6 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
-import { snakeToTitleCase } from '../../../../utils/utils';
 import keymap from './keymap';
 import styles from './lsf.module.css'
 import "./lsf.css"
@@ -71,8 +76,6 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
 
-  console.log("projectId, taskId", projectId, taskId);
-  // debugger
 
 useEffect(() => {
     if(filterdataitemsList.results !== undefined){
@@ -238,7 +241,6 @@ useEffect(() => {
 
         onLabelStudioLoad: function (ls) {
           annotation_status.current = ProjectDetails.project_stage == 2 ? "labeled": "accepted";
-          console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
           if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
@@ -301,7 +303,6 @@ useEffect(() => {
         onSkipTask: function () {
         //   message.warning('Notes will not be saved for skipped tasks!');
           let annotation = annotations.find((annotation) => !annotation.parentAnnotation);
-          console.log("onSkip", annotation)
           if (annotation) {
             showLoader();
             patchAnnotation(
@@ -420,8 +421,6 @@ useEffect(() => {
         loaded.current = taskId;
         getProjectsandTasks(projectId, taskId).then(
           ([labelConfig, taskData, annotations, predictions]) => {
-            // both have loaded!
-            console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
             if (labelConfig.project_type.includes("OCRSegmentCategorization")){
               tempLabelConfig = labelConfigJS;
@@ -458,9 +457,7 @@ useEffect(() => {
   const onNextAnnotation = async () => {
     showLoader();
     getNextProject(projectId, taskId,"Alltask").then((res) => {
-        console.log(taskId,"taskId")
       hideLoader();
-      // window.location.href = `/projects/${projectId}/task/${res.id}`;
      tasksComplete(res?.id || null);
     });
   }

@@ -8,7 +8,6 @@
  
  export default class GetTasksByProjectIdAPI extends API {
    constructor(projectId, pageNo, countPerPage, selectedFilters, taskType, pullvalue,rejected,pull, timeout = 2000) {
-     // console.log(pullvalue,"pullvaluepullvalue")
      super("GET", timeout, false);
      const datavalue = []
      this.type = constants.GET_TASK_LIST;
@@ -32,7 +31,6 @@
              
           }
       }
-      console.log(queryString);
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks+queryString}`;
    }
  }

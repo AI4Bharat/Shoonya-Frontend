@@ -1,22 +1,20 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.bubble.css';
 import LabelStudio1 from "./lsf-build/static/js/main";
 import LabelStudio2 from "@heartexlabs/label-studio";
-import {
-  Tooltip,
-  Button,
-  Box,
-  Card,
-  TextField,
-  Grid,
-  Alert,
-  Popover,
-  Autocomplete,
-  Typography,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Alert from "@mui/material/Alert";
+import Card from "@mui/material/Card";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
+import Autocomplete from "@mui/material/Autocomplete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -29,7 +27,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 import InfoIcon from "@mui/icons-material/Info";
-import getCaretCoordinates from "textarea-caret";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -52,7 +49,6 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
-import { translate } from "../../../../config/localisation";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 
@@ -272,15 +268,6 @@ const LabelStudioWrapper = ({
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
 
-  //console.log("projectId, taskId", projectId, taskId);
-  // debugger
-
-  /* useEffect(() => {
-    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
-      autoSaveReview();
-      navigate(`/projects/${projectId}/ReviewAudioTranscriptionLandingPage/${taskId}`);
-    }
-  }, [userData]); */
 
 useEffect(() => {
   if(filterdataitemsList.results !== undefined){
@@ -461,7 +448,6 @@ useEffect(() => {
           // } else {
           // let hasReview = false;
           // for (let i = 0; i < annotations.length; i++) {
-          //   console.log(annotations[i], "test");
           //   if (annotations[i].parent_annotation) {
           //     ls.annotationStore.selectAnnotation(annotations[i].result[0].id);
           //     // hasReview = true;
@@ -500,7 +486,6 @@ useEffect(() => {
         },
 
         // onUpdateAnnotation: function (ls, annotation) {
-        //   console.log(  annotations," annotation.serializeAnnotation()")
         //   if (taskData.task_status !== "freezed") {
         //     for (let i = 0; i < annotations.length; i++) {
         //       if (
@@ -706,7 +691,6 @@ useEffect(() => {
         annotationNotesRef.current.value = normalAnnotation?.annotation_notes ?? "";
         superCheckerNotesRef.current.value = superCheckerAnnotation?.supercheck_notes ?? "";
         reviewNotesRef.current.value =  userAnnotation?.review_notes ?? "";
-        console.log(annotationNotesRef,typeof(annotationNotesRef.current.value));
         try {
           const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
           annotationNotesRef.current.getEditor().setContents(newDelta2);
@@ -894,13 +878,7 @@ useEffect(() => {
       loaded.current = taskId;
       getProjectsandTasks(projectId, taskId).then(
         ([labelConfig, taskData, annotations, predictions]) => {
-          // both have loaded!
-          // console.log("[labelConfig, taskData, annotations, predictions]", [
-          //   labelConfig,
-          //   taskData,
-          //   annotations,
-          //   predictions,
-          // ]);
+
           setNotes(taskData, annotations);
           let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
           if (labelConfig.project_type.includes("OCRSegmentCategorization")){
@@ -938,7 +916,6 @@ useEffect(() => {
     //     targetElement.oninput = function (e) {
     //       let textAreaInnerText = e.target.value;
 
-    //       // console.log("e ---------------------- ", e.currentTarget);
 
     //       let lastInputChar =
     //         textAreaInnerText[targetElement.selectionStart - 1];
@@ -1612,7 +1589,6 @@ export default function LSF() {
   };
 
 
-console.log(reviewtext,annotationtext);
   
   const resetNotes = () => {
     setShowNotes(false);

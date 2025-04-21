@@ -17,7 +17,6 @@ import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import {  useSelector } from "react-redux";
 import { Stack } from "@mui/material";
-// import { translate } from "../../../../assets/localisation";
 
 const FilterList = (props) => {
   const classes = DatasetStyle();
@@ -25,51 +24,16 @@ const FilterList = (props) => {
   const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status ? currentFilters?.annotation_status : currentFilters.review_status);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
-  // const [selectedType, setSelectedType] = useState(selectedFilter.Annotators);
-  // const [selectedStatus, setSelectedStatus] = useState(selectedFilter.status);
-  // const handleDatasetChange = (e) => {
-  //   if (e.target.checked) setSelectedType([...selectedType, e.target.name]);
-  //   else {
-  //     const selected = Object.assign([], selectedType);
-  //     const index = selected.indexOf(e.target.name);
-
-  //     if (index > -1) {
-  //       selected.splice(index, 1);
-  //       setSelectedType(selected);
-  //     }
-  //   }
-  // };
-
-  console.log(filterStatusData, selectedStatus, currentFilters);
   const pulledstatus = currentFilters?.annotation_status ? ["Pulled By reviewer", "Not Pulled By reviewer"]
     : currentFilters?.review_status ? ["Pulled By SuperChecker", "Not Pulled By SuperChecker"] : null;
   const handleStatusChange = (e) => {
     let statusvalue = !!currentFilters?.annotation_status ? "annotation_status" : "review_status"
-    // let pullvalue = (pull == 'Pulled By reviewer' || pull == 'Pulled By SuperChecker') ? false :
-    //   (pull == 'Not Pulled By reviewer' || pull == 'Not Pulled By SuperChecker') ? true :
-    //     ''
-    console.log(pullvalue);
     updateFilters({
       ...currentFilters,
       [statusvalue]: selectedStatus,
-      // ["editable"]: pullvalue
     })
     props.handleClose();
   };
-  // const handleClearAll = () => {
-  //   setSelectedStatus([]);
-  //   setSelectedType([]);
-  //   clearAll({ datasetType: [], status: [] });
-  // };
-  // const isChecked = (type, param) => {
-  //   const index =
-  //     param === "status"
-  //       ? selectedStatus.indexOf(type)
-  //       : selectedType.indexOf(type);
-  //   if (index > -1) return true;
-  //   return false;
-  // };
-
   return (
     <div>
       <Popover

@@ -7,7 +7,6 @@ import TextField from "@mui/material/TextField";
 import { translate } from "../../../../config/localisation";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import DatasetStyle from "../../../styles/Dataset";
-// import { translate } from "../../../../assets/localisation";
 
 const SearchPopup = (props) => {
     const classes = DatasetStyle();

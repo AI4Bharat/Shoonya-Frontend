@@ -10,18 +10,11 @@ import Box from "@mui/material/Box";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
-// import { translate } from "../../../../assets/localisation";
 
 const SuperCheckerFilter = (props) => {
   const classes = DatasetStyle();
   const { filterStatusData, currentFilters, updateFilters } = props;
   const [selectedStatus, setSelectedStatus] = useState(currentFilters?.supercheck_status);
-  const [selectAnnotator, setSelectAnnotator] = useState("All");
-console.log(currentFilters,"currentFilters")
-
-  
-
-
   const handleStatusChange = (e) => {
     let statusvalue =  !!currentFilters?.supercheck_status? "supercheck_status":""
     updateFilters({

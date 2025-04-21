@@ -10,14 +10,12 @@ import Box from "@mui/material/Box";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
-// import { translate } from "../../../../assets/localisation";
 
 const AllTasksFilterList = (props) => {
   const classes = DatasetStyle();        
   const { filterStatusData, currentFilters, updateFilters,onchange} = props;
   const [selectedStatus, setSelectedStatus] = useState(currentFilters.task_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
-console.log(currentFilters,"selectedStatus")
 
   const handleStatusChange = (e) => {
     onchange()
