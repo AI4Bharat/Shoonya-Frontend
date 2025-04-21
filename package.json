@@ -16,6 +16,7 @@
     "@mui/styles": "^5.8.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.6",
     "@react-hook/media-query": "^1.1.1",
+    "@testing-library/jest-dom": "^6.6.3",
     "axios": "^0.27.2",
     "chart.js": "^3.9.1",
     "date-fns": "^2.28.0",
@@ -52,12 +53,11 @@
     "wfplayer": "^2.2.6"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "webpack": "webpack",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
+    "predeploy": "react-app-rewired build",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
@@ -92,6 +92,7 @@
     "react-app-rewired": "^2.2.1",
     "terser-webpack-plugin": "^5.3.14",
     "webpack": "^5.98.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1"
   },
   "alias": {
