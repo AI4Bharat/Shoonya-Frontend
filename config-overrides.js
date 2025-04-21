@@ -29,8 +29,6 @@ const addOptimizations = (config) => {
     config.plugins.push(
       new MiniCssExtractPlugin({
         filename: "css/[name].[contenthash].css",
-        chunkFilename: "css/[id].[contenthash].css",
-        experimentalUseImportModule: true,
       })
     );
 
