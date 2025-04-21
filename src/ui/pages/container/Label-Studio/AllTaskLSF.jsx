@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
-import LabelStudio1 from "./lsf-build/static/js/main";
-import LabelStudio2 from "@heartexlabs/label-studio";
+
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Alert from "@mui/material/Alert";
@@ -40,6 +39,8 @@ import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 //used just in postAnnotation to support draft status update.
+const LabelStudio1 = window.LabelStudio1;
+const LabelStudio2 = window.LabelStudio2;
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render

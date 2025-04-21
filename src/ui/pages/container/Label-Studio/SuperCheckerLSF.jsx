@@ -1,10 +1,7 @@
 import PropTypes from "prop-types";
-import React, { useState, useEffect, useRef } from "react";
-import ReactQuill from 'react-quill';
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import "./editor.css"
 import 'quill/dist/quill.snow.css';
-import LabelStudio1 from "./lsf-build/static/js/main";
-import LabelStudio2 from "@heartexlabs/label-studio";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -29,7 +26,7 @@ import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/C
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
+import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import keymap from "./keymap";
 import {
@@ -37,7 +34,7 @@ import {
   getNextProject,
   patchSuperChecker,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
-import {JsonTable} from 'react-json-to-html';
+import { JsonTable } from "react-json-to-html";
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 
@@ -46,6 +43,11 @@ import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+
+const LabelStudio1 = window.LabelStudio1;
+const LabelStudio2 = window.LabelStudio2;
+// Lazy load ReactQuill
+const ReactQuillLazy = React.lazy(() => import("react-quill"));
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -99,12 +101,14 @@ const filterAnnotations = (annotations, user, taskData) => {
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unvalidated") {
-      filteredAnnotations = userAnnotation.result.length > 0 ?
-        [userAnnotation] : annotations.filter(
-          (annotation) =>
-            annotation.id === userAnnotation.parent_annotation &&
-            annotation.annotation_type === 2
-        );
+      filteredAnnotations =
+        userAnnotation.result.length > 0
+          ? [userAnnotation]
+          : annotations.filter(
+              (annotation) =>
+                annotation.id === userAnnotation.parent_annotation &&
+                annotation.annotation_type === 2
+            );
     } else if (
       ["validated", "validated_with_changes", "draft"].includes(
         userAnnotation.annotation_status
@@ -188,46 +192,62 @@ const LabelStudioWrapper = ({
   }, [taskData]);
 
 
-useEffect(() => {
-    if(filterdataitemsList.results !== undefined){
+  useEffect(() => {
+    if (filterdataitemsList.results !== undefined) {
       if ("metadata_json" in filterdataitemsList.results[0]) {
-        if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
-        setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
-      }}
+        if ("image_url" in filterdataitemsList.results[0].metadata_json[0]) {
+          setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
+        }
+      }
     }
   }, [filterdataitemsList.results]);
-  
-useEffect(() => {
-  getProjectsandTasks(projectId, taskId).then(
-    ([labelConfig, taskData, annotations, predictions]) => {
-    if(labelConfig?.project_type?.includes("OCRTranscriptionEditing")){
-      const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
-      dispatch(APITransport(inputData));
-    }
-    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
-    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
-    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
-    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
-    localStorage.setItem(
-      "labelStudio:settings",
-      JSON.stringify({
-        bottomSidePanel: !sidePanel,
-        continuousLabeling: continousLabelingOnly,
-        enableAutoSave: false,
-        enableHotkeys: true,
-        enableLabelTooltips: true,
-        enablePanelHotkeys: true,
-        enableTooltips: false,
-        fullscreen: false,
-        imageFullSize: false,
-        selectAfterCreate: selectAfterCreateOnly,
-        showAnnotationsPanel: true,
-        showLabels: showLabelsOnly,
-        showLineNumbers: false,
-        showPredictionsPanel: true,
-        sidePanelMode: "SIDEPANEL_MODE_REGIONS",
-      })
-    );});},[]);
+
+  useEffect(() => {
+    getProjectsandTasks(projectId, taskId).then(
+      ([labelConfig, taskData, annotations, predictions]) => {
+        if (labelConfig?.project_type?.includes("OCRTranscriptionEditing")) {
+          const inputData = new DatasetSearchPopupAPI({
+            instance_ids: labelConfig.datasets[0].instance_id,
+            dataset_type: "OCRDocument",
+            search_keys: { id: taskData.input_data },
+          });
+          dispatch(APITransport(inputData));
+        }
+        let sidePanel =
+          labelConfig?.project_type?.includes("OCRSegmentCategorization") ||
+          labelConfig?.project_type?.includes("OCRTranscriptionEditing");
+        let showLabelsOnly = labelConfig?.project_type?.includes(
+          "OCRSegmentCategorization"
+        );
+        let selectAfterCreateOnly = labelConfig?.project_type?.includes(
+          "OCRSegmentCategorization"
+        );
+        let continousLabelingOnly = labelConfig?.project_type?.includes(
+          "OCRSegmentCategorization"
+        );
+        localStorage.setItem(
+          "labelStudio:settings",
+          JSON.stringify({
+            bottomSidePanel: !sidePanel,
+            continuousLabeling: continousLabelingOnly,
+            enableAutoSave: false,
+            enableHotkeys: true,
+            enableLabelTooltips: true,
+            enablePanelHotkeys: true,
+            enableTooltips: false,
+            fullscreen: false,
+            imageFullSize: false,
+            selectAfterCreate: selectAfterCreateOnly,
+            showAnnotationsPanel: true,
+            showLabels: showLabelsOnly,
+            showLineNumbers: false,
+            showPredictionsPanel: true,
+            sidePanelMode: "SIDEPANEL_MODE_REGIONS",
+          })
+        );
+      }
+    );
+  }, []);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -265,9 +285,12 @@ useEffect(() => {
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    const [filteredAnnotations, disableSkip, disableAutoSave] = filterAnnotations(annotations, userData);
+    const [filteredAnnotations, disableSkip, disableAutoSave] =
+      filterAnnotations(annotations, userData);
     if (disableSkip || disableAutoSave) setAutoSave(false);
-    LabelStudio.current = projectType?.includes("OCR") ? LabelStudio1 : LabelStudio2;
+    LabelStudio.current = projectType?.includes("OCR")
+      ? LabelStudio1
+      : LabelStudio2;
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -280,7 +303,8 @@ useEffect(() => {
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
+        projectType === "AudioTranscriptionEditing" ||
+        projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -306,7 +330,8 @@ useEffect(() => {
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
+        projectType === "AudioTranscriptionEditing" ||
+        projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -385,7 +410,9 @@ useEffect(() => {
               load_time.current,
               review.lead_time,
               "skipped",
-              JSON.stringify(superCheckerNotesRef.current.getEditor().getContents())
+              JSON.stringify(
+                superCheckerNotesRef.current.getEditor().getContents()
+              )
             ).then(() => {
               getNextProject(projectId, taskData.id, "supercheck").then(
                 (res) => {
@@ -401,44 +428,43 @@ useEffect(() => {
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
           let countLables = 0;
-          if (projectType.includes("OCRTranscriptionEditing")){
+          if (projectType.includes("OCRTranscriptionEditing")) {
             addLabelsToBboxes(temp);
-          }   
+          }
           temp.map((curr) => {
-            if(curr.type !== "relation"){
+            if (curr.type !== "relation") {
               ids.add(curr.id);
             }
-            if(curr.type === "labels"){
+            if (curr.type === "labels") {
               countLables++;
             }
           });
-          if (projectType.includes("OCR") && ids.size>countLables) {
+          if (projectType.includes("OCR") && ids.size > countLables) {
             setSnackbarInfo({
               open: true,
               message: "Please select labels for all boxes",
               variant: "error",
             });
-          }
-          else {
+          } else {
             if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
-              const counter = temp.reduce((acc, curr) => {
-                if (curr.from_name === "labels")
-                  acc.labels++;
-                else if (curr.from_name === "transcribed_json") {
-                  if(curr.type !== "relation"){
-                    if (curr.value.text[0] === "")
-                    acc.empty++;
-                  acc.textareas++;
-                }
-              }
-                return acc;
-              },
+              const counter = temp.reduce(
+                (acc, curr) => {
+                  if (curr.from_name === "labels") acc.labels++;
+                  else if (curr.from_name === "transcribed_json") {
+                    if (curr.type !== "relation") {
+                      if (curr.value.text[0] === "") acc.empty++;
+                      acc.textareas++;
+                    }
+                  }
+                  return acc;
+                },
                 { labels: 0, textareas: 0, empty: 0 }
               );
               if (counter.labels !== counter.textareas || counter.empty) {
                 setSnackbarInfo({
                   open: true,
-                  message: "Please fill the annotations for every segment/region",
+                  message:
+                    "Please fill the annotations for every segment/region",
                   variant: "warning",
                 });
                 return;
@@ -450,9 +476,9 @@ useEffect(() => {
               let temp = annotation.serializeAnnotation();
 
               for (let i = 0; i < temp.length; i++) {
-                if(temp[i].type === "relation"){
+                if (temp[i].type === "relation") {
                   continue;
-                }else if (temp[i].value.text) {
+                } else if (temp[i].value.text) {
                   temp[i].value.text = [temp[i].value.text[0]];
                 }
               }
@@ -469,7 +495,9 @@ useEffect(() => {
                 review_status.current,
                 temp,
                 superChecker.parent_annotation,
-                JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+                JSON.stringify(
+                  superCheckerNotesRef.current.getEditor().getContents()
+                ),
                 false,
                 selectedLanguages,
                 ocrDomain
@@ -492,7 +520,8 @@ useEffect(() => {
                 message: "Task is frozen",
                 variant: "error",
               });
-        }},
+          }
+        },
       });
     }
   }
@@ -509,31 +538,36 @@ useEffect(() => {
           (annotation) => annotation.id === userAnnotation.parent_annotation
         );
         reviewNotesRef.current.value = reviewAnnotation?.review_notes ?? "";
-        superCheckerNotesRef.current.value = userAnnotation?.supercheck_notes ?? "";
-        
-        
+        superCheckerNotesRef.current.value =
+          userAnnotation?.supercheck_notes ?? "";
+
         try {
-          const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+          const newDelta1 =
+            reviewNotesRef.current.value != ""
+              ? JSON.parse(reviewNotesRef.current.value)
+              : "";
           reviewNotesRef.current.getEditor().setContents(newDelta1);
         } catch (err) {
-          if(err){
+          if (err) {
             const newDelta1 = reviewNotesRef.current.value;
-            reviewNotesRef.current.getEditor().setText(newDelta1); 
+            reviewNotesRef.current.getEditor().setText(newDelta1);
           }
         }
         try {
-          const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+          const newDelta3 =
+            superCheckerNotesRef.current.value != ""
+              ? JSON.parse(superCheckerNotesRef.current.value)
+              : "";
           superCheckerNotesRef.current.getEditor().setContents(newDelta3);
         } catch (err) {
-          if(err){
+          if (err) {
             const newDelta3 = superCheckerNotesRef.current.value;
-            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
+            superCheckerNotesRef.current.getEditor().setText(newDelta3);
           }
         }
 
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
-        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
-
+        setreviewtext(reviewNotesRef.current.getEditor().getText());
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText());
       } else {
         let reviewerAnnotations = annotations.filter(
           (value) => value.annotation_type === 2
@@ -552,29 +586,35 @@ useEffect(() => {
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
 
-              
-              try {
-                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-                reviewNotesRef.current.getEditor().setContents(newDelta1);
-              } catch (err) {
-                if(err){
-                  const newDelta1 = reviewNotesRef.current.value;
-                  reviewNotesRef.current.getEditor().setText(newDelta1); 
-                }
+            try {
+              const newDelta1 =
+                reviewNotesRef.current.value != ""
+                  ? JSON.parse(reviewNotesRef.current.value)
+                  : "";
+              reviewNotesRef.current.getEditor().setContents(newDelta1);
+            } catch (err) {
+              if (err) {
+                const newDelta1 = reviewNotesRef.current.value;
+                reviewNotesRef.current.getEditor().setText(newDelta1);
               }
-              try {
-                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-              } catch (err) {
-                if(err){
-                  const newDelta3 = superCheckerNotesRef.current.value;
-                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
-                }
+            }
+            try {
+              const newDelta3 =
+                superCheckerNotesRef.current.value != ""
+                  ? JSON.parse(superCheckerNotesRef.current.value)
+                  : "";
+              superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            } catch (err) {
+              if (err) {
+                const newDelta3 = superCheckerNotesRef.current.value;
+                superCheckerNotesRef.current.getEditor().setText(newDelta3);
               }
-            
-        setreviewtext(reviewNotesRef.current.getEditor().getText())
-        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+            }
 
+            setreviewtext(reviewNotesRef.current.getEditor().getText());
+            setsupercheckertext(
+              superCheckerNotesRef.current.getEditor().getText()
+            );
           } else {
             let superCheckerAnnotation = annotations.find(
               (annotation) =>
@@ -584,29 +624,36 @@ useEffect(() => {
               reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
               superCheckerAnnotation.supercheck_notes ?? "";
-              
-              try {
-                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
-                reviewNotesRef.current.getEditor().setContents(newDelta1);
-              } catch (err) {
-                if(err){
-                  const newDelta1 = reviewNotesRef.current.value;
-                  reviewNotesRef.current.getEditor().setText(newDelta1); 
-                }
-              }
-              try {
-                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
-                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-              } catch (err) {
-                if(err){
-                  const newDelta3 = superCheckerNotesRef.current.value;
-                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
-                }
-              }
-      
-              setreviewtext(reviewNotesRef.current.getEditor().getText())
-        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
 
+            try {
+              const newDelta1 =
+                reviewNotesRef.current.value != ""
+                  ? JSON.parse(reviewNotesRef.current.value)
+                  : "";
+              reviewNotesRef.current.getEditor().setContents(newDelta1);
+            } catch (err) {
+              if (err) {
+                const newDelta1 = reviewNotesRef.current.value;
+                reviewNotesRef.current.getEditor().setText(newDelta1);
+              }
+            }
+            try {
+              const newDelta3 =
+                superCheckerNotesRef.current.value != ""
+                  ? JSON.parse(superCheckerNotesRef.current.value)
+                  : "";
+              superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+            } catch (err) {
+              if (err) {
+                const newDelta3 = superCheckerNotesRef.current.value;
+                superCheckerNotesRef.current.getEditor().setText(newDelta3);
+              }
+            }
+
+            setreviewtext(reviewNotesRef.current.getEditor().getText());
+            setsupercheckertext(
+              superCheckerNotesRef.current.getEditor().getText()
+            );
           }
         }
       }
@@ -632,8 +679,14 @@ useEffect(() => {
           //   predictions,
           // ]);
           setNotes(taskData, annotations);
-          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
-            if (labelConfig.project_type.includes("OCRSegmentCategorization")){
+          let tempLabelConfig =
+            labelConfig.project_type === "ConversationTranslation" ||
+            labelConfig.project_type === "ConversationTranslationEditing"
+              ? generateLabelConfig(taskData.data)
+              : labelConfig.project_type === "ConversationVerification"
+              ? conversationVerificationLabelConfig(taskData.data)
+              : labelConfig.label_config;
+          if (labelConfig.project_type.includes("OCRSegmentCategorization")) {
             tempLabelConfig = labelConfigJS;
           }
           setAnnotations(annotations);
@@ -719,7 +772,7 @@ useEffect(() => {
   useEffect(() => {
     const projectObj = new GetProjectDetailsAPI(projectId);
     dispatch(APITransport(projectObj));
-  }, [])
+  }, []);
 
   useEffect(() => {
     showLoader();
@@ -727,20 +780,25 @@ useEffect(() => {
 
   useEffect(() => {
     const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
-    }
+      getTaskAssignedUsers(taskData).then((res) => setAssignedUsers(res));
+    };
     taskData?.id && showAssignedUsers();
   }, [taskData]);
 
   const autoSaveSuperCheck = () => {
-    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "validated" && taskData.task_status.toLowerCase() !== "validated_with_changes") {
+    if (
+      autoSave &&
+      lsfRef.current?.store?.annotationStore?.selected &&
+      taskData.task_status.toLowerCase() !== "validated" &&
+      taskData.task_status.toLowerCase() !== "validated_with_changes"
+    ) {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
-          if(temp[i].type === "relation"){
+          if (temp[i].type === "relation") {
             continue;
-          }else if (temp[i].value.text) {
+          } else if (temp[i].value.text) {
             temp[i].value.text = [temp[i].value.text[0]];
           }
         }
@@ -755,7 +813,9 @@ useEffect(() => {
           superChecker.annotation_status,
           temp,
           superChecker.parent_annotation,
-          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+          JSON.stringify(
+            superCheckerNotesRef.current.getEditor().getContents()
+          ),
           true,
           selectedLanguages,
           ocrDomain
@@ -778,17 +838,21 @@ useEffect(() => {
   };
 
   const clearAllChildren = () => {
-    if (lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "validated" && taskData.task_status.toLowerCase() !== "validated_with_changes") {
+    if (
+      lsfRef.current?.store?.annotationStore?.selected &&
+      taskData.task_status.toLowerCase() !== "validated" &&
+      taskData.task_status.toLowerCase() !== "validated_with_changes"
+    ) {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
-          if (temp[i].parentID !== undefined){
+          if (temp[i].parentID !== undefined) {
             delete temp[i].parentID;
           }
-          if(temp[i].type === "relation"){
+          if (temp[i].type === "relation") {
             continue;
-          }else if (temp[i].value.text) {
+          } else if (temp[i].value.text) {
             temp[i].value.text = [temp[i].value.text[0]];
           }
         }
@@ -803,7 +867,9 @@ useEffect(() => {
           superChecker.annotation_status,
           temp,
           superChecker.parent_annotation,
-          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+          JSON.stringify(
+            superCheckerNotesRef.current.getEditor().getContents()
+          ),
           true,
           selectedLanguages,
           ocrDomain
@@ -814,7 +880,7 @@ useEffect(() => {
               message: "Error in clearing children bboxes",
               variant: "error",
             });
-          }else{
+          } else {
             window.location.reload();
           }
         });
@@ -828,15 +894,15 @@ useEffect(() => {
   };
 
   let hidden, visibilityChange;
-  if (typeof document.hidden !== 'undefined') {
-    hidden = 'hidden';
-    visibilityChange = 'visibilitychange';
-  } else if (typeof document.msHidden !== 'undefined') {
-    hidden = 'msHidden';
-    visibilityChange = 'msvisibilitychange';
-  } else if (typeof document.webkitHidden !== 'undefined') {
-    hidden = 'webkitHidden';
-    visibilityChange = 'webkitvisibilitychange';
+  if (typeof document.hidden !== "undefined") {
+    hidden = "hidden";
+    visibilityChange = "visibilitychange";
+  } else if (typeof document.msHidden !== "undefined") {
+    hidden = "msHidden";
+    visibilityChange = "msvisibilitychange";
+  } else if (typeof document.webkitHidden !== "undefined") {
+    hidden = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
   }
 
   const [visible, setVisibile] = useState(!document[hidden]);
@@ -846,7 +912,7 @@ useEffect(() => {
     document.addEventListener(visibilityChange, handleVisibilityChange);
     return () => {
       document.removeEventListener(visibilityChange, handleVisibilityChange);
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -858,7 +924,12 @@ useEffect(() => {
       visible && autoSaveSuperCheck();
     }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
-  }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
+  }, [
+    visible,
+    autoSave,
+    lsfRef.current?.store?.annotationStore?.selected,
+    taskData,
+  ]);
 
   const onNextAnnotation = async () => {
     showLoader();
@@ -882,7 +953,7 @@ useEffect(() => {
     review_status.current = "rejected";
     lsfRef.current.store.submitAnnotation();
   };
- 
+
   const handleAcceptClick = async (status) => {
     review_status.current = status;
     lsfRef.current.store.submitAnnotation();
@@ -908,28 +979,42 @@ useEffect(() => {
   const ProjectData = JSON.parse(ProjectsData);
 
   const handleSelectChange = (event) => {
-    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
-    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
+    selectedLanguages.current = Array.from(
+      event.target.selectedOptions,
+      (option) => option.value
+    );
+    setSelectedL(
+      Array.from(event.target.selectedOptions, (option) => option.value)
+    );
   };
 
   useEffect(() => {
-    if(taskData){
-      if(Array.isArray(taskData?.data?.language)){
-        taskData?.data?.language?.map((lang)=>{
+    if (taskData) {
+      if (Array.isArray(taskData?.data?.language)) {
+        taskData?.data?.language?.map((lang) => {
           if (!selectedLanguages.current.includes(lang)) {
             selectedLanguages.current.push(lang);
-          }        
-          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
+          }
+          const newLanguages = new Set([
+            ...selectedL,
+            ...taskData?.data?.language,
+          ]);
           setSelectedL(Array.from(newLanguages));
         });
       }
-      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
+      if (
+        typeof taskData?.data?.language === "string" &&
+        taskData?.data?.ocr_domain !== ""
+      ) {
         setSelectedL([taskData?.data?.language]);
         if (!selectedLanguages.current.includes(taskData?.data?.language)) {
           selectedLanguages.current.push(taskData?.data?.language);
-        }      
+        }
       }
-      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
+      if (
+        typeof taskData?.data?.ocr_domain === "string" &&
+        taskData?.data?.ocr_domain !== ""
+      ) {
         ocrDomain.current = taskData?.data?.ocr_domain;
         setOcrD(taskData?.data?.ocr_domain);
       }
@@ -939,35 +1024,45 @@ useEffect(() => {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-        {taskData?.super_check_user === userData?.id &&
+        {taskData?.super_check_user === userData?.id && (
           <div style={{ textAlign: "left", marginBottom: "15px" }}>
-            {autoSave ? <Typography variant="body" color="#000000">
-              Auto-save is enabled for this scenario.
-            </Typography> :
+            {autoSave ? (
               <Typography variant="body" color="#000000">
-                Auto-save is not available for this scenario. Please save your task manually.
-              </Typography>}
+                Auto-save is enabled for this scenario.
+              </Typography>
+            ) : (
+              <Typography variant="body" color="#000000">
+                Auto-save is not available for this scenario. Please save your
+                task manually.
+              </Typography>
+            )}
           </div>
-        }
+        )}
         <div>
           {ProjectData.revision_loop_count >
-            taskData?.revision_loop_count?.super_check_count
+          taskData?.revision_loop_count?.super_check_count
             ? false
             : true && (
-              <div style={{ textAlign: "right", marginBottom: "15px" }}>
-                <Typography variant="body" color="#f5222d">
-                  Note: The 'Revision Loop Count' limit has been reached for this
-                  task.
-                </Typography>
-              </div>
-            )}
+                <div style={{ textAlign: "right", marginBottom: "15px" }}>
+                  <Typography variant="body" color="#f5222d">
+                    Note: The 'Revision Loop Count' limit has been reached for
+                    this task.
+                  </Typography>
+                </div>
+              )}
 
-          {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
+          {ProjectData.revision_loop_count -
+            taskData?.revision_loop_count?.super_check_count !==
+            0 && (
             <div style={{ textAlign: "right", marginBottom: "15px" }}>
               <Typography variant="body" color="#f5222d">
-                Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
+                Note: This task can be rejected{" "}
+                {ProjectData.revision_loop_count -
+                  taskData?.revision_loop_count?.super_check_count}{" "}
+                more times.
               </Typography>
-            </div>)}
+            </div>
+          )}
         </div>
       </div>
 
@@ -986,11 +1081,15 @@ useEffect(() => {
                   minWidth: "40px",
                   border: "1px solid #e6e6e6",
                   color: "grey",
-                  pt: 1, pl: 1, pr: 1,
+                  pt: 1,
+                  pl: 1,
+                  pr: 1,
                   borderBottom: "None",
                 }}
-                > 
-                  <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
+              >
+                <InfoOutlinedIcon
+                  sx={{ mb: "-3px", ml: "2px", color: "grey" }}
+                />
               </Button>
             </LightTooltip>
             <Tooltip title="Go to next task">
@@ -1037,7 +1136,7 @@ useEffect(() => {
                   onClick={handleRejectClick}
                   disabled={
                     ProjectData.revision_loop_count >
-                      taskData?.revision_loop_count?.super_check_count
+                    taskData?.revision_loop_count?.super_check_count
                       ? false
                       : true
                   }
@@ -1046,7 +1145,7 @@ useEffect(() => {
                     border: "1px solid #e6e6e6",
                     color: (
                       ProjectData.revision_loop_count >
-                        taskData?.revision_loop_count?.super_check_count
+                      taskData?.revision_loop_count?.super_check_count
                         ? false
                         : true
                     )
@@ -1089,11 +1188,13 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
-            {ProjectDetails?.project_type?.includes("OCR") &&
-            <Tooltip title="Clear all children bboxes">
+            {ProjectDetails?.project_type?.includes("OCR") && (
+              <Tooltip title="Clear all children bboxes">
                 <Button
                   type="default"
-                  onClick={() => {clearAllChildren()}}
+                  onClick={() => {
+                    clearAllChildren();
+                  }}
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
@@ -1108,28 +1209,30 @@ useEffect(() => {
                   Clear All Mergings
                 </Button>
               </Tooltip>
-          }
-          {parentMetadata !== undefined &&
-          <>
-          <Tooltip title="Show Parent Image">
-              <Button
-                type="default"
-                onClick={() => {window.open(parentMetadata.image_url, "_blank")}}
-                style={{
-                  minWidth: "160px",
-                  border: "1px solid #e6e6e6",
-                  color: "#09f",
-                  pt: 3,
-                  pb: 3,
-                  borderBottom: "None",
-                }}
-                className="lsf-button"
-              >
-                Parent Image
-              </Button>
-            </Tooltip>
-          </>
-          }
+            )}
+            {parentMetadata !== undefined && (
+              <>
+                <Tooltip title="Show Parent Image">
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      window.open(parentMetadata.image_url, "_blank");
+                    }}
+                    style={{
+                      minWidth: "160px",
+                      border: "1px solid #e6e6e6",
+                      color: "#09f",
+                      pt: 3,
+                      pb: 3,
+                      borderBottom: "None",
+                    }}
+                    className="lsf-button"
+                  >
+                    Parent Image
+                  </Button>
+                </Tooltip>
+              </>
+            )}
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
@@ -1173,95 +1276,195 @@ useEffect(() => {
           {tagSuggestionList}
         </Popover>
       </Box>
-      {parentMetadata !== undefined &&
-      <>
-        <div style={{textAlign:"center", display:"flex", justifyContent:"center"}}>
-          <div>
-            <h3>Parent MetaData</h3>
-            <JsonTable json={parentMetadata}/>
+      {parentMetadata !== undefined && (
+        <>
+          <div
+            style={{
+              textAlign: "center",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div>
+              <h3>Parent MetaData</h3>
+              <JsonTable json={parentMetadata} />
+            </div>
           </div>
-        </div>
-      </>
-      }
-      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
+        </>
+      )}
+      {!loader &&
+        ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && (
           <>
-            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
-              <select multiple onChange={handleSelectChange} value={selectedL}>
-                <option value="English">English</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Marathi">Marathi</option>
-                <option value="Tamil">Tamil</option>
-                <option value="Telugu">Telugu</option>
-                <option value="Kannada">Kannada</option>
-                <option value="Gujarati">Gujarati</option>
-                <option value="Punjabi">Punjabi</option>
-                <option value="Bengali">Bengali</option>
-                <option value="Malayalam">Malayalam</option>
-                <option value="Assamese">Assamese</option>
-                <option value="Bodo">Bodo</option>
-                <option value="Dogri">Dogri</option>
-                <option value="Kashmiri">Kashmiri</option>
-                <option value="Maithili">Maithili</option>
-                <option value="Manipuri">Manipuri</option>
-                <option value="Nepali">Nepali</option>
-                <option value="Odia">Odia</option>
-                <option value="Sindhi">Sindhi</option>
-                <option value="Sinhala">Sinhala</option>
-                <option value="Urdu">Urdu</option>
-                <option value="Santali">Santali</option>
-                <option value="Sanskrit">Sanskrit</option>
-                <option value="Goan Konkani">Goan Konkani</option>
-              </select>
+            <div
+              style={{
+                borderStyle: "solid",
+                borderWidth: "1px",
+                borderColor: "#E0E0E0",
+                paddingBottom: "1%",
+                display: "flex",
+                justifyContent: "space-around",
+              }}
+            >
+              <div
+                style={{
+                  paddingLeft: "1%",
+                  fontSize: "medium",
+                  paddingTop: "1%",
+                  display: "flex",
+                }}
+              >
+                <div style={{ margin: "auto" }}>Languages :&nbsp;</div>
+                <select
+                  multiple
+                  onChange={handleSelectChange}
+                  value={selectedL}
+                >
+                  <option value="English">English</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="Marathi">Marathi</option>
+                  <option value="Tamil">Tamil</option>
+                  <option value="Telugu">Telugu</option>
+                  <option value="Kannada">Kannada</option>
+                  <option value="Gujarati">Gujarati</option>
+                  <option value="Punjabi">Punjabi</option>
+                  <option value="Bengali">Bengali</option>
+                  <option value="Malayalam">Malayalam</option>
+                  <option value="Assamese">Assamese</option>
+                  <option value="Bodo">Bodo</option>
+                  <option value="Dogri">Dogri</option>
+                  <option value="Kashmiri">Kashmiri</option>
+                  <option value="Maithili">Maithili</option>
+                  <option value="Manipuri">Manipuri</option>
+                  <option value="Nepali">Nepali</option>
+                  <option value="Odia">Odia</option>
+                  <option value="Sindhi">Sindhi</option>
+                  <option value="Sinhala">Sinhala</option>
+                  <option value="Urdu">Urdu</option>
+                  <option value="Santali">Santali</option>
+                  <option value="Sanskrit">Sanskrit</option>
+                  <option value="Goan Konkani">Goan Konkani</option>
+                </select>
               </div>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
-              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
-                <option disabled selected></option>
-                <option value="BO">Books</option>
-                <option value="FO">Forms</option>
-                <option value="OT">Others</option>
-                <option value="TB">Textbooks</option>
-                <option value="NV">Novels</option>
-                <option value="NP">Newspapers</option>
-                <option value="MG">Magazines</option>
-                <option value="RP">Research_Papers</option>
-                <option value="FM">Form</option>
-                <option value="BR">Brochure_Posters_Leaflets</option>
-                <option value="AR">Acts_Rules</option>
-                <option value="PB">Publication</option>
-                <option value="NT">Notice</option>
-                <option value="SY">Syllabus</option>
-                <option value="QP">Question_Papers</option>
-                <option value="MN">Manual</option>
-              </select>
+              <div
+                style={{
+                  paddingLeft: "1%",
+                  fontSize: "medium",
+                  paddingTop: "1%",
+                  display: "flex",
+                }}
+              >
+                <div style={{ margin: "auto" }}>Domain :&nbsp;</div>
+                <select
+                  style={{ margin: "auto" }}
+                  onChange={(e) => {
+                    setOcrD(e.target.value);
+                    ocrDomain.current = e.target.value;
+                  }}
+                  value={ocrD}
+                >
+                  <option disabled selected></option>
+                  <option value="BO">Books</option>
+                  <option value="FO">Forms</option>
+                  <option value="OT">Others</option>
+                  <option value="TB">Textbooks</option>
+                  <option value="NV">Novels</option>
+                  <option value="NP">Newspapers</option>
+                  <option value="MG">Magazines</option>
+                  <option value="RP">Research_Papers</option>
+                  <option value="FM">Form</option>
+                  <option value="BR">Brochure_Posters_Leaflets</option>
+                  <option value="AR">Acts_Rules</option>
+                  <option value="PB">Publication</option>
+                  <option value="NT">Notice</option>
+                  <option value="SY">Syllabus</option>
+                  <option value="QP">Question_Papers</option>
+                  <option value="MN">Manual</option>
+                </select>
               </div>
             </div>
-            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
-              {predictions?.length > 0 ?
+            <div
+              style={{
+                borderStyle: "solid",
+                borderWidth: "1px",
+                borderColor: "#E0E0E0",
+                paddingBottom: "1%",
+              }}
+            >
+              <div
+                style={{
+                  paddingLeft: "1%",
+                  fontSize: "medium",
+                  paddingTop: "1%",
+                  paddingBottom: "1%",
+                }}
+              >
+                Predictions
+              </div>
+              {predictions?.length > 0 ? (
                 (() => {
                   try {
                     return JSON.parse(predictions)?.map((pred, index) => (
-                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
-                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      <div
+                        style={{
+                          paddingLeft: "2%",
+                          display: "flex",
+                          paddingRight: "2%",
+                          paddingBottom: "1%",
+                        }}
+                      >
+                        <div
+                          style={{
+                            padding: "1%",
+                            margin: "auto",
+                            color: "#9E9E9E",
+                          }}
+                        >
+                          {index}
+                        </div>
+                        <textarea
+                          readOnly
+                          style={{ width: "100%", borderColor: "#E0E0E0" }}
+                          value={pred.text}
+                        />
                       </div>
                     ));
                   } catch (error) {
                     console.error("Error parsing predictions:", error);
                     return predictions?.map((pred, index) => (
-                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
-                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                      <div
+                        style={{
+                          paddingLeft: "2%",
+                          display: "flex",
+                          paddingRight: "2%",
+                          paddingBottom: "1%",
+                        }}
+                      >
+                        <div
+                          style={{
+                            padding: "1%",
+                            margin: "auto",
+                            color: "#9E9E9E",
+                          }}
+                        >
+                          {index}
+                        </div>
+                        <textarea
+                          readOnly
+                          style={{ width: "100%", borderColor: "#E0E0E0" }}
+                          value={pred.text}
+                        />
                       </div>
                     ));
                   }
                 })()
-              :
-              <div style={{textAlign:"center"}}>No Predictions Present</div>}
+              ) : (
+                <div style={{ textAlign: "center" }}>
+                  No Predictions Present
+                </div>
+              )}
             </div>
           </>
-        }
+        )}
       {loader}
       {renderSnackBar()}
     </div>
@@ -1275,8 +1478,8 @@ export default function LSF() {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
-  const [reviewtext,setreviewtext] = useState('')
-  const [supercheckertext,setsupercheckertext] = useState('')
+  const [reviewtext, setreviewtext] = useState("");
+  const [supercheckertext, setsupercheckertext] = useState("");
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -1288,20 +1491,24 @@ export default function LSF() {
   // const [notesValue, setNotesValue] = useState('');
   const { projectId } = useParams();
   const modules = {
-    toolbar:[
-      
-    [{ size: [] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'color': [] }],
-    [{ 'script': 'sub'}, { 'script': 'super' }],
-    ]
+    toolbar: [
+      [{ size: [] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }],
+      [{ script: "sub" }, { script: "super" }],
+    ],
   };
 
   const formats = [
-    'size',
-    'bold','italic','underline','strike',
-    'color','background',
-    'script']
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "script",
+  ];
 
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
@@ -1333,8 +1540,6 @@ export default function LSF() {
     setShowNotes(!showNotes);
   };
 
-
-
   const resetNotes = () => {
     setShowNotes(false);
     superCheckerNotesRef.current.getEditor().setContents([]);
@@ -1360,7 +1565,7 @@ export default function LSF() {
           startIcon={<ArrowBackIcon />}
           variant="contained"
           color="primary"
-          sx={{mt:2}} 
+          sx={{ mt: 2 }}
           onClick={() => {
             localStorage.removeItem("labelAll");
             navigate(`/projects/${projectId}`);
@@ -1389,9 +1594,7 @@ export default function LSF() {
             <Button
               endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
               variant="contained"
-              color={
-                reviewtext.trim().length === 0 ? "primary" : "success"
-              }
+              color={reviewtext.trim().length === 0 ? "primary" : "success"}
               onClick={handleCollapseClick}
             >
               Notes {reviewtext.trim().length === 0 ? "" : "*"}
@@ -1404,61 +1607,26 @@ export default function LSF() {
               paddingBottom: "16px",
             }}
           >
-            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
-              {translate("alert.notes")}
-          </Alert> */}
-            {/* <TextField
-              multiline
-              placeholder="Place your remarks here ..."
-              label="Review Notes"
-              // value={notesValue}
-              // onChange={event=>setNotesValue(event.target.value)}
-              inputRef={reviewNotesRef}
-              rows={2}
-              maxRows={4}
-              inputProps={{
-                style: { fontSize: "1rem" },
-                readOnly: true,
-              }}
-              style={{ width: "99%", marginTop: "1%" }}
-              // ref={quillRef}
-            />
-
-            <TextField
-              multiline
-              placeholder="Place your remarks here ..."
-              label="Super Checker Notes"
-              // value={notesValue}
-              // onChange={event=>setNotesValue(event.target.value)}
-              inputRef={superCheckerNotesRef}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              rows={2}
-              maxRows={4}
-              inputProps={{
-                style: { fontSize: "1rem" },
-              }}
-              style={{ width: "99%", marginTop: "1%" }}
-              ref={quillRef}
-            /> */}
-            <ReactQuill
-              ref={reviewNotesRef}
-              modules={modules}
-              formats={formats}
-              bounds={"#note"}
-              placeholder="Review Notes"
-              style={{ marginbottom: "1%", minHeight: "2rem" }}
-              readOnly={true}
-            ></ReactQuill>
-            <ReactQuill
-              ref={superCheckerNotesRef}
-              modules={modules}
-              bounds={"#note"}
-              formats={formats}
-              placeholder="SuperChecker Notes"
-              style={{ marginbottom: "1%", minHeight: "2rem" }}
-            ></ReactQuill>
+            {/* Add Suspense with fallback UI for lazy loading */}
+            <Suspense fallback={<div>Loading editor...</div>}>
+              <ReactQuillLazy
+                ref={reviewNotesRef}
+                modules={modules}
+                formats={formats}
+                bounds={"#note"}
+                placeholder="Review Notes"
+                style={{ marginbottom: "1%", minHeight: "2rem" }}
+                readOnly={true}
+              ></ReactQuillLazy>
+              <ReactQuillLazy
+                ref={superCheckerNotesRef}
+                modules={modules}
+                bounds={"#note"}
+                formats={formats}
+                placeholder="SuperChecker Notes"
+                style={{ marginbottom: "1%", minHeight: "2rem" }}
+              ></ReactQuillLazy>
+            </Suspense>
           </div>
           <Button
             variant="contained"
@@ -1538,9 +1706,8 @@ export default function LSF() {
           loader={loader}
           showLoader={showLoader}
           hideLoader={hideLoader}
-          setreviewtext = {setreviewtext}
+          setreviewtext={setreviewtext}
           setsupercheckertext={setsupercheckertext}
-
         />
       </Card>
     </div>

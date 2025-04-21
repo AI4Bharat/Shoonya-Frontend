@@ -4,9 +4,21 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/Shoonya_Logo.webp" />
     <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <link rel="preconnect" href="https://backend.dev.shoonya.ai4bharat.org" crossorigin="anonymous">
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preconnect"
+      href="https://backend.dev.shoonya.ai4bharat.org"
+      crossorigin="anonymous"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
@@ -47,10 +59,21 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Shoonya</title>
+    <!-- Official Label Studio  -->
+    <script src="https://unpkg.com/@heartexlabs/label-studio@1.4.0/build/static/js/main.js"></script>
+    <script>
+      window.LabelStudio2 = window.LabelStudio;
+    </script>
+
+    <!-- Custom Label Studio -->
+    <script src="%PUBLIC_URL%/lsf-build/static/js/main.js"></script>
+    <script>
+      window.LabelStudio1 = window.LabelStudio;
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" style="height: 100%;"></div>
+    <div id="root" style="height: 100%"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
