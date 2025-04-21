@@ -52,12 +52,8 @@ const addOptimizations = (config) => {
         minRatio: 0.8,
         deleteOriginalAssets: false,
       }),
-      // new BundleAnalyzerPlugin({
-      //   analyzerMode: "static",
-      //   reportFilename: "report.html",
-      //   openAnalyzer: true,
-      // }),
-      //     );
+    
+          );
 
       config.optimization = {
         ...config.optimization,
@@ -118,11 +114,10 @@ const addOptimizations = (config) => {
         },
       },
 
-      // Optional: Performance hint
       config.performance = {
         hints: "warning",
         assetFilter: (assetFilename) => assetFilename.endsWith(".js.gz"),
-    });
+    };
   }
 
   return config;
