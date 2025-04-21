@@ -26,11 +26,6 @@ const addModernBabelPreset = () =>
 
 const addOptimizations = (config) => {
   if (config.mode === "production") {
-    config.plugins.push(
-      new MiniCssExtractPlugin({
-        filename: "css/[name].[contenthash].css",
-      })
-    );
 
     config.plugins.push(
       new CompressionPlugin({
