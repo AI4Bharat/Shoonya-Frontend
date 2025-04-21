@@ -37,7 +37,6 @@ function apiStatusAsync(progress, errors, message, res = null, unauthrized = fal
 }
 
 function success(res, api, dispatch) {
-console.log(res,"res")
   api.processResponse(res.data);
   if (api.type) {
     dispatch(dispatchAPIAsync(api));

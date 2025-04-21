@@ -1,32 +1,18 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-// import { Grid ,ThemeProvider} from "@material-ui/core";
-import {
-  Button,
-  Grid,
-  ThemeProvider,
-  Select,
-  Box,
-  MenuItem,
-  Radio,
-  InputLabel,
-  FormControl,
-  Card,
-  Typography,
-  Menu,
-  styled,
-} from "@mui/material";
-import WorkspaceMetaAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetMetaAnalytics";
+import Grid from "@mui/material/Grid";
+import Select from "@mui/material/Select";
+import Box from "@mui/material/Box";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Menu from "@mui/material/Menu";
+import { styled } from "@mui/material/styles";
+import WorkspaceMetaAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetMetaAnalytics"
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
-// import ContextualTranslationEditing from "../MetaAnalytics/ContextualTranslationEditing";
-// import SemanticTextualSimilarity_Scale5 from "../MetaAnalytics/SemanticTextualSimilarity_Scale5";
-import SingleSpeakerAudioTranscriptionEditing from "../MetaAnalytics/SingleSpeakerAudioTranscriptionEditing";
-// import AudioTranscription from "../MetaAnalytics/AudioTranscription";
-// import AudioSegmentation from "../MetaAnalytics/AudioSegmentation";
 import Spinner from "../../../component/common/Spinner";
-import themeDefault from "../../../../theme/theme";
-import LightTooltip from "../../../component/common/Tooltip";
+import LightTooltip from '../../../component/common/Tooltip';
 import { translate } from "../../../../../config/localisation";
 import InfoIcon from "@mui/icons-material/Info";
 import { MenuProps } from "../../../../../utils/utils";

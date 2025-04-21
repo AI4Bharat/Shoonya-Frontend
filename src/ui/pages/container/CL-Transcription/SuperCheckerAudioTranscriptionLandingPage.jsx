@@ -280,7 +280,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, userData);
   }, [AnnotationsTaskDetails, userData]);
-  //console.log(disableSkip);
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -604,10 +603,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     getAnnotationsTaskData(taskId);
     getProjectDetails();
     getTaskData(taskId);
-    console.log(
-      localStorage.getItem("Stage") === "review",
-      "StageStageStageStage"
-    );
   }, []);
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(projectId);
@@ -1132,22 +1127,20 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     }
   }, [advancedWaveformSettings]);
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.shiftKey && event.key === " ") {
-        event.preventDefault();
-        if (player) {
-          console.log(isPlaying(player));
-          if (isPlaying(player)) {
-            player.pause();
-          } else {
-            player.play();
-          }
+useEffect(() => {
+  const handleKeyDown = (event) => {
+    if (event.shiftKey && event.key === ' ') {
+      event.preventDefault();
+      if(player){
+        if(isPlaying(player)){
+          player.pause();
+        }else{
+          player.play();
         }
       }
-      const activeElement = document.activeElement;
-      const isTextAreaFocused = activeElement.tagName == "TEXTAREA";
-      console.log(activeElement);
+    }
+    const activeElement = document.activeElement;
+    const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
 
       if (isTextAreaFocused) {
         return;

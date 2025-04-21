@@ -1,31 +1,27 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import "./editor.css";
-import "quill/dist/quill.snow.css";
-import {
-  Tooltip,
-  Button,
-  Box,
-  Card,
-  TextField,
-  Grid,
-  Typography,
-  Popover,
-  Autocomplete,
-} from "@mui/material";
+import "./editor.css"
+import 'quill/dist/quill.snow.css';
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
+import Autocomplete from "@mui/material/Autocomplete";
+import Card from "@mui/material/Card";
+import TextField from "@mui/material/TextField";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Box from "@mui/material/Box";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import generateLabelConfig from "../../../../utils/LabelConfig/ConversationTranslation";
 import { styled, alpha } from "@mui/material/styles";
-import Menu, { MenuProps } from "@mui/material/Menu";
+import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Glossary from "../Glossary/Glossary";
 import { TabsSuggestionData } from "../../../../utils/TabsSuggestionData/TabsSuggestionData";
 import InfoIcon from "@mui/icons-material/Info";
-import getCaretCoordinates from "textarea-caret";
 import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/ConversationVerification";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -36,8 +32,6 @@ import keymap from "./keymap";
 import {
   getProjectsandTasks,
   getNextProject,
-  fetchAnnotation,
-  postReview,
   patchSuperChecker,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 import { JsonTable } from "react-json-to-html";
@@ -47,7 +41,6 @@ import useFullPageLoader from "../../../../hooks/useFullPageLoader";
 import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
-import { translate } from "../../../../config/localisation";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 
@@ -198,14 +191,6 @@ const LabelStudioWrapper = ({
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
 
-  //console.log("projectId, taskId", projectId, taskId);
-  // debugger
-  /* useEffect(() => {
-    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
-      autoSaveSuperCheck();
-      navigate(`/projects/${projectId}/SuperCheckerAudioTranscriptionLandingPage/${taskId}`);
-    }
-  }, [userData]); */
 
   useEffect(() => {
     if (filterdataitemsList.results !== undefined) {
@@ -398,7 +383,6 @@ const LabelStudioWrapper = ({
           // } else {
           // let hasReview = false;
           // for (let i = 0; i < annotations.length; i++) {
-          //   console.log(annotations[i], "test");
           //   if (annotations[i].parent_annotation) {
           //     ls.annotationStore.selectAnnotation(annotations[i].result[0].id);
           //     // hasReview = true;

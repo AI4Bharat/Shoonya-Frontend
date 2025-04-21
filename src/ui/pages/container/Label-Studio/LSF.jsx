@@ -2,20 +2,18 @@ import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import "./editor.css";
 import "quill/dist/quill.snow.css";
-import {
-  Tooltip,
-  Button,
-  Alert,
-  Card,
-  TextField,
-  Box,
-  Grid,
-  Typography,
-  Popover,
-  IconButton,
-  Autocomplete,
-  MenuItem,
-} from "@mui/material";
+
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Alert from "@mui/material/Alert";
+import Card from "@mui/material/Card";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
+import Autocomplete from "@mui/material/Autocomplete";
+import MenuItem from "@mui/material/MenuItem";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -224,16 +222,6 @@ const LabelStudioWrapper = ({
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
-  //console.log("projectId, taskId", projectId, taskId);
-  // debugger
-  // const projectType = ProjectDetails?.project_type?.includes("Audio")
-
-  /* useEffect(() => {
-    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
-      autoSaveAnnotation();
-      navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${taskId}`);
-    }
-  }, [userData]); */
 
   useEffect(() => {
     getProjectsandTasks(projectId, taskId).then(
@@ -420,7 +408,6 @@ const LabelStudioWrapper = ({
         onLabelStudioLoad: function (ls) {
           annotation_status.current =
             ProjectDetails.project_stage == 2 ? "labeled" : "labeled";
-          //console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
           if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
@@ -693,8 +680,6 @@ const LabelStudioWrapper = ({
               hideLoader();
               return;
             }
-            // both have loaded!
-            // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
               labelConfig.project_type === "ConversationTranslationEditing"
@@ -736,7 +721,6 @@ const LabelStudioWrapper = ({
     //     targetElement.oninput = function (e) {
     //       let textAreaInnerText = e.target.value;
 
-    //       // console.log("e ---------------------- ", e.currentTarget);
 
     //       let lastInputChar =
     //         textAreaInnerText[targetElement.selectionStart - 1];
@@ -1508,7 +1492,6 @@ export default function LSF() {
   useEffect(() => {
     fetchAnnotation(taskId).then((data) => {
       if (data && Array.isArray(data) && data.length > 0) {
-        console.log(annotationNotesRef);
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
         try {
@@ -1516,7 +1499,6 @@ export default function LSF() {
             annotationNotesRef.current.value !== ""
               ? JSON.parse(annotationNotesRef.current.value)
               : "";
-          console.log(newDelta2);
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
           if (err instanceof SyntaxError) {

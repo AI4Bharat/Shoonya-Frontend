@@ -1,19 +1,16 @@
-import {
-  Box,
-  Button,
-  Card,
-  Grid,
-  Tab,
-  Tabs,
-  ThemeProvider,
-  Typography,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import { ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
-import Header from "../../component/common/Header";
 import themeDefault from "../../../theme/theme";
-import { Link, useNavigate, useParams, useHistory } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import TaskTable from "../../component/Project/TaskTable";
 import MembersTable from "../../component/Project/MembersTable";
 import ReportsTable from "../../component/Project/ReportsTable";
@@ -26,14 +23,12 @@ import addUserTypes from "../../../../constants/addUserTypes";
 import Spinner from "../../component/common/Spinner";
 import Menu from "@mui/material/Menu";
 import { styled, alpha } from "@mui/material/styles";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DatasetStyle from "../../../styles/Dataset";
 import ProjectDescription from "./ProjectDescription";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AllTaskTable from "../../component/Project/AllTaskTable";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import SuperCheckerTasks from "../../component/Project/SuperCheckerTasks";
-import SuperChecker from "../../component/Project/SuperChecker";
 import ProjectAnalytics from "../../component/Project/ProjectAnalytics";
 import { setValue } from "../../../../redux/actions/Tasks/ProjectTabActions";
 
@@ -106,7 +101,6 @@ const StyledMenu = styled((props) => (
   },
 }));
 const Projects = () => {
-  // console.log("props", props)
   const { id } = useParams();
   const classes = DatasetStyle();
   const [projectData, setProjectData] = useState([

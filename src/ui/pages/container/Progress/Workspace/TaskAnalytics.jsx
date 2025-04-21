@@ -1,37 +1,22 @@
-// import { Grid } from "@material-ui/core";
-import {
-  Button,
-  Grid,
-  ThemeProvider,
-  Select,
-  Box,
-  MenuItem,
-  Radio,
-  InputLabel,
-  FormControl,
-  Checkbox,
-  Card,
-  Typography,
-  Menu,
-  styled,
-  FormControlLabel,
-  IconButton,
-} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Select from "@mui/material/Select";
+import Box from "@mui/material/Box";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Checkbox from "@mui/material/Checkbox";
+import Menu from "@mui/material/Menu";
+import { styled } from "@mui/material/styles";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
 import React from "react";
-// import ContextualTranslationEditing from "../TaskAnalytics/ContextualTranslationEditing";
-// import SemanticTextualSimilarityChart from "../TaskAnalytics/SemanticTextualSimilarityChart";
-import ContextualSentenceVerificationChart from "../TaskAnalytics/ContextualSentenceVerificationChart";
 import WorkspaceTaskAnalyticsAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetTaskAnalytics";
-import SingleSpeakerAudioTranscriptionEditing from "../TaskAnalytics/SingleSpeakerAudioTranscriptionEditing";
-// import AudioSegmentation from "../TaskAnalytics/AudioSegmentation";
-// import AudioTranscription from "../TaskAnalytics/AudioTranscription";
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import Spinner from "../../../component/common/Spinner";
-import LightTooltip from "../../../component/common/Tooltip";
-import { translate } from "../../../../../config/localisation";
-import InfoIcon from "@mui/icons-material/Info";
+import LightTooltip from '../../../component/common/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
 import { MenuProps } from "../../../../../utils/utils";
 import CustomButton from "../../../component/common/Button";
 import AudioTaskAnalyticsChart from "../TaskAnalytics/AudioTaskAnalyticsChart";

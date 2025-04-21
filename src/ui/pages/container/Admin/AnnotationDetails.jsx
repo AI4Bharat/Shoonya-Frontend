@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Button, Box, CircularProgress } from '@mui/material';
+import React, { useState } from 'react';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import { JSONTree } from 'react-json-tree';
 import { snakeToTitleCase } from '../../../../utils/utils.js';
 import FetchUserByIdAPI from "../../../../redux/actions/api/UserManagement/FetchUserById";

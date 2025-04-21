@@ -619,9 +619,6 @@ const MembersTable = (props) => {
     ),
   };
 
-  // console.log('columns',columns)
-  // console.log('options',options)
-  // console.log('data',data)
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -661,7 +658,6 @@ const MembersTable = (props) => {
         setConfirmationDialog(false);
       }else{
         window.alert("Invalid credentials, please try again");
-        // console.log(rsp_data);
       }}
     else if(memberOrReviewer === "superchecker"){
       if(pin === "0104"){

@@ -1,16 +1,13 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import WFPlayer from "wfplayer";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import GetAnnotationsTaskAPI from "../../../../redux/actions/CL-Transcription/GetAnnotationsTask";
 import DT from "duration-time-conversion";
 import clamp from "lodash/clamp";
 import { throttle } from "lodash";
 import Metronome from "./Metronome";
 import SubtitleBoxes from "./SubtitleBoxes";  
-import { useParams } from "react-router-dom";
 
 
 const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
@@ -18,7 +15,6 @@ const WaveForm = (({ setWaveform, setRender, waveformSettings }) => {
   const $waveform = useRef();
 
   const player = useSelector((state) => state.commonReducer?.player);
-  // console.log(waveformSettings);
   useEffect(() => {
     [...WFPlayer.instances].forEach((item) => item.destroy());
 
@@ -79,25 +75,8 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
 
   const sub = useSelector((state) => state.commonReducer?.subtitles);
 
-  // console.log(taskDetails)
 
   const [grabbing, setGrabbing] = useState(false);
-  // console.log(taskId,"taskIdtaskIdtaskId")
-
-  // console.log('subtitles',state.commonReducer.subtitles)
-  // console.log('subtitles',sub[0])
-  // useEffect(() => {
-  //   if (firstLoaded.current && !grabbing) {
-  //     const apiObj = new GetAnnotationsTaskAPI(
-  //       taskDetails.id,
-  //     );
-  //     dispatch(APITransport(apiObj));
-  //   } else {
-  //     firstLoaded.current = true;
-  //   }
-
-  //   // eslint-disable-next-line
-  // }, [grabbing]);
 
   const onProgressClick = useCallback(
     (event) => {
@@ -107,13 +86,6 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
       player.currentTime = currentTime;
       waveform.seek(currentTime);
 
-      // const apiObj = new GetAnnotationsTaskAPI(
-      //   taskDetails.id,
-      //   // taskDetails?.task_type,
-      //   // DT.d2t(currentTime),
-      //   // limit
-      // );
-      // dispatch(APITransport(apiObj));
     },
 
     // eslint-disable-next-line
@@ -169,7 +141,6 @@ const Progress = memo(({ waveform, currentTime, subtitle = [] ,taskId}) => {
         {sub != undefined //TODO check if the Semantic (L2) transcription box is empty for Supercheckers/Reviewers of internal language
           ? sub.map((item, index) => {
               const { duration } = player;
-              // console.log(item)
               return (
                 item.text === ''? 
                 <span
@@ -204,7 +175,6 @@ const Grab = memo(({ waveform , taskId,}) => {
   const player = useSelector((state) => state.commonReducer.player);
   const limit = useSelector((state) => state.commonReducer.limit);
   const taskDetails = useSelector((state) => state.getTaskDetails.data);
-// console.log(taskDetails.id,"taskDetailstaskDetails")
 
   const [grabStartX, setGrabStartX] = useState(0);
   const [grabStartTime, setGrabStartTime] = useState(0);

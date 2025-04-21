@@ -5,7 +5,6 @@ import React, { useEffect, useMemo, useState, useRef, Suspense } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
 import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -1050,22 +1049,20 @@ const AudioTranscriptionLandingPage = () => {
     }
   }, [advancedWaveformSettings]);
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.shiftKey && event.key === " ") {
-        event.preventDefault();
-        if (player) {
-          // console.log(isPlaying(player));
-          if (isPlaying(player)) {
-            player.pause();
-          } else {
-            player.play();
-          }
+useEffect(() => {
+  const handleKeyDown = (event) => {
+    if (event.shiftKey && event.key === ' ') {
+      event.preventDefault();
+      if(player){
+        if(isPlaying(player)){
+          player.pause();
+        }else{
+          player.play();
         }
       }
-      const activeElement = document.activeElement;
-      const isTextAreaFocused = activeElement.tagName == "TEXTAREA";
-      console.log(activeElement);
+    }
+    const activeElement = document.activeElement;
+    const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
 
       if (isTextAreaFocused) {
         return;

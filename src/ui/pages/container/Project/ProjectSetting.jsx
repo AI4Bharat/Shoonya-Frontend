@@ -1,4 +1,10 @@
-import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Tab from "@mui/material/Tab";
+import Card from "@mui/material/Card";
+import Tabs from "@mui/material/Tabs";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
 import React from 'react'
 import { useState ,useEffect} from 'react'
 import BasicSettings from '../../component/Tabs/BasicSettings';

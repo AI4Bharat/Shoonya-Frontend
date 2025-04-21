@@ -13,26 +13,19 @@ import {
 } from "chart.js";
 
 import { useSelector, useDispatch } from "react-redux";
-
-import {
-  Button,
-  Grid,
-  ThemeProvider,
-  Select,
-  Box,
-  MenuItem,
-  Radio,
-  InputLabel,
-  FormControl,
-  Card,
-  Typography,
-} from "@mui/material";
-import LightTooltip from "../../../component/common/Tooltip";
-import { translate } from "../../../../../config/localisation";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Select from "@mui/material/Select";
+import Box from "@mui/material/Box";
+import MenuItem from "@mui/material/MenuItem";
+import Radio from "@mui/material/Radio";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Card from "@mui/material/Card";
+import Typography from "@mui/material/Typography";
 import Checkbox from "@mui/material/Checkbox";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import InfoIcon from "@mui/icons-material/Info";
 import CircularProgress from '@mui/material/CircularProgress';
 import { MenuProps } from "../../../../../utils/utils";
 import { DateRangePicker } from "react-date-range";
@@ -40,9 +33,6 @@ import {
   addDays,
   isSameDay,
   format,
-  minutesToSeconds,
-  hoursToSeconds,
-  secondsToHours,
 } from "date-fns/esm";
 import { modifiedStaticRanges } from "../../../../../utils/Date_Range/getDateRangeFormat";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -219,7 +209,6 @@ export default function PerformanceAnalytics() {
     })
     .catch(err => {
         setLoading(false);
-        console.log("err - ", err);
         setPerformanceAnalyticsTasksData([])
     })
   };
@@ -246,8 +235,6 @@ export default function PerformanceAnalytics() {
         entries.push(i["data"][0]["periodical_tasks_count"]);
       }
     }
-    console.log(labels);
-    console.log(entries);
 
     setChartData({
       labels: labels,

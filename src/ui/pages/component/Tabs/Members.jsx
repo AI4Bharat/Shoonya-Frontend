@@ -29,7 +29,6 @@ const Members = () => {
     }
   }, [OrganizationUserData]);
 
-  console.log("OrganizationUserData", OrganizationUserData);
 
   return (
     <div>

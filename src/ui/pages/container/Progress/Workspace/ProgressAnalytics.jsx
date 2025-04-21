@@ -6,7 +6,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from "@mui/material/Checkbox";
 import { useSelector, useDispatch } from "react-redux";
 import themeDefault from "../../../../theme/theme";
-import DatasetStyle from "../../../../styles/Dataset";
 import WorkspacePeriodicalTasksAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetPeriodicalTasks";
 import WorkspaceCumulativeTasksAPI from "../../../../../redux/actions/api/WorkspaceDetails/GetCumulativeTasks";
 import LightTooltip from '../../../component/common/Tooltip';
@@ -233,7 +232,6 @@ function ProgressAnalytics() {
       })
       .catch(err => {
         setLoading(false);
-        console.log("err - ", err);
       })
   }
 
@@ -251,7 +249,6 @@ function ProgressAnalytics() {
       })
       .catch(err => {
         setLoading(false);
-        console.log("err - ", err);
       })
   }
 
@@ -269,7 +266,6 @@ function ProgressAnalytics() {
       })
       .catch(err => {
         setLoading(false);
-        console.log("err - ", err);
       })
   }
 
@@ -529,13 +525,10 @@ function ProgressAnalytics() {
     let svgChData;
     if (chartTypes === availableChartType.Individual) {
       if (baseperiod === "Cumulative") {
-        // console.log("CumulativeTasksData - ", CumulativeTasksData);
-        // debugger
         svgChData = CumulativeTasksData.map((el, i) => {
           return {
             name: el.language,
             value: getCumulativeMetaInfo(el),
-            // stack: el.language
           }
         })
         const labels = CumulativeTasksData && CumulativeTasksData.map((el, i) => el.language)
@@ -581,7 +574,6 @@ function ProgressAnalytics() {
             }),
 
         };
-        // console.log("data data - ", data);
       }
 
     } else {

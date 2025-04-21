@@ -1,27 +1,23 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Grid,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-  styled,
-  Menu,
-  Checkbox,
-  FormControlLabel,
-  IconButton,
-} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import styled from "@mui/material/styles/styled";
+import Menu from "@mui/material/Menu";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
 import APITransport from "../../../../../redux/actions/apitransport/apitransport";
 import TaskAnalyticsDataAPI from "../../../../../redux/actions/api/Progress/TaskAnalytics";
 import AudioTaskAnalyticsChart from "./AudioTaskAnalyticsChart";
 import TaskCountAnalyticsChart from "./TaskCountAnalyticsChart";
 import Spinner from "../../../component/common/Spinner";
-import LightTooltip from "../../../component/common/Tooltip";
-import InfoIcon from "@mui/icons-material/Info";
-import { translate } from "../../../../../config/localisation";
+import LightTooltip from '../../../component/common/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
 import CustomButton from "../../../component/common/Button";
 import { MenuProps } from "../../../../../utils/utils";
 import exportFromJSON from "export-from-json";

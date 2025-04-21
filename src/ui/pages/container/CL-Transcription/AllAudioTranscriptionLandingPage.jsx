@@ -619,8 +619,7 @@ const AllAudioTranscriptionLandingPage = () => {
         }
       }
       const activeElement = document.activeElement;
-      const isTextAreaFocused = activeElement.tagName == "TEXTAREA";
-      console.log(activeElement);
+      const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
 
       if (isTextAreaFocused) {
         return;
