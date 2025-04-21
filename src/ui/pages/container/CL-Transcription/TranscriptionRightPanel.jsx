@@ -109,7 +109,6 @@ const TranscriptionRightPanel = ({
   const handlePageChange = (event, value) => {
     setPage(value);
   };
-  //console.log(subtitles);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles;
@@ -990,7 +989,6 @@ const TranscriptionRightPanel = ({
                           onChangeText={() => {}}
                           onDoubleClick={(event)=>{
                             const textarea = textRefs.current[index]
-                            console.log(textarea);
                             if(textarea){
                               const start = textarea.selectionStart
                               const end = textarea.selectionEnd
@@ -1013,11 +1011,9 @@ const TranscriptionRightPanel = ({
                           }}
 
                           onKeyDown={(event) => {
-                            console.log(event,"log",document.activeElement);
 
                             if ( event.shiftKey && event.key == "ArrowLeft") {
                               const textArea = textRefs.current[index];
-                              console.log("helo");
 
                               if (textArea) {
                                 const start = textArea.selectionStart;
@@ -1067,7 +1063,6 @@ const TranscriptionRightPanel = ({
                                   dir={enableRTL_Typing ? "rtl" : "ltr"}
                                   onDoubleClick={(event)=>{
                                     const textarea = textRefs.current[index]
-                                    console.log(textarea);
                                     if(textarea){
                                       const start = textarea.selectionStart
                                       const end = textarea.selectionEnd
@@ -1090,11 +1085,9 @@ const TranscriptionRightPanel = ({
                                   }}
         
                                   onKeyDown={(event) => {
-                                    console.log(event,"log",document.activeElement);
         
                                     if ( event.shiftKey && event.key == "ArrowLeft") {
                                       const textArea = textRefs.current[index];
-                                      console.log("helo");
         
                                       if (textArea) {
                                         const start = textArea.selectionStart;
@@ -1155,7 +1148,6 @@ const TranscriptionRightPanel = ({
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             onDoubleClick={(event)=>{
                               const textarea = textRefs.current[index]
-                              console.log(textarea);
                               if(textarea){
                                 const start = textarea.selectionStart
                                 const end = textarea.selectionEnd
@@ -1178,11 +1170,9 @@ const TranscriptionRightPanel = ({
                             }}
   
                             onKeyDown={(event) => {
-                              console.log(event,"log",document.activeElement);
   
                               if ( event.shiftKey && event.key == "ArrowLeft") {
                                 const textArea = textRefs.current[index];
-                                console.log("helo");
   
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1241,7 +1231,6 @@ const TranscriptionRightPanel = ({
                             value={item.acoustic_normalised_text}
                             onDoubleClick={(event)=>{
                               const textarea = textRefs.current[index]
-                              console.log(textarea);
                               if(textarea){
                                 const start = textarea.selectionStart
                                 const end = textarea.selectionEnd
@@ -1264,11 +1253,9 @@ const TranscriptionRightPanel = ({
                             }}
   
                             onKeyDown={(event) => {
-                              console.log(event,"log",document.activeElement);
   
                               if ( event.shiftKey && event.key == "ArrowLeft") {
                                 const textArea = textRefs.current[index];
-                                console.log("helo");
   
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1323,7 +1310,6 @@ const TranscriptionRightPanel = ({
                                     dir={enableRTL_Typing ? "rtl" : "ltr"}
                                     onDoubleClick={(event)=>{
                                       const textarea = textRefs.current[index]
-                                      console.log(textarea);
                                       if(textarea){
                                         const start = textarea.selectionStart
                                         const end = textarea.selectionEnd
@@ -1346,11 +1332,9 @@ const TranscriptionRightPanel = ({
                                     }}
           
                                     onKeyDown={(event) => {
-                                      console.log(event,"log",document.activeElement);
           
                                       if ( event.shiftKey && event.key == "ArrowLeft") {
                                         const textArea = textRefs.current[index];
-                                        console.log("helo");
           
                                         if (textArea) {
                                           const start = textArea.selectionStart;
@@ -1406,7 +1390,6 @@ const TranscriptionRightPanel = ({
                               }}
                               onDoubleClick={(event)=>{
                                 const textarea = textRefs.current[index]
-                                console.log(textarea);
                                 if(textarea){
                                   const start = textarea.selectionStart
                                   const end = textarea.selectionEnd
@@ -1429,11 +1412,9 @@ const TranscriptionRightPanel = ({
                               }}
     
                               onKeyDown={(event) => {
-                                console.log(event,"log",document.activeElement);
     
                                 if ( event.shiftKey && event.key == "ArrowLeft") {
                                   const textArea = textRefs.current[index];
-                                  console.log("helo");
     
                                   if (textArea) {
                                     const start = textArea.selectionStart;

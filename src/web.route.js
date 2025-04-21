@@ -108,7 +108,6 @@ const App = () => {
           path="projects/:projectId/task/:taskId"
           element={ProtectedRouteWrapper(
             <Layout component={<LSF />} />
-            // <Layout component={<AnnotateTask />} />
           )}
         />
         <Route

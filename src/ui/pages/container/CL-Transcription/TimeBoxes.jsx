@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
-import { Box, TextField } from "@mui/material";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
 
 const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
   const classes = AudioTranscriptionLandingStyle();

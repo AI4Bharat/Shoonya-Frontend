@@ -2,7 +2,6 @@
 import { snakeToTitleCase } from "../utils";
 
 const conversationVerificationLabelConfig = (taskData) => {
-    console.log(taskData, "taskData");
     const sourceChat = (taskData.unverified_conversation_json)?.map((item, idx) => {
         const speaker = taskData?.speakers_json.find(s => s?.speaker_id == item?.speaker_id);
         return (

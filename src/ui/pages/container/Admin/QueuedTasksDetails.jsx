@@ -19,8 +19,6 @@ import GetQueuedTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetQueu
 
 const QueuedTasksDetails = (props) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  // const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",

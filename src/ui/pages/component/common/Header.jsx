@@ -1,36 +1,30 @@
-import {
-  AppBar,
-  Avatar,
-  Box,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  Grid,
-  Button,
-  Stack,
-  IconButton,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Tooltip,
-  Typography,
-  Tabs,
-  Tab,
-  Badge,
-  Popover,
-  Chip,
-} from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
+import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Badge from "@mui/material/Badge";
+import Popover from "@mui/material/Popover";
+
 import { useEffect, useState } from "react";
 
 import { formatDistanceToNow, format } from "date-fns";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import GradingSharpIcon from "@mui/icons-material/GradingSharp";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import { Link, NavLink } from "react-router-dom";
-import CustomButton from "../common/Button";
 import headerStyle from "../../../styles/header";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationPatchAPI from "../../../../redux/actions/api/Notification/NotificationPatchApi";
@@ -40,7 +34,6 @@ import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 import { useLocation, useNavigate } from "react-router-dom";
-import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import MobileNavbar from "./MobileNavbar";
 import { useTheme } from "@emotion/react";
 import { useMediaQuery } from "@mui/material";

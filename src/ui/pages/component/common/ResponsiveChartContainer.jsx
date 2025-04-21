@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMediaQuery, useMediaQueries } from '@react-hook/media-query'
+import { useMediaQuery} from '@react-hook/media-query'
 import { ResponsiveContainer } from 'recharts';
 import { Box } from '@mui/material';
 

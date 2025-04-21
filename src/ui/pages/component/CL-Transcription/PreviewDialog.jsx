@@ -1,6 +1,5 @@
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -17,7 +16,6 @@ const PreviewDialog = ({
   subtitles,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  console.log(subtitles);
   const annotationData = useSelector((state) => state.getAnnotationsTask.data);
 
   const [loading, setLoading] = useState(false);

@@ -1,5 +1,14 @@
 import {useState} from 'react';
-import { Box, Card, Grid, ThemeProvider, Typography, Tabs, Tab ,IconButton, Tooltip} from "@mui/material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import { ThemeProvider } from "@mui/material/styles";
+
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import themeDefault from '../../../theme/theme'
 import { useParams,useNavigate } from "react-router-dom";
@@ -23,7 +32,6 @@ import Spinner from '../../component/common/Spinner';
 const DatasetDetails = () => {
 
     const { datasetId } = useParams();
-    console.log(datasetId)
       const [loading, setLoading] = useState(false);
     const [selectedTab, setSelectedTab] = useState(0);
     const [datasetData, setDatasetData] = useState(

@@ -43,7 +43,6 @@ const UserDetail = (props) => {
   const [Role, setRole] = useState("");
 
   const UserDetail = useSelector((state) => state.getUserDetails.data);
-  console.log(UserDetail);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const SearchUserDetail = useSelector(
     (state) => state.SearchProjectCards.data
