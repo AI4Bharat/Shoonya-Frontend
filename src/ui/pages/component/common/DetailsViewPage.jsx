@@ -103,6 +103,8 @@ const DetailsViewPage = (props) => {
     message: "",
     variant: "success",
   });
+  const [reloadWorkspaceTable, setReloadWorkspaceTable] = useState(false);
+
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
@@ -110,16 +112,7 @@ const DetailsViewPage = (props) => {
     setValue(newValue);
   };
   const apiLoading = useSelector((state) => state.apiStatus.loading);
-  // const workspaceData = useSelector(state=>state.getWorkspaces.data);
-  // const getDashboardWorkspaceData = ()=>{
-  //     const workspaceObj = new GetWorkspacesAPI(1);
-  //     dispatch(APITransport(workspaceObj));
-  //   }
-
-
-  useEffect(() => {
-    // getDashboardWorkspaceData();
-  }, []);
+ 
   const getWorkspaceDetails = () => {
     const workspaceObj = new GetWorkspacesDetailsAPI(orgId);
     dispatch(APITransport(workspaceObj));
@@ -577,11 +570,12 @@ const DetailsViewPage = (props) => {
                   sx={{ width: "100%", mb: 2 }}
                   onClick={handleWorkspaceDialogOpen}
                 />
-                <Workspaces />
+                <Workspaces reloadWorkspaceTable={reloadWorkspaceTable} setReloadWorkspaceTable={setReloadWorkspaceTable}/>
                 <AddWorkspaceDialog
                   dialogCloseHandler={handleWorkspaceDialogClose}
                   isOpen={addWorkspacesDialogOpen}
                   orgId={orgId}
+                  setReloadWorkspaceTable={setReloadWorkspaceTable}
                 />
               </>
             )}
