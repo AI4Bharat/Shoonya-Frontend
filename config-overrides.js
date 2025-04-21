@@ -6,7 +6,7 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const addBabelPreset = require("customize-cra").addBabelPreset;
 
 
-const addModernBabelPreset = () => 
+const addModernBabelPreset = () =>
   addBabelPreset([
     "@babel/preset-env",
     {
@@ -30,8 +30,8 @@ const addOptimizations = (config) => {
       new MiniCssExtractPlugin({
         filename: "css/[name].[contenthash].css",
         chunkFilename: "css/[id].[contenthash].css",
-        experimentalUseImportModule: true, 
-            })
+        experimentalUseImportModule: true,
+      })
     );
 
     config.plugins.push(
@@ -59,70 +59,70 @@ const addOptimizations = (config) => {
       // }),
       //     );
 
-    config.optimization = {
-      ...config.optimization,
-      usedExports: true,
-      moduleIds: "deterministic",
-      minimizer: [
-        new TerserPlugin({
-          terserOptions: {
-            compress: {
-              drop_console: true,
-              drop_debugger: true,
-              dead_code: true,
-              passes: 3,
-              pure_funcs: ["console.log", "console.info"],
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        moduleIds: "deterministic",
+        minimizer: [
+          new TerserPlugin({
+            terserOptions: {
+              compress: {
+                drop_console: true,
+                drop_debugger: true,
+                dead_code: true,
+                passes: 3,
+                pure_funcs: ["console.log", "console.info"],
+              },
+              output: {
+                comments: false,
+              },
             },
-            output: {
-              comments: false,
+            parallel: true,
+          }),
+        ],
+        splitChunks: {
+          chunks: 'all',
+          minSize: 30000,
+          maxSize: 244000,
+          minChunks: 1,
+          maxAsyncRequests: 30,
+          maxInitialRequests: 30,
+          automaticNameDelimiter: '~',
+          cacheGroups: {
+            vendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10,
+              name: 'vendors',
             },
-          },
-          parallel: true,
-        }),
-      ],
-splitChunks: {
-  chunks: 'all',
-  minSize: 30000,
-  maxSize: 244000, 
-  minChunks: 1,
-  maxAsyncRequests: 30,
-  maxInitialRequests: 30,
-  automaticNameDelimiter: '~',
-  cacheGroups: {
-    vendors: {
-      test: /[\\/]node_modules[\\/]/,
-      priority: -10,
-      name: 'vendors',
-    },
-    default: {
-      minChunks: 2,
-      priority: -20,
-      reuseExistingChunk: true,
-    },
-    quill: {
-      test: /[\\/]node_modules[\\/]quill[\\/]/,
-      name: 'quill',
-      chunks: 'all',
-      priority: 5,
-    },
-    lodash: {
-      test: /[\\/]node_modules[\\/]lodash[\\/]/,
-      name: 'lodash',
-      chunks: 'all',
-      priority: 5,
-    },
-  }
-},
-      runtimeChunk: {
-        name: "manifest",
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+            quill: {
+              test: /[\\/]node_modules[\\/]quill[\\/]/,
+              name: 'quill',
+              chunks: 'all',
+              priority: 5,
+            },
+            lodash: {
+              test: /[\\/]node_modules[\\/]lodash[\\/]/,
+              name: 'lodash',
+              chunks: 'all',
+              priority: 5,
+            },
+          }
+        },
+        runtimeChunk: {
+          name: "manifest",
+        },
       },
-    };
 
-    // Optional: Performance hint
-    config.performance = {
-      hints: "warning",
-      assetFilter: (assetFilename) => assetFilename.endsWith(".js.gz"),
-    };
+      // Optional: Performance hint
+      config.performance = {
+        hints: "warning",
+        assetFilter: (assetFilename) => assetFilename.endsWith(".js.gz"),
+    });
   }
 
   return config;
@@ -155,5 +155,5 @@ module.exports = override(
   addModernBabelPreset(),
   addOptimizations,
   addExtraRules(),
-  addExternals() 
+  addExternals()
 );
