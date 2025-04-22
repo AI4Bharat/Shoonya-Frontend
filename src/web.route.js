@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react'
 import {
   BrowserRouter as Router,
   HashRouter,
@@ -5,44 +6,51 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import Login from "./ui/pages/container/UserManagement/Login";
-import ForgotPassword from "./ui/pages/container/UserManagement/ForgotPassword";
-import Dashboard from "./ui/pages/container/Project/ProjectList";
-import Projects from "./ui/pages/container/Project/ProjectDetails";
 import { ThemeProvider } from "@mui/material/styles";
-import ProjectSetting from "./ui/pages/container/Project/ProjectSetting";
-import WorkSpace from "./ui/pages/container/Workspace/WorkSpaceDetails";
 import themeDefault from "./ui/theme/theme";
-import AnnotationProject from "./ui/pages/container/Workspace/AnnotationProject";
-import WorkSpaces from "./ui/pages/container/Workspace/WorkSpaceList";
-import Layout from "./ui/Layout";
-import MyOrganization from "./ui/pages/container/Organization/MyOrganization";
-import CollectionProject from "./ui/pages/container/Workspace/CollectionProject";
-import DatasetList from "./ui/pages/container/Dataset/DatasetList";
-import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
-import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
-import LSF from "./ui/pages/container/Label-Studio/LSF";
-import ReviewLSF from "./ui/pages/container/Label-Studio/ReviewLSF";
-import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
-import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
-import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
-import ProgressPage from "./ui/pages/container/UserManagement/ProgressPage";
-import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
-import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
-import SignUp from "./ui/pages/container/UserManagement/SignUp";
-import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
-import ProgressList from "./ui/pages/container/Progress/ProgressList"
-import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
-import AllAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AllAudioTranscriptionLandingPage";
-import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
-import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
-import DashBoard from "./ui/pages/container/Admin/DashBoard";
-import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
-import AudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AudioTranscriptionLandingPage";
-import ReviewAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/ReviewAudioTranscriptionLandingPage";
-import SuperCheckerAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/SuperCheckerAudioTranscriptionLandingPage"
+// Lazy-loaded components
+const Login = React.lazy(() => import("./ui/pages/container/UserManagement/Login"));
+const ForgotPassword = React.lazy(() => import("./ui/pages/container/UserManagement/ForgotPassword"));
+const ConfirmForgetPassword = React.lazy(() => import("./ui/pages/container/UserManagement/ConfirmForgetPassword"));
+const SignUp = React.lazy(() => import("./ui/pages/container/UserManagement/SignUp"));
+const ChangePassword = React.lazy(() => import("./ui/pages/container/UserManagement/ChangePassword"));
+const ProfilePage = React.lazy(() => import("./ui/pages/container/UserManagement/ProfilePage"));
+const ProgressPage = React.lazy(() => import("./ui/pages/container/UserManagement/ProgressPage"));
+const EditProfile = React.lazy(() => import("./ui/pages/container/UserManagement/EditProfile"));
 
+const Dashboard = React.lazy(() => import("./ui/pages/container/Project/ProjectList"));
+const Projects = React.lazy(() => import("./ui/pages/container/Project/ProjectDetails"));
+const ProjectSetting = React.lazy(() => import("./ui/pages/container/Project/ProjectSetting"));
+
+const WorkSpaces = React.lazy(() => import("./ui/pages/container/Workspace/WorkSpaceList"));
+const WorkSpace = React.lazy(() => import("./ui/pages/container/Workspace/WorkSpaceDetails"));
+const WorkspaceSettingTabs = React.lazy(() => import("./ui/pages/container/Workspace/WorkspaceSettingTabs"));
+const AnnotationProject = React.lazy(() => import("./ui/pages/container/Workspace/AnnotationProject"));
+const CollectionProject = React.lazy(() => import("./ui/pages/container/Workspace/CollectionProject"));
+
+const DatasetList = React.lazy(() => import("./ui/pages/container/Dataset/DatasetList"));
+const DatasetDetails = React.lazy(() => import("./ui/pages/container/Dataset/DatasetDetails"));
+const DatasetSettingTabs = React.lazy(() => import("./ui/pages/container/Dataset/DatasetSettingTabs"));
+const AutomateDatasets = React.lazy(() => import("./ui/pages/container/Dataset/AutomateDatasets"));
+const CreateDatasetInstanceButton = React.lazy(() => import("./ui/pages/container/Dataset/CreateNewDatasetInstance"));
+
+const Transliteration = React.lazy(() => import("./ui/pages/container/Transliteration/Transliteration"));
+const MyOrganization = React.lazy(() => import("./ui/pages/container/Organization/MyOrganization"));
+
+const LSF = React.lazy(() => import("./ui/pages/container/Label-Studio/LSF"));
+const ReviewLSF = React.lazy(() => import("./ui/pages/container/Label-Studio/ReviewLSF"));
+const AllTaskLSF = React.lazy(() => import("./ui/pages/container/Label-Studio/AllTaskLSF"));
+const SuperCheckerLSF = React.lazy(() => import("./ui/pages/container/Label-Studio/SuperCheckerLSF"));
+
+const AudioTranscriptionLandingPage = React.lazy(() => import("./ui/pages/container/CL-Transcription/AudioTranscriptionLandingPage"));
+const ReviewAudioTranscriptionLandingPage = React.lazy(() => import("./ui/pages/container/CL-Transcription/ReviewAudioTranscriptionLandingPage"));
+const SuperCheckerAudioTranscriptionLandingPage = React.lazy(() => import("./ui/pages/container/CL-Transcription/SuperCheckerAudioTranscriptionLandingPage"));
+const AllAudioTranscriptionLandingPage = React.lazy(() => import("./ui/pages/container/CL-Transcription/AllAudioTranscriptionLandingPage"));
+
+const ProgressList = React.lazy(() => import("./ui/pages/container/Progress/ProgressList"));
+const DashBoard = React.lazy(() => import("./ui/pages/container/Admin/DashBoard"));
+const Layout = React.lazy(() => import("./ui/Layout"));
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -61,6 +69,7 @@ const App = () => {
 
   return (
     <HashRouter>
+    <Suspense fallback={<div>Loading...</div>}>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -232,6 +241,7 @@ const App = () => {
           />
          
       </Routes>
+      </Suspense>
     </HashRouter>
   );
 };
