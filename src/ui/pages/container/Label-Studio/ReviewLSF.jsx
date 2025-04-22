@@ -1,7 +1,10 @@
 import PropTypes from "prop-types";
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import ReactQuill from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.bubble.css';
+import LabelStudio1 from "./lsf-build/static/js/main";
+import LabelStudio2 from "@heartexlabs/label-studio";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Alert from "@mui/material/Alert";
@@ -28,10 +31,10 @@ import conversationVerificationLabelConfig from "../../../../utils/LabelConfig/C
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
+import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import keymap from "./keymap";
-import { JsonTable } from "react-json-to-html";
+import {JsonTable} from 'react-json-to-html';
 import {
   getProjectsandTasks,
   getNextProject,
@@ -48,10 +51,6 @@ import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
-const LabelStudio1 = window.LabelStudio1;
-const LabelStudio2 = window.LabelStudio2;
-// Lazy load ReactQuill
-const ReactQuillLazy = React.lazy(() => import("react-quill"));
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -102,7 +101,7 @@ const filterAnnotations = (
   setDisableBtns,
   setFilterMessage,
   setDisableButton,
-  taskData
+  taskData,
 ) => {
   let filteredAnnotations = annotations;
   let userAnnotation = annotations.find((annotation) => {
@@ -111,40 +110,37 @@ const filterAnnotations = (
   let disable = false;
   let disableSkip = false;
   let userAnnotationData = annotations.find(
-    (annotation) => annotation.annotation_type === 3
+    (annotation) =>
+      annotation.annotation_type === 3
   );
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unreviewed") {
-      filteredAnnotations =
-        userAnnotation.result.length > 0 &&
-        !taskData?.revision_loop_count?.review_count
-          ? [userAnnotation]
-          : annotations.filter(
-              (annotation) =>
-                annotation.id === userAnnotation.parent_annotation &&
-                annotation.annotation_type === 1
-            );
+      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.review_count
+        ? [userAnnotation]
+        : annotations.filter((annotation) => annotation.id === userAnnotation.parent_annotation && annotation.annotation_type === 1);
     } else if (
       userAnnotation &&
-      ["rejected"].includes(userAnnotation.annotation_status)
+      [
+        "rejected"
+      ].includes(userAnnotation.annotation_status)
     ) {
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      setFilterMessage(
-        "Revise and Skip buttons are disabled, since the task is being validated by the super checker"
-      );
-    } else if (
+      setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
+    }
+    else if (
       userAnnotationData &&
-      ["draft"].includes(userAnnotation.annotation_status)
+      [
+        "draft"
+      ].includes(userAnnotation.annotation_status)
     ) {
       filteredAnnotations = [userAnnotation];
       disableSkip = true;
       setDisableButton(true);
-      setFilterMessage(
-        "Revise and Skip buttons are disabled, since the task is being validated by the super checker"
-      );
-    } else if (userAnnotation.annotation_status === "draft") {
+      setFilterMessage("Revise and Skip buttons are disabled, since the task is being validated by the super checker");
+    }
+    else if (userAnnotation.annotation_status === "draft") {
       filteredAnnotations = [userAnnotation];
     } else if (
       [
@@ -175,7 +171,9 @@ const filterAnnotations = (
         )
       ) {
         filteredAnnotations = [userAnnotation];
-        setFilterMessage("This task is being validated by the super checker");
+        setFilterMessage(
+          "This task is being validated by the super checker"
+        );
         setDisableBtns(true);
         disable = true;
       } else {
@@ -265,68 +263,52 @@ const LabelStudioWrapper = ({
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
-
+ 
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
 
 
-  useEffect(() => {
-    if (filterdataitemsList.results !== undefined) {
+useEffect(() => {
+  if(filterdataitemsList.results !== undefined){
       if ("metadata_json" in filterdataitemsList.results[0]) {
-        if ("image_url" in filterdataitemsList.results[0].metadata_json[0]) {
-          setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
-        }
-      }
+        if("image_url" in filterdataitemsList.results[0].metadata_json[0]){
+      setParentMetadata(filterdataitemsList.results[0].metadata_json[0]);
+    }}
+  }
+}, [filterdataitemsList.results]);
+  
+useEffect(() => {
+  getProjectsandTasks(projectId, taskId).then(
+    ([labelConfig, taskData, annotations, predictions]) => {
+    if(labelConfig?.project_type?.includes("OCRTranscriptionEditing")){
+      const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
+      dispatch(APITransport(inputData));
     }
-  }, [filterdataitemsList.results]);
-
-  useEffect(() => {
-    getProjectsandTasks(projectId, taskId).then(
-      ([labelConfig, taskData, annotations, predictions]) => {
-        if (labelConfig?.project_type?.includes("OCRTranscriptionEditing")) {
-          const inputData = new DatasetSearchPopupAPI({
-            instance_ids: labelConfig.datasets[0].instance_id,
-            dataset_type: "OCRDocument",
-            search_keys: { id: taskData.input_data },
-          });
-          dispatch(APITransport(inputData));
-        }
-        let sidePanel =
-          labelConfig?.project_type?.includes("OCRSegmentCategorization") ||
-          labelConfig?.project_type?.includes("OCRTranscriptionEditing");
-        let showLabelsOnly = labelConfig?.project_type?.includes(
-          "OCRSegmentCategorization"
-        );
-        let selectAfterCreateOnly = labelConfig?.project_type?.includes(
-          "OCRSegmentCategorization"
-        );
-        let continousLabelingOnly = labelConfig?.project_type?.includes(
-          "OCRSegmentCategorization"
-        );
-        localStorage.setItem(
-          "labelStudio:settings",
-          JSON.stringify({
-            bottomSidePanel: !sidePanel,
-            continuousLabeling: continousLabelingOnly,
-            enableAutoSave: false,
-            enableHotkeys: true,
-            enableLabelTooltips: true,
-            enablePanelHotkeys: true,
-            enableTooltips: false,
-            fullscreen: false,
-            imageFullSize: false,
-            selectAfterCreate: selectAfterCreateOnly,
-            showAnnotationsPanel: true,
-            showLabels: showLabelsOnly,
-            showLineNumbers: false,
-            showPredictionsPanel: true,
-            sidePanelMode: "SIDEPANEL_MODE_REGIONS",
-          })
-        );
-      }
-    );
-  }, []);
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
+    let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
+    let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
+    localStorage.setItem(
+      "labelStudio:settings",
+      JSON.stringify({
+        bottomSidePanel: !sidePanel,
+        continuousLabeling: continousLabelingOnly,
+        enableAutoSave: false,
+        enableHotkeys: true,
+        enableLabelTooltips: true,
+        enablePanelHotkeys: true,
+        enableTooltips: false,
+        fullscreen: false,
+        imageFullSize: false,
+        selectAfterCreate: selectAfterCreateOnly,
+        showAnnotationsPanel: true,
+        showLabels: showLabelsOnly,
+        showLineNumbers: false,
+        showPredictionsPanel: true,
+        sidePanelMode: "SIDEPANEL_MODE_REGIONS",
+      })
+    );});}, []);
 
   const tasksComplete = (id) => {
     if (id) {
@@ -364,19 +346,16 @@ const LabelStudioWrapper = ({
   ) {
     let interfaces = [];
     if (predictions == null) predictions = [];
-    LabelStudio.current = projectType?.includes("OCR")
-      ? LabelStudio1
-      : LabelStudio2;
+    LabelStudio.current = projectType?.includes("OCR") ? LabelStudio1 : LabelStudio2;
 
-    const [filteredAnnotations, disableLSFControls, disableSkip] =
-      filterAnnotations(
-        annotations,
-        userData,
-        setDisableBtns,
-        setFilterMessage,
-        setDisableButton,
-        taskData
-      );
+    const [filteredAnnotations, disableLSFControls, disableSkip] = filterAnnotations(
+      annotations,
+      userData,
+      setDisableBtns,
+      setFilterMessage,
+      setDisableButton,
+      taskData
+    );
     if (taskData.task_status === "freezed") {
       interfaces = [
         "panel",
@@ -388,8 +367,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing" ||
-        projectType.includes("OCR")
+          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -416,8 +394,7 @@ const LabelStudioWrapper = ({
         "topbar",
         "instruction",
         ...(projectType === "AudioTranscription" ||
-        projectType === "AudioTranscriptionEditing" ||
-        projectType.includes("OCR")
+          projectType === "AudioTranscriptionEditing" || projectType.includes("OCR")
           ? ["side-column"]
           : []),
         "annotations:history",
@@ -499,7 +476,7 @@ const LabelStudioWrapper = ({
               review.lead_time,
               "skipped",
               JSON.stringify(reviewNotesRef.current.getEditor().getContents())
-            ).then(() => {
+              ).then(() => {
               getNextProject(projectId, taskData.id, "review").then((res) => {
                 hideLoader();
                 tasksComplete(res?.id || null);
@@ -602,48 +579,44 @@ const LabelStudioWrapper = ({
         onUpdateAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
           let ids = new Set();
-          let countLables = 0;
-          if (projectType.includes("OCRTranscriptionEditing")) {
+          let countLables = 0;         
+          if (projectType.includes("OCRTranscriptionEditing")){
             addLabelsToBboxes(temp);
           }
           temp.map((curr) => {
-            if (curr.type !== "relation") {
+            if(curr.type !== "relation"){
               ids.add(curr.id);
             }
-            if (curr.type === "labels") {
+            if(curr.type === "labels"){
               countLables++;
             }
           });
-          if (projectType.includes("OCR") && ids.size > countLables) {
+          if (projectType.includes("OCR") && ids.size>countLables) {
             setSnackbarInfo({
               open: true,
               message: "Please select labels for all boxes",
               variant: "error",
             });
-          } else {
+          }
+          else {
             if (AUDIO_PROJECT_SAVE_CHECK.includes(projectType)) {
-              const counter = temp.reduce(
-                (acc, curr) => {
-                  if (curr.from_name === "labels") acc.labels++;
-                  else if (
-                    ["transcribed_json", "verbatim_transcribed_json"].includes(
-                      curr.from_name
-                    )
-                  ) {
-                    if (curr.type === "relation") {
-                      if (curr.value.text[0] === "") acc.empty++;
-                      acc.textareas++;
-                    }
-                  }
-                  return acc;
-                },
+              const counter = temp.reduce((acc, curr) => {
+                if (curr.from_name === "labels")
+                  acc.labels++;
+                else if (["transcribed_json", "verbatim_transcribed_json"].includes(curr.from_name)) {
+                  if(curr.type === "relation"){
+                    if (curr.value.text[0] === "")
+                    acc.empty++;
+                  acc.textareas++;
+                }}
+                return acc;
+              },
                 { labels: 0, textareas: 0, empty: 0 }
               );
               if (counter.labels !== counter.textareas || counter.empty) {
                 setSnackbarInfo({
                   open: true,
-                  message:
-                    "Please fill the annotations for every segment/region",
+                  message: "Please fill the annotations for every segment/region",
                   variant: "warning",
                 });
                 return;
@@ -654,9 +627,9 @@ const LabelStudioWrapper = ({
               showLoader();
 
               for (let i = 0; i < temp.length; i++) {
-                if (temp[i].type === "relation") {
+                if(temp[i].type === "relation"){
                   continue;
-                } else if (temp[i].value.text) {
+                }else if (temp[i].value.text) {
                   temp[i].value.text = [temp[i].value.text[0]];
                 }
               }
@@ -672,9 +645,7 @@ const LabelStudioWrapper = ({
                 review_status.current,
                 temp,
                 review.parent_annotation,
-                JSON.stringify(
-                  reviewNotesRef.current.getEditor().getContents()
-                ),
+                JSON.stringify(reviewNotesRef.current.getEditor().getContents()),
                 false,
                 selectedLanguages,
                 ocrDomain
@@ -697,8 +668,8 @@ const LabelStudioWrapper = ({
                 message: "Task is frozen",
                 variant: "error",
               });
-          }
-        },
+        }
+      },
       });
     }
   }
@@ -721,45 +692,37 @@ const LabelStudioWrapper = ({
         superCheckerNotesRef.current.value = superCheckerAnnotation?.supercheck_notes ?? "";
         reviewNotesRef.current.value =  userAnnotation?.review_notes ?? "";
         try {
-          const newDelta2 =
-            annotationNotesRef.current.value !== ""
-              ? JSON.parse(annotationNotesRef.current.value)
-              : "";
+          const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
-          if (err) {
+          if(err){
             const newDelta2 = annotationNotesRef.current.value;
-            annotationNotesRef.current.getEditor().setText(newDelta2);
+            annotationNotesRef.current.getEditor().setText(newDelta2);  
           }
         }
-
+        
         try {
-          const newDelta1 =
-            reviewNotesRef.current.value != ""
-              ? JSON.parse(reviewNotesRef.current.value)
-              : "";
+          const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
           reviewNotesRef.current.getEditor().setContents(newDelta1);
         } catch (err) {
-          if (err) {
+          if(err){
             const newDelta1 = reviewNotesRef.current.value;
-            reviewNotesRef.current.getEditor().setText(newDelta1);
+            reviewNotesRef.current.getEditor().setText(newDelta1); 
           }
         }
         try {
-          const newDelta3 =
-            superCheckerNotesRef.current.value != ""
-              ? JSON.parse(superCheckerNotesRef.current.value)
-              : "";
+          const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
           superCheckerNotesRef.current.getEditor().setContents(newDelta3);
         } catch (err) {
-          if (err) {
+          if(err){
             const newDelta3 = superCheckerNotesRef.current.value;
-            superCheckerNotesRef.current.getEditor().setText(newDelta3);
+            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
           }
         }
-        setannotationtext(annotationNotesRef.current.getEditor().getText());
-        setreviewtext(reviewNotesRef.current.getEditor().getText());
-        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText());
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
+
       } else {
         let reviewerAnnotations = annotations.filter(
           (annotation) => annotation.annotation_type === 2
@@ -780,48 +743,36 @@ const LabelStudioWrapper = ({
                 (annotation) =>
                   annotation.parent_annotation === correctAnnotation.id
               )?.supercheck_notes ?? "";
-            try {
-              const newDelta2 =
-                annotationNotesRef.current.value !== ""
-                  ? JSON.parse(annotationNotesRef.current.value)
-                  : "";
-              annotationNotesRef.current.getEditor().setContents(newDelta2);
-            } catch (err) {
-              if (err) {
-                const newDelta2 = annotationNotesRef.current.value;
-                annotationNotesRef.current.getEditor().setText(newDelta2);
+              try {
+                const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+                annotationNotesRef.current.getEditor().setContents(newDelta2);
+              } catch (err) {
+                if(err){
+                  const newDelta2 = annotationNotesRef.current.value;
+                  annotationNotesRef.current.getEditor().setText(newDelta2);                 }
               }
-            }
-
-            try {
-              const newDelta1 =
-                reviewNotesRef.current.value != ""
-                  ? JSON.parse(reviewNotesRef.current.value)
-                  : "";
-              reviewNotesRef.current.getEditor().setContents(newDelta1);
-            } catch (err) {
-              if (err) {
-                const newDelta1 = reviewNotesRef.current.value;
-                reviewNotesRef.current.getEditor().setText(newDelta1);
+              
+              try {
+                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+                reviewNotesRef.current.getEditor().setContents(newDelta1);
+              } catch (err) {
+                if(err){
+                  const newDelta1 = reviewNotesRef.current.value;
+                reviewNotesRef.current.getEditor().setText(newDelta1);  
+                }
               }
-            }
-            try {
-              const newDelta3 =
-                superCheckerNotesRef.current.value != ""
-                  ? JSON.parse(superCheckerNotesRef.current.value)
-                  : "";
-              superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-            } catch (err) {
-              if (err) {
-                const newDelta3 = superCheckerNotesRef.current.value;
-                superCheckerNotesRef.current.getEditor().setText(newDelta3);
-              }
-            }
-            setannotationtext(annotationNotesRef.current.getEditor().getText());
-            setreviewtext(reviewNotesRef.current.getEditor().getText());
-            setsupercheckertext(
-              superCheckerNotesRef.current.getEditor().getText()
-            );
+              try {
+                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+              } catch (err) {
+                if(err){
+                  const newDelta3 = superCheckerNotesRef.current.value;
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3);
+                }
+              }      
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           } else {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
@@ -835,100 +786,76 @@ const LabelStudioWrapper = ({
                 (annotation) =>
                   annotation.parent_annotation === reviewerAnnotations[0].id
               )?.supercheck_notes ?? "";
-            try {
-              const newDelta2 =
-                annotationNotesRef.current.value !== ""
-                  ? JSON.parse(annotationNotesRef.current.value)
-                  : "";
-              annotationNotesRef.current.getEditor().setContents(newDelta2);
-            } catch (err) {
-              if (err) {
-                const newDelta2 = annotationNotesRef.current.value;
-                annotationNotesRef.current.getEditor().setText(newDelta2);
+              try {
+                const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+                annotationNotesRef.current.getEditor().setContents(newDelta2);
+              } catch (err) {
+                if(err){
+                  const newDelta2 = annotationNotesRef.current.value;
+                  annotationNotesRef.current.getEditor().setText(newDelta2);   
+                }
               }
-            }
-
-            try {
-              const newDelta1 =
-                reviewNotesRef.current.value != ""
-                  ? JSON.parse(reviewNotesRef.current.value)
-                  : "";
-              reviewNotesRef.current.getEditor().setContents(newDelta1);
-            } catch (err) {
-              if (err) {
-                const newDelta1 = reviewNotesRef.current.value;
-                reviewNotesRef.current.getEditor().setText(newDelta1);
+              
+              try {
+                const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+                reviewNotesRef.current.getEditor().setContents(newDelta1);
+              } catch (err) {
+                if(err){
+                  const newDelta1 = reviewNotesRef.current.value;
+                reviewNotesRef.current.getEditor().setText(newDelta1); 
+                }
               }
-            }
-            try {
-              const newDelta3 =
-                superCheckerNotesRef.current.value != ""
-                  ? JSON.parse(superCheckerNotesRef.current.value)
-                  : "";
-              superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-            } catch (err) {
-              if (err) {
-                const newDelta3 = superCheckerNotesRef.current.value;
-                superCheckerNotesRef.current.getEditor().setText(newDelta3);
+              try {
+                const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+                superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+              } catch (err) {
+                if(err){
+                  const newDelta3 = superCheckerNotesRef.current.value;
+                  superCheckerNotesRef.current.getEditor().setText(newDelta3); 
+                }
               }
-            }
-            setannotationtext(annotationNotesRef.current.getEditor().getText());
-            setreviewtext(reviewNotesRef.current.getEditor().getText());
-            setsupercheckertext(
-              superCheckerNotesRef.current.getEditor().getText()
-            );
+              setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
           }
         } else {
           let normalAnnotation = annotations.find(
             (annotation) => annotation.annotation_type === 1
           );
-          annotationNotesRef.current.value =
-            normalAnnotation.annotation_notes ?? "";
-          superCheckerNotesRef.current.value =
-            normalAnnotation.supercheck_notes ?? "";
-          reviewNotesRef.current.value = normalAnnotation.review_notes ?? "";
-          try {
-            const newDelta2 =
-              annotationNotesRef.current.value !== ""
-                ? JSON.parse(annotationNotesRef.current.value)
-                : "";
-            annotationNotesRef.current.getEditor().setContents(newDelta2);
-          } catch (err) {
-            if (err) {
-              const newDelta2 = annotationNotesRef.current.value;
-              annotationNotesRef.current.getEditor().setText(newDelta2);
-            }
+          annotationNotesRef.current.value = normalAnnotation.annotation_notes ?? "";
+        superCheckerNotesRef.current.value = normalAnnotation.supercheck_notes ?? "";
+        reviewNotesRef.current.value =  normalAnnotation.review_notes ?? "";
+        try {
+          const newDelta2 = annotationNotesRef.current.value !== "" ? JSON.parse(annotationNotesRef.current.value) : "";
+          annotationNotesRef.current.getEditor().setContents(newDelta2);
+        } catch (err) {
+          if(err){
+            const newDelta2 = annotationNotesRef.current.value;
+            annotationNotesRef.current.getEditor().setText(newDelta2); 
           }
-
-          try {
-            const newDelta1 =
-              reviewNotesRef.current.value != ""
-                ? JSON.parse(reviewNotesRef.current.value)
-                : "";
-            reviewNotesRef.current.getEditor().setContents(newDelta1);
-          } catch (err) {
-            if (err) {
-              const newDelta1 = reviewNotesRef.current.value;
-              reviewNotesRef.current.getEditor().setText(newDelta1);
-            }
+        }
+        
+        try {
+          const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
+          reviewNotesRef.current.getEditor().setContents(newDelta1);
+        } catch (err) {
+          if(err){
+            const newDelta1 = reviewNotesRef.current.value;
+            reviewNotesRef.current.getEditor().setText(newDelta1);   
           }
-          try {
-            const newDelta3 =
-              superCheckerNotesRef.current.value != ""
-                ? JSON.parse(superCheckerNotesRef.current.value)
-                : "";
-            superCheckerNotesRef.current.getEditor().setContents(newDelta3);
-          } catch (err) {
-            if (err) {
-              const newDelta3 = superCheckerNotesRef.current.value;
-              superCheckerNotesRef.current.getEditor().setText(newDelta3);
-            }
+        }
+        try {
+          const newDelta3 = superCheckerNotesRef.current.value!=""?JSON.parse(superCheckerNotesRef.current.value):"";
+          superCheckerNotesRef.current.getEditor().setContents(newDelta3);
+        } catch (err) {
+          if(err){
+            const newDelta3 = superCheckerNotesRef.current.value;
+            superCheckerNotesRef.current.getEditor().setText(newDelta3); 
           }
-          setannotationtext(annotationNotesRef.current.getEditor().getText());
-          setreviewtext(reviewNotesRef.current.getEditor().getText());
-          setsupercheckertext(
-            superCheckerNotesRef.current.getEditor().getText()
-          );
+        }
+        setannotationtext(annotationNotesRef.current.getEditor().getText())
+        setreviewtext(reviewNotesRef.current.getEditor().getText())
+        setsupercheckertext(superCheckerNotesRef.current.getEditor().getText())
         }
       }
     }
@@ -939,7 +866,7 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     const projectObj = new GetProjectDetailsAPI(projectId);
     dispatch(APITransport(projectObj));
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (localStorage.getItem("rtl") === "true") {
@@ -953,14 +880,8 @@ const LabelStudioWrapper = ({
         ([labelConfig, taskData, annotations, predictions]) => {
 
           setNotes(taskData, annotations);
-          let tempLabelConfig =
-            labelConfig.project_type === "ConversationTranslation" ||
-            labelConfig.project_type === "ConversationTranslationEditing"
-              ? generateLabelConfig(taskData.data)
-              : labelConfig.project_type === "ConversationVerification"
-              ? conversationVerificationLabelConfig(taskData.data)
-              : labelConfig.label_config;
-          if (labelConfig.project_type.includes("OCRSegmentCategorization")) {
+          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data) : labelConfig.label_config;
+          if (labelConfig.project_type.includes("OCRSegmentCategorization")){
             tempLabelConfig = labelConfigJS;
           }
           setLabelConfig(tempLabelConfig);
@@ -1088,20 +1009,14 @@ const LabelStudioWrapper = ({
   }, [taskId]);
 
   const autoSaveReview = () => {
-    if (
-      autoSave &&
-      lsfRef.current?.store?.annotationStore?.selected &&
-      taskData.task_status.toLowerCase() !== "accepted" &&
-      taskData.task_status.toLowerCase() !== "accepted_with_minor_changes" &&
-      taskData.task_status.toLowerCase() !== "accepted_with_major_changes"
-    ) {
+    if (autoSave && lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "accepted" && taskData.task_status.toLowerCase() !== "accepted_with_minor_changes" && taskData.task_status.toLowerCase() !== "accepted_with_major_changes") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
-          if (temp[i].type === "relation") {
+          if(temp[i].type === "relation"){
             continue;
-          } else if (temp[i].value.text) {
+          }else if (temp[i].value.text) {
             temp[i].value.text = [temp[i].value.text[0]];
           }
         }
@@ -1139,22 +1054,17 @@ const LabelStudioWrapper = ({
   };
 
   const clearAllChildren = () => {
-    if (
-      lsfRef.current?.store?.annotationStore?.selected &&
-      taskData.task_status.toLowerCase() !== "accepted" &&
-      taskData.task_status.toLowerCase() !== "accepted_with_minor_changes" &&
-      taskData.task_status.toLowerCase() !== "accepted_with_major_changes"
-    ) {
+    if (lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "accepted" && taskData.task_status.toLowerCase() !== "accepted_with_minor_changes" && taskData.task_status.toLowerCase() !== "accepted_with_major_changes") {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
         for (let i = 0; i < temp.length; i++) {
-          if (temp[i].parentID !== undefined) {
+          if (temp[i].parentID !== undefined){
             delete temp[i].parentID;
           }
-          if (temp[i].type === "relation") {
+          if(temp[i].type === "relation"){
             continue;
-          } else if (temp[i].value.text) {
+          }else if (temp[i].value.text) {
             temp[i].value.text = [temp[i].value.text[0]];
           }
         }
@@ -1180,7 +1090,7 @@ const LabelStudioWrapper = ({
               message: "Error in clearing children bboxes",
               variant: "error",
             });
-          } else {
+          }else{
             window.location.reload();
           }
         });
@@ -1194,15 +1104,15 @@ const LabelStudioWrapper = ({
   };
 
   let hidden, visibilityChange;
-  if (typeof document.hidden !== "undefined") {
-    hidden = "hidden";
-    visibilityChange = "visibilitychange";
-  } else if (typeof document.msHidden !== "undefined") {
-    hidden = "msHidden";
-    visibilityChange = "msvisibilitychange";
-  } else if (typeof document.webkitHidden !== "undefined") {
-    hidden = "webkitHidden";
-    visibilityChange = "webkitvisibilitychange";
+  if (typeof document.hidden !== 'undefined') {
+    hidden = 'hidden';
+    visibilityChange = 'visibilitychange';
+  } else if (typeof document.msHidden !== 'undefined') {
+    hidden = 'msHidden';
+    visibilityChange = 'msvisibilitychange';
+  } else if (typeof document.webkitHidden !== 'undefined') {
+    hidden = 'webkitHidden';
+    visibilityChange = 'webkitvisibilitychange';
   }
 
   const [visible, setVisibile] = useState(!document[hidden]);
@@ -1212,7 +1122,7 @@ const LabelStudioWrapper = ({
     document.addEventListener(visibilityChange, handleVisibilityChange);
     return () => {
       document.removeEventListener(visibilityChange, handleVisibilityChange);
-    };
+    }
   }, []);
 
   useEffect(() => {
@@ -1221,8 +1131,8 @@ const LabelStudioWrapper = ({
 
   useEffect(() => {
     const showAssignedUsers = async () => {
-      getTaskAssignedUsers(taskData).then((res) => setAssignedUsers(res));
-    };
+      getTaskAssignedUsers(taskData).then(res => setAssignedUsers(res));
+    }
     taskData?.id && showAssignedUsers();
   }, [taskData]);
 
@@ -1231,12 +1141,7 @@ const LabelStudioWrapper = ({
       visible && autoSaveReview();
     }, AUTO_SAVE_INTERVAL);
     return () => clearInterval(interval);
-  }, [
-    visible,
-    autoSave,
-    lsfRef.current?.store?.annotationStore?.selected,
-    taskData,
-  ]);
+  }, [visible, autoSave, lsfRef.current?.store?.annotationStore?.selected, taskData]);
 
   const onNextAnnotation = async () => {
     showLoader();
@@ -1283,42 +1188,28 @@ const LabelStudioWrapper = ({
   };
 
   const handleSelectChange = (event) => {
-    selectedLanguages.current = Array.from(
-      event.target.selectedOptions,
-      (option) => option.value
-    );
-    setSelectedL(
-      Array.from(event.target.selectedOptions, (option) => option.value)
-    );
+    selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
+    setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
   };
 
   useEffect(() => {
-    if (taskData) {
-      if (Array.isArray(taskData?.data?.language)) {
-        taskData?.data?.language?.map((lang) => {
+    if(taskData){
+      if(Array.isArray(taskData?.data?.language)){
+        taskData?.data?.language?.map((lang)=>{
           if (!selectedLanguages.current.includes(lang)) {
             selectedLanguages.current.push(lang);
-          }
-          const newLanguages = new Set([
-            ...selectedL,
-            ...taskData?.data?.language,
-          ]);
+          }        
+          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
           setSelectedL(Array.from(newLanguages));
         });
       }
-      if (
-        typeof taskData?.data?.language === "string" &&
-        taskData?.data?.ocr_domain !== ""
-      ) {
+      if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
         setSelectedL([taskData?.data?.language]);
         if (!selectedLanguages.current.includes(taskData?.data?.language)) {
           selectedLanguages.current.push(taskData?.data?.language);
-        }
+        }      
       }
-      if (
-        typeof taskData?.data?.ocr_domain === "string" &&
-        taskData?.data?.ocr_domain !== ""
-      ) {
+      if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
         ocrDomain.current = taskData?.data?.ocr_domain;
         setOcrD(taskData?.data?.ocr_domain);
       }
@@ -1327,13 +1218,12 @@ const LabelStudioWrapper = ({
 
   return (
     <div>
-      {autoSave && (
+      {autoSave &&
         <div style={{ textAlign: "left", marginBottom: "15px" }}>
           <Typography variant="body" color="#000000">
             Auto-save enabled for this scenario.
           </Typography>
-        </div>
-      )}
+        </div>}
       {filterMessage && (
         <Alert severity="info" showIcon style={{ marginBottom: "1%" }}>
           {filterMessage}
@@ -1354,15 +1244,11 @@ const LabelStudioWrapper = ({
                   minWidth: "40px",
                   border: "1px solid #e6e6e6",
                   color: "grey",
-                  pt: 1,
-                  pl: 1,
-                  pr: 1,
+                  pt: 1, pl: 1, pr: 1,
                   borderBottom: "None",
                 }}
-              >
-                <InfoOutlinedIcon
-                  sx={{ mb: "-3px", ml: "2px", color: "grey" }}
-                />
+                > 
+                  <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
               </Button>
             </LightTooltip>
             <Tooltip title="Go to next task">
@@ -1401,29 +1287,27 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {!disableBtns &&
-              !disableButton &&
-              taskData?.review_user === userData?.id && (
-                <Tooltip title="Revise Annotation">
-                  <Button
-                    value="to_be_revised"
-                    type="default"
-                    onClick={handleReviseClick}
-                    style={{
-                      minWidth: "160px",
-                      border: "1px solid #e6e6e6",
-                      color: "#f5222d",
-                      pt: 3,
-                      pb: 3,
-                      borderBottom: "None",
-                      borderLeft: "None",
-                    }}
-                    className="lsf-button"
-                  >
-                    Revise
-                  </Button>
-                </Tooltip>
-              )}
+            {!disableBtns && !disableButton && taskData?.review_user === userData?.id && (
+              <Tooltip title="Revise Annotation">
+                <Button
+                  value="to_be_revised"
+                  type="default"
+                  onClick={handleReviseClick}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#f5222d",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    borderLeft: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Revise
+                </Button>
+              </Tooltip>
+            )}
             {!disableBtns && taskData?.review_user === userData?.id && (
               <Tooltip title="Accept Annotation">
                 <Button
@@ -1450,13 +1334,11 @@ const LabelStudioWrapper = ({
                 </Button>
               </Tooltip>
             )}
-            {ProjectDetails?.project_type?.includes("OCR") && (
-              <Tooltip title="Clear all children bboxes">
+            {ProjectDetails?.project_type?.includes("OCR") &&
+            <Tooltip title="Clear all children bboxes">
                 <Button
                   type="default"
-                  onClick={() => {
-                    clearAllChildren();
-                  }}
+                  onClick={() => {clearAllChildren()}}
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
@@ -1471,30 +1353,28 @@ const LabelStudioWrapper = ({
                   Clear All Mergings
                 </Button>
               </Tooltip>
-            )}
-            {parentMetadata !== undefined && (
-              <>
-                <Tooltip title="Show Parent Image">
-                  <Button
-                    type="default"
-                    onClick={() => {
-                      window.open(parentMetadata.image_url, "_blank");
-                    }}
-                    style={{
-                      minWidth: "160px",
-                      border: "1px solid #e6e6e6",
-                      color: "#09f",
-                      pt: 3,
-                      pb: 3,
-                      borderBottom: "None",
-                    }}
-                    className="lsf-button"
-                  >
-                    Parent Image
-                  </Button>
-                </Tooltip>
-              </>
-            )}
+            }
+            {parentMetadata !== undefined &&
+            <>
+            <Tooltip title="Show Parent Image">
+                <Button
+                  type="default"
+                  onClick={() => {window.open(parentMetadata.image_url, "_blank")}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                  }}
+                  className="lsf-button"
+                >
+                  Parent Image
+                </Button>
+              </Tooltip>
+            </>
+            }
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
@@ -1544,195 +1424,95 @@ const LabelStudioWrapper = ({
           {tagSuggestionList}
         </Popover>
       </Box>
-      {parentMetadata !== undefined && (
-        <>
-          <div
-            style={{
-              textAlign: "center",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <div>
-              <h3>Parent MetaData</h3>
-              <JsonTable json={parentMetadata} />
-            </div>
+      {parentMetadata !== undefined &&
+      <>
+        <div style={{textAlign:"center", display:"flex", justifyContent:"center"}}>
+          <div>
+            <h3>Parent MetaData</h3>
+            <JsonTable json={parentMetadata}/>
           </div>
-        </>
-      )}
-      {!loader &&
-        ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && (
+        </div>
+      </>
+      }
+      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>
-            <div
-              style={{
-                borderStyle: "solid",
-                borderWidth: "1px",
-                borderColor: "#E0E0E0",
-                paddingBottom: "1%",
-                display: "flex",
-                justifyContent: "space-around",
-              }}
-            >
-              <div
-                style={{
-                  paddingLeft: "1%",
-                  fontSize: "medium",
-                  paddingTop: "1%",
-                  display: "flex",
-                }}
-              >
-                <div style={{ margin: "auto" }}>Languages :&nbsp;</div>
-                <select
-                  multiple
-                  onChange={handleSelectChange}
-                  value={selectedL}
-                >
-                  <option value="English">English</option>
-                  <option value="Hindi">Hindi</option>
-                  <option value="Marathi">Marathi</option>
-                  <option value="Tamil">Tamil</option>
-                  <option value="Telugu">Telugu</option>
-                  <option value="Kannada">Kannada</option>
-                  <option value="Gujarati">Gujarati</option>
-                  <option value="Punjabi">Punjabi</option>
-                  <option value="Bengali">Bengali</option>
-                  <option value="Malayalam">Malayalam</option>
-                  <option value="Assamese">Assamese</option>
-                  <option value="Bodo">Bodo</option>
-                  <option value="Dogri">Dogri</option>
-                  <option value="Kashmiri">Kashmiri</option>
-                  <option value="Maithili">Maithili</option>
-                  <option value="Manipuri">Manipuri</option>
-                  <option value="Nepali">Nepali</option>
-                  <option value="Odia">Odia</option>
-                  <option value="Sindhi">Sindhi</option>
-                  <option value="Sinhala">Sinhala</option>
-                  <option value="Urdu">Urdu</option>
-                  <option value="Santali">Santali</option>
-                  <option value="Sanskrit">Sanskrit</option>
-                  <option value="Goan Konkani">Goan Konkani</option>
-                </select>
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
+              <select multiple onChange={handleSelectChange} value={selectedL}>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Assamese">Assamese</option>
+                <option value="Bodo">Bodo</option>
+                <option value="Dogri">Dogri</option>
+                <option value="Kashmiri">Kashmiri</option>
+                <option value="Maithili">Maithili</option>
+                <option value="Manipuri">Manipuri</option>
+                <option value="Nepali">Nepali</option>
+                <option value="Odia">Odia</option>
+                <option value="Sindhi">Sindhi</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Santali">Santali</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Goan Konkani">Goan Konkani</option>
+              </select>
               </div>
-              <div
-                style={{
-                  paddingLeft: "1%",
-                  fontSize: "medium",
-                  paddingTop: "1%",
-                  display: "flex",
-                }}
-              >
-                <div style={{ margin: "auto" }}>Domain :&nbsp;</div>
-                <select
-                  style={{ margin: "auto" }}
-                  onChange={(e) => {
-                    setOcrD(e.target.value);
-                    ocrDomain.current = e.target.value;
-                  }}
-                  value={ocrD}
-                >
-                  <option disabled selected></option>
-                  <option value="BO">Books</option>
-                  <option value="FO">Forms</option>
-                  <option value="OT">Others</option>
-                  <option value="TB">Textbooks</option>
-                  <option value="NV">Novels</option>
-                  <option value="NP">Newspapers</option>
-                  <option value="MG">Magazines</option>
-                  <option value="RP">Research_Papers</option>
-                  <option value="FM">Form</option>
-                  <option value="BR">Brochure_Posters_Leaflets</option>
-                  <option value="AR">Acts_Rules</option>
-                  <option value="PB">Publication</option>
-                  <option value="NT">Notice</option>
-                  <option value="SY">Syllabus</option>
-                  <option value="QP">Question_Papers</option>
-                  <option value="MN">Manual</option>
-                </select>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
+              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
+                <option disabled selected></option>
+                <option value="BO">Books</option>
+                <option value="FO">Forms</option>
+                <option value="OT">Others</option>
+                <option value="TB">Textbooks</option>
+                <option value="NV">Novels</option>
+                <option value="NP">Newspapers</option>
+                <option value="MG">Magazines</option>
+                <option value="RP">Research_Papers</option>
+                <option value="FM">Form</option>
+                <option value="BR">Brochure_Posters_Leaflets</option>
+                <option value="AR">Acts_Rules</option>
+                <option value="PB">Publication</option>
+                <option value="NT">Notice</option>
+                <option value="SY">Syllabus</option>
+                <option value="QP">Question_Papers</option>
+                <option value="MN">Manual</option>
+              </select>
               </div>
             </div>
-            <div
-              style={{
-                borderStyle: "solid",
-                borderWidth: "1px",
-                borderColor: "#E0E0E0",
-                paddingBottom: "1%",
-              }}
-            >
-              <div
-                style={{
-                  paddingLeft: "1%",
-                  fontSize: "medium",
-                  paddingTop: "1%",
-                  paddingBottom: "1%",
-                }}
-              >
-                Predictions
-              </div>
-              {predictions?.length > 0 ? (
+            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
+              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
+              {predictions?.length > 0 ?
                 (() => {
                   try {
                     return JSON.parse(predictions)?.map((pred, index) => (
-                      <div
-                        style={{
-                          paddingLeft: "2%",
-                          display: "flex",
-                          paddingRight: "2%",
-                          paddingBottom: "1%",
-                        }}
-                      >
-                        <div
-                          style={{
-                            padding: "1%",
-                            margin: "auto",
-                            color: "#9E9E9E",
-                          }}
-                        >
-                          {index}
-                        </div>
-                        <textarea
-                          readOnly
-                          style={{ width: "100%", borderColor: "#E0E0E0" }}
-                          value={pred.text}
-                        />
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   } catch (error) {
                     console.error("Error parsing predictions:", error);
                     return predictions?.map((pred, index) => (
-                      <div
-                        style={{
-                          paddingLeft: "2%",
-                          display: "flex",
-                          paddingRight: "2%",
-                          paddingBottom: "1%",
-                        }}
-                      >
-                        <div
-                          style={{
-                            padding: "1%",
-                            margin: "auto",
-                            color: "#9E9E9E",
-                          }}
-                        >
-                          {index}
-                        </div>
-                        <textarea
-                          readOnly
-                          style={{ width: "100%", borderColor: "#E0E0E0" }}
-                          value={pred.text}
-                        />
+                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
+                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   }
                 })()
-              ) : (
-                <div style={{ textAlign: "center" }}>
-                  No Predictions Present
-                </div>
-              )}
+              :
+              <div style={{textAlign:"center"}}>No Predictions Present</div>}
             </div>
           </>
-        )}
+        }
       {loader}
       {renderSnackBar()}
     </div>
@@ -1746,9 +1526,9 @@ export default function LSF() {
   const annotationNotesRef = useRef(null);
   const reviewNotesRef = useRef(null);
   const superCheckerNotesRef = useRef(null);
-  const [annotationtext, setannotationtext] = useState("");
-  const [reviewtext, setreviewtext] = useState("");
-  const [supercheckertext, setsupercheckertext] = useState("");
+  const [annotationtext,setannotationtext] = useState('')
+  const [reviewtext,setreviewtext] = useState('')
+  const [supercheckertext,setsupercheckertext] = useState('')
   const { taskId } = useParams();
   const [showTagsInput, setShowTagsInput] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
@@ -1762,25 +1542,22 @@ export default function LSF() {
   const navigate = useNavigate();
   const [loader, showLoader, hideLoader] = useFullPageLoader();
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-
+ 
   const modules = {
-    toolbar: [
-      [{ size: [] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ color: [] }],
-      [{ script: "sub" }, { script: "super" }],
-    ],
+    toolbar:[
+      
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    ]
   };
 
   const formats = [
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "color",
-    "script",
-  ];
+    'size',
+    'bold','italic','underline','strike',
+    'color',
+    'script']
 
   const [value, setvalue] = useState();
   const handleTagChange = (event, value, reason) => {
@@ -1795,12 +1572,13 @@ export default function LSF() {
       });
     }
   };
+  
+
 
   useEffect(() => {
     if (
       ProjectDetails?.project_type &&
-      (ProjectDetails?.project_type.toLowerCase().includes("audio") ||
-        ProjectDetails?.project_type?.includes("Acoustic"))
+      (ProjectDetails?.project_type.toLowerCase().includes("audio") || ProjectDetails?.project_type?.includes("Acoustic"))
     ) {
       setShowTagsInput(true);
     }
@@ -1816,6 +1594,7 @@ export default function LSF() {
     setShowNotes(false);
     reviewNotesRef.current.getEditor().setContents([]);
   };
+  
 
   useEffect(() => {
     resetNotes();
@@ -1836,7 +1615,7 @@ export default function LSF() {
           startIcon={<ArrowBackIcon />}
           variant="contained"
           color="primary"
-          sx={{ mt: 2 }}
+          sx={{mt:2}} 
           onClick={() => {
             localStorage.removeItem("labelAll");
             navigate(`/projects/${projectId}`);
@@ -1874,10 +1653,8 @@ export default function LSF() {
               onClick={handleCollapseClick}
             >
               Notes{" "}
-              {annotationtext.trim().length === 0 &&
-              supercheckertext.trim().length === 0
-                ? ""
-                : "*"}
+              {annotationtext.trim().length === 0  &&
+                supercheckertext.trim().length === 0 ? "" : "*"}
             </Button>
           )}
           <div
@@ -1887,32 +1664,78 @@ export default function LSF() {
               paddingBottom: "16px",
             }}
           >
-            {/* Add Suspense with fallback UI for lazy loading */}
-            <Suspense fallback={<div>Loading editor...</div>}>
-              <ReactQuillLazy
-                ref={annotationNotesRef}
-                modules={modules}
-                bounds={"#note"}
-                formats={formats}
-                placeholder="Annotation Notes"
-                readOnly={true}
-              ></ReactQuillLazy>
-              <ReactQuillLazy
-                ref={reviewNotesRef}
-                modules={modules}
-                bounds={"#note"}
-                formats={formats}
-                placeholder="Review Notes"
-              ></ReactQuillLazy>
-              <ReactQuillLazy
-                ref={superCheckerNotesRef}
-                modules={modules}
-                bounds={"#note"}
-                formats={formats}
-                placeholder="SuperChecker Notes"
-                readOnly={true}
-              ></ReactQuillLazy>
-            </Suspense>
+            {/* <Alert severity="warning" showIcon style={{marginBottom: '1%'}}>
+              {translate("alert.notes")}
+          </Alert> */}
+            {/* <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Annotation Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={annotationNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            // ref={quillRef}
+            /> */}
+            {/* <TextField
+              multiline
+              // placeholder="Review Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={reviewNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+              }}
+              style={{ width: "100%",fontSize:"1rem"}}
+              ref={quillRef}
+            /> */}
+            <ReactQuill
+              ref={annotationNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              formats={formats}
+              placeholder="Annotation Notes"
+              readOnly={true}
+            ></ReactQuill>
+            <ReactQuill
+              ref={reviewNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              formats={formats}
+              placeholder="Review Notes"
+            ></ReactQuill>
+            <ReactQuill
+              ref={superCheckerNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              formats={formats}
+              placeholder="SuperChecker Notes"
+              readOnly={true}
+            ></ReactQuill>
+            {/* <TextField
+              multiline
+              placeholder="Place your remarks here ..."
+              label="Super Checker Notes"
+              // value={notesValue}
+              // onChange={event=>setNotesValue(event.target.value)}
+              inputRef={superCheckerNotesRef}
+              rows={2}
+              maxRows={4}
+              inputProps={{
+                style: { fontSize: "1rem" },
+                readOnly: true,
+              }}
+              style={{ width: "99%", marginTop: "1%" }}
+            // ref={quillRef}
+            /> */}
           </div>
           <Button
             variant="contained"
@@ -1993,7 +1816,7 @@ export default function LSF() {
           showLoader={showLoader}
           hideLoader={hideLoader}
           setannotationtext={setannotationtext}
-          setreviewtext={setreviewtext}
+          setreviewtext = {setreviewtext}
           setsupercheckertext={setsupercheckertext}
         />
       </Card>
