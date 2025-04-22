@@ -5,7 +5,7 @@ import FetchUserByIdAPI from '../../../../redux/actions/api/UserManagement/Fetch
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, IconButton, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip, Paper } from '@mui/material';
-import Input  from '@mui/material/Input';
+import Input from '@mui/material/Input';
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
