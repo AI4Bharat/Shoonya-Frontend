@@ -28,10 +28,15 @@ const addOptimizations = (config) => {
   if (config.mode === "production") {
 
     config.plugins.push(
+       new MiniCssExtractPlugin({
+        filename: "css/[name].[contenthash].css",
+        chunkFilename: "css/[id].[contenthash].css",
+        experimentalUseImportModule: true, 
+            }),
       new CompressionPlugin({
         filename: "[path][base].gz",
         algorithm: "gzip",
-        test: /\.(js|html|svg|json)$/,
+        test: /\.(js|css|html|svg|json)$/,
         threshold: 1024,
         minRatio: 0.8,
         deleteOriginalAssets: false,
@@ -40,7 +45,7 @@ const addOptimizations = (config) => {
         filename: "[path][base].br",
         algorithm: "brotliCompress",
         compressionOptions: { level: 11 },
-        test: /\.(js|html|svg|json)$/,
+        test: /\.(js|css|html|svg|json)$/,
         threshold: 1024,
         minRatio: 0.8,
         deleteOriginalAssets: false,
