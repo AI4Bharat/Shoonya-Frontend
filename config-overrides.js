@@ -131,17 +131,8 @@ const addExtraRules = () => (config) => {
   return config;
 };
 
-const addExternals = () => (config) => {
-  config.externals = {
-    ...(config.externals || {}),
-    "@heartexlabs/label-studio": "LabelStudio",
-  };
-  return config;
-};
-
 module.exports = override(
   addModernBabelPreset(),
   addOptimizations,
   addExtraRules(),
-  addExternals()
 );
