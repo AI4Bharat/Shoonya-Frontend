@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import {
   BrowserRouter as Router,
   HashRouter,
@@ -10,50 +10,33 @@ import { ThemeProvider } from "@mui/material/styles";
 import themeDefault from "./ui/theme/theme";
 import { authenticateUser } from "./utils/utils";
 
-// Lazy-loaded components
-const Login = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/Login")
-);
-const ForgotPassword = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/ForgotPassword")
-);
-const ConfirmForgetPassword = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/ConfirmForgetPassword")
-);
-const SignUp = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/SignUp")
-);
-const ChangePassword = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/ChangePassword")
-);
-const ProfilePage = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/ProfilePage")
-);
-const ProgressPage = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/ProgressPage")
-);
-const EditProfile = React.lazy(() =>
-  import("./ui/pages/container/UserManagement/EditProfile")
-);
+import Login from "./ui/pages/container/UserManagement/Login"
+import ForgotPassword from "./ui/pages/container/UserManagement/ForgotPassword"
+import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword"
+import SignUp from "./ui/pages/container/UserManagement/SignUp"
+import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword"
+import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage"
+import ProgressPage from "./ui/pages/container/UserManagement/ProgressPage"
+import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
+import Dashboard from "./ui/pages/container/Project/ProjectList"
+import ProgressList from "./ui/pages/container/Progress/ProgressList"
+import DashBoard from "./ui/pages/container/Admin/DashBoard"
+import Layout from "./ui/Layout";
+import ProjectSetting from "./ui/pages/container/Project/ProjectSetting"
+import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs"
+import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
+import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance"
+import Transliteration from "./ui/pages/container/Transliteration/Transliteration"
+import MyOrganization from "./ui/pages/container/Organization/MyOrganization"
 
-const Dashboard = React.lazy(() =>
-  import("./ui/pages/container/Project/ProjectList")
-);
 const Projects = React.lazy(() =>
   import("./ui/pages/container/Project/ProjectDetails")
 );
-const ProjectSetting = React.lazy(() =>
-  import("./ui/pages/container/Project/ProjectSetting")
-);
-
 const WorkSpaces = React.lazy(() =>
   import("./ui/pages/container/Workspace/WorkSpaceList")
 );
 const WorkSpace = React.lazy(() =>
   import("./ui/pages/container/Workspace/WorkSpaceDetails")
-);
-const WorkspaceSettingTabs = React.lazy(() =>
-  import("./ui/pages/container/Workspace/WorkspaceSettingTabs")
 );
 const AnnotationProject = React.lazy(() =>
   import("./ui/pages/container/Workspace/AnnotationProject")
@@ -61,30 +44,15 @@ const AnnotationProject = React.lazy(() =>
 const CollectionProject = React.lazy(() =>
   import("./ui/pages/container/Workspace/CollectionProject")
 );
-
 const DatasetList = React.lazy(() =>
   import("./ui/pages/container/Dataset/DatasetList")
 );
 const DatasetDetails = React.lazy(() =>
   import("./ui/pages/container/Dataset/DatasetDetails")
 );
-const DatasetSettingTabs = React.lazy(() =>
-  import("./ui/pages/container/Dataset/DatasetSettingTabs")
-);
 const AutomateDatasets = React.lazy(() =>
   import("./ui/pages/container/Dataset/AutomateDatasets")
 );
-const CreateDatasetInstanceButton = React.lazy(() =>
-  import("./ui/pages/container/Dataset/CreateNewDatasetInstance")
-);
-
-const Transliteration = React.lazy(() =>
-  import("./ui/pages/container/Transliteration/Transliteration")
-);
-const MyOrganization = React.lazy(() =>
-  import("./ui/pages/container/Organization/MyOrganization")
-);
-
 const LSF = React.lazy(() => import("./ui/pages/container/Label-Studio/LSF"));
 const ReviewLSF = React.lazy(() =>
   import("./ui/pages/container/Label-Studio/ReviewLSF")
@@ -95,7 +63,6 @@ const AllTaskLSF = React.lazy(() =>
 const SuperCheckerLSF = React.lazy(() =>
   import("./ui/pages/container/Label-Studio/SuperCheckerLSF")
 );
-
 const AudioTranscriptionLandingPage = React.lazy(() =>
   import("./ui/pages/container/CL-Transcription/AudioTranscriptionLandingPage")
 );
@@ -115,14 +82,6 @@ const AllAudioTranscriptionLandingPage = React.lazy(() =>
   )
 );
 
-const ProgressList = React.lazy(() =>
-  import("./ui/pages/container/Progress/ProgressList")
-);
-const DashBoard = React.lazy(() =>
-  import("./ui/pages/container/Admin/DashBoard")
-);
-const Layout = React.lazy(() => import("./ui/Layout"));
-
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
     if (!authenticateUser()) {
@@ -138,7 +97,6 @@ const App = () => {
 
   return (
     <HashRouter>
-      <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -332,7 +290,6 @@ const App = () => {
             )}
           />
         </Routes>
-      </Suspense>
     </HashRouter>
   );
 };
