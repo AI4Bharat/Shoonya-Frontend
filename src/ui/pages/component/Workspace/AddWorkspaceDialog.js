@@ -6,24 +6,18 @@ import CreateWorkspaceAPI from '../../../../redux/actions/api/WorkspaceDetails/C
 import APITransport from '../../../../redux/actions/apitransport/apitransport'
 import CustomButton from '../common/Button'
 
-
-
-
-const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
+const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId, setReloadWorkspaceTable }) => {
     const [workspaceName, setWorkspaceName] = useState('')
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+    
 
     const [publicanalytics,setpublicanalytics] = useState(true)
    
-
-
     const handlepublicanalytics = async () => {
         // setLoading(true);
         setpublicanalytics((publicanalytics)=>!publicanalytics)
-      };
-
-    
+      }; 
    
     const addBtnClickHandler = async (event) => {
         setWorkspaceName('');
@@ -47,12 +41,11 @@ const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
         if (createWorkspaceRes.ok) {
             const workspaceObj = new GetWorkspacesAPI(1);
             dispatch(APITransport(workspaceObj));
+            setReloadWorkspaceTable(true);
             return createWorkspaceRespData;
         }
 
         setLoading(false)
-       
-
     }
 
     const handleUserDialogClose = () => {
