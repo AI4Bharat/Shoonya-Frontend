@@ -519,7 +519,7 @@ const Header = () => {
           </Typography>
         </Grid>
       );
-    }
+
     else {
       return null;
     }
@@ -529,6 +529,7 @@ const Header = () => {
     // Organization tab - only shown for Organization Owners and Admins
     (userRole.OrganizationOwner === loggedInUserData?.role ||
       userRole.Admin === loggedInUserData?.role) ? (
+
       <Typography key="organization" variant="body1">
         <NavLink
           to={
@@ -623,7 +624,6 @@ const Header = () => {
   // Filter out null values
   const filteredTabs = tabs.filter(tab => tab !== null);
 
-
   const userSettings = [
     {
       name: "My Profile",
@@ -667,29 +667,6 @@ const Header = () => {
         />
       ),
     },
-    /* {
-      name: "Use Chitralekha Transcription Flow",
-      control: (
-        <Checkbox
-          onChange={handleTranscriptionFlowChange}
-          checked={checkClUI} 
-        />
-      ),
-    }, */
-    // {
-    //   name: "Enable Tags Dropdown",
-    //   control: (
-    //     <Checkbox
-    //       onChange={handleTagsChange}
-    //       defaultChecked={localStorage.getItem("enableTags") === "true"}
-    //     />
-    //   ),
-    // },
-
-    // {
-    //   name: "Help",
-    //   onclick: () => {},
-    // },
   ];
   const helpMenu = [
     {
@@ -699,11 +676,6 @@ const Header = () => {
         window.open(url, "_blank");
       },
     },
-
-    // {
-    //   name: "Feedback",
-    //   onclick: () => {},
-    // },
   ];
 
   const appInfo = [
@@ -758,15 +730,16 @@ const Header = () => {
                   width: "fit-content",
                 }}
               >
-                <a
+                <Link
+                  to="/projects"
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
                     gap: "10px",
+                    textDecoration: "none",
                   }}
-                  onClick={() => navigate("/projects")}
                 >
                   <img
                     src={Shoonya_Logo}
@@ -783,7 +756,7 @@ const Header = () => {
                   <Typography variant="h4" className={classes.headerTitle} sx={{ minHeight: 5, minWidth: 8, fontDisplay: "swap" }}>
                     Shoonya
                   </Typography>
-                </a>
+                </Link>
               </Grid>
               {renderTabs()}
               {renderSnackBar()}
@@ -889,7 +862,9 @@ const Header = () => {
                   </Grid>
                 </Grid>
                 <Menu
-                  sx={{ mt: "45px" }}
+                  sx={{ 
+                    mt: "45px",
+                  }}
                   id="menu-appbar"
                   anchorEl={anchorElSettings}
                   anchorOrigin={{
@@ -984,7 +959,15 @@ const Header = () => {
                 </Menu>
 
                 <Menu
-                  sx={{ mt: "45px", display: "flex", flexDirection: "row" }}
+                  sx={{ 
+                    mt: "45px", 
+                    display: "flex",
+                    "& .MuiPaper-root": {
+                      maxHeight: "750px", // Fixed height
+                      width: "800px",     // Fixed width
+                      overflow: "auto"    // Better than just "scroll"
+                    }
+                  }}
                   id="menu-appbar"
                   anchorEl={anchorElNotification}
                   anchorOrigin={{
@@ -1008,9 +991,9 @@ const Header = () => {
                     }}
                   >
                     <Typography variant="h4">Notifications</Typography>
-                    {Notification &&
-                      Notification?.length > 0 &&
-                      unseenNotifications?.length > 0 ? (
+                    {(Notification &&
+                    Notification?.length > 0 &&
+                    unseenNotifications?.length > 0) && (
                       <Tooltip title="Mark all as read">
                         <IconButton
                           aria-label="More"
@@ -1019,12 +1002,12 @@ const Header = () => {
                           <GradingSharpIcon color="primary" />
                         </IconButton>{" "}
                       </Tooltip>
-                    ) : null}
+                    )}
                   </Stack>
                   <Stack
                     direction="row"
                     spacing={2}
-                    style={{ padding: "0 0 10px 10px" }}
+                    style={{ paddingBottom: "10px", paddingLeft: "10px" }}
                   >
                     <Tabs
                       value={value}
@@ -1043,79 +1026,58 @@ const Header = () => {
                   {Notification && Notification?.length > 0 ? (
                     <>
                       {Notification.map((notification, index) => (
-                        <div
+                        <Box
                           key={index}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            padding: "10px",
-                          }}
+                          className={classes.nav_notif_container}
                         >
-                          <div
-                            style={{ marginRight: "10px", cursor: "pointer" }}
-                          >
-                            <FiberManualRecordIcon
-                              color={
-                                notification?.seen_json
-                                  ? notification?.seen_json[loggedInUserData.id]
-                                    ? "action"
-                                    : "primary"
+                          <FiberManualRecordIcon
+                            color={
+                              notification?.seen_json
+                                ? notification?.seen_json[loggedInUserData.id]
+                                  ? "action"
                                   : "primary"
-                              }
-                            />
-                          </div>
+                                : "primary"
+                            }
+                          />
                           <Link
                             style={{
                               color: "rgba(0, 0, 0, 0.87)",
-                              display: "flex",
-                              flexDirection: "column",
-                              width: "100%",
-                              cursor: "pointer",
                               textDecoration: "none",
+                              width: "100%",
+                              marginLeft: "15px"
                             }}
                             to={notification.on_click}
                           >
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                width: "100%",
-                              }}
+                            <Typography variant="subtitle2">{`${notification?.title}`}</Typography>
+                            <Typography
+                              variant="subtitle2"
+                              color="text.secondary"
                             >
-                              <Typography variant="subtitle2">{`ID: ${notification?.title?.split("-")[0]
-                                }`}</Typography>
-                              <Typography
-                                style={{ paddingLeft: "10px" }}
-                                variant="subtitle2"
-                              >{`TITLE: ${notification?.notification_type}`}</Typography>
-                              <Typography
-                                style={{ padding: "5px 5px 0px 5px" }}
-                                variant="caption"
-                                color="action"
-                              >{`${formatDistanceToNow(
-                                new Date(notification?.created_at),
-                                { addSuffix: true }
-                              )}`}</Typography>
-                            </div>
+                              {`Modification Type: ${notification?.notification_type}` ||
+                                "No modification type"}
+                            </Typography>
+                            <br />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >{`${formatDistanceToNow(
+                              new Date(notification?.created_at),
+                              { addSuffix: true }
+                            )}`}</Typography>
 
-                            <div
-                              style={{
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
                                 display: "flex",
-                                flexDirection: "row",
                                 justifyContent: "space-between",
                               }}
                             >
-                              <Typography
-                                style={{
-                                  justifyContent: "flex-start",
-                                  width: "100%",
-                                }}
-                                variant="body2"
-                              >
-                                {notification?.title?.split("-")[1]}
-                              </Typography>
-                              {notification?.seen_json == null ||
-                                !notification?.seen_json[loggedInUserData.id] ? (
+                              {`Sent on: ${format(
+                                new Date(notification?.created_at),
+                                "MMM d, yyyy"
+                              )}`}
+                              {(notification?.seen_json == null || !notification?.seen_json[loggedInUserData.id]) && (
                                 <Tooltip title="Mark as read">
                                   <IconButton
                                     aria-label="More"
@@ -1126,18 +1088,11 @@ const Header = () => {
                                     <CheckCircleOutlineRoundedIcon color="primary" />
                                   </IconButton>
                                 </Tooltip>
-                              ) : null}
-                            </div>
-                            <Typography
-                              variant="caption"
-                              color="action"
-                            >{`Sent on: ${format(
-                              new Date(notification?.created_at),
-                              "MMM d, yyyy"
-                            )}`}</Typography>
+                              )}
+                            </Typography>
                             {index !== Notification?.length - 1 && <Divider />}
                           </Link>
-                        </div>
+                        </Box>
                       ))}
                     </>
                   ) : (
