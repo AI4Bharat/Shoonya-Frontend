@@ -34,6 +34,23 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useParams } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
 import { MenuProps } from "../../../../utils/utils";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const MyProgress = () => {
   const { id } = useParams();
@@ -77,6 +94,7 @@ const MyProgress = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -114,27 +132,17 @@ const MyProgress = () => {
     const timer = setTimeout(applyResponsiveMode, 100);
     return () => clearTimeout(timer);
   }, []);
+
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
     dispatch(APITransport(typesObj));
     // const workspacesObj = new GetWorkspacesAPI(1, 9999);
     // dispatch(APITransport(workspacesObj));
   }, []);
+
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
-
-  // useEffect(() => {
-  //   if (UserDetails && Workspaces?.results) {
-  //     let workspacesList = [];
-  //     Workspaces.results.forEach((item) => {
-  //       workspacesList.push({ id: item.id, name: item.workspace_name });
-  //     });
-  //     setWorkspaces(workspacesList);
-  //     setSelectedWorkspaces(workspacesList.map(item => item.id))
-  //     setSelectedType("ContextualTranslationEditing");
-  //   }
-  // }, [UserDetails, Workspaces]);
 
   useEffect(() => {
     if (ProjectTypes) {
@@ -165,6 +173,25 @@ const MyProgress = () => {
             filter: false,
             sort: false,
             align: "center",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         });
         tempSelected.push(key);
@@ -180,6 +207,46 @@ const MyProgress = () => {
     setShowSpinner(false);
   }, [UserAnalytics]);
 
+  useEffect(() => {
+    if (UserAnalytics?.length) {
+      let tempColumns = [];
+      Object.keys(UserAnalytics[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: false,
+            align: "center",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
+          },
+        });
+      });
+      setColumns(tempColumns);
+    } else {
+      setColumns([]);
+    }
+    setShowSpinner(false);
+  }, [expandedRow]);
+
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
@@ -189,11 +256,6 @@ const MyProgress = () => {
   const handleProgressSubmit = () => {
     setShowPicker(false);
     setSubmitted(true);
-    // if (!selectedWorkspaces.length) {
-    //   setSnackbarText("Please select atleast one workspace!");
-    //   showSnackbar();
-    //   return;
-    // }
     const reviewdata = {
       user_id: id,
       project_type: selectedType,

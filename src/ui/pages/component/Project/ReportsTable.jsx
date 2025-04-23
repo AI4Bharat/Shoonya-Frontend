@@ -32,7 +32,23 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import tableTheme from "../../../theme/tableTheme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import { styled } from "@mui/material/styles";
 
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const ReportsTable = (props) => {
     const {isSuperChecker,isReviewer,isAnnotators}=props
@@ -61,6 +77,7 @@ const ReportsTable = (props) => {
     const classes = DatasetStyle();
     const [radiobutton, setRadiobutton] = useState(isAnnotators?"AnnotatationReports":isReviewer?"ReviewerReports":"SuperCheckerReports");
     const [submitted, setSubmitted] = useState(false);
+    const [expandedRow, setExpandedRow] = useState(null);
 
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
@@ -103,6 +120,7 @@ const ReportsTable = (props) => {
       const timer = setTimeout(applyResponsiveMode, 100);
       return () => clearTimeout(timer);
     }, []);
+
     useEffect(() => {
         if (reportRequested && ProjectReport?.length > 0) {
             let cols = [];
@@ -114,7 +132,27 @@ const ReportsTable = (props) => {
                     options: {
                         filter: false,
                         sort: false,
+                        customBodyRender: (value, tableMeta) => {
+                            const rowIndex = tableMeta.rowIndex;
+                            const isExpanded = expandedRow === rowIndex;
+                            return (
+                              <RowContainer
+                                expanded={isExpanded}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedRow((prevExpanded) =>
+                                    prevExpanded === rowIndex ? null : rowIndex
+                                  );
+                                }}
+                              >
+                                <TruncatedContent expanded={isExpanded}>
+                                  {value}
+                                </TruncatedContent>
+                              </RowContainer>
+                            );
+                          },
                     }
+                    
                 })
                 selected.push(key);
             });
@@ -126,6 +164,48 @@ const ReportsTable = (props) => {
         }
         setShowSpinner(false);
     }, [ProjectReport]);
+
+    useEffect(() => {
+        if (reportRequested && ProjectReport?.length > 0) {
+            let cols = [];
+            let selected = [];
+            Object.keys(ProjectReport[0]).forEach((key) => {
+                cols.push({
+                    name: key,
+                    label: key,
+                    options: {
+                        filter: false,
+                        sort: false,
+                        customBodyRender: (value, tableMeta) => {
+                            const rowIndex = tableMeta.rowIndex;
+                            const isExpanded = expandedRow === rowIndex;
+                            return (
+                              <RowContainer
+                                expanded={isExpanded}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedRow((prevExpanded) =>
+                                    prevExpanded === rowIndex ? null : rowIndex
+                                  );
+                                }}
+                              >
+                                <TruncatedContent expanded={isExpanded}>
+                                  {value}
+                                </TruncatedContent>
+                              </RowContainer>
+                            );
+                          },
+                    }
+                    
+                })
+                selected.push(key);
+            });
+            setColumns(cols);
+        } else {
+            setColumns([]);
+        }
+        setShowSpinner(false);
+    }, [expandedRow]);
 
 
     const handleChangeReports = (e) => {

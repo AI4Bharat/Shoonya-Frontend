@@ -20,6 +20,23 @@ import MUIDataTable from "mui-datatables";
 import { translate } from "../../../../config/localisation";
 import SearchIcon from "@mui/icons-material/Search";
 import AllTaskSearchPopup from "../Project/AllTaskSearchPopup";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const TASK_TYPES = ["annotation", "review", "supercheck"];
 
@@ -52,7 +69,7 @@ const RecentTasks = () => {
     ],
   };
   const [selectedFilters, setsSelectedFilters] = useState({});
-
+  
   const GetAllTasksdata = () => {
     const taskObjs = new FetchRecentTasksAPI(
       id,
@@ -66,7 +83,8 @@ const RecentTasks = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
-
+  const [expandedRow, setExpandedRow] = useState(null);
+  
   useEffect(() => {
     const handleResize = () => {
       setDisplayWidth(window.innerWidth);
@@ -132,6 +150,25 @@ const RecentTasks = () => {
             sort: false,
             align: "center",
             customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         };
       });
@@ -142,6 +179,52 @@ const RecentTasks = () => {
       setTasks([]);
     }
   }, [RecentTasks]);
+
+  useEffect(() => {
+    if (RecentTasks && RecentTasks?.results?.results?.length > 0) {
+      let colList = [];
+      if (
+        RecentTasks.results.results.length > 0 &&
+        typeof RecentTasks.results.results[0] === "object"
+      ) {
+        colList.push(...Object.keys(RecentTasks.results.results[0]));
+      }
+      const cols = colList.map((col) => {
+        return {
+          name: col,
+          label: col,
+          options: {
+            filter: false,
+            sort: false,
+            align: "center",
+            customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
+          },
+        };
+      });
+      setColumns(cols);
+    }
+  }, [expandedRow]);
+
+
   const handleClose = () => {
     setAnchorEl(null);
   };

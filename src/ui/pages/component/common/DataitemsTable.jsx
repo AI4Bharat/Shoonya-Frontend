@@ -635,14 +635,6 @@ const DataitemsTable = () => {
     rowsPerPage: currentRowPerPage,
     page: currentPageNumber - 1,
     rowsPerPageOptions: [10, 25, 50, 100, 200, 500, 1000, 2000, 4000, 8000],
-    textLabels: {
-      pagination: {
-        next: "Next >",
-        previous: "< Previous",
-        rowsPerPage: "currentRowPerPage",
-        displayRows: "OF",
-      },
-    },
     onChangePage: (currentPage) => {
       setCurrentPageNumber(currentPage + 1);
     },
@@ -665,7 +657,10 @@ const DataitemsTable = () => {
         viewColumns: "View Column",
       },
       pagination: {
+        next: "Next >",
+        previous: "< Previous",
         rowsPerPage: "Rows per page",
+        displayRows: "OF",
       },
       options: { sortDirection: "desc" },
     },

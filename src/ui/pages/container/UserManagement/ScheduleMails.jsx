@@ -27,6 +27,23 @@ import MUIDataTable from "mui-datatables";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../../component/common/ColumnList";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const ScheduleMails = () => {
   const { id } = useParams();
@@ -79,6 +96,7 @@ const ScheduleMails = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -271,6 +289,25 @@ const ScheduleMails = () => {
             filter: false,
             sort: true,
             align: "center",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         });
         key !== "id" && tempSelected.push(key);
@@ -282,6 +319,25 @@ const ScheduleMails = () => {
           filter: false,
           sort: true,
           align: "center",
+          customBodyRender: (value, tableMeta) => {
+            const rowIndex = tableMeta.rowIndex;
+            const isExpanded = expandedRow === rowIndex;
+            return (
+              <RowContainer
+                expanded={isExpanded}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedRow((prevExpanded) =>
+                    prevExpanded === rowIndex ? null : rowIndex
+                  );
+                }}
+              >
+                <TruncatedContent expanded={isExpanded}>
+                  {value}
+                </TruncatedContent>
+              </RowContainer>
+            );
+          },
         },
       });
       tempSelected.push("Actions");
@@ -317,6 +373,95 @@ const ScheduleMails = () => {
     }
     setShowSpinner(false);
   }, [scheduledMails]);
+
+  useEffect(() => {
+    if (scheduledMails?.length) {
+      let tempColumns = [];
+      Object.keys(scheduledMails[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
+          },
+        });
+      });
+      tempColumns.push({
+        name: "Actions",
+        label: "Actions",
+        options: {
+          filter: false,
+          sort: true,
+          align: "center",
+          customBodyRender: (value, tableMeta) => {
+            const rowIndex = tableMeta.rowIndex;
+            const isExpanded = expandedRow === rowIndex;
+            return (
+              <RowContainer
+                expanded={isExpanded}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedRow((prevExpanded) =>
+                    prevExpanded === rowIndex ? null : rowIndex
+                  );
+                }}
+              >
+                <TruncatedContent expanded={isExpanded}>
+                  {value}
+                </TruncatedContent>
+              </RowContainer>
+            );
+          },
+        },
+      });
+      scheduledMails.map((mail) => {
+        mail.Actions = (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 2,
+            }}
+          >
+            <CustomButton
+              label={mail["Status"] === "Enabled" ? "Pause" : "Resume"}
+              onClick={() => updateScheduledMail(mail)}
+            />
+            <CustomButton
+              label="Delete"
+              sx={{ backgroundColor: "#EC0000" }}
+              onClick={() => deleteScheduledMail(mail)}
+            />
+          </Box>
+        );
+        return mail;
+      });
+      setColumns(tempColumns);
+    } else {
+      setColumns([]);
+    }
+  }, [expandedRow]);
 
   const renderToolBar = () => {
     return (

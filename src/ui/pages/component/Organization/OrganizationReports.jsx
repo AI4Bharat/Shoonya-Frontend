@@ -35,6 +35,23 @@ import { addDays } from 'date-fns';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetOrganizationDetailedProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationDetailedProjectReports";
 import Skeleton from "@mui/material/Skeleton";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const ProgressType = ["Annotation Stage", "Review Stage", "Super Check Stage", "All Stage"]
 const ITEM_HEIGHT = 38;
@@ -109,6 +126,8 @@ const OrganizationReports = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [userReportsExpandedRow, setUserReportsExpandedRow] = useState(null);
+  const [projectReportsExpandedRow, setProjectReportsExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -186,6 +205,25 @@ const OrganizationReports = () => {
             sort: true,
             align: "center",
           },
+          customBodyRender: (value, tableMeta) => {
+            const rowIndex = tableMeta.rowIndex;
+            const isExpanded = userReportsExpandedRow === rowIndex;
+            return (
+              <RowContainer
+                expanded={isExpanded}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setUserReportsExpandedRow((prevExpanded) =>
+                    prevExpanded === rowIndex ? null : rowIndex
+                  );
+                }}
+              >
+                <TruncatedContent expanded={isExpanded}>
+                  {value}
+                </TruncatedContent>
+              </RowContainer>
+            );
+          },
         });
         tempSelected.push(key);
       });
@@ -209,6 +247,56 @@ const OrganizationReports = () => {
   }, [UserReports]);
 
   useEffect(() => {
+    if (reportRequested && UserReports?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(UserReports[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+          customBodyRender: (value, tableMeta) => {
+            const rowIndex = tableMeta.rowIndex;
+            const isExpanded = userReportsExpandedRow === rowIndex;
+            return (
+              <RowContainer
+                expanded={isExpanded}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setUserReportsExpandedRow((prevExpanded) =>
+                    prevExpanded === rowIndex ? null : rowIndex
+                  );
+                }}
+              >
+                <TruncatedContent expanded={isExpanded}>
+                  {value}
+                </TruncatedContent>
+              </RowContainer>
+            );
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+    } else {
+      if(emailRequested){
+          setSnackbarInfo({
+            open: true,
+            message: UserReports.message,
+            variant: "success",
+          })
+          setEmailRequested(false);
+        }
+      setColumns([]);
+    }
+    setShowSpinner(false);
+  }, [userReportsExpandedRow]);
+
+  useEffect(() => {
     if (reportRequested && ProjectReports?.length) {
       let tempColumns = [];
       let tempSelected = [];
@@ -220,6 +308,25 @@ const OrganizationReports = () => {
             filter: false,
             sort: true,
             align: "center",
+          },
+          customBodyRender: (value, tableMeta) => {
+            const rowIndex = tableMeta.rowIndex;
+            const isExpanded = projectReportsExpandedRow === rowIndex;
+            return (
+              <RowContainer
+                expanded={isExpanded}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setProjectReportsExpandedRow((prevExpanded) =>
+                    prevExpanded === rowIndex ? null : rowIndex
+                  );
+                }}
+              >
+                <TruncatedContent expanded={isExpanded}>
+                  {value}
+                </TruncatedContent>
+              </RowContainer>
+            );
           },
         });
         tempSelected.push(key);
@@ -243,32 +350,59 @@ const OrganizationReports = () => {
     setShowSpinner(false);
   }, [ProjectReports]);
 
-  // useEffect(() => {
-  //   if (reportRequested && SuperCheck?.length) {
-  //     let tempColumns = [];
-  //     let tempSelected = [];
-  //     Object.keys(SuperCheck[0]).forEach((key) => {
-  //       tempColumns.push({
-  //         name: key,
-  //         label: key,
-  //         options: {
-  //           filter: false,
-  //           sort: true,
-  //           align: "center",
-  //         },
-  //       });
-  //       tempSelected.push(key);
-  //     });
-  //     setColumns(tempColumns);
-  //     setReportData(SuperCheck);
-  //     setSelectedColumns(tempSelected);
-  //   } else {
-  //     setColumns([]);
-  //     setReportData([]);
-  //     setSelectedColumns([]);
-  //   }
-  //   setShowSpinner(false);
-  // }, [SuperCheck]);
+  useEffect(() => {
+    if (reportRequested && ProjectReports?.length) {
+      let tempColumns = [];
+      let tempSelected = [];
+      Object.keys(ProjectReports[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: true,
+            align: "center",
+          },
+          customBodyRender: (value, tableMeta) => {
+            const rowIndex = tableMeta.rowIndex;
+            const isExpanded = projectReportsExpandedRow === rowIndex;
+            return (
+              <RowContainer
+                expanded={isExpanded}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setProjectReportsExpandedRow((prevExpanded) =>
+                    prevExpanded === rowIndex ? null : rowIndex
+                  );
+                }}
+              >
+                <TruncatedContent expanded={isExpanded}>
+                  {value}
+                </TruncatedContent>
+              </RowContainer>
+            );
+          },
+        });
+        tempSelected.push(key);
+      });
+      setColumns(tempColumns);
+      setReportData(ProjectReports);
+      setSelectedColumns(tempSelected);
+    } else {
+      if(emailRequested){
+        setSnackbarInfo({
+          open: true,
+          message: ProjectReports.message,
+          variant: "success",
+        })
+        setEmailRequested(false);
+      }
+      setColumns([]);
+      setReportData([]);
+      setSelectedColumns([]);
+    }
+    setShowSpinner(false);
+  }, [projectReportsExpandedRow]);
 
   const renderToolBar = () => {
     return (

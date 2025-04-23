@@ -110,8 +110,7 @@ const addOptimizations = (config) => {
         runtimeChunk: {
           name: "manifest",
         },
-      },
-
+      }
       config.performance = {
         hints: "warning",
         assetFilter: (assetFilename) => assetFilename.endsWith(".js.gz"),

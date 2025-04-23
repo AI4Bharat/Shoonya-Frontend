@@ -264,16 +264,8 @@ export default function DatasetProjectsTable({ datasetId }) {
 		
         return el;
 	  }
-    //   } else if (
-    //     el.email?.toLowerCase().includes(SearchWorkspaceMembers?.toLowerCase())
-    //   ) {
-    //     return el;
-    //   }
     });
   };
-
-
-
 	const getPullNewDataAPI = async (project) => {
 		const projectObj = new GetPullNewDataAPI(project.id);
 		//dispatch(APITransport(projectObj));

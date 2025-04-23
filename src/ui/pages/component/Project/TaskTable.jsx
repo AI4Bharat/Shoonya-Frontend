@@ -50,6 +50,22 @@ import roles from "../../../../utils/UserMappedByRole/Roles";
 import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
+
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = [
   "context",
@@ -179,6 +195,7 @@ const TaskTable = (props) => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -434,6 +451,7 @@ const TaskTable = (props) => {
         : selectedFilters.review_status
     );
   }, [selectedFilters]);
+
   useEffect(() => {
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
@@ -530,6 +548,25 @@ const TaskTable = (props) => {
             sort: false,
             align: "center",
             customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         };
       });
@@ -540,6 +577,54 @@ const TaskTable = (props) => {
       setTasks([]);
     }
   }, [taskList, ProjectDetails]);
+
+  useEffect(() => {
+    if (taskList?.length > 0 && taskList[0]?.data) {
+      const annotatorEmail = taskList[0]?.hasOwnProperty("annotator_mail");
+      const email =
+        props.type === "review" && annotatorEmail ? "Annotator Email" : "";
+      let colList = ["id", ...(!!email ? [email] : [])];
+      colList.push(
+        ...Object.keys(taskList[0].data).filter(
+          (el) => !excludeCols.includes(el)
+        )
+      );
+      taskList[0].task_status && colList.push("status");
+      colList.push("actions");
+      const cols = colList.map((col) => {
+        return {
+          name: col,
+          label: snakeToTitleCase(col),
+          options: {
+            filter: false,
+            sort: false,
+            align: "center",
+            customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
+          },
+        };
+      });
+      setColumns(cols);
+    }
+  }, [expandedRow]);
 
   useEffect(() => {
     const newCols = columns.map((col) => {

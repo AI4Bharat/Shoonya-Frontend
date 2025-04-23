@@ -519,8 +519,7 @@ const Header = () => {
           </Typography>
         </Grid>
       );
-
-    else {
+    } else {
       return null;
     }
   };

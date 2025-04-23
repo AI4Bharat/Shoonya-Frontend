@@ -21,6 +21,23 @@ import GetDatasetLogsAPI from "../../../../redux/actions/api/Dataset/GetDatasetL
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const DatasetLogs = (props) => {
   const { datasetId } = props;
@@ -57,6 +74,7 @@ const DatasetLogs = (props) => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -119,6 +137,25 @@ const DatasetLogs = (props) => {
             filter: key === "status",
             sort: false,
             align: "center",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         });
       });
@@ -130,6 +167,43 @@ const DatasetLogs = (props) => {
     }
     setShowSpinner(false);
   }, [DatasetLogs]);
+
+  useEffect(() => {
+    if (DatasetLogs?.length) {
+      let tempColumns = [];
+      Object.keys(DatasetLogs[0]).forEach((key) => {
+        tempColumns.push({
+          name: key,
+          label: snakeToTitleCase(key),
+          options: {
+            filter: key === "status",
+            sort: false,
+            align: "center",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
+          },
+        });
+      });
+      setColumns(tempColumns);
+    } 
+  }, [expandedRow]);
 
   const CustomFooter = ({
     count,
