@@ -309,7 +309,11 @@ const SuperCheckerTasks = (props) => {
       );
       taskList[0].task_status && colList.push("status");
       colList.push("actions");
+      if (selectedColumns.length === 0) {
+        setSelectedColumns(colList);
+      }
       const cols = colList.map((col) => {
+        const isSelectedColumn = selectedColumns.includes(col);
         return {
           name: col,
           label: snakeToTitleCase(col),
@@ -317,6 +321,7 @@ const SuperCheckerTasks = (props) => {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
             customHeadLabelRender: customColumnHead,
             customBodyRender: (value, tableMeta) => {
               const rowIndex = tableMeta.rowIndex;
@@ -341,67 +346,27 @@ const SuperCheckerTasks = (props) => {
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList);
       setTasks(data);
     } else {
       setTasks([]);
     }
-  }, [taskList]);
+  }, [taskList, expandedRow, classes.link, ProjectDetails]);
 
-  useEffect(() => {
-    if (taskList?.length > 0 && taskList[0]?.data) {
-      let colList = ["id"];
-      colList.push(
-        ...Object.keys(taskList[0].data).filter(
-          (el) => !excludeCols.includes(el)
-        )
-      );
-      taskList[0].task_status && colList.push("status");
-      colList.push("actions");
-      const cols = colList.map((col) => {
-        return {
-          name: col,
-          label: snakeToTitleCase(col),
-          options: {
-            filter: false,
-            sort: false,
-            align: "center",
-            customHeadLabelRender: customColumnHead,
-            customBodyRender: (value, tableMeta) => {
-              const rowIndex = tableMeta.rowIndex;
-              const isExpanded = expandedRow === rowIndex;
-              return (
-                <RowContainer
-                  expanded={isExpanded}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedRow((prevExpanded) =>
-                      prevExpanded === rowIndex ? null : rowIndex
-                    );
-                  }}
-                >
-                  <TruncatedContent expanded={isExpanded}>
-                    {value}
-                  </TruncatedContent>
-                </RowContainer>
-              );
-            },
-          },
-        };
-      });
-      setColumns(cols);
-    }
-  }, [expandedRow]);
 
-  useEffect(() => {
-    const newCols = columns.map((col) => {
-      col.options.display = selectedColumns.includes(col.name)
-        ? "true"
-        : "false";
-      return col;
-    });
-    setColumns(newCols);
-  }, [selectedColumns]);
+    useEffect(() => {
+      if (columns.length > 0 && selectedColumns.length > 0) {
+          const newCols = columns.map((col) => ({
+              ...col,
+              options: {
+              ...col.options,
+              display: selectedColumns.includes(col.name) ? "true" : "false"
+              }
+          }));
+          if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+              setColumns(newCols);
+          }
+      }
+    }, [selectedColumns, columns]);
 
 
   const handleShowFilter = (event) => {

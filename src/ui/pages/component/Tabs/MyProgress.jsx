@@ -136,8 +136,6 @@ const MyProgress = () => {
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
     dispatch(APITransport(typesObj));
-    // const workspacesObj = new GetWorkspacesAPI(1, 9999);
-    // dispatch(APITransport(workspacesObj));
   }, []);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 // TaskTable
 
 import MUIDataTable from "mui-datatables";
-import {  useEffect, useState, useRef } from "react";
+import React, {  useEffect, useState, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
@@ -454,8 +454,6 @@ const TaskTable = (props) => {
 
   useEffect(() => {
     if (taskList?.length > 0 && taskList[0]?.data) {
-      // console.log("length", taskList.length, selectedColumns, columns);
-      
       const data = taskList.map((el) => {
         const email = props.type === "review" ? el.annotator_mail : "";
         let row = [el.id, ...(!!email ? [el.annotator_mail] : [])];
@@ -464,91 +462,61 @@ const TaskTable = (props) => {
             .filter((key) => !excludeCols.includes(key))
             .map((key) => el.data[key])
         );
-        props.type === "annotation" &&
-          taskList[0].annotation_status &&
+        if (props.type === "annotation" && taskList[0].annotation_status) {
           row.push(el.annotation_status);
-        props.type === "review" &&
-          taskList[0].review_status &&
+        } else if (props.type === "review" && taskList[0].review_status) {
           row.push(el.review_status);
-        props.type === "annotation" &&
-          row.push(
-            <Link
-              to={
-                ProjectDetails?.project_type?.includes("Acoustic")
-                  ? `AudioTranscriptionLandingPage/${el.id}`
-                  : `task/${el.id}`
-              }
-              className={classes.link}
-            >
-              <CustomButton
-                onClick={() => {
-                  localStorage.removeItem("labelAll");
-                }}
-                disabled={ProjectDetails.is_archived}
-                sx={{ p: 1, borderRadius: 2 }}
-                label={
-                  <Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                    {props.type === "annotation" &&
-                    ProjectDetails?.annotators?.some(
-                      (a) => a.id === userDetails?.id
-                    )
-                      ? ProjectDetails.project_mode === "Annotation"
-                        ? "Annotate"
-                        : "Edit"
-                      : "View"}
-                  </Typography>
-                }
-              />
-            </Link>
-          );
-        props.type === "review" &&
-          row.push(
-            <Link
-              to={
-                ProjectDetails?.project_type?.includes("Acoustic")
-                  ? `ReviewAudioTranscriptionLandingPage/${el.id}`
-                  : `review/${el.id}`
-              }
-              className={classes.link}
-            >
-              <CustomButton
-                disabled={ProjectDetails.is_archived}
-                onClick={() => {
-                  localStorage.removeItem("labelAll");
-                }}
-                sx={{ p: 1, borderRadius: 2 }}
-                label={
-                  <Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                    Review
-                  </Typography>
-                }
-              />
-            </Link>
-          );
+        } else if (taskList[0].task_status) { 
+           row.push(el.task_status); 
+        }
+
+        const actionLink = props.type === "annotation"
+            ? ProjectDetails?.project_type?.includes("Acoustic")
+                ? `AudioTranscriptionLandingPage/${el.id}`
+                : `task/${el.id}`
+            : ProjectDetails?.project_type?.includes("Acoustic")
+                ? `ReviewAudioTranscriptionLandingPage/${el.id}`
+                : `review/${el.id}`;
+
+        const actionLabel = props.type === "annotation"
+            ? (ProjectDetails?.annotators?.some(a => a.id === userDetails?.id)
+                ? (ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit")
+                : "View")
+            : "Review"; 
+
+        row.push(
+          <Link to={actionLink} className={classes.link}>
+            <CustomButton
+              onClick={() => localStorage.removeItem("labelAll")}
+              disabled={ProjectDetails.is_archived}
+              sx={{ p: 1, borderRadius: 2 }}
+              label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">{actionLabel}</Typography>}
+            />
+          </Link>
+        );
         return row;
       });
 
       const annotatorEmail = taskList[0]?.hasOwnProperty("annotator_mail");
-      const email =
-        props.type === "review" && annotatorEmail ? "Annotator Email" : "";
-      let colList = ["id", ...(!!email ? [email] : [])];
+      const emailColName = props.type === "review" && annotatorEmail ? "Annotator Email" : "";
+      let colList = ["id", ...(!!emailColName ? [emailColName] : [])];
       colList.push(
-        ...Object.keys(taskList[0].data).filter(
-          (el) => !excludeCols.includes(el)
-        )
+        ...Object.keys(taskList[0].data).filter((el) => !excludeCols.includes(el))
       );
+      
       taskList[0].task_status && colList.push("status");
       colList.push("actions");
-      // Initialize selectedColumns only if it's empty
+
       if (selectedColumns.length === 0) {
         setSelectedColumns(colList);
       }
+
       const cols = colList.map((col) => {
-        const isSelectedColumn =  selectedColumns.includes(col);
-        console.log("check", selectedColumns, col, isSelectedColumn); 
+        const isSelectedColumn = selectedColumns.includes(col);
+
         return {
-          name: col,
-          label: snakeToTitleCase(col),
+          name: col, 
+          label: snakeToTitleCase(col), 
           options: {
             filter: false,
             sort: false,
@@ -577,79 +545,28 @@ const TaskTable = (props) => {
           },
         };
       });
-      setColumns(cols);
-      setSelectedColumns(colList);
-      setTasks(data);
+
+      setColumns(cols); 
+      setTasks(data); 
     } else {
       setTasks([]);
     }
-  }, [taskList, ProjectDetails, expandedRow]);
-
-  // useEffect(() => {
-  //   if (taskList?.length > 0 && taskList[0]?.data) {
-  //     if(selectedColumns.length === 0) {
-  //       setSelectedColumns(columns);
-  //     }     
-  //     const cols = selectedColumns.map((col) => {
-  //       return {
-  //         name: col,
-  //         label: snakeToTitleCase(col),
-  //         options: {
-  //           filter: false,
-  //           sort: false,
-  //           align: "center",
-  //           display: selectedColumns.includes(col) ? "true" : "false",
-  //           customHeadLabelRender: customColumnHead,
-  //           customBodyRender: (value, tableMeta) => {
-  //             const rowIndex = tableMeta.rowIndex;
-  //             const isExpanded = expandedRow === rowIndex;
-  //             return (
-  //               <RowContainer
-  //                 expanded={isExpanded}
-  //                 onClick={(e) => {
-  //                   e.stopPropagation();
-  //                   setExpandedRow((prevExpanded) =>
-  //                     prevExpanded === rowIndex ? null : rowIndex
-  //                   );
-  //                 }}
-  //               >
-  //                 <TruncatedContent expanded={isExpanded}>
-  //                   {value}
-  //                 </TruncatedContent>
-  //               </RowContainer>
-  //             );
-  //           },
-  //         },
-  //       };
-  //     });
-  //     setColumns(cols);
-  //   }
-  // }, [expandedRow]);
-
-  // useEffect(() => {
-  //   const newCols = columns.map((col) => {
-  //     col.options.display = selectedColumns.includes(col.name)
-  //       ? "true"
-  //       : "false";
-  //     return col;
-  //   });
-  //   setColumns(newCols);
-  // }, [selectedColumns]);
+  }, [taskList, ProjectDetails, expandedRow, props.type, userDetails, classes.link]); // Added props.type, userDetails, classes.link as they are used inside
 
   useEffect(() => {
-    if (columns.length > 0) {
-      const newCols = columns.map((col) => ({
-        ...col,
-        options: {
-          ...col.options,
-          display: selectedColumns.includes(col.name) ? "true" : "false"
+    if (columns.length > 0 && selectedColumns.length > 0) {
+        const newCols = columns.map((col) => ({
+            ...col,
+            options: {
+            ...col.options,
+            display: selectedColumns.includes(col.name) ? "true" : "false"
+            }
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+            setColumns(newCols);
         }
-      }));
-      setColumns(newCols);
     }
-  }, [selectedColumns]);
-  
-  
+  }, [selectedColumns, columns]);
 
   useEffect(() => {
     if (ProjectDetails) {

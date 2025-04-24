@@ -21,6 +21,7 @@ import { translate } from "../../../../config/localisation";
 import SearchIcon from "@mui/icons-material/Search";
 import AllTaskSearchPopup from "../Project/AllTaskSearchPopup";
 import { styled } from "@mui/material/styles";
+import { snakeToTitleCase } from "../../../../utils/utils";
 
 const TruncatedContent = styled(Box)(({ expanded }) => ({
   overflow: "hidden",
@@ -69,7 +70,7 @@ const RecentTasks = () => {
     ],
   };
   const [selectedFilters, setsSelectedFilters] = useState({});
-  
+
   const GetAllTasksdata = () => {
     const taskObjs = new FetchRecentTasksAPI(
       id,
@@ -84,7 +85,7 @@ const RecentTasks = () => {
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
   const [expandedRow, setExpandedRow] = useState(null);
-  
+
   useEffect(() => {
     const handleResize = () => {
       setDisplayWidth(window.innerWidth);
@@ -141,14 +142,19 @@ const RecentTasks = () => {
       ) {
         colList.push(...Object.keys(RecentTasks.results.results[0]));
       }
+      if (selectedColumns.length === 0) {
+        setSelectedColumns(colList);
+      }
       const cols = colList.map((col) => {
+        const isSelectedColumn = selectedColumns.includes(col);
         return {
           name: col,
-          label: col,
+          label: snakeToTitleCase(col),
           options: {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
             customHeadLabelRender: customColumnHead,
             customBodyRender: (value, tableMeta) => {
               const rowIndex = tableMeta.rowIndex;
@@ -173,57 +179,26 @@ const RecentTasks = () => {
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList);
       setTasks(data);
     } else {
       setTasks([]);
     }
-  }, [RecentTasks]);
+  }, [RecentTasks, expandedRow]);
 
   useEffect(() => {
-    if (RecentTasks && RecentTasks?.results?.results?.length > 0) {
-      let colList = [];
-      if (
-        RecentTasks.results.results.length > 0 &&
-        typeof RecentTasks.results.results[0] === "object"
-      ) {
-        colList.push(...Object.keys(RecentTasks.results.results[0]));
+    if (columns.length > 0 && selectedColumns.length > 0) {
+      const newCols = columns.map((col) => ({
+        ...col,
+        options: {
+          ...col.options,
+          display: selectedColumns.includes(col.name) ? "true" : "false",
+        },
+      }));
+      if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+        setColumns(newCols);
       }
-      const cols = colList.map((col) => {
-        return {
-          name: col,
-          label: col,
-          options: {
-            filter: false,
-            sort: false,
-            align: "center",
-            customHeadLabelRender: customColumnHead,
-            customBodyRender: (value, tableMeta) => {
-              const rowIndex = tableMeta.rowIndex;
-              const isExpanded = expandedRow === rowIndex;
-              return (
-                <RowContainer
-                  expanded={isExpanded}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedRow((prevExpanded) =>
-                      prevExpanded === rowIndex ? null : rowIndex
-                    );
-                  }}
-                >
-                  <TruncatedContent expanded={isExpanded}>
-                    {value}
-                  </TruncatedContent>
-                </RowContainer>
-              );
-            },
-          },
-        };
-      });
-      setColumns(cols);
     }
-  }, [expandedRow]);
-
+  }, [selectedColumns, columns]);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -282,16 +257,6 @@ const RecentTasks = () => {
       </Box>
     );
   };
-
-  useEffect(() => {
-    const newCols = columns.map((col) => {
-      col.options.display = selectedColumns.includes(col.name)
-        ? "true"
-        : "false";
-      return col;
-    });
-    setColumns(newCols);
-  }, [selectedColumns]);
 
   const CustomFooter = ({
     count,

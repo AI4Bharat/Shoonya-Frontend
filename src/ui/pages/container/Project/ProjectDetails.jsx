@@ -424,7 +424,7 @@ const Projects = () => {
   return (
     <ThemeProvider theme={themeDefault}>
       {/* <Header /> */}
-      {loading && <Spinner />}
+      {/* {loading && <Spinner />} */}
       <Grid
         container
         direction="row"
