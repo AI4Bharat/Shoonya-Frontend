@@ -111,10 +111,10 @@ const ProfilePage = () => {
     setLoading(true); 
     const userObj = new FetchUserByIdAPI(id);
     dispatch(APITransport(userObj));
-  }, [id, dispatch]);
+  }, [id]);
 
   useEffect(() => {
-    if (UserDetails && UserDetails.id === id) {
+    if (UserDetails && UserDetails.id == id) {
       setUserDetails(UserDetails);
       setLoading(false);
     }
@@ -122,7 +122,8 @@ const ProfilePage = () => {
 
   return (
     <Grid container spacing={2}>
-      {loading && <Spinner />}
+            {loading && <Spinner />}
+
       {renderSnackBar()}
       {userDetails && (
         <>
