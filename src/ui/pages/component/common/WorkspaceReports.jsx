@@ -80,17 +80,18 @@ const WorkspaceReports = () => {
   const [participationTypes, setParticipationTypes] = useState([1, 2, 4]);
   const [radioButton, setRadioButton] = useState("project");
   const [language, setLanguage] = useState("all");
-  const [columns, setColumns] = useState([]);
-  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [userColumns, setUserColumns] = useState([]);
+  const [projectColumns, setProjectColumns] = useState([]);
+  const [userSelectedColumns, setUserSelectedColumns] = useState([]);
+  const [projectSelectedColumns, setProjectSelectedColumns] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
-  const [reportData, setReportData] = useState([]);
   const [reportRequested, setReportRequested] = useState(false);
   const [emailRequested, setEmailRequested] = useState(false);
   const [projectType, setProjectType] = useState("AnnotatationReports");
   const [reportfilter, setReportfilter] = useState("AllStage");
   const [projectReportType, setProjectReportType] = useState(1);
   const [statisticsType, setStatisticsType] = useState(1);
-  
+
   const classes = DatasetStyle();
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -120,7 +121,8 @@ const WorkspaceReports = () => {
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
   const [userReportsExpandedRow, setUserReportsExpandedRow] = useState(null);
-  const [projectReportsExpandedRow, setProjectReportsExpandedRow] = useState(null);
+  const [projectReportsExpandedRow, setProjectReportsExpandedRow] =
+    useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -188,45 +190,96 @@ const WorkspaceReports = () => {
   }, [ProjectTypes, radioButton]);
 
   useEffect(() => {
-    if (reportRequested && UserReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(UserReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-          customBodyRender: (value, tableMeta) => {
-            const rowIndex = tableMeta.rowIndex;
-            const isExpanded = userReportsExpandedRow === rowIndex;
-            return (
-              <RowContainer
-                expanded={isExpanded}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setUserReportsExpandedRow((prevExpanded) =>
-                    prevExpanded === rowIndex ? null : rowIndex
-                  );
-                }}
-              >
-                <TruncatedContent expanded={isExpanded}>
-                  {value}
-                </TruncatedContent>
-              </RowContainer>
-            );
-          },
+    if (reportRequested) {
+      if (UserReports?.length && radioButton === "user") {
+        let tempColumns = [];
+        const currentSelectedColumns =
+          userSelectedColumns.length === 0
+            ? Object.keys(UserReports[0])
+            : userSelectedColumns;
+        if (userSelectedColumns.length === 0) {
+          setUserSelectedColumns(Object.keys(UserReports[0]));
+        }
+
+        Object.keys(UserReports[0]).forEach((key) => {
+          const isSelectedColumn = currentSelectedColumns.includes(key);
+          tempColumns.push({
+            name: key,
+            label: key,
+            options: {
+              filter: false,
+              sort: true,
+              align: "center",
+              display: isSelectedColumn ? "true" : "false",
+              customBodyRender: (value, tableMeta) => {
+                const rowIndex = tableMeta.rowIndex;
+                const isExpanded = userReportsExpandedRow === rowIndex;
+                return (
+                  <RowContainer
+                    expanded={isExpanded}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUserReportsExpandedRow((prevExpanded) =>
+                        prevExpanded === rowIndex ? null : rowIndex
+                      );
+                    }}
+                  >
+                    <TruncatedContent expanded={isExpanded}>
+                      {value}
+                    </TruncatedContent>
+                  </RowContainer>
+                );
+              },
+            },
+          });
         });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(UserReports);
-      setSelectedColumns(tempSelected);
+        setUserColumns(tempColumns);
+      }
+      if (ProjectReports?.length && radioButton === "project") {
+        let tempColumns = [];
+        const currentSelectedColumns =
+          projectSelectedColumns.length === 0
+            ? Object.keys(ProjectReports[0])
+            : projectSelectedColumns;
+        if (projectSelectedColumns.length === 0) {
+          setProjectSelectedColumns(Object.keys(ProjectReports[0]));
+        }
+        Object.keys(ProjectReports[0]).forEach((key) => {
+          const isSelectedColumn = currentSelectedColumns.includes(key);
+          tempColumns.push({
+            name: key,
+            label: key,
+            options: {
+              filter: false,
+              sort: true,
+              align: "center",
+              display: isSelectedColumn ? "true" : "false",
+              customBodyRender: (value, tableMeta) => {
+                const rowIndex = tableMeta.rowIndex;
+                const isExpanded = projectReportsExpandedRow === rowIndex;
+                return (
+                  <RowContainer
+                    expanded={isExpanded}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProjectReportsExpandedRow((prevExpanded) =>
+                        prevExpanded === rowIndex ? null : rowIndex
+                      );
+                    }}
+                  >
+                    <TruncatedContent expanded={isExpanded}>
+                      {value}
+                    </TruncatedContent>
+                  </RowContainer>
+                );
+              },
+            },
+          });
+        });
+        setProjectColumns(tempColumns);
+      }
     } else {
-      if (emailRequested) {
+      if (emailRequested && UserReports?.length) {
         setSnackbarInfo({
           open: true,
           message: UserReports.message,
@@ -234,103 +287,7 @@ const WorkspaceReports = () => {
         });
         setEmailRequested(false);
       }
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
-    }
-    setShowSpinner(false);
-  }, [UserReports]);
-
-  useEffect(() => {
-    if (reportRequested && UserReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(UserReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-          customBodyRender: (value, tableMeta) => {
-            const rowIndex = tableMeta.rowIndex;
-            const isExpanded = userReportsExpandedRow === rowIndex;
-            return (
-              <RowContainer
-                expanded={isExpanded}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setUserReportsExpandedRow((prevExpanded) =>
-                    prevExpanded === rowIndex ? null : rowIndex
-                  );
-                }}
-              >
-                <TruncatedContent expanded={isExpanded}>
-                  {value}
-                </TruncatedContent>
-              </RowContainer>
-            );
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-    } else {
-      if (emailRequested) {
-        setSnackbarInfo({
-          open: true,
-          message: UserReports.message,
-          variant: "success",
-        });
-        setEmailRequested(false);
-      }
-      setColumns([]);
-    }
-    setShowSpinner(false);
-  }, [userReportsExpandedRow]);
-
-  useEffect(() => {
-    if (reportRequested && ProjectReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(ProjectReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-          customBodyRender: (value, tableMeta) => {
-            const rowIndex = tableMeta.rowIndex;
-            const isExpanded = projectReportsExpandedRow === rowIndex;
-            return (
-              <RowContainer
-                expanded={isExpanded}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setProjectReportsExpandedRow((prevExpanded) =>
-                    prevExpanded === rowIndex ? null : rowIndex
-                  );
-                }}
-              >
-                <TruncatedContent expanded={isExpanded}>
-                  {value}
-                </TruncatedContent>
-              </RowContainer>
-            );
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-      setReportData(ProjectReports);
-      setSelectedColumns(tempSelected);
-    } else {
-      if (emailRequested) {
+      if (emailRequested && ProjectReports?.length) {
         setSnackbarInfo({
           open: true,
           message: ProjectReports.message,
@@ -338,62 +295,56 @@ const WorkspaceReports = () => {
         });
         setEmailRequested(false);
       }
-      setColumns([]);
-      setReportData([]);
-      setSelectedColumns([]);
+      radioButton === "user" && setUserColumns([]);
+      radioButton === "project" && setProjectColumns([]);
     }
     setShowSpinner(false);
-  }, [ProjectReports]);
+  }, [
+    reportRequested,
+    UserReports,
+    userReportsExpandedRow,
+    radioButton,
+    ProjectReports,
+    projectReportsExpandedRow,
+  ]);
 
   useEffect(() => {
-    if (reportRequested && ProjectReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(ProjectReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
+    if (radioButton === "user") {
+      if (userColumns.length > 0 && userSelectedColumns.length > 0) {
+        const newCols = userColumns.map((col) => ({
+          ...col,
           options: {
-            filter: false,
-            sort: true,
-            align: "center",
+            ...col.options,
+            display: userSelectedColumns.includes(col.name) ? "true" : "false",
           },
-          customBodyRender: (value, tableMeta) => {
-            const rowIndex = tableMeta.rowIndex;
-            const isExpanded = projectReportsExpandedRow === rowIndex;
-            return (
-              <RowContainer
-                expanded={isExpanded}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setProjectReportsExpandedRow((prevExpanded) =>
-                    prevExpanded === rowIndex ? null : rowIndex
-                  );
-                }}
-              >
-                <TruncatedContent expanded={isExpanded}>
-                  {value}
-                </TruncatedContent>
-              </RowContainer>
-            );
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-    } else {
-      if (emailRequested) {
-        setSnackbarInfo({
-          open: true,
-          message: ProjectReports.message,
-          variant: "success",
-        });
-        setEmailRequested(false);
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(userColumns)) {
+          setUserColumns(newCols);
+        }
       }
-      setColumns([]);
-    }
-    setShowSpinner(false);
-  }, [projectReportsExpandedRow]);
+    } else if (radioButton === "project") {
+      if (projectColumns.length > 0 && projectSelectedColumns.length > 0) {
+        const newCols = projectColumns.map((col) => ({
+          ...col,
+          options: {
+            ...col.options,
+            display: projectSelectedColumns.includes(col.name)
+              ? "true"
+              : "false",
+          },
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(projectColumns)) {
+          setProjectColumns(newCols);
+        }
+      }
+    } 
+  }, [
+    radioButton,
+    userSelectedColumns,
+    userColumns,
+    projectSelectedColumns,
+    projectColumns,
+  ]);
 
   const renderToolBar = () => {
     const buttonSXStyle = { borderRadius: 2, margin: 2 };
@@ -403,9 +354,27 @@ const WorkspaceReports = () => {
         className={classes.ToolbarContainer}
       >
         <ColumnList
-          columns={columns}
-          setColumns={setSelectedColumns}
-          selectedColumns={selectedColumns}
+          columns={
+            radioButton === "user"
+              ? userColumns
+              : radioButton === "project"
+              ? projectColumns
+              : null
+          }
+          setColumns={
+            radioButton === "user"
+              ? setUserSelectedColumns
+              : radioButton === "project"
+              ? setProjectSelectedColumns
+              : null
+          }
+          selectedColumns={
+            radioButton === "user"
+              ? userSelectedColumns
+              : radioButton === "project"
+              ? projectSelectedColumns
+              : null
+          }
         />
       </Box>
     );
@@ -513,8 +482,10 @@ const WorkspaceReports = () => {
   const userId = useSelector((state) => state.fetchLoggedInUserData.data.id);
 
   const handleChangeReports = (e) => {
-    setRadioButton(e.target.value);
+    const value = e.target.value;
+    setRadioButton(value);
   };
+
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
@@ -931,15 +902,27 @@ const WorkspaceReports = () => {
           <ThemeProvider theme={tableTheme}>
             <div ref={tableRef}>
               {isBrowser ? (
-                <MUIDataTable
-                  key={`table-${displayWidth}`}
-                  title={ProjectReports.length > 0 ? "Reports" : ""}
-                  data={reportData}
-                  columns={columns.filter((col) =>
-                    selectedColumns.includes(col.name)
-                  )}
-                  options={options}
-                />
+                radioButton === "user" && UserReports?.length ? (
+                  <MUIDataTable
+                    key={`table-${displayWidth}`}
+                    title={"User Reports"}
+                    data={UserReports}
+                    columns={userColumns.filter((col) =>
+                      userSelectedColumns.includes(col.name)
+                    )}
+                    options={options}
+                  />
+                ) : radioButton === "project" && ProjectReports?.length > 0 ? (
+                  <MUIDataTable
+                    key={`table-${displayWidth}`}
+                    title={"Projects Reports"}
+                    data={ProjectReports}
+                    columns={projectColumns.filter((col) =>
+                      projectSelectedColumns.includes(col.name)
+                    )}
+                    options={options}
+                  />
+                ) : null
               ) : (
                 <Skeleton
                   variant="rectangular"

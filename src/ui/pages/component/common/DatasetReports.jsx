@@ -132,8 +132,11 @@ const DatasetReports = () => {
   useEffect(() => {
     if (reportRequested && DatasetReports?.length) {
       let tempColumns = [];
-      let tempSelected = [];
+      if(selectedColumns.length === 0) {
+        setSelectedColumns(columns);
+      }
       Object.keys(DatasetReports[0]).forEach((key) => {
+        const isSelectedColumn = selectedColumns.includes(key)
         tempColumns.push({
           name: key,
           label: key,
@@ -141,7 +144,7 @@ const DatasetReports = () => {
             filter: false,
             sort: true,
             align: "center",
-          },
+            display: isSelectedColumn ? "true" : "false",
           customBodyRender: (value, tableMeta) => {
             const rowIndex = tableMeta.rowIndex;
             const isExpanded = expandedRow === rowIndex;
@@ -160,62 +163,32 @@ const DatasetReports = () => {
                 </TruncatedContent>
               </RowContainer>
             );
-          },
+          }}
         });
-        tempSelected.push(key);
       });
       setColumns(tempColumns);
       setReportData(DatasetReports);
-      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setReportData([]);
-      setSelectedColumns([]);
     }
     setShowSpinner(false);
-  }, [DatasetReports]);
+  }, [DatasetReports, expandedRow]);
 
   useEffect(() => {
-    if (reportRequested && DatasetReports?.length) {
-      let tempColumns = [];
-      let tempSelected = [];
-      Object.keys(DatasetReports[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: true,
-            align: "center",
-          },
-          customBodyRender: (value, tableMeta) => {
-            const rowIndex = tableMeta.rowIndex;
-            const isExpanded = expandedRow === rowIndex;
-            return (
-              <RowContainer
-                expanded={isExpanded}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpandedRow((prevExpanded) =>
-                    prevExpanded === rowIndex ? null : rowIndex
-                  );
-                }}
-              >
-                <TruncatedContent expanded={isExpanded}>
-                  {value}
-                </TruncatedContent>
-              </RowContainer>
-            );
-          },
-        });
-        tempSelected.push(key);
-      });
-      setColumns(tempColumns);
-    } else {
-      setColumns([]);
+    if (columns.length > 0 && selectedColumns.length > 0) {
+      const newCols = columns.map((col) => ({
+        ...col,
+        options: {
+          ...col.options,
+          display: selectedColumns.includes(col.name) ? "true" : "false",
+        },
+      }));
+      if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+        setColumns(newCols);
+      }
     }
-    setShowSpinner(false);
-  }, [expandedRow]);
+  }, [selectedColumns, columns]);
 
   const renderToolBar = () => {
     return (

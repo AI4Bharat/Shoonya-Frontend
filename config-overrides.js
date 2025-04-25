@@ -50,7 +50,11 @@ const addOptimizations = (config) => {
         minRatio: 0.8,
         deleteOriginalAssets: false,
       }),
-    
+      new BundleAnalyzerPlugin({
+          analyzerMode: "static",
+          reportFilename: "report.html",
+          openAnalyzer: true,
+        })
           );
 
       config.optimization = {
