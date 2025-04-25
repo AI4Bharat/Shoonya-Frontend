@@ -1,5 +1,3 @@
-// OrganizationReports
-
 import React, { useState, useEffect, useRef } from "react";
 import MUIDataTable from "mui-datatables";
 import Box from "@mui/material/Box";
@@ -95,14 +93,10 @@ const OrganizationReports = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
   const [participationTypes, setParticipationTypes] = useState([1, 2, 4]);
-  const [selectedType, setSelectedType] = useState("");
-  const [reportType, setReportType] = useState("ProjectReports");
-  const [targetLanguage, setTargetLanguage] = useState("all");
   const [userColumns, setUserColumns] = useState([]);
   const [projectColumns, setProjectColumns] = useState([]);
   const [userSelectedColumns, setUserSelectedColumns] = useState([]);
   const [projectSelectedColumns, setProjectSelectedColumns] = useState([]);
-  const [reportData, setReportData] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
   const [emailRequested, setEmailRequested] = useState(false);
@@ -134,14 +128,21 @@ const OrganizationReports = () => {
 
   let ProgressTypeValue = "Annotation Stage";
   const filterdata = ProgressType.filter((item) => item !== ProgressTypeValue);
-  const FilterProgressType =
-    reportTypes === "Reviewer" ? filterdata : ProgressType;
+  const FilterProgressType = reportTypes === "Reviewer" ? filterdata : ProgressType;
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
   const [userReportsExpandedRow, setUserReportsExpandedRow] = useState(null);
-  const [projectReportsExpandedRow, setProjectReportsExpandedRow] =
-    useState(null);
+  const [projectReportsExpandedRow, setProjectReportsExpandedRow] = useState(null);
+  const [projectType, setProjectType] = useState({
+    UsersReports: "ContextualTranslationEditing",
+    ProjectReports: "ContextualTranslationEditing",
+    PaymentReports: "AllAudioProjects",
+  });
+  const [targetLanguage, setTargetLanguage] = useState({
+    UsersReports: "all",
+    ProjectReports: "all",
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -163,7 +164,6 @@ const OrganizationReports = () => {
   useEffect(() => {
     setIsBrowser(true);
 
-    // Force responsive mode after component mount
     const applyResponsiveMode = () => {
       if (tableRef.current) {
         const tableWrapper = tableRef.current.querySelector(
@@ -175,7 +175,6 @@ const OrganizationReports = () => {
       }
     };
 
-    // Apply after a short delay to ensure DOM is ready
     const timer = setTimeout(applyResponsiveMode, 100);
     return () => clearTimeout(timer);
   }, []);
@@ -196,7 +195,6 @@ const OrganizationReports = () => {
       });
       types.push("AllAudioProjects");
       setProjectTypes(types);
-      setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -204,7 +202,6 @@ const OrganizationReports = () => {
         types.push(...subTypes);
       });
       setProjectTypes(types);
-      setSelectedType(types[3]);
     }
   }, [ProjectTypes, radioButton]);
 
@@ -505,7 +502,7 @@ const OrganizationReports = () => {
       const userReportObj = new SendOrganizationUserReports(
         orgId,
         UserDetails.id,
-        selectedType,
+        projectType[radioButton],
         participationTypes,
         format(selectRange[0].startDate, "yyyy-MM-dd"),
         format(selectRange[0].endDate, "yyyy-MM-dd")
@@ -552,7 +549,7 @@ const OrganizationReports = () => {
         }
         const userReportObj = new GetOrganizationUserReportsAPI(
           orgId,
-          selectedType,
+          projectType[radioButton],
           format(selectRange[0].startDate, "yyyy-MM-dd"),
           format(selectRange[0].endDate, "yyyy-MM-dd"),
           reportTypes === "Annotator"
@@ -560,7 +557,7 @@ const OrganizationReports = () => {
             : reportTypes === "Reviewer"
             ? "review"
             : "supercheck",
-          targetLanguage,
+          targetLanguage[radioButton],
           sendMail,
           ...ReviewData
         );
@@ -571,11 +568,11 @@ const OrganizationReports = () => {
       ) {
         const supercheckObj = new GetOrganizationUserReportsAPI(
           orgId,
-          selectedType,
+          projectType[radioButton],
           format(selectRange[0].startDate, "yyyy-MM-dd"),
           format(selectRange[0].endDate, "yyyy-MM-dd"),
           "supercheck",
-          targetLanguage,
+          targetLanguage[radioButton],
           sendMail
         );
         dispatch(APITransport(supercheckObj));
@@ -583,8 +580,8 @@ const OrganizationReports = () => {
         if (projectReportType === 1) {
           const projectReportObj = new GetOrganizationProjectReportsAPI(
             orgId,
-            selectedType,
-            targetLanguage,
+            projectType[radioButton],
+            targetLanguage[radioButton],
             userId,
             sendMail
           );
@@ -592,7 +589,7 @@ const OrganizationReports = () => {
         } else if (projectReportType === 2) {
           const projectReportObj = new GetOrganizationDetailedProjectReportsAPI(
             Number(orgId),
-            selectedType,
+            projectType[radioButton],
             userId,
             statisticsType
           );
@@ -710,9 +707,14 @@ const OrganizationReports = () => {
               MenuProps={MenuProps}
               labelId="project-type-label"
               id="project-type-select"
-              value={selectedType}
+              value={projectType[radioButton]}
               label="Project Type"
-              onChange={(e) => setSelectedType(e.target.value)}
+              onChange={(e) => {
+                setProjectType((prev) => ({
+                  ...prev,
+                  [radioButton]: e.target.value,
+                }));
+              }}
             >
               {projectTypes.map((type, index) => (
                 <MenuItem value={type} key={index}>
@@ -731,9 +733,14 @@ const OrganizationReports = () => {
               <Select
                 labelId="language-label"
                 id="language-select"
-                value={targetLanguage}
+                value={targetLanguage[radioButton]}
                 label="Target Language"
-                onChange={(e) => setTargetLanguage(e.target.value)}
+                onChange={(e) =>
+                  setTargetLanguage((prev) => ({
+                    ...prev,
+                    [radioButton]: e.target.value,
+                  }))
+                }
                 MenuProps={MenuProps}
               >
                 <MenuItem value={"all"}>All languages</MenuItem>
@@ -858,9 +865,14 @@ const OrganizationReports = () => {
                 <Select
                   labelId="language-label"
                   id="language-select"
-                  value={targetLanguage}
+                  value={targetLanguage[radioButton]}
                   label="Target Language"
-                  onChange={(e) => setTargetLanguage(e.target.value)}
+                  onChange={(e) =>
+                    setTargetLanguage((prev) => ({
+                      ...prev,
+                      [radioButton]: e.target.value,
+                    }))
+                  }
                   MenuProps={MenuProps}
                 >
                   <MenuItem value={"all"}>All languages</MenuItem>

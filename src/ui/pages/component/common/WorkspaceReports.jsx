@@ -1,5 +1,3 @@
-// WorkspaceReports
-
 import React, { useState, useEffect, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import MUIDataTable from "mui-datatables";
@@ -76,10 +74,8 @@ const WorkspaceReports = () => {
   ]);
   const [showPicker, setShowPicker] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState("");
   const [participationTypes, setParticipationTypes] = useState([1, 2, 4]);
   const [radioButton, setRadioButton] = useState("project");
-  const [language, setLanguage] = useState("all");
   const [userColumns, setUserColumns] = useState([]);
   const [projectColumns, setProjectColumns] = useState([]);
   const [userSelectedColumns, setUserSelectedColumns] = useState([]);
@@ -87,9 +83,7 @@ const WorkspaceReports = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [reportRequested, setReportRequested] = useState(false);
   const [emailRequested, setEmailRequested] = useState(false);
-  const [projectType, setProjectType] = useState("AnnotatationReports");
   const [reportfilter, setReportfilter] = useState("AllStage");
-  const [projectReportType, setProjectReportType] = useState(1);
   const [statisticsType, setStatisticsType] = useState(1);
 
   const classes = DatasetStyle();
@@ -115,14 +109,29 @@ const WorkspaceReports = () => {
   const filterdata = ProgressType.filter(
     (item) => item.name !== ProgressTypeValue
   );
-  const FilterProgressType =
-    projectType === "ReviewerReports" ? filterdata : ProgressType;
+
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
   const [userReportsExpandedRow, setUserReportsExpandedRow] = useState(null);
   const [projectReportsExpandedRow, setProjectReportsExpandedRow] =
     useState(null);
+  const [reportType, setReportType] = useState({
+    user: "AnnotatationReports",
+    project: 1,
+    payment: "AnnotatationReports",
+  });
+  const [projectType, setProjectType] = useState({
+    user: "ContextualTranslationEditing",
+    project: "ContextualTranslationEditing",
+    payment: "AllAudioProjects",
+  });
+  const [targetLanguage, setTargetLanguage] = useState({
+      user: "all",
+      project: "all",
+    });
+  const FilterProgressType =
+    projectType[radioButton] === "ReviewerReports" ? filterdata : ProgressType;
 
   useEffect(() => {
     const handleResize = () => {
@@ -144,7 +153,6 @@ const WorkspaceReports = () => {
   useEffect(() => {
     setIsBrowser(true);
 
-    // Force responsive mode after component mount
     const applyResponsiveMode = () => {
       if (tableRef.current) {
         const tableWrapper = tableRef.current.querySelector(
@@ -156,7 +164,6 @@ const WorkspaceReports = () => {
       }
     };
 
-    // Apply after a short delay to ensure DOM is ready
     const timer = setTimeout(applyResponsiveMode, 100);
     return () => clearTimeout(timer);
   }, []);
@@ -177,7 +184,6 @@ const WorkspaceReports = () => {
       });
       types.push("AllAudioProjects");
       setProjectTypes(types);
-      setSelectedType("AllAudioProjects");
     } else if (ProjectTypes) {
       let types = [];
       Object.keys(ProjectTypes).forEach((key) => {
@@ -185,7 +191,6 @@ const WorkspaceReports = () => {
         types.push(...subTypes);
       });
       setProjectTypes(types);
-      setSelectedType(types[3]);
     }
   }, [ProjectTypes, radioButton]);
 
@@ -336,7 +341,7 @@ const WorkspaceReports = () => {
           setProjectColumns(newCols);
         }
       }
-    } 
+    }
   }, [
     radioButton,
     userSelectedColumns,
@@ -347,9 +352,7 @@ const WorkspaceReports = () => {
 
   const renderToolBar = () => {
     return (
-      <Box
-        className={classes.ToolbarContainer}
-      >
+      <Box className={classes.ToolbarContainer}>
         <ColumnList
           columns={
             radioButton === "user"
@@ -493,7 +496,7 @@ const WorkspaceReports = () => {
       const userReportObj = new SendWorkspaceUserReportsAPI(
         id,
         UserDetails.id,
-        selectedType,
+        projectType[radioButton],
         participationTypes,
         format(selectRange[0].startDate, "yyyy-MM-dd"),
         format(selectRange[0].endDate, "yyyy-MM-dd")
@@ -516,41 +519,40 @@ const WorkspaceReports = () => {
       if (radioButton === "user") {
         const userReportObj = new GetWorkspaceUserReportsAPI(
           id,
-          selectedType,
+          projectType[radioButton],
           format(selectRange[0].startDate, "yyyy-MM-dd"),
           format(selectRange[0].endDate, "yyyy-MM-dd"),
-          language,
+          targetLanguage[radioButton],
           sendMail,
-          projectType === "AnnotatationReports"
+          projectType[radioButton] === "AnnotatationReports"
             ? "annotation"
-            : projectType === "ReviewerReports"
+            : projectType[radioButton] === "ReviewerReports"
             ? "review"
             : "supercheck",
           reportfilter
         );
         dispatch(APITransport(userReportObj));
       } else if (radioButton === "project") {
-        if (projectReportType === 1) {
+        if (reportType[radioButton] === 1) {
           const projectReportObj = new GetWorkspaceProjectReportAPI(
             id,
-            selectedType,
-
-            language,
+            projectType[radioButton],
+            targetLanguage[radioButton],
             sendMail,
-            projectType === "AnnotatationReports"
+            projectType[radioButton] === "AnnotatationReports"
               ? "annotation"
-              : projectType === "ReviewerReports"
+              : projectType[radioButton] === "ReviewerReports"
               ? "review"
               : "supercheck"
           );
           dispatch(APITransport(projectReportObj));
-        } else if (projectReportType === 2) {
+        } else if (reportType[radioButton] === 2) {
           const projectReportObj = new GetWorkspaceDetailedProjectReportsAPI(
             Number(id),
-            selectedType,
+            projectType[radioButton],
             userId,
             statisticsType,
-            language
+            targetLanguage[radioButton],
           );
           dispatch(APITransport(projectReportObj));
           setSnackbarInfo({
@@ -647,9 +649,14 @@ const WorkspaceReports = () => {
                 MenuProps={MenuProps}
                 labelId="project-report-type-type-label"
                 id="project-report-type-select"
-                value={projectReportType}
+                value={reportType[radioButton]}
                 label="Project Report Type"
-                onChange={(e) => setProjectReportType(e.target.value)}
+                onChange={(e) => {
+                  setReportType({
+                    ...reportType,
+                    [radioButton]: e.target.value,
+                  });
+                }}
               >
                 <MenuItem value={1}>High-Level Reports</MenuItem>
                 <MenuItem value={2}>Detailed Reports</MenuItem>
@@ -667,9 +674,14 @@ const WorkspaceReports = () => {
               <Select
                 labelId="report-type-label"
                 id="report-select"
-                value={projectType}
+                value={reportType[radioButton]}
                 label="Report Type"
-                onChange={(e) => setProjectType(e.target.value)}
+                onChange={(e) => {
+                  setReportType({
+                    ...reportType,
+                    [radioButton]: e.target.value,
+                  });
+                }}
                 MenuProps={MenuProps}
               >
                 <MenuItem value={"AnnotatationReports"}>Annotator</MenuItem>
@@ -687,9 +699,14 @@ const WorkspaceReports = () => {
             <Select
               labelId="project-type-label"
               id="project-type-select"
-              value={selectedType}
+              value={projectType[radioButton]}
               label="Project Type"
-              onChange={(e) => setSelectedType(e.target.value)}
+              onChange={(e) => {
+                setProjectType({
+                  ...projectType,
+                  [radioButton]: e.target.value,
+                });
+              }}
               MenuProps={MenuProps}
             >
               {projectTypes.map((type, index) => (
@@ -705,7 +722,7 @@ const WorkspaceReports = () => {
             <FormControl
               fullWidth
               size="small"
-              disabled={projectType === "SuperCheckerReports"}
+              disabled={projectType[radioButton] === "SuperCheckerReports"}
             >
               <InputLabel id="project-type-label" sx={{ fontSize: "16px" }}>
                 Projects Filter
@@ -738,9 +755,14 @@ const WorkspaceReports = () => {
               <Select
                 labelId="language-label"
                 id="language-select"
-                value={language}
+                value={targetLanguage[radioButton]}
                 label="Target Language"
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={(e) => {
+                  setTargetLanguage({
+                    ...targetLanguage,
+                    [radioButton]: e.target.value,
+                  });
+                }}
                 MenuProps={MenuProps}
               >
                 <MenuItem value={"all"}>All languages</MenuItem>
@@ -753,7 +775,7 @@ const WorkspaceReports = () => {
             </FormControl>
           </Grid>
         )}
-        {radioButton === "project" && projectReportType === 2 && (
+        {radioButton === "project" && reportType[radioButton] === 2 && (
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <FormControl fullWidth size="small">
               <InputLabel id="statistics-label" sx={{ fontSize: "16px" }}>
@@ -816,7 +838,7 @@ const WorkspaceReports = () => {
         )}
 
         {(radioButton === "user" ||
-          (radioButton === "project" && projectReportType === 1)) && (
+          (radioButton === "project" && reportType[radioButton] === 1)) && (
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
               fullWidth
