@@ -121,24 +121,7 @@ import React, {
       }
      },[AnnotationsTaskDetails])
 
-      // useEffect(() => {
-      //   if (result) {
-      //     const isLastSub =
-      //       player?.currentTime > result[result?.length - 1]?.endTime;
-  
-      //     if (isPlaying(player) && isLastSub) {
-      //       const payloadObj = new GetAnnotationsTaskAPI(
-      //         taskId,
-      //         taskData?.annotation_status
-           
-      //       );
-      //       dispatch(APITransport(payloadObj));
-      //     }
-      //   }
-  
-      //   // eslint-disable-next-line
-      // }, [result, currentIndex, isPlaying(player)]);
-
+     
       const removeSub = useCallback(
         (sub) => {
           const index = hasSub(sub);

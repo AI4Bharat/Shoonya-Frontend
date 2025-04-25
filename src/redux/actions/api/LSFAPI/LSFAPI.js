@@ -162,11 +162,6 @@ const patchReview = async (
       ...(ocr_domain && {ocr_domain: ocr_domain.current}),
       ...(autoSave && { auto_save: true }),
     });
-    // if (review_status === "to_be_revised") {
-    //   await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
-    //     annotation_status: review_status,
-    //   });
-    // }
   } catch (err) {
     return err;
   }
@@ -220,12 +215,6 @@ const getNextProject = async (projectID, taskID, mode = "annotation") => {
     let labellingMode = localStorage.getItem("labellingMode");
     let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
     let requestUrl = `/projects/${projectID}/next/`;
-    //  if (localStorage.getItem("labelAll")) {
-    //   //requestUrl += labellingMode ? `?task_status=${labellingMode}` : ""
-    //   Object?.keys(searchFilters)?.forEach(key => {
-    //     requestUrl += `&${key}=${this.searchFilters[key]}`;
-    //   });
-    // }
     for (let key in searchFilters) {
       if (searchFilters[key] && localStorage.getItem("labelAll")) {
         requestUrl += `?${key}=${searchFilters[key]}`;

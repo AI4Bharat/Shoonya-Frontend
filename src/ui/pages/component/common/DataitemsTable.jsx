@@ -186,16 +186,12 @@ const JSONViewer = ({ data, initiallyExpanded = false }) => {
 
 const excludeKeys = [
   "parent_data_id",
-  // "metadata_json",
   "instance_id_id",
   "datasetbase_ptr_id",
   "key",
   "instance_id",
   "speakers_json",
-  // "conversation_json",
-  // "transcribed_json",
   "machine_transcribed_json",
-  // "prediction_json",
   "conversation_json",
   "machine_translated_conversation_json",
   "speakers_json",

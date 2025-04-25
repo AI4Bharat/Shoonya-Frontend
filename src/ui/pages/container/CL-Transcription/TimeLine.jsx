@@ -189,24 +189,7 @@ const Grab = memo(({ waveform , taskId,}) => {
     },
     [player]
   );
-
-  // useEffect(() => {
-  //   if (firstLoaded.current && !grabbing) {
-  //     const apiObj = new GetAnnotationsTaskAPI(
-  //       taskDetails.id,
-        
-  //       // taskDetails?.task_type,
-  //       // DT.d2t(player.currentTime),
-  //       // limit
-  //     );
-  //     dispatch(APITransport(apiObj));
-  //   } else {
-  //     firstLoaded.current = true;
-  //   }
-
-  //   // eslint-disable-next-line
-  // }, [grabbing]);
-
+  
   const onGrabUp = () => {
     setGrabStartX(0);
     setGrabStartTime(0);

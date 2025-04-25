@@ -299,15 +299,6 @@ const AdvancedOperation = (props) => {
     }
   };
 
-  // useEffect(() => {
-  //     setSnackbarInfo({
-  //         open: apiMessage ? true : false,
-  //         variant: apiError ? "error" : "success",
-  //         message: apiMessage,
-  //     });
-  //     setSpinner(false);
-  // }, [apiMessage, apiError])
-
   const getPullNewDataAPI = async () => {
     const projectObj = new GetPullNewDataAPI(id);
     //dispatch(APITransport(projectObj));

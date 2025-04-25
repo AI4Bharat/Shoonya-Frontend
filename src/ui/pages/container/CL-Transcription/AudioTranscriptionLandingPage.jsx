@@ -204,29 +204,6 @@ const AudioTranscriptionLandingPage = () => {
       setIsFullscreen(false);
     }
   };
-  // useEffect(() => {
-  //   let intervalId;
-
-  //   const updateTimer = () => {
-  //     ref.current = ref.current + 1;
-  //   };
-
-  //   intervalId = setInterval(updateTimer, 1000);
-
-  //   setInterval(() => {
-  //     clearInterval(intervalId);
-  //     ref.current = 0;
-
-  //     intervalId = setInterval(updateTimer, 1000);
-  //   }, 60 * 1000);
-
-  //   return () => {
-  //     const apiObj = new UpdateTimeSpentPerTask(taskId, ref.current);
-  //     dispatch(APITransport(apiObj));
-  //     clearInterval(intervalId);
-  //     ref.current = 0;
-  //   };
-  // }, []);
 
   const filterAnnotations = (annotations, user) => {
     let disableSkip = false;
@@ -541,37 +518,6 @@ const AudioTranscriptionLandingPage = () => {
     // eslint-disable-next-line
   }, [autoSave, user, taskId, annotations, taskDetails, isActive]);
 
-  // useEffect(() => {
-  //   const apiObj = new FetchTaskDetailsAPI(taskId);
-  //   dispatch(APITransport(apiObj));
-
-  //   return () => {
-  //     dispatch({ type: C.CLEAR_STATE, payload: [] });
-  //   };
-  //   // eslint-disable-next-line
-  // }, []);
-
-  // useEffect(() => {
-  //   if (AnnotationsTaskDetails && AnnotationsTaskDetails?.id) {
-  //     const apiObj = new GetAnnotationsTaskAPI(
-  //       // encodeURIComponent(AnnotationsTaskDetails.video_url.replace(/&amp;/g, "&")),
-  //       // AnnotationsTaskDetails.src_language,
-  //       // AnnotationsTaskDetails.project,
-  //       // AnnotationsTaskDetails.is_audio_only
-  //     );
-  //     dispatch(APITransport(apiObj));
-
-  //     (async () => {
-  //       const payloadObj = new GetAnnotationsTaskAPI(
-  //         AnnotationsTaskDetails.id,
-  //         AnnotationsTaskDetails.task_type
-  //       );
-  //       dispatch(APITransport(payloadObj));
-  //     })();
-  //   }
-  //   // eslint-disable-next-line
-  // }, [AnnotationsTaskDetails]);
-
   useEffect(() => {
     let standardisedTranscription = "";
 
@@ -583,17 +529,6 @@ const AudioTranscriptionLandingPage = () => {
     }).map((item) => new Sub(item));
 
     setStdTranscription(standardisedTranscription);
-
-    // const newSub = cloneDeep(sub);
-
-    // dispatch(setCurrentPage(transcriptPayload?.current));
-    // dispatch(setNextPage(transcriptPayload?.next));
-    // dispatch(setPreviousPage(transcriptPayload?.previous));
-    // dispatch(setTotalPages(transcriptPayload?.count));
-    // dispatch(setSubtitlesForCheck(newSub));
-    // dispatch(setCompletedCount(transcriptPayload?.completed_count));
-    // dispatch(setRangeStart(transcriptPayload?.start));
-    // dispatch(setRangeEnd(transcriptPayload?.end));
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
     // eslint-disable-next-line
