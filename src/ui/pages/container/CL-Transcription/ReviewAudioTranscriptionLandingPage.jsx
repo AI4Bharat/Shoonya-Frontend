@@ -1169,12 +1169,7 @@ useEffect(() => {
         }
       }
     }
-    const activeElement = document.activeElement;
-    const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
-
-    if (isTextAreaFocused) {
-      return;
-    }
+    
     if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
