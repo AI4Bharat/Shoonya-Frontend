@@ -303,7 +303,6 @@ const WorkspaceReports = () => {
     reportRequested,
     UserReports,
     userReportsExpandedRow,
-    radioButton,
     ProjectReports,
     projectReportsExpandedRow,
   ]);
@@ -347,10 +346,8 @@ const WorkspaceReports = () => {
   ]);
 
   const renderToolBar = () => {
-    const buttonSXStyle = { borderRadius: 2, margin: 2 };
     return (
       <Box
-        // className={classes.filterToolbarContainer}
         className={classes.ToolbarContainer}
       >
         <ColumnList

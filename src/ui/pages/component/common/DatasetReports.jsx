@@ -167,7 +167,6 @@ const DatasetReports = () => {
         });
       });
       setColumns(tempColumns);
-      setReportData(DatasetReports);
     } else {
       setColumns([]);
       setReportData([]);
