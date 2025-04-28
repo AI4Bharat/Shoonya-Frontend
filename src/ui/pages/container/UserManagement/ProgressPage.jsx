@@ -36,7 +36,6 @@ const ProfilePage = () => {
   const recentTasksData = useSelector((state) => state.getRecentTasks.data);
   const isRecentTasksLoading = useSelector((state) => state.getRecentTasks.isLoading);
 
-  // Function to fetch user data
   const fetchUserData = () => {
     setLoading(true);
     setRecentTasksLoading(true);
@@ -85,18 +84,15 @@ const ProfilePage = () => {
     );
   };
   
-  // Initial data fetch
   useEffect(() => {
     fetchUserData();
     
-    // Cleanup function to reset states when component unmounts
     return () => {
       setLoading(false);
       setRecentTasksLoading(false);
     };
   }, [id]);
 
-  // Handle user details loading
   useEffect(() => {
     if(UserDetails && UserDetails.id == id) {
       setUserDetails(UserDetails);
@@ -104,17 +100,13 @@ const ProfilePage = () => {
     }
   }, [UserDetails, id]);
 
-  // Handle recent tasks loading
   useEffect(() => {
-    // Only set recentTasksLoading to false when data is actually loaded
     if (recentTasksData && recentTasksData.results && !isRecentTasksLoading) {
       setRecentTasksLoading(false);
     }
   }, [recentTasksData, isRecentTasksLoading]);
 
-  // Reset loading states when tab changes
   useEffect(() => {
-    // This effect will run when the component mounts or when the tab changes
     setLoading(true);
     setRecentTasksLoading(true);
   }, []);
