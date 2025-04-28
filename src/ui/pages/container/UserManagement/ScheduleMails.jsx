@@ -364,6 +364,8 @@ const ScheduleMails = () => {
 
       const allColumnNames = tempColumns.map(col => col.name);
       setColumns(tempColumns);
+
+      // Update the selectedColumns state to include all column names
       setSelectedColumns(allColumnNames);
 
       setTableData(scheduledMails);

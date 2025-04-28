@@ -62,11 +62,9 @@ const ReportsTable = (props) => {
       key: "selection",
     },
   ]);
-  // const [rangeValue, setRangeValue] = useState([format(Date.parse(ProjectDetails?.created_at, 'yyyy-MM-ddTHH:mm:ss.SSSZ'), 'yyyy-MM-dd'), Date.now()]);
   const [showPicker, setShowPicker] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState([]);
-  const [reportRequested, setReportRequested] = useState(false);
   const [columns, setColumns] = useState([]);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -85,7 +83,6 @@ const ReportsTable = (props) => {
       ? "ReviewerReports"
       : "SuperCheckerReports"
   );
-  const [submitted, setSubmitted] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null);
 
   const loggedInUserData = useSelector(
@@ -94,6 +91,21 @@ const ReportsTable = (props) => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [reportRequested, setReportRequested] = useState({
+    AnnotatationReports: false,
+    ReviewerReports: false,
+    SuperCheckerReports: false,
+  });
+  const [submitted, setSubmitted] = useState({
+    AnnotatationReports: false,
+    ReviewerReports: false,
+    SuperCheckerReports: false,
+  });
+  const [reportDataByType, setReportDataByType] = useState({
+    AnnotatationReports: [],
+    ReviewerReports: [],
+    SuperCheckerReports: [],
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -115,7 +127,6 @@ const ReportsTable = (props) => {
   useEffect(() => {
     setIsBrowser(true);
 
-    // Force responsive mode after component mount
     const applyResponsiveMode = () => {
       if (tableRef.current) {
         const tableWrapper = tableRef.current.querySelector(
@@ -126,16 +137,26 @@ const ReportsTable = (props) => {
         }
       }
     };
-
-    // Apply after a short delay to ensure DOM is ready
     const timer = setTimeout(applyResponsiveMode, 100);
+
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (reportRequested && ProjectReport?.length > 0) {
+    if (reportRequested[radiobutton]) {
+      setReportDataByType((prevData) => ({
+        ...prevData,
+        [radiobutton]: ProjectReport || [],
+      }));
+      setShowSpinner(false);
+    }
+  }, [ProjectReport, reportRequested, reportRequested]);
+
+  useEffect(() => {
+    const currentReportData = reportDataByType[radiobutton];
+    if (reportRequested[radiobutton] && currentReportData && currentReportData.length > 0) {
       let cols = [];
-      Object.keys(ProjectReport[0]).forEach((key) => {
+      Object.keys(currentReportData[0]).forEach((key) => {
         cols.push({
           name: key,
           label: key,
@@ -166,6 +187,76 @@ const ReportsTable = (props) => {
       });
       const allColumnNames = cols.map(col => col.name);
       setColumns(cols);
+       if (!selectedColumns.length || JSON.stringify(selectedColumns) !== JSON.stringify(allColumnNames)) {
+            setSelectedColumns(allColumnNames);
+       }
+    } else if (reportRequested[radiobutton]) {
+       setColumns([]);
+       setSelectedColumns([]);
+    }
+  }, [reportDataByType, radiobutton, expandedRow, reportRequested]);
+
+  useEffect(() => {
+    if (columns.length > 0 && selectedColumns.length > 0) {
+        const newCols = columns.map((col) => ({
+            ...col,
+            options: {
+                ...col.options,
+                display: selectedColumns.includes(col.name) ? "true" : "false",
+            },
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+            setColumns(newCols);
+        }
+    } else if (columns.length > 0 && selectedColumns.length === 0) {
+         const newCols = columns.map((col) => ({
+            ...col,
+            options: {
+                ...col.options,
+                display: "false",
+            },
+         }));
+         if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+            setColumns(newCols);
+        }
+    }
+  }, [selectedColumns, columns]);
+
+
+  useEffect(() => {
+    if (reportRequested[radiobutton] && ProjectReport?.length > 0) {
+      let cols = [];
+      Object.keys(ProjectReport[0]).forEach((key) => {
+        cols.push({
+          name: key,
+          label: key,
+          options: {
+            filter: false,
+            sort: false,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
+          },
+        });
+      });
+      const allColumnNames = cols.map((col) => col.name);
+      setColumns(cols);
       setSelectedColumns(allColumnNames);
     } else {
       setColumns([]);
@@ -174,26 +265,25 @@ const ReportsTable = (props) => {
   }, [ProjectReport, expandedRow]);
 
   useEffect(() => {
-      if (columns.length > 0 && selectedColumns.length > 0) {
-        const newCols = columns.map((col) => ({
-          ...col,
-          options: {
-            ...col.options,
-            display: selectedColumns.includes(col.name) ? "true" : "false",
-          },
-        }));
-        if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
-          setColumns(newCols);
-        }
+    if (columns.length > 0 && selectedColumns.length > 0) {
+      const newCols = columns.map((col) => ({
+        ...col,
+        options: {
+          ...col.options,
+          display: selectedColumns.includes(col.name) ? "true" : "false",
+        },
+      }));
+      if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+        setColumns(newCols);
       }
-    }, [selectedColumns, columns]);
-
+    }
+  }, [selectedColumns, columns]);
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value);
+    setExpandedRow(null);
   };
 
   const renderToolBar = () => {
-    const buttonSXStyle = { borderRadius: 2, margin: 2 };
     return (
       <Box className={classes.ToolbarContainer}>
         <ColumnList
@@ -212,6 +302,8 @@ const ReportsTable = (props) => {
     changeRowsPerPage,
     changePage,
   }) => {
+    const currentDataCount = reportDataByType[radiobutton]?.length || 0;
+    const totalPages = Math.ceil(currentDataCount / rowsPerPage);
     return (
       <Box
         sx={{
@@ -232,7 +324,8 @@ const ReportsTable = (props) => {
         {/* Pagination Controls */}
         <TablePagination
           component="div"
-          count={count}
+
+          count={currentDataCount}
           page={page}
           rowsPerPage={rowsPerPage}
           onPageChange={(_, newPage) => changePage(newPage)}
@@ -290,7 +383,7 @@ const ReportsTable = (props) => {
     customToolbar: renderToolBar,
     textLabels: {
       body: {
-        noMatch: "No Record Found!",
+        noMatch: reportRequested[radiobutton] ? "No Record Found!" : "Please select dates and click Submit.",
       },
     },
     responsive: "vertical",
@@ -318,8 +411,12 @@ const ReportsTable = (props) => {
       radiobutton === "SuperCheckerReports"
         ? "superchecker_reports"
         : "review_reports";
-    setReportRequested(true);
-    setSubmitted(true);
+    setShowSpinner(true);
+    setReportRequested((prevState) => ({ ...prevState, [radiobutton]: true }));
+    setSubmitted((prevState) => ({ ...prevState, [radiobutton]: true }));
+     setReportDataByType(prevData => ({ ...prevData, [radiobutton]: [] }));
+     setColumns([]);
+
 
     if (radiobutton === "AnnotatationReports") {
       projectObj = new GetProjectReportAPI(
@@ -343,20 +440,6 @@ const ReportsTable = (props) => {
       );
     }
     dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    if (resp.message) {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      });
-    }
-
     setShowPicker(false);
   };
 
@@ -381,6 +464,10 @@ const ReportsTable = (props) => {
       />
     );
   };
+
+  const currentData = reportDataByType[radiobutton];
+  const hasSubmittedCurrent = submitted[radiobutton];
+  const isLoadingCurrent = showSpinner && reportRequested[radiobutton] && !currentData?.length;
 
   return (
     <React.Fragment>
@@ -524,67 +611,44 @@ const ReportsTable = (props) => {
           </Card>
         </Box>
       )}
-      {ProjectReport?.length > 0 ? (
+      {isLoadingCurrent ? (
+        <Grid container justifyContent="center">
+          <Grid item sx={{ mt: "10%" }}>
+             <CircularProgress color="primary" size={50} />
+          </Grid>
+        </Grid>
+      ) : hasSubmittedCurrent && currentData && currentData.length > 0 ? (
         <>
-          {!(
-            userRole.Annotator === loggedInUserData?.role ||
-            userRole.Reviewer === loggedInUserData?.role
-          ) &&
-            frozenUsers.length > 0 && (
-              <Typography variant="body2" color="#F8644F">
-                * User Inactive
-              </Typography>
-            )}
+          {!( userRole.Annotator === loggedInUserData?.role || userRole.Reviewer === loggedInUserData?.role ) && frozenUsers.length > 0 && ( <Typography variant="body2" color="#F8644F">* User Inactive</Typography> )}
           <ThemeProvider theme={tableTheme}>
-            {showSpinner ? (
-              <CircularProgress sx={{ mx: "auto", display: "block" }} />
-            ) : (
-              reportRequested && (
                 <div ref={tableRef}>
                   {isBrowser ? (
                     <MUIDataTable
-                      key={`table-${displayWidth}`}
+                      key={`table-${radiobutton}-${displayWidth}`} 
                       title={
-                        radiobutton === "AnnotatationReports"
-                          ? "Annotation Report"
-                          : radiobutton === "ReviewerReports"
-                          ? "Reviewer Report"
-                          : "Super Checker Report"
+                        radiobutton === "AnnotatationReports" ? "Annotation Report" :
+                        radiobutton === "ReviewerReports" ? "Reviewer Report" :
+                        "Super Checker Report"
                       }
-                      data={ProjectReport}
+                      data={currentData}
                       columns={columns.filter((col) =>
                         selectedColumns.includes(col.name)
                       )}
                       options={options}
                     />
                   ) : (
-                    <Skeleton
-                      variant="rectangular"
-                      height={400}
-                      sx={{
-                        mx: 2,
-                        my: 3,
-                        borderRadius: "4px",
-                        transform: "none",
-                      }}
-                    />
+                    <Skeleton variant="rectangular" height={400} sx={{ mx: 2, my: 3, borderRadius: "4px", transform: "none" }} />
                   )}
                 </div>
-              )
-            )}
           </ThemeProvider>
         </>
-      ) : (
+      ) : hasSubmittedCurrent ? (
         <Grid container justifyContent="center">
           <Grid item sx={{ mt: "10%" }}>
-            {showSpinner ? (
-              <CircularProgress color="primary" size={50} />
-            ) : (
-              !ProjectReport?.length && submitted && <>No results</>
-            )}
+             <>No results</>
           </Grid>
         </Grid>
-      )}
+      ) : null}
     </React.Fragment>
   );
 };
