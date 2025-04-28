@@ -60,7 +60,6 @@ const WorkspaceTable = (props) => {
     useEffect(() => {
       setIsBrowser(true);
 
-      // Force responsive mode after component mount
       const applyResponsiveMode = () => {
         if (tableRef.current) {
           const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
@@ -70,7 +69,6 @@ const WorkspaceTable = (props) => {
         }
       };
 
-      // Apply after a short delay to ensure DOM is ready
       const timer = setTimeout(applyResponsiveMode, 100);
       return () => clearTimeout(timer);
     }, []);
@@ -82,7 +80,6 @@ const WorkspaceTable = (props) => {
     useEffect(() => {
         if (!isWorkspaceLoading && workspaceData && workspaceData.length > 0) {
             setLoading(false);
-            // Small delay to ensure smooth transition
             setTimeout(() => {
                 setShowContent(true);
             }, 100);
@@ -122,7 +119,6 @@ const WorkspaceTable = (props) => {
 
     }
 
-    // Memoize the processed data
     const processedData = useMemo(() => {
         if (!workspaceData || workspaceData.length === 0) return [];
         
@@ -140,7 +136,6 @@ const WorkspaceTable = (props) => {
         ]);
     }, [workspaceData, SearchWorkspace]);
 
-    // Effect to check if table is rendered
     useEffect(() => {
         if (!isWorkspaceLoading && processedData.length > 0) {
             const checkTableRendered = () => {
