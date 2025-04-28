@@ -135,18 +135,13 @@ const ReportsTable = (props) => {
   useEffect(() => {
     if (reportRequested && ProjectReport?.length > 0) {
       let cols = [];
-      if(selectedColumns.length === 0) {
-        setSelectedColumns(columns);
-      }
       Object.keys(ProjectReport[0]).forEach((key) => {
-        const isSelectedColumn = selectedColumns.includes(key)
         cols.push({
           name: key,
           label: key,
           options: {
             filter: false,
             sort: false,
-            display: isSelectedColumn ? "true" : "false",
             customBodyRender: (value, tableMeta) => {
               const rowIndex = tableMeta.rowIndex;
               const isExpanded = expandedRow === rowIndex;
@@ -169,7 +164,9 @@ const ReportsTable = (props) => {
           },
         });
       });
+      const allColumnNames = cols.map(col => col.name);
       setColumns(cols);
+      setSelectedColumns(allColumnNames);
     } else {
       setColumns([]);
     }
