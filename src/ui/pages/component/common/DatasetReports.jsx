@@ -166,7 +166,8 @@ const DatasetReports = () => {
           }}
         });
       });
-      setColumns(tempColumns);
+      setColumns(tempColumns);   
+      setReportData(DatasetReports);   
     } else {
       setColumns([]);
       setReportData([]);

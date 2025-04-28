@@ -162,8 +162,11 @@ const MyProgress = () => {
     }
     if (UserAnalytics?.length) {
       let tempColumns = [];
-      let tempSelected = [];
+      if(selectedColumns.length === 0) {
+        setSelectedColumns(columns);
+      }
       Object.keys(UserAnalytics[0]).forEach((key) => {
+        const isSelectedColumn = selectedColumns.includes(key)
         tempColumns.push({
           name: key,
           label: key,
@@ -171,6 +174,7 @@ const MyProgress = () => {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
             customBodyRender: (value, tableMeta) => {
               const rowIndex = tableMeta.rowIndex;
               const isExpanded = expandedRow === rowIndex;
@@ -192,58 +196,30 @@ const MyProgress = () => {
             },
           },
         });
-        tempSelected.push(key);
       });
       setColumns(tempColumns);
       setReportData(UserAnalytics);
-      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setReportData([]);
-      setSelectedColumns([]);
     }
     setShowSpinner(false);
-  }, [UserAnalytics]);
+  }, [UserAnalytics, expandedRow]);
 
   useEffect(() => {
-    if (UserAnalytics?.length) {
-      let tempColumns = [];
-      Object.keys(UserAnalytics[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
+      if (columns.length > 0 && selectedColumns.length > 0) {
+        const newCols = columns.map((col) => ({
+          ...col,
           options: {
-            filter: false,
-            sort: false,
-            align: "center",
-            customBodyRender: (value, tableMeta) => {
-              const rowIndex = tableMeta.rowIndex;
-              const isExpanded = expandedRow === rowIndex;
-              return (
-                <RowContainer
-                  expanded={isExpanded}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedRow((prevExpanded) =>
-                      prevExpanded === rowIndex ? null : rowIndex
-                    );
-                  }}
-                >
-                  <TruncatedContent expanded={isExpanded}>
-                    {value}
-                  </TruncatedContent>
-                </RowContainer>
-              );
-            },
+            ...col.options,
+            display: selectedColumns.includes(col.name) ? "true" : "false",
           },
-        });
-      });
-      setColumns(tempColumns);
-    } else {
-      setColumns([]);
-    }
-    setShowSpinner(false);
-  }, [expandedRow]);
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+          setColumns(newCols);
+        }
+      }
+    }, [selectedColumns, columns]);
 
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;

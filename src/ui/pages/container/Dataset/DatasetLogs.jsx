@@ -166,44 +166,8 @@ const DatasetLogs = (props) => {
       setDatasetLogs([]);
     }
     setShowSpinner(false);
-  }, [DatasetLogs]);
+  }, [DatasetLogs, expandedRow]);
 
-  useEffect(() => {
-    if (DatasetLogs?.length) {
-      let tempColumns = [];
-      Object.keys(DatasetLogs[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: snakeToTitleCase(key),
-          options: {
-            filter: key === "status",
-            sort: false,
-            align: "center",
-            customBodyRender: (value, tableMeta) => {
-              const rowIndex = tableMeta.rowIndex;
-              const isExpanded = expandedRow === rowIndex;
-              return (
-                <RowContainer
-                  expanded={isExpanded}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedRow((prevExpanded) =>
-                      prevExpanded === rowIndex ? null : rowIndex
-                    );
-                  }}
-                >
-                  <TruncatedContent expanded={isExpanded}>
-                    {value}
-                  </TruncatedContent>
-                </RowContainer>
-              );
-            },
-          },
-        });
-      });
-      setColumns(tempColumns);
-    } 
-  }, [expandedRow]);
 
   const CustomFooter = ({
     count,

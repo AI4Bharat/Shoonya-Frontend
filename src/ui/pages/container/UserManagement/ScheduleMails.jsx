@@ -28,6 +28,7 @@ import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../../component/common/ColumnList";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import { styled } from "@mui/material/styles";
+import { selectClasses } from "@mui/material";
 
 const TruncatedContent = styled(Box)(({ expanded }) => ({
   overflow: "hidden",
@@ -280,7 +281,6 @@ const ScheduleMails = () => {
   useEffect(() => {
     if (scheduledMails?.length) {
       let tempColumns = [];
-      let tempSelected = [];
       Object.keys(scheduledMails[0]).forEach((key) => {
         tempColumns.push({
           name: key,
@@ -310,7 +310,6 @@ const ScheduleMails = () => {
             },
           },
         });
-        key !== "id" && tempSelected.push(key);
       });
       tempColumns.push({
         name: "Actions",
@@ -340,7 +339,6 @@ const ScheduleMails = () => {
           },
         },
       });
-      tempSelected.push("Actions");
       scheduledMails.map((mail) => {
         mail.Actions = (
           <Box
@@ -363,105 +361,33 @@ const ScheduleMails = () => {
         );
         return mail;
       });
+
+      const allColumnNames = tempColumns.map(col => col.name);
       setColumns(tempColumns);
+      setSelectedColumns(allColumnNames);
+
       setTableData(scheduledMails);
-      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setTableData([]);
-      setSelectedColumns([]);
     }
     setShowSpinner(false);
-  }, [scheduledMails]);
+  }, [scheduledMails, expandedRow])
 
   useEffect(() => {
-    if (scheduledMails?.length) {
-      let tempColumns = [];
-      Object.keys(scheduledMails[0]).forEach((key) => {
-        tempColumns.push({
-          name: key,
-          label: key,
+      if (columns.length > 0 && selectedColumns.length > 0) {
+        const newCols = columns.map((col) => ({
+          ...col,
           options: {
-            filter: false,
-            sort: true,
-            align: "center",
-            customBodyRender: (value, tableMeta) => {
-              const rowIndex = tableMeta.rowIndex;
-              const isExpanded = expandedRow === rowIndex;
-              return (
-                <RowContainer
-                  expanded={isExpanded}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedRow((prevExpanded) =>
-                      prevExpanded === rowIndex ? null : rowIndex
-                    );
-                  }}
-                >
-                  <TruncatedContent expanded={isExpanded}>
-                    {value}
-                  </TruncatedContent>
-                </RowContainer>
-              );
-            },
+            ...col.options,
+            display: selectedColumns.includes(col.name) ? "true" : "false",
           },
-        });
-      });
-      tempColumns.push({
-        name: "Actions",
-        label: "Actions",
-        options: {
-          filter: false,
-          sort: true,
-          align: "center",
-          customBodyRender: (value, tableMeta) => {
-            const rowIndex = tableMeta.rowIndex;
-            const isExpanded = expandedRow === rowIndex;
-            return (
-              <RowContainer
-                expanded={isExpanded}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpandedRow((prevExpanded) =>
-                    prevExpanded === rowIndex ? null : rowIndex
-                  );
-                }}
-              >
-                <TruncatedContent expanded={isExpanded}>
-                  {value}
-                </TruncatedContent>
-              </RowContainer>
-            );
-          },
-        },
-      });
-      scheduledMails.map((mail) => {
-        mail.Actions = (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 2,
-            }}
-          >
-            <CustomButton
-              label={mail["Status"] === "Enabled" ? "Pause" : "Resume"}
-              onClick={() => updateScheduledMail(mail)}
-            />
-            <CustomButton
-              label="Delete"
-              sx={{ backgroundColor: "#EC0000" }}
-              onClick={() => deleteScheduledMail(mail)}
-            />
-          </Box>
-        );
-        return mail;
-      });
-      setColumns(tempColumns);
-    } else {
-      setColumns([]);
-    }
-  }, [expandedRow]);
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+          setColumns(newCols);
+        }
+      }
+    }, [selectedColumns, columns]);
 
   const renderToolBar = () => {
     return (
