@@ -18,12 +18,12 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 
 const ProfilePage = () => {
-
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [recentTasksLoading, setRecentTasksLoading] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -33,6 +33,17 @@ const ProfilePage = () => {
   const UserDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
+  const recentTasksData = useSelector((state) => state.getRecentTasks.data);
+  const isRecentTasksLoading = useSelector((state) => state.getRecentTasks.isLoading);
+
+  // Function to fetch user data
+  const fetchUserData = () => {
+    setLoading(true);
+    setRecentTasksLoading(true);
+    const userObj = new FetchUserByIdAPI(id);
+    dispatch(APITransport(userObj));
+  };
+
   const handleEmailToggle = async () => {
     setLoading(true);
     const mailObj = new ToggleMailsAPI(LoggedInUserId, !userDetails.enable_mail);
@@ -74,22 +85,43 @@ const ProfilePage = () => {
     );
   };
   
+  // Initial data fetch
   useEffect(() => {
-    setLoading(true);
-    const userObj = new FetchUserByIdAPI(id);
-    dispatch(APITransport(userObj));
+    fetchUserData();
+    
+    // Cleanup function to reset states when component unmounts
+    return () => {
+      setLoading(false);
+      setRecentTasksLoading(false);
+    };
   }, [id]);
 
+  // Handle user details loading
   useEffect(() => {
     if(UserDetails && UserDetails.id == id) {
       setUserDetails(UserDetails);
       setLoading(false);
     }
-  }, [UserDetails]);
+  }, [UserDetails, id]);
+
+  // Handle recent tasks loading
+  useEffect(() => {
+    // Only set recentTasksLoading to false when data is actually loaded
+    if (recentTasksData && recentTasksData.results && !isRecentTasksLoading) {
+      setRecentTasksLoading(false);
+    }
+  }, [recentTasksData, isRecentTasksLoading]);
+
+  // Reset loading states when tab changes
+  useEffect(() => {
+    // This effect will run when the component mounts or when the tab changes
+    setLoading(true);
+    setRecentTasksLoading(true);
+  }, []);
 
   return (
     <Grid container>
-      {loading && <Spinner />}
+      {(loading || recentTasksLoading || isRecentTasksLoading) && <Spinner />}
       {renderSnackBar()}
       {userDetails && (
         <>
@@ -130,6 +162,6 @@ const ProfilePage = () => {
       )}
     </Grid>
   );
-};  
+};
 
 export default ProfilePage;
