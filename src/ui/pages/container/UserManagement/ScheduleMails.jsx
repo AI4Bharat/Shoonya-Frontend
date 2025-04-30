@@ -289,6 +289,7 @@ const ScheduleMails = () => {
             filter: false,
             sort: true,
             align: "center",
+
             customBodyRender: (value, tableMeta) => {
               const rowIndex = tableMeta.rowIndex;
               const isExpanded = expandedRow === rowIndex;
@@ -308,6 +309,14 @@ const ScheduleMails = () => {
                 </RowContainer>
               );
             },
+            setCellProps: () => ({
+              style: {
+
+                whiteSpace: "normal",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+              }
+            }),
           },
         });
       });
@@ -345,7 +354,7 @@ const ScheduleMails = () => {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              gap: 2,
+              gap: 1,
             }}
           >
             <CustomButton
