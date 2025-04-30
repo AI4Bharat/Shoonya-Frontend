@@ -1379,7 +1379,7 @@ export default function LSF() {
   };
 
   return (
-    <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" }}>
+    <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" , position:"relative" , zIndex:0}}>
       {!loader && (
         <Button
           value="Back to Project"
