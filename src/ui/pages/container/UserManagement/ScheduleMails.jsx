@@ -271,6 +271,15 @@ const ScheduleMails = () => {
             filter: false,
             sort: true,
             align: "center",
+            setCellProps: () => ({
+              style: {
+
+                whiteSpace: "normal",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+              }
+            }),
+
           },
         });
         key !== "id" && tempSelected.push(key);
@@ -282,6 +291,7 @@ const ScheduleMails = () => {
           filter: false,
           sort: true,
           align: "center",
+         
         },
       });
       tempSelected.push("Actions");
@@ -291,7 +301,7 @@ const ScheduleMails = () => {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              gap: 2,
+              gap: 1,
             }}
           >
             <CustomButton

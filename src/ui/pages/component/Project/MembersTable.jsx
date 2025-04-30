@@ -148,7 +148,10 @@ const MembersTable = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", padding: "16px" },
+          style: { height: "70px", padding: "16px" ,            whiteSpace: "normal",
+            overflowWrap: "break-word",
+            wordBreak: "break-word",
+},
         }),
       },
     },
