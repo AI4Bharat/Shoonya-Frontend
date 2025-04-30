@@ -333,8 +333,6 @@ const DataitemsTable = () => {
                     <Box
                       sx={{
                         width: "100%",
-                        minWidth: "250px",
-                        maxWidth: "500px",
                         m: 1,
                         border: "1px solid rgba(224, 224, 224, 1)",
                         borderRadius: "4px",
@@ -358,6 +356,8 @@ const DataitemsTable = () => {
                 display: isDefaultColumn ? "true" : "false",
                 viewColumns: true,
                 align: "center",
+
+        
                 customHeadLabelRender: customColumnHead,
                 customBodyRender: (value, tableMeta) => {
                   const rowIndex = tableMeta.rowIndex;
