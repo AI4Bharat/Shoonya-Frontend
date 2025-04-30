@@ -221,63 +221,7 @@ const ReportsTable = (props) => {
         }
     }
   }, [selectedColumns, columns]);
-
-
-  useEffect(() => {
-    if (reportRequested[radiobutton] && ProjectReport?.length > 0) {
-      let cols = [];
-      Object.keys(ProjectReport[0]).forEach((key) => {
-        cols.push({
-          name: key,
-          label: key,
-          options: {
-            filter: false,
-            sort: false,
-            customBodyRender: (value, tableMeta) => {
-              const rowIndex = tableMeta.rowIndex;
-              const isExpanded = expandedRow === rowIndex;
-              return (
-                <RowContainer
-                  expanded={isExpanded}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedRow((prevExpanded) =>
-                      prevExpanded === rowIndex ? null : rowIndex
-                    );
-                  }}
-                >
-                  <TruncatedContent expanded={isExpanded}>
-                    {value}
-                  </TruncatedContent>
-                </RowContainer>
-              );
-            },
-          },
-        });
-      });
-      const allColumnNames = cols.map((col) => col.name);
-      setColumns(cols);
-      setSelectedColumns(allColumnNames);
-    } else {
-      setColumns([]);
-    }
-    setShowSpinner(false);
-  }, [ProjectReport, expandedRow]);
-
-  useEffect(() => {
-    if (columns.length > 0 && selectedColumns.length > 0) {
-      const newCols = columns.map((col) => ({
-        ...col,
-        options: {
-          ...col.options,
-          display: selectedColumns.includes(col.name) ? "true" : "false",
-        },
-      }));
-      if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
-        setColumns(newCols);
-      }
-    }
-  }, [selectedColumns, columns]);
+  
   const handleChangeReports = (e) => {
     setRadiobutton(e.target.value);
     setExpandedRow(null);
