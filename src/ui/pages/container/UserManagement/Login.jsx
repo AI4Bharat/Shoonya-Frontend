@@ -1,6 +1,6 @@
 
 import Grid from "@mui/material/Grid";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Link from "@mui/material/Link";
 
 import { useState, useEffect } from "react";
@@ -19,7 +19,6 @@ import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import AppInfo from "./AppInfo";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LoginStyle from "../../../styles/loginStyle";
-import userRole from "../../../../utils/UserMappedByRole/Roles";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
 

@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import {  useSelector } from "react-redux";
 import ProjectFilterList from "../../component/common/ProjectFilterList";

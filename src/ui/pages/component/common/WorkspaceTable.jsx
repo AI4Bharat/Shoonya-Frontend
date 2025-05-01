@@ -6,9 +6,8 @@ import { Link } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 import GetWorkspaceAPI from "../../../../redux/actions/api/Organization/GetWorkspace";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
-import DatasetStyle from "../../../styles/Dataset";
 import Search from "../../component/common/Search";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -257,16 +256,13 @@ const WorkspaceTable = (props) => {
             pagination: { rowsPerPage: "Rows per page" },
             options: { sortDirection: "desc" },
         },
-        // customToolbar: fetchHeaderButton,
         displaySelectToolbar: false,
         fixedHeader: false,
         filterType: "checkbox",
         download: false,
         print: false,
         rowsPerPageOptions: [10, 25, 50, 100],
-        // rowsPerPage: PageInfo.count,
         filter: false,
-        // page: PageInfo.page,
         viewColumns: false,
         selectableRows: "none",
         search: false,

@@ -1,7 +1,7 @@
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
   import React, { useEffect, useState } from "react";
   import themeDefault from "../../../theme/theme";
   import {  useNavigate, useParams } from "react-router-dom";

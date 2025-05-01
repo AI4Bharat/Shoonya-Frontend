@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
-import { Link, useNavigate, useParams,useLocation } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
 import PullNewSuperCheckerBatchAPI from "../../../../redux/actions/api/Tasks/PullNewSuperCheckerBatch";
@@ -25,7 +25,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { styled } from "@mui/styles";
 import { tooltipClasses } from "@mui/material/Tooltip";
 import InfoIcon from '@mui/icons-material/Info';
@@ -82,9 +82,6 @@ const SuperCheckerTasks = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
   const navigate = useNavigate();
-  let location = useLocation();
-
-  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const [snackbar, setSnackbarInfo] = useState({
     open: false,

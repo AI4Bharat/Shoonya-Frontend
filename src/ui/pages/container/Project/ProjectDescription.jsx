@@ -4,15 +4,13 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import ImageArray from '../../../../utils/getModelIcons';
 import React  from "react";
 import themeDefault from "../../../theme/theme";
 
 const ProjectDescription = (props) => {
     const { name, value, index } = props;
-
-    // const history = useHistory();
 
     const classes = DatasetStyle();
     return (

@@ -10,7 +10,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import { addMonths, parse } from "date-fns/esm";
 import { DateRangePicker } from "react-date-range";
 import { useParams } from "react-router-dom";
@@ -131,14 +131,14 @@ const ProjectLogs = () => {
     })
       .then(async (res) => {
         setLoading(false);
-        if (res.status == 204) {
-          return null; 
+        if (res.status === 204) {
+          return null;
         }
         if (!res.ok) throw await res.json();
         else return await res.json();
       })
       .then((res) => {
-        setAllLogs(res||[]);
+        setAllLogs(res || []);
       })
       .catch();
   };

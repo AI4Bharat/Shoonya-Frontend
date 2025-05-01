@@ -8,7 +8,7 @@ import Grid from "@mui/material/Grid";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Typography from "@mui/material/Typography";
 import DraftDataPopulation from "./DraftDataPopulation";
 import PopulateAiModel from "./PopulateAiModel";
@@ -18,9 +18,6 @@ export default function ControlledRadioButtonsGroup() {
   const [draftdata,setdraftdata] = useState(false);
   const [aimodel,setaimodel] = useState(true);
   const [automation,setautomation] = useState();
-  const handleChange=(value)=>{
-    setautomation(value)
-  }
  const handledraftdropdown=()=>{
    setdraftdata(true)
    setaimodel(false)

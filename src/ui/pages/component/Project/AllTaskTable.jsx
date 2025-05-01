@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
@@ -63,13 +63,7 @@ const excludeSearch = ["status", "actions"];
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
-  const [loading, setLoading] = useState(false);
   const { id } = useParams();
-  const [snackbar, setSnackbarInfo] = useState({
-    open: false,
-    message: "",
-    variant: "success",
-  });
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -87,7 +81,6 @@ const AllTaskTable = (props) => {
     (state) => state.getAllTasksdata.data.total_count
   );
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const filterData = {
     Status: [
       "incomplete",
@@ -393,14 +386,6 @@ const AllTaskTable = (props) => {
     rowsPerPage: currentRowPerPage,
     page: currentPageNumber - 1,
     rowsPerPageOptions: [10, 25, 50, 100],
-    textLabels: {
-      pagination: {
-        next: "Next >",
-        previous: "< Previous",
-        rowsPerPage: "currentRowPerPage",
-        displayRows: "OF",
-      },
-    },
     onChangePage: (currentPage) => {
       setCurrentPageNumber(currentPage + 1);
     },
@@ -424,7 +409,10 @@ const AllTaskTable = (props) => {
         viewColumns: "View Column",
       },
       pagination: {
+        next: "Next >",
+        previous: "< Previous",
         rowsPerPage: "Rows per page",
+        displayRows: "OF",
       },
       options: { sortDirection: "desc" },
     },
@@ -488,7 +476,6 @@ const AllTaskTable = (props) => {
           anchorEl={searchAnchor}
           handleClose={handleSearchClose}
           updateFilters={setsSelectedFilters}
-          //filterStatusData={filterData}
           currentFilters={selectedFilters}
           searchedCol={searchedCol}
           onchange={GetAllTasksdata}

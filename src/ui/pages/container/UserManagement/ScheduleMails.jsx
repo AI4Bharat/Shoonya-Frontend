@@ -7,7 +7,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import themeDefault from "../../../theme/theme";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
@@ -28,7 +28,6 @@ import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../../component/common/ColumnList";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import { styled } from "@mui/material/styles";
-import { selectClasses } from "@mui/material";
 
 const TruncatedContent = styled(Box)(({ expanded }) => ({
   overflow: "hidden",

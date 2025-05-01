@@ -12,15 +12,13 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { useSelector, useDispatch } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetUserAnalyticsAPI from "../../../../redux/actions/api/UserManagement/GetUserAnalytics";
 import MUIDataTable from "mui-datatables";
@@ -75,12 +73,9 @@ const MyProgress = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
-  const [workspaces, setWorkspaces] = useState([]);
   const [totalsummary, setTotalsummary] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedWorkspaces, setSelectedWorkspaces] = useState([]);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
-  const Workspaces = useSelector((state) => state.getWorkspaces.data);
   const UserAnalytics = useSelector(
     (state) => state.getUserAnalytics.data.project_summary
   );
@@ -484,28 +479,6 @@ const MyProgress = () => {
               Pick Dates
             </Button>
           </Grid>
-          {/* <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>
-                Workspace
-              </InputLabel>
-              <Select
-                labelId="workspace-label"
-                id="workspace-select"
-                value={selectedWorkspaces}
-                multiple
-                label="Project Type"
-                // onSelect={(e,)}
-                onChange={(e) => setSelectedWorkspaces(e.target.value)}
-              >
-                {Workspaces.map((Workspaces, index) => (
-                  <MenuItem value={Workspaces.id} key={Workspaces.id}>
-                    {Workspaces.workspace_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid> */}
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
               fullWidth

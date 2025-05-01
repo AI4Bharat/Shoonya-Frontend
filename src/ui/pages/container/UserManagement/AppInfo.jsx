@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 
 import Shoonya_Logo from "../../../../assets/Shoonya_Logo.webp";
 import { useNavigate } from "react-router-dom";

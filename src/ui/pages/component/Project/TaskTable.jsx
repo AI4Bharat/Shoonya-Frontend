@@ -24,7 +24,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { styled } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
 import tableTheme from "../../../theme/tableTheme";

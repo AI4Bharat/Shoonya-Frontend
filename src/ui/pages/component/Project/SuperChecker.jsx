@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import MUIDataTable from "mui-datatables";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Box from "@mui/material/Box";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
@@ -144,16 +144,13 @@ const SuperChecker = (props) => {
       pagination: { rowsPerPage: "Rows per page" },
       options: { sortDirection: "desc" },
     },
-    // customToolbar: fetchHeaderButton,
     displaySelectToolbar: false,
     fixedHeader: false,
     filterType: "checkbox",
     download: false,
     print: false,
     rowsPerPageOptions: [10, 25, 50, 100],
-    // rowsPerPage: PageInfo.count,
     filter: false,
-    // page: PageInfo.page,
     viewColumns: false,
     selectableRows: "none",
     search: false,

@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
@@ -120,9 +120,6 @@ const OrganizationReports = () => {
   );
   const ProjectReports = useSelector(
     (state) => state.getOrganizationProjectReports.data
-  );
-  const SuperCheck = useSelector(
-    (state) => state.getOrganizationAnnotatorQuality.data
   );
   const LanguageChoices = useSelector((state) => state.fetchLanguages.data);
 
