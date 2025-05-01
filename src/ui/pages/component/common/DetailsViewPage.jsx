@@ -32,7 +32,6 @@ import WorkspaceReports from "./WorkspaceReports";
 import AddUsersDialog from "./AddUsersDialog";
 import addUserTypes from "../../../../constants/addUserTypes";
 import AddWorkspaceDialog from "../Workspace/AddWorkspaceDialog";
-import Spinner from "../../component/common/Spinner";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useSelector, useDispatch } from "react-redux";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
