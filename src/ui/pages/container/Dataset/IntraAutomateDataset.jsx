@@ -17,7 +17,6 @@ export default function ControlledRadioButtonsGroup() {
   const classes = DatasetStyle();
   const [draftdata,setdraftdata] = useState(false);
   const [aimodel,setaimodel] = useState(true);
-  const [automation,setautomation] = useState();
  const handledraftdropdown=()=>{
    setdraftdata(true)
    setaimodel(false)
