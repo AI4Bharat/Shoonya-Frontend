@@ -551,16 +551,6 @@ const TranscriptionRightPanel = ({
       const doubleHashedText = `##${selectedText}##`;
 
       replaceSelectedText(doubleHashedText, currentIndexToSplitTextBlock, index);
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "doubleHash",
-          index: i,
-          originalText: selectedText,
-          hashedText: doubleHashedText,
-        },
-      ]);
-      setRedoStack([]);
     }
   }
 
@@ -590,32 +580,10 @@ const TranscriptionRightPanel = ({
     if (undoStack?.length > 0) {
       //getting last last action performed by user
       const lastAction = undoStack[undoStack?.length - 1];
-      if (lastAction.type === "doubleHash") {
-      // Undo the double-hash action
-      const elementsWithBoxHighlightClass = document.getElementsByClassName(
-        classes.boxHighlight
-      );
-      const textArea = elementsWithBoxHighlightClass[lastAction.index];
-    if (textArea) {
-        textArea.value = textArea.value.replace(
-          lastAction.hashedText,
-          lastAction.originalText
-        );
-
-        // Update the subtitles state
-        const sub = onSubtitleChange(
-          textArea.value,
-          currentIndexToSplitTextBlock,
-          lastAction.index
-        );
-        dispatch(setSubtitles(sub, C.SUBTITLES));
-      }
-    } else {
 
       // modifing subtitles based on last action
       const sub = onUndoAction(lastAction);
       dispatch(setSubtitles(sub, C.SUBTITLES));
-    }
 
       //removing the last action from undo and putting in redo stack
       setUndoStack(undoStack.slice(0, undoStack?.length - 1));
@@ -629,31 +597,10 @@ const TranscriptionRightPanel = ({
     if (redoStack?.length > 0) {
       //getting last last action performed by user
       const lastAction = redoStack[redoStack?.length - 1];
-      if (lastAction.type === "doubleHash") {
-      // Redo the double-hash action
-      const elementsWithBoxHighlightClass = document.getElementsByClassName(
-        classes.boxHighlight
-      );
-      const textArea = elementsWithBoxHighlightClass[lastAction.index];
-      if (textArea) {
-        textArea.value = textArea.value.replace(
-          lastAction.originalText,
-          lastAction.hashedText
-        );
 
-        // Update the subtitles state
-        const sub = onSubtitleChange(
-          textArea.value,
-          currentIndexToSplitTextBlock,
-          lastAction.index
-        );
-        dispatch(setSubtitles(sub, C.SUBTITLES));
-      }
-    } else {
       // modifing subtitles based on last action
       const sub = onRedoAction(lastAction);
       dispatch(setSubtitles(sub, C.SUBTITLES));
-    }
 
       //removing the last action from redo and putting in undo stack
       setRedoStack(redoStack.slice(0, redoStack?.length - 1));
@@ -662,23 +609,6 @@ const TranscriptionRightPanel = ({
 
     // eslint-disable-next-line
   }, [undoStack, redoStack]);
-
-  useEffect(() => {
-      const handleKeyDown = (event) => {
-        if (event.ctrlKey && event.key === "z") {
-          event.preventDefault();
-          onUndo();
-        } else if (event.ctrlKey && event.key === "y") {
-          event.preventDefault();
-          onRedo();
-        }
-      };
-
-      document.addEventListener("keydown", handleKeyDown);
-      return () => {
-        document.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [onUndo, onRedo]);
 
   const targetLength = (index) => {
     if (subtitles[index]?.text?.trim() !== "")
@@ -1085,7 +1015,7 @@ const TranscriptionRightPanel = ({
                           onKeyDown={(event) => {
                             console.log(event,"log",document.activeElement);
 
-                            if ( event.shiftKey && event.key == "<") {
+                            if ( event.shiftKey && event.key == "ArrowLeft") {
                               const textArea = textRefs.current[index];
                               console.log("helo");
 
@@ -1098,7 +1028,7 @@ const TranscriptionRightPanel = ({
                                 event.preventDefault(); 
                               }
                             }
-                            else if (event.shiftKey && event.key == ">") {
+                            else if (event.shiftKey && event.key == "ArrowRight") {
                               const textArea = textRefs.current[index];
                               if (textArea) {
                                 const start = textArea.selectionStart;
@@ -1162,7 +1092,7 @@ const TranscriptionRightPanel = ({
                                   onKeyDown={(event) => {
                                     console.log(event,"log",document.activeElement);
         
-                                    if ( event.shiftKey && event.key == "<") {
+                                    if ( event.shiftKey && event.key == "ArrowLeft") {
                                       const textArea = textRefs.current[index];
                                       console.log("helo");
         
@@ -1175,7 +1105,7 @@ const TranscriptionRightPanel = ({
                                         event.preventDefault(); 
                                       }
                                     }
-                                    else if (event.shiftKey && event.key == ">") {
+                                    else if (event.shiftKey && event.key == "ArrowRight") {
                                       const textArea = textRefs.current[index];
                                       if (textArea) {
                                         const start = textArea.selectionStart;
@@ -1250,7 +1180,7 @@ const TranscriptionRightPanel = ({
                             onKeyDown={(event) => {
                               console.log(event,"log",document.activeElement);
   
-                              if ( event.shiftKey && event.key == "<") {
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
                                 const textArea = textRefs.current[index];
                                 console.log("helo");
   
@@ -1263,7 +1193,7 @@ const TranscriptionRightPanel = ({
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.shiftKey && event.key == ">") {
+                              else if (event.shiftKey && event.key == "ArrowRight") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1336,7 +1266,7 @@ const TranscriptionRightPanel = ({
                             onKeyDown={(event) => {
                               console.log(event,"log",document.activeElement);
   
-                              if ( event.shiftKey && event.key == "<") {
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
                                 const textArea = textRefs.current[index];
                                 console.log("helo");
   
@@ -1349,7 +1279,7 @@ const TranscriptionRightPanel = ({
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.shiftKey && event.key == ">") {
+                              else if (event.shiftKey && event.key == "ArrowRight") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1418,7 +1348,7 @@ const TranscriptionRightPanel = ({
                                     onKeyDown={(event) => {
                                       console.log(event,"log",document.activeElement);
           
-                                      if ( event.shiftKey && event.key == "<") {
+                                      if ( event.shiftKey && event.key == "ArrowLeft") {
                                         const textArea = textRefs.current[index];
                                         console.log("helo");
           
@@ -1431,7 +1361,7 @@ const TranscriptionRightPanel = ({
                                           event.preventDefault(); 
                                         }
                                       }
-                                      else if (event.shiftKey && event.key == ">") {
+                                      else if (event.shiftKey && event.key == "ArrowRight") {
                                         const textArea = textRefs.current[index];
                                         if (textArea) {
                                           const start = textArea.selectionStart;
@@ -1501,7 +1431,7 @@ const TranscriptionRightPanel = ({
                               onKeyDown={(event) => {
                                 console.log(event,"log",document.activeElement);
     
-                                if ( event.shiftKey && event.key == "<") {
+                                if ( event.shiftKey && event.key == "ArrowLeft") {
                                   const textArea = textRefs.current[index];
                                   console.log("helo");
     
@@ -1514,7 +1444,7 @@ const TranscriptionRightPanel = ({
                                     event.preventDefault(); 
                                   }
                                 }
-                                else if (event.shiftKey && event.key == ">") {
+                                else if (event.shiftKey && event.key == "ArrowRight") {
                                   const textArea = textRefs.current[index];
                                   if (textArea) {
                                     const start = textArea.selectionStart;
