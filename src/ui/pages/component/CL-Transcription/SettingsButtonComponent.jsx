@@ -255,8 +255,7 @@ ProjectDetails,
             }}
             trigger={
               <FormControlLabel
-                sx={{paddingLeft:"48px"}}
-                label="Hotkeys Explorer"
+                label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hotkeys Explorer"
                 control={<div></div>}
               />
             }
@@ -284,12 +283,8 @@ ProjectDetails,
                 <li>Play/Pause - Shift + Space</li>
                 <li>Seek Left - Shift + &#8592;</li>
                 <li>Seek Right - Shift + &#8594;</li>
-                <li>Select Text Left - Shift + &lt;</li>
-                <li>Select Text Right - Shift + &gt;</li>
                 <li>Noise Tags - $$$</li>
                 <li>Toggle Transliteration - Alt + 1</li>
-                <li>Undo - Ctrl + Z</li>
-                <li>Redu - Ctrl + Y</li>
                 {/* <li>Color Schema set</li> */}
               </ul>
             </div>
