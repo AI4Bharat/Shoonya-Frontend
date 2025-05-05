@@ -289,7 +289,7 @@ ProjectDetails,
                 <li>Noise Tags - $$$</li>
                 <li>Toggle Transliteration - Alt + 1</li>
                 <li>Undo - Ctrl + Z</li>
-                <li>Redu - Ctrl + Y</li>
+                <li>Redo - Ctrl + Y</li>
                 {/* <li>Color Schema set</li> */}
               </ul>
             </div>
