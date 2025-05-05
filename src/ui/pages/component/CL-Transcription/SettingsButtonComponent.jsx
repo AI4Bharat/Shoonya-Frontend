@@ -284,8 +284,8 @@ ProjectDetails,
                 <li>Play/Pause - Shift + Space</li>
                 <li>Seek Left - Shift + &#8592;</li>
                 <li>Seek Right - Shift + &#8594;</li>
-                <li>Select Text Left - Shift + &lt;</li>
-                <li>Select Text Right - Shift + &gt;</li>
+                <li>Select Text Left - Ctrl + Shift + &lt;</li>
+                <li>Select Text Right - Ctrl + Shift + &gt;</li>
                 <li>Noise Tags - $$$</li>
                 <li>Toggle Transliteration - Alt + 1</li>
                 <li>Undo - Ctrl + Z</li>
