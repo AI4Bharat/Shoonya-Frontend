@@ -404,19 +404,6 @@ const TranscriptionRightPanel = ({
       currentTarget,
     } = event;
 
-  const oldText = subtitles[index]?.text || "";
-  if (oldText !== value) {
-    setUndoStack((prevState) => [
-      ...prevState,
-      {
-        type: "textChange",
-        index: index,
-        previousText: oldText,
-      },
-    ]);
-    setRedoStack([]);
-  }
-
     const containsTripleDollar = value.includes("$$$");
 
     // setEnableTransliterationSuggestion(true);
@@ -564,16 +551,6 @@ const TranscriptionRightPanel = ({
       const doubleHashedText = `##${selectedText}##`;
 
       replaceSelectedText(doubleHashedText, currentIndexToSplitTextBlock, index);
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "doubleHash",
-          index: i,
-          originalText: selectedText,
-          hashedText: doubleHashedText,
-        },
-      ]);
-      setRedoStack([]);
     }
   }
 
@@ -599,146 +576,39 @@ const TranscriptionRightPanel = ({
     [limit, currentOffset]
   );
 
-const onUndo = useCallback(() => {
-  if (undoStack?.length > 0) {
-    const lastAction = undoStack[undoStack.length - 1];
+  const onUndo = useCallback(() => {
+    if (undoStack?.length > 0) {
+      //getting last last action performed by user
+      const lastAction = undoStack[undoStack?.length - 1];
 
-    if (lastAction.type === "textChange") {
-      const currentText = subtitles[lastAction.index]?.text || "";
-
-      // Undo text change
-      const sub = onSubtitleChange(
-        lastAction.previousText,
-        lastAction.index,
-        false
-      );
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-
-      // Push redo version of this action
-      setRedoStack((prevState) => [
-        ...prevState,
-        {
-          type: "textChange",
-          index: lastAction.index,
-          previousText: currentText,
-        },
-      ]);
-    }
-
-    else if (lastAction.type === "doubleHash") {
-      // Undo double-hash action
-      const elementsWithBoxHighlightClass = document.getElementsByClassName(
-        classes.boxHighlight
-      );
-      const textArea = elementsWithBoxHighlightClass[lastAction.index];
-      if (textArea) {
-        textArea.value = textArea.value.replace(
-          lastAction.hashedText,
-          lastAction.originalText
-        );
-
-        const sub = onSubtitleChange(
-          textArea.value,
-          currentIndexToSplitTextBlock,
-          lastAction.index
-        );
-        dispatch(setSubtitles(sub, C.SUBTITLES));
-      }
-
-      setRedoStack((prevState) => [...prevState, lastAction]);
-    }
-
-    else {
-      // Handle other action types
+      // modifing subtitles based on last action
       const sub = onUndoAction(lastAction);
       dispatch(setSubtitles(sub, C.SUBTITLES));
+
+      //removing the last action from undo and putting in redo stack
+      setUndoStack(undoStack.slice(0, undoStack?.length - 1));
       setRedoStack((prevState) => [...prevState, lastAction]);
     }
 
-    // Always pop from undo stack
-    setUndoStack((prev) => prev.slice(0, prev.length - 1));
-  }
-}, [undoStack, subtitles, dispatch, currentIndexToSplitTextBlock, classes.boxHighlight]);
+    // eslint-disable-next-line
+  }, [undoStack, redoStack]);
 
-const onRedo = useCallback(() => {
-  if (redoStack?.length > 0) {
-    const lastAction = redoStack[redoStack.length - 1];
+  const onRedo = useCallback(() => {
+    if (redoStack?.length > 0) {
+      //getting last last action performed by user
+      const lastAction = redoStack[redoStack?.length - 1];
 
-    if (lastAction.type === "textChange") {
-      const currentText = subtitles[lastAction.index]?.text || "";
-
-      // Redo text change
-      const sub = onSubtitleChange(
-        lastAction.previousText,
-        lastAction.index,
-        false
-      );
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-
-      // Push undo version of this action
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "textChange",
-          index: lastAction.index,
-          previousText: currentText,
-        },
-      ]);
-    }
-
-    else if (lastAction.type === "doubleHash") {
-      // Redo double-hash action
-      const elementsWithBoxHighlightClass = document.getElementsByClassName(
-        classes.boxHighlight
-      );
-      const textArea = elementsWithBoxHighlightClass[lastAction.index];
-      if (textArea) {
-        textArea.value = textArea.value.replace(
-          lastAction.originalText,
-          lastAction.hashedText
-        );
-
-        const sub = onSubtitleChange(
-          textArea.value,
-          currentIndexToSplitTextBlock,
-          lastAction.index
-        );
-        dispatch(setSubtitles(sub, C.SUBTITLES));
-      }
-
-      setUndoStack((prevState) => [...prevState, lastAction]);
-    }
-
-    else {
-      // Redo other actions
+      // modifing subtitles based on last action
       const sub = onRedoAction(lastAction);
       dispatch(setSubtitles(sub, C.SUBTITLES));
+
+      //removing the last action from redo and putting in undo stack
+      setRedoStack(redoStack.slice(0, redoStack?.length - 1));
       setUndoStack((prevState) => [...prevState, lastAction]);
     }
 
-    // Remove from redo stack
-    setRedoStack((prev) => prev.slice(0, prev.length - 1));
-  }
-}, [redoStack, subtitles, dispatch, currentIndexToSplitTextBlock, classes.boxHighlight]);
-
-
-
-  useEffect(() => {
-      const handleKeyDown = (event) => {
-        if (event.ctrlKey && event.key === "z") {
-          event.preventDefault();
-          onUndo();
-        } else if (event.ctrlKey && event.key === "y") {
-          event.preventDefault();
-          onRedo();
-        }
-      };
-
-      document.addEventListener("keydown", handleKeyDown);
-      return () => {
-        document.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [onUndo, onRedo]);
+    // eslint-disable-next-line
+  }, [undoStack, redoStack]);
 
   const targetLength = (index) => {
     if (subtitles[index]?.text?.trim() !== "")
@@ -1145,7 +1015,7 @@ const onRedo = useCallback(() => {
                           onKeyDown={(event) => {
                             console.log(event,"log",document.activeElement);
 
-                            if ( event.ctrlKey && event.shiftKey && event.key === "<") {
+                            if ( event.shiftKey && event.key == "ArrowLeft") {
                               const textArea = textRefs.current[index];
                               console.log("helo");
 
@@ -1158,7 +1028,7 @@ const onRedo = useCallback(() => {
                                 event.preventDefault(); 
                               }
                             }
-                            else if (event.ctrlKey && event.shiftKey && event.key === ">") {
+                            else if (event.shiftKey && event.key == "ArrowRight") {
                               const textArea = textRefs.current[index];
                               if (textArea) {
                                 const start = textArea.selectionStart;
@@ -1222,7 +1092,7 @@ const onRedo = useCallback(() => {
                                   onKeyDown={(event) => {
                                     console.log(event,"log",document.activeElement);
         
-                                    if ( event.ctrlKey && event.shiftKey && event.key === "<") {
+                                    if ( event.shiftKey && event.key == "ArrowLeft") {
                                       const textArea = textRefs.current[index];
                                       console.log("helo");
         
@@ -1235,7 +1105,7 @@ const onRedo = useCallback(() => {
                                         event.preventDefault(); 
                                       }
                                     }
-                                    else if (event.ctrlKey && event.shiftKey && event.key === ">") {
+                                    else if (event.shiftKey && event.key == "ArrowRight") {
                                       const textArea = textRefs.current[index];
                                       if (textArea) {
                                         const start = textArea.selectionStart;
@@ -1310,7 +1180,7 @@ const onRedo = useCallback(() => {
                             onKeyDown={(event) => {
                               console.log(event,"log",document.activeElement);
   
-                              if ( event.ctrlKey && event.shiftKey && event.key === "<") {
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
                                 const textArea = textRefs.current[index];
                                 console.log("helo");
   
@@ -1323,7 +1193,7 @@ const onRedo = useCallback(() => {
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.ctrlKey && event.shiftKey && event.key === ">") {
+                              else if (event.shiftKey && event.key == "ArrowRight") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1396,7 +1266,7 @@ const onRedo = useCallback(() => {
                             onKeyDown={(event) => {
                               console.log(event,"log",document.activeElement);
   
-                              if ( event.ctrlKey && event.shiftKey && event.key === "<") {
+                              if ( event.shiftKey && event.key == "ArrowLeft") {
                                 const textArea = textRefs.current[index];
                                 console.log("helo");
   
@@ -1409,7 +1279,7 @@ const onRedo = useCallback(() => {
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.ctrlKey && event.shiftKey && event.key === ">") {
+                              else if (event.shiftKey && event.key == "ArrowRight") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1478,7 +1348,7 @@ const onRedo = useCallback(() => {
                                     onKeyDown={(event) => {
                                       console.log(event,"log",document.activeElement);
           
-                                      if ( event.ctrlKey && event.shiftKey && event.key === "<") {
+                                      if ( event.shiftKey && event.key == "ArrowLeft") {
                                         const textArea = textRefs.current[index];
                                         console.log("helo");
           
@@ -1491,7 +1361,7 @@ const onRedo = useCallback(() => {
                                           event.preventDefault(); 
                                         }
                                       }
-                                      else if (event.ctrlKey && event.shiftKey && event.key === ">") {
+                                      else if (event.shiftKey && event.key == "ArrowRight") {
                                         const textArea = textRefs.current[index];
                                         if (textArea) {
                                           const start = textArea.selectionStart;
@@ -1561,7 +1431,7 @@ const onRedo = useCallback(() => {
                               onKeyDown={(event) => {
                                 console.log(event,"log",document.activeElement);
     
-                                if ( event.ctrlKey && event.shiftKey && event.key === "<") {
+                                if ( event.shiftKey && event.key == "ArrowLeft") {
                                   const textArea = textRefs.current[index];
                                   console.log("helo");
     
@@ -1574,7 +1444,7 @@ const onRedo = useCallback(() => {
                                     event.preventDefault(); 
                                   }
                                 }
-                                else if (event.ctrlKey && event.shiftKey && event.key === ">") {
+                                else if (event.shiftKey && event.key == "ArrowRight") {
                                   const textArea = textRefs.current[index];
                                   if (textArea) {
                                     const start = textArea.selectionStart;
