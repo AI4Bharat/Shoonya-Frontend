@@ -51,6 +51,8 @@ import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/
 import InviteManagerSuggestions from "../../../../redux/actions/api/Organization/InviteManagerSuggestions";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI"
 import CustomizedSnackbars from "./Snackbar";
+import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -256,11 +258,15 @@ const DetailsViewPage = (props) => {
   const handleOpenSettings = () => {
     navigate(`/workspaces/${id}/workspacesetting`);
   };
-
+  
   const handleClickMenu = (data)  =>{
   setSelectmenu(data)
   handleMenuClose()
-  }
+  };
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
@@ -319,22 +325,16 @@ const DetailsViewPage = (props) => {
             Created by : {createdBy}
           </Typography>
           <Box>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-              variant="fullWidth"
-              TabIndicatorProps={{
-                style: { display: "none" },
-              }}
-              sx={{
-                "@media (min-width: 600px)": {
-                  flexDirection: "row",
-                  borderBottom: "1px solid #ddd",
-                  borderRight: "none",
-                },
-              }}
-            >
+          <Tabs
+                value={value}
+                onChange={handleChange}
+                aria-label="basic tabs example"
+                variant="fullWidth"
+                TabIndicatorProps={{
+                  style: { display: "none" },
+                }}
+                orientation={isSmallScreen ? "vertical" : "horizontal"}
+              >
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.projects")}
@@ -358,6 +358,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 0 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 0 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
@@ -389,6 +390,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 1 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 1 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
@@ -420,6 +422,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 2 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 2 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
@@ -451,6 +454,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 3 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 3 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
