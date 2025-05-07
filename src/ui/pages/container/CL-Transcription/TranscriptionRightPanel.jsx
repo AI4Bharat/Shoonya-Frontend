@@ -403,6 +403,19 @@ const TranscriptionRightPanel = ({
       currentTarget,
     } = event;
 
+    const oldText = subtitles[index]?.text || "";
+  if (oldText !== value) {
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: "textChange",
+        index: index,
+        previousText: oldText,
+      },
+    ]);
+    setRedoStack([]);
+  }
+
     const containsTripleDollar = value.includes("$$$");
 
     // setEnableTransliterationSuggestion(true);
@@ -585,24 +598,44 @@ const TranscriptionRightPanel = ({
     [limit, currentOffset]
   );
 
-  const onUndo = useCallback(() => {
-    if (undoStack?.length > 0) {
-      //getting last last action performed by user
-      const lastAction = undoStack[undoStack?.length - 1];
+const onUndo = useCallback(() => {
+  if (undoStack?.length > 0) {
+    const lastAction = undoStack[undoStack.length - 1];
 
-       if (lastAction.type === "doubleHash") {
-      // Undo the double-hash action
+    if (lastAction.type === "textChange") {
+      const currentText = subtitles[lastAction.index]?.text || "";
+
+      // Undo text change
+      const sub = onSubtitleChange(
+        lastAction.previousText,
+        lastAction.index,
+        false
+      );
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+
+      // Push redo version of this action
+      setRedoStack((prevState) => [
+        ...prevState,
+        {
+          type: "textChange",
+          index: lastAction.index,
+          previousText: currentText,
+        },
+      ]);
+    }
+
+    else if (lastAction.type === "doubleHash") {
+      // Undo double-hash action
       const elementsWithBoxHighlightClass = document.getElementsByClassName(
         classes.boxHighlight
       );
       const textArea = elementsWithBoxHighlightClass[lastAction.index];
-    if (textArea) {
+      if (textArea) {
         textArea.value = textArea.value.replace(
           lastAction.hashedText,
           lastAction.originalText
         );
 
-        // Update the subtitles state
         const sub = onSubtitleChange(
           textArea.value,
           currentIndexToSplitTextBlock,
@@ -610,29 +643,50 @@ const TranscriptionRightPanel = ({
         );
         dispatch(setSubtitles(sub, C.SUBTITLES));
       }
-    } else {
-      // Handle other undo actions
 
-      // modifing subtitles based on last action
-      const sub = onUndoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    }
-
-      //removing the last action from undo and putting in redo stack
-      setUndoStack(undoStack.slice(0, undoStack?.length - 1));
       setRedoStack((prevState) => [...prevState, lastAction]);
     }
 
-    // eslint-disable-next-line
-  }, [undoStack, redoStack]);
+    else {
+      // Handle other action types
+      const sub = onUndoAction(lastAction);
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+      setRedoStack((prevState) => [...prevState, lastAction]);
+    }
 
-  const onRedo = useCallback(() => {
-    if (redoStack?.length > 0) {
-      //getting last last action performed by user
-      const lastAction = redoStack[redoStack?.length - 1];
+    // Always pop from undo stack
+    setUndoStack((prev) => prev.slice(0, prev.length - 1));
+  }
+}, [undoStack, subtitles, dispatch, currentIndexToSplitTextBlock, classes.boxHighlight]);
 
-       if (lastAction.type === "doubleHash") {
-      // Redo the double-hash action
+const onRedo = useCallback(() => {
+  if (redoStack?.length > 0) {
+    const lastAction = redoStack[redoStack.length - 1];
+
+    if (lastAction.type === "textChange") {
+      const currentText = subtitles[lastAction.index]?.text || "";
+
+      // Redo text change
+      const sub = onSubtitleChange(
+        lastAction.previousText,
+        lastAction.index,
+        false
+      );
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+
+      // Push undo version of this action
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: "textChange",
+          index: lastAction.index,
+          previousText: currentText,
+        },
+      ]);
+    }
+
+    else if (lastAction.type === "doubleHash") {
+      // Redo double-hash action
       const elementsWithBoxHighlightClass = document.getElementsByClassName(
         classes.boxHighlight
       );
@@ -643,7 +697,6 @@ const TranscriptionRightPanel = ({
           lastAction.hashedText
         );
 
-        // Update the subtitles state
         const sub = onSubtitleChange(
           textArea.value,
           currentIndexToSplitTextBlock,
@@ -651,23 +704,25 @@ const TranscriptionRightPanel = ({
         );
         dispatch(setSubtitles(sub, C.SUBTITLES));
       }
-    } else {
-      // Handle other redo actions
 
-      // modifing subtitles based on last action
-      const sub = onRedoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-    }
-
-      //removing the last action from redo and putting in undo stack
-      setRedoStack(redoStack.slice(0, redoStack?.length - 1));
       setUndoStack((prevState) => [...prevState, lastAction]);
     }
 
-    // eslint-disable-next-line
-  }, [undoStack, redoStack]);
+    else {
+      // Redo other actions
+      const sub = onRedoAction(lastAction);
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+      setUndoStack((prevState) => [...prevState, lastAction]);
+    }
 
-    useEffect(() => {
+    // Remove from redo stack
+    setRedoStack((prev) => prev.slice(0, prev.length - 1));
+  }
+}, [redoStack, subtitles, dispatch, currentIndexToSplitTextBlock, classes.boxHighlight]);
+
+
+
+  useEffect(() => {
       const handleKeyDown = (event) => {
         if (event.ctrlKey && event.key === "z") {
           event.preventDefault();
@@ -1087,7 +1142,7 @@ const TranscriptionRightPanel = ({
 
                           onKeyDown={(event) => {
 
-                            if ( event.shiftKey && event.key == "<") {
+                            if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                               const textArea = textRefs.current[index];
 
                               if (textArea) {
@@ -1099,7 +1154,7 @@ const TranscriptionRightPanel = ({
                                 event.preventDefault(); 
                               }
                             }
-                            else if (event.shiftKey && event.key == ">") {
+                            else if (event.ctrlKey && event.shiftKey && event.key === ">") {
                               const textArea = textRefs.current[index];
                               if (textArea) {
                                 const start = textArea.selectionStart;
@@ -1161,7 +1216,7 @@ const TranscriptionRightPanel = ({
         
                                   onKeyDown={(event) => {
         
-                                    if ( event.shiftKey && event.key == "<") {
+                                    if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                       const textArea = textRefs.current[index];
         
                                       if (textArea) {
@@ -1173,7 +1228,7 @@ const TranscriptionRightPanel = ({
                                         event.preventDefault(); 
                                       }
                                     }
-                                    else if (event.shiftKey && event.key == ">") {
+                                    else if (event.ctrlKey && event.shiftKey && event.key === ">") {
                                       const textArea = textRefs.current[index];
                                       if (textArea) {
                                         const start = textArea.selectionStart;
@@ -1246,7 +1301,7 @@ const TranscriptionRightPanel = ({
   
                             onKeyDown={(event) => {
   
-                              if ( event.shiftKey && event.key == "<") {
+                              if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                 const textArea = textRefs.current[index];
   
                                 if (textArea) {
@@ -1258,7 +1313,7 @@ const TranscriptionRightPanel = ({
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.shiftKey && event.key == ">") {
+                              else if (event.ctrlKey && event.shiftKey && event.key === ">") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1329,7 +1384,7 @@ const TranscriptionRightPanel = ({
   
                             onKeyDown={(event) => {
   
-                              if ( event.shiftKey && event.key == "<") {
+                              if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                 const textArea = textRefs.current[index];
   
                                 if (textArea) {
@@ -1341,7 +1396,7 @@ const TranscriptionRightPanel = ({
                                   event.preventDefault(); 
                                 }
                               }
-                              else if (event.shiftKey && event.key == ">") {
+                              else if (event.ctrlKey && event.shiftKey && event.key === ">") {
                                 const textArea = textRefs.current[index];
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1408,7 +1463,7 @@ const TranscriptionRightPanel = ({
           
                                     onKeyDown={(event) => {
           
-                                      if ( event.shiftKey && event.key == "<") {
+                                      if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                         const textArea = textRefs.current[index];
           
                                         if (textArea) {
@@ -1420,7 +1475,7 @@ const TranscriptionRightPanel = ({
                                           event.preventDefault(); 
                                         }
                                       }
-                                      else if (event.shiftKey && event.key == ">") {
+                                      else if (event.ctrlKey && event.shiftKey && event.key === ">") {
                                         const textArea = textRefs.current[index];
                                         if (textArea) {
                                           const start = textArea.selectionStart;
@@ -1488,7 +1543,7 @@ const TranscriptionRightPanel = ({
     
                               onKeyDown={(event) => {
     
-                                if ( event.shiftKey && event.key == "<") {
+                                if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                   const textArea = textRefs.current[index];
     
                                   if (textArea) {
@@ -1500,7 +1555,7 @@ const TranscriptionRightPanel = ({
                                     event.preventDefault(); 
                                   }
                                 }
-                                else if (event.shiftKey && event.key == ">") {
+                                else if (event.ctrlKey && event.shiftKey && event.key === ">") {
                                   const textArea = textRefs.current[index];
                                   if (textArea) {
                                     const start = textArea.selectionStart;
