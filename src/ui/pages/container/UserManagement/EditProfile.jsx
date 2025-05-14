@@ -1,4 +1,4 @@
-import { Button, Card, CircularProgress, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem, InputLabel, InputAdornment } from "@mui/material";
+import { Button, Card, CircularProgress, Grid, ThemeProvider, Typography, Select, OutlinedInput, Box, Chip, MenuItem,  InputLabel, InputAdornment} from "@mui/material";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState } from "react";
@@ -230,6 +230,111 @@ const MyProfile = () => {
                 InputLabelProps={{ shrink: true }}
               ></OutlinedTextField>
             </Grid>
+
+
+            {/* New fields added */}
+
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <OutlinedTextField
+                select
+                fullWidth
+                label="Gender"
+                name="gender"
+                value={newDetails?.gender}
+                onChange={handleFieldChange}
+                InputLabelProps={{ shrink: true }}
+                  >
+                    <MenuItem value="Male">Male</MenuItem>
+                    <MenuItem value="Female">Female</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
+                  </OutlinedTextField>
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+             <OutlinedTextField
+                  select
+                  fullWidth
+                  label="Age Group"
+                  name="age_group"
+                  value={newDetails?.age_group}
+                  onChange={handleFieldChange}
+                  InputLabelProps={{ shrink: true }}
+                >
+                  <MenuItem value="18 - 30">18 - 30</MenuItem>
+                  <MenuItem value="30 - 45">30 - 45</MenuItem>
+                  <MenuItem value="45 - 60">45 - 60</MenuItem>
+                  <MenuItem value="60+">60+</MenuItem>
+                </OutlinedTextField>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+             <OutlinedTextField
+             select
+             fullWidth
+                  label="Experience"
+                  value={newDetails?.qualification}
+                  name="qualification"
+                  onChange={handleFieldChange}
+                  InputLabelProps={{ shrink: true }}
+                >
+                  <MenuItem value="No schooling">No schooling</MenuItem>
+                  <MenuItem value="Upto 12th">Upto 12th</MenuItem>
+                  <MenuItem value="Undergrad and Grad">Undergrad and Grad</MenuItem>
+                  <MenuItem value="PostGrad + PhD">PostGrad + PhD</MenuItem>
+                </OutlinedTextField>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <OutlinedTextField
+              select
+              fullWidth
+              label="Experience"
+                  value={newDetails?.job_type}
+                  name="job_type"
+                  onChange={handleFieldChange}
+                   InputLabelProps={{ shrink: true }}
+                >
+                  <MenuItem value="Blue Collar">Blue Collar</MenuItem>
+                  <MenuItem value="White Collar">White Collar</MenuItem>
+                </OutlinedTextField>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <OutlinedTextField
+                fullWidth
+                label="Native State"
+                name="native_state"
+                value={newDetails?.native_state}
+                onChange={handleFieldChange}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <OutlinedTextField
+                fullWidth
+                label="Native District"
+                name="native_district"
+                value={newDetails?.native_district}
+                onChange={handleFieldChange}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+              <OutlinedTextField
+              select
+              fullWidth
+                  label="Area Type"
+                  value={newDetails?.area}
+                  name="area"
+                  onChange={handleFieldChange}
+                  InputLabelProps={{ shrink: true }}
+                >
+                  <MenuItem value="Rural">Rural</MenuItem>
+                  <MenuItem value="Urban">Urban</MenuItem>
+                 </OutlinedTextField>
+            </Grid>
+
             
             {/* <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
             <InputLabel id="availability-label" style={{fontSize: "1.25rem", zIndex: "1", position: "absolute", display: "block", transform: "translate(14px, -9px) scale(0.75)", backgroundColor: "white", paddingLeft: "4px", paddingRight: "4px"}}>Availability Status</InputLabel>

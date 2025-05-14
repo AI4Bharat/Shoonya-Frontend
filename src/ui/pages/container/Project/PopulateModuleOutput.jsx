@@ -556,7 +556,7 @@ const langCodes = {
 };
 
 const apiEndpoints_pred = {
-     default_asr: `${configs.BASE_URL_AUTO}/projects/populate_asr_model_predictions/`,
+    default_asr: `${configs.BASE_URL_AUTO}/projects/populate_asr_model_predictions/`,
     youtube: `${configs.BASE_URL_AUTO}/projects/populate_asr_model_predictions_yt/`
 };
 
@@ -580,6 +580,7 @@ export default function PopulateModuleOutput() {
                         "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
                     }
                 });
+                console.log("Response:", response);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -601,12 +602,19 @@ export default function PopulateModuleOutput() {
     };
 
     const handleSubmit = async () => {
-        setAnchorEl(null);
+        setAnchorEl(null); const payload = {
+            model_language: modelLanguage,
+            project_ids: projectIds.split(",").map(id => id.trim()),
+            stage: stage
+        };
+    
+        console.log("Submitting payload:", payload);
         try {
             const response = await fetch(apiEndpoint, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
                 },
                 body: JSON.stringify({
                     model_language: modelLanguage,

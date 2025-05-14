@@ -374,15 +374,15 @@ const UserDetail = (props) => {
           openDialog={openDialog}
           handleCloseDialog={() => handleCloseDialog()}
           submit={() => handleUpdateEditProfile()}
-          Email={email}
           FirstName={firstName}
+          LastName={lastName}
+          setFirstName={setFirstName}
+          setLastName={setLastName}
+          Email={email}
           userName = {userName}
           setUserName={setUserName}
           active={active}
           setActive={setActive}
-          setFirstName={setFirstName}
-          LastName={lastName}
-          setLastName={setLastName}
           Language={language}
           setLanguage={setLanguage}
           ParticipationType={participationType}

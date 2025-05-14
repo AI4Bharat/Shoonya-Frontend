@@ -97,7 +97,7 @@
   },
   "resolution":{
     "@ai4bharat/indic-transliterate": {
-      "react": "^18.0.0"
+      "react": "^18.19.0"
     }
   }
 }
