@@ -287,7 +287,7 @@ const MyProfile = () => {
               <OutlinedTextField
               select
               fullWidth
-              label="Experience"
+              label="Job Type"
                   value={newDetails?.job_type}
                   name="job_type"
                   onChange={handleFieldChange}
