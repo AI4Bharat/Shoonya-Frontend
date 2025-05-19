@@ -412,6 +412,8 @@ const TranscriptionRightPanel = ({
         type: "textChange",
         index: index,
         previousText: oldText,
+        updateAcoustic: updateAcoustic
+
       },
     ]);
     setRedoStack([]);
@@ -605,12 +607,13 @@ const onUndo = useCallback(() => {
 
     if (lastAction.type === "textChange") {
       const currentText = subtitles[lastAction.index]?.text || "";
+console.log(lastAction.updateAcoustic);
 
       // Undo text change
       const sub = onSubtitleChange(
         lastAction.previousText,
         lastAction.index,
-        false
+        lastAction.updateAcoustic
       );
       dispatch(setSubtitles(sub, C.SUBTITLES));
 
@@ -621,6 +624,7 @@ const onUndo = useCallback(() => {
           type: "textChange",
           index: lastAction.index,
           previousText: currentText,
+          updateAcoustic: lastAction.updateAcoustic
         },
       ]);
     }
@@ -667,11 +671,10 @@ const onRedo = useCallback(() => {
     if (lastAction.type === "textChange") {
       const currentText = subtitles[lastAction.index]?.text || "";
 
-      // Redo text change
       const sub = onSubtitleChange(
         lastAction.previousText,
         lastAction.index,
-        false
+        lastAction.updateAcoustic,
       );
       dispatch(setSubtitles(sub, C.SUBTITLES));
 
@@ -682,6 +685,7 @@ const onRedo = useCallback(() => {
           type: "textChange",
           index: lastAction.index,
           previousText: currentText,
+          updateAcoustic: lastAction.updateAcoustic
         },
       ]);
     }
