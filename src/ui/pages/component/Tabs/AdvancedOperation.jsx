@@ -621,7 +621,7 @@ const AdvancedOperation = (props) => {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <AllocateTasksDialog open={open} handleClose={handleClose} />
           </Grid>
-
+{/* manual task assign */}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeallocationAnnotatorsAndReviewers />
           </Grid>
