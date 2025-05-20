@@ -398,23 +398,26 @@ const TranscriptionRightPanel = ({
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
 
   const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
-    const {
-      target: { value },
-      currentTarget,
-    } = event;
-
-    const oldText = subtitles[index]?.text || "";
-  if (oldText !== value) {
-    setUndoStack((prevState) => [
-      ...prevState,
-      {
-        type: "textChange",
-        index: index,
-        previousText: oldText,
-      },
-    ]);
-    setRedoStack([]);
-  }
+    const { value } = event.target;
+    const { currentTarget } = event;
+  
+    // Get the appropriate text field
+    const oldText = updateAcoustic 
+      ? subtitles[index]?.acoustic_normalised_text || ""
+      : subtitles[index]?.text || "";
+  
+    if (oldText !== value) {
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: updateAcoustic ? "textChangeAcoustic" : "textChange",
+          index: index,
+          previousText: oldText,
+          updateAcoustic: updateAcoustic
+        },
+      ]);
+      setRedoStack([]);
+    }
 
     const containsTripleDollar = value.includes("$$$");
 
@@ -598,31 +601,52 @@ const TranscriptionRightPanel = ({
     [limit, currentOffset]
   );
 
-const onUndo = useCallback(() => {
-  if (undoStack?.length > 0) {
-    const lastAction = undoStack[undoStack.length - 1];
-
-    if (lastAction.type === "textChange") {
-      const currentText = subtitles[lastAction.index]?.text || "";
-
-      // Undo text change
-      const sub = onSubtitleChange(
-        lastAction.previousText,
-        lastAction.index,
-        false
-      );
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-
-      // Push redo version of this action
-      setRedoStack((prevState) => [
-        ...prevState,
-        {
-          type: "textChange",
-          index: lastAction.index,
-          previousText: currentText,
-        },
-      ]);
-    }
+  const onUndo = useCallback(() => {
+    if (undoStack?.length > 0) {
+      const lastAction = undoStack[undoStack.length - 1];
+  
+      if (lastAction.type === "textChange") {
+        // Handle verbatim text undo
+        const currentText = subtitles[lastAction.index]?.text || "";
+        
+        const sub = onSubtitleChange(
+          lastAction.previousText,
+          lastAction.index,
+          false // updateAcoustic flag
+        );
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+  
+        setRedoStack((prevState) => [
+          ...prevState,
+          {
+            type: "textChange",
+            index: lastAction.index,
+            previousText: currentText,
+            updateAcoustic: false
+          },
+        ]);
+      }
+      else if (lastAction.type === "textChangeAcoustic") {
+        // Handle acoustic text undo
+        const currentText = subtitles[lastAction.index]?.acoustic_normalised_text || "";
+        
+        const sub = onSubtitleChange(
+          lastAction.previousText,
+          lastAction.index,
+          true // updateAcoustic flag
+        );
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+  
+        setRedoStack((prevState) => [
+          ...prevState,
+          {
+            type: "textChangeAcoustic",
+            index: lastAction.index,
+            previousText: currentText,
+            updateAcoustic: true
+          },
+        ]);
+      }
 
     else if (lastAction.type === "doubleHash") {
       // Undo double-hash action
@@ -664,23 +688,44 @@ const onRedo = useCallback(() => {
     const lastAction = redoStack[redoStack.length - 1];
 
     if (lastAction.type === "textChange") {
+      // Handle verbatim text redo
       const currentText = subtitles[lastAction.index]?.text || "";
 
-      // Redo text change
       const sub = onSubtitleChange(
         lastAction.previousText,
         lastAction.index,
-        false
+        false // updateAcoustic flag
       );
       dispatch(setSubtitles(sub, C.SUBTITLES));
 
-      // Push undo version of this action
       setUndoStack((prevState) => [
         ...prevState,
         {
           type: "textChange",
           index: lastAction.index,
           previousText: currentText,
+          updateAcoustic: false
+        },
+      ]);
+    }
+    else if (lastAction.type === "textChangeAcoustic") {
+      // Handle acoustic text redo
+      const currentText = subtitles[lastAction.index]?.acoustic_normalised_text || "";
+
+      const sub = onSubtitleChange(
+        lastAction.previousText,
+        lastAction.index,
+        true // updateAcoustic flag
+      );
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: "textChangeAcoustic",
+          index: lastAction.index,
+          previousText: currentText,
+          updateAcoustic: true
         },
       ]);
     }
@@ -1112,7 +1157,7 @@ const onRedo = useCallback(() => {
                             changeTranscriptHandler(
                               event,
                               index + idxOffset,
-                              false
+                              true
                             );
                           }}
                           enabled={enableTransliterationSuggestion}
