@@ -5,7 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 import Switch from "@mui/material/Switch";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,6 @@ import GetIndicTransLanguagesAPI from "../../../../redux/actions/api/Dataset/Get
 import roles from "../../../../utils/UserMappedByRole/Roles";
 import { MenuProps } from "../../../../utils/utils";
 
-const APi_Type = [{ Api_Typename: "indic-trans" }, { Api_Typename: "google" },{ Api_Typename: "azure" }]
 const InterAutomateDataset = () => {
   const navigate = useNavigate();
   const classes = DatasetStyle();
@@ -391,39 +390,7 @@ const api_type = translationModel===1?"indic-trans": translationModel===2?"googl
              />
             </Grid>
             </Grid>
-            
 
-            {/* <Grid
-              className={classes.projectsettingGrid}
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-            >
-              <Typography gutterBottom component="div">
-                Api Type:
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-
-            <FormControl
-                  fullWidth
-                  sx={{ minWidth: 110 }}
-                >
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="APi-simple-select"
-                    value={api_type}
-                    onChange={handleAPi_Type}
-                  >
-                   {APi_Type.map((item, index) => (
-                    <MenuItem value={item.Api_Typename}>{item.Api_Typename}</MenuItem>
-                  ))}
-                  </Select>
-                </FormControl>
-            </Grid>
-            */}
             <Grid
               style={{}}
               item

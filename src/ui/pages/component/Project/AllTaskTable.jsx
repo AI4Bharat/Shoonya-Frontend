@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link,  useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
 import GetAllTasksAPI from "../../../../redux/actions/api/Tasks/GetAllTasks";
@@ -12,16 +12,33 @@ import Typography from "@mui/material/Typography";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AllTasksFilterList from "./AllTasksFilter";
-import CustomButton from '../common/Button';
-import SearchIcon from '@mui/icons-material/Search';
-import AllTaskSearchPopup from './AllTaskSearchPopup';
+import CustomButton from "../common/Button";
+import SearchIcon from "@mui/icons-material/Search";
+import AllTaskSearchPopup from "./AllTaskSearchPopup";
 import Skeleton from "@mui/material/Skeleton";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const excludeCols = [
   "context",
@@ -42,16 +59,11 @@ const excludeCols = [
 ];
 
 const excludeSearch = ["status", "actions"];
+
 const AllTaskTable = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
-  const [loading, setLoading] = useState(false);
   const { id } = useParams();
-  const [snackbar, setSnackbarInfo] = useState({
-    open: false,
-    message: "",
-    variant: "success",
-  });
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -65,37 +77,50 @@ const AllTaskTable = (props) => {
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
   const AllTaskData = useSelector((state) => state.getAllTasksdata.data.result);
-  const totalTaskCount = useSelector((state) => state.getAllTasksdata.data.total_count);
+  const totalTaskCount = useSelector(
+    (state) => state.getAllTasksdata.data.total_count
+  );
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
-  const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const filterData = {
-    Status: ["incomplete", "annotated", "reviewed","super_checked","exported"],
+    Status: [
+      "incomplete",
+      "annotated",
+      "reviewed",
+      "super_checked",
+      "exported",
+    ],
   };
   const [selectedFilters, setsSelectedFilters] = useState({
     task_status: [filterData.Status[0]],
   });
 
   const GetAllTasksdata = () => {
-    const taskObjs = new GetAllTasksAPI(id, currentPageNumber,selectedFilters, currentRowPerPage);
+    const taskObjs = new GetAllTasksAPI(
+      id,
+      currentPageNumber,
+      selectedFilters,
+      currentRowPerPage
+    );
     dispatch(APITransport(taskObjs));
   };
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
       setDisplayWidth(window.innerWidth);
     };
 
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       handleResize();
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
     }
 
     return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('resize', handleResize);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
       }
     };
   }, []);
@@ -106,9 +131,11 @@ const AllTaskTable = (props) => {
     // Force responsive mode after component mount
     const applyResponsiveMode = () => {
       if (tableRef.current) {
-        const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
+        const tableWrapper = tableRef.current.querySelector(
+          ".MuiDataTable-responsiveBase"
+        );
         if (tableWrapper) {
-          tableWrapper.classList.add('MuiDataTable-vertical');
+          tableWrapper.classList.add("MuiDataTable-vertical");
         }
       }
     };
@@ -122,7 +149,6 @@ const AllTaskTable = (props) => {
     GetAllTasksdata();
   }, [currentPageNumber, currentRowPerPage]);
 
-
   useEffect(() => {
     if (AllTaskData?.length > 0 && AllTaskData[0]?.data) {
       const data = AllTaskData.map((el) => {
@@ -133,20 +159,31 @@ const AllTaskTable = (props) => {
             .map((key) => el.data[key])
         );
         AllTaskData[0].task_status && row.push(el.task_status);
-        row.push( <>
-          <Link to={ProjectDetails?.project_type?.includes("Acoustic") ?
-          `AllAudioTranscriptionLandingPage/${el.id}` : `Alltask/${el.id}`} className={classes.link}>
-          <CustomButton
-              onClick={() => {  localStorage.removeItem("labelAll") }}
-              sx={{ p: 1, borderRadius: 2 }}
-              label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                   View
-              </Typography>} />
-      </Link>
-
-        </>)
+        row.push(
+          <>
+            <Link
+              to={
+                ProjectDetails?.project_type?.includes("Acoustic")
+                  ? `AllAudioTranscriptionLandingPage/${el.id}`
+                  : `Alltask/${el.id}`
+              }
+              className={classes.link}
+            >
+              <CustomButton
+                onClick={() => {
+                  localStorage.removeItem("labelAll");
+                }}
+                sx={{ p: 1, borderRadius: 2 }}
+                label={
+                  <Typography sx={{ color: "#FFFFFF" }} variant="body2">
+                    View
+                  </Typography>
+                }
+              />
+            </Link>
+          </>
+        );
         return row;
-        
       });
       let colList = ["id"];
       colList.push(
@@ -156,7 +193,12 @@ const AllTaskTable = (props) => {
       );
       AllTaskData[0].task_status && colList.push("status");
       colList.push("actions");
+      if (selectedColumns.length === 0) {
+        setSelectedColumns(colList);
+      }
+
       const cols = colList.map((col) => {
+        const isSelectedColumn = selectedColumns.includes(col);
         return {
           name: col,
           label: snakeToTitleCase(col),
@@ -164,28 +206,51 @@ const AllTaskTable = (props) => {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
             customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList);
       setTasks(data);
     } else {
       setTasks([]);
     }
-  }, [AllTaskData, ProjectDetails]);
+  }, [AllTaskData, ProjectDetails, expandedRow]);
 
   useEffect(() => {
-    const newCols = columns.map((col) => {
-      col.options.display = selectedColumns.includes(col.name)
-        ? "true"
-        : "false";
-      return col;
-    });
-    setColumns(newCols);
-  }, [selectedColumns]);
-
+      if (columns.length > 0 && selectedColumns.length > 0) {
+          const newCols = columns.map((col) => ({
+              ...col,
+              options: {
+              ...col.options,
+              display: selectedColumns.includes(col.name) ? "true" : "false"
+              }
+          }));
+          if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+              setColumns(newCols);
+          }
+      }
+    }, [selectedColumns, columns]);
 
   const handleShowFilter = (event) => {
     setAnchorEl(event.currentTarget);
@@ -196,32 +261,35 @@ const AllTaskTable = (props) => {
   const handleShowSearch = (col, event) => {
     setSearchAnchor(event.currentTarget);
     setSearchedCol(col);
-  
-}
-const handleSearchClose = () => {
-  setSearchAnchor(null);
-}
+  };
+  const handleSearchClose = () => {
+    setSearchAnchor(null);
+  };
 
   const customColumnHead = (col) => {
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-start",
-                columnGap: "5px",
-                flexGrow: "1",
-                alignItems: "center",
-            }}
-        >
-               {col.label}
-                {!excludeSearch.includes(col.name) && <IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
-                    <SearchIcon id={col.name + "_btn"} />
-                </IconButton>}
-        </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          columnGap: "5px",
+          flexGrow: "1",
+          alignItems: "center",
+        }}
+      >
+        {col.label}
+        {!excludeSearch.includes(col.name) && (
+          <IconButton
+            sx={{ borderRadius: "100%" }}
+            onClick={(e) => handleShowSearch(col.name, e)}
+          >
+            <SearchIcon id={col.name + "_btn"} />
+          </IconButton>
+        )}
+      </Box>
     );
-}
-
+  };
 
   const renderToolBar = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
@@ -240,25 +308,30 @@ const handleSearchClose = () => {
       </Box>
     );
   };
-  const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
+  const CustomFooter = ({
+    count,
+    page,
+    rowsPerPage,
+    changeRowsPerPage,
+    changePage,
+  }) => {
     return (
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap", 
-          justifyContent: { 
-            xs: "space-between", 
-            md: "flex-end" 
-          }, 
+          flexWrap: "wrap",
+          justifyContent: {
+            xs: "space-between",
+            md: "flex-end",
+          },
           alignItems: "center",
           padding: "10px",
-          gap: { 
-            xs: "10px", 
-            md: "20px" 
-          }, 
+          gap: {
+            xs: "10px",
+            md: "20px",
+          },
         }}
       >
-
         {/* Pagination Controls */}
         <TablePagination
           component="div"
@@ -269,21 +342,24 @@ const handleSearchClose = () => {
           onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
           sx={{
             "& .MuiTablePagination-actions": {
-            marginLeft: "0px",
-          },
-          "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input": {
-            marginRight: "10px",
-          },
+              marginLeft: "0px",
+            },
+            "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input":
+              {
+                marginRight: "10px",
+              },
           }}
         />
 
         {/* Jump to Page */}
         <div>
-          <label style={{ 
-            marginRight: "5px", 
-            fontSize:"0.83rem", 
-          }}>
-          Jump to Page:
+          <label
+            style={{
+              marginRight: "5px",
+              fontSize: "0.83rem",
+            }}
+          >
+            Jump to Page:
           </label>
           <Select
             value={page + 1}
@@ -310,22 +386,14 @@ const handleSearchClose = () => {
     rowsPerPage: currentRowPerPage,
     page: currentPageNumber - 1,
     rowsPerPageOptions: [10, 25, 50, 100],
-    textLabels: {
-        pagination: {
-            next: "Next >",
-            previous: "< Previous",
-            rowsPerPage: "currentRowPerPage",
-            displayRows: "OF"
-        }
-    },
     onChangePage: (currentPage) => {
-        setCurrentPageNumber(currentPage + 1);
+      setCurrentPageNumber(currentPage + 1);
     },
     onChangeRowsPerPage: (rowPerPageCount) => {
-        setCurrentPageNumber(1);
-        setCurrentRowPerPage(rowPerPageCount);
+      setCurrentPageNumber(1);
+      setCurrentRowPerPage(rowPerPageCount);
     },
-    filterType: 'checkbox',
+    filterType: "checkbox",
     selectableRows: "none",
     download: false,
     filter: false,
@@ -333,17 +401,20 @@ const handleSearchClose = () => {
     search: false,
     viewColumns: false,
     textLabels: {
-        body: {
-            noMatch: "No records ",
-        },
-        toolbar: {
-            search: "Search",
-            viewColumns: "View Column",
-        },
-        pagination: {
-            rowsPerPage: "Rows per page",
-        },
-        options: { sortDirection: "desc" },
+      body: {
+        noMatch: "No records ",
+      },
+      toolbar: {
+        search: "Search",
+        viewColumns: "View Column",
+      },
+      pagination: {
+        next: "Next >",
+        previous: "< Previous",
+        rowsPerPage: "Rows per page",
+        displayRows: "OF",
+      },
+      options: { sortDirection: "desc" },
     },
     jumpToPage: true,
     serverSide: true,
@@ -359,12 +430,12 @@ const handleSearchClose = () => {
         changePage={changePage}
       />
     ),
-};
+  };
 
   return (
     <div>
       <ThemeProvider theme={tableTheme}>
-      <div ref={tableRef}>
+        <div ref={tableRef}>
           {isBrowser ? (
             <MUIDataTable
               key={`table-${displayWidth}`}
@@ -380,8 +451,8 @@ const handleSearchClose = () => {
               sx={{
                 mx: 2,
                 my: 3,
-                borderRadius: '4px',
-                transform: 'none'
+                borderRadius: "4px",
+                transform: "none",
               }}
             />
           )}
@@ -399,16 +470,17 @@ const handleSearchClose = () => {
           onchange={GetAllTasksdata}
         />
       )}
-       {searchOpen && <AllTaskSearchPopup
-                    open={searchOpen}
-                    anchorEl={searchAnchor}
-                     handleClose={handleSearchClose}
-                    updateFilters={setsSelectedFilters}
-                    //filterStatusData={filterData}
-                    currentFilters={selectedFilters}
-                    searchedCol={searchedCol}
-                    onchange={GetAllTasksdata}
-                />}
+      {searchOpen && (
+        <AllTaskSearchPopup
+          open={searchOpen}
+          anchorEl={searchAnchor}
+          handleClose={handleSearchClose}
+          updateFilters={setsSelectedFilters}
+          currentFilters={selectedFilters}
+          searchedCol={searchedCol}
+          onchange={GetAllTasksdata}
+        />
+      )}
     </div>
   );
 };

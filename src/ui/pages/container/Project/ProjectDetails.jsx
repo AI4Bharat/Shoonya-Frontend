@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import Tab from "@mui/material/Tab";
@@ -7,7 +6,7 @@ import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import {  useNavigate, useParams } from "react-router-dom";
@@ -18,9 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { translate } from "../../../../config/localisation";
-// import TabPanel from "../../component/common/TabPanel";
 import addUserTypes from "../../../../constants/addUserTypes";
-import Spinner from "../../component/common/Spinner";
 import Menu from "@mui/material/Menu";
 import { styled, alpha } from "@mui/material/styles";
 import DatasetStyle from "../../../styles/Dataset";
@@ -31,12 +28,6 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 import SuperCheckerTasks from "../../component/Project/SuperCheckerTasks";
 import ProjectAnalytics from "../../component/Project/ProjectAnalytics";
 import { setValue } from "../../../../redux/actions/Tasks/ProjectTabActions";
-
-const menuOptions = [
-  { name: "Tasks", isChecked: false, component: () => null },
-  { name: "Members", isChecked: false, component: () => null },
-  { name: "Reports", isChecked: true, component: () => null },
-];
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -423,8 +414,6 @@ const Projects = () => {
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {/* <Header /> */}
-      {loading && <Spinner />}
       <Grid
         container
         direction="row"
@@ -433,7 +422,6 @@ const Projects = () => {
       >
         <Card
           sx={{
-            // width: window.innerWidth * 0.8,
             width: "100%",
             minHeight: 500,
             padding: 5,

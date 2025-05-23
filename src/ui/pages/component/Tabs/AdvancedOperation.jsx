@@ -7,7 +7,7 @@ import FormControl from "@mui/material/FormControl";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import {  useParams } from "react-router-dom";
@@ -179,34 +179,8 @@ const AdvancedOperation = (props) => {
   };
 
   const getDownloadProjectAnnotations = async () => {
-    // 'https://backend.shoonya.ai4bharat.org/projects/606/export_project_tasks/'
-    // SetTask([])
-    // setLoading(true)
     const projectObj = new getDownloadProjectAnnotationsAPI(id, taskStatus);
     dispatch(APITransport(projectObj));
-    // const projectObj = new GetPublishProjectButtonAPI(id);
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "success",
-    //   });
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   });
-    // }
-
-
   }
 
   const handleReviewToggle = async (e) => {
@@ -298,15 +272,6 @@ const AdvancedOperation = (props) => {
       });
     }
   };
-
-  // useEffect(() => {
-  //     setSnackbarInfo({
-  //         open: apiMessage ? true : false,
-  //         variant: apiError ? "error" : "success",
-  //         message: apiMessage,
-  //     });
-  //     setSpinner(false);
-  // }, [apiMessage, apiError])
 
   const getPullNewDataAPI = async () => {
     const projectObj = new GetPullNewDataAPI(id);
@@ -593,16 +558,6 @@ const AdvancedOperation = (props) => {
             }
           }}
         >
-          {/* <div className={classes.divider} ></div> */}
-          {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <FormControlLabel
-              control={<Switch color="primary" />}
-              label="Task Reviews"
-              labelPlacement="start"
-              checked={ProjectDetails.enable_task_reviews}
-              onChange={handleReviewToggle}
-            />
-          </Grid> */}
           <Grid item xs={12}>
               <FormControl size="small" sx={{ width : "100%" }}>
                 <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
@@ -615,7 +570,6 @@ const AdvancedOperation = (props) => {
                   label="Task Reviews"
                   onChange={handleReviewToggle}
                   disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ?true:false}
-                  // getOptionDisabled={(option) => option.disabled}
                 >
                   {projectStage.map((type, index) => (
                     <MenuItem value={type.value} key={index} disabled={type.disabled} >
@@ -654,18 +608,6 @@ const AdvancedOperation = (props) => {
           columnSpacing={2}
           sx={{ mt: 1 }}
         >
-          {/* <div className={classes.divider} ></div> */}
-          {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <FormControlLabel
-              control={<Switch color="primary" />}
-              label="Download Metadata"
-              labelPlacement="start"
-              checked={downloadMetadataToggle}
-              onChange={handleDownoadMetadataToggle}
-              disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
-
-            />
-          </Grid> */}
         </Grid>
 
         <Dialog

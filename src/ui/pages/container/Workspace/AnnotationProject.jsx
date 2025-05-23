@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
 import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState, useRef } from "react";

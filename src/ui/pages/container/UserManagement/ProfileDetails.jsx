@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 import { useNavigate, useParams } from 'react-router-dom';

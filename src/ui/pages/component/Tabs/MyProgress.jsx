@@ -12,15 +12,13 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import themeDefault from "../../../theme/theme";
 import React, { useEffect, useState, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { useSelector, useDispatch } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import GetWorkspacesAPI from "../../../../redux/actions/api/Dashboard/GetWorkspaces";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetUserAnalyticsAPI from "../../../../redux/actions/api/UserManagement/GetUserAnalytics";
 import MUIDataTable from "mui-datatables";
@@ -34,6 +32,23 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useParams } from "react-router-dom";
 import Spinner from "../../component/common/Spinner";
 import { MenuProps } from "../../../../utils/utils";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const MyProgress = () => {
   const { id } = useParams();
@@ -58,12 +73,9 @@ const MyProgress = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [radiobutton, setRadiobutton] = useState("AnnotatationReports");
-  const [workspaces, setWorkspaces] = useState([]);
   const [totalsummary, setTotalsummary] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedWorkspaces, setSelectedWorkspaces] = useState([]);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
-  const Workspaces = useSelector((state) => state.getWorkspaces.data);
   const UserAnalytics = useSelector(
     (state) => state.getUserAnalytics.data.project_summary
   );
@@ -77,6 +89,7 @@ const MyProgress = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -114,27 +127,15 @@ const MyProgress = () => {
     const timer = setTimeout(applyResponsiveMode, 100);
     return () => clearTimeout(timer);
   }, []);
+
   useEffect(() => {
     const typesObj = new GetProjectDomainsAPI();
     dispatch(APITransport(typesObj));
-    // const workspacesObj = new GetWorkspacesAPI(1, 9999);
-    // dispatch(APITransport(workspacesObj));
   }, []);
+
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
-
-  // useEffect(() => {
-  //   if (UserDetails && Workspaces?.results) {
-  //     let workspacesList = [];
-  //     Workspaces.results.forEach((item) => {
-  //       workspacesList.push({ id: item.id, name: item.workspace_name });
-  //     });
-  //     setWorkspaces(workspacesList);
-  //     setSelectedWorkspaces(workspacesList.map(item => item.id))
-  //     setSelectedType("ContextualTranslationEditing");
-  //   }
-  // }, [UserDetails, Workspaces]);
 
   useEffect(() => {
     if (ProjectTypes) {
@@ -156,8 +157,11 @@ const MyProgress = () => {
     }
     if (UserAnalytics?.length) {
       let tempColumns = [];
-      let tempSelected = [];
+      if(selectedColumns.length === 0) {
+        setSelectedColumns(columns);
+      }
       Object.keys(UserAnalytics[0]).forEach((key) => {
+        const isSelectedColumn = selectedColumns.includes(key)
         tempColumns.push({
           name: key,
           label: key,
@@ -165,20 +169,52 @@ const MyProgress = () => {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         });
-        tempSelected.push(key);
       });
       setColumns(tempColumns);
       setReportData(UserAnalytics);
-      setSelectedColumns(tempSelected);
     } else {
       setColumns([]);
       setReportData([]);
-      setSelectedColumns([]);
     }
     setShowSpinner(false);
-  }, [UserAnalytics]);
+  }, [UserAnalytics, expandedRow]);
+
+  useEffect(() => {
+      if (columns.length > 0 && selectedColumns.length > 0) {
+        const newCols = columns.map((col) => ({
+          ...col,
+          options: {
+            ...col.options,
+            display: selectedColumns.includes(col.name) ? "true" : "false",
+          },
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+          setColumns(newCols);
+        }
+      }
+    }, [selectedColumns, columns]);
 
   const handleRangeChange = (ranges) => {
     const { selection } = ranges;
@@ -189,11 +225,6 @@ const MyProgress = () => {
   const handleProgressSubmit = () => {
     setShowPicker(false);
     setSubmitted(true);
-    // if (!selectedWorkspaces.length) {
-    //   setSnackbarText("Please select atleast one workspace!");
-    //   showSnackbar();
-    //   return;
-    // }
     const reviewdata = {
       user_id: id,
       project_type: selectedType,
@@ -448,28 +479,6 @@ const MyProgress = () => {
               Pick Dates
             </Button>
           </Grid>
-          {/* <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>
-                Workspace
-              </InputLabel>
-              <Select
-                labelId="workspace-label"
-                id="workspace-select"
-                value={selectedWorkspaces}
-                multiple
-                label="Project Type"
-                // onSelect={(e,)}
-                onChange={(e) => setSelectedWorkspaces(e.target.value)}
-              >
-                {Workspaces.map((Workspaces, index) => (
-                  <MenuItem value={Workspaces.id} key={Workspaces.id}>
-                    {Workspaces.workspace_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid> */}
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
             <Button
               fullWidth

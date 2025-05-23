@@ -1,5 +1,4 @@
-
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";

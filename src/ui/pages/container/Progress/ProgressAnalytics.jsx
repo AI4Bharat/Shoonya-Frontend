@@ -7,7 +7,7 @@ import Radio from "@mui/material/Radio";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import Card from "@mui/material/Card";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState, useRef } from "react";

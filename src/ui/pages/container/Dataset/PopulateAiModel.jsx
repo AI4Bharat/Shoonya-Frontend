@@ -5,7 +5,7 @@ import Select from "@mui/material/Select";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Switch from "@mui/material/Switch";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 
 import Spinner from "../../component/common/Spinner";
 import Snackbar from "../../component/common/Snackbar";
@@ -33,17 +33,12 @@ const PopulateAiModel = () => {
   const [srcDatasetType, setSrcDatasetType] = useState('');
   const [translationModel, setTranslationModel] = useState('');
   const [srcInstances, setSrcInstances] = useState([]);
-  const [field, setfield] = useState([]);
   const [Field,setField] = useState([]);
   const [srcInstance, setSrcInstance] = useState('');
-  // const [instance, setinstance] = useState("");
-  // const [org_id, setorg_id] = useState("");
   const [loading, setLoading] = useState(false);
   const [snackbarState, setSnackbarState] = useState({ open: false, message: '', variant: '' });
 
-  // const Fields = ["draft_data_json", "input_language", "output_language", "input_text", "output_text", "machine_translation", "context", "labse_score", "rating", "domain", "parent_data", "instance_id"];
 
-  const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
   const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
   const DatasetTypes = useSelector((state) => state.GetDatasetType.data);
   const dataitemsList = useSelector((state) => state.getDataitemsById.data);
@@ -98,14 +93,6 @@ const PopulateAiModel = () => {
     }
   }, [DatasetTypes, srcDatasetType]);
 
-//   const handleChange = (event) => {
-//     const {
-//       target: { value },
-//     } = event;
-//     setfield(
-//       typeof value === 'string' ? value.split(',') : value,
-//     );
-//   };
   useEffect(() => {
     setLoading(false);
     if (dataitemsList.results?.length > 0) {
@@ -263,41 +250,7 @@ const PopulateAiModel = () => {
                 />
               </Grid>
             </>}
-            {/* <Grid
-              className={classes.projectsettingGrid}
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-            >
-              <Typography gutterBottom component="div">
-                Select Field:
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
-                <Select
-                  labelId="demo-multiple-checkbox-label"
-                  id="demo-multiple-checkbox"
-                  multiple
-                  value={field}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Tag" />}
-                  renderValue={(selected) => selected.join(',')}
-                  MenuProps={MenuProps}
-                >
-                  {Field.map((name) => (
-                    <MenuItem key={name} value={name}>
-                      <Checkbox checked={field.indexOf(name) > -1} />
-                      <ListItemText primary={name} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-            </Grid> */}
+            
             <Grid container direction="row" width={850}>
             <Grid
               className={classes.projectsettingGrid}

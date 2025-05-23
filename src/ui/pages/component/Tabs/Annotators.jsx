@@ -7,7 +7,7 @@ import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/Worksp
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import CustomButton from "../common/Button";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";

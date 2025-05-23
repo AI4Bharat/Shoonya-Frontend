@@ -17,7 +17,6 @@ const ColumnList = (props) => {
   const classes = DatasetStyle();
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef();
-
   return (
     <div>
       <Tooltip title="View Columns">
@@ -72,27 +71,6 @@ const ColumnList = (props) => {
             </ListItem>
           ))}
         </List>
-        {/* <Divider />
-        <Box 
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            columnGap: "10px",
-          }}
-        >
-          <Button
-            onClick={() => setIsOpen(false)}
-            variant="outlined"
-            color="primary"
-            size="small"
-            className={classes.clearAllBtn}
-          >
-            {" "}
-            Close
-          </Button>
-        </Box> */}
       </Box>
       </Popover>
     </div>
