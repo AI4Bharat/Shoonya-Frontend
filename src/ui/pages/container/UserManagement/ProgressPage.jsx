@@ -18,12 +18,12 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 
 const ProfilePage = () => {
-
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [recentTasksLoading, setRecentTasksLoading] = useState(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -33,6 +33,16 @@ const ProfilePage = () => {
   const UserDetails = useSelector((state) => state.fetchUserById.data);
   const LoggedInUserId = useSelector((state) => state.fetchLoggedInUserData.data.id);
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
+  const recentTasksData = useSelector((state) => state.getRecentTasks.data);
+  const isRecentTasksLoading = useSelector((state) => state.getRecentTasks.isLoading);
+
+  const fetchUserData = () => {
+    setLoading(true);
+    setRecentTasksLoading(true);
+    const userObj = new FetchUserByIdAPI(id);
+    dispatch(APITransport(userObj));
+  };
+
   const handleEmailToggle = async () => {
     setLoading(true);
     const mailObj = new ToggleMailsAPI(LoggedInUserId, !userDetails.enable_mail);
@@ -75,9 +85,12 @@ const ProfilePage = () => {
   };
   
   useEffect(() => {
-    setLoading(true);
-    const userObj = new FetchUserByIdAPI(id);
-    dispatch(APITransport(userObj));
+    fetchUserData();
+    
+    return () => {
+      setLoading(false);
+      setRecentTasksLoading(false);
+    };
   }, [id]);
 
   useEffect(() => {
@@ -85,11 +98,22 @@ const ProfilePage = () => {
       setUserDetails(UserDetails);
       setLoading(false);
     }
-  }, [UserDetails]);
+  }, [UserDetails, id]);
+
+  useEffect(() => {
+    if (recentTasksData && recentTasksData.results && !isRecentTasksLoading) {
+      setRecentTasksLoading(false);
+    }
+  }, [recentTasksData, isRecentTasksLoading]);
+
+  useEffect(() => {
+    setLoading(true);
+    setRecentTasksLoading(true);
+  }, []);
 
   return (
     <Grid container>
-      {loading && <Spinner />}
+      {(loading || recentTasksLoading || isRecentTasksLoading) && <Spinner />}
       {renderSnackBar()}
       {userDetails && (
         <>
@@ -130,6 +154,6 @@ const ProfilePage = () => {
       )}
     </Grid>
   );
-};  
+};
 
 export default ProfilePage;

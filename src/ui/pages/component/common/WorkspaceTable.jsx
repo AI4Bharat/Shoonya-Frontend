@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from '../../component/common/Button'
@@ -15,17 +15,24 @@ import Box from "@mui/material/Box";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-
+import Spinner from "../../component/common/Spinner";
 
 const WorkspaceTable = (props) => {
     const dispatch = useDispatch();
     const { showManager, showCreatedBy } = props;
     const workspaceData = useSelector(state => state.GetWorkspace.data);
+    const isWorkspaceLoading = useSelector(state => state.GetWorkspace.isLoading);
     const SearchWorkspace = useSelector((state) => state.SearchProjectCards.data);
+    const [isTableRendered, setIsTableRendered] = useState(false);
+    const tableContainerRef = useRef(null);
+    const [loading, setLoading] = useState(false);
+    const [showContent, setShowContent] = useState(false);
 
     const [currentPageNumber, setCurrentPageNumber] = useState(1);
 
     const getWorkspaceData = () => {
+        setLoading(true);
+        setShowContent(false);
         const workspaceObj = new GetWorkspaceAPI(currentPageNumber);
         dispatch(APITransport(workspaceObj));
     }
@@ -53,7 +60,6 @@ const WorkspaceTable = (props) => {
     useEffect(() => {
       setIsBrowser(true);
 
-      // Force responsive mode after component mount
       const applyResponsiveMode = () => {
         if (tableRef.current) {
           const tableWrapper = tableRef.current.querySelector('.MuiDataTable-responsiveBase');
@@ -63,7 +69,6 @@ const WorkspaceTable = (props) => {
         }
       };
 
-      // Apply after a short delay to ensure DOM is ready
       const timer = setTimeout(applyResponsiveMode, 100);
       return () => clearTimeout(timer);
     }, []);
@@ -73,8 +78,19 @@ const WorkspaceTable = (props) => {
     }, [currentPageNumber]);
 
     useEffect(() => {
-        getWorkspaceData();
-    }, []);
+        if (!isWorkspaceLoading && workspaceData && workspaceData.length > 0) {
+            setLoading(false);
+            setTimeout(() => {
+                setShowContent(true);
+            }, 100);
+        }
+    }, [isWorkspaceLoading, workspaceData]);
+
+    useEffect(() => {
+        if (workspaceData && workspaceData.length > 0) {
+            setIsTableRendered(true);
+        }
+    }, [workspaceData]);
 
     const pageSearch = () => {
 
@@ -103,7 +119,39 @@ const WorkspaceTable = (props) => {
 
     }
 
-   
+    const processedData = useMemo(() => {
+        if (!workspaceData || workspaceData.length === 0) return [];
+        
+        return pageSearch().map((el, i) => [
+            el.id,
+            el.workspace_name,
+            el.managers.map((manager) => manager.username).join(", "),
+            el.created_by && el.created_by.username,
+            <Link to={`/workspaces/${el.id}`} style={{ textDecoration: "none" }}>
+                <CustomButton
+                    sx={{ borderRadius: 2 }}
+                    label="View"
+                />
+            </Link>
+        ]);
+    }, [workspaceData, SearchWorkspace]);
+
+    useEffect(() => {
+        if (!isWorkspaceLoading && processedData.length > 0) {
+            const checkTableRendered = () => {
+                const tableElement = tableContainerRef.current?.querySelector('.MuiDataTable-root');
+                if (tableElement) {
+                    setIsTableRendered(true);
+                } else {
+                    requestAnimationFrame(checkTableRendered);
+                }
+            };
+            checkTableRendered();
+        } else {
+            setIsTableRendered(false);
+        }
+    }, [isWorkspaceLoading, processedData]);
+
     const columns = [
         {
             name: "id",
@@ -164,22 +212,6 @@ const WorkspaceTable = (props) => {
             }
         }];
       
-    const data = workspaceData && workspaceData.length > 0 ?pageSearch().map((el, i) => {
-        return [
-            el.id,
-            el.workspace_name,
-            el.managers.map((manager, index) => {
-                return manager.username
-            }).join(", "),
-            el.created_by && el.created_by.username,
-            <Link to={`/workspaces/${el.id}`} style={{ textDecoration: "none" }}>
-                <CustomButton
-                    sx={{ borderRadius: 2 }}
-                    label="View"
-                />
-            </Link>
-        ]
-    })  : [];
     const CustomFooter = ({ count, page, rowsPerPage, changeRowsPerPage, changePage }) => {
         return (
           <Box
@@ -287,33 +319,36 @@ const WorkspaceTable = (props) => {
 
     return (
         <div>
-            <Grid sx={{ mb: 1 }}>
-                <Search />
-            </Grid>
-            {workspaceData && <ThemeProvider theme={tableTheme}>
-            <div ref={tableRef}>
-                {isBrowser ? (
-                  <MUIDataTable
-                    key={`table-${displayWidth}`}
-                    title={""}
-                    data={data}
-                    columns={columns}
-                    options={options}
-                  />
-                ) : (
-                  <Skeleton
-                    variant="rectangular"
-                    height={400}
-                    sx={{
-                      mx: 2,
-                      my: 3,
-                      borderRadius: '4px',
-                      transform: 'none'
-                    }}
-                  />
-                )}
-              </div>
-            </ThemeProvider>}
+            {(loading || !showContent) && <Spinner />}
+            <div style={{ display: showContent ? 'block' : 'none' }}>
+                <Grid sx={{ mb: 1 }}>
+                    <Search />
+                </Grid>
+                <ThemeProvider theme={tableTheme}>
+                    <div ref={tableContainerRef}>
+                        {isWorkspaceLoading || !isTableRendered ? (
+                            <Skeleton
+                                variant="rectangular"
+                                height={400}
+                                sx={{
+                                    mx: 2,
+                                    my: 3,
+                                    borderRadius: '4px',
+                                    transform: 'none'
+                                }}
+                            />
+                        ) : (
+                            <MUIDataTable
+                                key={`table-${displayWidth}`}
+                                title={""}
+                                data={processedData}
+                                columns={columns}
+                                options={options}
+                            />
+                        )}
+                    </div>
+                </ThemeProvider>
+            </div>
         </div>
     )
 }
