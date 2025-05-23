@@ -1162,7 +1162,7 @@ const onRedo = useCallback(() => {
                             changeTranscriptHandler(
                               event,
                               index + idxOffset,
-                              true
+                              false
                             );
                           }}
                           enabled={enableTransliterationSuggestion}
