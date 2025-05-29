@@ -1,5 +1,4 @@
-// manualallocationtasks
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   TextField,
   Button,
@@ -12,23 +11,19 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import configs from '../../../../config/config';
 
 const AllocateTasksDialog = ({ userRole, loggedInUserData, ProjectDetails }) => {
-  const { projectID } = useParams();
+  const { id } = useParams();
+
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    projectID: '',
+    project_id: id || '',  // ✅ directly initialized here
     taskIDs: '',
     userID: '',
     allocation_type: '',
   });
   const [responseMessage, setResponseMessage] = useState('');
-
-  useEffect(() => {
-    if (projectID) {
-      setFormData((prev) => ({ ...prev, projectID }));
-    }
-  }, [projectID]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -45,58 +40,72 @@ const AllocateTasksDialog = ({ userRole, loggedInUserData, ProjectDetails }) => 
     e.preventDefault();
     try {
       const payload = {
-        ...formData,
-        taskIDs: formData.taskIDs.split(',').map((id) => id.trim()),
+        task_ids: formData.taskIDs.split(',').map((id) => id.trim()),
+        user_id: formData.userID,
         allocation_type: parseInt(formData.allocation_type),
       };
 
-      const response = await axios.post('/manual_task_assignment', payload);
+      const response = await axios.post(
+        `${configs.BASE_URL_AUTO}/projects/${formData.project_id}/manual_task_assignment/`,
+        payload,
+        {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem('shoonya_access_token')}`, // Or wherever your token is stored
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true, // if using session auth
+        }
+      );
+
+
       setResponseMessage(response.data.message || 'Tasks allocated successfully');
       handleClose();
     } catch (error) {
+      console.error(error);
       setResponseMessage(error.response?.data?.error || 'Error allocating tasks');
     }
   };
 
+
   return (
     <>
       <Grid item xs={12}>
-          <Button
-            variant="contained"
-            onClick={handleOpen}
-            sx={{
-              backgroundColor: '#2C2799',
-              color: '#fff',
-              p: 2,
-              borderRadius: 2,
-              ml: 2,
-              width: '300px',
-              textTransform: 'none',
-              fontWeight: 'bold',
-              mb: 2,
-              '&:hover': {
-                backgroundColor: '#1e1a7e',
-              },
-            }}
-            
-          >
-            Allocate Tasks
-          </Button>
+        <Button
+          variant="contained"
+          onClick={handleOpen}
+          sx={{
+            backgroundColor: '#2C2799',
+            color: '#fff',
+            p: 2,
+            borderRadius: 2,
+            ml: 2,
+            width: '300px',
+            textTransform: 'none',
+            fontWeight: 'bold',
+            mb: 2,
+            '&:hover': {
+              backgroundColor: '#ee6633',
+            },
+          }}
+
+        >
+          Allocate Tasks
+        </Button>
       </Grid>
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Allocate Tasks</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit}>
-            <TextField
+            {/* <TextField
               fullWidth
-              name="projectID"
+              name="project_id"
               label="Project ID"
               variant="outlined"
               margin="dense"
-              value={formData.projectID || projectID}
+              value={formData.id || id}
               disabled
-            />
+            /> */}
             <TextField
               fullWidth
               name="taskIDs"
