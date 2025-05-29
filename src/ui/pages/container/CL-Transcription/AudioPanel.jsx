@@ -15,7 +15,8 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 const AudioPanel = memo( ({
   setCurrentTime,
   setPlaying,
-  taskData
+  taskData,
+  audioUrl
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   const dispatch = useDispatch();
@@ -67,7 +68,7 @@ const AudioPanel = memo( ({
           id ="audio-panel"
           controls
           controlsList="nodownload"
-          src={TaskDetails?.data?.audio_url}
+          src={audioUrl}
           preload="metadata"
           type="audio"
           // style={{

@@ -20,26 +20,34 @@ import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import { DeallocateTaskById } from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import { Tab, Tabs } from "@mui/material";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 let AnnotationStatus = [
   "unlabeled",
   "skipped",
   "draft",
-  "labeled",
+  // "labeled",
   "to_be_revised",
 ];
 
 let ReviewStatus = [
   "unreviewed",
-  "accepted",
-  "accepted_with_minor_changes",
-  "accepted_with_major_changes",
+  // "accepted",
+  // "accepted_with_minor_changes",
+  // "accepted_with_major_changes",
   "to_be_revised",
   "draft",
   "skipped",
 ];
 
-let SuperChecker = ["unvalidated","validated","validated_with_changes","skipped","draft","rejected"];
+let SuperChecker = [
+  "unvalidated",
+  // "validated",
+  // "validated_with_changes",
+  "skipped",
+  "draft",
+  "rejected"
+];
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -74,6 +82,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
   const [superCheckStatus, setSuperCheckStatus] = useState([]);
   const [dealocateTasksBy, setDealocateTasksBy] = useState("taskId");
   const [dataIds, setdataIds] = useState("");
+  const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
 
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -268,7 +277,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
   return (
     <div>
       {renderSnackBar()}
-      <CustomButton
+     <CustomButton
         sx={{
           inlineSize: "max-content",
           p: 2,
@@ -280,6 +289,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
         onClick={handleClickOpen}
         label="Deallocate User Tasks"
         color="error"
+        disabled = {(userRole?.WorkspaceManager === loggedInUserData?.role )?true:false}
       />
 
       <Popover

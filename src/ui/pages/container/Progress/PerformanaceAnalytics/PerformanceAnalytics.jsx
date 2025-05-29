@@ -253,7 +253,7 @@ export default function PerformanceAnalytics() {
       labels: labels,
       datasets: [
         {
-          label: `${metaInfo?"Word Counts":"Task Count"}`,
+          label: `${selectedType==="AcousticNormalisedTranscriptionEditing" ?"Duration": metaInfo?"Word Count":"Task Count"}`,
           data: entries,
           backgroundColor: "rgba(255, 0, 0)",
           fill: {

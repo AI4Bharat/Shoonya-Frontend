@@ -9,12 +9,14 @@ import TransliterationAPI from "../../../../redux/actions/api/Transliteration/Tr
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import configs from "../../../../config/config";
+import { languages } from "./languages";
 const Transliteration = (props) => {
   const { onCancelTransliteration ,setIsSpaceClicked,isSpaceClicked,setShowTransliterationModel} = props;
   const params = useParams();
   const classes = GlobalStyles();
   const [text, setText] = useState("");
-  const [languageList, setLanguageList] = useState([{ DisplayName: "data" }]);
+  const languageList = languages;
   const [selectedLang, setSelectedLang] = useState("");
   const [prev, setprev] = useState(false);
   const keystrokesRef = useRef([]);
@@ -149,16 +151,6 @@ const Transliteration = (props) => {
 //   setIsSpaceClicked(false)
 // }
 
-  useEffect(() => {
-    getTransliterationLanguages()
-      .then(langs => {
-        setLanguageList(langs);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }, []);
-
   const handleLanguageChange = (event, val) => {
     setSelectedLang(val);
     // setIsSpaceClicked(true)
@@ -221,11 +213,13 @@ const Transliteration = (props) => {
           getOptionLabel={(el) => el.DisplayName}
           sx={{ width: window.innerWidth * 0.15 }}
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
-          
+          disableClearable={true}
         />
       </Grid>
 
       <IndicTransliterate
+        customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+        apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
         lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ? data[0]?.LangCode : "hi")}
         value={text}
         onChangeText={(val) => {

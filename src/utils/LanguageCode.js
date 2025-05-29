@@ -119,6 +119,11 @@ export default{
         "code": "gom",
         "label": "Goan Konkani",
         "active": true
+      },
+      {
+        "code": "gom",
+        "label": "Konkani",
+        "active": true
       }
     ]
   }
