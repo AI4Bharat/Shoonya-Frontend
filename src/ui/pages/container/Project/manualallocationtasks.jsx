@@ -109,33 +109,36 @@ const AllocateTasksDialog = ({ userRole, loggedInUserData, ProjectDetails }) => 
             <TextField
               fullWidth
               name="taskIDs"
-              label="Task IDs (comma-separated) *"
+              label="Task IDs (comma-separated)"
               variant="outlined"
               margin="dense"
               value={formData.taskIDs}
               onChange={handleChange}
               required
+              InputLabelProps={{ required: false }}
             />
             <TextField
               fullWidth
               name="userID"
-              label="User ID *"
+              label="User ID"
               variant="outlined"
               margin="dense"
               value={formData.userID}
               onChange={handleChange}
               required
+              InputLabelProps={{ required: false }}
             />
             <TextField
               select
               fullWidth
               name="allocation_type"
-              label="Allocation Type *"
+              label="Allocation Type"
               variant="outlined"
               margin="dense"
               value={formData.allocation_type}
               onChange={handleChange}
               required
+              InputLabelProps={{ required: false }}
             >
               <MenuItem value={1}>Annotation</MenuItem>
               <MenuItem value={2}>Review</MenuItem>
