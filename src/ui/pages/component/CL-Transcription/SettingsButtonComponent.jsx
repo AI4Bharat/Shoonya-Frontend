@@ -19,6 +19,7 @@ import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
+import { Box } from "@mui/material";
 
 const anchorOrigin = {
   vertical: "top",
@@ -79,14 +80,16 @@ ProjectDetails,
   };
   return (
     <>
-      <div
+      <Box
         style={{
-          marginLeft: "15px",
-          position: "absolute",
-          left: "0",
-          display: "block",
+          position:"absolute",
+          left:"15px",
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
           height: "40px",
           width: "40px",
+          minWidth:"40px",
           lineHeight: "40px",
           borderRadius: "50%",
           fontSize: "large",
@@ -96,7 +99,7 @@ ProjectDetails,
         }}
       >
         {totalSegments}
-      </div>
+      </Box>
 
       {showSplit && (
         <Tooltip title="Split Subtitle" placement="bottom">

@@ -1005,7 +1005,7 @@ useEffect(() => {
     <>
       {loading && <Spinner />}
       {renderSnackBar()}
-      <Grid container direction={"row"} className={classes.parentGrid}>
+      <Grid container sx={{xs:{height:"160%"}, md:{height:"100%"}}} className={classes.parentGrid}>
         <Grid md={6} xs={12} id="video" className={classes.videoParent}>
           <Button
             value="Back to Project"
@@ -1026,7 +1026,7 @@ useEffect(() => {
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
-            <Typography sx={{mt: 2, ml: 4, color: "grey"}}>
+            <Typography sx={{color: "grey"}}>
               Task #{taskDetails?.id}
               <LightTooltip
                 title={assignedUsers ? assignedUsers : ""}
@@ -1053,8 +1053,19 @@ useEffect(() => {
               taskData={taskData}
               audioUrl={audioURL}
             /> : <Grid style={{ padding: "0px 20px 0px 20px" }}><audio controls preload='none' className={classes.videoPlayer}/></Grid>}
-            <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
-             <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+            <Grid container>
+             <Stack 
+                sx={{
+                  display:"flex",
+                  gap:"20px",
+                  flexDirection:{xs:"column",sm:"row"},
+                }}
+                >
+                <Box sx={{
+                  display: "flex",
+                  gap: "20px",
+                  alignItems:"center"
+                }}>
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Timeline Scale:
                 </Typography>
@@ -1071,8 +1082,12 @@ useEffect(() => {
                     player.currentTime += 0.01;
                     player.currentTime -= 0.01;
                   }}/>
-              </Stack>
-              <Stack spacing={2} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+              </Box>
+                  <Box sx={{
+                    display: "flex",
+                    gap: "20px",
+                    alignItems:"center"
+                  }}>
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Playback Speed:
                 </Typography>
@@ -1089,9 +1104,10 @@ useEffect(() => {
                   onChange={(e) => {
                     player.playbackRate = e.target.value;
                   }}/>
+              </Box>
               </Stack>
             </Grid>
-            <Grid container spacing={1} sx={{ ml: 3 }}>
+            <Grid container>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -1328,7 +1344,7 @@ useEffect(() => {
       <Grid
         width={"100%"}
         position="fixed"
-        bottom={1}
+        bottom={0}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
         {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>} 
