@@ -3,8 +3,7 @@ import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
-import {  useSelector } from "react-redux";
-
+import { useSelector } from "react-redux";
 
 const AnnotationStageButtons = ({
   handleAnnotationClick,
@@ -15,8 +14,6 @@ const AnnotationStageButtons = ({
   disableSkipButton,
   filterMessage,
 }) => {
-
- 
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   const taskData = useSelector((state) => state.getTaskDetails?.data);
@@ -25,10 +22,9 @@ const AnnotationStageButtons = ({
     (annotation) => annotation.annotation_type === 1
   )[0];
 
-
   return (
     <>
-      <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
+      <Grid container spacing={1}>
         {!disableBtns &&
           taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>
@@ -41,7 +37,7 @@ const AnnotationStageButtons = ({
                     handleAnnotationClick(
                       "draft",
                       Annotation.id,
-                      Annotation.lead_time,
+                      Annotation.lead_time
                     )
                   }
                   style={{
@@ -89,7 +85,7 @@ const AnnotationStageButtons = ({
                     handleAnnotationClick(
                       "skipped",
                       Annotation.id,
-                      Annotation.lead_time,
+                      Annotation.lead_time
                     )
                   }
                   style={{
@@ -118,7 +114,7 @@ const AnnotationStageButtons = ({
                     handleAnnotationClick(
                       "labeled",
                       Annotation.id,
-                      Annotation.lead_time,
+                      Annotation.lead_time
                     )
                   }
                   style={{
@@ -136,7 +132,7 @@ const AnnotationStageButtons = ({
           )}
       </Grid>
       {filterMessage && (
-        <Alert severity="info" sx={{ ml:2,mb: 2,width:"95%"}}>
+        <Alert severity="info" sx={{ ml: 2, mb: 2, width: "95%" }}>
           {filterMessage}
         </Alert>
       )}

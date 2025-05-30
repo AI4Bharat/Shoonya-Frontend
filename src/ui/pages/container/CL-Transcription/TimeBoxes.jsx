@@ -7,7 +7,7 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
   const classes = AudioTranscriptionLandingStyle();
 
   return (
-    <Box display="flex">
+    <Box display="flex" alignItems="center">
       <TextField
         variant="standard"
         onChange={(event) =>
@@ -17,6 +17,7 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
         onFocus={(event) => event.target.select()}
         className={classes.timeInputBox}
         style={{
+          width: "5ch",
           paddingLeft: "10px",
           marginLeft: type === "endTime" ? "auto" : "",
         }}
@@ -26,7 +27,7 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
       <TextField
         variant="standard"
         value={":"}
-        style={{ width: "2%" }}
+        style={{ width: "1ch", textAlign: "center" }}
         className={classes.timeInputBox}
       />
 
@@ -40,12 +41,13 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
           handleTimeChange(event.target.value, index, type, "minutes")
         }
         type="number"
+        style={{ width: "5ch" }}
       />
 
       <TextField
         variant="standard"
         value={":"}
-        style={{ width: "2%" }}
+        style={{ width: "1ch", textAlign: "center" }}
         className={classes.timeInputBox}
       />
 
@@ -59,19 +61,20 @@ const TimeBoxes = ({ handleTimeChange, time, index, type }) => {
           handleTimeChange(event.target.value, index, type, "seconds")
         }
         type="number"
+        style={{ width: "5ch" }}
       />
 
       <TextField
         variant="standard"
         value={"."}
-        style={{ width: "2%" }}
+        style={{ width: "1ch", textAlign: "center" }}
         className={classes.timeInputBox}
       />
 
       <TextField
         variant="standard"
         value={time.split(":")[2].split(".")[1]}
-        style={{ width: "20%", paddingRight: "10px" }}
+        style={{ width: "5ch", paddingRight: "10px" }}
         onFocus={(event) => event.target.select()}
         InputProps={{ inputProps: { min: 0, max: 999 } }}
         className={classes.timeInputBox}
