@@ -27,6 +27,11 @@ import MUIDataTable from "mui-datatables";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../../component/common/ColumnList";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
 
 const ScheduleMails = () => {
   const { id } = useParams();
@@ -279,7 +284,6 @@ const ScheduleMails = () => {
                 wordBreak: "break-word",
               }
             }),
-
           },
         });
         key !== "id" && tempSelected.push(key);
@@ -297,23 +301,32 @@ const ScheduleMails = () => {
       tempSelected.push("Actions");
       scheduledMails.map((mail) => {
         mail.Actions = (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 1,
-            }}
-          >
-            <CustomButton
-              label={mail["Status"] === "Enabled" ? "Pause" : "Resume"}
-              onClick={() => updateScheduledMail(mail)}
-            />
-            <CustomButton
-              label="Delete"
-              sx={{ backgroundColor: "#EC0000" }}
-              onClick={() => deleteScheduledMail(mail)}
-            />
-          </Box>
+          <>
+            <Tooltip title={mail["Status"] === "Enabled" ? "Pause" : "Resume"}>
+              <Button
+                sx={{ m: 1, p: 1 }}
+                variant={"contained"}
+                color={"primary"}
+                onClick={() => updateScheduledMail(mail)}
+              >
+                {mail["Status"] === "Enabled" ? (
+                  <PauseIcon />
+                ) : (
+                  <PlayArrowIcon />
+                )}
+              </Button>
+            </Tooltip>
+            <Tooltip title={"Delete"}>
+              <Button
+                sx={{ m: 1, backgroundColor: "#EC0000" }}
+                variant={"contained"}
+                color={"primary"}
+                onClick={() => deleteScheduledMail(mail)}
+              >
+                {<DeleteIcon />}
+              </Button>
+            </Tooltip>
+          </>
         );
         return mail;
       });
