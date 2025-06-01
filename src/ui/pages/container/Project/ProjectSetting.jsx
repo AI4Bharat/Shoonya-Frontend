@@ -61,7 +61,9 @@ const ProjectSetting = () => {
             // width: window.innerWidth * 0.8,
             width: "100%",
             minHeight: 500,
-            padding: 5
+            overflowX: "hidden",
+            padding: 5,
+            boxSizing: "border-box"
         }}
     >
       
