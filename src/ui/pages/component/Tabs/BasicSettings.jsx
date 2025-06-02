@@ -39,7 +39,7 @@ const BasicSettings = (props) => {
   
 
     useEffect(() => {
-        if (ProjectDetails.project_type === "MonolingualTranslation" ||ProjectDetails.project_type === "SemanticTextualSimilarity" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing"|| ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing") {
+        if (ProjectDetails.project_type) {
             getLanguageChoices();
             setShowLanguage(true);
         }

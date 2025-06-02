@@ -8,7 +8,7 @@ import DatasetCard from "./DatasetCard";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import GetDatasetsAPI from "../../../../redux/actions/api/Dataset/GetDatasetList";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import DatasetStyle from "../../../styles/Dataset";
@@ -29,47 +29,43 @@ export default function DatasetList() {
     dataset_visibility: "",
     dataset_type: "",
   });
-  const getDashboardprojectData = () => {
-    const projectObj = new GetDatasetsAPI(selectedFilters);
-    dispatch(APITransport(projectObj));
-  };
-  
+
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
 
+  const getDashboardprojectData = () => {
+    const projectObj = new GetDatasetsAPI(selectedFilters);
+    dispatch(APITransport(projectObj));
+  };
 
   useEffect(() => {
     getDashboardprojectData();
   }, [selectedFilters]);
 
+  useEffect(() => {
+    setLoading(apiLoading);
+  }, [apiLoading]);
+
   const handleProjectlist = () => {
     setRadiobutton(true);
   };
+
   const handleProjectcard = () => {
     setRadiobutton(false);
   };
-  const handleCreateProject = (e) => {
+
+  const handleCreateProject = () => {
     navigate(`/create-Dataset-Instance-Button/`);
   };
-  //   useEffect(()=>{
-  //     getDatasetList();
-  // },[]);
 
-  //   const handleCreateProject =(e)=>{
-  //       navigate(`/create-Dataset-Instance-Button/`)
-  //   }
-
-  const handleAutomateButton = (e) => {
+  const handleAutomateButton = () => {
     navigate("/datasets/automate");
   };
-   useEffect(() => {
-      setLoading(apiLoading);
-  }, [apiLoading])
 
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
+      {(loading || !datasetList || datasetList.length === 0) && <Spinner />}
 
       <Grid container className={classes.root}>
         <Grid item style={{ flexGrow: "0" }}>
@@ -126,7 +122,7 @@ export default function DatasetList() {
             ml: 2,
             justifyContent: "flex-end",
           }}
-          disabled = {userRole.Admin === loggedInUserData?.role? false : true}
+          disabled={userRole.Admin === loggedInUserData?.role ? false : true}
           onClick={handleAutomateButton}
           label="Automate Datasets"
         />

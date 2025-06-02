@@ -39,6 +39,7 @@ import TaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/TaskRev
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import DeleteProjectTasks from "../../container/Project/DeleteProjectTasks";
+import AllocateTasksDialog from "../../container/Project/manualallocationtasks";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
@@ -48,6 +49,7 @@ import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import PopulateModuleOutput from "../../container/Project/PopulateModuleOutput";
 
 
 const ProgressType = [
@@ -474,7 +476,7 @@ const AdvancedOperation = (props) => {
               color="error"
               onClick={handleClickOpen}
               label={isArchived ? "Archived" : "Archive"}
-              disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
+              disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ? true : false}
             />
           </Grid>
 
@@ -487,37 +489,37 @@ const AdvancedOperation = (props) => {
             xl={12}
             sx={{ ml: 2, height: "20px", mb: 2 }}
           >
-                        {userRole.WorkspaceManager === loggedInUserData?.role ? null :
-<FormControl size="small" className={classes.formControl}>
-              <InputLabel
-                id="Select-Task-Statuses"
-                sx={{ fontSize: "16px", padding: "3px" }}
-              >
-                Select Task Statuses
-              </InputLabel>
-              <Select
-                labelId="Select-Task-Statuses"
-                label="Select Task Statuses"
-                multiple
-                value={taskStatus}
-                onChange={handleChange}
-                renderValue={(taskStatus) => taskStatus.join(", ")}
-                MenuProps={MenuProps}
-              >
-                {FilterProgressType.map((option) => (
-                  <MenuItem
-                    sx={{ textTransform: "capitalize" }}
-                    key={option}
-                    value={option}
-                  >
-                    <ListItemIcon>
-                      <Checkbox checked={taskStatus.indexOf(option) > -1} />
-                    </ListItemIcon>
-                    <ListItemText primary={snakeToTitleCase(option)} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>}
+            {userRole.WorkspaceManager === loggedInUserData?.role ? null :
+              <FormControl size="small" className={classes.formControl}>
+                <InputLabel
+                  id="Select-Task-Statuses"
+                  sx={{ fontSize: "16px", padding: "3px" }}
+                >
+                  Select Task Statuses
+                </InputLabel>
+                <Select
+                  labelId="Select-Task-Statuses"
+                  label="Select Task Statuses"
+                  multiple
+                  value={taskStatus}
+                  onChange={handleChange}
+                  renderValue={(taskStatus) => taskStatus.join(", ")}
+                  MenuProps={MenuProps}
+                >
+                  {FilterProgressType.map((option) => (
+                    <MenuItem
+                      sx={{ textTransform: "capitalize" }}
+                      key={option}
+                      value={option}
+                    >
+                      <ListItemIcon>
+                        <Checkbox checked={taskStatus.indexOf(option) > -1} />
+                      </ListItemIcon>
+                      <ListItemText primary={snakeToTitleCase(option)} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>}
           </Grid>
         </Grid>
 
@@ -542,7 +544,6 @@ const AdvancedOperation = (props) => {
               md={12}
               lg={12}
               xl={12}
-
             >
               <CustomButton
                 sx={{
@@ -569,7 +570,7 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handleOpenExportProjectDialog}
                 label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ? true : false}
 
               />
             ) : (
@@ -583,7 +584,7 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handleExportProject}
                 label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ? true : false}
 
               />
             )}
@@ -618,6 +619,10 @@ const AdvancedOperation = (props) => {
             <DeleteProjectTasks />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <AllocateTasksDialog open={open} handleClose={handleClose} />
+          </Grid>
+{/* manual task assign */}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeallocationAnnotatorsAndReviewers />
           </Grid>
 
@@ -649,25 +654,26 @@ const AdvancedOperation = (props) => {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}
             sx={{ ml: 2 }}
           >
-              <FormControl size="small" className={classes.formControl}>
-                <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
-                  Project Stage
-                </InputLabel>
-                <Select
-                  labelId="task-Reviews-label"
-                  id="task-Reviews-select"
-                  value={taskReviews}
-                  label="Task Reviews"
-                  onChange={handleReviewToggle}
-                // getOptionDisabled={(option) => option.disabled}
-                >
-                  {projectStage.map((type, index) => (
-                    <MenuItem value={type.value} key={index} disabled={type.disabled} >
-                      {type.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            <FormControl size="small" className={classes.formControl}>
+              <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
+                Project Stage
+              </InputLabel>
+              <Select
+                labelId="task-Reviews-label"
+                id="task-Reviews-select"
+                value={taskReviews}
+                label="Task Reviews"
+                onChange={handleReviewToggle}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ? true : false}
+              // getOptionDisabled={(option) => option.disabled}
+              >
+                {projectStage.map((type, index) => (
+                  <MenuItem value={type.value} key={index} disabled={type.disabled} >
+                    {type.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
 
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
@@ -680,7 +686,11 @@ const AdvancedOperation = (props) => {
             >
               <SuperCheckSettings ProjectDetails={ProjectDetails} />
             </Grid>}
+          <Grid item xs={12} sm={12} md={12} lg={7} xl={7}>
+            <PopulateModuleOutput />
+          </Grid>
         </Grid>
+
 
 
 

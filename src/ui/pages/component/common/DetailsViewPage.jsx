@@ -49,7 +49,13 @@ import MetaAnalytics from "../../container/Progress/Workspace/MetaAnalytics";
 import ProgressAnalytics from "../../container/Progress/Workspace/ProgressAnalytics";
 import { DriveEta } from "@material-ui/icons";
 import PerformanceAnalytics from "../../container/Progress/Workspace/PerformanceAnalytics";
-
+import InviteUsersDialog from "./InviteUsersDialog";
+import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
+import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/GetOragnizationUsers"
+import InviteManagerSuggestions from "../../../../redux/actions/api/Organization/InviteManagerSuggestions";
+import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI"
+import CustomizedSnackbars from "./Snackbar";
+import AssignMembersDialog from "../../container/Workspace/bulkaddmembers.jsx"
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -71,6 +77,8 @@ function TabPanel(props) {
 }
 
 const DetailsViewPage = (props) => {
+  const [annotatorDialogOpen, setAnnotatorDialogOpen] = useState(false);
+    React.useState(false);
   const { pageType, title, createdBy, onArchiveWorkspace } = props;
   const { id, orgId } = useParams();
   const classes = DatasetStyle();
@@ -90,7 +98,17 @@ const DetailsViewPage = (props) => {
     setAnchorEl(event.currentTarget);
 
   };
-
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [csvFile, setCsvFile] = useState(null);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
+  const [selectedEmails, setSelectedEmails] = useState([]);
+  const [btn,setbtn] = useState(null);
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
@@ -103,6 +121,7 @@ const DetailsViewPage = (props) => {
   //     const workspaceObj = new GetWorkspacesAPI(1);
   //     dispatch(APITransport(workspaceObj));
   //   }
+
 
   useEffect(() => {
     // getDashboardWorkspaceData();
@@ -118,6 +137,7 @@ const DetailsViewPage = (props) => {
     }
     
   }, []);
+  const organisation_id = useSelector(state => state.getWorkspacesProjectData?.data?.[0]?.organization_id);
 
   let navigate = useNavigate();
 
@@ -145,6 +165,97 @@ const DetailsViewPage = (props) => {
     setAddWorkspacesDialogOpen(true);
   };
 
+  const handleUserDialogOpen = () => {
+    setAddUserDialogOpen(true);
+  };
+  const handleUserDialogClose = () => {
+    setAddUserDialogOpen(false);
+  };
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
+
+  const addBtnClickHandler = async () => {
+    setLoading(true);
+    if(userDetails?.role === userRole.WorkspaceManager)
+    {
+      const addUsesrsObj = new InviteManagerSuggestions(
+        organisation_id,
+        selectedUsers,
+        userType
+      );
+      const res = await fetch(addUsesrsObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(addUsesrsObj.getBody()),
+        headers: addUsesrsObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+        const orgObj = new GetOragnizationUsersAPI(id);
+        dispatch(APITransport(orgObj));
+
+      }else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
+    }
+    else 
+    {
+
+    const addMembersObj = new InviteUsersToOrgAPI(
+        organisation_id,
+        selectedUsers,
+        userType
+      );
+      const res = await fetch(addMembersObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(addMembersObj.getBody()),
+        headers: addMembersObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+        const orgObj = new GetOragnizationUsersAPI(id);
+        dispatch(APITransport(orgObj));
+      }else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
+    }
+    handleUserDialogClose();
+    setLoading(false);
+    setSelectedUsers([ ]);
+    setSelectedEmails([]);
+    setCsvFile(null);
+    setbtn(null)
+    setUserType(Object.keys(UserRolesList)[0])
+  };
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading]);
@@ -159,50 +270,58 @@ const DetailsViewPage = (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
-      <Grid
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-      >
+      {renderSnackBar()}
+      <Grid container direction="row" sx={{ maxWidth: "100%" }}>
         <Card className={classes.workspaceCard}>
           {pageType === componentType.Type_Organization && (
-            <Typography variant="h2" gutterBottom component="div">
+            <Typography
+              variant="h2"
+              gutterBottom
+              component="div"
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+              }}
+            >
               {title}
             </Typography>
           )}
           {pageType === componentType.Type_Workspace && (
-            <Grid
-              container
-              direction="row"
-              justifyContent="center"
+            <Box
+              display="flex"
               alignItems="center"
+              justifyContent="space-between"
               sx={{ mb: 3 }}
             >
-              <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
-                <Typography variant="h3">{title}</Typography>
-              </Grid>
+              <Box flex="1" textAlign="center" sx={{ marginLeft: "3rem" }}>
+                <Typography variant="h2">{title}</Typography>
+              </Box>
 
               {(userRole.Annotator !== userDetails?.role ||
                 userRole.Reviewer !== userDetails?.role ||
                 userRole.SuperChecker !== userDetails?.role) && (
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Tooltip title={translate("label.showProjectSettings")}>
-                    <IconButton
-                      onClick={handleOpenSettings}
-                      sx={{ marginLeft: "140px" }}
-                    >
-                      <SettingsOutlinedIcon
-                        color="primary.dark"
-                        fontSize="large"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
+                <Tooltip title={translate("label.showProjectSettings")}>
+                  <IconButton onClick={handleOpenSettings}>
+                    <SettingsOutlinedIcon
+                      color="primary.dark"
+                      fontSize="large"
+                    />
+                  </IconButton>
+                </Tooltip>
               )}
-            </Grid>
+            </Box>
           )}
-          <Typography variant="body1" gutterBottom component="div">
+          <Typography
+            variant="body1"
+            gutterBottom
+            component="div"
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
             Created by : {createdBy}
           </Typography>
           <Box>
@@ -210,79 +329,175 @@ const DetailsViewPage = (props) => {
               value={value}
               onChange={handleChange}
               aria-label="basic tabs example"
+              variant="fullWidth"
+              TabIndicatorProps={{
+                style: { display: "none" },
+              }}
             >
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.projects")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 0 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 0 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.workspaces")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 0 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 0 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.members")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 1 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 1 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.members")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 1 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 1 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.managers")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 2 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 2 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.invites")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 2 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 2 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.reports")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 3 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 3 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
               {pageType === componentType.Type_Organization && (
                 <Tab
                   label={translate("label.reports")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 3 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 3 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
               )}
 
               {pageType === componentType.Type_Workspace && (
-           
                 <Tab
-                label={ <div style={{display:"flex",marginTop:"5px"}}> {translate("label.analytics")} <KeyboardArrowDownIcon style={{paddingBottom:"1px"}} /> </div>}
-                aria-controls="menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
-                sx={{ fontSize: 16, fontWeight: "700"}}  
+                  label={
+                    <div style={{ display: "flex", marginTop: "5px" }}>
+                      {" "}
+                      {translate("label.analytics")}{" "}
+                      <KeyboardArrowDownIcon style={{ paddingBottom: "1px" }} />{" "}
+                    </div>
+                  }
+                  aria-controls="menu"
+                  aria-haspopup="true"
+                  onClick={handleMenuOpen}
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 4 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 4 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
                 />
-            
               )}
-                
+
               {pageType === componentType.Type_Organization && (
-                
                 <Tab
                   label={"Organization " + translate("label.settings")}
-                  sx={{ fontSize: 16, fontWeight: "700" }}
-                /> 
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    bgcolor: value === 4 ? "#d3d3d3" : "#F5F5F5",
+                    color: value === 4 ? "black" : "text.primary",
+                    borderRadius: 1,
+                    "&:hover": {
+                      bgcolor: "#e0e0e0",
+                    },
+                  }}
+                />
               )}
-               
             </Tabs>
           </Box>
           <Menu
@@ -291,10 +506,31 @@ const DetailsViewPage = (props) => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem selected={selectmenu=== "TaskAnalytics"} onClick={() => handleClickMenu("TaskAnalytics")}> Task Analytics </MenuItem>
-            <MenuItem selected={ selectmenu=== "MetaAnalytics"} onClick={() => handleClickMenu("MetaAnalytics")}>Meta Analytics</MenuItem>
-            <MenuItem selected={selectmenu=== "AdvanceAnalytics"} onClick={() => handleClickMenu("AdvanceAnalytics")}>Advance Analytics</MenuItem>
-            <MenuItem selected={selectmenu=== "PerformanceAnalytics"} onClick={() => handleClickMenu("PerformanceAnalytics")}>Performance Analytics</MenuItem>
+            <MenuItem
+              selected={selectmenu === "TaskAnalytics"}
+              onClick={() => handleClickMenu("TaskAnalytics")}
+            >
+              {" "}
+              Task Analytics{" "}
+            </MenuItem>
+            <MenuItem
+              selected={selectmenu === "MetaAnalytics"}
+              onClick={() => handleClickMenu("MetaAnalytics")}
+            >
+              Meta Analytics
+            </MenuItem>
+            <MenuItem
+              selected={selectmenu === "AdvanceAnalytics"}
+              onClick={() => handleClickMenu("AdvanceAnalytics")}
+            >
+              Advance Analytics
+            </MenuItem>
+            <MenuItem
+              selected={selectmenu === "PerformanceAnalytics"}
+              onClick={() => handleClickMenu("PerformanceAnalytics")}
+            >
+              Performance Analytics
+            </MenuItem>
           </Menu>
           <TabPanel
             value={value}
@@ -311,7 +547,7 @@ const DetailsViewPage = (props) => {
                   columnSpacing={4}
                   rowSpacing={2}
                 >
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={12}>
                     <Link to={`/create-annotation-project/${id}`}>
                       <Button
                         className={classes.projectButton}
@@ -319,14 +555,14 @@ const DetailsViewPage = (props) => {
                       />
                     </Link>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  {/* <Grid item xs={12} sm={6}>
                     <Link to={`/create-collection-project/${id}`}>
                       <Button
                         className={classes.projectButton}
                         label={"Add New Collection Project"}
                       />
                     </Link>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
                 <div className={classes.workspaceTables}>
                   <ProjectTable />
@@ -352,12 +588,38 @@ const DetailsViewPage = (props) => {
           <TabPanel value={value} index={1}>
             {pageType === componentType.Type_Workspace && (
               <>
-                <Button
-                  className={classes.annotatorsButton}
-                  label={"Add Members to Workspace"}
-                  sx={{ width: "100%", mb: 2 }}
-                  onClick={handleAnnotatorDialogOpen}
-                />
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  columnSpacing={4}
+                  rowSpacing={2}
+                >
+                  <Grid item xs={4} sm={4}>
+                    <CustomButton
+                      className={classes.annotatorsButton}
+                      label={"Add Members to Workspace"}
+                      sx={{ width: "100%", mb: 2 }}
+                      onClick={handleAnnotatorDialogOpen}
+                    />
+                  </Grid>
+                  <Grid item xs={4} sm={4}>
+                    <CustomButton
+                      className={classes.annotatorsButton}
+                      label={"Invite Users to Organisation"}
+                      sx={{ width: "100%", mb: 2 }}
+                      onClick={handleUserDialogOpen}
+                    />
+                  </Grid>
+                  <Grid item xs={4} sm={4}>
+                      <AssignMembersDialog
+                        open={annotatorDialogOpen}
+                        onClose={() => setAnnotatorDialogOpen(false)}
+                        sx={{ width: '100%', mb: 2}}
+                      />
+                    </Grid>
+                </Grid>
                 <AnnotatorsTable
                   onRemoveSuccessGetUpdatedMembers={() => getWorkspaceDetails()}
                 />
@@ -366,6 +628,29 @@ const DetailsViewPage = (props) => {
                   isOpen={addAnnotatorsDialogOpen}
                   userType={addUserTypes.ANNOTATOR}
                   id={id}
+                />
+                <InviteUsersDialog
+                  handleDialogClose={handleUserDialogClose}
+                  isOpen={addUserDialogOpen}
+                  selectedUsers={selectedUsers}
+                  setSelectedUsers={setSelectedUsers}
+                  userType={userType}
+                  setUserType={setUserType}
+                  addBtnClickHandler={() => addBtnClickHandler()}
+                  loading={loading}
+                  selectedEmails={selectedEmails}
+                  setSelectedEmails={setSelectedEmails}
+                  csvFile={csvFile}
+                  setCsvFile={setCsvFile}
+                  btn={btn}
+                  setbtn={setbtn}
+                  value={value}
+                  setvalue={setValue}
+                  popUpLabel={
+                    userDetails?.role === userRole.WorkspaceManager
+                      ? "Request admin to add users to organization"
+                      : "Invite users to organization"
+                  }
                 />
               </>
             )}
@@ -403,10 +688,14 @@ const DetailsViewPage = (props) => {
             {pageType === componentType.Type_Workspace && <WorkspaceReports />}
           </TabPanel>
           <TabPanel value={value} index={4}>
-            {pageType === componentType.Type_Workspace && selectmenu=== "TaskAnalytics" && <TaskAnalytics />}
-            {pageType === componentType.Type_Workspace && selectmenu=== "MetaAnalytics" && <MetaAnalytics />}
-            {pageType === componentType.Type_Workspace && selectmenu=== "AdvanceAnalytics" && <ProgressAnalytics />}
-            {pageType === componentType.Type_Workspace && selectmenu=== "PerformanceAnalytics" && <PerformanceAnalytics /> }
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "TaskAnalytics" && <TaskAnalytics />}
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "MetaAnalytics" && <MetaAnalytics />}
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "AdvanceAnalytics" && <ProgressAnalytics />}
+            {pageType === componentType.Type_Workspace &&
+              selectmenu === "PerformanceAnalytics" && <PerformanceAnalytics />}
             {pageType === componentType.Type_Organization && (
               <OrganizationSettings />
             )}

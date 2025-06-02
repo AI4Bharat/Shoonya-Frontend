@@ -16,7 +16,7 @@ import {
   Typography,
   Grid,
   Button,
-  Slider, Stack
+  Slider, Stack, CircularProgress,  IconButton,Portal
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
@@ -41,6 +41,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import configs from '../../../../config/config';
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import CloseIcon from "@mui/icons-material/Close";
 
 const AllAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -84,7 +88,96 @@ const AllAudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [waveSurfer, setWaveSurfer] = useState(true);
+  const [audioURL, setAudioURL] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const dialogRef = useRef(null);
 
+  const type1 = AnnotationsTaskDetails.filter(
+    (item) => item.annotation_type === 1
+  );
+  const type2 = AnnotationsTaskDetails.filter(
+    (item) => item.annotation_type === 2
+  );
+  const type3 = AnnotationsTaskDetails.filter(
+    (item) => item.annotation_type === 3
+  );
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("msfullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        "mozfullscreenchange",
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        "msfullscreenchange",
+        handleFullscreenChange
+      );
+    };
+  }, []);
+
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
+
+  const handleOpenPopover = (position) => {
+    const offsetPosition = {
+      top: position.top - 0,
+      left: position.left - 1000,
+    };
+    setPopoverPosition(offsetPosition);
+    setPopoverOpen(true);
+  };
+
+  const handleClosePopover = () => {
+    setPopoverOpen(false);
+  };
+
+  const handleFullscreenToggle = () => {
+    const elem = dialogRef.current;
+    if (!isFullscreen) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        /* Firefox */
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) {
+        /* Chrome, Safari and Opera */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        /* IE/Edge */
+        elem.msRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        /* IE/Edge */
+        document.msExitFullscreen();
+      }
+      setIsFullscreen(false);
+    }
+  };
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
     setShowNotes(!showNotes);
@@ -113,10 +206,34 @@ const AllAudioTranscriptionLandingPage = () => {
       });
     } else {
       setTaskData(resp);
-      if (resp?.data?.audio_duration < 700){
+      if (resp?.data?.audio_duration < 1000){
         setWaveSurfer(false);
       }else{
         setWaveSurfer(true);
+      }
+      // const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
+      const fetchAudioData = await fetch(resp?.data?.audio_url
+      //, {
+      //   method: "GET",
+      //   headers: ProjectObj.getHeaders().headers}
+      )
+      if (!fetchAudioData.ok){
+        setAudioURL(resp?.data?.audio_url)
+      }else{
+        try {
+          // var base64data = await fetchAudioData.json();
+          // var binaryData = atob(base64data);
+          // var buffer = new ArrayBuffer(binaryData.length);
+          // var view = new Uint8Array(buffer);
+          // for (var i = 0; i < binaryData.length; i++) {
+          //     view[i] = binaryData.charCodeAt(i);
+          // }
+          // var blob = new Blob([view], { type: 'audio/mpeg' });
+          var blob = await fetchAudioData.blob();
+          setAudioURL(URL.createObjectURL(blob));
+        } catch {
+          setAudioURL(resp?.data?.audio_url)
+        }
       }
     }
     setLoading(false);
@@ -472,11 +589,13 @@ const AllAudioTranscriptionLandingPage = () => {
                 </Tooltip>
               </Grid>
             </Grid>
-            <AudioPanel
-              setCurrentTime={setCurrentTime}
-              setPlaying={setPlaying}
-              taskData={taskData}
-            />
+            {audioURL ?
+             <AudioPanel
+               setCurrentTime={setCurrentTime}
+               setPlaying={setPlaying}
+               taskData={taskData}
+               audioUrl={audioURL}
+              /> : <Grid style={{ padding: "0px 20px 0px 20px" }}><audio controls preload='none' className={classes.videoPlayer}/></Grid>}
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -578,6 +697,8 @@ const AllAudioTranscriptionLandingPage = () => {
             >
               {stdTranscriptionSettings.enableTransliteration ? (
                 <IndicTransliterate
+                  customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                  apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
                   lang={stdTranscriptionSettings.targetlang}
                   value={stdTranscription}
                   onChange={(e) => {
@@ -695,6 +816,7 @@ const AllAudioTranscriptionLandingPage = () => {
             waveSurfer={waveSurfer}
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
+            handleOpenPopover={handleOpenPopover}
           />
         </Grid>
       </Grid>
@@ -704,8 +826,116 @@ const AllAudioTranscriptionLandingPage = () => {
         position="fixed"
         bottom={1}
       >
-        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} />}
+        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} />) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
       </Grid>
+      {popoverOpen && (
+        <Portal>
+          <Box
+            ref={dialogRef}
+            sx={{
+              position: "fixed",
+              top: popoverPosition.top,
+              left: popoverPosition.left,
+              backgroundColor: "white",
+              boxShadow: 3,
+              padding: 2,
+              borderRadius: "8px",
+              minWidth: isFullscreen ? "100%" : "400px",
+              width: isFullscreen ? "100%" : "500px",
+              height: isFullscreen ? "100%" : "450px",
+              maxWidth: isFullscreen ? "100%" : "600px",
+              zIndex: 1300,
+              overflow: "auto",
+            }}
+          >
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography variant="h4" flexGrow={1}>
+                Subtitles
+              </Typography>
+              <IconButton onClick={handleFullscreenToggle}>
+                {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+              </IconButton>
+              <IconButton onClick={handleClosePopover}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Box sx={{ height: "410px", overflowY: "auto" }}>
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      {type1.length > 0 && (
+                        <th>
+                          <Typography variant="h6">Annotation</Typography>
+                        </th>
+                      )}
+                      {type2.length > 0 && (
+                        <th>
+                          <Typography variant="h6">Review</Typography>
+                        </th>
+                      )}
+                      {type3.length > 0 && (
+                        <th>
+                          <Typography variant="h6">SuperCheck</Typography>
+                        </th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {/* Render different types */}
+                      <td>
+                        {type1.length > 0 &&
+                          type1[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                      <td>
+                        {type2.length > 0 &&
+                          type2[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                      <td>
+                        {type3.length > 0 &&
+                          type3[0].result.map((el, index) => (
+                            <Box
+                              key={index}
+                              p={1}
+                              border="1px solid #000"
+                              borderRadius="4px"
+                              mb={1}
+                            >
+                              {el.text}
+                            </Box>
+                          ))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
+            </Box>
+          </Box>
+        </Portal>
+      )}
     </>
   );
 };
