@@ -2,4 +2,4 @@ node_modules
 package-lock.json
 build
 
-src/config/config.js``
+src/config/config.js
