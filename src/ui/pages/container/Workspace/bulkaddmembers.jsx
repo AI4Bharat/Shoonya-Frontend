@@ -77,7 +77,7 @@ const AssignMembersDialog = () => {
         payload,
         {
           headers: {
-            Authorization: `JWT ${localStorage.getItem('anudesh_access_token')}`,
+            Authorization: `JWT ${localStorage.getItem('shoonya_access_token')}`,
             'Content-Type': 'application/json',
           },
           withCredentials: true,
