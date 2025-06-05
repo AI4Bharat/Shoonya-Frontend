@@ -7,8 +7,6 @@ export default function SimpleModal(props) {
 
 
   const getModalStyle = () => {
-    // const top = 50;
-    // const left = 50;
     const mediaQuery = window.matchMedia('(max-width: 768px)')
     if (isTransliteration && mediaQuery.matches) {
       return {

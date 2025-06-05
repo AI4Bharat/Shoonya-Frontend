@@ -10,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Search from "../../component/common/Search";

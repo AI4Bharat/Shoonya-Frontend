@@ -68,11 +68,6 @@ const DatasetCards = (props) => {
       }
     });
   };
-
-  // useEffect(() => {
-  //     setLoading(apiLoading);
-  // }, [apiLoading])
-
     const areFiltersApplied = (filters) => {
     return Object.values(filters).some((value) => value !== "");
   };

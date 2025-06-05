@@ -7,7 +7,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import themeDefault from '../../../theme/theme'
@@ -22,7 +22,6 @@ import DatasetProjectsTable from '../../component/Tabs/DatasetProjectsTable';
 import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
 import GetDatasetMembersAPI from "../../../../redux/actions/api/Dataset/GetDatasetMembers";
 import MembersTable from '../../component/Project/MembersTable';
-import DatasetSettings from './DatasetSettings';
 import DatasetLogs from './DatasetLogs';
 import DatasetDescription from './DatasetDescription';
 import userRole from "../../../../utils/UserMappedByRole/Roles";
@@ -202,9 +201,6 @@ const DatasetDetails = () => {
                     <TabPanel value={selectedTab} index={4}>
                         <DatasetReports datasetId={datasetId} />
                     </TabPanel>
-                    {/* <TabPanel value={selectedTab} index={4}>
-                        <DatasetSettings datasetId={datasetId} />
-                    </TabPanel> */}
                 </Card>
             </Grid>
         </ThemeProvider>

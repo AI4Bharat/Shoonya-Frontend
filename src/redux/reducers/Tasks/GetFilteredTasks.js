@@ -7,8 +7,6 @@ let initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case constants.FILTER_TASKS:
-      // let initialTasks = action.payload.initialTasks;
-      // let filters = action.payload.filters;
       let { initialTasks, filters } = action.payload;
       let data = initialTasks.filter((task) => {
         let isValid = true;

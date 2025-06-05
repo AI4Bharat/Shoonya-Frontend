@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 
 //Themes
 import Box from "@mui/material/Box";
@@ -14,7 +13,7 @@ import Divider from "@mui/material/Divider";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import MUIDataTable from "mui-datatables";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";

@@ -323,15 +323,8 @@ const ProjectAnalytics = (props) => {
       labels: labels,
       datasets: [
         {
-          //   label: "Project Analytics",
           data: entries,
           backgroundColor: colorList,
-          //   backgroundColor: ['#FF708D', '#884DFF', '#8BA446'],
-          //   backgroundColor: "rgba(255, 0, 0)",
-          //   fill: {
-          //     target: "origin", // 3. Set the fill options
-          //     above: "rgba(255, 0, 0, 0.3)",
-          //   },
         },
       ],
     });
@@ -540,6 +533,7 @@ const ProjectAnalytics = (props) => {
                         {isBrowser ? (
                           <MUIDataTable
                             // title={"Project Analytics"}
+                            key={`table-${displayWidth}`}
                             data={tableData}
                             columns={[
                               {

@@ -1,5 +1,3 @@
-// MembersTable
-
 import React, { useEffect, useState, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +10,7 @@ import AddUsersDialog from "../common/AddUsersDialog";
 import InviteUsersDialog from "../common/InviteUsersDialog";
 import addUserTypes from "../../../../constants/addUserTypes";
 import { useNavigate, useParams } from "react-router-dom";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -40,18 +38,6 @@ import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import RejectManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/RejectManagerSuggestions";
 import ApproveManagerSuggestionsAPI from "../../../../redux/actions/api/Organization/ApproveManagerSuggestions";
 import { getManagerSuggestions } from "../Tabs/Invites";
-
-
-const options = {
-  filterType: "checkbox",
-  selectableRows: "none",
-  download: false,
-  filter: false,
-  print: false,
-  search: false,
-  viewColumns: false,
-  jumpToPage: true,
-};
 
 const addLabel = {
   dataset:"Add Members to Dataset",
@@ -595,16 +581,13 @@ const MembersTable = (props) => {
       pagination: { rowsPerPage: "Rows per page" },
       options: { sortDirection: "desc" },
     },
-    // customToolbar: fetchHeaderButton,
     displaySelectToolbar: false,
     fixedHeader: false,
     filterType: "checkbox",
     download: false,
     print: false,
     rowsPerPageOptions: [10, 25, 50, 100],
-    // rowsPerPage: PageInfo.count,
     filter: false,
-    // page: PageInfo.page,
     viewColumns: false,
     selectableRows: "none",
     search: false,
@@ -651,7 +634,6 @@ const MembersTable = (props) => {
         body: JSON.stringify(apiObj.getBody()),
         headers: apiObj.getHeaders().headers,
       });
-      const rsp_data = await res.json();
       if (res.ok) {
         if(memberOrReviewer === "member"){
         handleProjectMember(elId);

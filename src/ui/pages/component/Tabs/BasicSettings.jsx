@@ -148,11 +148,6 @@ const BasicSettings = (props) => {
         }));
     }
 
-    // const handleCancel = ()=>{
-    //     // setSourceLanguage(ProjectDetails?.tgt_language)
-    //     // setTargetLanguage(ProjectDetails?.src_language)
-    // }
-
     const renderSnackBar = () => {
         return (
             <CustomizedSnackbars

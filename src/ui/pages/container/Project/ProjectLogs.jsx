@@ -10,7 +10,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import { addMonths, parse } from "date-fns/esm";
 import { DateRangePicker } from "react-date-range";
 import { useParams } from "react-router-dom";
@@ -20,6 +20,23 @@ import GetProjectLogsAPI from "../../../../redux/actions/api/ProjectDetails/GetP
 import { snakeToTitleCase } from "../../../../utils/utils";
 import tableTheme from "../../../theme/tableTheme";
 import Spinner from "../../component/common/Spinner";
+import { styled } from "@mui/material/styles";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const ProjectLogs = () => {
   const { id } = useParams();
@@ -41,6 +58,7 @@ const ProjectLogs = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -113,14 +131,14 @@ const ProjectLogs = () => {
     })
       .then(async (res) => {
         setLoading(false);
-        if (res.status == 204) {
-          return null; 
+        if (res.status === 204) {
+          return null;
         }
         if (!res.ok) throw await res.json();
         else return await res.json();
       })
       .then((res) => {
-        setAllLogs(res||[]);
+        setAllLogs(res || []);
       })
       .catch();
   };
@@ -136,6 +154,25 @@ const ProjectLogs = () => {
             filter: key === "status",
             sort: false,
             align: "center",
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         });
       });
@@ -145,7 +182,7 @@ const ProjectLogs = () => {
       setColumns([]);
       setProjectLogs([]);
     }
-  }, [allLogs]);
+  }, [allLogs, expandedRow]);
   const CustomFooter = ({
     count,
     page,

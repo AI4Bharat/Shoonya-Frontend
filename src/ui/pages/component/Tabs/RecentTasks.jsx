@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import LightTooltip from "../common/Tooltip";
 import InfoIcon from "@mui/icons-material/Info";
 import React, { useEffect, useState, useRef } from "react";
@@ -20,6 +20,24 @@ import MUIDataTable from "mui-datatables";
 import { translate } from "../../../../config/localisation";
 import SearchIcon from "@mui/icons-material/Search";
 import AllTaskSearchPopup from "../Project/AllTaskSearchPopup";
+import { styled } from "@mui/material/styles";
+import { snakeToTitleCase } from "../../../../utils/utils";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const TASK_TYPES = ["annotation", "review", "supercheck"];
 
@@ -66,6 +84,7 @@ const RecentTasks = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -123,25 +142,64 @@ const RecentTasks = () => {
       ) {
         colList.push(...Object.keys(RecentTasks.results.results[0]));
       }
+      if (selectedColumns.length === 0) {
+        setSelectedColumns(colList);
+      }
       const cols = colList.map((col) => {
+        const isSelectedColumn = selectedColumns.includes(col);
         return {
           name: col,
-          label: col,
+          label: snakeToTitleCase(col),
           options: {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
             customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList);
       setTasks(data);
     } else {
       setTasks([]);
     }
-  }, [RecentTasks]);
+  }, [RecentTasks, expandedRow]);
+
+  useEffect(() => {
+    if (columns.length > 0 && selectedColumns.length > 0) {
+      const newCols = columns.map((col) => ({
+        ...col,
+        options: {
+          ...col.options,
+          display: selectedColumns.includes(col.name) ? "true" : "false",
+        },
+      }));
+      if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+        setColumns(newCols);
+      }
+    }
+  }, [selectedColumns, columns]);
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -199,16 +257,6 @@ const RecentTasks = () => {
       </Box>
     );
   };
-
-  useEffect(() => {
-    const newCols = columns.map((col) => {
-      col.options.display = selectedColumns.includes(col.name)
-        ? "true"
-        : "false";
-      return col;
-    });
-    setColumns(newCols);
-  }, [selectedColumns]);
 
   const CustomFooter = ({
     count,
