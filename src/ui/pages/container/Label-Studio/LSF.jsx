@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "./editor.css";
 import "quill/dist/quill.snow.css";
-import LabelStudio from "@heartexlabs/label-studio";
+import LabelStudio1 from "./lsf-build/static/js/main";
+import LabelStudio2 from "@heartexlabs/label-studio";
 import {
   Tooltip,
   Button,
@@ -174,6 +175,7 @@ const LabelStudioWrapper = ({
   );
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const LabelStudio = useRef();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
   const [snackbar, setSnackbarInfo] = useState({
@@ -291,6 +293,7 @@ const LabelStudioWrapper = ({
       );
     isAudioProject.current = AUDIO_PROJECT_SAVE_CHECK.includes(projectType);
     //console.log("labelConfig", labelConfig);
+    LabelStudio.current = projectType?.includes("OCR") ? LabelStudio1 : LabelStudio2;
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -357,7 +360,7 @@ const LabelStudioWrapper = ({
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
-      lsfRef.current = new LabelStudio(rootRef.current, {
+      lsfRef.current = new LabelStudio.current(rootRef.current, {
         /* all the options according to the docs */
         config: labelConfig,
 
@@ -857,6 +860,63 @@ const LabelStudioWrapper = ({
     }
   };
 
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected&&
+      taskData.task_status.toLowerCase() !== "labeled") {
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp;
+        for (let i = 0; i < annotations.length; i++) {
+          if (
+            !annotations[i].result?.length ||
+            annotation.serializeAnnotation()[0].id ===
+              annotations[i].result[0].id
+          ) {
+            temp = annotation.serializeAnnotation();
+            if (annotations[i].annotation_type !== 1) continue;
+            for (let i = 0; i < temp.length; i++) {
+              if (temp[i].parentID !== undefined){
+                delete temp[i].parentID;
+              }
+              if(temp[i].type === "relation"){
+                continue;
+              }else if (temp[i].value.text) {
+                temp[i].value.text = [temp[i].value.text[0]];
+              }
+            }
+            patchAnnotation(
+              taskId,
+              temp,
+              annotations[i].id,
+              load_time.current,
+              annotations[i].lead_time,
+              annotations[i].annotation_status,
+              JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
+              true,
+              selectedLanguages,
+              ocrDomain
+            ).then((res) => {
+              if (res.status !== 200) {
+                setSnackbarInfo({
+                  open: true,
+              message: "Error in clearing children bboxes",
+                  variant: "error",
+                });
+              }else{
+                window.location.reload();
+              }
+            });
+          }
+        }
+      }else
+      setSnackbarInfo({
+        open: true,
+        message: "Task is frozen",
+        variant: "error",
+      });
+    }
+  };
+
   let hidden, visibilityChange;
   if (typeof document.hidden !== "undefined") {
     hidden = "hidden";
@@ -933,14 +993,18 @@ const LabelStudioWrapper = ({
     if(taskData){
       if(Array.isArray(taskData?.data?.language)){
         taskData?.data?.language?.map((lang)=>{
-          selectedLanguages.current?.push(lang);
-          const newLanguages = [...selectedL, ...taskData?.data?.language];
-          setSelectedL(newLanguages);
+          if (!selectedLanguages.current.includes(lang)) {
+            selectedLanguages.current.push(lang);
+          }        
+          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
+          setSelectedL(Array.from(newLanguages));
         });
       }
       if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
         setSelectedL([taskData?.data?.language]);
-        selectedLanguages.current?.push(taskData?.data?.language);
+        if (!selectedLanguages.current.includes(taskData?.data?.language)) {
+          selectedLanguages.current.push(taskData?.data?.language);
+        }      
       }
       if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
         ocrDomain.current = taskData?.data?.ocr_domain;
@@ -969,7 +1033,7 @@ const LabelStudioWrapper = ({
           className="lsf-controls"
         >
           <div />
-          <Grid container spacing={0}>
+          <Grid container justifyContent="space-between">
             <Grid item>
               <LightTooltip title={assignedUsers ? assignedUsers : ""}>
                 <Button
@@ -990,9 +1054,7 @@ const LabelStudioWrapper = ({
                   />
                 </Button>
               </LightTooltip>
-            </Grid>
             {/* <Grid container spacing={0} sx={{ justifyContent: "end" }}> */}
-            <Grid item>
               {taskData?.annotation_users?.some(
                 (user) => user === userData.id
               ) &&
@@ -1016,8 +1078,6 @@ const LabelStudioWrapper = ({
                     </Button>
                   </Tooltip>
                 )}
-            </Grid>
-            <Grid item>
               {/* {localStorage.getItem("labelAll") === "true" ? ( */}
               <Tooltip title="Go to next task">
                 <Button
@@ -1040,6 +1100,28 @@ const LabelStudioWrapper = ({
               {/* ) : (
               <div style={{ minWidth: "160px" }} />
             )} */}
+            {ProjectDetails?.project_type?.includes("OCR") && 
+            <>
+              <Tooltip title="Clear all children bboxes">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    color: "#f00",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear All Mergings
+                </Button>
+              </Tooltip>
+            </>
+            }
             </Grid>
           </Grid>
         </div>

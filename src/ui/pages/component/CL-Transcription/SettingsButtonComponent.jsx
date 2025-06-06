@@ -23,12 +23,16 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import CheckIcon from "@mui/icons-material/Check";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
+import TagIcon from '@mui/icons-material/Tag';
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 // import { FindAndReplace } from "common";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import PreviewDialog from "./PreviewDialog";
+
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 // import FormatLineSpacingIcon from "@mui/icons-material/FormatLineSpacingIcon";
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 
 const anchorOrigin = {
   vertical: "top",
@@ -51,6 +55,10 @@ const SettingsButtonComponent = ({
   saveTranscriptHandler,
   setOpenConfirmDialog,
   durationError,
+  handleDoubleHashes,
+  sethash,
+hash,
+ProjectDetails,
   onUndo,
   onRedo,
   undoStack,
@@ -58,6 +66,7 @@ const SettingsButtonComponent = ({
   onSplitClick,
   showPopOver,
   showSplit,
+  subtitles,
   handleInfoButtonClick,
   advancedWaveformSettings,
   setAdvancedWaveformSettings,
@@ -66,6 +75,7 @@ const SettingsButtonComponent = ({
   pauseOnType,
   setPauseOnType,
   annotationId,
+  handleOpenPopover,
 }) => {
   const classes = AudioTranscriptionLandingStyle();
   // const dispatch = useDispatch();
@@ -73,10 +83,34 @@ const SettingsButtonComponent = ({
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElLimit, setAnchorElLimit] = useState(null);
-
+  const handleClick = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect(); 
+    const position = {
+      top: rect.top + window.scrollY, 
+      left: rect.left + window.scrollX,
+    };
+    handleOpenPopover(position); 
+  };
   return (
     <>
-      <div style={{marginLeft:"15px", position:"absolute", left:"0", display:"block", height:"40px", width:"40px", lineHeight:"40px", borderRadius:"50%", fontSize:"large", backgroundColor:"#2C2799", color:"white", textAlign:"center"}}>{totalSegments}</div>
+      <div
+        style={{
+          marginLeft: "15px",
+          position: "absolute",
+          left: "0",
+          display: "block",
+          height: "40px",
+          width: "40px",
+          lineHeight: "40px",
+          borderRadius: "50%",
+          fontSize: "large",
+          backgroundColor: "#2C2799",
+          color: "white",
+          textAlign: "center",
+        }}
+      >
+        {totalSegments}
+      </div>
 
       {showSplit && (
         <Tooltip title="Split Subtitle" placement="bottom">
@@ -129,9 +163,9 @@ const SettingsButtonComponent = ({
         onClose={() => setAnchorElSettings(null)}
       >
         <MenuItem>
-        <Typography sx={{fontSize: 14}}>
-          Annotation ID: {annotationId}
-        </Typography>
+          <Typography sx={{ fontSize: 14 }}>
+            Annotation ID: {annotationId}
+          </Typography>
         </MenuItem>
         <MenuItem>
           <FormControlLabel
@@ -141,7 +175,15 @@ const SettingsButtonComponent = ({
                 checked={enableTransliteration}
                 onChange={() => {
                   setAnchorElSettings(null);
-                  localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"enableTransliteration":!enableTransliteration}))
+                  localStorage.setItem(
+                    "userCustomTranscriptionSettings",
+                    JSON.stringify({
+                      ...JSON.parse(
+                        localStorage.getItem("userCustomTranscriptionSettings")
+                      ),
+                      enableTransliteration: !enableTransliteration,
+                    })
+                  );
                   setTransliteration(!enableTransliteration);
                 }}
               />
@@ -156,7 +198,15 @@ const SettingsButtonComponent = ({
                 checked={enableRTL_Typing}
                 onChange={() => {
                   setAnchorElSettings(null);
-                  localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"enableRTL_Typing":!enableRTL_Typing}))
+                  localStorage.setItem(
+                    "userCustomTranscriptionSettings",
+                    JSON.stringify({
+                      ...JSON.parse(
+                        localStorage.getItem("userCustomTranscriptionSettings")
+                      ),
+                      enableRTL_Typing: !enableRTL_Typing,
+                    })
+                  );
                   setRTL_Typing(!enableRTL_Typing);
                 }}
               />
@@ -176,6 +226,16 @@ const SettingsButtonComponent = ({
             }
           />
         </MenuItem>
+        {ProjectDetails?.title?.toLowerCase()?.includes("yt_transcription")&&<MenuItem>
+          <FormControlLabel
+            label="Double Hash"
+            control={<Checkbox checked={hash} onChange={() => {
+              const newValue = !hash;
+              sethash(newValue);
+              sessionStorage.setItem("hash", JSON.stringify(newValue));
+            }} />}
+          />
+        </MenuItem>}
         <MenuItem>
           <FormControlLabel
             label="Advanced Settings"
@@ -203,28 +263,46 @@ const SettingsButtonComponent = ({
           />
         </MenuItem>
         <MenuItem>
-        <Popup contentStyle={{
-          width: "300px",
-        }} 
-        trigger={<FormControlLabel
-            label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hotkeys Explorer"
-            control={
-              <div></div>
+          <Popup
+            contentStyle={{
+              width: "300px",
+            }}
+            trigger={
+              <FormControlLabel
+                label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hotkeys Explorer"
+                control={<div></div>}
+              />
             }
-          />} position="left center"
-          on={['hover', 'focus']}>
-          <div style={{padding:"2px"}}>
-            <div style={{fontSize: "large", textAlign: "center", fontWeight: "bold", marginBottom:"4px"}}>Hotkeys</div>
-            <ul style={{fontSize: "medium", paddingLeft: "20px", marginBottom:"1px"}}>
+            position="left center"
+            on={["hover", "focus"]}
+          >
+            <div style={{ padding: "2px" }}>
+              <div
+                style={{
+                  fontSize: "large",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  marginBottom: "4px",
+                }}
+              >
+                Hotkeys
+              </div>
+              <ul
+                style={{
+                  fontSize: "medium",
+                  paddingLeft: "20px",
+                  marginBottom: "1px",
+                }}
+              >
                 <li>Play/Pause - Shift + Space</li>
                 <li>Seek Left - Shift + &#8592;</li>
                 <li>Seek Right - Shift + &#8594;</li>
                 <li>Noise Tags - $$$</li>
                 <li>Toggle Transliteration - Alt + 1</li>
                 {/* <li>Color Schema set</li> */}
-            </ul>
-          </div>
-        </Popup>
+              </ul>
+            </div>
+          </Popup>
         </MenuItem>
       </Menu>
 
@@ -233,7 +311,27 @@ const SettingsButtonComponent = ({
         className={classes.rightPanelDivider}
         style={{ border: "1px solid grey", height: "auto", margin: "0 5px" }}
       />
+{ProjectDetails?.title?.toLowerCase()?.includes("yt_transcription") && hash && (
+      
+        <Tooltip title="Double Hash" placement="bottom">
+          <IconButton
+            className={classes.rightPanelBtnGrp}
+            style={{
+              backgroundColor: "#2C2799",
+              borderRadius: "50%",
+              color: "#fff",
+              marginLeft: "5px",
+              "&:hover": {
+                backgroundColor: "#271e4f",
+              },
+            }}
+            onClick={() => handleDoubleHashes()}
+          >
+            <TagIcon className={classes.rightPanelSvg} />
+          </IconButton>
+        </Tooltip>
 
+      )}
       <Tooltip title="Font Size" placement="bottom">
         <IconButton
           className={classes.rightPanelBtnGrp}
@@ -241,7 +339,7 @@ const SettingsButtonComponent = ({
             backgroundColor: "#2C2799",
             borderRadius: "50%",
             color: "#fff",
-            marginX: "5px",
+            marginLeft: "5px",
             "&:hover": {
               backgroundColor: "#271e4f",
             },
@@ -249,6 +347,23 @@ const SettingsButtonComponent = ({
           onClick={(event) => setAnchorElFont(event.currentTarget)}
         >
           <FormatSizeIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Subtitle Preview" placement="bottom">
+        <IconButton
+          className={classes.rightPanelBtnGrp}
+          onClick={handleClick}
+          style={{
+            backgroundColor: "#2C2799",
+            borderRadius: "50%",
+            color: "#fff",
+            marginLeft: "5px",
+            "&:hover": {
+              backgroundColor: "#271e4f",
+            },
+          }}
+        >
+          <VisibilityIcon className={classes.rightPanelSvg} />
         </IconButton>
       </Tooltip>
 
@@ -299,7 +414,15 @@ const SettingsButtonComponent = ({
           <MenuItem
             key={index}
             onClick={() => {
-              localStorage.setItem("userCustomTranscriptionSettings",JSON.stringify({...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings")),"fontSize":item.size}))
+              localStorage.setItem(
+                "userCustomTranscriptionSettings",
+                JSON.stringify({
+                  ...JSON.parse(
+                    localStorage.getItem("userCustomTranscriptionSettings")
+                  ),
+                  fontSize: item.size,
+                })
+              );
               setFontSize(item.size);
             }}
           >
@@ -362,6 +485,7 @@ const SettingsButtonComponent = ({
           <RedoIcon />
         </IconButton>
       </Tooltip>
+
     </>
   );
 };
