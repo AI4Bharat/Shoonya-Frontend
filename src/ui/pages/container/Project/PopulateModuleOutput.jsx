@@ -618,7 +618,7 @@ export default function PopulateModuleOutput() {
                 },
                 body: JSON.stringify({
                     model_language: modelLanguage,
-                    project_ids: projectIds.split(",").map(id => id.trim()),
+                    project__ids: projectIds.split(",").map(id => id.trim()),
                     stage: stage
                 })
             });
