@@ -38,7 +38,7 @@ const getTaskAssignedUsers = async (taskDetails) => {
     return Promise.all([getAnnotator(), getReviewer(), getSuperChecker()]).then(res => 
         <div style={{display: "flex", padding: "8px 0px", flexDirection: "column", gap: "14px"}}>
             {res.map((email, idx) => 
-                email && <div style={{display: "inline", fontSize: 12}}>{UserMappedByRole(idx + 1).element} {email}</div>
+                email && <div key={idx} style={{display: "inline", fontSize: 12}}>{UserMappedByRole(idx + 1).element} {email}</div>
             )}
         </div>
     )

@@ -148,9 +148,9 @@ const UserDetail = (props) => {
       });
     }
   };
+
   const pageSearch = () => {
     return UserDetail.filter((el) => {
-      const isActive = el.is_active ? "active" : "inactive";
       if (SearchUserDetail == "") {
         return el;
       } else if (
@@ -165,6 +165,12 @@ const UserDetail = (props) => {
         el.first_name?.toLowerCase().includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;
+      // }else if(
+      //   el.is_active?.toString()
+      //   ?.toLowerCase()
+      //   .includes(SearchUserDetail?.toLowerCase())
+      // ){
+      //   return el;
       }else if (
         SearchUserDetail.toLowerCase() === "active" && el.is_active ||
         SearchUserDetail.toLowerCase() === "inactive" && !el.is_active
@@ -189,7 +195,7 @@ const UserDetail = (props) => {
         return el;
       }
     });
-  }; 
+  };
 
   const columns = [
     {
@@ -433,5 +439,4 @@ const UserDetail = (props) => {
     </div>
   );
 };
-
 export default UserDetail;

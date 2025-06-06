@@ -9,7 +9,7 @@ import TransliterationAPI from "../../../../redux/actions/api/Transliteration/Tr
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-const Transliteration = (props) => {
+const Transliteration = (props) => { 
   const { onCancelTransliteration ,setIsSpaceClicked,isSpaceClicked,setShowTransliterationModel} = props;
   const params = useParams();
   const classes = GlobalStyles();
@@ -221,11 +221,12 @@ const Transliteration = (props) => {
           getOptionLabel={(el) => el.DisplayName}
           sx={{ width: window.innerWidth * 0.15 }}
           renderInput={(params) => <TextField {...params} label="" placeholder="Select Language" />}
-          
+          disableClearable={true}
         />
       </Grid>
 
       <IndicTransliterate
+        apiKey={process.env.REACT_APP_XLIT_APIKEY}
         lang={selectedLang.LangCode ? selectedLang.LangCode : (data.length > 0 && (params.taskId || params.id) ? data[0]?.LangCode : "hi")}
         value={text}
         onChangeText={(val) => {

@@ -84,7 +84,6 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
         barRadius: waveformSettings.barRadius,
         barHeight: waveformSettings.barHeight,
         mediaControls: true,
-        url: details?.data?.audio_url,
         hideScrollbar: true,
         autoCenter: true,
         autoScroll: true,
@@ -115,7 +114,6 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
       miniMap.current = WaveSurfer.create({
         container: document.querySelector('#minimap'),
         height: '20',
-        url: details?.data?.audio_url,
         hideScrollbar: true,
         mediaControls: true,
         media: document.querySelector('audio'),
@@ -140,7 +138,6 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
         barRadius: waveformSettings.barRadius,
         barHeight: waveformSettings.barHeight,
         mediaControls: true,
-        url: details?.data?.audio_url,
         hideScrollbar: true,
         autoCenter: true,
         autoScroll: true,
@@ -190,7 +187,6 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
       miniMap.current = WaveSurfer.create({
         container: document.querySelector('#minimap'),
         height: '20',
-        url: details?.data?.audio_url,
         mediaControls: true,
         media: document.querySelector('audio'),
         hideScrollbar: true,

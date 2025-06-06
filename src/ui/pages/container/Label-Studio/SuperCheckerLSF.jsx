@@ -4,7 +4,8 @@ import { useQuill } from 'react-quilljs';
 import ReactQuill, { Quill } from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.snow.css';
-import LabelStudio from "@heartexlabs/label-studio";
+import LabelStudio1 from "./lsf-build/static/js/main";
+import LabelStudio2 from "@heartexlabs/label-studio";
 import {
   Tooltip,
   Button,
@@ -40,6 +41,7 @@ import {
   getProjectsandTasks,
   getNextProject,
   fetchAnnotation,
+  fetchTransliteration,
   postReview,
   patchSuperChecker,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
@@ -52,7 +54,11 @@ import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import { labelConfigJS } from "./labelConfigJSX";
-
+import CustomButton from "../../component/common/Button";
+import CircularProgress from '@mui/material/CircularProgress';
+import LanguageCode from "../../../../utils/LanguageCode";
+import PostTransliterationForLogging from "../../../../redux/actions/api/Annotation/PostTransliterationForLogging";
+// import RomanisedTransliteration from "../Transliteration/RomanisedTransliteration";
 const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
@@ -105,7 +111,8 @@ const filterAnnotations = (annotations, user, taskData) => {
   });
   if (userAnnotation) {
     if (userAnnotation.annotation_status === "unvalidated") {
-      filteredAnnotations = userAnnotation.result.length > 0 ?
+      filteredAnnotations = userAnnotation.result.length > 0 && !taskData?.revision_loop_count?.super_check_count?
+
         [userAnnotation] : annotations.filter(
           (annotation) =>
             annotation.id === userAnnotation.parent_annotation &&
@@ -155,6 +162,7 @@ const LabelStudioWrapper = ({
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const review_status = useRef();
+  const LabelStudio = useRef();
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
@@ -183,6 +191,20 @@ const LabelStudioWrapper = ({
     useState(null);
   const [tagSuggestionList, setTagSuggestionList] = useState();
   const [assignedUsers, setAssignedUsers] = useState(null);
+
+  // const [romanisedTransliterationData, setRomanisedTransliterationData] = useState({
+  //   timestamp: '',
+  //   error: '',
+  //   input: '',
+  //   romanised_transliteration: '',
+  //   success: false
+  // });
+  // const [showRomanisedTransliterationModel, setShowRomanisedTransliterationModel] = useState(true);
+  const [showSpinner , setShowSpinner] = useState(false);
+  // const [originalRomanisedText, setOriginalRomanisedText] = useState("");
+  // const [editedRomanisedText, setEditedRomanisedText] = useState("")
+  // const [indicText, setIndicText] = useState("");
+   //console.log("projectId, taskId", projectId, taskId);
 
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
@@ -263,6 +285,7 @@ useEffect(() => {
     if (predictions == null) predictions = [];
     const [filteredAnnotations, disableSkip, disableAutoSave] = filterAnnotations(annotations, userData);
     if (disableSkip || disableAutoSave) setAutoSave(false);
+    LabelStudio.current = projectType?.includes("OCR") ? LabelStudio1 : LabelStudio2;
 
     if (taskData.task_status === "freezed") {
       interfaces = [
@@ -322,7 +345,7 @@ useEffect(() => {
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
-      lsfRef.current = new LabelStudio(rootRef.current, {
+      lsfRef.current = new LabelStudio.current(rootRef.current, {
         /* all the options according to the docs */
         config: labelConfig,
 
@@ -440,8 +463,7 @@ useEffect(() => {
             if (taskData.annotation_status !== "freezed") {
               setAutoSave(false);
               showLoader();
-              let temp = review_status.current === "rejected"
-                ? [] : annotation.serializeAnnotation();
+              let temp = annotation.serializeAnnotation();
 
               for (let i = 0; i < temp.length; i++) {
                 if(temp[i].type === "relation"){
@@ -454,7 +476,15 @@ useEffect(() => {
               let superChecker = annotations.filter(
                 (value) => value.annotation_type === 3
               )[0];
-
+              // if(originalRomanisedText.length==0  && projectType.includes("ContextualTranslationEditing")){
+              //   setSnackbarInfo({
+              //     open: true,
+              //     message: "Please click on Check Transliteration button first",
+              //     variant: "info",
+              //   });
+              //   // dont allow to move forward
+              //   hideLoader();
+              // }
               patchSuperChecker(
                 taskId,
                 superChecker.id,
@@ -544,7 +574,7 @@ useEffect(() => {
             );
             reviewNotesRef.current.value = correctAnnotation.review_notes ?? "";
             superCheckerNotesRef.current.value =
-              superCheckerAnnotation.supercheck_notes ?? "";
+              superCheckerAnnotation?.supercheck_notes ?? "";
 
               
               try {
@@ -577,7 +607,7 @@ useEffect(() => {
             reviewNotesRef.current.value =
               reviewerAnnotations[0].review_notes ?? "";
             superCheckerNotesRef.current.value =
-              superCheckerAnnotation.supercheck_notes ?? "";
+              superCheckerAnnotation?.supercheck_notes ?? "";
               
               try {
                 const newDelta1 = reviewNotesRef.current.value!=""?JSON.parse(reviewNotesRef.current.value):"";
@@ -771,6 +801,56 @@ useEffect(() => {
     }
   };
 
+  const clearAllChildren = () => {
+    if (lsfRef.current?.store?.annotationStore?.selected && taskData.task_status.toLowerCase() !== "validated" && taskData.task_status.toLowerCase() !== "validated_with_changes") {
+      if (taskData?.annotation_status !== "freezed") {
+        let annotation = lsfRef.current.store.annotationStore.selected;
+        let temp = annotation.serializeAnnotation();
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].parentID !== undefined){
+            delete temp[i].parentID;
+          }
+          if(temp[i].type === "relation"){
+            continue;
+          }else if (temp[i].value.text) {
+            temp[i].value.text = [temp[i].value.text[0]];
+          }
+        }
+        let superChecker = annotations.filter(
+          (value) => value.annotation_type === 3
+        )[0];
+        patchSuperChecker(
+          taskId,
+          superChecker.id,
+          load_time.current,
+          superChecker.lead_time,
+          superChecker.annotation_status,
+          temp,
+          superChecker.parent_annotation,
+          JSON.stringify(superCheckerNotesRef.current.getEditor().getContents()),
+          true,
+          selectedLanguages,
+          ocrDomain
+        ).then((res) => {
+          if (res.status !== 200) {
+            setSnackbarInfo({
+              open: true,
+              message: "Error in clearing children bboxes",
+              variant: "error",
+            });
+          }else{
+            window.location.reload();
+          }
+        });
+      } else
+        setSnackbarInfo({
+          open: true,
+          message: "Task is frozen",
+          variant: "error",
+        });
+    }
+  };
+
   let hidden, visibilityChange;
   if (typeof document.hidden !== 'undefined') {
     hidden = 'hidden';
@@ -812,6 +892,150 @@ useEffect(() => {
       tasksComplete(res?.id || null);
     });
   };
+  useEffect(() => {
+    if (taskId) {
+      fetchAnnotationTask();
+    }
+  }, [taskId]); 
+  const fetchAnnotationTask = async () => {
+    const res = await fetchAnnotation(taskId);
+    // console.log(res);
+    // if(res[0]?.result[0])
+    // { 
+    //   // setIndicText(res[0]?.result[0]?.value?.text[0]);
+    // }
+    setTaskData(res);
+    setAnnotations(res?.annotations);
+  };
+
+  // create a handleSubmitRomanisedText function
+  // const handleSubmitRomanisedText = async () => {
+  //   if(taskData?.data?.input_text && taskData?.data?.output_language){
+  //     const language = LanguageCode.languages 
+  //     let output_lng_code = ''
+
+  //     language.filter((lang) => {
+  //       if(lang.label === taskData?.data?.output_language){
+  //         output_lng_code= lang.code
+  //       }
+  //     });
+  //     // Create a new instance of the class
+  //     const postTransliterationForLogging = new PostTransliterationForLogging(
+  //       taskData?.data?.input_text, 
+  //       indicText , 
+  //       originalRomanisedText, 
+  //       editedRomanisedText,
+  //       output_lng_code
+  //     );
+  //     const res = await dispatch(APITransport(postTransliterationForLogging));
+  //     if(res?.success){
+  //       setRomanisedTransliterationData(
+  //         {
+  //           timestamp: '',
+  //           error: '',
+  //           input: '',
+  //           romanised_transliteration: '',
+  //           success: false
+  //         }
+  //       )
+  //       setOriginalRomanisedText("");
+  //       setEditedRomanisedText("");
+  //       setSnackbarInfo({
+  //         open: true,
+  //         message: "Transliteration Logged",
+  //         variant: "success",
+  //       });
+  //       setShowSpinner(false)
+
+  //     }else{
+  //       setSnackbarInfo({
+  //         open: true,
+  //         message: "Error in logging transliteration",
+  //         variant: "error",
+  //       });
+  //       setShowSpinner(false)
+  //     }
+  //   }
+  // }
+
+  // const handleTranslitrationOnClick = async () => {
+  //   setShowSpinner(true)
+  //   const language = LanguageCode.languages 
+  //   let output_lng_code = ''
+
+  //   language.filter((lang) => {
+  //     if(lang.label == taskData?.data?.output_language){
+  //       output_lng_code = lang.code
+  //     } 
+  //   })
+  //   try {
+
+  //   const res = await fetchTransliteration(indicText, output_lng_code);
+  //   if(res?.success && res?.romanised_transliteration) {
+  //     setRomanisedTransliterationData(res);
+  //     if(res?.romanised_transliteration)
+  //     {
+  //       setOriginalRomanisedText(res.romanised_transliteration);
+  //     }
+  //     setSnackbarInfo({
+  //       open: true,
+  //       message: "Transliteration Done",
+  //       variant: "success",
+  //     });
+  //     setShowSpinner(false)
+  //   }
+  // }
+  // catch (error) {
+  //   setSnackbarInfo({
+  //     open: true,
+  //     message: "Error in fetching romanised text",
+  //     variant: "error",
+  //   });
+  //   setShowSpinner(false)
+  // }
+
+  // }
+  // useEffect(() => {
+  //   if(originalRomanisedText) {
+  //     setEditedRomanisedText(originalRomanisedText);
+  //   }
+  // }, [originalRomanisedText]);
+
+  // useEffect(() => {
+  //   let annotation = lsfRef?.current?.store?.annotationStore?.selected;
+  //     let temp;
+  //     for (let i = 0; i < annotations?.length; i++) {
+  //       if (
+  //         !annotations[i]?.result?.length ||
+  //         annotation.serializeAnnotation()[0].id ===
+  //           annotations[i]?.result[0].id
+  //       ) {
+  //         temp = annotation.serializeAnnotation();
+  //         if (annotations[i]?.annotation_type !== 1) continue;
+  //         for (let i = 0; i < temp?.length; i++) {
+  //           if(temp[i].type === "relation"){
+  //             continue;
+  //           }else if (temp[i]?.value.text) {
+  //             temp[i].value.text = [temp[i].value.text[0]];
+  //           }
+  //         }          
+  //         if(temp[0]?.value?.text[0]?.length >0){
+  //           setIndicText(temp[0]?.value?.text[0])
+  //         }
+  //       }
+  //       }
+  // }, [annotations, fetchTransliteration, handleSubmitRomanisedText]);
+
+
+  // // call the handleTransliteration for first time if the indic text is present 
+  // useEffect(() => {
+  //   if(indicText){
+  //     handleTranslitrationOnClick()
+  //   }
+  // }, [indicText]);
+  // const handleEditableRomanisedText =(e)=>{
+  //   setEditedRomanisedText(e.target.value)
+  // }
   const [value, setvalue] = useState();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -860,14 +1084,18 @@ useEffect(() => {
     if(taskData){
       if(Array.isArray(taskData?.data?.language)){
         taskData?.data?.language?.map((lang)=>{
-          selectedLanguages.current?.push(lang);
-          const newLanguages = [...selectedL, ...taskData?.data?.language];
-          setSelectedL(newLanguages);
+          if (!selectedLanguages.current.includes(lang)) {
+            selectedLanguages.current.push(lang);
+          }        
+          const newLanguages = new Set([...selectedL, ...taskData?.data?.language]);
+          setSelectedL(Array.from(newLanguages));
         });
       }
       if(typeof taskData?.data?.language === 'string' && taskData?.data?.ocr_domain !== ""){
         setSelectedL([taskData?.data?.language]);
-        selectedLanguages.current?.push(taskData?.data?.language);
+        if (!selectedLanguages.current.includes(taskData?.data?.language)) {
+          selectedLanguages.current.push(taskData?.data?.language);
+        }      
       }
       if(typeof taskData?.data?.ocr_domain === 'string' && taskData?.data?.ocr_domain !== ""){
         ocrDomain.current = taskData?.data?.ocr_domain;
@@ -890,7 +1118,7 @@ useEffect(() => {
           </div>
         }
         <div>
-          {ProjectData.revision_loop_count >
+          {ProjectData && ProjectData?.revision_loop_count >
             taskData?.revision_loop_count?.super_check_count
             ? false
             : true && (
@@ -902,7 +1130,7 @@ useEffect(() => {
               </div>
             )}
 
-          {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
+          {ProjectData && ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count !== 0 && (
             <div style={{ textAlign: "right", marginBottom: "15px" }}>
               <Typography variant="body" color="#f5222d">
                 Note: This task can be rejected {ProjectData.revision_loop_count - taskData?.revision_loop_count?.super_check_count} more times.
@@ -976,7 +1204,7 @@ useEffect(() => {
                   type="default"
                   onClick={handleRejectClick}
                   disabled={
-                    ProjectData.revision_loop_count >
+                    ProjectData?.revision_loop_count >
                       taskData?.revision_loop_count?.super_check_count
                       ? false
                       : true
@@ -985,7 +1213,7 @@ useEffect(() => {
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
                     color: (
-                      ProjectData.revision_loop_count >
+                      ProjectData?.revision_loop_count >
                         taskData?.revision_loop_count?.super_check_count
                         ? false
                         : true
@@ -1029,6 +1257,26 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
+            {ProjectDetails?.project_type?.includes("OCR") &&
+            <Tooltip title="Clear all children bboxes">
+                <Button
+                  type="default"
+                  onClick={() => {clearAllChildren()}}
+                  style={{
+                    minWidth: "160px",
+                    border: "1px solid #e6e6e6",
+                    color: "#09f",
+                    pt: 3,
+                    pb: 3,
+                    borderBottom: "None",
+                    color: "#f00",
+                  }}
+                  className="lsf-button"
+                >
+                  Clear All Mergings
+                </Button>
+              </Tooltip>
+          }
             <StyledMenu
               id="accept-menu"
               MenuListProps={{
@@ -1071,6 +1319,23 @@ useEffect(() => {
         >
           {tagSuggestionList}
         </Popover>
+
+        { 
+          // <RomanisedTransliteration
+          //   minimizeTextbox = {showRomanisedTransliterationModel}
+          //   onClose = {() => {
+          //     setShowRomanisedTransliterationModel(!showRomanisedTransliterationModel) 
+          //   }}
+          //   setShowRomanisedTransliterationModel = {setShowRomanisedTransliterationModel}
+          //   indicText={indicText}
+          //   originalRomanisedText={originalRomanisedText}
+          //   editedRomanisedText={editedRomanisedText}
+          //   handleEditableRomanisedText={handleEditableRomanisedText}
+          //   handleTranslitrationOnClick={handleTranslitrationOnClick}
+          //   handleSubmitRomanisedText={handleSubmitRomanisedText}
+          //   showSpinner={showSpinner}
+          // />
+        }
       </Box>
       {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
           <>

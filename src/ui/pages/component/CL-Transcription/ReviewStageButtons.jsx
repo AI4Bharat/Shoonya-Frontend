@@ -6,6 +6,7 @@ import {
   Alert,
   MenuItem,
   Menu,
+  Typography,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -72,6 +73,7 @@ const ReviewStageButtons = ({
   const user = useSelector((state) => state.fetchLoggedInUserData?.data);
   const getNextTask = useSelector((state) => state.getnextProject?.data);
   const taskData = useSelector((state) => state.getTaskDetails?.data);
+  const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
 
 
   const open = Boolean(anchorEl);
@@ -90,6 +92,41 @@ const ReviewStageButtons = ({
 
   return (
     <>
+    <div>
+        {ProjectDetails.revision_loop_count >
+        taskData?.revision_loop_count?.review_count
+          ? false
+          : true && (
+              <div
+                style={{
+                  textAlign: "left",
+                  marginBottom: "5px",
+                  marginLeft: "40px",
+                  marginTop: "5px",
+                }}
+              >
+                <Typography variant="body" color="#f5222d">
+                  Note: The 'Revision Loop Count' limit has been reached for
+                  this task.
+                </Typography>
+              </div>
+            )}
+
+        {ProjectDetails.revision_loop_count -
+          taskData?.revision_loop_count?.review_count !==
+          0 && (
+          <div
+            style={{ textAlign: "left", marginLeft: "40px", marginTop: "8px" }}
+          >
+            <Typography variant="body" color="#f5222d">
+              Note: This task can be rejected{" "}
+              {ProjectDetails.revision_loop_count -
+                taskData?.revision_loop_count?.review_count}{" "}
+              more times.
+            </Typography>
+          </div>
+        )}
+      </div>
       <Grid container spacing={1} sx={{ mt: 2, mb: 3, ml: 3 }}>
         {!disableBtns && taskData?.review_user === user?.id && (
           <Grid item>
@@ -177,6 +214,12 @@ const ReviewStageButtons = ({
                   value="to_be_revised"
                   type="default"
                   variant="outlined"
+                  disabled={
+                    ProjectDetails.revision_loop_count >
+                      taskData?.revision_loop_count?.review_count
+                      ? false
+                      : true
+                  }
                   onClick={() =>
                     handleReviewClick(
                       "to_be_revised",
@@ -188,7 +231,14 @@ const ReviewStageButtons = ({
                   style={{
                     minWidth: "120px",
                     border: "1px solid gray",
-                    color: "rgb(245, 34, 45)",
+                    color: (
+                      ProjectDetails.revision_loop_count >
+                        taskData?.revision_loop_count?.review_count
+                        ? false
+                        : true
+                    )
+                      ? "#B2BABB"
+                      : "#f5222d",
                     pt: 2,
                     pb: 2,
                   }}

@@ -41,6 +41,8 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
+import configs from '../../../../config/config';
+import StandarisedisedTranscriptionEditing from './StandardizedTranscription';
 
 const AllAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -84,6 +86,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [waveSurfer, setWaveSurfer] = useState(true);
+  const [audioURL, setAudioURL] = useState("");
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -113,26 +116,47 @@ const AllAudioTranscriptionLandingPage = () => {
       });
     } else {
       setTaskData(resp);
-      if (resp?.data?.audio_duration < 700){
+      if (resp?.data?.audio_duration < 1000){
         setWaveSurfer(false);
       }else{
         setWaveSurfer(true);
+      }
+      const fetchAudioData = await fetch(String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=`), {
+        method: "GET",
+        headers: ProjectObj.getHeaders().headers
+      })
+      if (!fetchAudioData.ok){
+        setAudioURL(resp?.data?.audio_url)
+      }else{
+        try {
+          var base64data = await fetchAudioData.json();
+          var binaryData = atob(base64data);
+          var buffer = new ArrayBuffer(binaryData.length);
+          var view = new Uint8Array(buffer);
+          for (var i = 0; i < binaryData.length; i++) {
+              view[i] = binaryData.charCodeAt(i);
+          }
+          var blob = new Blob([view], { type: 'audio/mpeg' });
+          setAudioURL(URL.createObjectURL(blob));
+        } catch {
+          setAudioURL(resp?.data?.audio_url)
+        }
       }
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    let standardisedTranscription = "";
+    let standardizedTranscription = "";
 
     const sub = annotations[0]?.result.filter((item) => {
-      if ("standardised_transcription" in item) {
-        standardisedTranscription = item.standardised_transcription;
+      if ("standardized_transcription" in item) {
+        standardizedTranscription = item.standardized_transcription;
         return false;
       } else return true;
     }).map((item) => new Sub(item));
 
-    setStdTranscription(standardisedTranscription);
+    setStdTranscription(standardizedTranscription);
     dispatch(setSubtitles(sub, C.SUBTITLES));
   }, [annotations]);
 
@@ -472,11 +496,14 @@ const AllAudioTranscriptionLandingPage = () => {
                 </Tooltip>
               </Grid>
             </Grid>
+            {audioURL &&
             <AudioPanel
               setCurrentTime={setCurrentTime}
               setPlaying={setPlaying}
               taskData={taskData}
+              audioUrl={audioURL}
             />
+            } 
             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
@@ -539,7 +566,7 @@ const AllAudioTranscriptionLandingPage = () => {
                       setShowNotes(false);
                     }}
                   >
-                    Standardised Transcription
+                    Standardized Transcription
                   </Button>
                 </Grid>}
             </Grid>
@@ -578,6 +605,7 @@ const AllAudioTranscriptionLandingPage = () => {
             >
               {stdTranscriptionSettings.enableTransliteration ? (
                 <IndicTransliterate
+                  apiKey={process.env.REACT_APP_XLIT_APIKEY}
                   lang={stdTranscriptionSettings.targetlang}
                   value={stdTranscription}
                   onChange={(e) => {
@@ -682,6 +710,26 @@ const AllAudioTranscriptionLandingPage = () => {
         </Grid>
 
         <Grid md={6} xs={12} sx={{ width: "100%" }}>
+
+          {ProjectDetails && ProjectDetails?.data?.project_type === "StandardizedTranscriptionEditing" ? 
+          <>
+          <StandarisedisedTranscriptionEditing
+            currentIndex={currentIndex}
+            AnnotationsTaskDetails={AnnotationsTaskDetails}
+            player={player}
+            ProjectDetails={ProjectDetails}
+            TaskDetails={taskData}
+            // stage={2}
+            handleStdTranscriptionSettings={setStdTranscriptionSettings}
+            advancedWaveformSettings={advancedWaveformSettings}
+            setAdvancedWaveformSettings={setAdvancedWaveformSettings}
+            waveSurfer={waveSurfer}
+            setWaveSurfer={setWaveSurfer}
+            annotationId={annotations[0]?.id}
+          /> 
+          </> 
+          :
+          <> 
           <TranscriptionRightPanel
             currentIndex={currentIndex}
             AnnotationsTaskDetails={AnnotationsTaskDetails}
@@ -696,6 +744,9 @@ const AllAudioTranscriptionLandingPage = () => {
             setWaveSurfer={setWaveSurfer}
             annotationId={annotations[0]?.id}
           />
+          </>
+          }
+         
         </Grid>
       </Grid>
 
@@ -704,7 +755,7 @@ const AllAudioTranscriptionLandingPage = () => {
         position="fixed"
         bottom={1}
       >
-        {waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} />}
+        {audioURL && (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} />)}
       </Grid>
     </>
   );

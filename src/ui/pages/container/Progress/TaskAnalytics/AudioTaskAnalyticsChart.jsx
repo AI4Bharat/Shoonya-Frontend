@@ -25,6 +25,7 @@ function AudioTaskAnalyticsChart(props) {
   const [totalTaskCount, setTotalTaskCount] = useState();
   const [totalAnnotationTasksCount, setTotalAnnotationTasksCount] = useState();
   const [totalReviewTasksCount, setTotalReviewTasksCount] = useState();
+  const [totalSuperCheckTasksCount, setTotalSuperCheckTasksCount] = useState();
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -37,18 +38,21 @@ function AudioTaskAnalyticsChart(props) {
 
     let allAnnotatorCumulativeTasksCount = 0;
     let allReviewCumulativeTasksCount = 0;
+    let allSuperCheckCumulativeTasksCount = 0;
     var languages;
     analyticsData?.map((element, index) => {
       allAnnotatorCumulativeTasksCount +=
         element.annotation_cumulative_tasks_count;
       allReviewCumulativeTasksCount += element.review_cumulative_tasks_count;
+      allSuperCheckCumulativeTasksCount += element.sup_cumulative_tasks_count;
       languages = element.languages;
     });
 
     setTotalAnnotationTasksCount(allAnnotatorCumulativeTasksCount);
     setTotalReviewTasksCount(allReviewCumulativeTasksCount);
+    setTotalSuperCheckTasksCount(allSuperCheckCumulativeTasksCount)
     setTotalTaskCount(
-      allAnnotatorCumulativeTasksCount + allReviewCumulativeTasksCount
+      allAnnotatorCumulativeTasksCount + allReviewCumulativeTasksCount+allSuperCheckCumulativeTasksCount
     );
   }, [analyticsData]);
 
@@ -68,19 +72,28 @@ function AudioTaskAnalyticsChart(props) {
               }`}
               <p style={{ color: "rgba(243, 156, 18 )" }}>
                 {`Annotation : ${
-                  payload[0].payload.diff_annotation_review
+                  payload[0].payload.diff_annotation
                     ? new Intl.NumberFormat("en").format(
-                        payload[0].payload.diff_annotation_review
+                        payload[0].payload.diff_annotation
                       )
                     : 0
                 }`}
                 <p style={{ color: "rgba(35, 155, 86 )" }}>{`Review : ${
-                  payload[0].payload.review_cumulative_tasks_count
+                  payload[0].payload.diff_rev
                     ? new Intl.NumberFormat("en").format(
-                        payload[0].payload.review_cumulative_tasks_count
+                        payload[0].payload.diff_rev
+                      )
+                    : 0
+                }`}
+                <p style={{ color: "#2C2799" }}>{`SuperCheck : ${
+                  payload[0].payload.sup_cumulative_tasks_count
+                    ? new Intl.NumberFormat("en").format(
+                        payload[0].payload.sup_cumulative_tasks_count
                       )
                     : 0
                 }`}</p>
+                </p>
+
               </p>
             </p>
           </p>
@@ -97,7 +110,7 @@ function AudioTaskAnalyticsChart(props) {
         <Typography variant="h2" style={{marginBottom:"35px"}} className={classes.heading}>
           {`Tasks Dashboard - ${analyticsData[0].projectType}`}
           <Typography variant="body1">
-            Count of Annotated and Reviewed Audio Data
+            Count of Annotated , Reviewed  and  SuperChecked  Audio Data
           </Typography>
         </Typography>
        
@@ -116,7 +129,7 @@ function AudioTaskAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-                Total Tasks Count
+              Total Annotated Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalTaskCount &&
@@ -125,7 +138,7 @@ function AudioTaskAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Total Audio Files Annotated
+              Pending Review Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalAnnotationTasksCount &&
@@ -134,11 +147,20 @@ function AudioTaskAnalyticsChart(props) {
             </Box>
             <Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
-              Total quality/ reviewed audio files
+              Pending SuperCheck Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
                 {totalReviewTasksCount &&
                   new Intl.NumberFormat("en").format(totalReviewTasksCount)}
+              </Typography>
+            </Box>
+            <Box className={classes.topBarInnerBox}>
+              <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
+                SuperCheck Completed Tasks
+              </Typography>
+              <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
+                {totalReviewTasksCount &&
+                  new Intl.NumberFormat("en").format(totalSuperCheckTasksCount)}
               </Typography>
             </Box>
           </Box>
@@ -204,7 +226,14 @@ function AudioTaskAnalyticsChart(props) {
               />
               <Legend verticalAlign="top" />
               <Bar
-                dataKey="review_cumulative_tasks_count"
+                dataKey="sup_cumulative_tasks_count"
+                barSize={30}
+                name="Supercheck"
+                stackId="a"
+                fill="#2C2799"
+              />
+              <Bar
+                dataKey="diff_rev"
                 barSize={30}
                 name="Review"
                 stackId="a"
@@ -212,7 +241,7 @@ function AudioTaskAnalyticsChart(props) {
                 cursor="pointer"
               />
               <Bar
-                dataKey="diff_annotation_review"
+                dataKey="diff_annotation"
                 barSize={30}
                 name="Annotation"
                 stackId="a"

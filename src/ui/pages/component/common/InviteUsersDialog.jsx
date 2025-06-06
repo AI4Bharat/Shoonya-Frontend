@@ -44,14 +44,25 @@ const InviteUsersDialog = ({
   btn,
   setbtn,
   value,
-  setvalue
+  setvalue,
+  popUpLabel,
 }) => {
 
 
   
   const classes = DatasetStyle();
 
+  const [inputValue, setInputValue] = useState("");
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " " || event.key === ",") {
+      event.preventDefault();
+      if (inputValue.trim()) {
+        setSelectedUsers((prev) => [...prev, inputValue.trim()]);
+        setInputValue("");
+      }
+    }
+  };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -91,7 +102,7 @@ const InviteUsersDialog = ({
 
   return (
     <Dialog open={isOpen} onClose={dialogCloseHandler} close>
-      <DialogTitle style={{ paddingBottom: 0 }}>Invite users to organization</DialogTitle>
+      <DialogTitle style={{ paddingBottom: 0 }}>{popUpLabel ? popUpLabel : "Invite users to organization" } </DialogTitle>
       <DialogContent >
         <Stack direction="row">
           {btn?<Autocomplete
@@ -102,6 +113,8 @@ const InviteUsersDialog = ({
                 freeSolo
                 value={selectedUsers}
                 onChange={(e, newVal) => setSelectedUsers(newVal)}
+                inputValue={inputValue}
+                onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
                 renderTags={(value, getTagProps) =>
                 value?.map((option, index) => (
                     <Chip
@@ -122,6 +135,15 @@ const InviteUsersDialog = ({
                 placeholder="Email ids"
                 defaultValue=" "
                 value={selectedEmails.join(",")}
+                sx={{
+                  '& .MuiInputLabel-root': {
+                    fontSize: '0.93rem', 
+                    zIndex: 100,
+                  },
+                  minWidth: "350px",
+                  maxWidth: "450px"
+
+                }}
               />
             )
             }
@@ -134,6 +156,9 @@ const InviteUsersDialog = ({
                 freeSolo
                 value={selectedUsers}
                 onChange={(e, newVal) => setSelectedUsers(newVal)}
+                inputValue={inputValue}
+            onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
+            onKeyDown={handleKeyDown}
                 renderTags={(value, getTagProps) =>
                 value?.map((option, index) => (
                     <Chip
@@ -151,6 +176,15 @@ const InviteUsersDialog = ({
                       variant="outlined"
                       label="Enter email ids of users to invite"
                       placeholder="Email ids"
+                      sx={{
+                        '& .MuiInputLabel-root': {
+                          fontSize: '0.93rem', 
+                          zIndex: 100,
+                        },
+                        minWidth: "350px",
+                        maxWidth: "450px"
+
+                      }}
             
                   />
                   )}
