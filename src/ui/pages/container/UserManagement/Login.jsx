@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import CustomButton from "../../component/common/Button";
@@ -23,10 +24,17 @@ import Logo from "../../../../assets/logo.svg";
 import AppInfo from "./AppInfo";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LoginStyle from "../../../styles/loginStyle";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import FetchLoggedInUserDataAPI from "../../../../redux/actions/api/UserManagement/FetchLoggedInUserData";
+
 
 
 const Login = () => {
   const classes = LoginStyle();
+  const dispatch = useDispatch();
+  const accessToken = localStorage.getItem("shoonya_access_token");
+  const refreshToken = localStorage.getItem("shoonya_refresh_token");
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -39,9 +47,16 @@ const Login = () => {
     message: "",
     variant: "success",
   });
-
   const [isPressed, setIsPressed] = useState(false);
-  
+
+  const loggedInUserData = useSelector(
+    (state) => state.fetchLoggedInUserData.data
+  );
+  const getLoggedInUserData = () => {
+    const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
+    dispatch(APITransport(loggedInUserObj));
+  };
+
   const keyPress = (e) => {
     if (e.code === "Enter") {
       if (!isPressed) {
@@ -54,7 +69,7 @@ const Login = () => {
   const keyRelease = () => {
     setIsPressed(false);
   };
-  
+  console.log(userRole.Annotator === loggedInUserData?.role, "userroles")
   useEffect(() => {
     window.addEventListener("keydown", keyPress);
     window.addEventListener("keyup", keyRelease);
@@ -64,42 +79,91 @@ const Login = () => {
     }
   }, [keyPress, keyRelease]);
 
+  // useEffect(() => {
+  //   if(localStorage.getItem("shoonya_access_token") && localStorage.getItem("shoonya_refresh_token") && userRole.Admin === loggedInUserData?.role) {
+  //     navigate("/admin");
+  //     console.log("admin" ,"projectsprojectsprojectsprojects")
+  //   }else{
+  //     navigate("/projects");
+  //     console.log("projects","projectsprojectsprojectsprojects")
+  //   }
+  // }, [loggedInUserData]);
+
   useEffect(() => {
-    if(localStorage.getItem("shoonya_access_token") && localStorage.getItem("shoonya_refresh_token")) {
+    if (loggedInUserData && accessToken && refreshToken) {
       navigate("/projects");
     }
-  }, []);
+  }, [loggedInUserData]);
 
-  const createToken = () => {
-    const apiObj = new LoginAPI(credentials.email, credentials.password);
-    fetch(apiObj.apiEndPoint(), {
+  // const createToken = () => {
+  //   const apiObj = new LoginAPI(credentials.email.toLowerCase() , credentials.password);
+  //   fetch(apiObj.apiEndPoint(), {
+  //     method: "POST",
+  //     body: JSON.stringify(apiObj.getBody()),
+  //     headers: apiObj.getHeaders().headers,
+  //   })
+  //     .then(async (res) => {
+  //       const rsp_data = await res.json();
+  //       console.log(rsp_data);
+  //       if (!res.ok) {
+  //         // return Promise.reject('');
+  //         // let errorObj =
+  //         console.log("res -", res);
+  //         setSnackbarInfo({
+  //           open: true,
+  //           variant: "error",
+  //           // message: "Username or Password incorrect.",
+  //           message: rsp_data.detail
+
+  //         });
+  //       } else {
+  //         localStorage.setItem("shoonya_access_token", rsp_data.access);
+  //         localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
+  //         getLoggedInUserData()
+  //         if(userRole.Admin === loggedInUserData?.role){
+  //           navigate("/admin");
+  //         }else{
+  //           navigate("/projects");
+  //         }
+
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setSnackbarInfo({ open: true, variant: "error", message: error });
+  //     });
+  // };
+
+
+  const createToken = async () => {
+    // setLoading(true);
+
+    const apiObj = new LoginAPI(credentials.email.toLowerCase(), credentials.password);
+    const res = await fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
       headers: apiObj.getHeaders().headers,
-    })
-      .then(async (res) => {
-        const rsp_data = await res.json();
-        console.log(rsp_data);
-        if (!res.ok) {
-          // return Promise.reject('');
-          // let errorObj =
-          console.log("res -", res);
-          setSnackbarInfo({
-            open: true,
-            variant: "error",
-            // message: "Username or Password incorrect.",
-            message: rsp_data.detail
+    });
 
-          });
-        } else {
-          localStorage.setItem("shoonya_access_token", rsp_data.access);
-          localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
-          navigate("/projects");
-        }
+    const rsp_data = await res.json();
+    // console.log(rsp_data)
+    if (res.ok) {
+      // localStorage.setItem("token", resp.access);
+      // localStorage.setItem("user_id", rsp_data.user_id);
+      localStorage.setItem("shoonya_access_token", rsp_data.access);
+      localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
+      localStorage.setItem("email_id", credentials.email.toLowerCase());
+      localStorage.setItem("userCustomTranscriptionSettings", JSON.stringify({}))
+      getLoggedInUserData();
+      // setLoading(false);
+    } else{
+      setSnackbarInfo({
+        open: true,
+        message: rsp_data?.message,
+        variant: "error",
       })
-      .catch((error) => {
-        setSnackbarInfo({ open: true, variant: "error", message: error });
-      });
+    }
+
+    // setLoading(false);
   };
 
   const handleFieldChange = (event) => {
@@ -166,7 +230,7 @@ const Login = () => {
   };
   const renderCardContent = () => (
     <CustomCard title={"Sign in to Shoonya"} cardContent={TextFields()}>
-      <Grid container spacing={2} style={{ width: "100%" }}>
+      <Grid container spacing={2} style={{ width: "100%" ,cursor: "pointer"}}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} textAlign={"right"}>
           <Link onClick={() => navigate("/forgot-password")}>
             {translate("forgotPassword")}
@@ -193,7 +257,7 @@ const Login = () => {
     </CustomCard>
   );
 
-  
+
 
   const renderSnackBar = () => {
     return (
@@ -228,7 +292,7 @@ const Login = () => {
           </form>
         </Grid>
         {renderSnackBar()}
-       
+
       </Grid>
     </ThemeProvider>
   );

@@ -1,3 +1,4 @@
+
 import { Grid, ThemeProvider, Typography, Autocomplete, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
@@ -16,6 +17,8 @@ import Spinner from "../common/Spinner";
 
 
 const BasicSettings = (props) => {
+    const {ProjectDetails } = props;
+
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
@@ -33,22 +36,10 @@ const BasicSettings = (props) => {
     const classes = DatasetStyle();
     const dispatch = useDispatch();
     const apiLoading = useSelector(state => state.apiStatus.loading);
-    const ProjectDetails = useSelector(state => state.getProjectDetails.data);
-   
-    const getProjectDetails = () => {
-        const projectObj = new GetProjectDetailsAPI(id);
-        dispatch(APITransport(projectObj));
-    }
-
-
+  
 
     useEffect(() => {
-        getProjectDetails();
-    }, []);
-
-
-    useEffect(() => {
-        if (ProjectDetails.project_type === "MonolingualTranslation" ||ProjectDetails.project_type === "SemanticTextualSimilarity" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing") {
+        if (ProjectDetails.project_type === "MonolingualTranslation" ||ProjectDetails.project_type === "SemanticTextualSimilarity" || ProjectDetails.project_type === "TranslationEditing" || ProjectDetails.project_type === "ContextualTranslationEditing"|| ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing") {
             getLanguageChoices();
             setShowLanguage(true);
         }
@@ -274,7 +265,7 @@ const BasicSettings = (props) => {
                                 mt: 2
                             }}
                         >
-                            {ProjectDetails.project_type !== "ContextualSentenceVerification" &&
+                            {ProjectDetails.project_type !== "ContextualSentenceVerification"||ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing" &&
                             <>
                                 <Grid
                                     items
@@ -331,7 +322,7 @@ const BasicSettings = (props) => {
                                 xl={2}
                             >
                                 <Typography variant="body2" fontWeight='700' label="Required">
-                                    Target Language
+                                {ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing"?  "Language" :"Target Language"}
                                 </Typography>
                             </Grid>
                             <Grid
@@ -351,7 +342,7 @@ const BasicSettings = (props) => {
                                         <TextField
                                             {...params}
                                             inputProps={{ ...params.inputProps, style: { fontSize: "14px" } }}
-                                            placeholder="Enter target language"
+                                            placeholder={ProjectDetails.project_type==="SingleSpeakerAudioTranscriptionEditing" ?"Enter language":"Enter target language"}
                                         />
                                     )}
                                 />

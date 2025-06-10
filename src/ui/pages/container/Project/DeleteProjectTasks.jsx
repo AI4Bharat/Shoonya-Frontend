@@ -4,8 +4,11 @@ import {
     Popover,
     Box,
     TextField,
-    Grid, Typography, Dialog, DialogActions, DialogContent, DialogContentText,
+    Grid, Typography,Radio, Dialog, DialogActions, DialogContent, DialogContentText,
 } from "@mui/material";
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import DeleteProjectTasksAPI from "../../../../redux/actions/api/ProjectDetails/DeleteProjectTasks";
@@ -13,7 +16,8 @@ import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
-
+import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 export default function DeleteProjectTasks() {
     const classes = DatasetStyle();
@@ -24,11 +28,17 @@ export default function DeleteProjectTasks() {
     const [projectTaskEndId, setProjectTaskEndId] = useState("");
     const [loading, setLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
+    const [radiobutton, setRadiobutton] = useState(true)
+    const [dataIds, setDataIds] = useState("")
     const [snackbar, setSnackbarInfo] = useState({
         open: false,
         message: "",
         variant: "success",
     });
+    const loggedInUserData = useSelector(
+        (state) => state.fetchLoggedInUserData.data
+      );
+    
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -45,17 +55,47 @@ export default function DeleteProjectTasks() {
         setProjectTaskEndId();
     };
 
+    const handleDeletebyids = () => {
+        setRadiobutton(true)
+
+    }
+    const handleDeletebyrange = () => {
+        setRadiobutton(false)
+    }
+    const handledataIds = (e,) => {
+        setDataIds(e.target.value);
+
+
+    }
+
+    let datasetitem = dataIds.split(",")
+    var value = datasetitem.map(function (str) {
+        return parseInt(str);
+    });
+
     const handleok = async() => {
         setOpenDialog(false);
         setAnchorEl(null);
         setProjectTaskStartId();
         setProjectTaskEndId();
-
-        const DeleteDataItems = {
+        let projectObj
+        const ProjectTaskStartAndEndID = {
             project_task_start_id: parseInt(projectTaskStartId),
             project_task_end_id: parseInt(projectTaskEndId)
         }
-        const projectObj = new DeleteProjectTasksAPI(id, DeleteDataItems)
+        
+
+        const  ProjectTaskIDs = {
+            project_task_ids: value
+        }
+
+        if (radiobutton === true) {
+             projectObj = new DeleteProjectTasksAPI(id, ProjectTaskStartAndEndID)
+
+
+        } else {
+             projectObj = new DeleteProjectTasksAPI(id, ProjectTaskIDs)
+        }
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
             body: JSON.stringify(projectObj.getBody()),
@@ -102,23 +142,42 @@ export default function DeleteProjectTasks() {
         );
     };
 
+    const emailId = localStorage.getItem("email_id");
+    const [password, setPassword] = useState("");
+    const handleConfirm = async () => {
+      const apiObj = new LoginAPI(emailId, password);
+        const res = await fetch(apiObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(apiObj.getBody()),
+        headers: apiObj.getHeaders().headers,
+        });
+        const rsp_data = await res.json();
+        if (res.ok) {
+        handleok();
+        }else{
+        window.alert("Invalid credentials, please try again");
+        console.log(rsp_data);
+        }
+    };
+
     return (
         <div >
             {renderSnackBar()}
-            <Button
+            {userRole.Admin === loggedInUserData?.role ?<Button
                 sx={{
                     inlineSize: "max-content",
                     p: 2,
                     borderRadius: 3,
                     ml: 2,
-                    mb: 2,
                     width: "300px"
                 }}
                 aria-describedby={Id}
                 variant="contained"
-                onClick={handleClick}>
+                onClick={handleClick}
+                // disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
+                color="error">
                 Delete Project Tasks
-            </Button>
+            </Button>:null}
 
             <Popover
                 Id={Id}
@@ -130,6 +189,27 @@ export default function DeleteProjectTasks() {
                     horizontal: 'left',
                 }}
             >
+
+                  <Grid container className={classes.root} >
+                    <Grid item style={{ flexGrow: "1", padding: "10px" }}>
+                        <FormControl >
+                            <RadioGroup
+                                row
+                                aria-labelledby="demo-row-radio-buttons-group-label"
+                                name="row-radio-buttons-group"
+                                defaultValue="deletebyrange"
+
+                            >
+
+                                <FormControlLabel value="deletebyrange" control={<Radio />} label="Delete by Range" onClick={handleDeletebyids} />
+                                <FormControlLabel value="deletebyids" control={<Radio />} label="Delete by IDs" onClick={handleDeletebyrange} />
+
+                            </RadioGroup>
+                        </FormControl>
+                    </Grid>
+                </Grid>
+              {radiobutton === true &&
+              <>
                 <Grid
                     container
                     direction='row'
@@ -213,7 +293,54 @@ export default function DeleteProjectTasks() {
                             }}
                         />
                     </Grid>
+   
                 </Grid>
+                </>}
+                {radiobutton === false &&
+                    <Grid
+                        container
+                        direction='row'
+                        sx={{
+                            alignItems: "center",
+                            p: 1
+                        }}
+                    >
+                        <Grid
+                            items
+                            xs={12}
+                            sm={12}
+                            md={12}
+                            lg={5}
+                            xl={5}
+                        >
+                            <Typography variant="body2" fontWeight='700' label="Required">
+                            Project Task IDs:
+                            </Typography>
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                            md={12}
+                            lg={6}
+                            xl={6}
+                            sm={6}
+                        >
+
+                            <TextField
+                                size="small"
+                                variant="outlined"
+                                value={dataIds}
+                                onChange={handledataIds}
+                                inputProps={{
+                                    style: {
+                                        fontSize: "16px"
+                                    }
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                }
+
                 <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, p: 1 }}>
                     <Button
                         onClick={handleClearSearch}
@@ -246,22 +373,32 @@ export default function DeleteProjectTasks() {
                 <DialogContent>
 
                     <DialogContentText id="alert-dialog-description">
-                    Are you you want to delete these tasks? Please note this action cannot be undone.
+                    Are you  sure want to delete these tasks? Please note this action cannot be undone.
                     </DialogContentText>
+                    <TextField
+                            autoFocus
+                            margin="dense"
+                            id="password"
+                            label="Password"
+                            type="password"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}
                         variant="outlined"
-                        color="primary"
+                        color="error"
                         size="small"
-                        className={classes.clearAllBtn} > {" "}
-                        {translate("button.clear")}
+                        className={classes.clearAllBtn} >
+                            Cancel
                     </Button>
-                    <Button onClick={handleok}
+                    <Button onClick={handleConfirm}
                         variant="contained"
-                        color="primary"
+                        color="error"
                         size="small" className={classes.clearAllBtn} autoFocus >
-                        Ok
+                        Confirm
                     </Button>
                 </DialogActions>
             </Dialog>

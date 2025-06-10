@@ -6,7 +6,6 @@ const fetchProject = async (projectID) => {
     return response.data;
   } catch (err) {
     return err;
-    // message.error("Error fetching projects");
   }
 };
 
@@ -16,7 +15,6 @@ const fetchTask = async (taskID) => {
     return response.data;
   } catch (err) {
     return err;
-    // message.error("Error fetching tasks");
   }
 };
 
@@ -26,7 +24,6 @@ const fetchPrediction = async (taskID) => {
     return response.data;
   } catch (err) {
     return err;
-    // message.error("Error fetching predictions");
   }
 };
 
@@ -36,33 +33,73 @@ const fetchAnnotation = async (taskID) => {
     return response.data;
   } catch (err) {
     return err;
-    // message.error("Error fetching annotations");
   }
 };
 
-const postAnnotation = async (result, task, completed_by, load_time, lead_time, task_status, notes) => {
-  try {
-    await axiosInstance.post(`/annotation/`, {
-      result: result,
-      task: task,
-      completed_by: completed_by,
-      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-      task_status: task_status,
-      annotation_notes: notes
+
+const fetchTransliteration = async (sourceText,tgtLng) => {
+  const url = `https://xlit-api.ai4bharat.org/rt/${encodeURIComponent(tgtLng)}/${encodeURIComponent(sourceText)}`;  
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
     },
-    )
-    .then((res)=> {
-    if(res.status !== 201){
-      // message.error(res.data.message)
-    }
-  })
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return {
+    timestamp: data.at,
+    error: data.error,
+    input: data.input,
+    romanised_transliteration: data.result.join(", "), // Assuming result is always an array; join elements for a single string output
+    success: data.success
+  };
+};
+
+const postAnnotation = async (
+  result,
+  task,
+  completed_by,
+  load_time,
+  lead_time,
+  annotation_status,
+  notes
+) => {
+  try { 
+    
+    await axiosInstance
+      .post(`/annotation/`, {
+        result: result,
+        task: task,
+        completed_by: completed_by,
+        lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+        annotation_status: annotation_status,
+        annotation_notes: notes,
+      })
+      .then((res) => {
+        if (res.status !== 201) {
+          // message.error("Error creating annotation.");
+        }
+      });
   } catch (err) {
     return err;
-    // message.error("Error submitting annotations");
   }
 };
 
-const postReview = async (result, task, completed_by, parentAnnotation, load_time, lead_time, review_status, annotation_notes, review_notes) => {
+const postReview = async (
+  result,
+  task,
+  completed_by,
+  parentAnnotation,
+  load_time,
+  lead_time,
+  review_status,
+  annotation_notes,
+  review_notes
+) => {
   try {
     await axiosInstance.post(`/annotation/`, {
       result: result,
@@ -70,93 +107,177 @@ const postReview = async (result, task, completed_by, parentAnnotation, load_tim
       completed_by: completed_by,
       parent_annotation: parentAnnotation,
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-      review_status: review_status,
+      annotation_status: review_status,
       annotation_notes: annotation_notes,
-      review_notes: review_notes,
-      mode: "review"
+      review_notes:review_notes,
+      mode: "review",
     });
   } catch (err) {
     return err;
-    // message.error("Error updating annotations");
   }
 };
 
-const patchAnnotation = async (result, annotationID, load_time, lead_time, task_status, notes) => {
+
+
+
+const patchAnnotation = async (
+  taskId,
+  result,
+  annotationID,
+  load_time,
+  lead_time,
+  annotation_status,
+  notes,
+  autoSave=false,
+  languages,
+  ocr_domain
+) => {
   try {
-    await axiosInstance.patch(`/annotation/${annotationID}/`, {
-      result: result,
-      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
-      task_status: task_status,
-      annotation_notes: notes
+    const res = await axiosInstance.patch(`/annotation/${annotationID}/`, {
+      ...(annotation_status !== "skipped" && { result: result }),
+      ...(annotation_status && {
+        lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+        annotation_status: annotation_status,
+      }),
+      task_id: taskId,
+      annotation_notes: notes,
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
+      ...(autoSave && { auto_save: true }),
     });
+    return res;
   } catch (err) {
     return err;
-    // message.error("Error updating annotations");
   }
 };
 
-const patchReview = async (result, annotationID, parentAnnotation, load_time, lead_time, review_status, review_notes) => {
+const patchReview = async (
+  taskId,
+  annotationID,
+  load_time,
+  lead_time,
+  review_status,
+  result,
+  parentAnnotation,
+  reviewnotes,
+  autoSave=false,
+  languages,
+  ocr_domain
+) => {
   try {
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
-      result: result,
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status: review_status,
+      result: result,
+      task_id: taskId,
+      review_notes: reviewnotes,
+      ...((review_status === "to_be_revised" ||
+        review_status === "accepted" ||
+        review_status === "accepted_with_minor_changes" ||
+        review_status === "accepted_with_major_changes") && {
+        lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+        annotation_status: review_status,
+        result: result,
+        parent_annotation: parentAnnotation,
+        review_notes: reviewnotes,
+      }),
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
+      ...(autoSave && { auto_save: true }),
+    });
+    // if (review_status === "to_be_revised") {
+    //   await axiosInstance.patch(`/annotation/${parentAnnotation}/`, {
+    //     annotation_status: review_status,
+    //   });
+    // }
+  } catch (err) {
+    return err;
+  }
+};
+
+
+const patchSuperChecker = async (
+  taskId,
+  annotationID,
+  load_time,
+  lead_time,
+  review_status,
+  result,
+  parentAnnotation,
+  superchecknotes,
+  autoSave=false,
+  languages,
+  ocr_domain
+) => {
+  console.log(superchecknotes,"superchecknotes")
+  try {
+    await axiosInstance.patch(`/annotation/${annotationID}/`, {
+      lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
+      annotation_status: review_status,
+      task_id: taskId,
+      result: result,
       parent_annotation: parentAnnotation,
-      review_status: review_status,
-      // annotation_notes: annotation_notes,
-      review_notes: review_notes,
-      mode: "review"
+      supercheck_notes: superchecknotes,
+      ...(languages && {languages: languages.current}),
+      ...(ocr_domain && {ocr_domain: ocr_domain.current}),
+      ...(autoSave && { auto_save: true }),
     });
+   
   } catch (err) {
     return err;
-    // message.error("Error updating annotations");
   }
-}
+};
+
+
+
 
 const deleteAnnotation = async (annotationID) => {
   try {
     await axiosInstance.delete(`/annotation/${annotationID}/`);
   } catch (err) {
     return err;
-    // message.error("Error deleting annotations");
   }
 };
 
-const updateTask = async (taskID) => {
-  try {
-    let response = await axiosInstance.patch(`/task/${taskID}/`, {
-      task_status: "skipped",
-    });
-    return response.data;
-  } catch (err) {
-    return err;
-    // message.error("Error skipping task.");
-  }
-};
-
-const getNextProject = async (projectID, taskID, mode="annotation") => {
+const getNextProject = async (projectID, taskID, mode = "annotation") => {
   try {
     let labellingMode = localStorage.getItem("labellingMode");
     let searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
-    let requestUrl = `/projects/${projectID}/next/?current_task_id=${taskID}${mode === "review" ? `&mode=review` : ""}`;
-    if (localStorage.getItem("labelAll")) {
-      requestUrl += labellingMode ? `&task_status=${labellingMode}` : ""
-      Object.keys(searchFilters)?.forEach(key => {
-        requestUrl += `&${key}=${this.searchFilters[key]}`;
-      });
+    let requestUrl = `/projects/${projectID}/next/`;
+    //  if (localStorage.getItem("labelAll")) {
+    //   //requestUrl += labellingMode ? `?task_status=${labellingMode}` : ""
+    //   Object?.keys(searchFilters)?.forEach(key => {
+    //     requestUrl += `&${key}=${this.searchFilters[key]}`;
+    //   });
+    // }
+    for (let key in searchFilters) {
+      if (searchFilters[key] && localStorage.getItem("labelAll")) {
+        requestUrl += `?${key}=${searchFilters[key]}`;
+      }
     }
     let response = await axiosInstance.post(requestUrl, {
       id: projectID,
+      current_task_id: taskID,
+      ...(mode === "annotation" && {
+        mode: "annotation",
+        annotation_status: labellingMode,
+      }),
+      ...(mode === "review" && {
+        mode: "review",
+        annotation_status: labellingMode,
+      }),
+      ...(mode === "supercheck" && {
+        mode: "supercheck",
+        annotation_status: labellingMode,
+      }),
     });
     if (response.status === 204) {
-      // message.info("No more tasks for this project.");
-    }
-    else {
+      // message.error("Error getting next task.");
+    } else {
       return response.data;
     }
-  }
-  catch (err) {
-    // message.error("Error getting next task.");
-    return err
+  } catch (err) {
+    return err;
   }
 };
 
@@ -168,15 +289,15 @@ const getProjectsandTasks = async (projectID, taskID) => {
     fetchPrediction(taskID),
   ]);
 };
-
 export {
   getProjectsandTasks,
   postAnnotation,
-  updateTask,
   getNextProject,
   patchAnnotation,
   deleteAnnotation,
   fetchAnnotation,
+  fetchTransliteration,
   postReview,
   patchReview,
+  patchSuperChecker,
 };

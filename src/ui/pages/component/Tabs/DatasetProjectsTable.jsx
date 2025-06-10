@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import CustomButton from "../common/Button";
+import GetPullNewDataAPI from "../../../../redux/actions/api/ProjectDetails/PullNewData";
 import CustomizedSnackbars from "../../component/common/Snackbar"
 import Spinner from "../../component/common/Spinner";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import GetDatasetProjects from "../../../../redux/actions/api/Dataset/GetDatasetProjects";
 import GetExportProjectButtonAPI from '../../../../redux/actions/api/ProjectDetails/GetExportProject';
 import MUIDataTable from "mui-datatables";
+import Search from "../../component/common/Search";
+
 
 import { Grid, Stack, ThemeProvider } from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
+import { width } from "@mui/system";
+import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 const columns = [
 	{
@@ -21,7 +26,7 @@ const columns = [
 			filter: false,
 			sort: false,
 			align: "center",
-			setCellHeaderProps: sort => ({ style: { height: "70px",  padding: "16px" } }),
+			setCellHeaderProps: sort => ({ style: { height: "70px", padding: "16px" } }),
 		},
 	},
 	{
@@ -71,6 +76,7 @@ const columns = [
 	},
 ];
 
+
 const options = {
 	filterType: "checkbox",
 	selectableRows: "none",
@@ -84,11 +90,14 @@ const options = {
 
 export default function DatasetProjectsTable({ datasetId }) {
 	const dispatch = useDispatch();
+	const datasetProjects = useSelector((state) =>
+		state.getDatasetProjects.data);
+
 	const [snackbar, setSnackbarInfo] = useState({
 		open: false,
 		message: "",
 		variant: "success",
-	});	
+	});
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
@@ -101,44 +110,94 @@ export default function DatasetProjectsTable({ datasetId }) {
 			new GetExportProjectButtonAPI(project.id, project.dataset_id[0]) : new GetExportProjectButtonAPI(project.id);
 		dispatch(APITransport(projectObj));
 		const res = await fetch(projectObj.apiEndPoint(), {
-				method: "POST",
-				body: JSON.stringify(projectObj.getBody()),
-				headers: projectObj.getHeaders().headers,
+			method: "POST",
+			body: JSON.stringify(projectObj.getBody()),
+			headers: projectObj.getHeaders().headers,
 		});
 		const resp = await res.json();
 		setLoading(false);
 		if (res.ok) {
-				setSnackbarInfo({
-						open: true,
-						message: resp?.message,
-						variant: "success",
-				})
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "success",
+			})
 
 		} else {
-				setSnackbarInfo({
-						open: true,
-						message: resp?.message,
-						variant: "error",
-				})
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "error",
+			})
 		}
 	}
+	const SearchWorkspaceMembers = useSelector(
+		(state) => state.SearchProjectCards.data
+	  );
+  const pageSearch = () => {
+    return datasetProjects.filter((el) => {
+      if (SearchWorkspaceMembers == "") {
+        return el;
+      } else if (
+        el.title
+          ?.toLowerCase()
+          .includes(SearchWorkspaceMembers?.toLowerCase())
+      ) {
+		
+        return el;
+	  }
+    //   } else if (
+    //     el.email?.toLowerCase().includes(SearchWorkspaceMembers?.toLowerCase())
+    //   ) {
+    //     return el;
+    //   }
+    });
+  };
 
+
+
+	const getPullNewDataAPI = async (project) => {
+		const projectObj = new GetPullNewDataAPI(project.id);
+		//dispatch(APITransport(projectObj));
+		const res = await fetch(projectObj.apiEndPoint(), {
+			method: "POST",
+			body: JSON.stringify(projectObj.getBody()),
+			headers: projectObj.getHeaders().headers,
+		});
+		const resp = await res.json();
+		setLoading(false);
+		if (res.ok) {
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "success",
+			});
+		} else {
+			setSnackbarInfo({
+				open: true,
+				message: resp?.message,
+				variant: "error",
+			});
+		}
+	};
+	const loggedInUserData = useSelector(
+        (state) => state.fetchLoggedInUserData.data
+      );
 	const renderSnackBar = () => {
 		return (
-				<CustomizedSnackbars
-						open={snackbar.open}
-						handleClose={() =>
-								setSnackbarInfo({ open: false, message: "", variant: "" })
-						}
-						anchorOrigin={{ vertical: "top", horizontal: "right" }}
-						variant={snackbar.variant}
-						message={snackbar.message}
-				/>
+			<CustomizedSnackbars
+				open={snackbar.open}
+				handleClose={() =>
+					setSnackbarInfo({ open: false, message: "", variant: "" })
+				}
+				anchorOrigin={{ vertical: "top", horizontal: "right" }}
+				variant={snackbar.variant}
+				message={snackbar.message}
+			/>
 		);
 	};
 
-	const datasetProjects = useSelector((state) =>
-		state.getDatasetProjects.data.map((project) => ({
+	const data = datasetProjects? pageSearch().map((project) => ({
 			...project,
 			actions: () => (
 				<Stack direction="row" spacing={2}>
@@ -148,23 +207,27 @@ export default function DatasetProjectsTable({ datasetId }) {
 					>
 						<CustomButton sx={{ borderRadius: 2 }} label="View" />
 					</Link>
-					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getExportProjectButton(project)} label="Export" />
+					{userRole.Admin === loggedInUserData?.role ?<CustomButton sx={{ borderRadius: 2, height: 37 }} onClick={() => getExportProjectButton(project)} label="Export" />:null}
+					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" />
 				</Stack>
 			),
-		}))
-	);
+		})):[]
+    // )
 
 	return (
 		<>
 			<ThemeProvider theme={tableTheme}>
 				{loading && <Spinner />}
 				<Grid>
-						{renderSnackBar()}
+					{renderSnackBar()}
+				</Grid>
+				<Grid sx={{ mb: 1 }}>
+					<Search />
 				</Grid>
 				<MUIDataTable
 					columns={columns}
 					options={options}
-					data={datasetProjects}
+					data={data}
 				/>
 			</ThemeProvider>
 		</>

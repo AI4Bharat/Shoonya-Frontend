@@ -88,7 +88,7 @@ const themeDefault = createTheme({
       fontSize: "0.75rem",
       fontFamily: "'Roboto', sans-serif",
       fontWeight: "400",
-      color : "#3A3A3A"
+      color: "#3A3A3A"
     },
     subtitle1: {
       fontSize: "1.125rem",
@@ -172,7 +172,7 @@ const themeDefault = createTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: {
-            fontSize: "0.875rem",
+          fontSize: "0.875rem",
           "@media (max-width:670px)": {
             fontSize: "0.875rem",
           },
@@ -263,20 +263,20 @@ const themeDefault = createTheme({
         paper: { minWidth: "360px", minHeight: "116px" },
       },
     },
-    MuiAvatar : {
-        styleOverrides : {
-            root : {
-                backgroundColor : "#271e4f",
-                color : "#FFFFFF"
-            }
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#271e4f",
+          color: "#FFFFFF"
         }
+      }
     },
-    MuiIconButton : {
-        styleOverrides : {
-            root : {
-                borderRadius : "5%"
-            }
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: "5%"
         }
+      }
     },
     MuiAppBar: {
       styleOverrides: {
@@ -284,7 +284,7 @@ const themeDefault = createTheme({
           boxSizing: "border-box",
           margin: "-1px",
           padding: "0px",
-           backgroundImage: "linear-gradient(to right, #f1f1f1, #ffffff)",
+          backgroundImage: "linear-gradient(to right, #f1f1f1, #ffffff)",
         },
       },
     },
@@ -359,7 +359,7 @@ const themeDefault = createTheme({
           letterSpacing: "0px",
           fontFamily: "Roboto",
           padding: "0",
-          textTransform : "none",
+          textTransform: "none",
           marginRight: "28px",
           opacity: 1,
           color: "#3A3A3A",
@@ -466,6 +466,20 @@ const themeDefault = createTheme({
         }
       }
     },
+    MuiInputLabel: {
+      styleOverrides: {
+        sizeSmall: {
+          fontSize: "0.875rem",
+        }
+      }
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        inputRoot: {
+          fontSize: "0.875rem",
+        }
+      }
+    }
   },
 });
 

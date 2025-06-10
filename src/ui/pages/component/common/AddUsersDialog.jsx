@@ -23,6 +23,7 @@ import AssignManagerToWorkspaceAPI from "../../../../redux/actions/api/Workspace
 import GetWorkspacesAnnotatorsDataAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceAnnotators";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 import AddProjectReviewersAPI from "../../../../redux/actions/api/ProjectDetails/AddProjectReviewers";
+import AddProjectSuperCheckerAPI from "../../../../redux/actions/api/ProjectDetails/AddProjectSuperChecker";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CustomButton from "./Button";
 
@@ -31,12 +32,14 @@ const DialogHeading = {
   [addUserTypes.MANAGER]: 'Assign Manager',
   [addUserTypes.PROJECT_ANNOTATORS]: 'Add Project Annotators',
   [addUserTypes.PROJECT_REVIEWER]: 'Add Project Reviewers',
+  [addUserTypes.PROJECT_SUPERCHECKER]: 'Add Project SuperChecker',
 }
 
 // fetch all users in the current organization/workspace
 const fetchAllUsers = (userType, id, dispatch) => {
   switch (userType) {
     case addUserTypes.PROJECT_ANNOTATORS:
+      case addUserTypes.PROJECT_SUPERCHECKER:
     case addUserTypes.PROJECT_REVIEWER:
       const workspaceAnnotatorsObj = new GetWorkspacesAnnotatorsDataAPI(id);
       dispatch(APITransport(workspaceAnnotatorsObj));
@@ -69,17 +72,27 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
             (workspaceAnnotator) =>
               projectDetails?.annotation_reviewers.findIndex(
                 (projectUser) => projectUser?.id === workspaceAnnotator?.id
-              ) === -1
-          )
+              ) === -1   && workspaceAnnotator?.role != 1
+          ) 
           .map((user) => ({ id: user.id, email: user.email, username: user.username }));
         break;
+        case addUserTypes.PROJECT_SUPERCHECKER:
+          return workspaceAnnotators
+            .filter(
+              (workspaceAnnotator) =>
+                projectDetails?.review_supercheckers.findIndex(
+                  (projectUser) => projectUser?.id === workspaceAnnotator?.id
+                ) === -1   && (workspaceAnnotator?.role != 1 && workspaceAnnotator?.role != 2 ) 
+            ) 
+            .map((user) => ({ id: user.id, email: user.email, username: user.username }));
+          break;
     case addUserTypes.ANNOTATOR:
       return orgUsers
         ?.filter(
           (orgUser) =>
             workspaceAnnotators.findIndex(
               (annotator) => annotator?.id === orgUser?.id
-            ) === -1
+            ) === -1 
         )
         .map((user) => ({ email: user.email, username: user.username, id: user.id }));
       break;
@@ -88,9 +101,10 @@ const getAvailableUsers = (userType, projectDetails, workspaceAnnotators, worksp
         ?.filter(
           (orgUser) =>
             workspaceManagers.findIndex(
-              (manager) => manager?.id === orgUser?.id
-            ) === -1
+              (manager) =>  manager?.id === orgUser?.id
+            ) === -1  && orgUser?.role != 1 && orgUser?.role != 2 && orgUser?.role != 3
         )
+       
         .map((user) => ({ id: user.id, email: user.email, username: user.username }));
       break;
     default:
@@ -139,6 +153,25 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
           return reviewerRespData;
         }
         break;
+        case addUserTypes.PROJECT_SUPERCHECKER:
+        const addsuperCheckerObj = new AddProjectSuperCheckerAPI(
+          id,
+          users.map((user) => user.id),
+        );
+        const superCheckerRes = await fetch(addsuperCheckerObj.apiEndPoint(), {
+          method: "POST",
+          body: JSON.stringify(addsuperCheckerObj.getBody()),
+          headers: addsuperCheckerObj.getHeaders().headers,
+        });
+  
+        const superCheckerRespData = await superCheckerRes.json();
+  
+        if (superCheckerRes.ok) {
+          const projectObj = new GetProjectDetailsAPI(id);
+          dispatch(APITransport(projectObj));
+          return superCheckerRespData;
+        }
+        break;
 
     case addUserTypes.ANNOTATOR:
       const addAnnotatorsObj = new AddAnnotatorsToWorkspaceAPI(
@@ -163,7 +196,7 @@ const handleAddUsers = async (userType, users, id, dispatch) => {
     case addUserTypes.MANAGER:
       const addManagerObj = new AssignManagerToWorkspaceAPI(
         id,
-        [users.id],
+        users.map((user) => user.id),
       );
       const assignManagerRes = await fetch(addManagerObj.apiEndPoint(), {
         method: "POST",
@@ -191,7 +224,7 @@ const AddUsersDialog = ({
   id,
 }) => {
   const [availableUsers, setAvailableUsers] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState(userType === addUserTypes.MANAGER ? null : []);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const projectDetails = useSelector((state) => state.getProjectDetails?.data);
   const workspaceAnnotators = useSelector((state) => state.getWorkspacesAnnotatorsData?.data);
@@ -200,10 +233,12 @@ const AddUsersDialog = ({
   const orgUsers = useSelector((state) => state.getOrganizationUsers?.data);
   const dispatch = useDispatch();
 
+
   useEffect(() => {
     let id = '';
     switch (userType) {
       case addUserTypes.PROJECT_ANNOTATORS:
+        case addUserTypes.PROJECT_SUPERCHECKER:
       case addUserTypes.PROJECT_REVIEWER:
         id = projectDetails?.workspace_id;
         break;
@@ -216,10 +251,9 @@ const AddUsersDialog = ({
     }
     if (id) fetchAllUsers(userType, id, dispatch);
   }, [userType, id, projectDetails])
-
+ console.log(selectedUsers);
   useEffect(() => {
     setAvailableUsers(getAvailableUsers(userType, projectDetails, workspaceAnnotators, workspaceDetails?.managers, orgUsers));
-    console.log(getAvailableUsers(userType, projectDetails, workspaceAnnotators, orgUsers));
   }, [projectDetails, workspaceAnnotators, workspaceDetails, orgUsers])
 
   const addBtnClickHandler = async () => {
@@ -233,7 +267,6 @@ const AddUsersDialog = ({
   };
 
   const dialogCloseHandler = () => {
-    setSelectedUsers([]);
     handleDialogClose();
   };
 
@@ -245,7 +278,7 @@ const AddUsersDialog = ({
           Select users to be added.
         </DialogContentText>
         <Autocomplete
-          multiple={userType !== addUserTypes.MANAGER}
+          multiple
           limitTags={3}
           onChange={(e, newVal) => setSelectedUsers(newVal)}
           options={availableUsers}

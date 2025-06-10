@@ -29412,7 +29412,7 @@
      padding: 0;
      white-space: normal;
      word-break: break-all;
- }
+   }
  
  .ant-typography ins,
  .ant-typography u {
@@ -31438,7 +31438,7 @@
      top: 0;
      user-select: none;
      width: 100%;
-     z-index: 101
+     z-index: 1;
  }
  
  .lsf-topbar,
@@ -32610,7 +32610,7 @@
      box-shadow: 0 0 4px #d9d9d9;
      left: -1px;
      margin-top: 9px;
-     max-height: 60vh;
+     max-height: 30vh;
      max-width: 50vw;
      min-width: 100%;
      overflow-y: auto;
@@ -33053,6 +33053,7 @@
      height: 100%;
      min-width: 170px;
      padding: 10px 12px
+     
  }
  
  .lsf-entity-tab_bordered {
@@ -33818,11 +33819,13 @@
  
  .lsf-entity {
      margin-top: 12px;
-     padding: 0 15px
+     padding: 0 15px;
+    
  }
  
  .lsf-entity__info {
-     margin-bottom: 12px
+     margin-bottom: 12px;
+    
  }
  
  .list--2wbr2 {

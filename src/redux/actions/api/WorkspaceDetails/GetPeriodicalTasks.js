@@ -1,21 +1,20 @@
-/**
- * Enable Task Reviews API
- */
+
  import API from "../../../api";
  import ENDPOINTS from "../../../../config/apiendpoint";
  import constants from "../../../constants";
  
- export default class EnableTaskReviewsAPI extends API {
-   constructor(id, timeout = 2000) {
+ export default class WorkspacePeriodicalTasksAPI extends API {
+   constructor(wsId, progressObj, metaInfo, timeout = 2000) {
      super("POST", timeout, false);
-     this.type = constants.ENABLE_TASK_REVIEWS;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${id}/allow_task_reviews/`;
+     this.progressObj = progressObj;
+     this.type = constants.WS_PERODICAL_TASK;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${wsId}/periodical_tasks_count/${metaInfo ? "?metainfo=true" : ""}`;
    }
  
    processResponse(res) {
      super.processResponse(res);
      if (res) {
-       this.reviewRes = res;
+       this.wsPeriodicalTasks = res;
      }
    }
  
@@ -23,7 +22,9 @@
      return this.endpoint;
    }
  
-   getBody() {}
+   getBody() {
+     return this.progressObj;
+   }
  
    getHeaders() {
      this.headers = {
@@ -36,7 +37,7 @@
    }
  
    getPayload() {
-     return this.reviewRes;
+     return this.wsPeriodicalTasks;
    }
  }
  

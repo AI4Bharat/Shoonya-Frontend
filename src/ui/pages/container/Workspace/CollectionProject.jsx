@@ -118,12 +118,12 @@ import {
       const newProject = {
         title: title,
         description: description,
-        created_by: User.id,
+        created_by: User?.id,
         is_archived: false,
         is_published: false,
-        users: [User.id],
+        users: [User?.id],
         workspace_id: +id,
-        organization_id: User.organization.id,
+        organization_id: User?.organization?.id,
         project_type: selectedType,
         label_config: "string",
         variable_parameters: {},
@@ -174,7 +174,7 @@ import {
                 className={classes.projectsettingGrid}
               >
                 <Typography gutterBottom component="div" label="Required">
-                  Title:
+                  Title<span style={{ color: '#d93025' }}>*</span> :
                 </Typography>
               </Grid>
               <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -244,7 +244,7 @@ import {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a Project Type:
+                    Select a Project Type<span style={{ color: '#d93025' }}>*</span> :
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>

@@ -11,6 +11,7 @@ import Snackbar from "../../component/common/Snackbar";
 import UpdateEmailDialog from "../../component/common/UpdateEmailDialog"
 import UserMappedByRole from "../../../../utils/UserMappedByRole/UserMappedByRole";
 import {participationType} from '../../../../config/dropDownValues';
+import { MenuProps } from "../../../../utils/utils";
 
 const MyProfile = () => {
   const [newDetails, setNewDetails] = useState();
@@ -72,7 +73,7 @@ const MyProfile = () => {
 
   const handleUpdateEmail = () => {
     setEmailVerifyLoading(true);
-    const apiObj = new UpdateEmailAPI(email);
+    const apiObj = new UpdateEmailAPI(email.toLowerCase());
     fetch(apiObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(apiObj.getBody()),
@@ -186,7 +187,7 @@ const MyProfile = () => {
                 isOpen={showEmailDialog}
                 handleClose={handleEmailDialogClose}
                 oldEmail={userDetails.email}
-                newEmail={email}
+                newEmail={email?.toLowerCase()}
                 onSuccess={handleVerificationSuccess}
               />
             </Grid>
@@ -254,6 +255,7 @@ const MyProfile = () => {
                 value={newDetails?.languages? newDetails.languages : []}
                 onChange={handleFieldChange}
                 style={{zIndex: "0"}}
+                MenuProps={MenuProps}
                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

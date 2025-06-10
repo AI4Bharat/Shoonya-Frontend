@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Switch, TextField } from '@mui/material'
 import React, { useState } from 'react'
 import { useDispatch} from 'react-redux'
 import GetWorkspacesAPI from '../../../../redux/actions/api/Dashboard/GetWorkspaces'
@@ -14,6 +14,16 @@ const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
     const [workspaceName, setWorkspaceName] = useState('')
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+
+    const [publicanalytics,setpublicanalytics] = useState(true)
+   
+
+
+    const handlepublicanalytics = async () => {
+        // setLoading(true);
+        setpublicanalytics((publicanalytics)=>!publicanalytics)
+      };
+
     
    
     const addBtnClickHandler = async (event) => {
@@ -25,6 +35,7 @@ const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
         const createWorkspaceObj = new CreateWorkspaceAPI(
             orgId,
             workspaceName,
+            publicanalytics
         );
         const createWorkspaceRes = await fetch(createWorkspaceObj.apiEndPoint(), {
             method: "POST",
@@ -59,6 +70,13 @@ const AddWorkspaceDialog = ({ isOpen, dialogCloseHandler, orgId }) => {
             <DialogTitle>Enter workspace details</DialogTitle>
             <DialogContent style={{ paddingTop: 4 }}>
                 <TextField placeholder='Enter Workspace Name' label="Workspace Name" fullWidth size='small' value={workspaceName} onChange={handleTextField} />
+                <FormControlLabel
+                            control={<Switch color="primary" />}
+                            labelPlacement="start"
+                            label ="Public Analytics"
+                            checked={publicanalytics}
+                            onChange={handlepublicanalytics}
+                        />
             </DialogContent>
             <DialogActions style={{ padding: '0 24px 24px 0' }}>
                 <Button onClick={handleUserDialogClose} size="small">

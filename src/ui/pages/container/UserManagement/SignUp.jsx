@@ -57,10 +57,11 @@ const SignUp = () => {
     };
     const comformdata = {
         username: values.UserName,
-        email: values.email,
+        email: values.email.toLowerCase(),
         password: values.password,
 
     }
+
     //SignUpAPI
     const handleSubmit = () => {
         let apiObj = new SignUpAPI(comformdata,inviteCode)

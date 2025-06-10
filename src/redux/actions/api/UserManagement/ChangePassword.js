@@ -6,11 +6,11 @@
  import constants from "../../../constants";
  
  export default class ChangePasswordAPI extends API {
-   constructor(projectObj, timeout = 2000) {
+   constructor(user_id,projectObj, timeout = 2000) {
      super("POST", timeout, false);
      this.projectObj = projectObj;
      this.type = constants.CHANGE_PASSWORD;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.authUsers}set_password/`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.changepassword}${user_id}/update_my_password/`;
    }
  
    processResponse(res) {

@@ -1,4 +1,13 @@
-import { Box, Chip, Grid, ThemeProvider, Typography, Card ,IconButton} from "@mui/material";
+import {
+  Box,
+  Chip,
+  Grid,
+  ThemeProvider,
+  Typography,
+  Card,
+  IconButton,
+  InputLabel,
+} from "@mui/material";
 import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState } from "react";
@@ -24,18 +33,31 @@ import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/
 import GetDataitemsByIdAPI from "../../../../redux/actions/api/Dataset/GetDataitemsById";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { snakeToTitleCase } from "../../../../utils/utils";
-import CustomizedSnackbars from "../../component/common/Snackbar"
+import CustomizedSnackbars from "../../component/common/Snackbar";
 import Spinner from "../../component/common/Spinner";
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import SearchIcon from '@mui/icons-material/Search';
-import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import SearchIcon from "@mui/icons-material/Search";
+import DatasetSearchPopup from "../../container/Dataset/DatasetSearchPopup";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+import { MenuProps } from "../../../../utils/utils";
 
 const isNum = (str) => {
-  var reg = new RegExp('^[0-9]*$');
+  var reg = new RegExp("^[0-9]*$");
   return reg.test(String(str));
-}
+};
+const projectStage = [
+  { name: "Annotation Stage", value: 1 },
+  { name: "Review Stage", value: 2 },
+  { name: "Super-Check Stage", value: 3 }
+];
+
+const CreateAnnotationsAutomatically = [
+  { name: "None", value: "none" },
+  { name: "Annotation", value: "annotation" },
+  { name: "Review", value: "review" },
+  { name: "Supercheck", value: "supercheck" }
+];
 
 const AnnotationProject = (props) => {
   const { id } = useParams();
@@ -46,14 +68,13 @@ const AnnotationProject = (props) => {
   const User = useSelector((state) => state.fetchLoggedInUserData.data);
   const NewProject = useSelector((state) => state.createProject.data);
   const ProjectDomains = useSelector((state) => state.getProjectDomains.data);
-  const DatasetInstances = useSelector(
-    (state) => state.getDatasetsByType.data
-  );
+  const DatasetInstances = useSelector((state) => state.getDatasetsByType.data);
   const DatasetFields = useSelector((state) => state.getDatasetFields.data);
   const LanguageChoices = useSelector((state) => state.getLanguageChoices.data);
   const DataItems = useSelector((state) => state.getDataitemsById.data);
-  const filterdataitemsList =useSelector((state) => state.datasetSearchPopup.data);
-
+  const filterdataitemsList = useSelector(
+    (state) => state.datasetSearchPopup.data
+  );
 
   const [domains, setDomains] = useState([]);
   const [projectTypes, setProjectTypes] = useState(null);
@@ -63,7 +84,6 @@ const AnnotationProject = (props) => {
   const [variableParameters, setVariableParameters] = useState(null);
   const [languageOptions, setLanguageOptions] = useState([]);
   const [searchedCol, setSearchedCol] = useState();
-
   //Form related state variables
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -74,7 +94,7 @@ const AnnotationProject = (props) => {
   const [samplingMode, setSamplingMode] = useState(null);
   const [random, setRandom] = useState("");
   const [batchSize, setBatchSize] = useState();
-  const [batchNumber, setBatchNumber] = useState();
+  const [batchNumber, setBatchNumber] = useState([]);
   const [samplingParameters, setSamplingParameters] = useState(null);
   const [selectedInstances, setSelectedInstances] = useState([]);
   const [confirmed, setConfirmed] = useState(false);
@@ -83,8 +103,8 @@ const AnnotationProject = (props) => {
   const [selectedVariableParameters, setSelectedVariableParameters] = useState(
     []
   );
-  const [taskReviews, setTaskReviews] = useState(false)
-
+  const [taskReviews, setTaskReviews] = useState(1);
+  const [variable_Parameters_lang, setVariable_Parameters_lang] = useState("");
   //Table related state variables
   const [columns, setColumns] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -94,10 +114,13 @@ const AnnotationProject = (props) => {
   const [tableData, setTableData] = useState([]);
   const [searchAnchor, setSearchAnchor] = useState(null);
   const [selectedFilters, setsSelectedFilters] = useState({});
+  const [createannotationsAutomatically, setsCreateannotationsAutomatically] = useState("none");
+  const [acousticEnabledStage, setAcousticEnabledStage] = useState(1);
+
   const searchOpen = Boolean(searchAnchor);
   const excludeKeys = [
     "parent_data_id",
-    "metadata_json",
+    // "metadata_json",
     "instance_id_id",
     "datasetbase_ptr_id",
     "key",
@@ -107,8 +130,16 @@ const AnnotationProject = (props) => {
     "id",
     "rating",
     // "conversation_json",
-    // "machine_translated_conversation_json",
-    // "speakers_json"
+    "machine_translated_conversation_json",
+    "speakers_json",
+    // "transcribed_json",
+    "conversation_json",
+    // "prediction_json",
+    "machine_transcribed_json",
+    "unverified_conversation_json",
+    "annotation_bboxes",
+    "annotation_labels",
+    "annotation_transcripts",
   ];
   const renderToolBar = () => {
     return (
@@ -131,29 +162,30 @@ const AnnotationProject = (props) => {
           </Grid>
         </Grid>
       </Grid>
-
     );
   };
   const customColumnHead = (col) => {
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-start",
-                columnGap: "5px",
-                flexGrow: "1",
-                alignItems: "center",
-            }}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          columnGap: "5px",
+          flexGrow: "1",
+          alignItems: "center",
+        }}
+      >
+        {col.label}
+        <IconButton
+          sx={{ borderRadius: "100%" }}
+          onClick={(e) => handleShowSearch(col.name, e)}
         >
-            {col.label}
-             <IconButton sx={{ borderRadius: "100%" }} onClick={(e) => handleShowSearch(col.name, e)}>
-                <SearchIcon id={col.name + "_btn"} />
-            </IconButton>
-        </Box>
+          <SearchIcon id={col.name + "_btn"} />
+        </IconButton>
+      </Box>
     );
-}
-
+  };
   const options = {
     count: totalDataitems,
     rowsPerPage: currentRowPerPage,
@@ -197,9 +229,7 @@ const AnnotationProject = (props) => {
     serverSide: true,
     customToolbar: renderToolBar,
   };
- 
-  
- 
+
   useEffect(() => {
     const domainObj = new GetProjectDomainsAPI();
     dispatch(APITransport(domainObj));
@@ -207,8 +237,8 @@ const AnnotationProject = (props) => {
 
   useEffect(() => {
     setTotalDataitems(filterdataitemsList.count);
-    setTableData(filterdataitemsList.results)
-  }, [filterdataitemsList.results])
+    setTableData(filterdataitemsList.results);
+  }, [filterdataitemsList.results]);
 
   useEffect(() => {
     if (NewProject.id) {
@@ -218,7 +248,7 @@ const AnnotationProject = (props) => {
   }, [NewProject]);
   useEffect(() => {
     getsearchdataitems();
-  }, [currentPageNumber,currentRowPerPage,selectedFilters]);
+  }, [currentPageNumber, currentRowPerPage, selectedFilters]);
 
   useEffect(() => {
     if (User) {
@@ -300,13 +330,13 @@ const AnnotationProject = (props) => {
           temp.push({
             name: element,
             data: DatasetFields[element],
-            value: "",
+            value: variable_Parameters_lang,
           });
         }
       );
       setSelectedVariableParameters(temp);
     }
-  }, [DatasetFields]);
+  }, [DatasetFields, variable_Parameters_lang]);
 
   useEffect(() => {
     if (LanguageChoices && LanguageChoices.length > 0) {
@@ -328,19 +358,28 @@ const AnnotationProject = (props) => {
     let tempColumns = [];
     let tempSelected = [];
     if (fetchedItems?.length) {
-      Object.keys(fetchedItems[0]).forEach((key) => {
-        if (!excludeKeys.includes(key) && !key.includes("_json")) {
+      Object.keys(fetchedItems[0]).forEach((keys) => {
+        if (!excludeKeys.includes(keys)) {
           tempColumns.push({
-            name: key,
-            label: snakeToTitleCase(key),
+            name: keys,
+            label: snakeToTitleCase(keys),
             options: {
               filter: false,
               sort: false,
               align: "center",
               customHeadLabelRender: customColumnHead,
+              customBodyRender: (value) => {
+                if ((keys.includes("json")) && value !== null ) {
+                  const data = JSON.stringify(value)
+                  const metadata = data.replace(/\\/g, "");
+                  return metadata;
+                } else {
+                  return value;
+                }
+              },
             },
           });
-          tempSelected.push(key);
+          tempSelected.push(keys);
         }
       });
     }
@@ -352,7 +391,12 @@ const AnnotationProject = (props) => {
     setSelectedType("");
     setSamplingParameters(null);
     setConfirmed(false);
-    if (selectedDomain === "Translation" || selectedDomain === "Conversation" ||selectedDomain === "Monolingual") {
+    if (
+      selectedDomain === "Translation" ||
+      selectedDomain === "Conversation" ||
+      selectedDomain === "Monolingual" ||
+      selectedDomain === "Audio"
+    ) {
       const langChoicesObj = new GetLanguageChoicesAPI();
       dispatch(APITransport(langChoicesObj));
     }
@@ -380,11 +424,13 @@ const AnnotationProject = (props) => {
     }
   }, [selectedType]);
 
+
   useEffect(() => {
+
     if (batchSize && batchNumber) {
       setSamplingParameters({
         batch_size: batchSize,
-        batch_number: batchNumber,
+        batch_number: new Function("return [" + [batchNumber] + "]")(),
       });
     } else {
       setSamplingParameters(null);
@@ -435,7 +481,9 @@ const AnnotationProject = (props) => {
 
   const handleRandomChange = (e) => {
     setRandom(e.target.value);
-    setSamplingParameters(e.target.value ? { fraction: parseFloat(e.target.value / 100) } : null);
+    setSamplingParameters(
+      e.target.value ? { fraction: parseFloat(e.target.value / 100) } : null
+    );
   };
 
   const onConfirmSelections = () => {
@@ -445,8 +493,7 @@ const AnnotationProject = (props) => {
   const handleShowSearch = (col, event) => {
     setSearchAnchor(event.currentTarget);
     setSearchedCol(col);
-  
-}
+  };
 
   useEffect(() => {
     if (selectedInstances && datasetTypes) {
@@ -455,21 +502,24 @@ const AnnotationProject = (props) => {
   }, [currentPageNumber, currentRowPerPage]);
 
   const getDataItems = () => {
-    const dataObj = new GetDataitemsByIdAPI(selectedInstances, currentPageNumber, currentRowPerPage, datasetTypes[selectedType]);
+    const dataObj = new GetDataitemsByIdAPI(
+      selectedInstances,
+      datasetTypes[selectedType],
+      selectedFilters,
+      currentPageNumber,
+      currentRowPerPage
+    );
     dispatch(APITransport(dataObj));
-    
   };
 
-  const getsearchdataitems = () =>{
-    const searchPopupdata ={
+  const getsearchdataitems = () => {
+    const searchPopupdata = {
       instance_ids: selectedInstances,
-      search_keys:selectedFilters
-    }
+      search_keys: selectedFilters,
+    };
     const taskObj = new DatasetSearchPopupAPI(searchPopupdata);
-    dispatch(APITransport(taskObj)); 
-
-  }
-
+    dispatch(APITransport(taskObj));
+  };
 
   const processNameString = (string) => {
     let temp = "";
@@ -479,24 +529,24 @@ const AnnotationProject = (props) => {
     return temp;
   };
 
+
+
+
   const handleCreateProject = () => {
     let temp = {};
     selectedVariableParameters.forEach((element) => {
       temp[element.name] = element.value;
     });
 
-    
-
-
     const newProject = {
       title: title,
       description: description,
-      created_by: User.id,
+      created_by: User?.id,
       is_archived: false,
       is_published: false,
       users: [User?.id],
       workspace_id: id,
-      organization_id: User.organization.id,
+      organization_id: User?.organization?.id,
       filter_string: filterString,
       sampling_mode: samplingMode,
       sampling_parameters_json: samplingParameters,
@@ -506,25 +556,31 @@ const AnnotationProject = (props) => {
       variable_parameters: temp,
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
-      enable_task_reviews: taskReviews,
+      project_stage: taskReviews,
+      ...(createannotationsAutomatically !== "none" && { automatic_annotation_creation_mode: createannotationsAutomatically }),
+      acoustic_enabled_stage: acousticEnabledStage,
     };
 
-    if (sourceLanguage) newProject['src_language'] = sourceLanguage;
-    if (targetLanguage) newProject['tgt_language'] = targetLanguage;
-
+    if (sourceLanguage) newProject["src_language"] = sourceLanguage;
+    if (targetLanguage) newProject["tgt_language"] = targetLanguage;
     const projectObj = new CreateProjectAPI(newProject);
     dispatch(APITransport(projectObj));
   };
 
   const handleSearchClose = () => {
     setSearchAnchor(null);
-  }
- 
+  };
 
+  const handleReviewToggle = async (e) => {
+    setTaskReviews(e.target.value);
+  };
+
+  const handleChangeCreateAnnotationsAutomatically = (e) => {
+    setsCreateannotationsAutomatically(e.target.value)
+  }
 
   return (
     <ThemeProvider theme={themeDefault}>
-
       {/* <Header /> */}
       {/* <Grid
                 container
@@ -544,7 +600,15 @@ const AnnotationProject = (props) => {
                 > */}
       <Grid container direction="row">
         <Card className={classes.workspaceCard}>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ pb: "6rem" }}>
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+            xl={12}
+            sx={{ pb: "6rem" }}
+          >
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <Typography variant="h2" gutterBottom component="div">
                 Create a Project
@@ -562,7 +626,7 @@ const AnnotationProject = (props) => {
                 className={classes.projectsettingGrid}
               >
                 <Typography gutterBottom component="div" label="Required">
-                  Title:
+                  Title<span style={{ color: '#d93025' }}>*</span> :
                 </Typography>
               </Grid>
               <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -583,7 +647,7 @@ const AnnotationProject = (props) => {
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Description:
+                Description<span style={{ color: '#d93025' }}>*</span> :
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -605,7 +669,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a Category to Work in:
+                    Select a Category to Work in<span style={{ color: '#d93025' }}>*</span> :
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -629,7 +693,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a Project Type:
+                    Select a Project Type<span style={{ color: '#d93025' }}>*</span> :
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -647,91 +711,177 @@ const AnnotationProject = (props) => {
               </>
             )}
 
-            {(selectedDomain === "Translation" || selectedDomain === "Conversation") && (selectedType === "TranslationEditing" || selectedType === "SemanticTextualSimilarity" || selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation" || selectedType === "ConversationTranslationEditing") &&
-              <>
-                <Grid
-                  className={classes.projectsettingGrid}
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  lg={12}
-                  xl={12}
-                >
-                  <Typography gutterBottom component="div">
-                    Source Language:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                  <MenuItems
-                    menuOptions={languageOptions}
-                    handleChange={(value) => setSourceLanguage(value)}
-                    value={sourceLanguage}
-                  />
-                </Grid>
+            {/* {selectedType &&
+              variableParameters?.[selectedType]?.variable_parameters !==
+              undefined && (
+                <>
+                  <Grid
+                    className={classes.projectsettingGrid}
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                  >
+                    <Typography gutterBottom component="div">
+                      Variable Parameters<span style={{ color: '#d93025' }}>*</span> :
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                    <OutlinedTextField
+                      fullWidth
+                      value={variable_Parameters_lang}
+                      onChange={(e) =>
+                        setVariable_Parameters_lang(e.target.value)
+                      }
+                    />
+                  </Grid>
+                </>
+              )} */}
+            {(selectedDomain === "Translation" ||
+              selectedDomain === "Conversation") &&
+              (selectedType === "TranslationEditing" ||
+                selectedType === "SemanticTextualSimilarity" ||
+                selectedType === "ContextualTranslationEditing" ||
+                selectedType === "ConversationTranslation" ||
+                selectedType === "ConversationTranslationEditing") && (
+                <>
+                  <Grid
+                    className={classes.projectsettingGrid}
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                  >
+                    <Typography gutterBottom component="div">
+                      Source Language:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                    <FormControl fullWidth>
+                      <Select
+                        fullWidth
+                        labelId="select-Language"
+                        value={sourceLanguage}
+                        onChange={(e) => setSourceLanguage(e.target.value)}
+                        style={{ zIndex: "0" }}
+                        inputProps={{ "aria-label": "Without label" }}
+                        MenuProps={MenuProps}
+                      >
+                        {languageOptions?.map((item, index) => (
+                          <MenuItem key={index} value={item.value}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-                <Grid
-                  className={classes.projectsettingGrid}
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  lg={12}
-                  xl={12}
-                >
-                  <Typography gutterBottom component="div">
-                    Target Language:
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                  <MenuItems
-                    menuOptions={languageOptions}
-                    handleChange={(value) => setTargetLanguage(value)}
-                    value={targetLanguage}
-                  />
-                </Grid>
+                  <Grid
+                    className={classes.projectsettingGrid}
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                  >
+                    <Typography gutterBottom component="div">
+                      Target Language:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                    <FormControl fullWidth>
+                      <Select
+                        fullWidth
+                        labelId="select-Language"
+                        value={targetLanguage}
+                        onChange={(e) => setTargetLanguage(e.target.value)}
+                        style={{ zIndex: "0" }}
+                        inputProps={{ "aria-label": "Without label" }}
+                        MenuProps={MenuProps}
+                      >
+                        {languageOptions?.map((item, index) => (
+                          <MenuItem key={index} value={item.value}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </>
+              )}
 
-              </>
-            }
-
-            {(selectedDomain === "Monolingual" || selectedDomain === "Translation") && (selectedType === "SentenceSplitting" || selectedType === "ContextualSentenceVerification" || selectedType === "MonolingualTranslation") &&
-              <><Grid
-                className={classes.projectsettingGrid}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-              >
-                <Typography gutterBottom component="div">
-                  Target Language:
-                </Typography>
-              </Grid>
-                <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-                  <MenuItems
-                    menuOptions={languageOptions}
-                    handleChange={(value) => setTargetLanguage(value)}
-                    value={targetLanguage}
-                  />
-                </Grid></>}
+            {(selectedDomain === "Monolingual" ||
+              selectedDomain === "Translation" ||
+              selectedDomain === "Audio") &&
+              (selectedType === "SentenceSplitting" ||
+                selectedType === "ContextualSentenceVerification" ||
+                selectedType === "MonolingualTranslation" ||
+                selectedType === "SingleSpeakerAudioTranscriptionEditing" ||
+                selectedType === "AudioTranscription" ||
+                selectedType === "AudioSegmentation" ||
+                selectedType === "AudioTranscriptionEditing" ||
+                selectedType === "AcousticNormalisedTranscriptionEditing" ||
+                selectedType === "StandardizedTranscriptionEditing" 
+                ) && (
+                <>
+                  <Grid
+                    className={classes.projectsettingGrid}
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                  >
+                    <Typography gutterBottom component="div">
+                      {selectedType === "SingleSpeakerAudioTranscriptionEditing"
+                        ? "Language:"
+                        : "Target Language:"}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
+                    <FormControl fullWidth>
+                      <Select
+                        fullWidth
+                        labelId="select-Language"
+                        value={targetLanguage}
+                        onChange={(e) => setTargetLanguage(e.target.value)}
+                        style={{ zIndex: "0" }}
+                        inputProps={{ "aria-label": "Without label" }}
+                        MenuProps={MenuProps}
+                      >
+                        {languageOptions?.map((item, index) => (
+                          <MenuItem key={index} value={item.value}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </>
+              )}
 
             {instanceIds && (
               <>
-
                 {selectedVariableParameters.map((parameter, index) => (
-
                   <>
-                    {selectedType === "Conversation" && (selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation") &&
-                      <Grid
-                        className={classes.projectsettingGrid}
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={12}
-                        xl={12}
-                      >
-                        <Typography gutterBottom component="div">
-                          {processNameString(parameter["name"])}:
-                        </Typography>
-                      </Grid>}
+                    {selectedType === "Conversation" &&
+                      (selectedType === "ContextualTranslationEditing" ||
+                        selectedType === "ConversationTranslation") && (
+                        <Grid
+                          className={classes.projectsettingGrid}
+                          xs={12}
+                          sm={12}
+                          md={12}
+                          lg={12}
+                          xl={12}
+                        >
+                          <Typography gutterBottom component="div">
+                            {processNameString(parameter["name"])}:
+                          </Typography>
+                        </Grid>
+                      )}
                     <Grid
                       className={classes.projectsettingGrid}
                       item
@@ -741,23 +891,32 @@ const AnnotationProject = (props) => {
                       lg={12}
                       xl={12}
                     >
-                      {parameter.data["choices"] !== undefined ? (
+                      {parameter?.data["choices"] !== undefined ? (
                         <>
-                          {selectedType === "Conversation" && (selectedType === "ContextualTranslationEditing" || selectedType === "ConversationTranslation") &&
-                            <MenuItems
-                              menuOptions={parameter.data["choices"].map(
-                                (element) => {
-                                  return {
-                                    name: element[0],
-                                    value: element[0],
-                                  };
+                          {selectedType === "Conversation" &&
+                            (selectedType === "ContextualTranslationEditing" ||
+                              selectedType === "ConversationTranslation") && (
+                              <MenuItems
+                                menuOptions={parameter?.data["choices"].map(
+                                  (element) => {
+                                    return {
+                                      name: element[0],
+                                      value: element[0],
+                                    };
+                                  }
+                                )}
+                                value={
+                                  selectedVariableParameters[index]["value"]
                                 }
-                              )}
-                              value={selectedVariableParameters[index]["value"]}
-                              handleChange={(e) =>
-                                handleVariableParametersChange(parameter["name"], e)
-                              }
-                            ></MenuItems>}</>
+                                handleChange={(e) =>
+                                  handleVariableParametersChange(
+                                    parameter["name"],
+                                    e
+                                  )
+                                }
+                              ></MenuItems>
+                            )}
+                        </>
                       ) : (
                         <>
                           {parameter.data["name"] === "DecimalField" ||
@@ -781,7 +940,6 @@ const AnnotationProject = (props) => {
                               }}
                             />
                           ) : (
-
                             <OutlinedTextField
                               fullWidth
                               value={selectedVariableParameters[index]["value"]}
@@ -798,7 +956,7 @@ const AnnotationProject = (props) => {
                     </Grid>
                   </>
                 ))}
-                {selectedType   && Object.keys(instanceIds).length > 0 && (
+                {selectedType && Object.keys(instanceIds).length > 0 && (
                   <>
                     <Grid
                       className={classes.projectsettingGrid}
@@ -809,7 +967,7 @@ const AnnotationProject = (props) => {
                       xl={12}
                     >
                       <Typography gutterBottom component="div">
-                        Select sources to fetch data from:
+                        Select sources to fetch data from<span style={{ color: '#d93025' }}>*</span> :
                       </Typography>
                     </Grid>
 
@@ -820,6 +978,10 @@ const AnnotationProject = (props) => {
                         disabled={confirmed}
                       >
                         <Select
+                          fullWidth
+                          style={{ zIndex: "0" }}
+                          inputProps={{ "aria-label": "Without label" }}
+                          MenuProps={MenuProps}
                           labelId="demo-simple-select-standard-label"
                           id="demo-simple-select-standard"
                           onChange={onSelectInstances}
@@ -827,7 +989,11 @@ const AnnotationProject = (props) => {
                           multiple={true}
                           renderValue={(selected) => (
                             <Box
-                              sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                              sx={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 0.5,
+                              }}
                             >
                               {selected.map((key) => (
                                 <Chip
@@ -840,13 +1006,17 @@ const AnnotationProject = (props) => {
                                       }
                                     />
                                   }
-                                  onDelete={confirmed ? undefined : () => {
-                                    setSelectedInstances(
-                                      selectedInstances.filter(
-                                        (instance) => instance !== key
-                                      )
-                                    );
-                                  }}
+                                  onDelete={
+                                    confirmed
+                                      ? undefined
+                                      : () => {
+                                        setSelectedInstances(
+                                          selectedInstances.filter(
+                                            (instance) => instance !== key
+                                          )
+                                        );
+                                      }
+                                  }
                                 />
                               ))}
                             </Box>
@@ -915,7 +1085,10 @@ const AnnotationProject = (props) => {
                     <MUIDataTable
                       title={""}
                       data={tableData}
-                      columns={columns.filter((column) => selectedColumns.includes(column.name))}
+                      columns={columns.filter((column) =>
+                        selectedColumns.includes(column.name)
+
+                      )}
                       options={options}
                     />
                   </ThemeProvider>
@@ -929,7 +1102,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select Sampling Type:
+                    Select Sampling Type<span style={{ color: '#d93025' }}>*</span> :
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -1012,7 +1185,10 @@ const AnnotationProject = (props) => {
                     type="number"
                     inputProps={{ type: "number" }}
                     value={batchSize}
-                    onChange={(e) => isNum(e.target.value) && setBatchSize(Number(e.target.value) || e.target.value)}
+                    onChange={(e) =>
+                      isNum(e.target.value) &&
+                      setBatchSize(Number(e.target.value) || e.target.value)
+                    }
                   />
                 </Grid>
 
@@ -1031,10 +1207,13 @@ const AnnotationProject = (props) => {
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
                   <OutlinedTextField
                     fullWidth
-                    type="number"
-                    inputProps={{ type: "number" }}
+                    // type="number"
+                    // inputProps={{ type: "number" }}
                     value={batchNumber}
-                    onChange={(e) => isNum(e.target.value) && setBatchNumber(Number(e.target.value))}
+                    onChange={(e) =>
+                      // isNum(e.target.value) &&
+                      setBatchNumber(e.target.value)
+                    }
                   />
                 </Grid>
               </>
@@ -1062,25 +1241,96 @@ const AnnotationProject = (props) => {
                 </Grid>
               </>
             )}
-            {confirmed && (<Grid
-              item
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sx={{ mt: 3 }}
-
-            >
-              <FormControlLabel
-                sx={{ marginLeft: "1px" }}
-                control={<Switch color="primary" />}
-                label={<Typography gutterBottom component="div" >Task Reviews</Typography>}
-                labelPlacement="start"
-                checked={taskReviews}
-                onChange={(event) => setTaskReviews(event.target.checked)}
-              />
-            </Grid>)}
+            {confirmed && (
+              <>
+                <Grid
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  className={classes.projectsettingGrid}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                    Project Stage:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <FormControl fullWidth className={classes.formControl}>
+                    <Select
+                      labelId="task-Reviews-label"
+                      id="task-Reviews-select"
+                      value={taskReviews}
+                      onChange={handleReviewToggle}
+                    >
+                      {projectStage.map((type, index) => (
+                        <MenuItem value={type.value} key={index}>
+                          {type.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  xl={12}
+                  className={classes.projectsettingGrid}
+                >
+                  <Typography gutterBottom component="div" label="Required">
+                    Create Annotations Automatically:
+                  </Typography>
+                </Grid>
+                <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                  <FormControl fullWidth className={classes.formControl}>
+                    <Select
+                      labelId="task-Reviews-label"
+                      id="task-Reviews-select"
+                      value={createannotationsAutomatically}
+                      onChange={handleChangeCreateAnnotationsAutomatically}
+                    >
+                      {CreateAnnotationsAutomatically.map((type, index) => (
+                        <MenuItem value={type.value} key={index}>
+                          {type.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                {(selectedType === "AcousticNormalisedTranscriptionEditing" || selectedType ==="StandardizedTranscriptionEditing")   && <>
+                  <Grid
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                    className={classes.projectsettingGrid}
+                  >
+                    <Typography gutterBottom component="div" label="Required">
+                      Acoustic Enabled Stage:
+                    </Typography>
+                  </Grid>
+                  <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                    <FormControl fullWidth className={classes.formControl}>
+                      <Select
+                        labelId="acoustic-label"
+                        id="acoustic-select"
+                        value={acousticEnabledStage}
+                        onChange={(e) => setAcousticEnabledStage(e.target.value)}
+                      >
+                        {projectStage.map((type, index) => (
+                          <MenuItem value={type.value} key={index}>
+                            {type.name.split(/(?<=^\S+)\s/)[0]}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </>}
+              </>
+            )}
 
             <Grid
               className={classes.projectsettingGrid}
@@ -1094,8 +1344,6 @@ const AnnotationProject = (props) => {
                 Finalize Project
               </Typography>
             </Grid>
-
-
 
             <Grid
               className={classes.projectsettingGrid}
@@ -1112,7 +1360,18 @@ const AnnotationProject = (props) => {
                 style={{ margin: "0px 20px 0px 0px" }}
                 label={"Create Project"}
                 onClick={handleCreateProject}
-                disabled={(title && description && selectedDomain && selectedType && selectedInstances && domains && samplingMode && selectedVariableParameters) ? false : true}
+                disabled={
+                  title &&
+                    description &&
+                    selectedDomain &&
+                    selectedType &&
+                    selectedInstances &&
+                    domains &&
+                    samplingMode &&
+                    selectedVariableParameters
+                    ? false
+                    : true
+                }
               />
               {/* )}  */}
               <Button
@@ -1122,18 +1381,20 @@ const AnnotationProject = (props) => {
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12} />
           </Grid>
-
-        </Card> </Grid>
+        </Card>{" "}
+      </Grid>
       {/* </Grid>
             </Grid> */}
-             {searchOpen && <DatasetSearchPopup
-                    open={searchOpen}
-                    anchorEl={searchAnchor}
-                     handleClose={handleSearchClose}
-                    updateFilters={setsSelectedFilters}
-                    currentFilters={selectedFilters}
-                    searchedCol={searchedCol}
-                />}
+      {searchOpen && (
+        <DatasetSearchPopup
+          open={searchOpen}
+          anchorEl={searchAnchor}
+          handleClose={handleSearchClose}
+          updateFilters={setsSelectedFilters}
+          currentFilters={selectedFilters}
+          searchedCol={searchedCol}
+        />
+      )}
     </ThemeProvider>
   );
 };

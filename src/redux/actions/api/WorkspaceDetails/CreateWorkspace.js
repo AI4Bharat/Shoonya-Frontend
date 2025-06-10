@@ -6,12 +6,13 @@ import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
 
 export default class CreateWorkspaceAPI extends API {
-    constructor(orgId, workspaceName, timeout = 2000) {
+    constructor(orgId, workspaceName,publicanalytics, timeout = 2000) {
         super("POST", timeout, false);
         this.type = constants.ADD_MEMBERS_TO_PROJECT;
         this.organization = orgId;
         this.workspace_name = workspaceName;
         this.is_archived = false;
+        this.public_analytics = publicanalytics;
         this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces
             }`;
     }
@@ -32,6 +33,7 @@ export default class CreateWorkspaceAPI extends API {
             organization: this.organization,
             workspace_name: this.workspace_name,
             is_archived: this.is_archived,
+            public_analytics: this.public_analytics
         };
     }
 

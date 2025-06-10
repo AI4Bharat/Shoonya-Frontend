@@ -6,11 +6,12 @@
  import constants from "../../../constants";
  
  export default class DeallocateReviewTasksAPI extends API {
-   constructor(projectId,selectedFilters,timeout = 2000) {
-     super("GET", timeout, false);
+
+   constructor(projectId,selectedFilters, timeout = 2000) {
+     super("POST", timeout, false);
      this.projectId = projectId;
      this.type = constants.DE_ALLOCATE_REVIEW_TASKS;
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_review_tasks/?task_status=['${selectedFilters}']`;
+     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/unassign_review_tasks/?review_status=['${selectedFilters}']`;
    }
  
    processResponse(res) {

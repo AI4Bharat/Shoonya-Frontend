@@ -7,12 +7,12 @@
 import constants from "../../../constants";
  
  export default class GetDataitemsByIdAPI extends API {
-   constructor(instanceIds, pageNo, countPerPage, datasetType,searchKeys, timeout = 2000) {
+   constructor(instanceIds, datasetType,selectedFilters,pageNo, countPerPage, timeout = 2000) {
      super("POST", timeout, false);
      this.type = constants.GET_DATAITEMS_BY_ID;
      this.instanceIds = instanceIds;
      this.datasetType = datasetType;
-     this.searchKeys = searchKeys;
+     this.search_keys = selectedFilters;
      const queryString = `?${pageNo ? "&page="+pageNo : ""}${countPerPage ?"&records="+countPerPage : ""}`
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getDatasets}dataitems/get_data_items/${queryString}`;
    }
@@ -32,7 +32,7 @@ import constants from "../../../constants";
     return {
       instance_ids: this.instanceIds,
       dataset_type: this.datasetType,
-      search_keys:this.searchKeys,
+      search_keys:this.search_keys
     }
    }
  

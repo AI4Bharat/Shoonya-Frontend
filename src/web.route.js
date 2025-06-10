@@ -26,18 +26,29 @@ import DatasetList from "./ui/pages/container/Dataset/DatasetList";
 import DatasetDetails from "./ui/pages/container/Dataset/DatasetDetails";
 import { authenticateUser } from "./utils/utils";
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration";
-import LSF from "./ui/pages/container/Label-Studio/LSF";
 import ReviewLSF from "./ui/pages/container/Label-Studio/ReviewLSF";
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance";
 import ChangePassword from "./ui/pages/container/UserManagement/ChangePassword";
 import ProfilePage from "./ui/pages/container/UserManagement/ProfilePage";
+import ProgressPage from "./ui/pages/container/UserManagement/ProgressPage";
 import EditProfile from "./ui/pages/container/UserManagement/EditProfile"
 import ConfirmForgetPassword from "./ui/pages/container/UserManagement/ConfirmForgetPassword";
 import SignUp from "./ui/pages/container/UserManagement/SignUp";
 import AutomateDatasets from "./ui/pages/container/Dataset/AutomateDatasets";
 import ProgressList from "./ui/pages/container/Progress/ProgressList"
 import browserhistory from "./web.history";
-
+import AllTaskLSF from "./ui/pages/container/Label-Studio/AllTaskLSF";
+import AllAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AllAudioTranscriptionLandingPage";
+// import DatasetSettings from "./ui/pages/container/Dataset/DatasetSettings";
+import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
+import WorkspaceSettingTabs from "./ui/pages/container/Workspace/WorkspaceSettingTabs";
+import DashBoard from "./ui/pages/container/Admin/DashBoard";
+import SuperCheckerLSF from "./ui/pages/container/Label-Studio/SuperCheckerLSF";
+import AudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/AudioTranscriptionLandingPage";
+import ReviewAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/ReviewAudioTranscriptionLandingPage";
+import SuperCheckerAudioTranscriptionLandingPage from "./ui/pages/container/CL-Transcription/SuperCheckerAudioTranscriptionLandingPage"
+import AnnotationTranscription from "./ui/pages/container/CL-Transcription/AnnotationTranscription";
+import ReviewerSupercheckerTranscription from "./ui/pages/container/CL-Transcription/ReviewerSupercheckerTranscription";
 
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
@@ -134,6 +145,11 @@ const App = () => {
         <Route path="/forget-password/confirm/:key/:token" element={<ConfirmForgetPassword />} />
         <Route path="/invite/:inviteCode" element={<SignUp />} />
         <Route
+          path="/admin"
+          element={ProtectedRouteWrapper(<Layout component={<DashBoard />}  />)}
+        />
+        
+        <Route
           path="/edit-profile"
           element={ProtectedRouteWrapper(<Layout component={<EditProfile />} Backbutton={true} />)}
         />
@@ -156,29 +172,52 @@ const App = () => {
           )}
         />
         <Route
+          path="/progress/:id"
+          element={ProtectedRouteWrapper(<Layout component={<ProgressPage />} Backbutton={true} />)}
+        />
+        <Route
           path="projects/:id/projectsetting"
           element={ProtectedRouteWrapper(
             <Layout component={<ProjectSetting />} Backbutton={true} />
           )}
         />
+        
         <Route
           path="projects/:projectId/task/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<LSF />} />
+            // <Layout component={<LSF />} />
+            <Layout component={<AnnotationTranscription />} />
             // <Layout component={<AnnotateTask />} />
           )}
         />
         <Route
           path="projects/:projectId/review/:taskId"
           element={ProtectedRouteWrapper(
-            <Layout component={<ReviewLSF />} />
+            <Layout component={<ReviewerSupercheckerTranscription />} />
           )}
         />
-
+         <Route
+          path="projects/:projectId/Alltask/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<AllTaskLSF />} />
+          )}
+          />
+           <Route
+          path="projects/:projectId/SuperChecker/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<ReviewerSupercheckerTranscription />} />
+          )}
+          />
         <Route
           path="workspaces/:id"
           element={ProtectedRouteWrapper(
             <Layout component={<WorkSpace />} Backbutton={true} />
+          )}
+        />
+        <Route
+          path="workspaces/:id/workspacesetting"
+          element={ProtectedRouteWrapper(
+            <Layout component={<WorkspaceSettingTabs />} Backbutton={true} />
           )}
         />
         <Route
@@ -216,6 +255,12 @@ const App = () => {
           )}
         />
         <Route
+          path="datasets/:datasetId/datasetsetting"
+          element={ProtectedRouteWrapper(
+            <Layout component={<DatasetSettingTabs />} Backbutton={true} />
+          )}
+        />
+        <Route
           path="datasets/automate"
           element={ProtectedRouteWrapper(
             <Layout component={<AutomateDatasets />} Backbutton={true} />
@@ -233,12 +278,39 @@ const App = () => {
             <Layout component={<CreateDatasetInstanceButton />} Backbutton={true} />
           )}
         />
+        
+      
          <Route
           path="analytics"
           element={ProtectedRouteWrapper(
             <Layout component={<ProgressList />} />
           )}
         />
+          <Route
+          path="projects/:projectId/AudioTranscriptionLandingPage/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout 
+            component={<AudioTranscriptionLandingPage />} />
+          )}
+        />
+         <Route
+          path="projects/:projectId/ReviewAudioTranscriptionLandingPage/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<ReviewAudioTranscriptionLandingPage />} />
+          )}
+        />
+         <Route
+          path="projects/:projectId/SuperCheckerAudioTranscriptionLandingPage/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<SuperCheckerAudioTranscriptionLandingPage />} />
+          )}
+        />
+        <Route
+          path="projects/:projectId/AllAudioTranscriptionLandingPage/:taskId"
+          element={ProtectedRouteWrapper(
+            <Layout component={<AllAudioTranscriptionLandingPage />} />
+          )}
+          />
          
       </Routes>
     </HashRouter>

@@ -13,8 +13,10 @@ import getWorkspaceDetails from './WorkspaceDetails/GetWorkspaceDetails'
 import getTaskPrediction from './Tasks/GetTaskPrediction';
 import fetchLanguages from './UserManagement/FetchLanguages';
 import getOrganizationUsers from './Organization/GetOragnizationUsers';
+import getManagerSuggestions from './Organization/GetManagerSuggestions';
 import getDatasetList from './Dataset/GetDatasetList';
 import getTaskDetails from './Tasks/GetTaskDetails'
+import getQueuedTaskDetails from './Tasks/GetQueuedTaskDetails'
 import getDatasetDetails from './Dataset/GetDatasetDetails';
 import getDataitemsById from './Dataset/GetDataitemsById';
 import getArchiveProject from './ProjectDetails/ArchiveProject';
@@ -73,6 +75,30 @@ import getOrganizationAnnotatorQuality from './Organization/GetOrganizationAnnot
 import FindAndReplaceWordsInAnnotation from './ProjectDetails/FindAndReplaceWordsInAnnotation';
 import getRecentTasks from './UserManagement/FetchRecentTasks';
 import datasetSearchPopup from './Dataset/DatasetSearchPopup';
+import getAllTasksdata from './Tasks/GetAllTasks';
+import glossarysentence from './Glossary/GlossarySentence';
+import getDomains from "./Glossary/GetDomain";
+import getProjectTypeDetails from "./ProjectDetails/GetProjectTypeDetails";
+import getTaskAnalyticsData from "./Progress/TaskAnalytics";
+import getMetaAnalyticsData from "./Progress/MetaAnalytics";
+import getDownloadProjectAnnotations from "./ProjectDetails/DownloadProjectAnnotations";
+import getUserDetails from "./Admin/UserDetail";
+import getDatasetProjectReports from "./Dataset/GetDatasetProjectReports";
+import wsCumulativeTasks from "./WorkspaceDetails/GetCumulativeTasks";
+import wsMetaAnalytics from "./WorkspaceDetails/GetMetaAnalytics";
+import wsPeriodicalTasks from "./WorkspaceDetails/GetPeriodicalTasks";
+import wsTaskAnalytics from "./WorkspaceDetails/GetTaskAnalytics";
+import sendOrganizationUserReports from "./Organization/SendOrganizationUserReports";
+import sendWorkspaceUserReports from './WorkspaceDetails/SendWorkspaceUserReports';
+import getScheduledMails from './UserManagement/GetScheduledMails';
+import createScheduledMails from './UserManagement/CreateScheduledMails';
+import updateScheduledMails from './UserManagement/UpdateScheduledMails';
+import deleteScheduledMails from './UserManagement/DeleteScheduledMails';
+import commonReducer from "./CL-Transcription/Common";
+import getAnnotationsTask from "./CL-Transcription/GetAnnotationsTask";
+import patchAnnotation from "./CL-Transcription/PatchAnnotation"
+import updateUIPrefs from "./UserManagement/UpdateUIPrefs";
+
 
 const index = {
     apiStatus,
@@ -87,11 +113,12 @@ const index = {
     getWorkspacesAnnotatorsData,
     getWorkspacesManagersData,
     getWorkspaceDetails,
-    getTaskPrediction,    
+    getTaskPrediction,
     fetchLanguages,
-    getOrganizationUsers, 
+    getOrganizationUsers,
     getDatasetList,
     getTaskDetails,
+    getQueuedTaskDetails,
     getDatasetList,
     getDatasetDetails,
     getDataitemsById,
@@ -153,7 +180,30 @@ const index = {
     FindAndReplaceWordsInAnnotation,
     getRecentTasks,
     datasetSearchPopup,
-    
+    getAllTasksdata,
+    glossarysentence,
+    getDomains,
+    getProjectTypeDetails,
+    getTaskAnalyticsData,
+    getMetaAnalyticsData,
+    getDownloadProjectAnnotations,
+    getUserDetails,
+    getDatasetProjectReports,
+    wsCumulativeTasks,
+    wsMetaAnalytics,
+    wsPeriodicalTasks,
+    wsTaskAnalytics,
+    sendOrganizationUserReports,
+    sendWorkspaceUserReports,
+    getScheduledMails,
+    createScheduledMails,
+    updateScheduledMails,
+    deleteScheduledMails,
+    commonReducer,
+    getAnnotationsTask,
+    patchAnnotation,
+    updateUIPrefs,
+    getManagerSuggestions,
 };
 
 export default index;

@@ -49,46 +49,34 @@ const ConfirmForgetPassword = () => {
         event.preventDefault();
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async() => {
         const ConfirmForgetPassword = {
             new_password: values.confirmPassword,
             uid: key,
             token: token
         }
-        let apiObj = new ConfirmForgetPasswordAPI(ConfirmForgetPassword)
 
-        fetch(apiObj.apiEndPoint(), {
-            method: 'POST',
-            body: JSON.stringify(apiObj.getBody()),
-            headers: apiObj.getHeaders().headers
-        }).then((response) => {
-
-            setLoading(false)
-            if (response.status === 204) {
-                setSnackbarInfo({
-                    ...snackbar,
-                    open: true,
-                    message: "success",
-                    variant: 'success'
-                })
-                navigate(`/`)
-            }
-            else {
-                setSnackbarInfo({
-                    ...snackbar,
-                    open: true,
-                    message: "Invalid password / user id or user doesn't exis ",
-                    variant: 'error'
-                })
-
-            }
-
-        })
-            .catch(error => {
-                setLoading(false)
-
+        let obj = new ConfirmForgetPasswordAPI(ConfirmForgetPassword);
+        const res = await fetch(obj.apiEndPoint(), {
+            method: "POST",
+            body: JSON.stringify(obj.getBody()),
+            headers: obj.getHeaders().headers,
+        });
+        const resp = await res.json();
+        setLoading(false);
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "success",
             })
-
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message,
+                variant: "error",
+            })
+        }
 
     }
 
@@ -216,7 +204,7 @@ const ConfirmForgetPassword = () => {
                     {error.confirmPassword && <FormHelperText error={true}>Both password must match.</FormHelperText>}
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={12} xl={12} >
-                    <Button fullWidth label={"Change PassWord"} onClick={handleConfirmForgetPassword} />
+                    <Button fullWidth label={"Change Password"} onClick={handleConfirmForgetPassword} />
                 </Grid>
             </Grid>
         );

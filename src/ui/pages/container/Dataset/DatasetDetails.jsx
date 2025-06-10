@@ -1,7 +1,8 @@
 import {useState} from 'react';
-import { Box, Card, Grid, ThemeProvider, Typography, Tabs, Tab } from "@mui/material";
+import { Box, Card, Grid, ThemeProvider, Typography, Tabs, Tab ,IconButton, Tooltip} from "@mui/material";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import themeDefault from '../../../theme/theme'
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useEffect } from "react";
@@ -15,10 +16,13 @@ import MembersTable from '../../component/Project/MembersTable';
 import DatasetSettings from './DatasetSettings';
 import DatasetLogs from './DatasetLogs';
 import DatasetDescription from './DatasetDescription';
+import userRole from "../../../../utils/UserMappedByRole/Roles";
+import DatasetReports from '../../component/common/DatasetReports';
 
 const DatasetDetails = () => {
 
     const { datasetId } = useParams();
+    console.log(datasetId)
     const [selectedTab, setSelectedTab] = useState(0);
     const [datasetData, setDatasetData] = useState(
         [
@@ -29,8 +33,10 @@ const DatasetDetails = () => {
     )
 
     const dispatch = useDispatch();
+    let navigate = useNavigate();
     const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
     const DatasetMembers = useSelector((state) => state.getDatasetMembers.data);
+    const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
     
     useEffect(() => {
 		dispatch(APITransport(new GetDatasetDetailsAPI(datasetId)));
@@ -56,6 +62,11 @@ const DatasetDetails = () => {
         ])
     }, [DatasetDetails.instance_id]);
 
+    const handleOpenSettings = () => {
+        // navigate(`/projects/${id}/projectsetting`);
+        navigate(`datasetsetting`)
+    }
+
     return (
         <ThemeProvider theme={themeDefault}>
             <Grid
@@ -71,9 +82,32 @@ const DatasetDetails = () => {
                         padding: 5,
                     }}
                 >
-                    <Typography variant="h3">
+                    {/* <Typography variant="h3">
                         {DatasetDetails.instance_name}
-                    </Typography>
+                    </Typography> */}
+                    <Grid
+                        container
+                        direction='row'
+                        justifyContent='center'
+                        alignItems='center'
+                        sx={{ mb: 3 }}
+                    >
+                        <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
+                            <Typography  variant="h3">{DatasetDetails.instance_name}</Typography>
+                        </Grid>
+
+                        {(userRole.Annotator !== userDetails?.role || userRole.Reviewer !== userDetails?.role || userRole.SuperChecker !== userDetails?.role )  && <Grid item  xs={12} sm={12} md={2} lg={2} xl={2}>
+                            <Tooltip title={translate("label.showProjectSettings")}>
+                                <IconButton onClick={handleOpenSettings} sx={{marginLeft:"140px"}}>
+                                    <SettingsOutlinedIcon
+                                        color="primary.dark"
+                                        fontSize="large"
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        </Grid>}
+
+                    </Grid>
                     {/* <Grid
                         container
                         alignItems="center"
@@ -130,7 +164,8 @@ const DatasetDetails = () => {
                             <Tab label={translate("label.members")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.projects")} sx={{ fontSize: 16, fontWeight: '700' }} />
                             <Tab label={translate("label.logs")} sx={{ fontSize: 16, fontWeight: '700' }} />
-                            <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            <Tab label={translate("label.reports")} sx={{ fontSize: 16, fontWeight: '700' }} />
+                            {/* <Tab label={translate("label.settings")} sx={{ fontSize: 16, fontWeight: '700' }} /> */}
                         </Tabs>
                     </Box>
                     <TabPanel value={selectedTab} index={0}>
@@ -146,8 +181,11 @@ const DatasetDetails = () => {
                         <DatasetLogs datasetId={datasetId} />
                     </TabPanel>
                     <TabPanel value={selectedTab} index={4}>
-                        <DatasetSettings datasetId={datasetId} />
+                        <DatasetReports datasetId={datasetId} />
                     </TabPanel>
+                    {/* <TabPanel value={selectedTab} index={4}>
+                        <DatasetSettings datasetId={datasetId} />
+                    </TabPanel> */}
                 </Card>
             </Grid>
         </ThemeProvider>

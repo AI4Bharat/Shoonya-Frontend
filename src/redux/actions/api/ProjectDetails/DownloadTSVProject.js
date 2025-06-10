@@ -7,6 +7,7 @@
     constructor(projectId,taskStatus, timeout = 2000) {
       super("POST", timeout, false);
      this.type = constants.DOWNLOAD_PROJECT_TSV;
+     this.projectBody={}//object with key-value pair
       this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getProjects}${projectId}/download/?export_type=TSV&task_status=${taskStatus}`;
     }
   
@@ -21,7 +22,9 @@
       return this.endpoint;
     }
  
-    getBody() {}
+    getBody() {
+      return this.projectBody
+    }
    
   
     getHeaders() {

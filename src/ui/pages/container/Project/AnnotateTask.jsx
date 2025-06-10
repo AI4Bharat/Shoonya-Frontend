@@ -26,7 +26,6 @@ const AnnotateTask = () => {
   const TaskDetails = useSelector(state => state.getTaskDetails.data);
   const NextTask = useSelector(state => state.getNextTask.data);
   const User = useSelector((state) => state.fetchLoggedInUserData.data);
-
   const [loadTime, setLoadTime] = useState(Date.now());
   const [translatedText, setTranslatedText] = useState("");
   const [showNotes, setShowNotes] = useState(false);
@@ -116,7 +115,7 @@ const AnnotateTask = () => {
         variant="contained" 
         color="primary" 
         startIcon={<  ArrowBackIcon />} 
-        sx={{ color:"white" ,   mb:2  }} 
+        sx={{ color:"white" ,   mb:2  ,mt:2}} 
         onClick={() => navigate(`/projects/${urlParams?.projectId}`)}
       >
         {translate("label.backToProject")}

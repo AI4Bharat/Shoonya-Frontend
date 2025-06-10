@@ -29,6 +29,7 @@ const ChangePassword = (props) => {
   const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState("")
   const [currentPassword, setCurrentPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState({
     password: "",
@@ -37,6 +38,10 @@ const ChangePassword = (props) => {
   const [newvalues, setNewValues] = useState({
     newpassword: "",
     showNewPassword: false,
+  });
+  const [confirmvalues, setConfirmValues] = useState({
+    confirmpassword: "",
+    showConfirmPassword: false,
   });
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -65,55 +70,61 @@ const ChangePassword = (props) => {
 const handleClickShowNewPassword = () => {
   setNewValues({ ...newvalues, showNewPassword: !newvalues.showNewPassword });
 };
+const handleClickShowConfirmPassword = () => {
+  setConfirmValues({ ...confirmvalues, showConfirmPassword: !confirmvalues.showConfirmPassword });
+};
+
 
 const handleMouseDownPassword = (event) => {
     event.preventDefault();
 };
-
+const loggedInUserData = useSelector(
+  (state) => state.fetchLoggedInUserData.data
+);
  
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     setNewPassword("")
     setCurrentPassword("")
+    setConfirmPassword("")
     const ChangePassword = {
       new_password: newPassword,
       current_password: currentPassword,
-
+      confirm_password: confirmPassword
     }
-    let apiObj = new ChangePasswordAPI(ChangePassword)
-
-    fetch(apiObj.apiEndPoint(), {
-        method: 'POST',
-        body: JSON.stringify(apiObj.getBody()),
-        headers: apiObj.getHeaders().headers
-    }).then((response) => {
-
-        setLoading(false)
-        if (response.status === 204) {
-            setSnackbarInfo({
-                ...snackbar,
-                open: true,
-                message: "success",
-                variant: 'success'
-            })
-           
-        }
-        else {
-            setSnackbarInfo({
-                ...snackbar,
-                open: true,
-                message: "Invalid password  ",
-                variant: 'error'
-            })
-
-        }
-
+    if(newPassword!==confirmPassword){
+      setSnackbarInfo({
+        ...snackbar,
+        open: true,
+        message: "New Password and Confirm Password must match",
+        variant: 'error'
     })
-        .catch(error => {
-            setLoading(false)
-
-        })
+    }
+    else{
+      const userObj = new ChangePasswordAPI(loggedInUserData.id,ChangePassword);
+      const res = await fetch(userObj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(userObj.getBody()),
+          headers: userObj.getHeaders().headers,
+      });
+      const resp = await res.json();
+      if (res.ok) {
+          setSnackbarInfo({
+              open: true,
+              message: resp?.message,
+              variant: "success",
+          })
+    
+      } else {
+          setSnackbarInfo({
+              open: true,
+              message: resp?.message,
+              variant: "error",
+          })
+      }
+      }
 
   }
+
 
 
   const renderSnackBar = () => {
@@ -145,43 +156,9 @@ const handleMouseDownPassword = (event) => {
               </Typography>
             </Grid>
 
-            <Grid container direction="row">
-              <Grid
-                items
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-                className={classes.projectsettingGrid}
-              >
-                <Typography gutterBottom component="div" label="Required">
-                  New Password:
-                </Typography>
-              </Grid>
-              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
-                <OutlinedTextField
-                  fullWidth
-                  placeholder={translate("newPassword")}
-                  type={newvalues.showNewPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                 InputProps={{
-                  endAdornment: (
-                      <InputAdornment position="end">
-                          <IconButton
-                              onClick={handleClickShowNewPassword}
-                              onMouseDown={handleMouseDownPassword}
-                          >
-                              {newvalues.showNewPassword ? <Visibility /> : <VisibilityOff />}
-
-                          </IconButton>
-                      </InputAdornment>
-                  ),
-              }}
-                />
-              </Grid>
-            </Grid>
+            {/* <Grid container direction="row">
+             
+            </Grid> */}
 
             <Grid
               className={classes.projectsettingGrid}
@@ -193,7 +170,7 @@ const handleMouseDownPassword = (event) => {
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Current Password:
+                Current Password
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -220,6 +197,79 @@ const handleMouseDownPassword = (event) => {
                 
               />
             </Grid>
+
+            <Grid
+                items
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+                className={classes.projectsettingGrid}
+              >
+                <Typography gutterBottom component="div" label="Required">
+                  New Password
+                </Typography>
+              </Grid>
+              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                <OutlinedTextField
+                  fullWidth
+                  placeholder={translate("newPassword")}
+                  type={newvalues.showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                 InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowNewPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {newvalues.showNewPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
+                />
+              </Grid>
+
+              <Grid
+                items
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+                className={classes.projectsettingGrid}
+              >
+                <Typography gutterBottom component="div" label="Required">
+                  Confirm Password
+                </Typography>
+              </Grid>
+              <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+                <OutlinedTextField
+                  fullWidth
+                  placeholder={translate("newPassword")}
+                  type={confirmvalues.showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                 InputProps={{
+                  endAdornment: (
+                      <InputAdornment position="end">
+                          <IconButton
+                              onClick={handleClickShowConfirmPassword}
+                              onMouseDown={handleMouseDownPassword}
+                          >
+                              {confirmvalues.showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+
+                          </IconButton>
+                      </InputAdornment>
+                  ),
+              }}
+                />
+              </Grid>
+
             <Grid
               className={classes.projectsettingGrid}
               item
@@ -249,4 +299,3 @@ const handleMouseDownPassword = (event) => {
 };
 
 export default ChangePassword;
-

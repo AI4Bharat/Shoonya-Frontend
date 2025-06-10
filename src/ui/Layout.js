@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 // import { useHistory } from "react-router-dom";
 import {  ThemeProvider,  } from "@mui/material";
 // import Header from "./components/common/Header";
@@ -26,6 +26,8 @@ const Layout= (props) => {
   const [show, setShow] = useState(false);
   const [popUp, setPopup] = useState(true);
   const apiStatus = useSelector((state) => state.apiStatus);
+  const location = useLocation();
+  const projectType = useSelector((state) => state.getProjectDetails.data?.project_type);
 
   const classes = GlobalStyles();
 //   const history = useHistory();
@@ -39,6 +41,9 @@ const Layout= (props) => {
   const handleClose = () => {
     setPopup(false);
   };
+  const loggedInUserData = useSelector(
+    (state) => state?.fetchLoggedInUserData?.data
+  );
 
   // const renderError = () => {
   //   if (apiStatus.unauthrized) {
@@ -89,7 +94,7 @@ const Layout= (props) => {
   return (
     <ThemeProvider theme={themeDefault}>
       <div 
-      className={classes.root}
+      className={location.pathname.includes("AudioTranscriptionLandingPage")  ? classes.Audioroot : classes.root}
       >
         <Suspense fallback={<div>Loading....</div>}>
           <Header
@@ -98,13 +103,13 @@ const Layout= (props) => {
             className={classes.headerContainer}
           />
         </Suspense>
-        <div 
-        className={classes.container}
+        <div
+        className={location.pathname.includes("AudioTranscriptionLandingPage") || projectType=="StandardizedTranscriptionEditing"  ? classes.Audiocontainer : classes.container}
         >
           {/* {renderSpinner()}
           {renderError()} */}
           { Backbutton  && 
-           < BackButton startIcon={<  ArrowBackIcon />} sx={{ color:"white" ,   mb:2  }} backPressNavigationPath={backPressNavigationPath ? backPressNavigationPath : ""} label={translate("label.backToPreviousPage")}/>
+           < BackButton startIcon={<  ArrowBackIcon />} sx={{ color:"white" ,   mb:2 ,mt:2 }} backPressNavigationPath={backPressNavigationPath ? backPressNavigationPath : ""} label={translate("label.backToPreviousPage")}/>
            }
           <Suspense fallback={<div>Loading....</div>}>
             {component}

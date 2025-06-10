@@ -11,26 +11,29 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "./ColumnList";
 import SearchIcon from '@mui/icons-material/Search';
 import DatasetSearchPopup from '../../container/Dataset/DatasetSearchPopup';
-import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import Spinner from "../../component/common/Spinner";
 
 
 
 const excludeKeys = [
   "parent_data_id",
-  "metadata_json",
+  // "metadata_json",
   "instance_id_id",
   "datasetbase_ptr_id",
   "key",
   "instance_id",
   "speakers_json",
-  "conversation_json",
-  "transcribed_json",
-  "machine_transcribed_json",
-  "prediction_json",
   // "conversation_json",
-  // "machine_translated_conversation_json",
-  // "speakers_json"
+  // "transcribed_json",
+  "machine_transcribed_json",
+  // "prediction_json",
+  "conversation_json",
+  "machine_translated_conversation_json",
+  "speakers_json",
+  "unverified_conversation_json",
+  "annotation_bboxes",
+  "annotation_labels",
+  "annotation_transcripts",
 ];
 
 const DataitemsTable = () => {
@@ -54,47 +57,102 @@ const DataitemsTable = () => {
   const searchOpen = Boolean(searchAnchor);
   const [searchedCol, setSearchedCol] = useState();
 
-
+  useEffect(()=>{
+    try{
+      localStorage.setItem("DataitemsList", JSON.stringify(columns));
+      localStorage.setItem("Dataitem",  JSON.stringify(dataitemsList));  
+    }catch{
+      console.log("Local storage set item quota exceeded")
+    }
+  }, [columns, dataitemsList]);
+  
   const getDataitems = () => {
-    const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage, DatasetDetails.dataset_type,selectedFilters);
+    const dataObj = new GetDataitemsById(
+      datasetId,
+      DatasetDetails.dataset_type,
+      selectedFilters,
+      currentPageNumber,
+      currentRowPerPage
+    );
     dispatch(APITransport(dataObj));
   };
 
-  
- 
-  useEffect(() => {
-    setLoading(apiLoading);
+//   const dataObj = new GetDataitemsById(datasetId, currentPageNumber, currentRowPerPage, DatasetDetails.dataset_type,selectedFilters);
+//   dispatch(APITransport(dataObj));
+// };
+
+useEffect(() => {
+  setLoading(apiLoading);
 }, [apiLoading]);
  
 
-useEffect(() => {
-  setTotalDataitems(dataitemsList.count);
-  let fetchedItems = dataitemsList.results;
-  setDataitems(fetchedItems);
-  let tempColumns = [];
-  let tempSelected = [];
-  if (fetchedItems?.length) {
-    Object.keys(fetchedItems[0]).forEach((key) => {
-      if (!excludeKeys.includes(key)) {
-        tempColumns.push({
-          name: key,
-          label: snakeToTitleCase(key),
-          options: {
-            filter: false,
-            sort: false,
-            align: "center",
-            customHeadLabelRender: customColumnHead,
-          },
-        });
-        tempSelected.push(key);
-      }
-    });
-  }
-  setColumns(tempColumns);
-  setSelectedColumns(tempSelected);
-}, [dataitemsList]);
+    useEffect(() => {
+      let fetchedItems =dataitemsList.results;
+      setTotalDataitems(dataitemsList.count);
+      fetchedItems = dataitemsList.results;
+      setDataitems(fetchedItems);
 
- 
+     
+   
+    
+    let tempColumns = [];
+    let tempSelected = [];
+    if (fetchedItems?.length) {
+      Object.keys(fetchedItems[0]).forEach((key) => {
+        if (!excludeKeys.includes(key)) {
+          tempColumns.push({
+            name: key,
+            label: snakeToTitleCase(key),
+            options: {
+              filter: false,
+              sort: false,
+              align: "center",
+              customHeadLabelRender: customColumnHead,
+              customBodyRender: (value) => {
+                if ((key.includes("json")) && value !== null ) {
+                 const data = JSON.stringify(value)
+                 const metadata = data.replace(/\\/g, "");
+                  return metadata;
+                } else {
+                  return value;
+                }
+              },
+            },
+          });
+          tempSelected.push(key);
+        }
+      });
+    }
+    setColumns(tempColumns);
+    setSelectedColumns(tempSelected);
+    // console.log(tempSelected,"tempSelected",tempColumns)
+    // if (dataitemsList?.length > 0 && dataitemsList[0]) {
+
+    // let colList = [];
+    //         colList.push(...Object.keys(dataitemsList?.[0])?.filter(el => !excludeKeys.includes(el)));
+    //         const cols = colList.map((col) => {
+    //             return {
+    //                 name: col,
+    //                 label: snakeToTitleCase(col),
+    //                 options: {
+    //                     filter: false,
+    //                     sort: false,
+    //                     align: "center",
+    //                     customHeadLabelRender: customColumnHead,
+    //                 }
+    //             }
+    //         });
+            
+    //         setColumns(cols);
+    //         setSelectedColumns(colList);
+            
+          
+    //       }else {
+    //         setDataitems([]);
+    //     }
+     
+     }, [dataitemsList])
+   
 
   useEffect(() => {
     getDataitems();
