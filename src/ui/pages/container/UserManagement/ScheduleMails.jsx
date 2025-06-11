@@ -27,6 +27,7 @@ import MUIDataTable from "mui-datatables";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from "../../component/common/ColumnList";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+
 import { styled } from "@mui/material/styles";
 
 const TruncatedContent = styled(Box)(({ expanded }) => ({
@@ -44,6 +45,8 @@ const RowContainer = styled(Box)(({ expanded }) => ({
   cursor: "pointer",
   transition: "all 1.8s ease-in-out",
 }));
+
+
 
 const ScheduleMails = () => {
   const { id } = useParams();
@@ -349,23 +352,32 @@ const ScheduleMails = () => {
       });
       scheduledMails.map((mail) => {
         mail.Actions = (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 1,
-            }}
-          >
-            <CustomButton
-              label={mail["Status"] === "Enabled" ? "Pause" : "Resume"}
-              onClick={() => updateScheduledMail(mail)}
-            />
-            <CustomButton
-              label="Delete"
-              sx={{ backgroundColor: "#EC0000" }}
-              onClick={() => deleteScheduledMail(mail)}
-            />
-          </Box>
+          <>
+            <Tooltip title={mail["Status"] === "Enabled" ? "Pause" : "Resume"}>
+              <Button
+                sx={{ m: 1, p: 1 }}
+                variant={"contained"}
+                color={"primary"}
+                onClick={() => updateScheduledMail(mail)}
+              >
+                {mail["Status"] === "Enabled" ? (
+                  <PauseIcon />
+                ) : (
+                  <PlayArrowIcon />
+                )}
+              </Button>
+            </Tooltip>
+            <Tooltip title={"Delete"}>
+              <Button
+                sx={{ m: 1, backgroundColor: "#EC0000" }}
+                variant={"contained"}
+                color={"primary"}
+                onClick={() => deleteScheduledMail(mail)}
+              >
+                {<DeleteIcon />}
+              </Button>
+            </Tooltip>
+          </>
         );
         return mail;
       });
