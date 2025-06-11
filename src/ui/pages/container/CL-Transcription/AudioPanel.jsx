@@ -42,7 +42,7 @@ const AudioPanel = memo( ({
   }, [])
 
   return (
-    <Grid style={{ padding: "0px 20px 0px 20px" }}>
+    <Grid>
      
       {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio
