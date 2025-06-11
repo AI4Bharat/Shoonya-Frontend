@@ -20,7 +20,6 @@ import { styled } from "@mui/material/styles";
 
 const DatasetCardList = (props) => {
   const { datasetList, selectedFilters, setsSelectedFilters } = props;
-  const SearchDataset = useSelector((state) => state.SearchProjectCards.data);
   const [anchorEl, setAnchorEl] = useState(null);
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
@@ -73,28 +72,6 @@ const DatasetCardList = (props) => {
     setAnchorEl(null);
   };
 
-  const pageSearch = () => {
-    return datasetList.filter((el) => {
-      if (SearchDataset == "") {
-        return el;
-      } else if (
-        el.dataset_type?.toLowerCase().includes(SearchDataset?.toLowerCase())
-      ) {
-        return el;
-      } else if (
-        el.instance_name?.toLowerCase().includes(SearchDataset?.toLowerCase())
-      ) {
-        return el;
-      } else if (
-        el.instance_id
-          .toString()
-          ?.toLowerCase()
-          ?.includes(SearchDataset.toLowerCase())
-      ) {
-        return el;
-      }
-    });
-  };
 
   const columns = [
     {
@@ -141,7 +118,7 @@ const DatasetCardList = (props) => {
 
   const data =
     datasetList && datasetList.length > 0
-      ? pageSearch().map((el, i) => {
+      ? datasetList.map((el, i) => {
           return [
             el.instance_id,
             el.instance_name,
@@ -263,8 +240,15 @@ const DatasetCardList = (props) => {
           count={count}
           page={page}
           rowsPerPage={rowsPerPage}
-          onPageChange={(_, newPage) => changePage(newPage)}
-          onRowsPerPageChange={(e) => changeRowsPerPage(e.target.value)}
+          onPageChange={(event, newPage) => {
+            if (typeof newPage === 'number') {
+              changePage(event, newPage);
+            }
+          }}
+          onRowsPerPageChange={(e) => {
+            changeRowsPerPage(e);
+          }}
+          rowsPerPageOptions={[10, 25, 50, 100]}
           sx={{
             "& .MuiTablePagination-actions": {
               marginLeft: "0px",
@@ -288,7 +272,12 @@ const DatasetCardList = (props) => {
           </label>
           <Select
             value={page + 1}
-            onChange={(e) => changePage(Number(e.target.value) - 1)}
+            onChange={(e) => {
+              const newPage = Number(e.target.value) - 1;
+              if (typeof newPage === 'number' && newPage >= 0) {
+                changePage(e, newPage);
+              }
+            }}
             sx={{
               fontSize: "0.8rem",
               padding: "4px",
@@ -335,13 +324,17 @@ const DatasetCardList = (props) => {
     customToolbar: renderToolBar,
     responsive: "vertical",
     enableNestedDataAccess: ".",
+    serverSide: true,
+    count: props.totalCount,
+    page: props.page,
+    rowsPerPage: props.rowsPerPage,
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) => (
       <CustomFooter
-        count={count}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        changeRowsPerPage={changeRowsPerPage}
-        changePage={changePage}
+        count={props.totalCount}
+        page={props.page}
+        rowsPerPage={props.rowsPerPage}
+        changeRowsPerPage={props.onRowsPerPageChange}
+        changePage={props.onPageChange}
       />
     ),
   };
