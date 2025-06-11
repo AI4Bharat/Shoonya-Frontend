@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
-import { Link, useNavigate, useParams,useLocation } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
 import PullNewSuperCheckerBatchAPI from "../../../../redux/actions/api/Tasks/PullNewSuperCheckerBatch";
@@ -25,7 +25,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { styled } from "@mui/styles";
 import { tooltipClasses } from "@mui/material/Tooltip";
 import InfoIcon from '@mui/icons-material/Info';
@@ -44,6 +44,21 @@ import roles from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const excludeCols = [
   "context",
@@ -67,9 +82,6 @@ const SuperCheckerTasks = (props) => {
   const dispatch = useDispatch();
   const classes = DatasetStyle();
   const navigate = useNavigate();
-  let location = useLocation();
-
-  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -125,6 +137,7 @@ const SuperCheckerTasks = (props) => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -293,7 +306,11 @@ const SuperCheckerTasks = (props) => {
       );
       taskList[0].task_status && colList.push("status");
       colList.push("actions");
+      if (selectedColumns.length === 0) {
+        setSelectedColumns(colList);
+      }
       const cols = colList.map((col) => {
+        const isSelectedColumn = selectedColumns.includes(col);
         return {
           name: col,
           label: snakeToTitleCase(col),
@@ -301,27 +318,52 @@ const SuperCheckerTasks = (props) => {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
             customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList);
       setTasks(data);
     } else {
       setTasks([]);
     }
-  }, [taskList]);
+  }, [taskList, expandedRow, classes.link, ProjectDetails]);
 
-  useEffect(() => {
-    const newCols = columns.map((col) => {
-      col.options.display = selectedColumns.includes(col.name)
-        ? "true"
-        : "false";
-      return col;
-    });
-    setColumns(newCols);
-  }, [selectedColumns]);
+
+    useEffect(() => {
+      if (columns.length > 0 && selectedColumns.length > 0) {
+          const newCols = columns.map((col) => ({
+              ...col,
+              options: {
+              ...col.options,
+              display: selectedColumns.includes(col.name) ? "true" : "false"
+              }
+          }));
+          if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+              setColumns(newCols);
+          }
+      }
+    }, [selectedColumns, columns]);
 
 
   const handleShowFilter = (event) => {
@@ -903,18 +945,6 @@ const renderSnackBar = () => {
           )
         ) : (
           <></>
-          // <CustomButton
-          //   sx={{
-          //     p: 1,
-          //     width: "98%",
-          //     borderRadius: 2,
-          //     mb: 3,
-          //     ml: "1%",
-          //     mr: "1%",
-          //     mt: "1%",
-          //   }}
-          //   label={"Add New Item"}
-          // />
         ))}
       
       <ThemeProvider theme={tableTheme}>

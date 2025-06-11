@@ -1,7 +1,7 @@
 // TaskTable
 
 import MUIDataTable from "mui-datatables";
-import {  useEffect, useState, useRef } from "react";
+import React, {  useEffect, useState, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
@@ -24,7 +24,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import TablePagination from "@mui/material/TablePagination";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { styled } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
 import tableTheme from "../../../theme/tableTheme";
@@ -49,6 +49,22 @@ import FindAndReplaceWordsInAnnotationAPI from "../../../../redux/actions/api/Pr
 import roles from "../../../../utils/UserMappedByRole/Roles";
 import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+
+const TruncatedContent = styled(Box)(({ expanded }) => ({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  display: "-webkit-box",
+  WebkitLineClamp: expanded ? "unset" : 3,
+  WebkitBoxOrient: "vertical",
+  lineHeight: "1.5em",
+  maxHeight: expanded ? "9900px" : "4.5em",
+  transition: "max-height 1.8s ease-in-out",
+}));
+
+const RowContainer = styled(Box)(({ expanded }) => ({
+  cursor: "pointer",
+  transition: "all 1.8s ease-in-out",
+}));
 
 const excludeSearch = ["status", "actions", "output_text"];
 const excludeCols = [
@@ -179,6 +195,7 @@ const TaskTable = (props) => {
   const [isBrowser, setIsBrowser] = useState(false);
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -434,6 +451,7 @@ const TaskTable = (props) => {
         : selectedFilters.review_status
     );
   }, [selectedFilters]);
+
   useEffect(() => {
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
@@ -444,112 +462,111 @@ const TaskTable = (props) => {
             .filter((key) => !excludeCols.includes(key))
             .map((key) => el.data[key])
         );
-        props.type === "annotation" &&
-          taskList[0].annotation_status &&
+        if (props.type === "annotation" && taskList[0].annotation_status) {
           row.push(el.annotation_status);
-        props.type === "review" &&
-          taskList[0].review_status &&
+        } else if (props.type === "review" && taskList[0].review_status) {
           row.push(el.review_status);
-        props.type === "annotation" &&
-          row.push(
-            <Link
-              to={
-                ProjectDetails?.project_type?.includes("Acoustic")
-                  ? `AudioTranscriptionLandingPage/${el.id}`
-                  : `task/${el.id}`
-              }
-              className={classes.link}
-            >
-              <CustomButton
-                onClick={() => {
-                  localStorage.removeItem("labelAll");
-                }}
-                disabled={ProjectDetails.is_archived}
-                sx={{ p: 1, borderRadius: 2 }}
-                label={
-                  <Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                    {props.type === "annotation" &&
-                    ProjectDetails?.annotators?.some(
-                      (a) => a.id === userDetails?.id
-                    )
-                      ? ProjectDetails.project_mode === "Annotation"
-                        ? "Annotate"
-                        : "Edit"
-                      : "View"}
-                  </Typography>
-                }
-              />
-            </Link>
-          );
-        props.type === "review" &&
-          row.push(
-            <Link
-              to={
-                ProjectDetails?.project_type?.includes("Acoustic")
-                  ? `ReviewAudioTranscriptionLandingPage/${el.id}`
-                  : `review/${el.id}`
-              }
-              className={classes.link}
-            >
-              <CustomButton
-                disabled={ProjectDetails.is_archived}
-                onClick={() => {
-                  localStorage.removeItem("labelAll");
-                }}
-                sx={{ p: 1, borderRadius: 2 }}
-                label={
-                  <Typography sx={{ color: "#FFFFFF" }} variant="body2">
-                    Review
-                  </Typography>
-                }
-              />
-            </Link>
-          );
+        } else if (taskList[0].task_status) { 
+           row.push(el.task_status); 
+        }
+
+        const actionLink = props.type === "annotation"
+            ? ProjectDetails?.project_type?.includes("Acoustic")
+                ? `AudioTranscriptionLandingPage/${el.id}`
+                : `task/${el.id}`
+            : ProjectDetails?.project_type?.includes("Acoustic")
+                ? `ReviewAudioTranscriptionLandingPage/${el.id}`
+                : `review/${el.id}`;
+
+        const actionLabel = props.type === "annotation"
+            ? (ProjectDetails?.annotators?.some(a => a.id === userDetails?.id)
+                ? (ProjectDetails.project_mode === "Annotation" ? "Annotate" : "Edit")
+                : "View")
+            : "Review"; 
+
+        row.push(
+          <Link to={actionLink} className={classes.link}>
+            <CustomButton
+              onClick={() => localStorage.removeItem("labelAll")}
+              disabled={ProjectDetails.is_archived}
+              sx={{ p: 1, borderRadius: 2 }}
+              label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">{actionLabel}</Typography>}
+            />
+          </Link>
+        );
         return row;
       });
-      // let colList = ["id"];
-      // colList.push(...Object.keys(taskList[0].data).filter(el => !excludeCols.includes(el) && !el.includes("_json")));
 
       const annotatorEmail = taskList[0]?.hasOwnProperty("annotator_mail");
-      const email =
-        props.type === "review" && annotatorEmail ? "Annotator Email" : "";
-      let colList = ["id", ...(!!email ? [email] : [])];
+      const emailColName = props.type === "review" && annotatorEmail ? "Annotator Email" : "";
+      let colList = ["id", ...(!!emailColName ? [emailColName] : [])];
       colList.push(
-        ...Object.keys(taskList[0].data).filter(
-          (el) => !excludeCols.includes(el)
-        )
+        ...Object.keys(taskList[0].data).filter((el) => !excludeCols.includes(el))
       );
+      
       taskList[0].task_status && colList.push("status");
       colList.push("actions");
+
+      if (selectedColumns.length === 0) {
+        setSelectedColumns(colList);
+      }
+
       const cols = colList.map((col) => {
+        const isSelectedColumn = selectedColumns.includes(col);
+
         return {
-          name: col,
-          label: snakeToTitleCase(col),
+          name: col, 
+          label: snakeToTitleCase(col), 
           options: {
             filter: false,
             sort: false,
             align: "center",
+            display: isSelectedColumn ? "true" : "false",
             customHeadLabelRender: customColumnHead,
+            customBodyRender: (value, tableMeta) => {
+              const rowIndex = tableMeta.rowIndex;
+              const isExpanded = expandedRow === rowIndex;
+              return (
+                <RowContainer
+                  expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedRow((prevExpanded) =>
+                      prevExpanded === rowIndex ? null : rowIndex
+                    );
+                  }}
+                >
+                  <TruncatedContent expanded={isExpanded}>
+                    {value}
+                  </TruncatedContent>
+                </RowContainer>
+              );
+            },
           },
         };
       });
-      setColumns(cols);
-      setSelectedColumns(colList);
-      setTasks(data);
+
+      setColumns(cols); 
+      setTasks(data); 
     } else {
       setTasks([]);
     }
-  }, [taskList, ProjectDetails]);
+  }, [taskList, ProjectDetails, expandedRow, props.type, userDetails, classes.link]); // Added props.type, userDetails, classes.link as they are used inside
 
   useEffect(() => {
-    const newCols = columns.map((col) => {
-      col.options.display = selectedColumns.includes(col.name)
-        ? "true"
-        : "false";
-      return col;
-    });
-    setColumns(newCols);
-  }, [selectedColumns]);
+    if (columns.length > 0 && selectedColumns.length > 0) {
+        const newCols = columns.map((col) => ({
+            ...col,
+            options: {
+            ...col.options,
+            display: selectedColumns.includes(col.name) ? "true" : "false"
+            }
+        }));
+        if (JSON.stringify(newCols) !== JSON.stringify(columns)) {
+            setColumns(newCols);
+        }
+    }
+  }, [selectedColumns, columns]);
 
   useEffect(() => {
     if (ProjectDetails) {
@@ -698,74 +715,6 @@ const TaskTable = (props) => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
       <Box className={classes.filterToolbarContainer} sx={{ height: "80px" }}>
-        {/* {props.ProjectDetails?.project_type ===
-          "ContextualTranslationEditing" && (
-          <>
-            {(props.type === "annotation" || props.type === "review") &&
-              ((props.type === "annotation" &&
-                selectedFilters.annotation_status === "labeled") ||
-                selectedFilters.review_status === "accepted" ||
-                selectedFilters.accepted_with_changes ===
-                  "accepted_with_changes") && (
-                <Grid container justifyContent="start" alignItems="center">
-                  <Grid>
-                    <Typography
-                      variant="body2"
-                      fontWeight="700"
-                      label="Required"
-                    >
-                      Find :
-                    </Typography>
-                  </Grid>
-                  <Grid>
-                    <OutlinedTextField
-                      size="small"
-                      name="find"
-                      InputProps={{
-                        style: { fontSize: "14px", width: "150px" },
-                      }}
-                      value={find}
-                      onChange={(e) => setFind(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid>
-                    <Typography
-                      variant="body2"
-                      fontWeight="700"
-                      label="Required"
-                    >
-                      Replace :
-                    </Typography>
-                  </Grid>
-                  <Grid>
-                    <OutlinedTextField
-                      size="small"
-                      name="replace"
-                      InputProps={{
-                        style: { fontSize: "14px", width: "150px" },
-                      }}
-                      value={replace}
-                      onChange={(e) => setReplace(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid>
-                    <CustomButton
-                      sx={{
-                        inlineSize: "max-content",
-                        width: "50px",
-                        borderRadius: "20px",
-                        
-                      }}
-                      onClick={handleOpenFindAndReplace}
-                      label="Submit"
-                      disabled={find && replace  ? false : true}
-
-                    />
-                  </Grid>
-                </Grid>
-              )}
-          </>
-        )} */}
 
         {props.type === "annotation" &&
           (roles?.WorkspaceManager === userDetails?.role ||

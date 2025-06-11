@@ -17,7 +17,7 @@ import Box from "@mui/material/Box";
 import TablePagination from "@mui/material/TablePagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import tableTheme from "../../../theme/tableTheme";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 
@@ -264,16 +264,8 @@ export default function DatasetProjectsTable({ datasetId }) {
 		
         return el;
 	  }
-    //   } else if (
-    //     el.email?.toLowerCase().includes(SearchWorkspaceMembers?.toLowerCase())
-    //   ) {
-    //     return el;
-    //   }
     });
   };
-
-
-
 	const getPullNewDataAPI = async (project) => {
 		const projectObj = new GetPullNewDataAPI(project.id);
 		//dispatch(APITransport(projectObj));

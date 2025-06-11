@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import InputAdornment from "@mui/material/InputAdornment";
 import FormHelperText from "@mui/material/FormHelperText";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import LoginStyle from "../../../styles/loginStyle";

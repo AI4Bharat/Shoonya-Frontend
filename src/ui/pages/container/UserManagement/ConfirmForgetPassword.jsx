@@ -6,7 +6,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import LoginStyle from "../../../styles/loginStyle";

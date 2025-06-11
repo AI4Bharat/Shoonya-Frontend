@@ -6,7 +6,7 @@ import MUIDataTable from "mui-datatables";
 import GetWorkspacesProjectDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceProject";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
-import { ThemeProvider } from "@mui/material/styles";
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import TablePagination from "@mui/material/TablePagination";
