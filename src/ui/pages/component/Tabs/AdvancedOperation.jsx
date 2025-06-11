@@ -40,6 +40,7 @@ import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import PopulateModuleOutput from "../../container/Project/populateASR";
 
 
 const ProgressType = [
@@ -634,7 +635,10 @@ const AdvancedOperation = (props) => {
           )) &&
             <Grid item xs={12}>
               <SuperCheckSettings ProjectDetails={ProjectDetails} />
-            </Grid>}
+            </Grid>}<Grid item xs={12} sm={12} md={12} lg={7} xl={7}>
+            <PopulateModuleOutput />
+          </Grid>
+
         </Grid>
         </Grid>
 
