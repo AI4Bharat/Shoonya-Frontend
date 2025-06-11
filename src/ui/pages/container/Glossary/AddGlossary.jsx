@@ -278,6 +278,7 @@ const AddGlossary = ({
                
                 { Sourcedata.length > 0 && selectedSourceLang !== "en" ? (
                  <IndicTransliterate
+                  apiKey={process.env.REACT_APP_XLIT_APIKEY}
                   lang={Sourcelanguage.LangCode  ? Sourcelanguage.LangCode  : (Sourcedata.length > 0   ?   Sourcedata[0]?.LangCode  : "hi" )}
                   value={SourceText}
                   onChangeText={(SourceText) => {
@@ -293,6 +294,7 @@ const AddGlossary = ({
               />)}
                { data.length > 0 && selectedTargetLang !== "en" ? (
                 <IndicTransliterate
+                  apiKey={process.env.REACT_APP_XLIT_APIKEY}
                   lang={Targetlanguage.LangCode  ? Targetlanguage.LangCode : (data.length > 0  ?  data[0]?.LangCode : "hi")}
                   value={targetText}
                   onChangeText={(targetText) => {

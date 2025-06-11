@@ -48,7 +48,7 @@ import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
-
+import PopulateModuleOutput from "../../container/Project/populateASR";
 
 const ProgressType = [
   "incomplete",
@@ -646,7 +646,8 @@ const AdvancedOperation = (props) => {
               onChange={handleReviewToggle}
             />
           </Grid> */}
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}
+           {userRole.Admin === loggedInUserData?.role  ||
+            userRole.OrganizationOwner === loggedInUserData?.role?<Grid item xs={12} sm={12} md={12} lg={12} xl={12}
             sx={{ ml: 2 }}
           >
               <FormControl size="small" className={classes.formControl}>
@@ -668,7 +669,7 @@ const AdvancedOperation = (props) => {
                   ))}
                 </Select>
               </FormControl>
-          </Grid>
+          </Grid>:null}
 
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
             userRole.OrganizationOwner === loggedInUserData?.role ||
@@ -680,6 +681,10 @@ const AdvancedOperation = (props) => {
             >
               <SuperCheckSettings ProjectDetails={ProjectDetails} />
             </Grid>}
+             <Grid item xs={12} sm={12} md={12} lg={7} xl={7}>
+            <PopulateModuleOutput />
+          </Grid>
+
         </Grid>
 
 

@@ -36,6 +36,29 @@ const fetchAnnotation = async (taskID) => {
   }
 };
 
+
+const fetchTransliteration = async (sourceText,tgtLng) => {
+  const url = `https://xlit-api.ai4bharat.org/rt/${encodeURIComponent(tgtLng)}/${encodeURIComponent(sourceText)}`;  
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return {
+    timestamp: data.at,
+    error: data.error,
+    input: data.input,
+    romanised_transliteration: data.result.join(", "), // Assuming result is always an array; join elements for a single string output
+    success: data.success
+  };
+};
+
 const postAnnotation = async (
   result,
   task,
@@ -273,6 +296,7 @@ export {
   patchAnnotation,
   deleteAnnotation,
   fetchAnnotation,
+  fetchTransliteration,
   postReview,
   patchReview,
   patchSuperChecker,

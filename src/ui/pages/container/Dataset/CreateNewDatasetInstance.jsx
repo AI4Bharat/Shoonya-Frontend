@@ -5,6 +5,7 @@ import {
   Tab,
   Tabs,
   ThemeProvider,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -21,6 +22,7 @@ import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import CreateNewDatasetInstanceAPI from "../../../../redux/actions/api/Dataset/CreateNewDatasetInstance";
 import GetDatasetTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetType"
 import MenuItems from "../../component/common/MenuItems"
+import { Info } from "@mui/icons-material";
 
 const CollectionProject = (props) => {
   const { id } = useParams();
@@ -176,9 +178,22 @@ const CollectionProject = (props) => {
               lg={12}
               xl={12}
             >
-              <Typography gutterBottom component="div">
-                Parent_Instance_Id:
-              </Typography>
+
+<Grid item xs={4} md={4} lg={4} xl={4} sm={4}>
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <Typography gutterBottom component="div">
+      Parent_Instance_Id:
+    </Typography>
+    <Tooltip 
+    arrow
+      title="Parent Data (A reference to database object referenced by integer ID field) - The parent data item id of this record. When a single sentence in a particular language is to be translated into another language, the source data item id is used as a 'Parent Data' and a separate child conversation data item is created for each language for which the source data item is to be translated into." 
+      placement="right"
+    >
+      <Info style={{ marginBottom: "5px", cursor: 'pointer', color: "grey" }} />
+    </Tooltip>
+  </div>
+</Grid>
+
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
               <OutlinedTextField
