@@ -11,12 +11,14 @@ import {
     MenuItem,
     RadioGroup,
     FormControlLabel,
-    Radio
-} from "@mui/material";
+    Radio,
+    Snackbar,
+    Alert,
+    CircularProgress
+} 
+from "@mui/material";
 import { useParams } from "react-router-dom";
-// import ENDPOINTS from "../../../../config/apiendpoint";
 import configs from '../../../../config/config.js';
-
 
 const langCodes = {
     'Assamese': 'as', 'Bengali': 'bn', 'Bodo': 'brx', 'Dogri': 'doi', 'Gujarati': 'gu',
@@ -35,12 +37,14 @@ export default function PopulateModuleOutput() {
     const { id: projectId } = useParams();
     const [anchorEl, setAnchorEl] = useState(null);
     const [message, setMessage] = useState("");
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [modelLanguage, setModelLanguage] = useState("");
     const [projectIds, setProjectIds] = useState(projectId || "default_project_id");
     const [stage, setStage] = useState("l1");
     const [projectType, setProjectType] = useState("");
     const [apiEndpoint, setApiEndpoint] = useState(apiEndpoints_pred.default_asr);
     const [userRole, setUserRole] = useState(null);
+    const [loading, setLoading] = useState(false); // ✅ loading state
 
     useEffect(() => {
         async function fetchProjectDetails() {
@@ -52,12 +56,7 @@ export default function PopulateModuleOutput() {
                         "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
                     }
                 });
-                console.log("Response:", response);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
                 setModelLanguage(langCodes[data.tgt_language] || "");
                 setProjectType(data.project_type);
@@ -65,35 +64,27 @@ export default function PopulateModuleOutput() {
                 console.error("Error fetching project details:", error);
             }
         }
-
         fetchProjectDetails();
     }, [projectId]);
 
-
     useEffect(() => {
-        async function fetchroleDetails() {
+        async function fetchRoleDetails() {
             try {
-                const response1 = await fetch(`${configs.BASE_URL_AUTO}/users/account/me/fetch/`, {
+                const response = await fetch(`${configs.BASE_URL_AUTO}/users/account/me/fetch/`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
                     }
                 });
-                console.log("Response Role:", response1);
-
-                if (!response1.ok) {
-                    throw new Error(`HTTP error! Status: ${response1.status}`);
-                }
-
-                const data = await response1.json();
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
                 setUserRole(data.role);
             } catch (error) {
                 console.error("Error fetching Role details:", error);
             }
         }
-
-        fetchroleDetails();
+        fetchRoleDetails();
     }, []);
 
     const handleClick = (event) => {
@@ -101,13 +92,13 @@ export default function PopulateModuleOutput() {
     };
 
     const handleSubmit = async () => {
-        setAnchorEl(null); const payload = {
+        setAnchorEl(null);
+        setLoading(true); // ✅ Start loading
+        const payload = {
             model_language: modelLanguage,
             project_ids: projectIds.split(",").map(id => id.trim()),
             stage: stage
         };
-
-        console.log("Submitting payload:", payload);
         try {
             const response = await fetch(apiEndpoint, {
                 method: "POST",
@@ -115,23 +106,22 @@ export default function PopulateModuleOutput() {
                     "Content-Type": "application/json",
                     "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`
                 },
-                body: JSON.stringify({
-                    model_language: modelLanguage,
-                    project_ids: projectIds.split(",").map(id => id.trim()),
-                    stage: stage
-                })
+                body: JSON.stringify(payload)
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error(data?.detail || `HTTP error! Status: ${response.status}`);
             }
 
-            const data = await response.json();
-            console.log("Success:", data);
-            setMessage("Module output populated successfully!");
+            // ✅ Show backend message if available, fallback to success text
+            setMessage(data?.message || "✅ Module output populated successfully!");
         } catch (error) {
-            console.error("Error:", error);
-            setMessage("Failed to populate module output.");
+            setMessage(`❌ ${error.message || "Failed to populate module output."}`);
+        } finally {
+            setLoading(false); // ✅ Stop loading
+            setSnackbarOpen(true);
         }
     };
 
@@ -142,12 +132,10 @@ export default function PopulateModuleOutput() {
     const open = Boolean(anchorEl);
     const popoverId = open ? 'simple-popover' : undefined;
 
-    // Hide button if project_type is not "AcousticNormalisedTranscriptionEditing"
-    const allowedRoles = [6,5];
+    const allowedRoles = [6, 5];
     if (projectType !== "AcousticNormalisedTranscriptionEditing" || !allowedRoles.includes(userRole)) {
         return null;
     }
-
 
     return (
         <div>
@@ -193,6 +181,7 @@ export default function PopulateModuleOutput() {
                                 variant="outlined"
                                 value={projectIds}
                                 onChange={(e) => setProjectIds(e.target.value)}
+                                disabled // ✅ Disabled as per original code
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -233,12 +222,33 @@ export default function PopulateModuleOutput() {
                         <Button onClick={handleClose} variant="outlined" color="primary">
                             Cancel
                         </Button>
-                        <Button onClick={handleSubmit} variant="contained" color="primary">
-                            Submit
+                        <Button
+                            onClick={handleSubmit}
+                            variant="contained"
+                            color="primary"
+                            disabled={loading} // ✅ Disabled when loading
+                        >
+                            {loading ? <CircularProgress size={20} color="inherit" /> : "Submit"}
                         </Button>
                     </Box>
                 </Box>
             </Popover>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert
+                    onClose={() => setSnackbarOpen(false)}
+                    severity={message.toLowerCase().includes("error") || message.toLowerCase().includes("fail") ? "error" : "success"}
+                    sx={{ width: '100%' }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }
+
