@@ -2,3 +2,9 @@ node_modules
 package-lock.json
 build
 dist/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
