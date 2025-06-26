@@ -400,12 +400,12 @@ const TranscriptionRightPanel = ({
   const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const { value } = event.target;
     const { currentTarget } = event;
-  
+
     // Get the appropriate text field
-    const oldText = updateAcoustic 
+    const oldText = updateAcoustic
       ? subtitles[index]?.acoustic_normalised_text || ""
       : subtitles[index]?.text || "";
-  
+
     if (oldText !== value) {
       setUndoStack((prevState) => [
         ...prevState,
@@ -413,7 +413,7 @@ const TranscriptionRightPanel = ({
           type: updateAcoustic ? "textChangeAcoustic" : "textChange",
           index: index,
           previousText: oldText,
-          updateAcoustic: updateAcoustic
+          updateAcoustic: updateAcoustic,
         },
       ]);
       setRedoStack([]);
@@ -604,84 +604,86 @@ const TranscriptionRightPanel = ({
   const onUndo = useCallback(() => {
     if (undoStack?.length > 0) {
       const lastAction = undoStack[undoStack.length - 1];
-  
+
       if (lastAction.type === "textChange") {
         // Handle verbatim text undo
         const currentText = subtitles[lastAction.index]?.text || "";
-        
+
         const sub = onSubtitleChange(
           lastAction.previousText,
           lastAction.index,
           false // updateAcoustic flag
         );
         dispatch(setSubtitles(sub, C.SUBTITLES));
-  
+
         setRedoStack((prevState) => [
           ...prevState,
           {
             type: "textChange",
             index: lastAction.index,
             previousText: currentText,
-            updateAcoustic: false
+            updateAcoustic: false,
           },
         ]);
-      }
-      else if (lastAction.type === "textChangeAcoustic") {
+      } else if (lastAction.type === "textChangeAcoustic") {
         // Handle acoustic text undo
-        const currentText = subtitles[lastAction.index]?.acoustic_normalised_text || "";
-        
+        const currentText =
+          subtitles[lastAction.index]?.acoustic_normalised_text || "";
+
         const sub = onSubtitleChange(
           lastAction.previousText,
           lastAction.index,
           true // updateAcoustic flag
         );
         dispatch(setSubtitles(sub, C.SUBTITLES));
-  
+
         setRedoStack((prevState) => [
           ...prevState,
           {
             type: "textChangeAcoustic",
             index: lastAction.index,
             previousText: currentText,
-            updateAcoustic: true
+            updateAcoustic: true,
           },
         ]);
-      }
-
-    else if (lastAction.type === "doubleHash") {
-      // Undo double-hash action
-      const elementsWithBoxHighlightClass = document.getElementsByClassName(
-        classes.boxHighlight
-      );
-      const textArea = elementsWithBoxHighlightClass[lastAction.index];
-      if (textArea) {
-        textArea.value = textArea.value.replace(
-          lastAction.hashedText,
-          lastAction.originalText
+      } else if (lastAction.type === "doubleHash") {
+        // Undo double-hash action
+        const elementsWithBoxHighlightClass = document.getElementsByClassName(
+          classes.boxHighlight
         );
+        const textArea = elementsWithBoxHighlightClass[lastAction.index];
+        if (textArea) {
+          textArea.value = textArea.value.replace(
+            lastAction.hashedText,
+            lastAction.originalText
+          );
 
-        const sub = onSubtitleChange(
-          textArea.value,
-          currentIndexToSplitTextBlock,
-          lastAction.index
-        );
+          const sub = onSubtitleChange(
+            textArea.value,
+            currentIndexToSplitTextBlock,
+            lastAction.index
+          );
+          dispatch(setSubtitles(sub, C.SUBTITLES));
+        }
+
+        setRedoStack((prevState) => [...prevState, lastAction]);
+      } else {
+        // Handle other action types
+        const sub = onUndoAction(lastAction);
         dispatch(setSubtitles(sub, C.SUBTITLES));
+        setRedoStack((prevState) => [...prevState, lastAction]);
       }
 
-      setRedoStack((prevState) => [...prevState, lastAction]);
+      // Always pop from undo stack
+      setUndoStack((prev) => prev.slice(0, prev.length - 1));
     }
-
-    else {
-      // Handle other action types
-      const sub = onUndoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-      setRedoStack((prevState) => [...prevState, lastAction]);
-    }
-
-    // Always pop from undo stack
-    setUndoStack((prev) => prev.slice(0, prev.length - 1));
-  }
-}, [undoStack, subtitles, dispatch, currentIndexToSplitTextBlock, classes.boxHighlight]);
+  }, [
+    undoStack,
+    subtitles,
+    dispatch,
+    currentIndexToSplitTextBlock,
+    classes.boxHighlight,
+  ]);
 
 const onRedo = useCallback(() => {
   if (redoStack?.length > 0) {
@@ -691,13 +693,15 @@ const onRedo = useCallback(() => {
       // Handle verbatim text redo
       const currentText = subtitles[lastAction.index]?.text || "";
 
+      // Redo text change
       const sub = onSubtitleChange(
         lastAction.previousText,
         lastAction.index,
-        false // updateAcoustic flag
+        false
       );
       dispatch(setSubtitles(sub, C.SUBTITLES));
 
+      // Push undo version of this action
       setUndoStack((prevState) => [
         ...prevState,
         {
