@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef, memo } from "react";
-import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
+import { IndicTransliterate } from "@ai4bharat/indic-transliterate-transcribe";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Resizable } from "re-resizable";
@@ -1153,6 +1153,8 @@ const onRedo = useCallback(() => {
                       enableTransliteration ? (
                         <IndicTransliterate
                           customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                          enableASR={true}
+                          asrApiUrl={`${configs.BASE_URL_AUTO}/tasks/asr-api/generic/transcribe`}
                           apiKey={`JWT ${localStorage.getItem(
                             "shoonya_access_token"
                           )}`}
@@ -1413,6 +1415,8 @@ const onRedo = useCallback(() => {
                         enableTransliteration ? (
                           <IndicTransliterate
                             customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                            enableASR={true}
+                            asrApiUrl={`${configs.BASE_URL_AUTO}/tasks/asr-api/generic/transcribe`}
                             apiKey={`JWT ${localStorage.getItem(
                               "shoonya_access_token"
                             )}`}
