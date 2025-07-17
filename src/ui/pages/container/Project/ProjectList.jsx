@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Radio, Box, Grid, Typography, ThemeProvider } from "@mui/material";
+import Radio from "@mui/material/Radio";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import { ThemeProvider } from "@mui/material/styles";
+
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
@@ -12,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import Search from "../../component/common/Search";
 import DatasetStyle from "../../../styles/Dataset";
 import themeDefault from "../../../theme/theme";
-import tableTheme from "../../../theme/tableTheme";
 
 export default function ProjectList() {
   const [radiobutton, setRadiobutton] = useState(true);
@@ -117,7 +121,7 @@ export default function ProjectList() {
         </Grid>
       </Grid>
       <Box>
-        <Box sx={{ marginTop: "20px" }}>
+        <Box sx={{ marginTop: "20px" ,marginLeft:'15px',marginRight:'15px'}}>
           {radiobutton ? (
             <ProjectCardList
               projectData={projectData}

@@ -1,11 +1,8 @@
-import {
-  Grid,
-  Link,
-  Typography,
-  Hidden,
-  ThemeProvider,
-  Box,
-} from "@mui/material";
+
+import Grid from "@mui/material/Grid";
+import { ThemeProvider } from "@mui/material/styles";
+import Link from "@mui/material/Link";
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -65,7 +62,6 @@ const Login = () => {
   const keyRelease = () => {
     setIsPressed(false);
   };
-  console.log(userRole.Annotator === loggedInUserData?.role, "userroles");
   useEffect(() => {
     window.addEventListener("keydown", keyPress);
     window.addEventListener("keyup", keyRelease);
@@ -75,59 +71,12 @@ const Login = () => {
     };
   }, [keyPress, keyRelease]);
 
-  // useEffect(() => {
-  //   if(localStorage.getItem("shoonya_access_token") && localStorage.getItem("shoonya_refresh_token") && userRole.Admin === loggedInUserData?.role) {
-  //     navigate("/admin");
-  //     console.log("admin" ,"projectsprojectsprojectsprojects")
-  //   }else{
-  //     navigate("/projects");
-  //     console.log("projects","projectsprojectsprojectsprojects")
-  //   }
-  // }, [loggedInUserData]);
 
   useEffect(() => {
     if (loggedInUserData && accessToken && refreshToken) {
       navigate("/projects");
     }
   }, [loggedInUserData]);
-
-  // const createToken = () => {
-  //   const apiObj = new LoginAPI(credentials.email.toLowerCase() , credentials.password);
-  //   fetch(apiObj.apiEndPoint(), {
-  //     method: "POST",
-  //     body: JSON.stringify(apiObj.getBody()),
-  //     headers: apiObj.getHeaders().headers,
-  //   })
-  //     .then(async (res) => {
-  //       const rsp_data = await res.json();
-  //       console.log(rsp_data);
-  //       if (!res.ok) {
-  //         // return Promise.reject('');
-  //         // let errorObj =
-  //         console.log("res -", res);
-  //         setSnackbarInfo({
-  //           open: true,
-  //           variant: "error",
-  //           // message: "Username or Password incorrect.",
-  //           message: rsp_data.detail
-
-  //         });
-  //       } else {
-  //         localStorage.setItem("shoonya_access_token", rsp_data.access);
-  //         localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
-  //         getLoggedInUserData()
-  //         if(userRole.Admin === loggedInUserData?.role){
-  //           navigate("/admin");
-  //         }else{
-  //           navigate("/projects");
-  //         }
-
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setSnackbarInfo({ open: true, variant: "error", message: error });
-  //     });
-  // };
 
   const createToken = async () => {
     // setLoading(true);
@@ -143,10 +92,7 @@ const Login = () => {
     });
 
     const rsp_data = await res.json();
-    // console.log(rsp_data)
     if (res.ok) {
-      // localStorage.setItem("token", resp.access);
-      // localStorage.setItem("user_id", rsp_data.user_id);
       localStorage.setItem("shoonya_access_token", rsp_data.access);
       localStorage.setItem("shoonya_refresh_token", rsp_data.refresh);
       localStorage.setItem("email_id", credentials.email.toLowerCase());

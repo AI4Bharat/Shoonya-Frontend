@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Radio, Box, Grid, Typography, ThemeProvider } from "@mui/material";
+import Radio from "@mui/material/Radio";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import RadioGroup from "@mui/material/RadioGroup";
+import { ThemeProvider } from "@mui/material/styles";
+
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import DatasetCardList from "./DatasetCardList";
@@ -8,7 +13,7 @@ import DatasetCard from "./DatasetCard";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch, useSelector } from "react-redux";
 import GetDatasetsAPI from "../../../../redux/actions/api/Dataset/GetDatasetList";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import DatasetStyle from "../../../styles/Dataset";
@@ -23,7 +28,7 @@ export default function DatasetList() {
   const [radiobutton, setRadiobutton] = useState(true);
   const [loading, setLoading] = useState(false);
   const datasetList = useSelector((state) => state.getDatasetList.data);
-  const apiLoading = useSelector((state) => state.apiStatus.loading);
+  const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
 
   const [selectedFilters, setsSelectedFilters] = useState(() => {
   const savedFilters = localStorage.getItem("datasetSelectedFilters");
@@ -32,14 +37,14 @@ export default function DatasetList() {
       : { dataset_visibility: "", dataset_type: "" };
   });
   const getDashboardprojectData = () => {
+    setLoading(true);
     const projectObj = new GetDatasetsAPI(selectedFilters);
     dispatch(APITransport(projectObj));
   };
-  
-  const loggedInUserData = useSelector(
-    (state) => state.fetchLoggedInUserData.data
-  );
 
+  useEffect(() => {
+    setLoading(false);
+  }, [datasetList]);
 
   useEffect(() => {
     getDashboardprojectData();
@@ -72,9 +77,6 @@ export default function DatasetList() {
   const handleAutomateButton = (e) => {
     navigate("/datasets/automate");
   };
-   useEffect(() => {
-      setLoading(apiLoading);
-  }, [apiLoading])
 
   return (
     <ThemeProvider theme={themeDefault}>

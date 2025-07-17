@@ -226,7 +226,6 @@ const DataitemsTable = () => {
       localStorage.setItem("DataitemsList", JSON.stringify(columns));
       localStorage.setItem("Dataitem", JSON.stringify(dataitemsList));
     } catch {
-      console.log("Local storage set item quota exceeded");
     }
   }, [columns, dataitemsList]);
 
@@ -334,8 +333,6 @@ const DataitemsTable = () => {
                     <Box
                       sx={{
                         width: "100%",
-                        minWidth: "250px",
-                        maxWidth: "500px",
                         m: 1,
                         border: "1px solid rgba(224, 224, 224, 1)",
                         borderRadius: "4px",
@@ -359,6 +356,8 @@ const DataitemsTable = () => {
                 display: isDefaultColumn ? "true" : "false",
                 viewColumns: true,
                 align: "center",
+
+        
                 customHeadLabelRender: customColumnHead,
                 customBodyRender: (value, tableMeta) => {
                   const rowIndex = tableMeta.rowIndex;

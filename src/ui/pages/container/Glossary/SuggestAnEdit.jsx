@@ -72,7 +72,6 @@ const [Targetlanguage, setTargetlanguage] = useState([]);
         setTargetlanguage(langs)
       })
       .catch(err => {
-        console.log(err);
       })
   }, [])
 

@@ -8,6 +8,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV === "production";
+console.log(isProduction,"prod");
 
 module.exports = {
   mode: isProduction ? "production" : "development", // Switch mode

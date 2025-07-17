@@ -1,5 +1,5 @@
 // AudioTranscriptionLandingPage
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
 import "../../../../ui/pages/container/Label-Studio/cl_ui.css"
 import 'quill/dist/quill.bubble.css';
 import React, {
@@ -11,7 +11,6 @@ import React, {
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
 import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -974,7 +973,6 @@ useEffect(() => {
     if (event.shiftKey && event.key === ' ') {
       event.preventDefault();
       if(player){
-        // console.log(isPlaying(player));
         if(isPlaying(player)){
           player.pause();
         }else{
@@ -982,13 +980,7 @@ useEffect(() => {
         }
       }
     }
-    const activeElement = document.activeElement;
-    const isTextAreaFocused = activeElement.tagName =='TEXTAREA';
-    console.log(activeElement);
 
-    if (isTextAreaFocused) {
-      return;
-    }
     if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){

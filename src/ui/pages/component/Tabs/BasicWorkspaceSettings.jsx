@@ -1,16 +1,16 @@
 
-import { Grid, ThemeProvider, Typography, Autocomplete, TextField, FormControlLabel, Switch } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import { ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import themeDefault from '../../../theme/theme'
 import { useNavigate, useParams } from 'react-router-dom';
 import OutlinedTextField from "../common/OutlinedTextField";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch, useSelector } from "react-redux";
-// import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
-// import GetDatasetDetailsAPI from "../../../../redux/actions/api/Dataset/GetDatasetDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
-// import GetSaveButtonAPI from '../../../../redux/actions/api/ProjectDetails/EditUpdate'
-// import GetSaveButtonAPI from "../../../../redux/actions/api/Dataset/DatasetEditUpdate";
 import GetWorkspaceSaveButtonAPI from "../../../../redux/actions/api/WorkspaceDetails/WorkspaceEditUpdate";
 import CustomButton from "../common/Button";
 import CustomizedSnackbars from "../common/Snackbar";
@@ -43,8 +43,6 @@ const BasicWorkspaceSettings = (props) => {
       };
 
     const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
-    console.log('test')
-    console.log(workspaceDetails)
     const getWorkspaceDetails = () => {
         const workspaceObj = new GetWorkspacesDetailsAPI(id);
         dispatch(APITransport(workspaceObj));

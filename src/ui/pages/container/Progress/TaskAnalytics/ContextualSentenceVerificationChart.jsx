@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { Grid, ThemeProvider, Box, Typography, Paper } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 import DatasetStyle from "../../../../styles/Dataset";
-import React, { PureComponent } from "react";
+import React from "react";
 import {
   BarChart,
   Bar,
