@@ -1169,7 +1169,7 @@ useEffect(() => {
         }
       }
     }
-    
+
     if (event.shiftKey && event.key === 'ArrowLeft') {
       event.preventDefault();
       if(player){
