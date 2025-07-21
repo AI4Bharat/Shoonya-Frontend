@@ -1,7 +1,8 @@
 import { InputBase,Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
  import DatasetStyle from "../../../styles/Dataset";
+import debounce from "lodash/debounce";
  import { useDispatch } from "react-redux";
  import SearchProjectCards from "../../../../redux/actions/api/ProjectDetails/SearchProjectCards"
 
@@ -13,20 +14,34 @@ const Search = (props) => {
   const [searchValue, setSearchValue] = useState("");
 
 
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      if (props.onSearch) {
+        props.onSearch(value);
+      }
+    }, 500),
+    [props.onSearch]
+  );
+
   useEffect(() => {
     if (ref) ref.current.focus();
   }, [ref]);
 
   useEffect(() => {
-   
     dispatch(SearchProjectCards(""));
-}, [])
+  }, [dispatch]);
 
   const handleChangeName = (value) => {
     setSearchValue(value);
+    debouncedSearch(value);
     dispatch(SearchProjectCards(value));
   };
- 
+  
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   return (
    <Grid container justifyContent="end" sx={{marginTop:"20px"}}>
