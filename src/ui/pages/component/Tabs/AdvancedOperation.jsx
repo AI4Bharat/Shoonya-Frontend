@@ -94,6 +94,8 @@ const AdvancedOperation = (props) => {
   const [newDetails, setNewDetails] = useState();
   const [OpenExportProjectDialog, setOpenExportProjectDialog] = useState(false);
   const [datasetId, setDatasetId] = useState("");
+  const [pullDataLoading, setPullDataLoading] = useState(false);
+
   const [projectType, setProjectType] = useState("");
   const [taskReviews, setTaskReviews] = useState("")
   const { id } = useParams();
@@ -314,16 +316,16 @@ const AdvancedOperation = (props) => {
   //     setSpinner(false);
   // }, [apiMessage, apiError])
 
-  const getPullNewDataAPI = async () => {
-    const projectObj = new GetPullNewDataAPI(id);
-    //dispatch(APITransport(projectObj));
+const getPullNewDataAPI = async () => {
+  setPullDataLoading(true); 
+  const projectObj = new GetPullNewDataAPI(id);
+  try {
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
       headers: projectObj.getHeaders().headers,
     });
     const resp = await res.json();
-    setLoading(false);
     if (res.ok) {
       setSnackbarInfo({
         open: true,
@@ -337,7 +339,16 @@ const AdvancedOperation = (props) => {
         variant: "error",
       });
     }
-  };
+  } catch (error) {
+    setSnackbarInfo({
+      open: true,
+      message: "An error occurred",
+      variant: "error",
+    });
+  } finally {
+    setPullDataLoading(false); 
+  }
+};
 
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
   const [isArchived, setIsArchived] = useState(false);
@@ -428,7 +439,7 @@ const AdvancedOperation = (props) => {
   };
   return (
     <ThemeProvider theme={themeDefault}>
-      {loading && <Spinner />}
+      {(loading || pullDataLoading) && <Spinner />}
       <Grid>{renderSnackBar()}</Grid>
 
       <div className={classes.rootdiv}>
@@ -566,7 +577,7 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handlePullNewData}
                 label="Pull New Data Items from Source Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
+                disabled={pullDataLoading || userRole.WorkspaceManager === loggedInUserData?.role? true:false}
               />
             ) : (
               " "
