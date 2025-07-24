@@ -182,8 +182,9 @@ const AdvancedOperation = (props) => {
     // 'https://backend.shoonya.ai4bharat.org/projects/606/export_project_tasks/'
     // SetTask([])
     // setLoading(true)
+    const taskStatus = "all";
     const projectObj = new getDownloadProjectAnnotationsAPI(id, taskStatus);
-    dispatch(APITransport(projectObj));
+    await projectObj.downloadAnnotations();
     // const projectObj = new GetPublishProjectButtonAPI(id);
     // const res = await fetch(projectObj.apiEndPoint(), {
     //   method: "POST",
@@ -511,7 +512,7 @@ const AdvancedOperation = (props) => {
             },
           }}
         >
-          {ProjectDetails.project_type == 'ContextualTranslationEditing' ? (
+          
             <Grid
               item
               xs={12}
@@ -523,7 +524,7 @@ const AdvancedOperation = (props) => {
                 }}
                 onClick={handleDownloadProjectAnnotations}
                 label="Downoload Project Annotations" />
-            </Grid>) : " "}
+            </Grid>
           <Grid item xs={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
               <CustomButton
