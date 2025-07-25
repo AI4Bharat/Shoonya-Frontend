@@ -176,6 +176,8 @@ export default function DatasetProjectsTable({ datasetId }) {
 		message: "",
 		variant: "success",
 	});
+	const [pullDataLoading, setPullDataLoading] = useState(false);
+
 	const [loading, setLoading] = useState(false);
 	const loggedInUserData = useSelector(
 		(state) => state?.fetchLoggedInUserData?.data
@@ -276,26 +278,35 @@ export default function DatasetProjectsTable({ datasetId }) {
 
 	const getPullNewDataAPI = async (project) => {
 		const projectObj = new GetPullNewDataAPI(project.id);
-		//dispatch(APITransport(projectObj));
+		setPullDataLoading(true);
+		try {
 		const res = await fetch(projectObj.apiEndPoint(), {
 			method: "POST",
 			body: JSON.stringify(projectObj.getBody()),
 			headers: projectObj.getHeaders().headers,
-		});
-		const resp = await res.json();
-		setLoading(false);
-		if (res.ok) {
-			setSnackbarInfo({
-				open: true,
-				message: resp?.message,
-				variant: "success",
 			});
-		} else {
+			const resp = await res.json();
+			if (res.ok) {
+				setSnackbarInfo({
+					open: true,
+					message: resp?.message,
+					variant: "success",
+				});
+			} else {
+				setSnackbarInfo({
+					open: true,
+					message: resp?.message,
+					variant: "error",
+				});
+			}
+		} catch (error) {
 			setSnackbarInfo({
 				open: true,
-				message: resp?.message,
+				message: "An error occurred",
 				variant: "error",
 			});
+		} finally {
+		setPullDataLoading(false);
 		}
 	};
 	const renderSnackBar = () => {
@@ -322,7 +333,7 @@ export default function DatasetProjectsTable({ datasetId }) {
 					>
 						<CustomButton sx={{ borderRadius: 2 }} label="View" />
 					</Link>
-					{userRole.Admin === loggedInUserData?.role ?<CustomButton sx={{ borderRadius: 2, height: 37 }} onClick={() => getExportProjectButton(project)} label="Export" />:null}					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" />
+					{userRole.Admin === loggedInUserData?.role ?<CustomButton sx={{ borderRadius: 2, height: 37 }} onClick={() => getExportProjectButton(project)} label="Export" />:null}					<CustomButton sx={{ borderRadius: 2 }} onClick={() => getPullNewDataAPI(project)} label="Pull New Data Items" disabled={pullDataLoading?true:false}/>
 				</Stack>
 			),
 		})):[]
@@ -331,7 +342,7 @@ export default function DatasetProjectsTable({ datasetId }) {
 	return (
 		<>
 			<ThemeProvider theme={tableTheme}>
-				{loading && <Spinner />}
+				{(loading || pullDataLoading) && <Spinner />}
 				<Grid>
 					{renderSnackBar()}
 				</Grid>
