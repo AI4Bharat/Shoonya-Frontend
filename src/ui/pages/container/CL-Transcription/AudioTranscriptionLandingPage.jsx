@@ -393,7 +393,9 @@ const AudioTranscriptionLandingPage = () => {
         : String(resp?.data?.audio_url)),
     {
         method: "GET",
-        headers: ProjectObj.getHeaders().headers
+        headers: String(resp?.data?.audio_url).includes("objectstore.e2enetworks.net")
+        ? ProjectObj.getHeaders().headers
+        : {}
       })
       if (!fetchAudioData.ok){
         setAudioURL(resp?.data?.audio_url)
