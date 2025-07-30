@@ -49,7 +49,7 @@ import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/
 import InviteManagerSuggestions from "../../../../redux/actions/api/Organization/InviteManagerSuggestions";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI"
 import CustomizedSnackbars from "./Snackbar";
-
+import AssignMembersDialog from "../../container/Workspace/bulkuserstoprojects.jsx";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -589,7 +589,7 @@ const DetailsViewPage = (props) => {
                   columnSpacing={4}
                   rowSpacing={2}
                 >
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={4}>
                     <CustomButton
                       className={classes.annotatorsButton}
                       label={"Add Members to Workspace"}
@@ -597,12 +597,16 @@ const DetailsViewPage = (props) => {
                       onClick={handleAnnotatorDialogOpen}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={4}>
                     <CustomButton
                       className={classes.annotatorsButton}
                       label={"Invite Users to Organisation"}
                       sx={{ width: "100%", mb: 2 }}
                       onClick={handleUserDialogOpen}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <AssignMembersDialog
                     />
                   </Grid>
                 </Grid>
