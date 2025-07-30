@@ -1,4 +1,8 @@
-import { Box, Tab, Tabs, Typography, Paper } from '@mui/material'
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
 import React from 'react'
 import { useState } from 'react'
 import UserDetail from "./UserDetail";

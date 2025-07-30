@@ -1,6 +1,17 @@
 import { makeStyles } from "@mui/styles";
 
 const GlobalStyles = makeStyles(theme=>({
+  "@global": {
+    "@font-face": {
+      fontFamily: "Rowdies", // Name to reference later
+      src: `
+        url('https://fonts.gstatic.com/s/rowdies/v9/ptRJTieMYPNBAK21zrdJwObb.woff2') format('woff')
+      `,
+      fontWeight: " 700", // Rowdies supports light (300) and bold (700)
+      fontStyle: "normal",
+      fontDisplay: "swap", // Avoid invisible text during load
+    },
+  },
   section: {
     background: "url('../img/slide1-bg.jpg')",
     backgroundRepeat: "no-repeat",
@@ -67,7 +78,7 @@ const GlobalStyles = makeStyles(theme=>({
     color: "rgba(234,108,69)",
     fontSize: "1.25rem",
     letterSpacing: "-.025em",
-    fontWeight: "600",
+    fontWeight: "700",
     fontFamily: "Rowdies, cursive",
   },
 
@@ -81,7 +92,7 @@ const GlobalStyles = makeStyles(theme=>({
     color: "black",
     fontSize: "1.25rem",
     letterSpacing: "-.025em",
-    fontWeight: "600",
+    fontWeight: "700",
     fontFamily: "Rowdies, cursive",
     marginTop: "1rem",
   },

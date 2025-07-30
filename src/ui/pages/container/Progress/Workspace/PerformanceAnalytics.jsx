@@ -221,7 +221,6 @@ export default function PerformanceAnalytics() {
     })
     .catch(err => {
         setLoading(false);
-        console.log("err - ", err);
         setPerformanceAnalyticsTasksData([]);
     })
   };
@@ -244,8 +243,6 @@ export default function PerformanceAnalytics() {
         entries.push(i["data"][0]["periodical_tasks_count"]);
       }
     }
-    console.log(labels);
-    console.log(entries);
 
     setChartData({
       labels: labels,
@@ -265,7 +262,6 @@ export default function PerformanceAnalytics() {
 
   useEffect(() => {
     handleAnalyticsData();
-    console.log("248")
   }, [performanceAnalyticsTasksData]);
 
   useEffect(() => {

@@ -245,7 +245,6 @@ const AnnotatorsTable = (props) => {
     workspaceAnnotators && workspaceAnnotators.length > 0
       ? pageSearch().map((el, i) => {
           const userRole = el.role && UserMappedByRole(el.role)?.element;
-          console.log("userRole", userRole);
           return [
             el.id,
             el.username,
@@ -411,7 +410,6 @@ const AnnotatorsTable = (props) => {
       setConfirmationDialog(false);
     } else {
       window.alert("Invalid credentials, please try again");
-      console.log(rsp_data);
     }
   };
   return (

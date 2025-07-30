@@ -11,7 +11,6 @@ import InputLabel from "@mui/material/InputLabel";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import DatasetStyle from "../../../styles/Dataset";
 import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetsByType";
 
 const ExportProjectDialog = ({
@@ -23,7 +22,6 @@ const ExportProjectDialog = ({
   projectType,
 }) => {
   const dispatch = useDispatch();
-  const classes = DatasetStyle();
   const [instanceIds, setInstanceIds] = useState([]);
  
 
@@ -31,9 +29,6 @@ const ExportProjectDialog = ({
     (state) => state.getDatasetsByType?.data
   );
  
-  instanceIds?.map((el) =>
-    console.log(el.instance_id, "instanceIdsinstanceIds")
-  );
 
   useEffect(() => {
     const instancesObj = new GetDatasetsByTypeAPI(projectType);

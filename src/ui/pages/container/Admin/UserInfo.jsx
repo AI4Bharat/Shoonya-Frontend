@@ -1,21 +1,13 @@
-import {
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  Card,
-  MenuItem,
-  DialogContent,
-  Dialog,
-  DialogContentText,
-  Typography,
-  Box,
-  Tab,
-  Tabs,
-} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import DialogContent from "@mui/material/DialogContent";
+import Dialog from "@mui/material/Dialog";
+import DialogContentText from "@mui/material/DialogContentText";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 import React from "react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import EditProfile from "./EditProfile";
 
 function TabPanel(props) {

@@ -11,11 +11,16 @@ const tableTheme = createTheme({
           minWidth: "25",
           borderRadius: "none",
           textTransform: "none",
+          '&.MuiButton-contained': {
+            willChange: 'transform' // GPU acceleration
+          }
+
         },
         label: {
           textTransform: "none",
           fontFamily: '"Roboto", "Segoe UI"',
           fontSize: "16px",
+          fontDisplay:"swap",
           letterSpacing: "0.16px",
           textAlign: "center",
           display: "flex",
@@ -40,6 +45,7 @@ const tableTheme = createTheme({
           backgroundColor: "white",
           width: "80%",
           fontFamily: '"Roboto" ,sans-serif',
+          willChange: 'contents' // GPU optimization
         },
         checkboxFormControl: {
           minWidth: "120px",

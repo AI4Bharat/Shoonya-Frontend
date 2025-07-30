@@ -34,7 +34,6 @@ import ColumnList from "../common/ColumnList";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import AllTasksFilterList from "./AllTasksFilter";
 import CustomButton from '../common/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import AllTaskSearchPopup from './AllTaskSearchPopup';
@@ -277,7 +276,7 @@ const SuperCheckerTasks = (props) => {
             ? `SuperCheckerAudioTranscriptionLandingPage/${el.id}` : `SuperChecker/${el.id}`} className={classes.link}>
             <CustomButton
               disabled={ProjectDetails.is_archived}
-              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll")}}
+              onClick={() => {  localStorage.removeItem("labelAll")}}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
                 Validate
@@ -306,7 +305,6 @@ const SuperCheckerTasks = (props) => {
           },
         };
       });
-      console.log("colss", cols);
       setColumns(cols);
       setSelectedColumns(colList);
       setTasks(data);
@@ -323,7 +321,6 @@ const SuperCheckerTasks = (props) => {
       return col;
     });
     setColumns(newCols);
-    console.log("columnss", newCols);
   }, [selectedColumns]);
 
 
@@ -627,7 +624,6 @@ const CustomTooltip = styled(({ className, ...props }) => (
     onChangeRowsPerPage: (rowPerPageCount) => {
         setCurrentPageNumber(1);
         setCurrentRowPerPage(rowPerPageCount);
-        console.log("rowPerPageCount", rowPerPageCount)
     },
     filterType: 'checkbox',
     selectableRows: "none",
@@ -692,7 +688,6 @@ const renderSnackBar = () => {
       unassignTasks();
     }else{
       window.alert("Invalid credentials, please try again");
-      console.log(rsp_data);
     }
   };
 

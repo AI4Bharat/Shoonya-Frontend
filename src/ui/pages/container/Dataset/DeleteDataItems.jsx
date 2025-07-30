@@ -1,18 +1,21 @@
 import React, { useState } from "react";
-import {
-    Button,
-    Popover,
-    Box,
-    TextField,
-    Grid, Typography, Radio,Dialog, DialogActions, DialogContent, DialogContentText,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Popover from "@mui/material/Popover";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Radio from "@mui/material/Radio";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import DeleteDataItemsAPI from "../../../../redux/actions/api/Dataset/DeleteDataItems";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
@@ -158,7 +161,6 @@ export default function DeleteDataItems() {
         handleok();
         }else{
         window.alert("Invalid credentials, please try again");
-        console.log(rsp_data);
         }
     };
 

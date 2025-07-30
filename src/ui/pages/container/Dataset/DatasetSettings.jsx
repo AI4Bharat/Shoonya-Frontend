@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams,useNavigate } from "react-router-dom";
-import { Card, CircularProgress, Grid, Typography,Modal,Box } from "@mui/material";
+import { useParams } from "react-router-dom";
+import Card from "@mui/material/Card";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
 import { useDispatch, useSelector } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -8,9 +13,6 @@ import GetDatasetDownloadCSV from "../../../../redux/actions/api/Dataset/GetData
 import UploaddataAPI from "../../../../redux/actions/api/Dataset/uploaddata";
 import GetFileTypesAPI from "../../../../redux/actions/api/Dataset/GetFileTypes";
 import CustomButton from "../../component/common/Button";
-//import Modal from "../../component/common/Modal";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
 import MenuItems from "../../component/common/MenuItems";
 import { FileUploader } from "react-drag-drop-files";
 import Switch from "@mui/material/Switch";
@@ -39,7 +41,6 @@ const label = { inputProps: { "aria-label": "Switch demo" } };
 
 export default function DatasetSettings() {
   const { datasetId } = useParams();
-  // console.log('current',datasetId)
   const dispatch = useDispatch();
   const fileRef = useRef();
   const [loading, setLoading] = useState(false);
@@ -49,7 +50,6 @@ export default function DatasetSettings() {
   const [type, setType] = useState([]);
   const [switchs, setswitchs] = useState("True");
   const [anchorEl, setAnchorEl] = useState(null);
-  console.log(file, filetype, switchs, "switchs");
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -76,7 +76,6 @@ export default function DatasetSettings() {
   }, [GetFileTypes]);
 
   const handleClick = () => {
-    console.log("called download");
     setLoading(true);
     dispatch(APITransport(new GetDatasetDownloadCSV(datasetId)));
   };
@@ -88,11 +87,9 @@ export default function DatasetSettings() {
   const handleOnChange = (e) => {
     // const [file] = e.target.files;
     setFile(e.target.files[0]);
-    console.log("select file ", e.target.files[0]);
   };
   const handleChange = (file) => {
     setFile(file[0]);
-    console.log("drag and drop file ", file);
   };
 
   const handleUpload = (e) => {

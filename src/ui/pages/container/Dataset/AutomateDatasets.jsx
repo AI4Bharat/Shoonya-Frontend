@@ -1,6 +1,8 @@
-import { Tabs,Tab ,Box} from "@mui/material";
-import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography,Switch } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import { ThemeProvider } from "@mui/material/styles";
+import React, { useState } from "react";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
 

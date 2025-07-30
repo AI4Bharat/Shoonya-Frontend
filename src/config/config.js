@@ -4,7 +4,6 @@ const configs = {
     ? process.env.REACT_APP_APIGW_BASE_URL
         :"https://backend.shoonya.ai4bharat.org"
 };
-
 export default configs;
 //http://20.51.211.111:8000
 //https://backend.shoonya.ai4bharat.org/

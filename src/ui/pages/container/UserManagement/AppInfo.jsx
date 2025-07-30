@@ -1,20 +1,11 @@
-import {
-  Grid,
-  Link,
-  Typography,
-  Hidden,
-  ThemeProvider,
-  Box,
-} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import { ThemeProvider } from "@mui/material/styles";
+
 import Shoonya_Logo from "../../../../assets/Shoonya_Logo.webp";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { translate } from "../../../../config/localisation";
-import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import LoginStyle from "../../../styles/loginStyle";
-import Button from "../../component/common/Button";
-import CustomCard from "../../component/common/Card";
-import OutlinedTextField from "../../component/common/OutlinedTextField";
 import themeDefault from "../../../theme/theme";
 
 export default function AppInfo() {

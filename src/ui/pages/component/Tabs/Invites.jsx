@@ -10,7 +10,7 @@ import GetManagerSuggestionsAPI from "../../../../redux/actions/api/Organization
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Box from '@mui/material/Box';
-import { FormControl } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
 
 export const getManagerSuggestions = (dispatch, orgId) => {
     const managerSuggestionsObj = new GetManagerSuggestionsAPI(orgId);
