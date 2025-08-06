@@ -1,19 +1,12 @@
 
 import DatasetStyle from "../../../styles/Dataset";
-import { useHistory, useParams } from 'react-router';
-import {
-    Grid,
-    Link,
-    Typography,
-    Card,
-    Box,
-    CardMedia,
-    CardContent,
-    ThemeProvider
-} from '@mui/material';
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import { ThemeProvider } from "@mui/material/styles";
 import ImageArray from '../../../../utils/getModelIcons';
-import React, { useEffect, useState } from "react";
-import tableTheme from "../../../theme/tableTheme";
+import React from "react";
 import themeDefault from "../../../theme/theme";
 
 const DatasetDescription = (props) => {

@@ -35,7 +35,6 @@ import AddWorkspaceDialog from "../Workspace/AddWorkspaceDialog";
 import Spinner from "../../component/common/Spinner";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useSelector, useDispatch } from "react-redux";
-import WorkspaceSetting from "../Tabs/WorkspaceSetting";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -43,7 +42,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import TaskAnalytics from "../../container/Progress/Workspace/TaskAnalytics";
 import MetaAnalytics from "../../container/Progress/Workspace/MetaAnalytics";
 import ProgressAnalytics from "../../container/Progress/Workspace/ProgressAnalytics";
-import { DriveEta } from "@material-ui/icons";
 import PerformanceAnalytics from "../../container/Progress/Workspace/PerformanceAnalytics";
 import InviteUsersDialog from "./InviteUsersDialog";
 import UserRolesList from "../../../../utils/UserMappedByRole/UserRolesList";
@@ -51,6 +49,8 @@ import GetOragnizationUsersAPI from "../../../../redux/actions/api/Organization/
 import InviteManagerSuggestions from "../../../../redux/actions/api/Organization/InviteManagerSuggestions";
 import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/InviteUsersToOrgAPI"
 import CustomizedSnackbars from "./Snackbar";
+import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -103,6 +103,8 @@ const DetailsViewPage = (props) => {
     message: "",
     variant: "success",
   });
+  const [reloadWorkspaceTable, setReloadWorkspaceTable] = useState(false);
+
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
@@ -110,16 +112,7 @@ const DetailsViewPage = (props) => {
     setValue(newValue);
   };
   const apiLoading = useSelector((state) => state.apiStatus.loading);
-  // const workspaceData = useSelector(state=>state.getWorkspaces.data);
-  // const getDashboardWorkspaceData = ()=>{
-  //     const workspaceObj = new GetWorkspacesAPI(1);
-  //     dispatch(APITransport(workspaceObj));
-  //   }
-
-
-  useEffect(() => {
-    // getDashboardWorkspaceData();
-  }, []);
+ 
   const getWorkspaceDetails = () => {
     const workspaceObj = new GetWorkspacesDetailsAPI(orgId);
     dispatch(APITransport(workspaceObj));
@@ -256,11 +249,15 @@ const DetailsViewPage = (props) => {
   const handleOpenSettings = () => {
     navigate(`/workspaces/${id}/workspacesetting`);
   };
-
+  
   const handleClickMenu = (data)  =>{
   setSelectmenu(data)
   handleMenuClose()
-  }
+  };
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
@@ -319,22 +316,16 @@ const DetailsViewPage = (props) => {
             Created by : {createdBy}
           </Typography>
           <Box>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-              variant="fullWidth"
-              TabIndicatorProps={{
-                style: { display: "none" },
-              }}
-              sx={{
-                "@media (min-width: 600px)": {
-                  flexDirection: "row",
-                  borderBottom: "1px solid #ddd",
-                  borderRight: "none",
-                },
-              }}
-            >
+          <Tabs
+                value={value}
+                onChange={handleChange}
+                aria-label="basic tabs example"
+                variant="fullWidth"
+                TabIndicatorProps={{
+                  style: { display: "none" },
+                }}
+                orientation={isSmallScreen ? "vertical" : "horizontal"}
+              >
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.projects")}
@@ -358,6 +349,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 0 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 0 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
@@ -389,6 +381,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 1 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 1 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
@@ -420,6 +413,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 2 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 2 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
@@ -451,6 +445,7 @@ const DetailsViewPage = (props) => {
                     fontWeight: "700",
                     bgcolor: value === 3 ? "#d3d3d3" : "#F5F5F5",
                     color: value === 3 ? "black" : "text.primary",
+                    margin: isSmallScreen ? "0 0 1rem 0" : "0 1rem 0 0",
                     borderRadius: 1,
                     "&:hover": {
                       bgcolor: "#e0e0e0",
@@ -577,11 +572,12 @@ const DetailsViewPage = (props) => {
                   sx={{ width: "100%", mb: 2 }}
                   onClick={handleWorkspaceDialogOpen}
                 />
-                <Workspaces />
+                <Workspaces reloadWorkspaceTable={reloadWorkspaceTable} setReloadWorkspaceTable={setReloadWorkspaceTable}/>
                 <AddWorkspaceDialog
                   dialogCloseHandler={handleWorkspaceDialogClose}
                   isOpen={addWorkspacesDialogOpen}
                   orgId={orgId}
+                  setReloadWorkspaceTable={setReloadWorkspaceTable}
                 />
               </>
             )}

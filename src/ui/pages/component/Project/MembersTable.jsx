@@ -148,7 +148,10 @@ const MembersTable = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", padding: "16px" },
+          style: { height: "70px", padding: "16px" ,            whiteSpace: "normal",
+            overflowWrap: "break-word",
+            wordBreak: "break-word",
+},
         }),
       },
     },
@@ -328,7 +331,9 @@ const MembersTable = (props) => {
 
   const addBtnClickHandler = async () => {
     setLoading(true);
-    const addMembersObj = new InviteUsersToOrgAPI(
+  
+    try {
+        const addMembersObj = new InviteUsersToOrgAPI(
         orgId,
         selectedUsers,
         userType
@@ -347,13 +352,16 @@ const MembersTable = (props) => {
         });
         const orgObj = new GetOragnizationUsersAPI(id);
         dispatch(APITransport(orgObj));
-      }else {
-        setSnackbarInfo({
-          open: true,
-          message: resp?.message,
-          variant: "error",
-        });
+      } else {
+        throw new Error(resp?.message || "Something went wrong!");
       }
+    } catch (error) {
+      setSnackbarInfo({
+        open: true,
+        message: error.message,
+        variant: "error",
+      });
+    } finally {
       handleUserDialogClose();
     setLoading(false);
     setSelectedUsers([ ]);
@@ -361,7 +369,9 @@ const MembersTable = (props) => {
     setCsvFile(null);
     setbtn(null)
     setUserType(Object.keys(UserRolesList)[0])
+    }
   };
+
   const handleRemoveFrozenUsers = async (FrozenUserId) => {
     const projectObj = new RemoveFrozenUserAPI(id, { ids: [FrozenUserId] });
     //dispatch(APITransport(projectObj));
@@ -612,9 +622,6 @@ const MembersTable = (props) => {
     ),
   };
 
-  // console.log('columns',columns)
-  // console.log('options',options)
-  // console.log('data',data)
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -654,7 +661,6 @@ const MembersTable = (props) => {
         setConfirmationDialog(false);
       }else{
         window.alert("Invalid credentials, please try again");
-        // console.log(rsp_data);
       }}
     else if(memberOrReviewer === "superchecker"){
       if(pin === "0104"){

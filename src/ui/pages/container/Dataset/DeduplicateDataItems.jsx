@@ -4,7 +4,6 @@ import Popover from "@mui/material/Popover";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
@@ -19,9 +18,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import removeDuplicatesDatasetInstanceAPI from "../../../../redux/actions/api/Dataset/removeDuplicatesDatasetInstance";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { snakeToTitleCase } from "../../../../utils/utils";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar"
@@ -182,7 +180,6 @@ const renderSnackBar = () => {
       handleok();
     }else{
       window.alert("Invalid credentials, please try again");
-      console.log(rsp_data);
     }
   };
 

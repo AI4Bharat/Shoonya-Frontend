@@ -1,15 +1,11 @@
 import { Box, Grid,Button,Tooltip } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import ProjectCard from "../../component/common/ProjectCard";
 import DatasetStyle from "../../../styles/Dataset";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import TablePagination from "@mui/material/TablePagination";
 import TablePaginationActions from "../../component/common/TablePaginationActions";
-import Spinner from "../../component/common/Spinner";
-import Search from "../../component/common/Search";
-import SearchProjectCards from "../../../../redux/actions/api/ProjectDetails/SearchProjectCards";
 import Record from "../../../../assets/no-record.svg";
-import { useNavigate } from "react-router-dom";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";

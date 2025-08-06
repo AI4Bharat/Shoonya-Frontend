@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link,  useParams } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
 import GetAllTasksAPI from "../../../../redux/actions/api/Tasks/GetAllTasks";
@@ -137,7 +137,7 @@ const AllTaskTable = (props) => {
           <Link to={ProjectDetails?.project_type?.includes("Acoustic") ?
           `AllAudioTranscriptionLandingPage/${el.id}` : `Alltask/${el.id}`} className={classes.link}>
           <CustomButton
-              onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
+              onClick={() => {  localStorage.removeItem("labelAll") }}
               sx={{ p: 1, borderRadius: 2 }}
               label={<Typography sx={{ color: "#FFFFFF" }} variant="body2">
                    View
@@ -168,7 +168,6 @@ const AllTaskTable = (props) => {
           },
         };
       });
-      console.log("colss", cols);
       setColumns(cols);
       setSelectedColumns(colList);
       setTasks(data);
@@ -185,7 +184,6 @@ const AllTaskTable = (props) => {
       return col;
     });
     setColumns(newCols);
-    // console.log("columnss", newCols);
   }, [selectedColumns]);
 
 
@@ -326,7 +324,6 @@ const handleSearchClose = () => {
     onChangeRowsPerPage: (rowPerPageCount) => {
         setCurrentPageNumber(1);
         setCurrentRowPerPage(rowPerPageCount);
-        console.log("rowPerPageCount", rowPerPageCount)
     },
     filterType: 'checkbox',
     selectableRows: "none",

@@ -28,8 +28,11 @@ import NotificationPatchAPI from "../../../../redux/actions/api/Notification/Not
 import Tooltip from "@mui/material/Tooltip";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import { formatDistanceToNow, format } from "date-fns";
+import { useTheme } from "@emotion/react";
 
 function MobileNavbar(props) {
+  const theme = useTheme();
   const { loggedInUserData, appSettings, userSettings, tabs, appInfo } = props;
   const [openDrawer, setOpenDrawer] = useState(false);
   const classes = headerStyle();
@@ -135,21 +138,32 @@ function MobileNavbar(props) {
             pb: 2,
           }}
         >
-          <Box style={{ position: "sticky", top: "0px", zIndex: 10, backgroundColor: "#f5f5f5", display: "flex", justifyContent: "space-between", alignItems: "start", borderBottom: "1px solid rgba(0, 0, 0, 0.12)", }}>
+          <Box
+            style={{
+              position: "sticky",
+              top: "0px",
+              zIndex: 10,
+              backgroundColor: "#f5f5f5",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "start",
+              borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+            }}
+          >
             <NavLink
               to={`/profile/${loggedInUserData.id}`}
               onClick={() => setOpenDrawer(false)}
               style={{ textDecoration: "none" }}
             >
               <Box className={classes.profileBox}>
-                <Avatar alt="user_profile_pic" className={classes.mobileNav_avatar}>
+                <Avatar
+                  alt="user_profile_pic"
+                  className={classes.mobileNav_avatar}
+                >
                   {loggedInUserData?.username?.[0]}
                 </Avatar>
                 <Box style={{ marginLeft: "20px" }}>
-                  <Typography
-                    variant="h6"
-                    className={classes.username}
-                  >
+                  <Typography variant="h6" className={classes.username}>
                     {loggedInUserData.username}
                   </Typography>
                   <Typography
@@ -341,7 +355,11 @@ function MobileNavbar(props) {
           <Tabs
             value={tabValue}
             onChange={handleTabChange}
-            indicatorColor="primary"
+            sx={{
+              "& .MuiTabs-indicator": {
+                backgroundColor: (theme) => theme.palette.primary.main,
+              },
+            }}
           >
             <Tab label="All" />
             <Tab label="Unread" />
@@ -371,18 +389,34 @@ function MobileNavbar(props) {
                         navigate(notification.on_click);
                       }}
                     >
-                      <Typography variant="body1" style={{ fontWeight: 700, fontSize: "1.2rem" }}>
-                        {notification.title || "Notification"}
+                      <Typography
+                        variant="body1"
+                        style={{ fontWeight: 700, fontSize: "1.2rem" }}
+                      >
+                        {notification?.title || "Notification"}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {notification.message || "No message content"}
+                        {`Modification Type: ${notification?.c}` ||
+                          "No modification type"}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
                         style={{ display: "block", marginTop: "16px" }}
                       >
-                        {new Date(notification.created_at).toLocaleString()}
+                        {`${formatDistanceToNow(
+                          new Date(notification?.created_at),
+                          { addSuffix: true }
+                        )}`}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        style={{ display: "block" }}
+                      >
+                        {`Sent on: ${new Date(
+                          notification?.created_at
+                        ).toLocaleString()}`}
                       </Typography>
 
                       {(!notification?.seen_json ||
@@ -420,8 +454,8 @@ function MobileNavbar(props) {
                     <Box
                       key={index}
                       style={{
-                        padding: "2rem",
-                        marginBottom: "1rem",
+                        padding: "20px",
+                        margin: "10px",
                         borderRadius: "8px",
                         backgroundColor: "#D7EAF9",
                         border: "1px solid",
@@ -433,18 +467,34 @@ function MobileNavbar(props) {
                         navigate(notification.on_click);
                       }}
                     >
-                      <Typography variant="body1" style={{ fontWeight: 700, fontSize: "1.2rem" }}>
-                        {notification.title || "Notification"}
+                      <Typography
+                        variant="body1"
+                        style={{ fontWeight: 700, fontSize: "1.2rem" }}
+                      >
+                        {notification?.title || "Notification"}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {notification.message || "No message content"}
+                        {`Modification Type: ${notification?.notification_type}` ||
+                          "No modification type"}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
                         style={{ display: "block", marginTop: "1rem" }}
                       >
-                        {new Date(notification.created_at).toLocaleString()}
+                        {`${formatDistanceToNow(
+                          new Date(notification?.created_at),
+                          { addSuffix: true }
+                        )}`}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        style={{ display: "block" }}
+                      >
+                        {`Sent on: ${new Date(
+                          notification?.created_at
+                        ).toLocaleString()}`}
                       </Typography>
 
                       <Tooltip title="Mark as read">

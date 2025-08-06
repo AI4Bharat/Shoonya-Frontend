@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
-import Typography from "@mui/material/Typography";
 import Popover from "@mui/material/Popover";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -11,7 +10,6 @@ import { snakeToTitleCase } from "../../../../utils/utils";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-// import { translate } from "../../../../assets/localisation";
 
 const AllTaskSearchPopup = (props) => {
     const classes = DatasetStyle();

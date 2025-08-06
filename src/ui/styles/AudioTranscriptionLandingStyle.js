@@ -15,6 +15,8 @@ const AudioTranscriptionLandingStyle = makeStyles({
     margin: "auto",
     display: "flex",
     flexDirection: "column",
+    gap: "20px",
+    padding: "20px",
     position: "relative",
   },
 
@@ -23,7 +25,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     flexDirection: "row",
     // backgroundColor: "rgba(254, 191, 44, 0.1)",
     backgroundColor: "#fcf7e9",
-    padding:"16px"
+    padding: "16px",
   },
 
   videoName: {
@@ -298,7 +300,6 @@ const AudioTranscriptionLandingStyle = makeStyles({
     height: "100%",
     pointerEvents: "none",
   },
- 
 
   subItem: {
     position: "absolute",
@@ -321,7 +322,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
 
     "&:hover": {
       backgroundColor: " rgba(255, 255, 255, 0)",
-      border: "1px solid rgba(255, 191, 0, 1)"
+      border: "1px solid rgba(255, 191, 0, 1)",
       // top: '8%',
       // height: "98%"
     },
@@ -354,7 +355,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     alignItems: "center",
     flexDirection: "column",
     // textShadow:
-      // "rgb(0 0 0) 1px 0px 1px, rgb(0 0 0) 0px 1px 1px, rgb(0 0 0) -1px 0px 1px, rgb(0 0 0) 0px -1px 1px",
+    // "rgb(0 0 0) 1px 0px 1px, rgb(0 0 0) 0px 1px 1px, rgb(0 0 0) -1px 0px 1px, rgb(0 0 0) 0px -1px 1px",
     height: "100%",
     wordWrap: "break-word",
   },
@@ -389,7 +390,6 @@ const AudioTranscriptionLandingStyle = makeStyles({
     borderRadius: "6px",
     zIndex: "20",
   },
-  
 
   optionIconBtn: {
     //backgroundColor: "#fff",
@@ -467,7 +467,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
   },
 
   customTextarea: {
-    padding: "12px 12px",
+    padding: "12px",
     fontSize: "1.25rem",
     fontWeight: "400",
     lineHeight: "1.4375em",
@@ -477,7 +477,7 @@ const AudioTranscriptionLandingStyle = makeStyles({
     outlineColor: "#2C2799",
     resize: "none",
     fontFamily: "Roboto, sans-serif",
-    width: "100%",
+    width: "95%",
   },
 
   boxHighlight: {
@@ -606,11 +606,11 @@ const AudioTranscriptionLandingStyle = makeStyles({
     alignItems: "center",
     borderBottom: "1px solid lightgrey",
   },
-  collapse :{
+  collapse: {
     margin: "1%",
     overflow: "hidden",
     transition: "height 0.2s ease-in-out",
-},
+  },
   timeInputBox: {
     backgroundColor: "#616A6B",
     width: "15%",

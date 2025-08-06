@@ -2,17 +2,42 @@ import { createTheme } from "@mui/material/styles";
 import Card from "../../assets/Card.svg";
 
 const themeDefault = createTheme({
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '@global': {
+          '@font-face': [
+            {
+              fontFamily: 'Roboto',
+              src: `url('/fonts/Roboto-Regular.woff2') format('woff2')`,
+              fontWeight: 400,
+              fontStyle: 'normal',
+              fontDisplay: 'swap',
+            },
+            {
+              fontFamily: 'Roboto',
+              src: `url('/fonts/Roboto-Bold.woff2') format('woff2')`,
+              fontWeight: 700,
+              fontStyle: 'normal',
+              fontDisplay: 'swap',
+            },
+          ],
+        },
+      },
+    },
+  },
+
   palette: {
     primary: {
-      light: "#60568d",
+      // light: "#60568d",
       main: "#2C2799",
-      dark: "#271e4f",
+      // dark: "#271e4f",
       contrastText: "#FFFFFF",
     },
     secondary: {
-      light: "#FFFFFF",
+      // light: "#FFFFFF",
       main: "#FFFFFF",
-      dark: "#FFFFFF",
+      // dark: "#FFFFFF",
       contrastText: "#000000",
     },
     background: {
@@ -21,60 +46,68 @@ const themeDefault = createTheme({
   },
   typography: {
     fontFamily: '"Roboto"',
+    fontDisplay: 'swap',
     fontWeight: "400",
     h1: {
       fontSize: "3.125rem",
-      fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontFamily: '"Roboto" ,sans-serif',
+      fontWeight: "400",
+      lineHeight: 1.2,
       "@media (max-width:550px)": {
         fontSize: "2rem",
       },
     },
     h2: {
       fontSize: "2.5rem",
-      fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontFamily: '"Roboto" ,sans-serif',
+      fontWeight: "400",
+      lineHeight: 1.2,
       "@media (max-width:550px)": {
         fontSize: "1.5rem",
       },
     },
     h3: {
       fontSize: "1.6875rem",
-      fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontFamily: '"Roboto" ,sans-serif',
+      fontWeight: "400",
       letterSpacing: "0px",
+      lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: "1.3rem",
       },
     },
     h4: {
       fontSize: "1.5rem",
-      fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontFamily: '"Roboto" ,sans-serif',
+      fontWeight: "400",
+      lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: "0.9rem",
       },
     },
     h5: {
       fontSize: "1.3125rem",
-      fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontFamily: '"Roboto" ,sans-serif',
+      fontWeight: "400",
+      lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: "1rem",
       },
     },
     h6: {
       fontSize: "1.125rem",
-      fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontFamily: '"Roboto" ,sans-serif',
+      fontWeight: "400",
       paddingTop: "4px",
+      lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: "1rem",
       },
     },
     body1: {
       fontSize: "1.25rem",
-      fontFamily: '"Roboto", sans-serif ,sans-serif',
+      fontFamily: '"Roboto", sans-serif ',
+      lineHeight: 1.3,
       fontWeight: "400",
     },
     body2: {
@@ -87,6 +120,7 @@ const themeDefault = createTheme({
     caption: {
       fontSize: "0.75rem",
       fontFamily: "'Roboto', sans-serif",
+      lineHeight: 1.3,
       fontWeight: "400",
       color: "#3A3A3A"
     },
@@ -94,14 +128,16 @@ const themeDefault = createTheme({
       fontSize: "1.125rem",
       fontFamily: "'Roboto', sans-serif",
       fontWeight: "400",
+      lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: ".9rem",
       },
     },
     subtitle2: {
       fontSize: "1rem",
-      fontFamily: '"Rowdies", cursive,"Roboto" ,sans-serif',
-      fontWeight: "300",
+      fontFamily: '"Roboto" ,sans-serif',
+      fontWeight: "400",
+      lineHeight: 1.3,
       "@media (max-width:550px)": {
         fontSize: ".7rem",
       },
@@ -120,6 +156,7 @@ const themeDefault = createTheme({
     MuiTableRow: {
       styleOverrides: {
         root: {
+          willChange: 'contents', // GPU optimization
           "&:nth-child(odd)": {
             backgroundColor: "#D6EAF8",
           },
@@ -211,6 +248,11 @@ const themeDefault = createTheme({
         },
         MuiButton: {
           root: {
+            minWidth: 'unset', // Reduce layout impact
+            '&.MuiButton-contained': {
+              willChange: 'transform' // GPU acceleration
+            },
+
             display: "none",
           },
         },
@@ -221,8 +263,9 @@ const themeDefault = createTheme({
         root: {
           padding: ".5rem .5rem .5rem .8rem",
           textTransform: "capitalize",
-        },
+          fontDisplay:"swap"
 
+        },
         stackedParent: {
           "@media (max-width: 400px)": {
             display: "table-row",
@@ -418,6 +461,8 @@ const themeDefault = createTheme({
       },
       responsiveBase: {
         minHeight: "560px",
+        willChange: "contents", // Isolate table rendering
+
       },
     },
     MUIDataTableToolbar: {
@@ -457,7 +502,9 @@ const themeDefault = createTheme({
       },
     },
     MUIDataTableBodyCell: {
-      root: { padding: ".5rem .5rem .5rem .8rem", textTransform: "capitalize" },
+      root: {
+        padding: ".5rem .5rem .5rem .8rem", textTransform: "capitalize", willChange: "transform", // GPU acceleration
+      },
     },
     MuiSelect: {
       styleOverrides: {
@@ -482,6 +529,13 @@ const themeDefault = createTheme({
     }
   },
 });
+themeDefault.criticalStyles = {
+  aboveTheFold: {
+    position: 'relative',
+    minHeight: '100vh',
+    overflow: 'hidden'
+  }
+};
 
 themeDefault.container = {
   backgroundImage: `url(${Card})`,

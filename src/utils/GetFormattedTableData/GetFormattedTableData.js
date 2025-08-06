@@ -1,6 +1,0 @@
-const GetColumnsByData = () => {
-
-}
- 
-
-export {GetColumnsByData}

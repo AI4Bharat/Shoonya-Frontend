@@ -1,20 +1,14 @@
 import React, { useState, useRef } from "react";
-import {
-  Button,
-  Divider,
-  Grid,
-  Typography,
-  Popover,
-  List,
-  ListItem,
-  FormGroup,
-  Checkbox,
-  FormControlLabel,
-  Radio,
-  Autocomplete,
-  Tooltip,
-  Box
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Tooltip from "@mui/material/Tooltip";
+import Box from "@mui/material/Box";
+
 import { translate } from "../../../../config/localisation";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import DatasetStyle from "../../../styles/Dataset";

@@ -1,9 +1,12 @@
-import { useState, useEffect, useContext } from "react";
-import CustomCard from "../../component/common/Card";
-import { Grid, Typography, Link, ThemeProvider, InputAdornment, FormHelperText, } from "@mui/material";
+import { useState} from "react";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormHelperText from "@mui/material/FormHelperText";
+import { ThemeProvider } from "@mui/material/styles";
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
-import { translate } from "../../../../config/localisation";
 import LoginStyle from "../../../styles/loginStyle";
 import themeDefault from '../../../theme/theme'
 import { useNavigate, useParams } from "react-router-dom";

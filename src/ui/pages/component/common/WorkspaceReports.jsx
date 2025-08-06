@@ -369,7 +369,6 @@ const WorkspaceReports = () => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
-    console.log(selection, "selection");
   };
   const handleDateSubmit = (sendMail) => {
     if (radioButton === "payment") {

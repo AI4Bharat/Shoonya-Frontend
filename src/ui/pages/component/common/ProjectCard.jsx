@@ -1,22 +1,11 @@
 import * as React from "react";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Box, Chip, Divider, Grid, ThemeProvider } from "@mui/material";
-import themeDefault from "../../../theme/theme";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import DatasetStyle from "../../../styles/Dataset";
+import  Grid from "@mui/material/Grid";
+import { Link } from "react-router-dom";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
 
 
 const ProjectCard = (props) => {
-  let navigate = useNavigate();
-  let { id } = useParams();
-
-  const classes = DatasetStyle();
   const { projectObj } = props;
   const userRole =projectObj.project_stage && UserMappedByProjectStage(projectObj.project_stage).name;
   return (

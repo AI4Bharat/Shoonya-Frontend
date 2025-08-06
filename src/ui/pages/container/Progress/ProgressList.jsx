@@ -1,4 +1,7 @@
-import { Box,Grid,Tab, Card,Tabs, Typography, Divider } from '@mui/material'
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Typography from "@mui/material/Typography";
 import React from 'react'
 import { useState } from 'react'
 import ProgressAnalytics from './ProgressAnalytics';
@@ -40,15 +43,22 @@ const ProgressList = () => {
     return (
       
         < >
-            <Box sx={{mb:2,}} >
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
+            <Box sx={{ mb: 2 }}>
+                <Tabs 
+                    value={tabValue} 
+                    onChange={handleTabChange} 
+                    aria-label="user-tabs" 
+                    variant="scrollable" 
+                    scrollButtons="auto" 
+                    sx={{ padding: '0 16px' }}
+                >
                     <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Meta Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Advance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Performance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} /> 
                 </Tabs>
             </Box>
-            <Box sx={{ p: 1}}>
+            <Box sx={{ p: 2 }}>
                 <TabPanel value={tabValue} index={0}>
                 <TaskAnalytics loggedInUserData ={loggedInUserData} />  
                 </TabPanel> 
