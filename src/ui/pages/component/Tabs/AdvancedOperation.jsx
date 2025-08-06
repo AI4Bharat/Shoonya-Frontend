@@ -40,7 +40,7 @@ import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
-
+import AssignTasksDialog from "../../container/Project/manualtaskassign";
 
 const ProgressType = [
   "incomplete",
@@ -635,6 +635,9 @@ const getPullNewDataAPI = async () => {
                   ))}
                 </Select>
               </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <AssignTasksDialog  />
           </Grid>
 
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
