@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TextField,
   Button,
@@ -22,10 +22,11 @@ const TasksassignDialog = () => {
   const [formData, setFormData] = useState({
     task_ids: '',
     user_id: '',
-    allocation_type: '',
+    annotation_type: '',
   });
+  const [users, setUsers] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // success | error | warning | info
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const handleOpen = () => setOpen(true);
@@ -41,15 +42,52 @@ const TasksassignDialog = () => {
     }));
   };
 
+  // Fetch users when dialog is opened
+  useEffect(() => {
+    if (open) {
+      const fetchUsers = async () => {
+        try {
+          const response = await axios.get(
+            `${configs.BASE_URL_AUTO}/projects/${id}/`,
+            {
+              headers: {
+                Authorization: `JWT ${localStorage.getItem('shoonya_access_token')}`,
+              },
+            }
+          );
+
+          const { annotation_reviewers, annotators, review_supercheckers } =
+            response.data;
+
+          // Merge all users into a single array (unique by id)
+          const combinedUsers = [
+            ...(annotation_reviewers || []),
+            ...(annotators || []),
+            ...(review_supercheckers || []),
+          ];
+
+          const uniqueUsers = Array.from(
+            new Map(combinedUsers.map((u) => [u.id, u])).values()
+          );
+
+          setUsers(uniqueUsers);
+        } catch (error) {
+          console.error('Error fetching project users:', error);
+        }
+      };
+
+      fetchUsers();
+    }
+  }, [open, id]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Close dialog immediately
     handleClose();
     try {
       const payload = {
         task_ids: formData.task_ids.split(',').map((t) => Number(t.trim())),
         user_id: Number(formData.user_id),
-        allocation_type: Number(formData.allocation_type),
+        annotation_type: Number(formData.annotation_type),
       };
 
       const response = await axios.post(
@@ -58,7 +96,7 @@ const TasksassignDialog = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `JWT ${localStorage.getItem('anudesh_access_token')}`,
+            Authorization: `JWT ${localStorage.getItem('shoonya_access_token')}`,
           },
         }
       );
@@ -67,9 +105,7 @@ const TasksassignDialog = () => {
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
 
-      handleClose();
-      setFormData({ task_ids: '', user_id: '', allocation_type: '' });
-
+      setFormData({ task_ids: '', user_id: '', annotation_type: '' });
     } catch (error) {
       console.error(error.response?.data);
       setSnackbarMessage(error.response?.data?.error || 'Error allocating tasks');
@@ -110,24 +146,34 @@ const TasksassignDialog = () => {
               onChange={handleChange}
               required
             />
+
+            {/* User dropdown instead of free text */}
             <TextField
+              select
               fullWidth
               name="user_id"
-              label="User ID *"
+              label="Select User *"
               variant="outlined"
               margin="dense"
               value={formData.user_id}
               onChange={handleChange}
               required
-            />
+            >
+              {users.map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {user.username || user.email || `User ${user.id}`}
+                </MenuItem>
+              ))}
+            </TextField>
+
             <TextField
               select
               fullWidth
-              name="allocation_type"
-              label="Allocation Type *"
+              name="annotation_type"
+              label="Annotation Type *"
               variant="outlined"
               margin="dense"
-              value={formData.allocation_type}
+              value={formData.annotation_type}
               onChange={handleChange}
               required
             >
