@@ -185,9 +185,8 @@ const UserDetail = (props) => {
       ) {
         return el;
       } else if (
-        el.is_active
-          ?.toString()
-          ?.toLowerCase()
+        (el.is_active === true ? "Active" : "Not Active")
+          .toLowerCase()
           .includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;
