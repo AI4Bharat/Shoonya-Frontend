@@ -643,10 +643,10 @@ const TranscriptionRightPanel = ({
         setRedoStack((prevState) => [
           ...prevState,
           {
-            type: "textChange",
-            index: lastAction.index,
-            previousText: currentText,
-            updateAcoustic: false,
+          type: updateAcoustic ? "textChangeAcoustic" : "textChange",
+          index: lastAction.index,
+          previousText: currentText,
+          updateAcoustic: updateAcoustic,
           },
         ]);
       }  else if (lastAction.type === "doubleHash") {
@@ -725,34 +725,36 @@ const onRedo = useCallback(() => {
       setUndoStack((prevState) => [
         ...prevState,
         {
-          type: "textChange",
+          type: updateAcoustic ? "textChangeAcoustic" : "textChange",
           index: lastAction.index,
           previousText: currentText,
-          updateAcoustic: false
+          updateAcoustic: updateAcoustic,
+
         },
       ]);
     }
-    else if (lastAction.type === "textChangeAcoustic") {
-      // Handle acoustic text redo
-      const currentText = subtitles[lastAction.index]?.acoustic_normalised_text || "";
+    // else if (lastAction.type === "textChangeAcoustic") {
+    //   // Handle acoustic text redo
+    //   const currentText = subtitles[lastAction.index]?.acoustic_normalised_text || "";
 
-      const sub = onSubtitleChange(
-        lastAction.previousText,
-        lastAction.index,
-        true // updateAcoustic flag
-      );
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+    //   const sub = onSubtitleChange(
+    //     lastAction.previousText,
+    //     lastAction.index,
+    //     true // updateAcoustic flag
+    //   );
+    //   dispatch(setSubtitles(sub, C.SUBTITLES));
 
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "textChangeAcoustic",
-          index: lastAction.index,
-          previousText: currentText,
-          updateAcoustic: true
-        },
-      ]);
-    }
+    //   setUndoStack((prevState) => [
+    //     ...prevState,
+    //     {
+    //       type: updateAcoustic ? "textChangeAcoustic" : "textChange",
+    //       index: lastAction.index,
+    //       previousText: currentText,
+    //       updateAcoustic: updateAcoustic,
+
+    //     },
+    //   ]);
+    // }
 
     else if (lastAction.type === "doubleHash") {
       // Redo double-hash action
