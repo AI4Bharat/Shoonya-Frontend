@@ -35,6 +35,8 @@ import { addDays } from 'date-fns';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import GetOrganizationDetailedProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationDetailedProjectReports";
 import Skeleton from "@mui/material/Skeleton";
+import Preferedworkspace from "./prefered_workspace.jsx";
+
 
 const ProgressType = ["Annotation Stage", "Review Stage", "Super Check Stage", "All Stage"]
 const ITEM_HEIGHT = 38;
@@ -544,6 +546,7 @@ const OrganizationReports = () => {
               </RadioGroup>
             </FormControl>
           </Grid >
+          <Preferedworkspace />
         </Grid>
 
         {radiobutton === "ProjectReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
