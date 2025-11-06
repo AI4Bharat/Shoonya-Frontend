@@ -1373,6 +1373,20 @@ export default function LSF() {
   const handleGlossaryClick = () => {
     setShowGlossary(!showGlossary);
   };
+useEffect(() => {
+  const blockNotesEvents = () => {
+    document.querySelectorAll('.ql-editor, .ql-toolbar').forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        e.stopImmediatePropagation();
+      }, true);
+    });
+  };
+
+  blockNotesEvents();
+  const interval = setInterval(blockNotesEvents, 1000);
+  
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <div style={{ maxHeight: "100%", maxWidth: "90%", margin: "auto" }}>

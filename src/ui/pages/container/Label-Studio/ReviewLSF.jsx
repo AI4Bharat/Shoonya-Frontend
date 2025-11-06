@@ -1214,7 +1214,20 @@ useEffect(() => {
       />
     );
   };
+useEffect(() => {
+  const blockNotesEvents = () => {
+    document.querySelectorAll('.ql-editor, .ql-toolbar').forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        e.stopImmediatePropagation();
+      }, true);
+    });
+  };
 
+  blockNotesEvents();
+  const interval = setInterval(blockNotesEvents, 1000);
+  
+  return () => clearInterval(interval);
+}, []);
   const handleSelectChange = (event) => {
     selectedLanguages.current = Array.from(event.target.selectedOptions, (option) => option.value);
     setSelectedL(Array.from(event.target.selectedOptions, (option) => option.value));
