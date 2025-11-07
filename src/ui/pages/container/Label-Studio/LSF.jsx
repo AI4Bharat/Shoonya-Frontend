@@ -1039,6 +1039,21 @@ const LabelStudioWrapper = ({
       }
     }
   }, [taskData]);
+  
+useEffect(() => {
+  const blockNotesEvents = () => {
+    document.querySelectorAll('.ql-editor, .ql-toolbar').forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        e.stopImmediatePropagation();
+      }, true);
+    });
+  };
+
+  blockNotesEvents();
+  const interval = setInterval(blockNotesEvents, 1000);
+  
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <div>
