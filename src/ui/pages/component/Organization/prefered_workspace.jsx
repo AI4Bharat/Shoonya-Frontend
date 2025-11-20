@@ -16,6 +16,25 @@ import configs from "../../../../config/config";
 import { useParams } from "react-router-dom";
 
 const PreferedWorkspace = () => {
+  const ITEM_HEIGHT = 400;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT,
+        width: 250,
+      }
+    },
+    getContentAnchorEl: null,
+    anchorOrigin: {
+      vertical: "bottom",
+      horizontal: "center"
+    },
+    transformOrigin: {
+      vertical: "top",
+      horizontal: "center"
+    },
+    variant: "menu"
+  };
   const { orgId } = useParams();
   const [workspaces, setWorkspaces] = useState([]);
   const [savedWorkspaces, setSavedWorkspaces] = useState([]);
@@ -161,24 +180,43 @@ const PreferedWorkspace = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <FormControl fullWidth style={{ width: 450 }}>
-          <InputLabel id="workspace-label">Preferred Workspaces</InputLabel>
+        <FormControl fullWidth style={{ width: 400 }}>
+          <InputLabel id="workspace-label" sx={{ fontSize: "16px" }}>Preferred Workspaces</InputLabel>
           <Select
-            labelId="workspace-label"
             multiple
-            value={selectedWorkspaces}
-            onChange={(e) => setSelectedWorkspaces(e.target.value)}
-            renderValue={() => ""}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 500,
-                  width: 460,
-                  padding: "10px",
-                },
-              },
+            style={{ zIndex: 0 }}
+            labelId="workspace-label"
+            id="workspace-select"
+            label="Preferred Workspaces"
+            MenuProps={MenuProps}
+
+            // ⬇️ Correct value (IDs only)
+            value={selectedWorkspaces.length > 0
+              ? selectedWorkspaces
+              : savedWorkspaces.map(ws => ws.id)
+            }
+
+            // ⬇️ Correct onChange logic
+            onChange={(e) => {
+              const ids = e.target.value;
+              setSelectedWorkspaces(ids);
+            }}
+
+            displayEmpty
+            renderValue={(selected) => {
+              // ⬇️ Default view: show saved preferred workspaces like Project Type
+              if (selected.length === 0 && savedWorkspaces.length > 0) {
+                return savedWorkspaces.map(ws => ws.workspace_name).join(", ");
+              }
+
+              // ⬇️ After user selects: show selected workspace names
+              return workspaces
+                .filter(ws => selected.includes(ws.id))
+                .map(ws => ws.workspace_name)
+                .join(", ");
             }}
           >
+
             {/* Available Workspaces */}
             <Typography variant="subtitle2" sx={{ fontWeight: "bold", ml: 2 }}>
               Available Workspaces
