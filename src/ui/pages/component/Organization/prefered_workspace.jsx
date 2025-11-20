@@ -187,22 +187,29 @@ const PreferedWorkspace = () => {
             style={{ zIndex: 0 }}
             labelId="workspace-label"
             id="workspace-select"
-            value={savedWorkspaces.map(ws => ws.id)}   
             label="Preferred Workspaces"
+            MenuProps={MenuProps}
+
+            // ⬇️ Correct value (IDs only)
+            value={selectedWorkspaces.length > 0
+              ? selectedWorkspaces
+              : savedWorkspaces.map(ws => ws.id)
+            }
+
+            // ⬇️ Correct onChange logic
             onChange={(e) => {
               const ids = e.target.value;
-
               setSelectedWorkspaces(ids);
-              setSavedWorkspaces(
-                workspaces.filter(ws => ids.includes(ws.id))
-              );
             }}
-            MenuProps={MenuProps}
+
             displayEmpty
             renderValue={(selected) => {
+              // ⬇️ Default view: show saved preferred workspaces like Project Type
               if (selected.length === 0 && savedWorkspaces.length > 0) {
                 return savedWorkspaces.map(ws => ws.workspace_name).join(", ");
               }
+
+              // ⬇️ After user selects: show selected workspace names
               return workspaces
                 .filter(ws => selected.includes(ws.id))
                 .map(ws => ws.workspace_name)
