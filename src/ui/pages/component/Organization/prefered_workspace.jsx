@@ -15,15 +15,28 @@ import { useParams } from "react-router-dom";
 const PreferedWorkspace = () => {
   const { orgId } = useParams();
 
-  const ITEM_HEIGHT = 400;
+  const ITEM_HEIGHT = 100;
+  const ITEM_PADDING_TOP = 0;
   const MenuProps = {
     PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 3.5 + ITEM_PADDING_TOP,
+        width: 250,
+      }
+    },
+    getContentAnchorEl: null,
+    anchorOrigin: {
+      vertical: "bottom",
+      horizontal: "center"
+    },
+    transformOrigin: {
+      vertical: "top",
+      horizontal: "center",
       style: { maxHeight: ITEM_HEIGHT, width: 300 },
     },
-    anchorOrigin: { vertical: "bottom", horizontal: "center" },
-    transformOrigin: { vertical: "top", horizontal: "center" },
-    variant: "menu",
+    variant: "menu"
   };
+
 
   const [workspaces, setWorkspaces] = useState([]);
   const [saved, setSaved] = useState([]);      // saved from backend
@@ -185,7 +198,18 @@ const PreferedWorkspace = () => {
     setSelected(allIds);
     fetchSaved();
   };
-  const sortedList = workspaces; // no need to separate saved & others
+
+
+  // Sort workspaces so that checked ones appear first
+  const sortedList = [...workspaces].sort((a, b) => {
+    const aChecked = selected.includes(a.id);
+    const bChecked = selected.includes(b.id);
+
+    // Checked → first
+    if (aChecked && !bChecked) return -1;
+    if (!aChecked && bChecked) return 1;
+    return 0;
+  });
 
   useEffect(() => {
     fetchWorkspaces();
@@ -197,14 +221,28 @@ const PreferedWorkspace = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <FormControl fullWidth style={{ width: 400 }}>
-          <InputLabel id="workspace-label">Preferred Workspaces</InputLabel>
+        <FormControl fullWidth style={{ width: 310, minHeight: 70, }}>
+          <InputLabel id="workspace-label" shrink sx={{ fontSize: "16px" }}>
+            Preferred Workspaces
+          </InputLabel>
 
           <Select
+            sx={{
+              "& .MuiSelect-select.MuiInputBase-input": {
+                padding: "10px 14px",
+                height: "auto !important",
+                minHeight: "1.6em",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }
+            }}
             multiple
+            style={{ zIndex: 10 }}
+            label="Preferred Workspaces"
             labelId="workspace-label"
             MenuProps={MenuProps}
-            value={selected}
+            value={selected.length === 0 ? ["ALL"] : selected}
             onChange={() => { }}
             renderValue={() => {
               if (selected.length === workspaces.length) return "All Workspaces";
@@ -231,8 +269,9 @@ const PreferedWorkspace = () => {
             ))}
           </Select>
         </FormControl>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
