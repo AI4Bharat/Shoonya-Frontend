@@ -1,21 +1,26 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
 import "./editor.css";
 import "quill/dist/quill.snow.css";
 import LabelStudio1 from "./lsf-build/static/js/main";
 import LabelStudio2 from "@heartexlabs/label-studio";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import Alert from "@mui/material/Alert";
-import Card from "@mui/material/Card";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-import Popover from "@mui/material/Popover";
-import Autocomplete from "@mui/material/Autocomplete";
-import MenuItem from "@mui/material/MenuItem";
+import {
+  Tooltip,
+  Button,
+  Alert,
+  Card,
+  TextField,
+  Box,
+  Grid,
+  Typography,
+  Popover,
+  IconButton,
+  Autocomplete,
+  MenuItem,
+  Menu,
+  Divider,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -50,6 +55,7 @@ import getTaskAssignedUsers from "../../../../utils/getTaskAssignedUsers";
 import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
 
 const filterAnnotations = (
   annotations,
@@ -224,6 +230,16 @@ const LabelStudioWrapper = ({
   const [filterMessage, setFilterMessage] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
+  //console.log("projectId, taskId", projectId, taskId);
+  // debugger
+  // const projectType = ProjectDetails?.project_type?.includes("Audio")
+
+  /* useEffect(() => {
+    if(Object.keys(userData).includes("prefer_cl_ui") && (userData.prefer_cl_ui) && ProjectDetails?.project_type?.includes("Acoustic")) {
+      autoSaveAnnotation();
+      navigate(`/projects/${projectId}/AudioTranscriptionLandingPage/${taskId}`);
+    }
+  }, [userData]); */
 
   useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
@@ -302,6 +318,7 @@ const LabelStudioWrapper = ({
         setDisableButton
       );
     isAudioProject.current = AUDIO_PROJECT_SAVE_CHECK.includes(projectType);
+    //console.log("labelConfig", labelConfig);
     LabelStudio.current = projectType?.includes("OCR") ? LabelStudio1 : LabelStudio2;
 
     if (taskData.task_status === "freezed") {
@@ -392,6 +409,7 @@ const LabelStudioWrapper = ({
         onLabelStudioLoad: function (ls) {
           annotation_status.current =
             ProjectDetails.project_stage == 2 ? "labeled" : "labeled";
+          //console.log("annotation_status", annotation_status.current, "test", ProjectDetails);
           if (annotations.length === 0) {
             var c = ls.annotationStore.addAnnotation({
               userGenerate: true,
@@ -654,12 +672,16 @@ const LabelStudioWrapper = ({
               hideLoader();
               return;
             }
+            // both have loaded!
+            // console.log("[labelConfig, taskData, annotations, predictions]", [labelConfig, taskData, annotations, predictions]);
             let tempLabelConfig =
               labelConfig.project_type === "ConversationTranslation" ||
               labelConfig.project_type === "ConversationTranslationEditing"
                 ? generateLabelConfig(taskData.data)
                 : labelConfig.project_type === "ConversationVerification"
                 ? conversationVerificationLabelConfig(taskData.data)
+                : labelConfig.project_type === "OCRTranscriptionEditing"
+                ? OCRConfigJS
                 : labelConfig.label_config;
             if (labelConfig.project_type.includes("OCRSegmentCategorization")) {
               tempLabelConfig = labelConfigJS;
@@ -695,6 +717,7 @@ const LabelStudioWrapper = ({
     //     targetElement.oninput = function (e) {
     //       let textAreaInnerText = e.target.value;
 
+    //       // console.log("e ---------------------- ", e.currentTarget);
 
     //       let lastInputChar =
     //         textAreaInnerText[targetElement.selectionStart - 1];
@@ -968,8 +991,262 @@ const LabelStudioWrapper = ({
     annotation_status.current = "draft";
     lsfRef.current.store.submitAnnotation();
   };
+  const [ocrMenuAnchorEl, setOcrMenuAnchorEl] = useState(null);
+  const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+  const [focusedEditor, setFocusedEditor] = useState(null);
+  const [copiedFormula, setCopiedFormula] = useState('');
 
-  const onNextAnnotation = async () => {
+  // Handler for button click
+  const handleOcrButtonClick = (event) => {
+    setOcrMenuAnchorEl(event.currentTarget);
+  };
+
+  // Handler for OCR formatting - for menu clicks (copy to clipboard)
+  const handleOcrFormatting = (formatType) => {
+    setOcrMenuAnchorEl(null);
+
+    let formula = '';
+
+    switch (formatType) {
+      case "superscript":
+        formula = '${}^{}$';
+        break;
+      case "subscript":
+        formula = '${}_{}$';
+        break;
+      case "fraction":
+        formula = '\\fraction{}{}';
+        break;
+      case "footnote":
+        formula = '\\footnote{}';
+        break;
+      case "dropcap":
+        formula = '\\dropcap{}';
+        break;
+      default:
+        return;
+    }
+
+    copyToClipboard(formula);
+  };
+
+  // Function to directly insert formula at cursor position
+  const insertFormulaAtCursor = (formula) => {
+    const activeEl = document.activeElement;
+
+    if (!activeEl || (!activeEl.isContentEditable && activeEl.tagName !== 'TEXTAREA' && activeEl.tagName !== 'INPUT')) {
+      console.log('No editable element focused');
+      return false;
+    }
+
+    try {
+      if (activeEl.isContentEditable) {
+        // For contenteditable elements (Label Studio editors)
+        const selection = window.getSelection();
+
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          range.deleteContents();
+
+          // Create text node with formula
+          const textNode = document.createTextNode(formula);
+          range.insertNode(textNode);
+
+          // Move cursor after the inserted formula
+          range.setStartAfter(textNode);
+          range.setEndAfter(textNode);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } else {
+          // If no selection, just append at the end
+          activeEl.textContent += formula;
+        }
+
+        // Trigger input event for Label Studio
+        const event = new Event('input', { bubbles: true });
+        activeEl.dispatchEvent(event);
+
+      } else {
+        // For textarea/input elements
+        const start = activeEl.selectionStart;
+        const end = activeEl.selectionEnd;
+        const text = activeEl.value;
+
+        activeEl.value = text.substring(0, start) + formula + text.substring(end);
+        activeEl.selectionStart = activeEl.selectionEnd = start + formula.length;
+
+        // Trigger input event
+        const event = new Event('input', { bubbles: true });
+        activeEl.dispatchEvent(event);
+      }
+
+      console.log('Formula inserted directly:', formula);
+      return true;
+    } catch (error) {
+      console.error('Error inserting formula:', error);
+      return false;
+    }
+  };
+
+  // Copy to clipboard function (for menu clicks)
+  const copyToClipboard = (formula) => {
+    navigator.clipboard.writeText(formula).then(() => {
+      setCopiedFormula(formula);
+      setTimeout(() => setCopiedFormula(''), 2000);
+    }).catch(err => {
+      // Fallback
+      const textArea = document.createElement('textarea');
+      textArea.value = formula;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedFormula(formula);
+      setTimeout(() => setCopiedFormula(''), 2000);
+    });
+  };
+
+  // Keyboard shortcut handler - DIRECT INSERTION
+  useEffect(() => {
+    const handleGlobalKeyDown = (event) => {
+      // Check if any editor is focused
+      if (!isTextareaFocused) return;
+
+      const key = event.key;
+      const isShift = event.shiftKey;
+
+      console.log('Key pressed:', key, 'Shift:', isShift, 'Focused:', isTextareaFocused);
+
+      // Only process if we're definitely in a text editor
+      const activeEl = document.activeElement;
+      const isInEditor = activeEl?.isContentEditable ||
+        activeEl?.classList?.contains('ant-typography') ||
+        activeEl?.closest('[contenteditable="true"]') ||
+        activeEl?.closest('.ant-typography') ||
+        activeEl?.tagName === 'TEXTAREA' ||
+        activeEl?.tagName === 'INPUT';
+
+      if (!isInEditor) return;
+
+      let formula = '';
+
+      // Simple key checks
+      if (key === '^') {
+        formula = '${}^{}$';
+      } else if (key === '_') {
+        formula = '${}_{}$';
+      } else if (key === '/') {
+        formula = '\\fraction{}{}';
+      } else if (isShift && key === 'F') {
+        formula = '\\footnote{}';
+      } else if (isShift && key === 'D') {
+        formula = '\\dropcap{}';
+      }
+
+      if (formula) {
+        console.log('Shortcut matched! Inserting formula:', formula);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        // DIRECT INSERTION instead of copy to clipboard
+        const success = insertFormulaAtCursor(formula);
+        if (success) {
+          setCopiedFormula(formula);
+          setTimeout(() => setCopiedFormula(''), 1000);
+        }
+      }
+    };
+
+    // Add event listener with high priority
+    document.addEventListener('keydown', handleGlobalKeyDown, true);
+
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown, true);
+    };
+  }, [isTextareaFocused]);
+
+  // Enhanced editor focus handler
+  const handleEditorFocus = (event) => {
+    console.log('Editor focus event');
+
+    const target = event.target;
+    let editor = null;
+
+    // Find the actual editor element
+    if (target.isContentEditable) {
+      editor = target;
+    } else if (target.closest('[contenteditable="true"]')) {
+      editor = target.closest('[contenteditable="true"]');
+    } else if (target.closest('.ant-typography')) {
+      editor = target.closest('.ant-typography');
+    }
+
+    if (editor) {
+      setIsTextareaFocused(true);
+      setFocusedEditor(editor);
+      console.log('✓ Editor focused - shortcuts should work');
+    }
+  };
+
+  const handleEditorBlur = (event) => {
+    setTimeout(() => {
+      const activeElement = document.activeElement;
+      const isFocusOnOurUI = activeElement?.closest('.lsf-button') ||
+        activeElement?.closest('[role="menu"]') ||
+        activeElement?.closest('.MuiMenu-paper');
+
+      if (!isFocusOnOurUI) {
+        setIsTextareaFocused(false);
+        setFocusedEditor(null);
+        console.log('Editor blurred');
+      }
+    }, 150);
+  };
+
+  // Setup editor listeners
+  useEffect(() => {
+    const setupListeners = () => {
+      const editors = document.querySelectorAll('.ant-typography, [contenteditable="true"]');
+
+      editors.forEach(editor => {
+        editor.removeEventListener('focus', handleEditorFocus);
+        editor.removeEventListener('blur', handleEditorBlur);
+        editor.removeEventListener('click', handleEditorFocus);
+
+        editor.addEventListener('focus', handleEditorFocus, true);
+        editor.addEventListener('blur', handleEditorBlur, true);
+        editor.addEventListener('click', handleEditorFocus, true);
+      });
+
+      console.log('Setup focus listeners on', editors.length, 'editors');
+    };
+
+    setupListeners();
+    const interval = setInterval(setupListeners, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Detect edit icon clicks
+  useEffect(() => {
+    const handleEditClick = (event) => {
+      if (event.target.closest('.anticon-edit')) {
+        console.log('Edit icon clicked');
+        setTimeout(() => {
+          const editor = document.querySelector('[contenteditable="true"]');
+          if (editor) {
+            setIsTextareaFocused(true);
+            setFocusedEditor(editor);
+            console.log('Editor focused via edit icon');
+          }
+        }, 300);
+      }
+    };
+
+    document.addEventListener('click', handleEditClick, true);
+    return () => document.removeEventListener('click', handleEditClick, true);
+  }, []);
+const onNextAnnotation = async () => {
     showLoader();
     getNextProject(projectId, taskId).then((res) => {
       hideLoader();
@@ -1021,6 +1298,21 @@ const LabelStudioWrapper = ({
       }
     }
   }, [taskData]);
+  
+useEffect(() => {
+  const blockNotesEvents = () => {
+    document.querySelectorAll('.ql-editor, .ql-toolbar').forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        e.stopImmediatePropagation();
+      }, true);
+    });
+  };
+
+  blockNotesEvents();
+  const interval = setInterval(blockNotesEvents, 1000);
+  
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <div>
@@ -1109,12 +1401,104 @@ const LabelStudioWrapper = ({
               {/* ) : (
               <div style={{ minWidth: "160px" }} />
             )} */}
-            {ProjectDetails?.project_type?.includes("OCR") && 
-            <>
-              <Tooltip title="Clear all children bboxes">
-                <Button
-                  type="default"
-                  onClick={() => {clearAllChildren()}}
+
+              {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") &&
+                <>
+                  {/* OCR Shortcut Button with Dropdown */}
+                  <Tooltip title={
+                    "OCR Shortcuts: ^ _ / Shift+F Shift+D (direct insert)" }>
+                    <Button
+                      type="default"
+                      onClick={handleOcrButtonClick}
+                      endIcon={<ArrowDropDownIcon />}
+                      style={{
+                        minWidth: "160px",
+                        border: "1px solid #e6e6e6",
+                        backgroundColor: "#f0f8ff",
+                        color: "#09f" ,
+                        pt: 3,
+                        pb: 3,
+                      }}
+                      className="lsf-button"
+                    >
+                      OCR Shortcuts
+                      {copiedFormula && " ✨"}
+                    </Button>
+                  </Tooltip>
+
+                  {/* Material-UI Menu for OCR Formatting Options */}
+                  <Menu
+                    anchorEl={ocrMenuAnchorEl}
+                    open={Boolean(ocrMenuAnchorEl)}
+                    onClose={() => setOcrMenuAnchorEl(null)}
+                    PaperProps={{
+                      style: {
+                        width: '320px',
+                      },
+                    }}
+                  >
+                    <MenuItem disabled style={{ fontSize: '11px', color: '#666', fontStyle: 'italic' }}>
+                      Menu: Copies to clipboard • Shortcuts: Direct insert
+                    </MenuItem>
+
+                    <MenuItem onClick={() => handleOcrFormatting("superscript")}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <div>
+                          <div><strong>Superscript</strong></div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>^</kbd> key</div>
+                        </div>
+                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}^{}`}$</span>
+                      </div>
+                    </MenuItem>
+
+                    <MenuItem onClick={() => handleOcrFormatting("subscript")}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <div>
+                          <div><strong>Subscript</strong></div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>_</kbd> key</div>
+                        </div>
+                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}_{}`}$</span>
+                      </div>
+                    </MenuItem>
+
+                    <MenuItem onClick={() => handleOcrFormatting("fraction")}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <div>
+                          <div><strong>Fraction</strong></div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>/</kbd> key</div>
+                        </div>
+                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\fraction{`{}{}`}</span>
+                      </div>
+                    </MenuItem>
+
+                    <MenuItem onClick={() => handleOcrFormatting("footnote")}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <div>
+                          <div><strong>Footnote</strong></div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Shift</kbd> + <kbd>F</kbd></div>
+                        </div>
+                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\footnote{`{}`}</span>
+                      </div>
+                    </MenuItem>
+
+                    <MenuItem onClick={() => handleOcrFormatting("dropcap")}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <div>
+                          <div><strong>Dropcap</strong></div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Shift</kbd> + <kbd>D</kbd></div>
+                        </div>
+                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\dropcap{`{}`}</span>
+                      </div>
+                    </MenuItem>
+                  </Menu>
+                </>
+              }
+     {ProjectDetails?.project_type?.includes("OCR") &&
+                <>
+                  <Tooltip title="Clear all children bboxes">
+                    <Button
+                      type="default"
+                      onClick={() => { clearAllChildren() }}
                   style={{
                     minWidth: "160px",
                     border: "1px solid #e6e6e6",
@@ -1152,6 +1536,7 @@ const LabelStudioWrapper = ({
               </Tooltip>
             </>
             }
+            
             </Grid>
           </Grid>
         </div>
@@ -1337,6 +1722,7 @@ export default function LSF() {
   useEffect(() => {
     fetchAnnotation(taskId).then((data) => {
       if (data && Array.isArray(data) && data.length > 0) {
+        console.log(annotationNotesRef);
         annotationNotesRef.current.value = data[0].annotation_notes ?? "";
         reviewNotesRef.current.value = data[0].review_notes ?? "";
         try {
@@ -1344,6 +1730,7 @@ export default function LSF() {
             annotationNotesRef.current.value !== ""
               ? JSON.parse(annotationNotesRef.current.value)
               : "";
+          console.log(newDelta2);
           annotationNotesRef.current.getEditor().setContents(newDelta2);
         } catch (err) {
           if (err instanceof SyntaxError) {
@@ -1384,7 +1771,7 @@ export default function LSF() {
   };
 
   return (
-    <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" , position:"relative" , zIndex:0}}>
+    <div style={{ maxHeight: "100%", maxWidth: "100%", margin: "auto" }}>
       {!loader && (
         <Button
           value="Back to Project"
