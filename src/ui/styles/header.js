@@ -39,6 +39,7 @@ const headerStyle = makeStyles({
     color: "#373939",
     display: "inline-block",
     letterSpacing: "1px",
+    fontDisplay:"swap",
     fontSize: "28px",
     fontWeight: "bold",
     fontFamily: 'Rowdies,"cursive", Roboto, sans-serif',
@@ -97,6 +98,13 @@ const headerStyle = makeStyles({
       width: "26px",
       height: "26px",
     },
+  },
+  nav_notif_container: {
+    display: "flex",
+    alignItems: "center",
+    padding: "10px",
+    marginRight: "10px",
+    cursor: "pointer"
   },
   drawer: {
     width: "50%",

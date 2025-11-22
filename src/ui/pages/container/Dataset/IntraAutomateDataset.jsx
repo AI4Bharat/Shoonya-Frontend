@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
-import { Card, FormControl, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, ThemeProvider, Typography } from '@mui/material';
+import Card from "@mui/material/Card";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { ThemeProvider } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
 import DraftDataPopulation from "./DraftDataPopulation";
 import PopulateAiModel from "./PopulateAiModel";
-import { FormControlLabel } from "@mui/material";
 
 export default function ControlledRadioButtonsGroup() {
   const classes = DatasetStyle();

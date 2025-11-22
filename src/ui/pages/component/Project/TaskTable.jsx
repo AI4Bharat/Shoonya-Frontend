@@ -1,9 +1,9 @@
 // TaskTable
 
 import MUIDataTable from "mui-datatables";
-import { Fragment, useEffect, useState, useRef } from "react";
+import {  useEffect, useState, useRef } from "react";
 import Skeleton from "@mui/material/Skeleton";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import GetTasksByProjectIdAPI from "../../../../redux/actions/api/Tasks/GetTasksByProjectId";
 import CustomButton from "../common/Button";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
@@ -44,7 +44,6 @@ import SearchPopup from "./SearchPopup";
 import { snakeToTitleCase } from "../../../../utils/utils";
 import ColumnList from "../common/ColumnList";
 import Spinner from "../../component/common/Spinner";
-import OutlinedTextField from "../common/OutlinedTextField";
 import FindAndReplaceDialog from "../../component/common/FindAndReplaceDialog";
 import FindAndReplaceWordsInAnnotationAPI from "../../../../redux/actions/api/ProjectDetails/FindAndReplaceWordsinAnnotation";
 import roles from "../../../../utils/UserMappedByRole/Roles";
@@ -52,9 +51,6 @@ import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 
 const excludeSearch = ["status", "actions", "output_text"];
-// const excludeCols = ["context", "input_language", "output_language", "language",
-// "conversation_json", "source_conversation_json", "machine_translated_conversation_json", "speakers_json"
-//  ];
 const excludeCols = [
   "context",
   "input_language",
@@ -78,7 +74,6 @@ const TaskTable = (props) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  let location = useLocation();
   const taskList = useSelector(
     (state) => state.getTasksByProjectId.data.result
   );
@@ -104,13 +99,6 @@ const TaskTable = (props) => {
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
 
-  console.log(
-    ProjectDetails.project_stage == 2,
-    ProjectDetails?.annotation_reviewers?.some(
-      (reviewer) => reviewer.id === userDetails?.id
-    ),
-    "hhhhhhhhh"
-  );
   const filterData = {
     Status:
       ProjectDetails.project_stage == 2 ||
@@ -331,7 +319,6 @@ const TaskTable = (props) => {
       });
     }
   };
-  // console.log(selectedFilters);
   const labelAllTasks = () => {
     let search_filters = Object?.keys(selectedFilters)
       .filter((key) => key?.startsWith("search_"))
@@ -481,7 +468,6 @@ const TaskTable = (props) => {
             >
               <CustomButton
                 onClick={() => {
-                  console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
                 }}
                 disabled={ProjectDetails.is_archived}
@@ -514,7 +500,6 @@ const TaskTable = (props) => {
               <CustomButton
                 disabled={ProjectDetails.is_archived}
                 onClick={() => {
-                  console.log("task id === ", el.id);
                   localStorage.removeItem("labelAll");
                 }}
                 sx={{ p: 1, borderRadius: 2 }}
@@ -554,11 +539,9 @@ const TaskTable = (props) => {
           },
         };
       });
-      console.log("colss", cols);
       setColumns(cols);
       setSelectedColumns(colList);
       setTasks(data);
-      console.log(colList, "colListcolList");
     } else {
       setTasks([]);
     }
@@ -572,7 +555,6 @@ const TaskTable = (props) => {
       return col;
     });
     setColumns(newCols);
-    console.log("columnss", newCols);
   }, [selectedColumns]);
 
   useEffect(() => {
@@ -1063,7 +1045,6 @@ const TaskTable = (props) => {
     onChangeRowsPerPage: (rowPerPageCount) => {
       setCurrentPageNumber(1);
       setCurrentRowPerPage(rowPerPageCount);
-      console.log("rowPerPageCount", rowPerPageCount);
     },
     filterType: "checkbox",
     selectableRows: "none",
@@ -1100,12 +1081,6 @@ const TaskTable = (props) => {
       />
     ),
   };
-  console.log(
-    props.type === "review",
-    ProjectDetails?.annotation_reviewers,
-    userDetails?.id,
-    "valuesdata"
-  );
 
   const emailId = localStorage.getItem("email_id");
   const [password, setPassword] = useState("");
@@ -1121,7 +1096,6 @@ const TaskTable = (props) => {
       unassignTasks();
     } else {
       window.alert("Invalid credentials, please try again");
-      console.log(rsp_data);
     }
   };
 

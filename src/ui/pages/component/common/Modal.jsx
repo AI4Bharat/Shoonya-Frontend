@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid } from "@mui/material";
+import  Grid  from "@mui/material/Grid";
 import Modal from "@mui/material/Modal";
 
 export default function SimpleModal(props) {
@@ -10,7 +10,6 @@ export default function SimpleModal(props) {
     // const top = 50;
     // const left = 50;
     const mediaQuery = window.matchMedia('(max-width: 768px)')
-    console.log("mediaQuery", mediaQuery);
     if (isTransliteration && mediaQuery.matches) {
       return {
         transform:' translate(20%, 25%)',

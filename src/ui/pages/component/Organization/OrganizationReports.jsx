@@ -22,23 +22,21 @@ import { useParams } from "react-router-dom";
 import GetProjectDomainsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDomains";
 import GetOrganizationUserReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationUserReports";
 import GetOrganizationProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationProjectReports";
-import GetOrganizationAnnotatorQualityAPI from "../../../../redux/actions/api/Organization/GetOrganizationAnnotatorQuality";
 import SendOrganizationUserReports from "../../../../redux/actions/api/Organization/SendOrganizationUserReports";
 import FetchLanguagesAPI from "../../../../redux/actions/api/UserManagement/FetchLanguages.js";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import DatasetStyle from "../../../styles/Dataset";
 import ColumnList from '../common/ColumnList';
-// import CircularProgress from '@material-ui/core/CircularProgress';
 import { isSameDay, format } from 'date-fns/esm';
 import { DateRangePicker, defaultStaticRanges } from "react-date-range";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { styled } from '@mui/material/styles';
 import { addDays } from 'date-fns';
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import { snakeToTitleCase } from "../../../../utils/utils";
 import GetOrganizationDetailedProjectReportsAPI from "../../../../redux/actions/api/Organization/GetOrganizationDetailedProjectReports";
 import Skeleton from "@mui/material/Skeleton";
+import Preferedworkspace from "./prefered_workspace.jsx";
+
 
 const ProgressType = ["Annotation Stage", "Review Stage", "Super Check Stage", "All Stage"]
 const ITEM_HEIGHT = 38;
@@ -383,7 +381,6 @@ const OrganizationReports = () => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
-    console.log(selection, "selection");
   };
 
   const userId = useSelector((state) => state.fetchLoggedInUserData.data.id);
@@ -549,6 +546,7 @@ const OrganizationReports = () => {
               </RadioGroup>
             </FormControl>
           </Grid >
+          <Preferedworkspace />
         </Grid>
 
         {radiobutton === "ProjectReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>

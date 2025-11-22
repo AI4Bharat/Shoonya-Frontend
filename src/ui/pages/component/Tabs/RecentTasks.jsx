@@ -117,7 +117,6 @@ const RecentTasks = () => {
         return [];
       });
       let colList = [];
-      console.log(...Object.keys(RecentTasks.results.results[0]));
       if (
         RecentTasks.results.results.length > 0 &&
         typeof RecentTasks.results.results[0] === "object"
@@ -136,7 +135,6 @@ const RecentTasks = () => {
           },
         };
       });
-      console.log("colss", cols, colList);
       setColumns(cols);
       setSelectedColumns(colList);
       setTasks(data);

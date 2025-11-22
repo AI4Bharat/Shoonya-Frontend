@@ -1,16 +1,11 @@
-import React, { useRef, useEffect, useState ,memo} from "react";
+import React, { useRef, useEffect,memo} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isPlaying } from "../../../../utils/utils";
 import { useParams } from "react-router-dom";
 import { Grid } from "@mui/material";
 
-//Styles
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
-
-//APIs
 import { setPlayer } from "../../../../redux/actions/Common";
-import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
 const AudioPanel = memo( ({
   setCurrentTime,
@@ -39,20 +34,6 @@ const AudioPanel = memo( ({
     // eslint-disable-next-line
   }, [setPlayer, setCurrentTime, setPlaying, $audio]);
 
-  //   const onClick = useCallback(() => {
-  //     if ($video.current) {
-  //       if (isPlaying($video.current)) {
-  //         $video.current.pause();
-  //         setPoster("play.png");
-  //       } else {
-  //         $video.current.play();
-  //         setPoster("pause.png");
-  //       }
-  //     }
-  //   }, [$video]);
-
-//console.log(TaskDetails?.data?.audio_url,"TaskDetailsTaskDetailsTaskDetails")
-
   useEffect(() => {
     const audio = document.getElementById('audio-panel');
     audio.oncontextmenu = function (e) {
@@ -61,7 +42,7 @@ const AudioPanel = memo( ({
   }, [])
 
   return (
-    <Grid style={{ padding: "0px 20px 0px 20px" }}>
+    <Grid>
      
       {/* <div className={classes.videoPlayerParent} style={{ display: "flex" }}> */}
         <audio

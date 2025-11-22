@@ -275,7 +275,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, userData);
   }, [AnnotationsTaskDetails, userData]);
-  //console.log(disableSkip);
 
   const handleCollapseClick = () => {
     !showNotes && setShowStdTranscript(false);
@@ -560,10 +559,6 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     getAnnotationsTaskData(taskId);
     getProjectDetails();
     getTaskData(taskId);
-    console.log(
-      localStorage.getItem("Stage") === "review",
-      "StageStageStageStage"
-    );
   }, []);
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(projectId);
@@ -1021,7 +1016,6 @@ useEffect(() => {
     if (event.shiftKey && event.key === ' ') {
       event.preventDefault();
       if(player){
-        console.log(isPlaying(player));
         if(isPlaying(player)){
           player.pause();
         }else{
