@@ -16,12 +16,9 @@ import { styled } from '@mui/material/styles';
 
 
 const DatasetCards = (props) => {
-  const { datasetList,selectedFilters,setsSelectedFilters } = props;
+  const { datasetList, selectedFilters, setsSelectedFilters, page, rowsPerPage, totalCount, onPageChange, onRowsPerPageChange } = props;
   const classes = DatasetStyle();
-  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(9);
-  // const apiLoading = useSelector(state => state.apiStatus.loading);
   const SearchDataset = useSelector((state) => state.SearchProjectCards.data);
   const [anchorEl, setAnchorEl] = useState(null);
   const popoverOpen = Boolean(anchorEl);
@@ -34,16 +31,6 @@ const DatasetCards = (props) => {
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-
-  const handleChangePage = (e, newPage) => {
-    setPage(newPage);
-  };
-
-  const rowChange = (e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setPage(0);
   };
 
   const pageSearch = () => {
@@ -97,7 +84,7 @@ const DatasetCards = (props) => {
     <React.Fragment>
       {/* <Header /> */}
       {/* {loading && <Spinner />} */}
-      <Grid sx={{textAlign:"end",margin:"-20px 10px 10px 0px"}}>
+      <Grid sx={{textAlign:"end",margin:"-5px 10px 10px 0px"}}>
         <Button style={{ minWidth: "25px" }} onClick={handleShowFilter}>
         {filtersApplied && <InfoIcon color="primary" fontSize="small" sx={{position:"absolute", top:-4, right:-4}}/>}
           <CustomTooltip
@@ -130,32 +117,28 @@ const DatasetCards = (props) => {
             columnSpacing={{ xs: 1, sm: 1, md: 3 }}
             sx={{ mb: 3 }}
           >
-            {pageSearch()
-              .map((el, i) => {
-                return (
-                  <Grid key={el.id} item xs={12} sm={6} md={4} lg={4} xl={4}>
-                    <DatasetCard
-                      classAssigned={
-                        i % 2 === 0
-                          ? classes.projectCardContainer2
-                          : classes.projectCardContainer1
-                      }
-                      datasetObj={el}
-                      index={i}
-                    />
-                  </Grid>
-                );
-              })
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+            {pageSearch().map((el, i) => (
+              <Grid key={el.id} item xs={12} sm={6} md={4} lg={4} xl={4}>
+                <DatasetCard
+                  classAssigned={
+                    i % 2 === 0
+                      ? classes.projectCardContainer2
+                      : classes.projectCardContainer1
+                  }
+                  datasetObj={el}
+                  index={i}
+                />
+              </Grid>
+            ))}
           </Grid>
           <TablePagination
             component="div"
-            count={pageSearch().length}
+            count={totalCount}
             page={page}
-            onPageChange={handleChangePage}
+            onPageChange={onPageChange}
             rowsPerPage={rowsPerPage}
             rowsPerPageOptions={[9, 18, 36, 72, { label: "All", value: -1 }]}
-            onRowsPerPageChange={rowChange}
+            onRowsPerPageChange={onRowsPerPageChange}
             ActionsComponent={TablePaginationActions}
           />
         </Box>
