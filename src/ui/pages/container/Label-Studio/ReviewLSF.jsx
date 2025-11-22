@@ -57,6 +57,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { translate } from "../../../../config/localisation";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
 
 const StyledMenu = styled((props) => (
   <Menu
