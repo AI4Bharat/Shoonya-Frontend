@@ -45,7 +45,7 @@ const PreferedWorkspace = () => {
 
 
   // Fetch Available Workspaces
- 
+
   const fetchWorkspaces = async () => {
     setLoading(true);
     try {
@@ -134,7 +134,7 @@ const PreferedWorkspace = () => {
     }
   };
 
- 
+
   // Checkbox Toggle Handler — FIXED VERSION
 
   const handleToggle = (id) => {
@@ -215,6 +215,23 @@ const PreferedWorkspace = () => {
     fetchWorkspaces();
     fetchSaved();
   }, [orgId]);
+
+  useEffect(() => {
+    if (!workspaces.length) return;   
+
+    if (saved.length === 0) {
+      
+      const allIds = workspaces.map((ws) => ws.id);
+
+      setSelected(allIds);
+
+      
+      workspaces.forEach((ws) => {
+        saveOne(ws.id);   
+      }); 
+    }
+  }, [workspaces, saved]);
+
 
   return (
     <div style={{ marginTop: 30 }}>
