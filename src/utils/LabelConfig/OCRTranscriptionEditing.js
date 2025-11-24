@@ -37,8 +37,6 @@ export const OCRConfigJS = `<View>
     <Label value="subsub-ordered-list" name="subsub-ordered-list" background="#AAD9BB" className="ignore_assertion"/>
     <Label value="subsub-section-title" name="subsub-section-title" background="#27AE60" className="ignore_assertion"/>
     <Label value="sub-unordered-list" name="sub-unordered-list" background="#E0AED0" className="ignore_assertion"/>
-    <Label value="subscript" name="subscript" background="#FF6B9D" className="ignore_assertion"/>
-    <Label value="superscript" name="superscript" background="#A166FF" className="ignore_assertion"/>
     <Label value="subsub-headline" name="subsub-headline" background="#D5B4B4" className="ignore_assertion"/>
     <Label value="subsub-unordered-list" name="subsub-unordered-list" background="#AC87C5" className="ignore_assertion"/>
     <Label value="table" name="table" background="#FAB1A0" className="ignore_assertion"/>

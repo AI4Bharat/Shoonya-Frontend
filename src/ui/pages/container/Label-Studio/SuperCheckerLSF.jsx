@@ -1007,6 +1007,7 @@ useEffect(() => {
 
       const key = event.key;
       const isShift = event.shiftKey;
+      const isCtrl  = event.ctrlKey || event.metaKey
 
       console.log('Key pressed:', key, 'Shift:', isShift, 'Focused:', isTextareaFocused);
 
@@ -1024,11 +1025,11 @@ useEffect(() => {
       let formula = '';
 
       // Simple key checks
-      if (key === '^') {
+      if (isCtrl && key === '^') {
         formula = '${}^{}$';
-      } else if (key === '_') {
+      } else if (isCtrl && key === '_') {
         formula = '${}_{}$';
-      } else if (key === '/') {
+      } else if (isCtrl && key === '/') {
         formula = '\\fraction{}{}';
       } else if (isShift && key === 'F') {
         formula = '\\footnote{}';
@@ -1412,7 +1413,7 @@ useEffect(() => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <div>
                           <div><strong>Superscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>^</kbd> key</div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd> + <kbd>^</kbd> </div>
                         </div>
                         <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}^{}`}$</span>
                       </div>
@@ -1422,7 +1423,7 @@ useEffect(() => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <div>
                           <div><strong>Subscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>_</kbd> key</div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd> + <kbd>_</kbd> </div>
                         </div>
                         <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}_{}`}$</span>
                       </div>
@@ -1432,7 +1433,7 @@ useEffect(() => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <div>
                           <div><strong>Fraction</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>/</kbd> key</div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd> + <kbd>/</kbd> </div>
                         </div>
                         <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\fraction{`{}{}`}</span>
                       </div>
