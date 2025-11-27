@@ -1023,6 +1023,9 @@ const LabelStudioWrapper = ({
       case "dropcap":
         formula = '\\dropcap{}';
         break;
+      case "squareroot":
+        formula = '\\sqrt{}';
+        break;
       default:
         return;
     }
@@ -1142,7 +1145,10 @@ const LabelStudioWrapper = ({
         formula = '\\footnote{}';
       } else if (isShift && key === 'D') {
         formula = '\\dropcap{}';
-      }
+      }else if (key === '√' || (isShift && key === 'V')) {
+      formula = '\\sqrt{}';
+    }
+
 
       if (formula) {
         console.log('Shortcut matched! Inserting formula:', formula);
@@ -1446,7 +1452,7 @@ useEffect(() => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <div>
                           <div><strong>Superscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd> + <kbd>^</kbd> </div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>^</kbd> </div>
                         </div>
                         <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}^{}`}$</span>
                       </div>
@@ -1456,7 +1462,7 @@ useEffect(() => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <div>
                           <div><strong>Subscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrlft</kbd> + <kbd>_</kbd></div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>_</kbd></div>
                         </div>
                         <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}_{}`}$</span>
                       </div>
@@ -1466,7 +1472,7 @@ useEffect(() => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <div>
                           <div><strong>Fraction</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd> + <kbd>/</kbd> </div>
+                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Ctrl</kbd>  +<kbd>/</kbd> </div>
                         </div>
                         <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\fraction{`{}{}`}</span>
                       </div>
@@ -1491,6 +1497,16 @@ useEffect(() => {
                         <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\dropcap{`{}`}</span>
                       </div>
                     </MenuItem>
+                  <MenuItem onClick={() => handleOcrFormatting("squareroot")}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                      <div>
+                        <div><strong>Square Root</strong></div>
+                        <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Shift</kbd> + <kbd>V</kbd></div>
+                      </div>
+                      <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\sqrt{`{}`}</span>
+                    </div>
+                  </MenuItem>
+
                   </Menu>
                 </>
               }
