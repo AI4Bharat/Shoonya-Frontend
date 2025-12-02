@@ -1,6 +1,3 @@
-// -----------------------------------------------------------------------
-//  final 
-// -----------------------------------------------------------------------
 import React, { useState, useEffect } from "react";
 import {
   CircularProgress,
@@ -75,9 +72,6 @@ const PreferedWorkspace = () => {
       // Load saved workspaces (but DO NOT auto-select)
       const savedList = prefs[orgId] || [];
       setSavedWorkspaces(savedList);
-
-      // ❌ No auto-select — leave selectedWorkspaces untouched
-      // setSelectedWorkspaces(savedList.map(ws => ws.id));   <-- removed
 
     } catch (err) {
       console.error("Error fetching saved preferred workspace:", err);
@@ -297,7 +291,7 @@ const PreferedWorkspace = () => {
                 onClick={handleSave}
                 disabled={saving}
               >
-                {saving ? "Saving..." : "Save Selected"}
+                {saving ? "Saving..." : "Save Preferrences"}
               </Button>
             </div>
           </Select>
