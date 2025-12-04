@@ -62,6 +62,7 @@ const MenuProps = {
 
 
 const OrganizationReports = () => {
+  const [open, setOpen] = useState(false);
   const OrganizationDetails = useSelector(state => state.fetchLoggedInUserData.data.organization);
   const UserDetails = useSelector(state => state.fetchLoggedInUserData.data);
   const [selectRange, setSelectRange] = useState([{
@@ -546,7 +547,12 @@ const OrganizationReports = () => {
               </RadioGroup>
             </FormControl>
           </Grid >
-          <Preferedworkspace />
+          
+          <Preferedworkspace
+            orgId={orgId}
+            open={open}
+            setOpen={setOpen}
+          />
         </Grid>
 
         {radiobutton === "ProjectReports" && <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
