@@ -140,13 +140,17 @@ export default function PopulateModuleOutput() {
 
     return (
         <div>
-            <Button
-                sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2, width: "300px" }}
-                variant="contained"
-                onClick={handleClick}
-            >
-                Populate Model Predictions
-            </Button>
+            <Grid  alignItems="center">
+                <Grid item>
+                    <Button
+                        sx={{ p: 2, borderRadius: 3, width: "300px" }}
+                        variant="contained"
+                        onClick={handleClick}
+                    >
+                        Populate Model Predictions
+                    </Button>
+                </Grid>
+            </Grid>
 
             <Popover
                 id={popoverId}
@@ -208,7 +212,7 @@ export default function PopulateModuleOutput() {
                                     <FormControlLabel
                                         value={apiEndpoints_pred(projectId).default_asr}
                                         control={<Radio />}
-                                        label="Default ASR Model Predictions"
+                                        label="Text ASR Model Predictions"
                                     />
                                     <FormControlLabel
                                         value={apiEndpoints_pred(projectId).youtube}
