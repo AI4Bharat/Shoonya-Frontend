@@ -74,7 +74,7 @@ function TabPanel(props) {
 
 const DetailsViewPage = (props) => {
   const [annotatorDialogOpen, setAnnotatorDialogOpen] = useState(false);
-    React.useState(false);
+  React.useState(false);
   const { pageType, title, createdBy, onArchiveWorkspace } = props;
   const { id, orgId } = useParams();
   const classes = DatasetStyle();
@@ -99,7 +99,7 @@ const DetailsViewPage = (props) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
   const [selectedEmails, setSelectedEmails] = useState([]);
-  const [btn,setbtn] = useState(null);
+  const [btn, setbtn] = useState(null);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -121,7 +121,7 @@ const DetailsViewPage = (props) => {
   };
 
   useEffect(() => {
-    if(pageType === "organization") {
+    if (pageType === "organization") {
       getWorkspaceDetails();
     }
 
@@ -177,8 +177,7 @@ const DetailsViewPage = (props) => {
 
   const addBtnClickHandler = async () => {
     setLoading(true);
-    if (userDetails?.role === userRole.WorkspaceManager) 
-    {
+    if (userDetails?.role === userRole.WorkspaceManager) {
       const addUsesrsObj = new InviteManagerSuggestions(
         organisation_id,
         selectedUsers,
@@ -199,7 +198,7 @@ const DetailsViewPage = (props) => {
         const orgObj = new GetOragnizationUsersAPI(id);
         dispatch(APITransport(orgObj));
 
-      }else {
+      } else {
         setSnackbarInfo({
           open: true,
           message: resp?.message,
@@ -209,7 +208,7 @@ const DetailsViewPage = (props) => {
     }
     else {
 
-    const addMembersObj = new InviteUsersToOrgAPI(
+      const addMembersObj = new InviteUsersToOrgAPI(
         organisation_id,
         selectedUsers,
         userType
@@ -228,7 +227,7 @@ const DetailsViewPage = (props) => {
         });
         const orgObj = new GetOragnizationUsersAPI(id);
         dispatch(APITransport(orgObj));
-      }else {
+      } else {
         setSnackbarInfo({
           open: true,
           message: resp?.message,
@@ -251,9 +250,9 @@ const DetailsViewPage = (props) => {
     navigate(`/workspaces/${id}/workspacesetting`);
   };
 
-  const handleClickMenu = (data)=>{
-  setSelectmenu(data)
-  handleMenuClose()
+  const handleClickMenu = (data) => {
+    setSelectmenu(data)
+    handleMenuClose()
   };
 
   const theme = useTheme();
@@ -293,15 +292,15 @@ const DetailsViewPage = (props) => {
               {(userRole.Annotator !== userDetails?.role ||
                 userRole.Reviewer !== userDetails?.role ||
                 userRole.SuperChecker !== userDetails?.role) && (
-                <Tooltip title={translate("label.showProjectSettings")}>
-                  <IconButton onClick={handleOpenSettings}>
-                    <SettingsOutlinedIcon
-                      color="primary.dark"
-                      fontSize="large"
-                    />
-                  </IconButton>
-                </Tooltip>
-              )}
+                  <Tooltip title={translate("label.showProjectSettings")}>
+                    <IconButton onClick={handleOpenSettings}>
+                      <SettingsOutlinedIcon
+                        color="primary.dark"
+                        fontSize="large"
+                      />
+                    </IconButton>
+                  </Tooltip>
+                )}
             </Box>
           )}
           <Typography
@@ -317,16 +316,16 @@ const DetailsViewPage = (props) => {
             Created by : {createdBy}
           </Typography>
           <Box>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-            variant="fullWidth"
-            TabIndicatorProps={{
-              style: { display: "none" },
-            }}
-            orientation={isSmallScreen ? "vertical" : "horizontal"}
-          >
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              aria-label="basic tabs example"
+              variant="fullWidth"
+              TabIndicatorProps={{
+                style: { display: "none" },
+              }}
+              orientation={isSmallScreen ? "vertical" : "horizontal"}
+            >
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.projects")}
@@ -573,7 +572,7 @@ const DetailsViewPage = (props) => {
                   sx={{ width: "100%", mb: 2 }}
                   onClick={handleWorkspaceDialogOpen}
                 />
-                <Workspaces reloadWorkspaceTable={reloadWorkspaceTable} setReloadWorkspaceTable={setReloadWorkspaceTable}/>
+                <Workspaces reloadWorkspaceTable={reloadWorkspaceTable} setReloadWorkspaceTable={setReloadWorkspaceTable} />
                 <AddWorkspaceDialog
                   dialogCloseHandler={handleWorkspaceDialogClose}
                   isOpen={addWorkspacesDialogOpen}
