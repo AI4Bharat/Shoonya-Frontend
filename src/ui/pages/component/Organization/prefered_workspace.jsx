@@ -13,9 +13,10 @@ import {
 } from "@mui/material";
 import configs from "../../../../config/config";
 import { useParams } from "react-router-dom";
+import { Snackbar, Alert } from "@mui/material";
 
-const PreferedWorkspace = () => {
-  const { orgId } = useParams();
+
+const PreferedWorkspace = ({ orgId, }) => {
 
   const [workspaces, setWorkspaces] = useState([]);
   const [saved, setSaved] = useState([]);                // saved preferred workspaces
@@ -23,18 +24,30 @@ const PreferedWorkspace = () => {
   const [selected, setSelected] = useState([]);          // user selections
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false); // dropdown closed by default
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // 'success' | 'warning' | 'error'
 
-  const ITEM_HEIGHT = 100;
+  const ITEM_HEIGHT = 85;
   const ITEM_PADDING_TOP = 0;
 
   const MenuProps = {
     PaperProps: {
       style: {
-        maxHeight: ITEM_HEIGHT * 3.5 + ITEM_PADDING_TOP,
-        width: 260,
+        maxHeight: 350,       // Controls total menu height
+        width: 300,
+        overflowX: "hidden", // ❗ Prevent Paper from adding scroll
+      },
+    },
+    MenuListProps: {
+      style: {
+        overflowX: "hidden",   // ❗ prevent extra scroll
+        whiteSpace: "normal",  // ❗ ALLOW text to wrap
       },
     },
   };
+
 
   /*-------------------- FETCH WORKSPACES ----------------------*/
   const fetchWorkspaces = async () => {
@@ -80,7 +93,16 @@ const PreferedWorkspace = () => {
 
 
   /*-------------------- SAVE SELECTED ----------------------*/
+
+
   const handleSave = async () => {
+    if (selected.length === 0) {
+      setSnackbarMessage("Please select at least one workspace");
+      setSnackbarSeverity("warning");
+      setSnackbarOpen(true);
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -95,10 +117,11 @@ const PreferedWorkspace = () => {
           })),
       };
 
-      await fetch(
-        `${configs.BASE_URL_AUTO}/users/account/save_prefered_workspace/`,
+      // ⭐ You forgot this line earlier
+      const response = await fetch(
+        `${configs.BASE_URL_AUTO}/users/account/save_update_prefered_workspace/`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `JWT ${token}`,
@@ -107,13 +130,31 @@ const PreferedWorkspace = () => {
         }
       );
 
+      // ⭐ Now ESLint will not complain
+      if (!response.ok) {
+        throw new Error(`API failed with status ${response.status}`);
+      }
+
+      // SUCCESS BLOCK
+      setOpen(false);
       fetchSaved();
+
+      setSnackbarMessage("Workspaces saved successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+
     } catch (err) {
-      console.error("save error:", err);
+      console.error("Save error:", err);
+
+      setSnackbarMessage("Failed to save workspaces. Please try again.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
 
     setSaving(false);
   };
+
+
 
   /*-------------------- TOGGLE CHECKBOXES ----------------------*/
   const handleToggle = (id) => {
@@ -124,13 +165,24 @@ const PreferedWorkspace = () => {
     }
   };
 
+  // const handleAll = () => {
+  //   if (selected.length === workspaces.length) {
+  //     setSelected([]);
+  //   } else {
+  //     setSelected(workspaces.map((ws) => ws.id));
+  //   }
+  // };
   const handleAll = () => {
+    // If ALL is currently selected → deselect everything
     if (selected.length === workspaces.length) {
-      setSelected([]);
-    } else {
-      setSelected(workspaces.map((ws) => ws.id));
+      setSelected([]);    // <-- DO NOT revert to savedWorkspaces
+      return;
     }
+
+    // Otherwise select all
+    setSelected(workspaces.map((ws) => ws.id));
   };
+
 
   /*-------------------- MERGE WITHOUT DUPLICATES ----------------------*/
   // savedWorkspaces -> first
@@ -152,11 +204,22 @@ const PreferedWorkspace = () => {
 
 
   /*-------------------- INIT ----------------------*/
+
+
   useEffect(() => {
     fetchWorkspaces();
     fetchSaved();
   }, [orgId]);
- 
+
+
+  useEffect(() => {
+    if (savedWorkspaces.length > 0 && workspaces.length > 0 && !saving) {
+      const savedIds = savedWorkspaces.map((ws) => ws.id);
+      setSelected(savedIds);
+    }
+  }, [savedWorkspaces, workspaces]);
+
+
   useEffect(() => {
     // Only run when there is no saved preference for this org
     if (savedWorkspaces.length === 0 && workspaces.length > 0 && !saving) {
@@ -201,6 +264,22 @@ const PreferedWorkspace = () => {
 
   return (
     <div style={{ width: 350, marginTop: 30 }}>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}     // success, error, warning, info
+          variant="filled"                // gives proper color
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
       {loading ? (
         <CircularProgress />
       ) : (
@@ -212,7 +291,11 @@ const PreferedWorkspace = () => {
           {/* ------------------------------------------------ */}
           {/*                SELECT DROPDOWN UI                */}
           {/* ------------------------------------------------ */}
+
           <Select
+            open={open}
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
             sx={{
               "& .MuiSelect-select.MuiInputBase-input": {
                 padding: "10px 14px",
@@ -230,30 +313,13 @@ const PreferedWorkspace = () => {
             value={selected.length === 0 ? ["ALL"] : selected}
             onChange={() => { }}
             renderValue={() => {
-
-              // -------------------------------------------
-              // 1️⃣ If user has selected something -> show selected
-              // -------------------------------------------
               if (selected.length > 0) {
-                if (selected.length === workspaces.length) {
-                  return "All Workspaces";
-                }
-
+                if (selected.length === workspaces.length) return "All Workspaces";
                 return sortedList
                   .filter((ws) => selected.includes(ws.id))
                   .map((ws) => ws.workspace_name)
                   .join(", ");
               }
-              if (savedWorkspaces.length === workspaces.length && workspaces.length > 0) {
-                return "All Workspaces";
-              }
-              // -----------------------------------------------------
-              // 2️⃣ When no user selection -> show saved preferred workspaces
-              // -----------------------------------------------------
-              if (savedWorkspaces.length > 0) {
-                return savedWorkspaces.map((ws) => ws.workspace_name).join(", ");
-              }
-
               return "None";
             }}
           >
@@ -266,18 +332,41 @@ const PreferedWorkspace = () => {
 
             <Divider />
 
-            {/* WORKSPACE LIST */}
-            {merged.map((ws) => (
-              <MenuItem key={ws.id} onClick={() => handleToggle(ws.id)}>
-                <Checkbox checked={selected.includes(ws.id)} />
-                <Tooltip title={ws.workspace_name} arrow>
-                  <ListItemText primary={ws.workspace_name} />
-                </Tooltip>
-              </MenuItem>
-            ))}
+            {/* ****************************** */}
+            {/* SCROLLABLE AREA – FIXED HEIGHT */}
+            {/* ****************************** */}
+            <div
+              style={{
+                maxHeight: "200px",
+                overflowY: "auto",
+                paddingRight: "6px"
+              }}
+            >
+              {merged.map((ws) => (
+                <MenuItem key={ws.id} onClick={() => handleToggle(ws.id)}>
+                  <Checkbox checked={selected.includes(ws.id)} />
+                  <Tooltip
+                    title={ws.workspace_name}
+                    arrow
+                    PopperProps={{ disablePortal: true }}
+                  >
+                    {/* <ListItemText primary={ws.workspace_name} /> */}
+                    <ListItemText
+                      primary={ws.workspace_name}
+                      sx={{
+                        maxWidth: "220px",
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                      }}
+                    />
+                  </Tooltip>
+                </MenuItem>
+              ))}
+            </div>
 
-
-            {/* STICKY SAVE BUTTON */}
+            {/* ****************************** */}
+            {/* SAVE BUTTON FIXED AT BOTTOM    */}
+            {/* ****************************** */}
             <div
               style={{
                 position: "sticky",
@@ -290,14 +379,18 @@ const PreferedWorkspace = () => {
                 fullWidth
                 onClick={handleSave}
                 disabled={saving}
+                sx={{ my: 0 }}
               >
-                {saving ? "Saving..." : "Save Preferrences"}
+                {saving ? "Saving..." : "Save Preferences"}
               </Button>
             </div>
+
           </Select>
+
         </FormControl>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
