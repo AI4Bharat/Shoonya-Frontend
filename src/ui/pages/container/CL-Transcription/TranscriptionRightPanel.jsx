@@ -153,6 +153,7 @@ const TranscriptionRightPanel = ({
   const [tagSuggestionList, setTagSuggestionList] = useState([]);
   const [textWithoutTripleDollar, setTextWithoutTripleDollar] = useState("");
   const [textAfterTripleDollar, setTextAfterTripleDollar] = useState("");
+  
   const [enableTransliterationSuggestion, setEnableTransliterationSuggestion] =
     useState(true);
   const [taskData, setTaskData] = useState([]);
@@ -448,10 +449,11 @@ const TranscriptionRightPanel = ({
     dispatch(setSubtitles(sub, C.SUBTITLES));
     // saveTranscriptHandler(false, false, sub);
   };
-
   const populateAcoustic = (index) => {
-    const sub = onSubtitleChange("", index, false, true);
-    dispatch(setSubtitles(sub, C.SUBTITLES));
+    if(ProjectDetails?.metadata_json?.copyL1ToL2==true){
+      const sub = onSubtitleChange("", index, false, true);
+    dispatch(setSubtitles(sub, C.SUBTITLES))
+  };
   };
 
   const saveTranscriptHandler = async (isFinal) => {
@@ -1639,9 +1641,9 @@ const onRedo = useCallback(() => {
                               }}
     
                               onFocus={() =>
-                                showAcousticText &&
-                                populateAcoustic(index + idxOffset)
-                              }
+                                      showAcousticText &&
+                                      populateAcoustic(index + idxOffset)
+                                    }
                               value={item.acoustic_normalised_text}
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
                               className={`${classes.customTextarea} ${
