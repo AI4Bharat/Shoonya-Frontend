@@ -46,7 +46,7 @@ const PreferedWorkspace = ({ orgId }) => {
     },
   };
 
-  /* ---------------- FETCH WORKSPACES ---------------- */
+  
   const fetchWorkspaces = async () => {
     setLoading(true);
     try {
@@ -83,7 +83,7 @@ const PreferedWorkspace = ({ orgId }) => {
     }
   };
 
-  /* ---------------- SAVE ---------------- */
+  
   const handleSave = async () => {
     if (selected.length === 0) {
       setSnackbarMessage("Please select at least one workspace");
@@ -137,7 +137,7 @@ const PreferedWorkspace = ({ orgId }) => {
     setSaving(false);
   };
 
-  /* ---------------- SELECTION HANDLERS ---------------- */
+  
   const handleToggle = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -152,7 +152,7 @@ const PreferedWorkspace = ({ orgId }) => {
     }
   };
 
-  /* ---------------- MERGE & FILTER ---------------- */
+ 
   const merged = [
     ...savedWorkspaces,
     ...workspaces.filter(
@@ -164,7 +164,7 @@ const PreferedWorkspace = ({ orgId }) => {
     ws.workspace_name.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  /* ---------------- INIT ---------------- */
+  
   useEffect(() => {
     fetchWorkspaces();
     fetchSaved();
@@ -228,7 +228,7 @@ const PreferedWorkspace = ({ orgId }) => {
                   .join(", ")
             }
           >
-            {/* ALL WORKSPACES*/}
+           
             <MenuItem onClick={handleAll} sx={{
               mt: 0,
               p: 0,
@@ -246,7 +246,7 @@ const PreferedWorkspace = ({ orgId }) => {
 
             <Divider sx={{ my: 0.1 }} />
 
-            {/* SEARCH */}
+           
             <MenuItem disableRipple sx={{
               py: 0.1,
             }}>
@@ -268,7 +268,7 @@ const PreferedWorkspace = ({ orgId }) => {
 
             <Divider sx={{ my: 0.1 }} />
 
-            {/* LIST */}
+          
             <div style={{ maxHeight: 200, overflowY: "auto" }}>
               {filteredWorkspaces.map((ws) => (
                 <MenuItem key={ws.id} onClick={() => handleToggle(ws.id)} sx={{
@@ -290,7 +290,7 @@ const PreferedWorkspace = ({ orgId }) => {
               ))}
             </div>
 
-            {/* SAVE */}
+           
             <div style={{
               position: "sticky",
               bottom: 0,
