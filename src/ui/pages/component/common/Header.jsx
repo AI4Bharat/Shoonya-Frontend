@@ -253,8 +253,15 @@ const handleRTLChange = (event) => {
     style.innerHTML = `
       input, textarea {
         direction: rtl;
-        unicode-bidi: plaintext;
+        unicode-bidi: isolate;
         text-align: right;
+      }
+      
+      /* Force LTR for input values */
+      input[type="text"],
+      input[type="number"],
+      textarea {
+        unicode-bidi: plaintext;
       }
     `;
   } else {
@@ -268,7 +275,6 @@ const handleRTLChange = (event) => {
     `;
   }
 };
-
   const handleTranscriptionFlowChange = async (event) => {
     const obj = new UpdateUIPrefsAPI(event.target.checked);
     // dispatch(APITransport(loggedInUserObj));
