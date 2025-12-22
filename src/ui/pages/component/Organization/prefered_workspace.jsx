@@ -47,7 +47,7 @@ const PreferedWorkspace = ({ orgId }) => {
     },
   };
 
-  
+
   const fetchWorkspaces = async () => {
     setLoading(true);
     try {
@@ -151,7 +151,7 @@ const PreferedWorkspace = ({ orgId }) => {
     }
   };
 
- 
+
   const merged = [
     ...savedWorkspaces,
     ...workspaces.filter(
@@ -174,6 +174,45 @@ const PreferedWorkspace = ({ orgId }) => {
       setSelected(savedWorkspaces.map((ws) => ws.id));
     }
   }, [savedWorkspaces, workspaces]);
+  useEffect(() => {
+    // Only run when there is no saved preference for this org
+    if (savedWorkspaces.length === 0 && workspaces.length > 0 && !saving) {
+
+      const allIds = workspaces.map((ws) => ws.id);
+      setSelected(allIds);
+
+      const autoSave = async () => {
+        try {
+          const token = localStorage.getItem("shoonya_access_token");
+
+          const payload = {
+            [orgId]: workspaces.map((ws) => ({
+              id: ws.id,
+              workspace_name: ws.workspace_name,
+            })),
+          };
+
+          await fetch(
+            `${configs.BASE_URL_AUTO}/users/account/save_prefered_workspace/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${token}`,
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          fetchSaved(); // refresh saved list
+        } catch (err) {
+          console.error("Auto-save error:", err);
+        }
+      };
+
+      autoSave();
+    }
+  }, [savedWorkspaces]);   // ONLY observe savedWorkspaces
 
   return (
     <div style={{ width: 350, marginTop: 14 }}>
@@ -227,7 +266,7 @@ const PreferedWorkspace = ({ orgId }) => {
                   .join(", ")
             }
           >
-          
+
             <MenuItem onClick={handleAll} sx={{
               mt: 0,
               p: 0,
@@ -245,7 +284,7 @@ const PreferedWorkspace = ({ orgId }) => {
 
             <Divider sx={{ my: 0.1 }} />
 
-    
+
             <MenuItem disableRipple sx={{
               py: 0.1,
             }}>
@@ -267,7 +306,7 @@ const PreferedWorkspace = ({ orgId }) => {
 
             <Divider sx={{ my: 0.1 }} />
 
-          
+
             <div style={{ maxHeight: 200, overflowY: "auto" }}>
               {filteredWorkspaces.map((ws) => (
                 <MenuItem key={ws.id} onClick={() => handleToggle(ws.id)} sx={{
@@ -289,7 +328,7 @@ const PreferedWorkspace = ({ orgId }) => {
               ))}
             </div>
 
-           
+
             <div style={{
               position: "sticky",
               bottom: 0,
