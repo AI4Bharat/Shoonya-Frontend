@@ -35,6 +35,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import DatasetSearchPopup from "../../container/Dataset/DatasetSearchPopup";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { MenuProps } from "../../../../utils/utils";
+import { FormControlLabel, Switch } from "@mui/material";
 
 const isNum = (str) => {
   var reg = new RegExp("^[0-9]*$");
@@ -294,6 +295,18 @@ const AnnotationProject = (props) => {
     const timer = setTimeout(applyResponsiveMode, 100);
     return () => clearTimeout(timer);
   }, []);
+  const [copyL1ToL2, setCopyL1ToL2] = useState(true)
+
+
+      const handleCopyL1ToL2Toggle = async (e) => {
+            const newValue = e.target.checked;
+    
+    setCopyL1ToL2(newValue);
+
+      }
+  
+
+
 
   const options = {
     count: totalDataitems,
@@ -677,6 +690,9 @@ const AnnotationProject = (props) => {
       }),
       acoustic_enabled_stage: acousticEnabledStage,
     };
+  if (selectedType === "AcousticNormalisedTranscriptionEditing") {
+    newProject.metadata_json = { copy_l1_to_l2: copyL1ToL2 };
+  }
 
     if (sourceLanguage) newProject["src_language"] = sourceLanguage;
     if (targetLanguage) newProject["tgt_language"] = targetLanguage;
@@ -1461,10 +1477,37 @@ const AnnotationProject = (props) => {
                         </Select>
                       </FormControl>
                     </Grid>
+                                          {selectedType == 'AcousticNormalisedTranscriptionEditing' ?(
+                                <Grid item xs={12}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={copyL1ToL2}
+                              onChange={handleCopyL1ToL2Toggle}
+                              color="primary"
+                            />
+                          }
+                          label="Auto-copy L1 to L2"
+                          labelPlacement="start"
+                          sx={{ 
+                            width: "100%",
+                            justifyContent: "space-between",
+                            margin: 0,
+                            "& .MuiFormControlLabel-label": {
+                              marginLeft: "8px"
+                            }
+                          }}
+                        />
+                      </Grid>
+                      ):null}
+            
+            
+
                   </>
                 )}
               </>
             )}
+            
 
             <Grid
               className={classes.projectsettingGrid}
