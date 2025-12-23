@@ -450,7 +450,7 @@ const TranscriptionRightPanel = ({
     // saveTranscriptHandler(false, false, sub);
   };
   const populateAcoustic = (index) => {
-    if(ProjectDetails?.metadata_json?.copyL1ToL2==true){
+    if( ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true){
       const sub = onSubtitleChange("", index, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES))
   };
