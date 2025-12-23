@@ -140,8 +140,7 @@ const AdvancedOperation = (props) => {
     getProjectDetails();
   }, []);
   const [copyL1ToL2, setCopyL1ToL2] = useState(
-    ProjectDetails?.metadata_json?.copy_l1_to_l2  ?? true
-  );
+    ProjectDetails?.metadata_json?.copy_l1_to_l2  ?? true)
 
 
       const handleCopyL1ToL2Toggle = async (e) => {
