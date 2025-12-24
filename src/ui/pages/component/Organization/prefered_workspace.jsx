@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   CircularProgress,
@@ -10,43 +11,42 @@ import {
   ListItemText,
   Tooltip,
   Divider,
+  TextField,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import configs from "../../../../config/config";
-import { useParams } from "react-router-dom";
-import { Snackbar, Alert } from "@mui/material";
 
-
-const PreferedWorkspace = ({ orgId, }) => {
-
+const PreferedWorkspace = ({ orgId }) => {
   const [workspaces, setWorkspaces] = useState([]);
-  const [saved, setSaved] = useState([]);                // saved preferred workspaces
   const [savedWorkspaces, setSavedWorkspaces] = useState([]);
-  const [selected, setSelected] = useState([]);          // user selections
+  const [selected, setSelected] = useState([]);
+  const [searchText, setSearchText] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [open, setOpen] = useState(false); // dropdown closed by default
+  const [open, setOpen] = useState(false);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // 'success' | 'warning' | 'error'
-
-  const ITEM_HEIGHT = 85;
-  const ITEM_PADDING_TOP = 0;
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const MenuProps = {
     PaperProps: {
       style: {
-        maxHeight: 350,       
+        maxHeight: 368,
         width: 300,
-        overflowX: "hidden", 
+        overflow: "hidden",
       },
     },
     MenuListProps: {
       style: {
-        overflowX: "hidden",  
-        whiteSpace: "normal", 
+        overflowX: "hidden",
+        whiteSpace: "normal",
       },
     },
   };
+
 
   const fetchWorkspaces = async () => {
     setLoading(true);
@@ -76,18 +76,14 @@ const PreferedWorkspace = ({ orgId, }) => {
           },
         }
       );
-
       const data = await res.json();
       const prefs = data?.prefered_workspace || {};
-
-      // Load saved workspaces (but DO NOT auto-select)
-      const savedList = prefs[orgId] || [];
-      setSavedWorkspaces(savedList);
-
+      setSavedWorkspaces(prefs[orgId] || []);
     } catch (err) {
-      console.error("Error fetching saved preferred workspace:", err);
+      console.error("fetch saved error:", err);
     }
   };
+
 
   const handleSave = async () => {
     if (selected.length === 0) {
@@ -98,7 +94,6 @@ const PreferedWorkspace = ({ orgId, }) => {
     }
 
     setSaving(true);
-
     try {
       const token = localStorage.getItem("shoonya_access_token");
 
@@ -124,169 +119,77 @@ const PreferedWorkspace = ({ orgId, }) => {
       );
 
       if (!response.ok) {
-        throw new Error(`API failed with status ${response.status}`);
+        throw new Error("Save failed");
       }
- 
+
       setOpen(false);
+      setSearchText("");
       fetchSaved();
 
       setSnackbarMessage("Workspaces saved successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
-
     } catch (err) {
-      console.error("Save error:", err);
-
-      setSnackbarMessage("Failed to save workspaces. Please try again.");
+      console.error(err);
+      setSnackbarMessage("Failed to save workspaces");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
-
     setSaving(false);
   };
 
+
   const handleToggle = (id) => {
-    if (selected.includes(id)) {
-      setSelected(selected.filter((x) => x !== id));
-    } else {
-      setSelected([...selected, id]);
-    }
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   };
 
   const handleAll = () => {
-    // If ALL is currently selected → deselect everything
     if (selected.length === workspaces.length) {
-      setSelected([]);    // <-- DO NOT revert to savedWorkspaces
-      return;
+      setSelected([]);
+    } else {
+      setSelected(workspaces.map((ws) => ws.id));
     }
-
-
-    setSelected(workspaces.map((ws) => ws.id));
   };
 
+
   const merged = [
-    ...savedWorkspaces,  // show saved first
+    ...savedWorkspaces,
     ...workspaces.filter(
       (ws) => !savedWorkspaces.some((s) => s.id === ws.id)
     ),
   ];
 
-  const sortedList = merged.sort((a, b) => {
-    const isSavedA = saved.some((s) => s.id === a.id);
-    const isSavedB = saved.some((s) => s.id === b.id);
-    return isSavedA === isSavedB ? 0 : isSavedA ? -1 : 1;
-  });
-  
+  const filteredWorkspaces = merged.filter((ws) =>
+    ws.workspace_name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+
   useEffect(() => {
     fetchWorkspaces();
     fetchSaved();
   }, [orgId]);
 
   useEffect(() => {
-    if (savedWorkspaces.length > 0 && workspaces.length > 0 && !saving) {
-      const savedIds = savedWorkspaces.map((ws) => ws.id);
-      setSelected(savedIds);
+    if (savedWorkspaces.length && workspaces.length && !saving) {
+      setSelected(savedWorkspaces.map((ws) => ws.id));
     }
   }, [savedWorkspaces, workspaces]);
-  useEffect(() => {
-   
-    if (savedWorkspaces.length === 0 && workspaces.length > 0 && !saving) {
-
-      const allIds = workspaces.map((ws) => ws.id);
-      setSelected(allIds);
-
-      const autoSave = async () => {
-        try {
-          const token = localStorage.getItem("shoonya_access_token");
-
-          const payload = {
-            [orgId]: workspaces.map((ws) => ({
-              id: ws.id,
-              workspace_name: ws.workspace_name,
-            })),
-          };
-
-          await fetch(
-            `${configs.BASE_URL_AUTO}/users/account/save_prefered_workspace/`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `JWT ${token}`,
-              },
-              body: JSON.stringify(payload),
-            }
-          );
-
-          fetchSaved();
-        } catch (err) {
-          console.error("Auto-save error:", err);
-        }
-      };
-
-      autoSave();
-    }
-  }, [savedWorkspaces]);  
-
-
-  useEffect(() => {
-    
-    if (savedWorkspaces.length === 0 && workspaces.length > 0 && !saving) {
-
-      const allIds = workspaces.map((ws) => ws.id);
-      setSelected(allIds);
-
-      const autoSave = async () => {
-        try {
-          const token = localStorage.getItem("shoonya_access_token");
-
-          const payload = {
-            [orgId]: workspaces.map((ws) => ({
-              id: ws.id,
-              workspace_name: ws.workspace_name,
-            })),
-          };
-
-          await fetch(
-            `${configs.BASE_URL_AUTO}/users/account/save_prefered_workspace/`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `JWT ${token}`,
-              },
-              body: JSON.stringify(payload),
-            }
-          );
-
-          fetchSaved(); // refresh saved list
-        } catch (err) {
-          console.error("Auto-save error:", err);
-        }
-      };
-
-      autoSave();
-    }
-  }, [savedWorkspaces]);   
 
   return (
-    <div style={{ width: 350, marginTop: 30 }}>
-
+    <div style={{ width: 350, marginTop: 14 }}>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}    
-          variant="filled"                
-          sx={{ width: "100%" }}
-        >
+        <Alert severity={snackbarSeverity} variant="filled">
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
       {loading ? (
         <CircularProgress />
       ) : (
@@ -296,35 +199,35 @@ const PreferedWorkspace = ({ orgId, }) => {
           </InputLabel>
 
           <Select
+            multiple
             open={open}
-            onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
+            onClose={() => {
+              setOpen(false);
+              setSearchText("");
+            }}
             sx={{
               "& .MuiSelect-select.MuiInputBase-input": {
-                padding: "10px 14px",
+                padding: "10px 8px",
                 height: "auto !important",
-                minHeight: "1.6em",
+                minHeight: "1.2em",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }
             }}
-            multiple
             label="Preferred Workspaces"
             labelId="workspace-label"
-            MenuProps={MenuProps}
             value={selected.length === 0 ? ["ALL"] : selected}
-            onChange={() => { }}
-            renderValue={() => {
-              if (selected.length > 0) {
-                if (selected.length === workspaces.length) return "All Workspaces";
-                return sortedList
+            MenuProps={MenuProps}
+            renderValue={() =>
+              selected.length === workspaces.length
+                ? "All Workspaces"
+                : merged
                   .filter((ws) => selected.includes(ws.id))
                   .map((ws) => ws.workspace_name)
-                  .join(", ");
-              }
-              return "None";
-            }}
+                  .join(", ")
+            }
           >
 
             <MenuItem onClick={handleAll} sx={{
@@ -344,6 +247,7 @@ const PreferedWorkspace = ({ orgId, }) => {
 
             <Divider sx={{ my: 0.1 }} />
 
+
             <MenuItem disableRipple sx={{
               py: 0.1,
             }}>
@@ -361,49 +265,32 @@ const PreferedWorkspace = ({ orgId, }) => {
                   },
                 }}
               />
-           
-            <MenuItem onClick={handleAll}>
-              <Checkbox checked={selected.length === workspaces.length} />
-              <ListItemText primary="All Workspaces" />
             </MenuItem>
 
-            <Divider />
+            <Divider sx={{ my: 0.1 }} />
+
 
             <div style={{ maxHeight: 200, overflowY: "auto" }}>
               {filteredWorkspaces.map((ws) => (
                 <MenuItem key={ws.id} onClick={() => handleToggle(ws.id)} sx={{
                   py: 0.1,
                 }}>
-
-            <div
-              style={{
-                maxHeight: "200px",
-                overflowY: "auto",
-                paddingRight: "6px"
-              }}
-            >
-              {merged.map((ws) => (
-                <MenuItem key={ws.id} onClick={() => handleToggle(ws.id)}>
-
                   <Checkbox checked={selected.includes(ws.id)} />
-                  <Tooltip
-                    title={ws.workspace_name}
-                    arrow
-                    PopperProps={{ disablePortal: true }}
-                  >
-                    {/* <ListItemText primary={ws.workspace_name} /> */}
+                  <Tooltip title={ws.workspace_name} arrow PopperProps={{ disablePortal: true }}>
                     <ListItemText
                       primary={ws.workspace_name}
+
                       sx={{
-                        maxWidth: "220px",
                         whiteSpace: "normal",
                         wordBreak: "break-word",
+                        maxWidth: 220,
                       }}
                     />
                   </Tooltip>
                 </MenuItem>
               ))}
             </div>
+
 
             <div style={{
               position: "sticky",
@@ -412,32 +299,19 @@ const PreferedWorkspace = ({ orgId, }) => {
               padding: "4px",
               borderTop: "1px solid #eee",
             }}>
-
-
-            <div
-              style={{
-                position: "sticky",
-                bottom: 0,
-                background: "#fff",
-              }}
-            >
               <Button
-                variant="contained"
                 fullWidth
+                variant="contained"
                 onClick={handleSave}
                 disabled={saving}
-                sx={{ my: 0 }}
               >
                 {saving ? "Saving..." : "Save Preferences"}
               </Button>
             </div>
-
           </Select>
-
         </FormControl>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 };
 
