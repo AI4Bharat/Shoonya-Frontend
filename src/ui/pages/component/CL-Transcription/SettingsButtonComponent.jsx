@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useState,useEffect } from "react";
 import { fontMenu } from "../../../../utils/SubTitlesUtils";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import Checkbox from "@mui/material/Checkbox";
@@ -77,6 +77,51 @@ ProjectDetails,
     };
     handleOpenPopover(position); 
   };
+ useEffect(() => {
+  let style = document.getElementById("rtl-style");
+
+  if (!style) {
+    style = document.createElement("style");
+    style.id = "rtl-style";
+    document.head.appendChild(style);
+  }
+
+  if (enableRTL_Typing) {
+    style.innerHTML = `
+      /* Base RTL styling */
+      input, textarea {
+        direction: rtl;
+        unicode-bidi: plaintext;
+        text-align: right;
+      }
+      
+      /* Force LTR for inputs that typically contain measurements/numbers */
+      input[type="number"],
+      input.input-number,
+      input.input-measurement {
+        direction: ltr !important;
+        unicode-bidi: plaintext !important;
+        text-align: left !important;
+      }
+      
+      /* Special class for mixed content inputs */
+      .mixed-content-rtl-fix {
+        unicode-bidi: plaintext;
+        direction: ltr;
+        text-align: left;
+      }
+    `;
+  } else {
+    style.innerHTML = `
+      input, textarea {
+        direction: ltr;
+        unicode-bidi: plaintext;
+        text-align: left;
+      }
+    `;
+  }
+}, [enableRTL_Typing]);
+
   return (
     <>
       <div

@@ -12,6 +12,7 @@ import {
   ListItemIcon,
   Card,
   Typography,
+  Switch,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
@@ -46,6 +47,8 @@ import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
+import GetSaveButtonAPI from "../../../../redux/actions/api/ProjectDetails/EditUpdate";
+import { FormControlLabel } from "@mui/material";
 
 
 const ProgressType = [
@@ -95,7 +98,6 @@ const AdvancedOperation = (props) => {
   const [OpenExportProjectDialog, setOpenExportProjectDialog] = useState(false);
   const [datasetId, setDatasetId] = useState("");
   const [pullDataLoading, setPullDataLoading] = useState(false);
-
   const [projectType, setProjectType] = useState("");
   const [taskReviews, setTaskReviews] = useState("")
   const { id } = useParams();
@@ -137,6 +139,57 @@ const AdvancedOperation = (props) => {
   useEffect(() => {
     getProjectDetails();
   }, []);
+  const [copyL1ToL2, setCopyL1ToL2] = useState(
+    ProjectDetails?.metadata_json?.copy_l1_to_l2  ?? true)
+
+
+      const handleCopyL1ToL2Toggle = async (e) => {
+        setLoading(true);
+            const newValue = e.target.checked;
+    
+    setCopyL1ToL2(newValue);
+
+      const currentMetadata = ProjectDetails.metadata_json || {};
+    const updatedMetadata = {
+      ...currentMetadata,
+      copy_l1_to_l2: newValue
+    };
+
+          const sendData = {
+              title: ProjectDetails.title,
+            project_type: ProjectDetails.project_type,
+            project_mode: ProjectDetails.project_mode,
+              metadata_json: updatedMetadata
+          }
+          const projectObj = new GetSaveButtonAPI(id, sendData);
+          dispatch(APITransport(projectObj));
+          const res = await fetch(projectObj.apiEndPoint(), {
+              method: "PUT",
+              body: JSON.stringify(projectObj.getBody()),
+              headers: projectObj.getHeaders().headers,
+          });
+          const resp = await res.json();
+          setLoading(false);
+          if (res.ok) {
+              setSnackbarInfo({
+                  open: true,
+                  message: "success",
+                  variant: "success",
+              })
+  
+          } else {
+              setSnackbarInfo({
+                  open: true,
+                  message: resp?.message,
+                  variant: "error",
+              })
+          }
+          getProjectDetails();
+        setLoading(false);
+  
+      }
+  
+
 
   useEffect(() => {
     setNewDetails({
@@ -478,6 +531,30 @@ const getPullNewDataAPI = async () => {
               disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role?true:false}
             />
           </Grid>
+          {ProjectDetails?.project_type == 'AcousticNormalisedTranscriptionEditing' ?(
+                    <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={copyL1ToL2}
+                  onChange={handleCopyL1ToL2Toggle}
+                  color="primary"
+                />
+              }
+              label="Auto-copy L1 to L2"
+              labelPlacement="start"
+              sx={{ 
+                width: "100%",
+                justifyContent: "space-between",
+                margin: 0,
+                "& .MuiFormControlLabel-label": {
+                  marginLeft: "8px"
+                }
+              }}
+            />
+          </Grid>
+          ):null}
+
 
           <Grid
             item

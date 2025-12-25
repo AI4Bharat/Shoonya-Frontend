@@ -239,21 +239,42 @@ const Header = () => {
     setAnchorElNotification(null);
   };
 
-  const handleRTLChange = (event) => {
-    let style;
-    if (event.target.checked) {
-      localStorage.setItem("rtl", true);
-      style = document.createElement("style");
-      style.innerHTML = "input, textarea { direction: RTL; }";
-      document.head.appendChild(style);
-    } else {
-      localStorage.setItem("rtl", false);
-      style = document.createElement("style");
-      style.innerHTML = "input, textarea { direction: unset; }";
-      document.head.appendChild(style);
-    }
-  };
+const handleRTLChange = (event) => {
+  let style = document.getElementById("rtl-style");
 
+  if (!style) {
+    style = document.createElement("style");
+    style.id = "rtl-style";
+    document.head.appendChild(style);
+  }
+
+  if (event.target.checked) {
+    localStorage.setItem("rtl", true);
+    style.innerHTML = `
+      input, textarea {
+        direction: rtl;
+        unicode-bidi: isolate;
+        text-align: right;
+      }
+      
+      /* Force LTR for input values */
+      input[type="text"],
+      input[type="number"],
+      textarea {
+        unicode-bidi: plaintext;
+      }
+    `;
+  } else {
+    localStorage.setItem("rtl", false);
+    style.innerHTML = `
+      input, textarea {
+        direction: ltr;
+        unicode-bidi: plaintext;
+        text-align: left;
+      }
+    `;
+  }
+};
   const handleTranscriptionFlowChange = async (event) => {
     const obj = new UpdateUIPrefsAPI(event.target.checked);
     // dispatch(APITransport(loggedInUserObj));
