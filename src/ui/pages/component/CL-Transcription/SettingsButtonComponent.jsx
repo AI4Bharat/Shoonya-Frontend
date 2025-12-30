@@ -18,7 +18,6 @@ import TagIcon from '@mui/icons-material/Tag';
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Popup from "reactjs-popup";
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import "reactjs-popup/dist/index.css";
 
 const anchorOrigin = {
@@ -33,7 +32,6 @@ const transformOrigin = {
 
 const SettingsButtonComponent = ({
   totalSegments,
-  formatMultiHypothesis,
   setTransliteration,
   enableTransliteration,
   setRTL_Typing,
@@ -71,29 +69,6 @@ ProjectDetails,
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElLimit, setAnchorElLimit] = useState(null);
-    const [autoFormatHypothesis, setAutoFormatHypothesis] = useState(
-    JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))
-      ?.autoFormatHypothesis || false
-  );
-  const handleAutoFormatChange = () => {
-    const newValue = !autoFormatHypothesis;
-    setAutoFormatHypothesis(newValue);
-    
-    // Save to localStorage
-    localStorage.setItem(
-      "userCustomTranscriptionSettings",
-      JSON.stringify({
-        ...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings") || "{}"),
-        autoFormatHypothesis: newValue,
-      })
-    );
-    
-    // If enabling auto-format, format all current subtitles
-    if (newValue && formatMultiHypothesis) {
-      formatMultiHypothesis();
-    }
-  };
-
   const handleClick = (event) => {
     const rect = event.currentTarget.getBoundingClientRect(); 
     const position = {
@@ -305,18 +280,6 @@ ProjectDetails,
             }
           />
         </MenuItem>
-                <MenuItem>
-          <FormControlLabel
-            label="Format Multi-Hypothesis"
-            control={
-              <Checkbox
-                checked={autoFormatHypothesis}
-                onChange={handleAutoFormatChange}
-              />
-            }
-          />
-        </MenuItem>
-
         <MenuItem>
           <FormControlLabel
             label="WaveSurfer"
@@ -330,7 +293,6 @@ ProjectDetails,
             }
           />
         </MenuItem>
-        
         <MenuItem>
           <Popup
             contentStyle={{
@@ -440,25 +402,6 @@ ProjectDetails,
           <VisibilityIcon className={classes.rightPanelSvg} />
         </IconButton>
       </Tooltip>
-            {autoFormatHypothesis && ( <Tooltip title="Format Multi-Hypothesis" placement="bottom">
-  <IconButton
-    className={classes.rightPanelBtnGrp}
-    style={{
-      backgroundColor: "#2C2799",
-      borderRadius: "50%",
-      color: "#fff",
-      marginLeft: "5px",
-      "&:hover": {
-        backgroundColor: "#271e4f",
-      },
-    }}
-    onClick={() => {
-      formatMultiHypothesis();
-    }}
-  >
-    <FormatListBulletedIcon />
-  </IconButton>
-</Tooltip>)}
 
       <Menu
         sx={{ mt: "45px" }}
@@ -534,7 +477,6 @@ ProjectDetails,
           </MenuItem>
         ))}
       </Menu>
-
 
       <Divider
         orientation="vertical"
