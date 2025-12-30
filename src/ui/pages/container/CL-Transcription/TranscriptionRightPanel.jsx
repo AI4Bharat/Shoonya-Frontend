@@ -436,15 +436,15 @@ const processNoiseTags = (value) => {
 };
 
 const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
-  const { value } = event.target;
+  const { value: eventValue } = event.target;
   const { currentTarget } = event;
 
-  // Get the appropriate text field
+  let value = eventValue;
   const oldText = updateAcoustic
     ? subtitles[index]?.acoustic_normalised_text || ""
     : subtitles[index]?.text || "";
 
-  value = processMultiHypothesisText(value);
+  // value = processMultiHypothesisText(value);
   
   // Apply noise tag processing
   value = processNoiseTags(value);
