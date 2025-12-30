@@ -398,58 +398,99 @@ const TranscriptionRightPanel = ({
 
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
+// Add this helper function for multi-hypothesis processing
+const processMultiHypothesisText = (value) => {
+  // match word|word ... ONLY when followed by a space or end of line
+  const pattern = /(?<!{)(\b[^<>{}\s]+\s*\|\s*[^<>{}\s]+\b(?:\s*\|\s*[^<>{}\s]+\b)*)(?=\s)/g;
 
-  const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
-    const { value } = event.target;
-    const { currentTarget } = event;
+  return value.replace(pattern, (match) => {
+    // already wrapped or noise-tagged -> leave as-is
+    if (match.startsWith("{") || match.includes("<")) return match;
 
-    // Get the appropriate text field
-    const oldText = updateAcoustic
-      ? subtitles[index]?.acoustic_normalised_text || ""
-      : subtitles[index]?.text || "";
+    return `{${match}}`;
+  });
+};
 
-    if (oldText !== value) {
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: updateAcoustic ? "textChangeAcoustic" : "textChange",
-          index: index,
-          previousText: oldText,
-          updateAcoustic: updateAcoustic,
-        },
-      ]);
-      setRedoStack([]);
-    }
 
-    const containsTripleDollar = value.includes("$$$");
+const processNoiseTags = (value) => {
+  if (!value) return value;
 
-    // setEnableTransliterationSuggestion(true);
-    if (value.includes("$$")) {
-      setEnableTransliterationSuggestion(false);
-    } else {
-      setEnableTransliterationSuggestion(true);
-    }
+  value = value.replace(/<+\s*([^<>]+?)\s*>+/g, (match, inner) => {
+    return inner.trim();
+  });
 
-    if (containsTripleDollar) {
-      // setEnableTransliterationSuggestion(false);
+  // 2) Auto-wrap valid noise words from tagSuggestionList
+  const noiseList = TabsSuggestionData.map(tag => tag.toLowerCase());
 
-      const textBeforeTab = value.split("$$$")[0];
-      const textAfterTab = value.split("$$$")[1].split("").join("");
-      setCurrentSelectedIndex(index);
-      setTagSuggestionsAnchorEl(currentTarget);
-      setTextWithoutTripleDollar(textBeforeTab);
-      setTextAfterTripleDollar(textAfterTab);
-      setCurrentTextRefIdx(
-        index + (updateAcoustic ? currentPageData?.length : 0)
-      );
-      setCurrentSelection(event.target.selectionEnd);
-      setTagSuggestionsAcoustic(updateAcoustic);
-    }
-    const sub = onSubtitleChange(value, index, updateAcoustic, false);
-    dispatch(setSubtitles(sub, C.SUBTITLES));
-    // saveTranscriptHandler(false, false, sub);
-  };
-  const populateAcoustic = (index) => {
+  // word boundary safe for multilingual text
+  const noiseRegex = new RegExp(`\\b(${noiseList.join("|")})\\b`, "gi");
+
+  value = value.replace(noiseRegex, (m) => `<${m.toLowerCase()}>`);
+
+  // 3) Collapse duplicates again to guarantee single pair
+  value = value.replace(/<+\s*([^<>]+?)\s*>+/g, (match, inner) => {
+    return `<${inner.trim().toLowerCase()}>`;
+  });
+
+  return value;
+};
+
+const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
+  const { value } = event.target;
+  const { currentTarget } = event;
+
+  // Get the appropriate text field
+  const oldText = updateAcoustic
+    ? subtitles[index]?.acoustic_normalised_text || ""
+    : subtitles[index]?.text || "";
+
+  // First apply noise tag processing to clean up angle brackets
+  value = processNoiseTags(value);
+  
+  // Then apply multi-hypothesis processing
+  value = processMultiHypothesisText(value);
+
+  if (oldText !== value) {
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: updateAcoustic ? "textChangeAcoustic" : "textChange",
+        index: index,
+        previousText: oldText,
+        updateAcoustic: updateAcoustic,
+      },
+    ]);
+    setRedoStack([]);
+  }
+
+  const containsTripleDollar = value.includes("$$$");
+
+  // setEnableTransliterationSuggestion(true);
+  if (value.includes("$$")) {
+    setEnableTransliterationSuggestion(false);
+  } else {
+    setEnableTransliterationSuggestion(true);
+  }
+
+  if (containsTripleDollar) {
+    // setEnableTransliterationSuggestion(false);
+
+    const textBeforeTab = value.split("$$$")[0];
+    const textAfterTab = value.split("$$$")[1].split("").join("");
+    setCurrentSelectedIndex(index);
+    setTagSuggestionsAnchorEl(currentTarget);
+    setTextWithoutTripleDollar(textBeforeTab);
+    setTextAfterTripleDollar(textAfterTab);
+    setCurrentTextRefIdx(
+      index + (updateAcoustic ? currentPageData?.length : 0)
+    );
+    setCurrentSelection(event.target.selectionEnd);
+    setTagSuggestionsAcoustic(updateAcoustic);
+  }
+  const sub = onSubtitleChange(value, index, updateAcoustic, false);
+  dispatch(setSubtitles(sub, C.SUBTITLES));
+  // saveTranscriptHandler(false, false, sub);
+};  const populateAcoustic = (index) => {
     if( ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true){
       const sub = onSubtitleChange("", index, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES))
@@ -551,6 +592,40 @@ const TranscriptionRightPanel = ({
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
 
+  const formatMultiHypothesis = () => {
+  const elementsWithBoxHighlightClass = document.getElementsByClassName(
+    classes.boxHighlight
+  );
+
+  for (let i = 0; i < elementsWithBoxHighlightClass.length; i++) {
+    const textArea = elementsWithBoxHighlightClass[i];
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const selectedText = textArea.value.substring(start, end);
+
+    if (selectedText.trim() !== "") {
+      // Check if it already contains |
+      if (selectedText.includes('|')) {
+        const parts = selectedText.split('|').map(part => part.trim());
+        const formattedText = `{${parts.join(' | ')}}`;
+        
+        // Replace the selected text with formatted version
+        replaceSelectedText(formattedText, currentIndexToSplitTextBlock, i);
+        
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "multiHypothesisFormat",
+            index: i,
+            originalText: selectedText,
+            formattedText: formattedText,
+          },
+        ]);
+        setRedoStack([]);
+      }
+    }
+  }
+};
   const handleDoubleHashes = () => {
    
   const elementsWithBoxHighlightClass = document.getElementsByClassName(
@@ -863,6 +938,7 @@ const onRedo = useCallback(() => {
           <Grid className={classes.rightPanelParentGrid}>
             <SettingsButtonComponent
               totalSegments={totalSegments}
+              formatMultiHypothesis={formatMultiHypothesis}
               setTransliteration={setTransliteration}
               enableTransliteration={enableTransliteration}
               setRTL_Typing={setRTL_Typing}
