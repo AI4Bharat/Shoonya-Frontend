@@ -436,7 +436,7 @@ const processNoiseTags = (value) => {
 };
 
 const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
-  let { value } = event.target;
+  const { value } = event.target;
   const { currentTarget } = event;
 
   // Get the appropriate text field
