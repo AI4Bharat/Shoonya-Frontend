@@ -403,7 +403,7 @@ const processMultiHypothesisText = (value) => {
   // match word|word ... ONLY when followed by a space or end of line
   const pattern = /(?<!{)(\b[^<>{}\s]+\s*\|\s*[^<>{}\s]+\b(?:\s*\|\s*[^<>{}\s]+\b)*)(?=\s)/g;
 
-  return value.replace(pattern, (match) => {
+  return value?.replace(pattern, (match) => {
     // already wrapped or noise-tagged -> leave as-is
     if (match.startsWith("{") || match.includes("<")) return match;
 
@@ -444,11 +444,11 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     ? subtitles[index]?.acoustic_normalised_text || ""
     : subtitles[index]?.text || "";
 
-  // First apply noise tag processing to clean up angle brackets
-  value = processNoiseTags(value);
-  
-  // Then apply multi-hypothesis processing
   value = processMultiHypothesisText(value);
+  
+  // Apply noise tag processing
+  value = processNoiseTags(value);
+
 
   if (oldText !== value) {
     setUndoStack((prevState) => [
@@ -490,7 +490,8 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   const sub = onSubtitleChange(value, index, updateAcoustic, false);
   dispatch(setSubtitles(sub, C.SUBTITLES));
   // saveTranscriptHandler(false, false, sub);
-};  const populateAcoustic = (index) => {
+};
+  const populateAcoustic = (index) => {
     if( ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true){
       const sub = onSubtitleChange("", index, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES))
