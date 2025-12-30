@@ -431,16 +431,16 @@ const TranscriptionRightPanel = ({
   }
 };
 
-// const processMultiHypothesisText = (value) => {
-//   // match word|word ... ONLY when followed by a space or end of line
-//   const pattern = /(?<!{)(\b[^<>{}\s]+\s*\|\s*[^<>{}\s]+\b(?:\s*\|\s*[^<>{}\s]+\b)*)(?=\s)/g;
+const processMultiHypothesisText = (value) => {
+  // match word|word ... ONLY when followed by a space or end of line
+  const pattern = /(?<!{)(\b[^<>{}\s]+\s*\|\s*[^<>{}\s]+\b(?:\s*\|\s*[^<>{}\s]+\b)*)(?=\s)/g;
 
-//   return value?.replace(pattern, (match) => {
-//     if (match.startsWith("{") || match.includes("<")) return match;
+  return value?.replace(pattern, (match) => {
+    if (match.startsWith("{") || match.includes("<")) return match;
 
-//     return `{${match}}`;
-//   });
-// };
+    return `{${match}}`;
+  });
+};
 
 
 const processNoiseTags = (value) => {
@@ -467,10 +467,10 @@ const processNoiseTags = (value) => {
 };
 
 const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
-  const { value } = event.target;
+  const { value: eventValue } = event.target;
   const { currentTarget } = event;
 
-  // Get the appropriate text field
+  let value = eventValue;
   const oldText = updateAcoustic
     ? subtitles[index]?.acoustic_normalised_text || ""
     : subtitles[index]?.text || "";
