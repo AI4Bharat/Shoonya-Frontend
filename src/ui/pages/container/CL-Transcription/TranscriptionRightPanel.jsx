@@ -476,17 +476,17 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     setRedoStack([]);
   }
 
-  const containsTripleDollar = value.includes("$$$");
+    const containsTripleDollar = value.includes("$$$");
 
-  // setEnableTransliterationSuggestion(true);
-  if (value.includes("$$")) {
-    setEnableTransliterationSuggestion(false);
-  } else {
-    setEnableTransliterationSuggestion(true);
-  }
+    // setEnableTransliterationSuggestion(true);
+    if (value.includes("$$")) {
+      setEnableTransliterationSuggestion(false);
+    } else {
+      setEnableTransliterationSuggestion(true);
+    }
 
-  if (containsTripleDollar) {
-    // setEnableTransliterationSuggestion(false);
+    if (containsTripleDollar) {
+      // setEnableTransliterationSuggestion(false);
 
     const textBeforeTab = value.split("$$$")[0];
     const textAfterTab = value.split("$$$")[1].split("").join("");
@@ -606,40 +606,6 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     dispatch(setSubtitles(sub, C.SUBTITLES));
   };
 
-  const formatMultiHypothesis = () => {
-  const elementsWithBoxHighlightClass = document.getElementsByClassName(
-    classes.boxHighlight
-  );
-
-  for (let i = 0; i < elementsWithBoxHighlightClass.length; i++) {
-    const textArea = elementsWithBoxHighlightClass[i];
-    const start = textArea.selectionStart;
-    const end = textArea.selectionEnd;
-    const selectedText = textArea.value.substring(start, end);
-
-    if (selectedText.trim() !== "") {
-      // Check if it already contains |
-      if (selectedText.includes('|')) {
-        const parts = selectedText.split('|').map(part => part.trim());
-        const formattedText = `{${parts.join(' | ')}}`;
-        
-        // Replace the selected text with formatted version
-        replaceSelectedText(formattedText, currentIndexToSplitTextBlock, i);
-        
-        setUndoStack((prevState) => [
-          ...prevState,
-          {
-            type: "multiHypothesisFormat",
-            index: i,
-            originalText: selectedText,
-            formattedText: formattedText,
-          },
-        ]);
-        setRedoStack([]);
-      }
-    }
-  }
-};
   const handleDoubleHashes = () => {
    
   const elementsWithBoxHighlightClass = document.getElementsByClassName(
@@ -952,7 +918,6 @@ const onRedo = useCallback(() => {
           <Grid className={classes.rightPanelParentGrid}>
             <SettingsButtonComponent
               totalSegments={totalSegments}
-              formatMultiHypothesis={formatMultiHypothesis}
               setTransliteration={setTransliteration}
               enableTransliteration={enableTransliteration}
               setRTL_Typing={setRTL_Typing}
