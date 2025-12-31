@@ -18,7 +18,9 @@ import TagIcon from '@mui/icons-material/Tag';
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Popup from "reactjs-popup";
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import "reactjs-popup/dist/index.css";
+import { Box } from "@mui/material";
 
 const anchorOrigin = {
   vertical: "top",
@@ -32,6 +34,7 @@ const transformOrigin = {
 
 const SettingsButtonComponent = ({
   totalSegments,
+  formatMultiHypothesis,
   setTransliteration,
   enableTransliteration,
   setRTL_Typing,
@@ -69,6 +72,29 @@ ProjectDetails,
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElLimit, setAnchorElLimit] = useState(null);
+    const [autoFormatHypothesis, setAutoFormatHypothesis] = useState(
+    JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))
+      ?.autoFormatHypothesis || false
+  );
+  const handleAutoFormatChange = () => {
+    const newValue = !autoFormatHypothesis;
+    setAutoFormatHypothesis(newValue);
+    
+    // Save to localStorage
+    localStorage.setItem(
+      "userCustomTranscriptionSettings",
+      JSON.stringify({
+        ...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings") || "{}"),
+        autoFormatHypothesis: newValue,
+      })
+    );
+    
+    // If enabling auto-format, format all current subtitles
+    if (newValue && formatMultiHypothesis) {
+      formatMultiHypothesis();
+    }
+  };
+
   const handleClick = (event) => {
     const rect = event.currentTarget.getBoundingClientRect(); 
     const position = {
@@ -122,16 +148,19 @@ ProjectDetails,
   }
 }, [enableRTL_Typing]);
 
+
   return (
     <>
-      <div
+      <Box
         style={{
-          marginLeft: "15px",
-          position: "absolute",
-          left: "0",
-          display: "block",
+          position:"absolute",
+          left:"15px",
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
           height: "40px",
           width: "40px",
+          minWidth:"40px",
           lineHeight: "40px",
           borderRadius: "50%",
           fontSize: "large",
@@ -141,8 +170,7 @@ ProjectDetails,
         }}
       >
         {totalSegments}
-      </div>
-
+      </Box>
       {showSplit && (
         <Tooltip title="Split Subtitle" placement="bottom">
           <IconButton
@@ -280,6 +308,19 @@ ProjectDetails,
             }
           />
         </MenuItem>
+
+                <MenuItem>
+          <FormControlLabel
+            label="Format Multi-Hypothesis"
+            control={
+              <Checkbox
+                checked={autoFormatHypothesis}
+                onChange={handleAutoFormatChange}
+              />
+            }
+          />
+        </MenuItem>
+
         <MenuItem>
           <FormControlLabel
             label="WaveSurfer"
@@ -292,7 +333,7 @@ ProjectDetails,
               />
             }
           />
-        </MenuItem>
+        </MenuItem>   
         <MenuItem>
           <Popup
             contentStyle={{
@@ -402,6 +443,25 @@ ProjectDetails,
           <VisibilityIcon className={classes.rightPanelSvg} />
         </IconButton>
       </Tooltip>
+            {autoFormatHypothesis && ( <Tooltip title="Format Multi-Hypothesis" placement="bottom">
+  <IconButton
+    className={classes.rightPanelBtnGrp}
+    style={{
+      backgroundColor: "#2C2799",
+      borderRadius: "50%",
+      color: "#fff",
+      marginLeft: "5px",
+      "&:hover": {
+        backgroundColor: "#271e4f",
+      },
+    }}
+    onClick={() => {
+      formatMultiHypothesis();
+    }}
+  >
+    <FormatListBulletedIcon />
+  </IconButton>
+</Tooltip>)}
 
       <Menu
         sx={{ mt: "45px" }}
