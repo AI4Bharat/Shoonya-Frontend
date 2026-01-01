@@ -177,6 +177,46 @@ const PreferedWorkspace = ({ orgId }) => {
     }
   }, [savedWorkspaces, workspaces]);
 
+  useEffect(() => {
+    // Only run when there is no saved preference for this org
+    if (savedWorkspaces.length === 0 && workspaces.length > 0 && !saving) {
+
+      const allIds = workspaces.map((ws) => ws.id);
+      setSelected(allIds);
+
+      const autoSave = async () => {
+        try {
+          const token = localStorage.getItem("shoonya_access_token");
+
+          const payload = {
+            [orgId]: workspaces.map((ws) => ({
+              id: ws.id,
+              workspace_name: ws.workspace_name,
+            })),
+          };
+
+          await fetch(
+            `${configs.BASE_URL_AUTO}/users/account/save_prefered_workspace/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${token}`,
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          fetchSaved(); // refresh saved list
+        } catch (err) {
+          console.error("Auto-save error:", err);
+        }
+      };
+
+      autoSave();
+    }
+  }, [savedWorkspaces]);
+
   return (
     <div style={{ width: 350, marginTop: 14 }}>
       <Snackbar
