@@ -52,6 +52,7 @@ import configs from '../../../../config/config';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import CloseIcon from "@mui/icons-material/Close";
+import { TabsSuggestionData } from '../../../../utils/TabsSuggestionData/TabsSuggestionData';
 
 const SuperCheckerAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -662,36 +663,46 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     parentannotation,
     reviewNotesValue,
   ) => {
-        if(ProjectDetails?.project_type === 'AcousticNormalizedTranscriptionEDiting'){    
-       let firstInvalidSegment = null;
+if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {    
+  let hasFormatError = false;
   
   for (let i = 0; i < result?.length; i++) {
     const text = result[i]?.text || "";
     if (!text.trim()) continue;
-    
-    const words = text.trim().split(/\s+/);
-    const invalidWord = words.find(word => {
+        const words = text.trim().split(/\s+/);
+    const hasUnwrappedWord = words.some(word => {
       if (!word) return false;
       return !(word.startsWith('{') && word.endsWith('}'));
     });
+    let hasInvalidNoise = false;
+    const angleBracketRegex = /<([^>]+)>/g;
+    let match;
+    const noiseList = TabsSuggestionData.map(tag => tag.toLowerCase());
     
-    if (invalidWord) {
-      firstInvalidSegment = i + 1;
+    while ((match = angleBracketRegex.exec(text)) !== null) {
+      const content = match[1].trim().toLowerCase();
+      if (!noiseList.includes(content)) {
+        hasInvalidNoise = true;
+        break;
+      }
+    }
+    
+    if (hasUnwrappedWord || hasInvalidNoise) {
+      hasFormatError = true;
       break;
     }
   }
 
-  if (firstInvalidSegment && !["draft", "skipped"].includes(value)) {
+  if (hasFormatError && !["draft", "skipped"].includes(value)) {
     setSnackbarInfo({
       open: true,
-      message: `Segment ${firstInvalidSegment}: All words must be wrapped in curly braces {}`,
+      message: "Format Error: 1) All words must be in {} 2) Only valid noise tags inside <>",
       variant: "error",
     });
     setLoading(false);
     return;
   }
 }
-
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
