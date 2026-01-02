@@ -307,21 +307,7 @@ ProjectDetails,
               />
             }
           />
-        </MenuItem>
-
-                <MenuItem>
-          <FormControlLabel
-            label="Format Multi-Hypothesis"
-            control={
-              <Checkbox
-                checked={autoFormatHypothesis}
-                onChange={handleAutoFormatChange}
-              />
-            }
-          />
-        </MenuItem>
-
-        <MenuItem>
+        </MenuItem>        <MenuItem>
           <FormControlLabel
             label="WaveSurfer"
             control={
@@ -443,26 +429,6 @@ ProjectDetails,
           <VisibilityIcon className={classes.rightPanelSvg} />
         </IconButton>
       </Tooltip>
-            {autoFormatHypothesis && ( <Tooltip title="Format Multi-Hypothesis" placement="bottom">
-  <IconButton
-    className={classes.rightPanelBtnGrp}
-    style={{
-      backgroundColor: "#2C2799",
-      borderRadius: "50%",
-      color: "#fff",
-      marginLeft: "5px",
-      "&:hover": {
-        backgroundColor: "#271e4f",
-      },
-    }}
-    onClick={() => {
-      formatMultiHypothesis();
-    }}
-  >
-    <FormatListBulletedIcon />
-  </IconButton>
-</Tooltip>)}
-
       <Menu
         sx={{ mt: "45px" }}
         id="menu-appbar"
