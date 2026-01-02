@@ -662,6 +662,36 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
     parentannotation,
     reviewNotesValue,
   ) => {
+        if(ProjectDetails?.project_type === 'AcousticNormalizedTranscriptionEDiting'){    
+       let firstInvalidSegment = null;
+  
+  for (let i = 0; i < result?.length; i++) {
+    const text = result[i]?.text || "";
+    if (!text.trim()) continue;
+    
+    const words = text.trim().split(/\s+/);
+    const invalidWord = words.find(word => {
+      if (!word) return false;
+      return !(word.startsWith('{') && word.endsWith('}'));
+    });
+    
+    if (invalidWord) {
+      firstInvalidSegment = i + 1;
+      break;
+    }
+  }
+
+  if (firstInvalidSegment && !["draft", "skipped"].includes(value)) {
+    setSnackbarInfo({
+      open: true,
+      message: `Segment ${firstInvalidSegment}: All words must be wrapped in curly braces {}`,
+      variant: "error",
+    });
+    setLoading(false);
+    return;
+  }
+}
+
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
