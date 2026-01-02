@@ -441,13 +441,12 @@ const processMultiHypothesisText = (value) => {
     return `{${match}}`;
   });
 };
-
-
 const processNoiseTags = (value) => {
   if (!value) return value;
-
+   console.log(value);
+   
   value = value.replace(/<+\s*([^<>]+?)\s*>+/g, (match, inner) => {
-    return inner.trim();
+    return `<${inner.trim()}>`;
   });
 
   // 2) Auto-wrap valid noise words from tagSuggestionList
@@ -478,8 +477,20 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   // value = processMultiHypothesisText(value);
   
   // Apply noise tag processing
-  value = processNoiseTags(value);
+  // value = processNoiseTags(value);
 
+  if (updateAcoustic && !(ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true)) {
+    const verbatimText = subtitles[index]?.text || "";
+    const verbatimNoiseTags = (verbatimText.match(/<[^>]+>/g) || []).length;
+    const acousticNoiseTags = (value.match(/<[^>]+>/g) || []).length;
+    if (verbatimNoiseTags > 0 && acousticNoiseTags !== verbatimNoiseTags) {
+      setSnackbarInfo({
+        open: true,
+        message: `Validation Error: L1 has ${verbatimNoiseTags} noise tag(s) but L2 has ${acousticNoiseTags}. All noise tags from L1 must be copied to L2.`,
+        variant: "error",
+      });
+    }
+  }
 
   if (oldText !== value) {
     setUndoStack((prevState) => [
