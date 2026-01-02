@@ -826,17 +826,6 @@ if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
         break;
       }
       
-      // Each variation should be a valid word (no special characters except -)
-      for (const variation of variations) {
-        if (!variation) continue;
-        
-        // Check for invalid characters
-        if (!/^[a-zA-Z0-9\-]+$/.test(variation)) {
-          firstInvalidSegment = i + 1;
-          errorReason = `Invalid characters in '${variation}'`;
-          break;
-        }
-      }
       
       if (firstInvalidSegment) break;
       
