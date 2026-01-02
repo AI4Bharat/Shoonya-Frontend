@@ -761,8 +761,7 @@ if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
       }
     }
   }
-}  
-    setLoading(true);
+}    setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
       task_id: taskId,
