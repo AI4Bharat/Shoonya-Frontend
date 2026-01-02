@@ -737,120 +737,50 @@ const ReviewAudioTranscriptionLandingPage = () => {
     parentannotation,
   ) => {
 if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {    
-  let firstInvalidSegment = null;
-  let errorReason = "";
-  
   for (let i = 0; i < result?.length; i++) {
     const text = result[i]?.text || "";
     if (!text.trim()) continue;
     
-    // Trim and parse
     const trimmedText = text.trim();
-    let position = 0;
-    let segmentCount = 0;
     
-    while (position < trimmedText.length) {
-      // Skip whitespace
-      while (position < trimmedText.length && /\s/.test(trimmedText[position])) {
-        position++;
-      }
-      
-      if (position >= trimmedText.length) break;
-      
-      // Must start with {
-      if (trimmedText[position] !== '{') {
-        firstInvalidSegment = i + 1;
-        errorReason = "Missing opening curly brace {";
-        break;
-      }
-      
-      // Find matching }
-      let braceDepth = 1;
-      let j = position + 1;
-      while (j < trimmedText.length && braceDepth > 0) {
-        if (trimmedText[j] === '{') braceDepth++;
-        else if (trimmedText[j] === '}') braceDepth--;
-        j++;
-      }
-      
-      if (braceDepth > 0) {
-        firstInvalidSegment = i + 1;
-        errorReason = "Missing closing curly brace }";
-        break;
-      }
-      
-      // Extract content inside {}
-      const innerContent = trimmedText.substring(position + 1, j - 1).trim();
-      
-      // Check inner content structure
-      if (!innerContent) {
-        firstInvalidSegment = i + 1;
-        errorReason = "Empty curly braces {} are not allowed";
-        break;
-      }
-      
-      // Check if inner content is valid
-      // It can be: 1) A single word/variation, 2) Multiple variations separated by |
-      // Can contain noise tags <noise>
-      
-      // First, extract all noise tags
-      let contentWithoutNoise = innerContent;
-      const noiseRegex = /<([^>]+)>/g;
-      let noiseMatch;
-      
-      while ((noiseMatch = noiseRegex.exec(innerContent)) !== null) {
-        const noiseContent = noiseMatch[1].trim().toLowerCase();
-        const noiseList = TabsSuggestionData.map(tag => tag.toLowerCase());
-        
-        // Check if it's a valid noise tag
-        if (!noiseList.includes(noiseContent)) {
-          firstInvalidSegment = i + 1;
-          errorReason = `'<${noiseContent}>' is not a valid noise tag`;
-          break;
-        }
-        
-        // Remove noise tag for further validation
-        contentWithoutNoise = contentWithoutNoise.replace(`<${noiseContent}>`, '');
-      }
-      
-      if (firstInvalidSegment) break;
-      
-      // Now check the remaining content (without noise tags)
-      // Split by | to get variations
-      const variations = contentWithoutNoise.split('|').map(v => v.trim()).filter(v => v);
-      
-      if (variations.length === 0 && contentWithoutNoise.includes('|')) {
-        // Case: only | characters with nothing between them
-        firstInvalidSegment = i + 1;
-        errorReason = "Empty variation in multi-hypothesis";
-        break;
-      }
-      
-      
-      if (firstInvalidSegment) break;
-      
-      segmentCount++;
-      position = j; // Move past the closing }
-    }
+    // Simple validation: check if text matches the pattern of {} segments
+    // Pattern: one or more {} blocks separated by whitespace
+const validPattern =
+  /^(\{(?:<[^>]+>|[A-Za-z0-9]+(?:\s*\|\s*[A-Za-z0-9]+)*)\}\s*)+$/;
     
-    if (firstInvalidSegment) break;
-    
-    // Check if we have at least one segment
-    if (segmentCount === 0 && trimmedText.length > 0) {
-      firstInvalidSegment = i + 1;
-      errorReason = "No valid segments found";
-      break;
-    }
-  }
-
-  if (firstInvalidSegment && !["draft", "skipped"].includes(value)) {
+    if (!validPattern.test(trimmedText)) {
+  if (!["draft", "skipped"].includes(value)) {
     setSnackbarInfo({
       open: true,
-      message: `Segment ${firstInvalidSegment}: ${errorReason}. Format should be: {word} {word1|word2} {<noise>}`,
+      message: `Segment ${
+        i + 1
+      }: Invalid format. Each segment must be like {word} or {word1 | word2} or {<noise>}`,
       variant: "error",
     });
     setLoading(false);
     return;
+  }
+  break;
+    }    
+    // Check noise tags validity
+    const noiseTags = trimmedText.match(/<([^>]+)>/g) || [];
+    const noiseList = TabsSuggestionData.map(tag => tag.toLowerCase());
+    
+    for (const tag of noiseTags) {
+      const content = tag.slice(1, -1).trim().toLowerCase();
+      if (!noiseList.includes(content)) {
+        if (!["draft", "skipped"].includes(value)) {
+          setSnackbarInfo({
+            open: true,
+            message: `Segment ${i + 1}: '<${content}>' is not a valid noise tag`,
+            variant: "error",
+          });
+          setLoading(false);
+          return;
+        }
+        break;
+      }
+    }
   }
 }
 setLoading(true);
