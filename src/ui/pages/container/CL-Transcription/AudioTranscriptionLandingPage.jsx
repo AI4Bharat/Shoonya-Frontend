@@ -50,6 +50,7 @@ import configs from '../../../../config/config';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import CloseIcon from "@mui/icons-material/Close";
+import { TabsSuggestionData } from '../../../../utils/TabsSuggestionData/TabsSuggestionData';
 
 const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -805,18 +806,7 @@ if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
         errorReason = "Empty variation in multi-hypothesis";
         break;
       }
-      
-      // Each variation should be a valid word (no special characters except -)
-      for (const variation of variations) {
-        if (!variation) continue;
-        
-        // Check for invalid characters
-        if (!/^[a-zA-Z0-9\-]+$/.test(variation)) {
-          firstInvalidSegment = i + 1;
-          errorReason = `Invalid characters in '${variation}'`;
-          break;
-        }
-      }
+
       
       if (firstInvalidSegment) break;
       
