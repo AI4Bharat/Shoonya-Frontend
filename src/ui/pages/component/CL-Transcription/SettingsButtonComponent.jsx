@@ -307,7 +307,7 @@ ProjectDetails,
               />
             }
           />
-        </MenuItem>
+        </MenuItem>        <MenuItem>
           <FormControlLabel
             label="WaveSurfer"
             control={
