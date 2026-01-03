@@ -435,6 +435,7 @@ const processNoiseTags = (value) => {
 
   return value;
 };
+
     const formatMultiHypothesis = () => {
   const elementsWithBoxHighlightClass = document.getElementsByClassName(
     classes.boxHighlight
@@ -482,7 +483,7 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   // value = processMultiHypothesisText(value);
   
   // Apply noise tag processing
-  value = processNoiseTags(value);
+  // value = processNoiseTags(value);
 
   if (updateAcoustic && !(ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true)) {
     const verbatimText = subtitles[index]?.text || "";
@@ -544,7 +545,7 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     dispatch(setSubtitles(sub, C.SUBTITLES))
   };
   };
-
+  
   const saveTranscriptHandler = async (isFinal) => {
     setLoading(true);
 

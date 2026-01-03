@@ -52,6 +52,7 @@ import configs from '../../../../config/config';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import CloseIcon from "@mui/icons-material/Close";
+import { TabsSuggestionData } from '../../../../utils/TabsSuggestionData/TabsSuggestionData';
 
 const ReviewAudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -735,7 +736,55 @@ const ReviewAudioTranscriptionLandingPage = () => {
     lead_time,
     parentannotation,
   ) => {
-    setLoading(true);
+if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {    
+  for (let i = 0; i < result?.length; i++) {
+    const text = result[i]?.text || "";
+    if (!text.trim()) continue;
+    
+    const trimmedText = text.trim();
+    
+    // Simple validation: check if text matches the pattern of {} segments
+    // Pattern: one or more {} blocks separated by whitespace
+const validPattern =
+  /^(\{(?:<[^>]+>|[^{}\|<>]+(?:\s*\|\s*[^{}\|<>]+)*)\}\s*)+$/;
+    
+    if (!validPattern.test(trimmedText)) {
+  if (!["draft", "skipped"].includes(value)) {
+    setSnackbarInfo({
+      open: true,
+      message: `Segment ${
+        i + 1
+      }: Invalid format. Each segment must be like {word} or {word1 | word2} or {<noise>}`,
+      variant: "error",
+    });
+    setLoading(false);
+    return;
+  }
+  break;
+    }
+    
+    // Check noise tags validity
+    const noiseTags = trimmedText.match(/<([^>]+)>/g) || [];
+    const noiseList = TabsSuggestionData;
+    
+    for (const tag of noiseTags) {
+      const content = tag.slice(1, -1).trim();
+      if (!noiseList.includes(content)) {
+        if (!["draft", "skipped"].includes(value)) {
+          setSnackbarInfo({
+            open: true,
+            message: `Segment ${i + 1}: '<${content}>' is not a valid noise tag`,
+            variant: "error",
+          });
+          setLoading(false);
+          return;
+        }
+        break;
+      }
+    }
+  }
+}
+setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
       task_id: taskId,
