@@ -667,27 +667,30 @@ if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
     
     // Simple validation: check if text matches the pattern of {} segments
     // Pattern: one or more {} blocks separated by whitespace
-    const validPattern = /^(\{[^}]*\}\s*)+$/;
+const validPattern =
+  /^(\{(?:<[^>]+>|[^{}\|<>]+(?:\s*\|\s*[^{}\|<>]+)*)\}\s*)+$/;
     
     if (!validPattern.test(trimmedText)) {
-      if (!["draft", "skipped"].includes(value)) {
-        setSnackbarInfo({
-          open: true,
-          message: `Segment ${i + 1}: Invalid format. Should be like: {word} {word1|word2} {<noise>}`,
-          variant: "error",
-        });
-        setLoading(false);
-        return;
-      }
-      break;
+  if (!["draft", "skipped"].includes(value)) {
+    setSnackbarInfo({
+      open: true,
+      message: `Segment ${
+        i + 1
+      }: Invalid format. Each segment must be like {word} or {word1 | word2} or {<noise>}`,
+      variant: "error",
+    });
+    setLoading(false);
+    return;
+  }
+  break;
     }
     
     // Check noise tags validity
     const noiseTags = trimmedText.match(/<([^>]+)>/g) || [];
-    const noiseList = TabsSuggestionData.map(tag => tag.toLowerCase());
+    const noiseList = TabsSuggestionData;
     
     for (const tag of noiseTags) {
-      const content = tag.slice(1, -1).trim().toLowerCase();
+      const content = tag.slice(1, -1).trim();
       if (!noiseList.includes(content)) {
         if (!["draft", "skipped"].includes(value)) {
           setSnackbarInfo({
@@ -702,7 +705,7 @@ if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
       }
     }
   }
-}  
+}
     setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
