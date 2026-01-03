@@ -44,9 +44,12 @@ import Transliteration from "../../container/Transliteration/Transliteration";
 import CustomizedSnackbars from "../common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
+import FetchunreadcountAPI from "../../../../redux/actions/api/Notification/Notifications_unseen";
 import UpdateUIPrefsAPI from "../../../../redux/actions/api/UserManagement/UpdateUIPrefs";
 
 const Header = () => {
+  const [isNotifOpen, setIsNotifOpen] = useState(false); // ✅ control fetching
+  const [unreadCount, setUnreadCount] = useState(0);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElNotification, setAnchorElNotification] = useState(null);
@@ -131,6 +134,52 @@ const Header = () => {
         console.error("Error fetching notifications:", error);
       });
   };
+  // useEffect(() => {
+  //   fetchNotifications();
+  // }, [unread]);
+  // ✅ only call when notif is opened + unread changes
+  useEffect(() => {
+    if (isNotifOpen) {
+      fetchNotifications();
+    }
+  }, [unread, isNotifOpen]);
+
+
+  const FetchUnreadcount = () => {
+    let apiObj = new FetchunreadcountAPI();
+    const endpoint = apiObj.apiEndPoint();
+
+    fetch(endpoint, {
+      method: "GET",
+      headers: apiObj.getHeaders().headers,
+    })
+      .then(async (response) => {
+        if (response.ok) {
+          const data = await response.json();
+
+          // API directly returns a number (85)
+          setUnreadCount(Number(data));
+        } else {
+          console.error("Error fetching unread count:", response.status, response.statusText);
+          setUnreadCount(0);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching unread count:", error);
+        setUnreadCount(0);
+      });
+  };
+
+  useEffect(() => {
+    FetchUnreadcount();
+    const interval = setInterval(() => {
+      FetchUnreadcount();
+    }, 30000); // every 30 seconds
+
+    return () => clearInterval(interval); // cleanup on unmount
+
+  }, []);
+
   const markAsRead = (notificationId) => {
     const task = new NotificationPatchAPI(notificationId);
     setSelectedNotificationId(notificationId);
@@ -154,9 +203,9 @@ const Header = () => {
     markAsRead(notificationId);
   };
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [unread, selectedNotificationId]);
+  // useEffect(() => {
+  //   fetchNotifications();
+  // }, [unread, selectedNotificationId]);
 
   useEffect(() => {
     getLoggedInUserData();
@@ -223,13 +272,23 @@ const Header = () => {
   const handleCloseSettingsMenu = () => {
     setAnchorElSettings(null);
   };
+  // const handleOpenNotification = (event) => {
+  //   event.stopPropagation(); // prevent event bubbling
+  //   setAnchorElNotification(event.currentTarget);
+  // };
+
+  // const handleCloseNotification = () => {
+  //   setAnchorElNotification(null);
+  // };
   const handleOpenNotification = (event) => {
-    event.stopPropagation(); // prevent event bubbling
+    event.stopPropagation();
     setAnchorElNotification(event.currentTarget);
+    setIsNotifOpen(true); // ✅ enable fetching
   };
 
   const handleCloseNotification = () => {
     setAnchorElNotification(null);
+    setIsNotifOpen(false); // optional: stop fetching when closed
   };
 
 const handleRTLChange = (event) => {
@@ -799,10 +858,7 @@ const handleRTLChange = (event) => {
                     <Tooltip title="Notifications">
                       <IconButton onClick={handleOpenNotification}>
                         <Badge
-                          badgeContent={
-                            unseenNotifications?.length > 0
-                              ? unseenNotifications?.length
-                              : null
+                          badgeContent={unreadCount > 0 ? unreadCount : null
                           }
                           color="primary"
                         >
@@ -883,7 +939,7 @@ const handleRTLChange = (event) => {
                   </Grid>
                 </Grid>
                 <Menu
-                  sx={{ 
+                  sx={{
                     mt: "45px",
                   }}
                   id="menu-appbar"
@@ -980,8 +1036,8 @@ const handleRTLChange = (event) => {
                 </Menu>
 
                 <Menu
-                  sx={{ 
-                    mt: "45px", 
+                  sx={{
+                    mt: "45px",
                     display: "flex",
                     "& .MuiPaper-root": {
                       maxHeight: "750px", // Fixed height
@@ -1013,17 +1069,17 @@ const handleRTLChange = (event) => {
                   >
                     <Typography variant="h4">Notifications</Typography>
                     {(Notification &&
-                    Notification?.length > 0 &&
-                    unseenNotifications?.length > 0) && (
-                      <Tooltip title="Mark all as read">
-                        <IconButton
-                          aria-label="More"
-                          onClick={handleMarkAllAsReadClick}
-                        >
-                          <GradingSharpIcon color="primary" />
-                        </IconButton>{" "}
-                      </Tooltip>
-                    )}
+                      Notification?.length > 0 &&
+                      unseenNotifications?.length > 0) && (
+                        <Tooltip title="Mark all as read">
+                          <IconButton
+                            aria-label="More"
+                            onClick={handleMarkAllAsReadClick}
+                          >
+                            <GradingSharpIcon color="primary" />
+                          </IconButton>{" "}
+                        </Tooltip>
+                      )}
                   </Stack>
                   <Stack
                     direction="row"
