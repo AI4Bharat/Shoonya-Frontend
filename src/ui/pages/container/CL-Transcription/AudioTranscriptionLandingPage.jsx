@@ -728,7 +728,7 @@ if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
     // Simple validation: check if text matches the pattern of {} segments
     // Pattern: one or more {} blocks separated by whitespace
 const validPattern =
-  /^(\{(?:<[^>]+>|[A-Za-z0-9]+(?:\s*\|\s*[A-Za-z0-9]+)*)\}\s*)+$/;
+  /^(\{(?:<[^>]+>|[^{}\|<>]+(?:\s*\|\s*[^{}\|<>]+)*)\}\s*)+$/;
     
     if (!validPattern.test(trimmedText)) {
   if (!["draft", "skipped"].includes(value)) {
@@ -747,10 +747,10 @@ const validPattern =
     
     // Check noise tags validity
     const noiseTags = trimmedText.match(/<([^>]+)>/g) || [];
-    const noiseList = TabsSuggestionData.map(tag => tag.toLowerCase());
+    const noiseList = TabsSuggestionData;
     
     for (const tag of noiseTags) {
-      const content = tag.slice(1, -1).trim().toLowerCase();
+      const content = tag.slice(1, -1).trim();
       if (!noiseList.includes(content)) {
         if (!["draft", "skipped"].includes(value)) {
           setSnackbarInfo({
