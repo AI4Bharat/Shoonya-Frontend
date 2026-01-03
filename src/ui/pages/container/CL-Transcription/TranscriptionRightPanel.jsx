@@ -482,7 +482,6 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   // value = processMultiHypothesisText(value);
   
   // Apply noise tag processing
-  value = processNoiseTags(value);
 
   if (updateAcoustic && !(ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true)) {
     const verbatimText = subtitles[index]?.text || "";
