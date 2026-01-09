@@ -51,7 +51,7 @@ import InviteUsersToOrgAPI from "../../../../redux/actions/api/Organization/Invi
 import CustomizedSnackbars from "./Snackbar";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
-
+import AssignMembersDialog from "../../container/Workspace/bulk_add_members.jsx"
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -73,6 +73,8 @@ function TabPanel(props) {
 }
 
 const DetailsViewPage = (props) => {
+  const [annotatorDialogOpen, setAnnotatorDialogOpen] = useState(false);
+  React.useState(false);
   const { pageType, title, createdBy, onArchiveWorkspace } = props;
   const { id, orgId } = useParams();
   const classes = DatasetStyle();
@@ -97,7 +99,7 @@ const DetailsViewPage = (props) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
   const [selectedEmails, setSelectedEmails] = useState([]);
-  const [btn,setbtn] = useState(null);
+  const [btn, setbtn] = useState(null);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -112,17 +114,17 @@ const DetailsViewPage = (props) => {
     setValue(newValue);
   };
   const apiLoading = useSelector((state) => state.apiStatus.loading);
- 
+
   const getWorkspaceDetails = () => {
     const workspaceObj = new GetWorkspacesDetailsAPI(orgId);
     dispatch(APITransport(workspaceObj));
   };
 
-   useEffect(() => {
-    if( pageType === "organization"){
+  useEffect(() => {
+    if (pageType === "organization") {
       getWorkspaceDetails();
     }
-    
+
   }, []);
   const organisation_id = useSelector(state => state.getWorkspacesProjectData?.data?.[0]?.organization_id);
 
@@ -175,8 +177,7 @@ const DetailsViewPage = (props) => {
 
   const addBtnClickHandler = async () => {
     setLoading(true);
-    if(userDetails?.role === userRole.WorkspaceManager)
-    {
+    if (userDetails?.role === userRole.WorkspaceManager) {
       const addUsesrsObj = new InviteManagerSuggestions(
         organisation_id,
         selectedUsers,
@@ -197,7 +198,7 @@ const DetailsViewPage = (props) => {
         const orgObj = new GetOragnizationUsersAPI(id);
         dispatch(APITransport(orgObj));
 
-      }else {
+      } else {
         setSnackbarInfo({
           open: true,
           message: resp?.message,
@@ -205,10 +206,9 @@ const DetailsViewPage = (props) => {
         });
       }
     }
-    else 
-    {
+    else {
 
-    const addMembersObj = new InviteUsersToOrgAPI(
+      const addMembersObj = new InviteUsersToOrgAPI(
         organisation_id,
         selectedUsers,
         userType
@@ -227,7 +227,7 @@ const DetailsViewPage = (props) => {
         });
         const orgObj = new GetOragnizationUsersAPI(id);
         dispatch(APITransport(orgObj));
-      }else {
+      } else {
         setSnackbarInfo({
           open: true,
           message: resp?.message,
@@ -237,7 +237,7 @@ const DetailsViewPage = (props) => {
     }
     handleUserDialogClose();
     setLoading(false);
-    setSelectedUsers([ ]);
+    setSelectedUsers([]);
     setSelectedEmails([]);
     setCsvFile(null);
     setbtn(null)
@@ -249,10 +249,10 @@ const DetailsViewPage = (props) => {
   const handleOpenSettings = () => {
     navigate(`/workspaces/${id}/workspacesetting`);
   };
-  
-  const handleClickMenu = (data)  =>{
-  setSelectmenu(data)
-  handleMenuClose()
+
+  const handleClickMenu = (data) => {
+    setSelectmenu(data)
+    handleMenuClose()
   };
 
   const theme = useTheme();
@@ -292,15 +292,15 @@ const DetailsViewPage = (props) => {
               {(userRole.Annotator !== userDetails?.role ||
                 userRole.Reviewer !== userDetails?.role ||
                 userRole.SuperChecker !== userDetails?.role) && (
-                <Tooltip title={translate("label.showProjectSettings")}>
-                  <IconButton onClick={handleOpenSettings}>
-                    <SettingsOutlinedIcon
-                      color="primary.dark"
-                      fontSize="large"
-                    />
-                  </IconButton>
-                </Tooltip>
-              )}
+                  <Tooltip title={translate("label.showProjectSettings")}>
+                    <IconButton onClick={handleOpenSettings}>
+                      <SettingsOutlinedIcon
+                        color="primary.dark"
+                        fontSize="large"
+                      />
+                    </IconButton>
+                  </Tooltip>
+                )}
             </Box>
           )}
           <Typography
@@ -316,16 +316,16 @@ const DetailsViewPage = (props) => {
             Created by : {createdBy}
           </Typography>
           <Box>
-          <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-                variant="fullWidth"
-                TabIndicatorProps={{
-                  style: { display: "none" },
-                }}
-                orientation={isSmallScreen ? "vertical" : "horizontal"}
-              >
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              aria-label="basic tabs example"
+              variant="fullWidth"
+              TabIndicatorProps={{
+                style: { display: "none" },
+              }}
+              orientation={isSmallScreen ? "vertical" : "horizontal"}
+            >
               {pageType === componentType.Type_Workspace && (
                 <Tab
                   label={translate("label.projects")}
@@ -572,7 +572,7 @@ const DetailsViewPage = (props) => {
                   sx={{ width: "100%", mb: 2 }}
                   onClick={handleWorkspaceDialogOpen}
                 />
-                <Workspaces reloadWorkspaceTable={reloadWorkspaceTable} setReloadWorkspaceTable={setReloadWorkspaceTable}/>
+                <Workspaces reloadWorkspaceTable={reloadWorkspaceTable} setReloadWorkspaceTable={setReloadWorkspaceTable} />
                 <AddWorkspaceDialog
                   dialogCloseHandler={handleWorkspaceDialogClose}
                   isOpen={addWorkspacesDialogOpen}
@@ -593,7 +593,7 @@ const DetailsViewPage = (props) => {
                   columnSpacing={4}
                   rowSpacing={2}
                 >
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={4} sm={4}>
                     <CustomButton
                       className={classes.annotatorsButton}
                       label={"Add Members to Workspace"}
@@ -601,12 +601,19 @@ const DetailsViewPage = (props) => {
                       onClick={handleAnnotatorDialogOpen}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={4} sm={4}>
                     <CustomButton
                       className={classes.annotatorsButton}
                       label={"Invite Users to Organisation"}
                       sx={{ width: "100%", mb: 2 }}
                       onClick={handleUserDialogOpen}
+                    />
+                  </Grid>
+                  <Grid item xs={4} sm={4}>
+                    <AssignMembersDialog
+                      open={annotatorDialogOpen}
+                      onClose={() => setAnnotatorDialogOpen(false)}
+                      sx={{ width: '100%', mb: 2 }}
                     />
                   </Grid>
                 </Grid>
