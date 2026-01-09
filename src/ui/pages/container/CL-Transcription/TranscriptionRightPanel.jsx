@@ -1321,10 +1321,11 @@ const onRedo = useCallback(() => {
                             return (
                               <div
                                 className={classes.relative}
-                                style={{ width: "100%", height: "100%" }}
+                                style={{ width: "100%", height: "100%",    textAlign: enableRTL_Typing ? "right" : "left",
+ }}
                               >
                                 <textarea
-                                  className={`${classes.customTextarea} ${
+                                  className={`ind-input ${classes.customTextarea} ${
                                     currentIndex === idxOffset + index
                                       ? classes.boxHighlight
                                       : ""
@@ -1469,14 +1470,15 @@ const onRedo = useCallback(() => {
   
                             value={item.text}
                             dir={enableRTL_Typing ? "rtl" : "ltr"}
-                            className={`auto-resizable-textarea ${
+                            className={`ind-input auto-resizable-textarea ${
                               classes.customTextarea
                             } ${
                               currentIndex === idxOffset + index
                                 ? classes.boxHighlight
                                 : ""
                             }`}
-                            style={{ fontSize: fontSize, height: "100%" }}
+                            style={{ fontSize: fontSize, height: "100%",    textAlign: enableRTL_Typing ? "right" : "left",
+}}
                             onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
@@ -1573,12 +1575,16 @@ const onRedo = useCallback(() => {
                                   style={{ width: "100%", height: "100%" }}
                                 >
                                   <textarea
-                                    className={`${classes.customTextarea} ${
+                                    className={`ind-input ${classes.customTextarea} ${
                                       currentIndex === idxOffset + index
                                         ? classes.boxHighlight
                                         : ""
                                     }`}
                                     dir={enableRTL_Typing ? "rtl" : "ltr"}
+                                    style={{
+    textAlign: enableRTL_Typing ? "right" : "left",
+  }}
+
                                     onDoubleClick={(event)=>{
                                       const textarea = textRefs.current[index]
                                       if(textarea){
@@ -1717,12 +1723,13 @@ const onRedo = useCallback(() => {
                               }
                               value={item.acoustic_normalised_text}
                               dir={enableRTL_Typing ? "rtl" : "ltr"}
-                              className={`${classes.customTextarea} ${
+                              className={`ind-input ${classes.customTextarea} ${
                                 currentIndex === idxOffset + index
                                   ? classes.boxHighlight
                                   : ""
                               }`}
-                              style={{ fontSize: fontSize, height: "100%" }}
+                              style={{ fontSize: fontSize, height: "100%" ,    textAlign: enableRTL_Typing ? "right" : "left",
+}}
                             />
                           </div>
                         ))}
