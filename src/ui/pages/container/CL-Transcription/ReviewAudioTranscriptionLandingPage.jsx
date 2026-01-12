@@ -1480,9 +1480,9 @@ useEffect(() => {
                     <div className={classes.relative} style={{ width: "100%" }}>
                       <textarea
                         className={classes.customTextarea}
-                        dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                        dir={"ltr"}
                         rows={4}
-                        style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px" }}
+                        style={{ fontSize: stdTranscriptionSettings.fontSize, height: "120px", textAlign: stdTranscriptionSettings.rtl ? "right" : "left" }}
                         {...props}
                       />
                     </div>
@@ -1495,11 +1495,12 @@ useEffect(() => {
                       setStdTranscription(e.target.value);
                     }}
                     value={stdTranscription}
-                    dir={stdTranscriptionSettings.rtl ? "rtl" : "ltr"}
+                    dir={"ltr"}
                     className={classes.customTextarea}
                     style={{
                       fontSize: stdTranscriptionSettings.fontSize,
                       height: "120px",
+                      textAlign: stdTranscriptionSettings.rtl ? "right" : "left"
                     }}
                     rows={4}
                   />

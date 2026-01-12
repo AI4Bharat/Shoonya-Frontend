@@ -245,7 +245,7 @@ const handleRTLChange = (event) => {
     localStorage.setItem("rtl", true);
     style.innerHTML = `
       input, textarea {
-        direction: rtl;
+        direction: ltr;
         unicode-bidi: isolate;
         text-align: right;
       }
