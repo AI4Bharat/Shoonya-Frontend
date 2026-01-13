@@ -1309,19 +1309,19 @@ const onRedo = useCallback(() => {
                           }}
 
                           onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
-                          containerStyles={{ width: "100%", height: "120px" }}
+                          containerStyles={{ width: "100%", height: "100%" }}
                           onBlur={() => {
                             setTimeout(() => {
                               setShowPopOver(false);
                             }, 200);
                           }}
-                          style={{ fontSize: fontSize, height: "120px" }}
+                          style={{ fontSize: fontSize, height: "100%" }}
                           renderComponent={(props) => {
                             textRefs.current[index] = props.ref.current;
                             return (
                               <div
                                 className={classes.relative}
-                                style={{ width: "100%", height: "100%",
+                                style={{ width: "100%", height: "100%",    textAlign: enableRTL_Typing ? "right" : "left",
  }}
                               >
                                 <textarea
@@ -1330,10 +1330,7 @@ const onRedo = useCallback(() => {
                                       ? classes.boxHighlight
                                       : ""
                                   }`}
-                                   style={{    textAlign: enableRTL_Typing ? "right" : "left",
- }}
-
-                                  dir={"ltr"}
+                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
                                   onDoubleClick={(event)=>{
                                     const textarea = textRefs.current[index]
                                     if(textarea){
@@ -1472,7 +1469,7 @@ const onRedo = useCallback(() => {
                             }}
   
                             value={item.text}
-                             dir={"ltr"}
+                            dir={enableRTL_Typing ? "rtl" : "ltr"}
                             className={`ind-input auto-resizable-textarea ${
                               classes.customTextarea
                             } ${
@@ -1566,8 +1563,8 @@ const onRedo = useCallback(() => {
                             }}
                             enabled={enableTransliterationSuggestion}
                             onChangeText={() => {}}
-                            containerStyles={{ width: "100%", height: "1000px" }}
-                            style={{ fontSize: fontSize, height: "1000px" }}
+                            containerStyles={{ width: "100%", height: "100%" }}
+                            style={{ fontSize: fontSize, height: "100%" }}
                             renderComponent={(props) => {
                               textRefs.current[
                                 index + currentPageData?.length
@@ -1575,7 +1572,7 @@ const onRedo = useCallback(() => {
                               return (
                                 <div
                                   className={classes.relative}
-                                  style={{ width: "100%", height: "1200px" }}
+                                  style={{ width: "100%", height: "100%" }}
                                 >
                                   <textarea
                                     className={`ind-input ${classes.customTextarea} ${
@@ -1583,9 +1580,9 @@ const onRedo = useCallback(() => {
                                         ? classes.boxHighlight
                                         : ""
                                     }`}
-                                     dir={"ltr"}
+                                    dir={enableRTL_Typing ? "rtl" : "ltr"}
                                     style={{
-    textAlign: enableRTL_Typing ? "right" : "left"
+    textAlign: enableRTL_Typing ? "right" : "left",
   }}
 
                                     onDoubleClick={(event)=>{
@@ -1725,7 +1722,7 @@ const onRedo = useCallback(() => {
                                 populateAcoustic(index + idxOffset)
                               }
                               value={item.acoustic_normalised_text}
-                               dir={"ltr"}
+                              dir={enableRTL_Typing ? "rtl" : "ltr"}
                               className={`ind-input ${classes.customTextarea} ${
                                 currentIndex === idxOffset + index
                                   ? classes.boxHighlight
