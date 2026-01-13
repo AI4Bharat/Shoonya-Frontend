@@ -116,8 +116,8 @@ ProjectDetails,
     style.innerHTML = `
       /* Base RTL styling */
       input, textarea {
-        // direction: ltr;
-        // unicode-bidi: plaintext;
+        direction: rtl;
+        unicode-bidi: plaintext;
         text-align: right;
       }
       
