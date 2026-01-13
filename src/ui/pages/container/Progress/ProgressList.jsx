@@ -9,9 +9,7 @@ import TaskAnalytics from "./TaskAnalytics/TaskAnalytics";
 import MetaAnalytics from "./MetaAnalytics/MetaAnalytics";
 import {useSelector} from "react-redux";
 import PerformanceAnalytics from './PerformanaceAnalytics/PerformanceAnalytics';
-
-
-
+import PreferedWorkspace from './PreferedWorkspace/PreferedWorkspace';
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -33,13 +31,15 @@ function TabPanel(props) {
 }
 
 const ProgressList = () => {
+    const [open, setOpen] = useState(false);
+
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (e, v) => {
         setTabValue(v)
     }
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
-      );
+    );
     return (
       
         < >
@@ -55,7 +55,11 @@ const ProgressList = () => {
                     <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Meta Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Advance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label="Performance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} /> 
+                    <Tab label="Performance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
+                    <PreferedWorkspace
+                    open={open}
+                    setOpen={setOpen}
+                />
                 </Tabs>
             </Box>
             <Box sx={{ p: 2 }}>
