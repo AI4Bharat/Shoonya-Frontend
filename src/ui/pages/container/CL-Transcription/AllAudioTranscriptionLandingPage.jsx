@@ -222,7 +222,7 @@ const AllAudioTranscriptionLandingPage = () => {
         : String(resp?.data?.audio_url)),
     {
         method: "GET",
-        headers: String(resp?.data?.audio_url).includes("sarvam-benchmark.objectstore.e2enetworks.net")
+        headers: (String(resp?.data?.audio_url).includes("sarvam-benchmark.objectstore.e2enetworks.net") || String(resp?.data?.audio_url).startsWith("https://objectstore.e2enetworks.net"))
         ? {}
         : ProjectObj.getHeaders().headers
       })
