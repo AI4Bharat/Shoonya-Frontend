@@ -45,6 +45,11 @@ const Login = () => {
   const loggedInUserData = useSelector(
     (state) => state.fetchLoggedInUserData.data
   );
+
+  useEffect(() => {
+    localStorage.removeItem("projectSelectedFilters");
+  }, []);
+  
   const getLoggedInUserData = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
     dispatch(APITransport(loggedInUserObj));
