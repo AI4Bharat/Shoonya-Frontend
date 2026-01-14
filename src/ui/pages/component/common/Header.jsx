@@ -17,7 +17,7 @@ import Tab from "@mui/material/Tab";
 import Badge from "@mui/material/Badge";
 import Popover from "@mui/material/Popover";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import { formatDistanceToNow, format } from "date-fns";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
@@ -60,8 +60,6 @@ const Header = () => {
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const [showTransliterationModel, setShowTransliterationModel] =
     useState(false);
-  const [rtlEnabled, setRtlEnabled] = useState(false);
-  const rtlUserToggled = useRef(false);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -164,55 +162,6 @@ const Header = () => {
     getLoggedInUserData();
   }, []);
 
-  const languageKey = JSON.stringify(loggedInUserData?.languages || "");
-
-  useEffect(() => {
-    rtlUserToggled.current = false;
-  }, [languageKey]);
-
-  useEffect(() => {
-    const languages = loggedInUserData?.languages;
-    const list =
-      Array.isArray(languages) && languages.length
-        ? languages
-        : typeof languages === "string"
-        ? languages.split(",")
-        : [];
-
-    const isUrduOrKashmiri = (lang) => {
-      if (!lang) return false;
-      const tokens =
-        typeof lang === "string"
-          ? [lang]
-          : [
-              lang.code,
-              lang.label,
-              lang.language,
-              lang.LangCode,
-              lang.Identifier,
-              lang.DisplayName,
-            ];
-      return tokens
-        .filter(Boolean)
-        .map((val) => String(val).trim().toLowerCase())
-        .some((t) => ["ur", "ks", "urdu", "kashmiri"].includes(t));
-    };
-
-    const nonEmptyCount = list.filter(
-      (l) => l !== undefined && l !== null && String(l).trim() !== ""
-    ).length;
-    const allUrduKashmiri =
-      nonEmptyCount > 0 && list.every((lang) => isUrduOrKashmiri(lang));
-
-    if (!rtlUserToggled.current && allUrduKashmiri !== rtlEnabled) {
-      setRtlEnabled(allUrduKashmiri);
-    }
-  }, [languageKey, rtlEnabled]);
-
-  useEffect(() => {
-    applyRTLStyles(rtlEnabled);
-  }, [rtlEnabled]);
-
   const onLogoutClick = () => {
     handleCloseUserMenu();
     dispatch(Logout());
@@ -283,20 +232,18 @@ const Header = () => {
     setAnchorElNotification(null);
   };
 
-  const applyRTLStyles = (enable) => {
-    let style = document.getElementById("rtl-style");
+const handleRTLChange = (event) => {
+  let style = document.getElementById("rtl-style");
 
-    if (!style) {
-      style = document.createElement("style");
-      style.id = "rtl-style";
-      document.head.appendChild(style);
-    }
+  if (!style) {
+    style = document.createElement("style");
+    style.id = "rtl-style";
+    document.head.appendChild(style);
+  }
 
-    // Persist for pages that still read localStorage on mount
-    localStorage.setItem("rtl", enable ? "true" : "false");
-
-    if (enable) {
-      style.innerHTML = `
+  if (event.target.checked) {
+    localStorage.setItem("rtl", true);
+    style.innerHTML = `
       input, textarea {
         direction: rtl;
         unicode-bidi: isolate;
@@ -310,22 +257,17 @@ const Header = () => {
         unicode-bidi: plaintext;
       }
     `;
-    } else {
-      style.innerHTML = `
+  } else {
+    localStorage.setItem("rtl", false);
+    style.innerHTML = `
       input, textarea {
         direction: ltr;
         unicode-bidi: plaintext;
         text-align: left;
       }
     `;
-    }
-  };
-
-  const handleRTLChange = (event) => {
-    rtlUserToggled.current = true;
-    setRtlEnabled(event.target.checked);
-    applyRTLStyles(event.target.checked);
-  };
+  }
+};
   const handleTranscriptionFlowChange = async (event) => {
     const obj = new UpdateUIPrefsAPI(event.target.checked);
     // dispatch(APITransport(loggedInUserObj));
@@ -742,7 +684,7 @@ const Header = () => {
       control: (
         <Checkbox
           onChange={handleRTLChange}
-          checked={rtlEnabled}
+          defaultChecked={localStorage.getItem("rtl") === "true"}
         />
       ),
     },
