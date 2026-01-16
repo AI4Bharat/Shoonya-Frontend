@@ -45,7 +45,7 @@ const Layout= (props) => {
   useEffect(() => {
     if (localStorage.getItem('rtl') === "true") {
       let style = document.createElement('style');
-      style.innerHTML = 'input, textarea { direction: RTL; }'
+      style.innerHTML = 'input, textarea {direction :ltr, text-align: right; }'
       document.head.appendChild(style);
     }
   }, []);
