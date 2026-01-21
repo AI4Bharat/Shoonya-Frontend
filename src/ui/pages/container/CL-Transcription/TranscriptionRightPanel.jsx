@@ -1315,20 +1315,21 @@ const onRedo = useCallback(() => {
                               setShowPopOver(false);
                             }, 200);
                           }}
-                          style={{ fontSize: fontSize, height: "100%" ,direction:"ltr", textAlign: enableRTL_Typing ? "right" : "left" }}
+                          style={{ fontSize: fontSize, height: "100%" }}
                           renderComponent={(props) => {
                             textRefs.current[index] = props.ref.current;
                             return (
                               <div
                                 className={classes.relative}
-                                style={{ width: "100%", height: "100%",direction:"ltr", textAlign: enableRTL_Typing ? "right" : "left" }}
+                                style={{ width: "100%", height: "100%" }}
                               >
                                 <textarea
-                                  className={`ind-input ${classes.customTextarea} ${
+                                  className={`${classes.customTextarea} ${
                                     currentIndex === idxOffset + index
                                       ? classes.boxHighlight
                                       : ""
                                   }`}
+                                  dir={enableRTL_Typing ? "rtl" : "ltr"}
                                   onDoubleClick={(event)=>{
                                     const textarea = textRefs.current[index]
                                     if(textarea){
@@ -1401,7 +1402,7 @@ const onRedo = useCallback(() => {
                       ) : (
                         <div
                           className={classes.relative}
-                          style={{ width: "100%", height: "100%", direction:"ltr",textAlign: enableRTL_Typing ? "right" : "left" }}
+                          style={{ width: "100%", height: "100%" }}
                         >
                           <textarea
                             ref={(el) => (textRefs.current[index] = el)}
@@ -1467,14 +1468,15 @@ const onRedo = useCallback(() => {
                             }}
   
                             value={item.text}
-                            className={`ind-input auto-resizable-textarea ${
+                            dir={enableRTL_Typing ? "rtl" : "ltr"}
+                            className={`auto-resizable-textarea ${
                               classes.customTextarea
                             } ${
                               currentIndex === idxOffset + index
                                 ? classes.boxHighlight
                                 : ""
                             }`}
-                            style={{ fontSize: fontSize, height: "100%" ,direction:"ltr",textAlign: enableRTL_Typing ? "right" : "left" }}
+                            style={{ fontSize: fontSize, height: "100%" }}
                             onBlur={() => {
                               setTimeout(() => {
                                 setShowPopOver(false);
@@ -1560,7 +1562,7 @@ const onRedo = useCallback(() => {
                             enabled={enableTransliterationSuggestion}
                             onChangeText={() => {}}
                             containerStyles={{ width: "100%", height: "100%" }}
-                            style={{ fontSize: fontSize, height: "100%" ,direction:"ltr", textAlign: enableRTL_Typing ? "right" : "left" }}
+                            style={{ fontSize: fontSize, height: "100%" }}
                             renderComponent={(props) => {
                               textRefs.current[
                                 index + currentPageData?.length
@@ -1568,14 +1570,15 @@ const onRedo = useCallback(() => {
                               return (
                                 <div
                                   className={classes.relative}
-                                  style={{ width: "100%", height: "100%",direction:"ltr", textAlign: enableRTL_Typing ? "right" : "left" }}
+                                  style={{ width: "100%", height: "100%" }}
                                 >
                                   <textarea
-                                    className={`ind-input ${classes.customTextarea} ${
+                                    className={`${classes.customTextarea} ${
                                       currentIndex === idxOffset + index
                                         ? classes.boxHighlight
                                         : ""
                                     }`}
+                                    dir={enableRTL_Typing ? "rtl" : "ltr"}
                                     onDoubleClick={(event)=>{
                                       const textarea = textRefs.current[index]
                                       if(textarea){
@@ -1713,12 +1716,13 @@ const onRedo = useCallback(() => {
                                 populateAcoustic(index + idxOffset)
                               }
                               value={item.acoustic_normalised_text}
-                              className={`ind-input ${classes.customTextarea} ${
+                              dir={enableRTL_Typing ? "rtl" : "ltr"}
+                              className={`${classes.customTextarea} ${
                                 currentIndex === idxOffset + index
                                   ? classes.boxHighlight
                                   : ""
                               }`}
-                              style={{ width: "100%", height: "100%", direction:"ltr",textAlign: enableRTL_Typing ? "right" : "left" }}
+                              style={{ fontSize: fontSize, height: "100%" }}
                             />
                           </div>
                         ))}
@@ -1794,4 +1798,3 @@ const onRedo = useCallback(() => {
 };
 
 export default memo(TranscriptionRightPanel);
-                          // style={{ fontSize: fontSize, height: "100%" }}
