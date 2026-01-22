@@ -875,11 +875,6 @@ useEffect(() => {
   }, [])
 
   useEffect(() => {
-    if (localStorage.getItem("rtl") === "true") {
-      var style = document.createElement("style");
-      style.innerHTML = "input, textarea { direction: RTL; }";
-      document.head.appendChild(style);
-    }
     if (userData?.id && loaded.current !== taskId) {
       loaded.current = taskId;
       getProjectsandTasks(projectId, taskId).then(
@@ -1760,7 +1755,7 @@ useEffect(() => {
         </div>
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div className="label-studio-root rtl-typing-scope" ref={rootRef}></div>
         <Popover
           id={"'simple-popover'"}
           open={Boolean(showTagSuggestionsAnchorEl)}
