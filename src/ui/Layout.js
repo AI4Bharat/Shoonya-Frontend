@@ -42,14 +42,6 @@ const Layout= (props) => {
     }
   })
 
-  useEffect(() => {
-    if (localStorage.getItem('rtl') === "true") {
-      let style = document.createElement('style');
-      style.innerHTML = 'input, textarea { direction: RTL; }'
-      document.head.appendChild(style);
-    }
-  }, []);
-
   return (
     <ThemeProvider theme={themeDefault}>
       <div 

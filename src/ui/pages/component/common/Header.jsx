@@ -17,7 +17,7 @@ import Tab from "@mui/material/Tab";
 import Badge from "@mui/material/Badge";
 import Popover from "@mui/material/Popover";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 
 import { formatDistanceToNow, format } from "date-fns";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
@@ -60,6 +60,9 @@ const Header = () => {
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const [showTransliterationModel, setShowTransliterationModel] =
     useState(false);
+  const storedRtl = localStorage.getItem("rtl");
+  const [rtlEnabled, setRtlEnabled] = useState(storedRtl === "true");
+  const rtlUserToggled = useRef(storedRtl !== null);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -83,6 +86,7 @@ const Header = () => {
   const loggedInUserData = useSelector(
     (state) => state?.fetchLoggedInUserData?.data
   );
+  const projectDetails = useSelector((state) => state?.getProjectDetails?.data);
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -96,6 +100,22 @@ const Header = () => {
   let navigate = useNavigate();
   const location = useLocation();
   const classes = headerStyle();
+  const pathname = location.pathname || "";
+  const isLsfPath =
+    pathname.includes("/projects/") &&
+    (pathname.includes("/task/") ||
+      pathname.includes("/review/") ||
+      pathname.includes("/Alltask/") ||
+      pathname.includes("/SuperChecker/"));
+  const isAudioPath =
+    pathname.includes("AudioTranscriptionLandingPage") ||
+    pathname.includes("ReviewAudioTranscriptionLandingPage") ||
+    pathname.includes("SuperCheckerAudioTranscriptionLandingPage") ||
+    pathname.includes("AllAudioTranscriptionLandingPage");
+  const isOcrProjectType = String(projectDetails?.project_type || "")
+    .toLowerCase()
+    .includes("ocr");
+  const isRtlToggleAllowed = (isLsfPath || isAudioPath) && !isOcrProjectType;
 
   const getLoggedInUserData = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
@@ -232,42 +252,55 @@ const Header = () => {
     setAnchorElNotification(null);
   };
 
-const handleRTLChange = (event) => {
-  let style = document.getElementById("rtl-style");
+  useEffect(() => {
+    if (!isRtlToggleAllowed && rtlEnabled) {
+      rtlUserToggled.current = true;
+      setRtlEnabled(false);
+    }
+  }, [isRtlToggleAllowed, rtlEnabled]);
 
-  if (!style) {
-    style = document.createElement("style");
-    style.id = "rtl-style";
-    document.head.appendChild(style);
-  }
+  const handleRTLChange = (event) => {
+    rtlUserToggled.current = true;
+    const enable = event.target.checked;
+    setRtlEnabled(enable);
 
-  if (event.target.checked) {
-    localStorage.setItem("rtl", true);
-    style.innerHTML = `
-      input, textarea {
+    let style = document.getElementById("rtl-typing-style");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "rtl-typing-style";
+      document.head.appendChild(style);
+    }
+
+    localStorage.setItem("rtl", enable ? "true" : "false");
+
+    if (enable) {
+      style.innerHTML = `
+      .rtl-typing-scope input,
+      .rtl-typing-scope textarea {
         direction: rtl;
         unicode-bidi: isolate;
         text-align: right;
       }
       
       /* Force LTR for input values */
-      input[type="text"],
-      input[type="number"],
-      textarea {
+      .rtl-typing-scope input[type="text"],
+      .rtl-typing-scope input[type="number"],
+      .rtl-typing-scope textarea {
         unicode-bidi: plaintext;
       }
     `;
-  } else {
-    localStorage.setItem("rtl", false);
-    style.innerHTML = `
-      input, textarea {
+    } else {
+      style.innerHTML = `
+      .rtl-typing-scope input,
+      .rtl-typing-scope textarea {
         direction: ltr;
         unicode-bidi: plaintext;
         text-align: left;
       }
     `;
-  }
-};
+    }
+  };
+
   const handleTranscriptionFlowChange = async (event) => {
     const obj = new UpdateUIPrefsAPI(event.target.checked);
     // dispatch(APITransport(loggedInUserObj));
@@ -684,7 +717,13 @@ const handleRTLChange = (event) => {
       control: (
         <Checkbox
           onChange={handleRTLChange}
-          defaultChecked={localStorage.getItem("rtl") === "true"}
+          checked={rtlEnabled}
+          disabled={!isRtlToggleAllowed}
+          sx={{
+            "&.Mui-disabled": {
+              color: "#c4c4c4",
+            },
+          }}
         />
       ),
     },
