@@ -7,8 +7,9 @@ import { useState } from 'react'
 import ProgressAnalytics from './ProgressAnalytics';
 import TaskAnalytics from "./TaskAnalytics/TaskAnalytics";
 import MetaAnalytics from "./MetaAnalytics/MetaAnalytics";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import PerformanceAnalytics from './PerformanaceAnalytics/PerformanceAnalytics';
+import PreferedWorkspace from './PreferedWorkspace/PreferedWorkspace';
 
 
 
@@ -33,47 +34,53 @@ function TabPanel(props) {
 }
 
 const ProgressList = () => {
+    const [open, setOpen] = useState(false);
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (e, v) => {
         setTabValue(v)
     }
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
-      );
+    );
     return (
-      
+
         < >
             <Box sx={{ mb: 2 }}>
-                <Tabs 
-                    value={tabValue} 
-                    onChange={handleTabChange} 
-                    aria-label="user-tabs" 
-                    variant="scrollable" 
-                    scrollButtons="auto" 
+                <Tabs
+                    value={tabValue}
+                    onChange={handleTabChange}
+                    aria-label="user-tabs"
+                    variant="scrollable"
+                    scrollButtons="auto"
                     sx={{ padding: '0 16px' }}
                 >
                     <Tab label="Task Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Meta Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
                     <Tab label="Advance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label="Performance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} /> 
+                    <Tab label="Performance Analytics " sx={{ fontSize: 16, fontWeight: '700', marginRight: '28px !important' }} />
+                    <PreferedWorkspace
+                        open={open}
+                        setOpen={setOpen}
+                    />
+
                 </Tabs>
             </Box>
             <Box sx={{ p: 2 }}>
                 <TabPanel value={tabValue} index={0}>
-                <TaskAnalytics loggedInUserData ={loggedInUserData} />  
-                </TabPanel> 
+                    <TaskAnalytics loggedInUserData={loggedInUserData} />
+                </TabPanel>
                 <TabPanel value={tabValue} index={1}>
-                <MetaAnalytics loggedInUserData ={loggedInUserData} />  
-                </TabPanel>  
+                    <MetaAnalytics loggedInUserData={loggedInUserData} />
+                </TabPanel>
                 <TabPanel value={tabValue} index={2}>
-                <ProgressAnalytics />  
-                </TabPanel> 
+                    <ProgressAnalytics />
+                </TabPanel>
                 <TabPanel value={tabValue} index={3}>
-                <PerformanceAnalytics />  
-                </TabPanel>   
+                    <PerformanceAnalytics />
+                </TabPanel>
             </Box>
         </>
-       
+
     )
 }
 
