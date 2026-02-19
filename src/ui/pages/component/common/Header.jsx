@@ -62,7 +62,7 @@ const Header = () => {
     useState(false);
   const storedRtl = localStorage.getItem("rtl");
   const [rtlEnabled, setRtlEnabled] = useState(storedRtl === "true");
-  const rtlUserToggled = useRef(storedRtl !== null);
+
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -100,22 +100,6 @@ const Header = () => {
   let navigate = useNavigate();
   const location = useLocation();
   const classes = headerStyle();
-  const pathname = location.pathname || "";
-  const isLsfPath =
-    pathname.includes("/projects/") &&
-    (pathname.includes("/task/") ||
-      pathname.includes("/review/") ||
-      pathname.includes("/Alltask/") ||
-      pathname.includes("/SuperChecker/"));
-  const isAudioPath =
-    pathname.includes("AudioTranscriptionLandingPage") ||
-    pathname.includes("ReviewAudioTranscriptionLandingPage") ||
-    pathname.includes("SuperCheckerAudioTranscriptionLandingPage") ||
-    pathname.includes("AllAudioTranscriptionLandingPage");
-  const isOcrProjectType = String(projectDetails?.project_type || "")
-    .toLowerCase()
-    .includes("ocr");
-  const isRtlToggleAllowed = (isLsfPath || isAudioPath) && !isOcrProjectType;
 
   const getLoggedInUserData = () => {
     const loggedInUserObj = new FetchLoggedInUserDataAPI("me");
@@ -252,15 +236,8 @@ const Header = () => {
     setAnchorElNotification(null);
   };
 
-  useEffect(() => {
-    if (!isRtlToggleAllowed && rtlEnabled) {
-      rtlUserToggled.current = true;
-      setRtlEnabled(false);
-    }
-  }, [isRtlToggleAllowed, rtlEnabled]);
 
   const handleRTLChange = (event) => {
-    rtlUserToggled.current = true;
     const enable = event.target.checked;
     setRtlEnabled(enable);
 
@@ -718,7 +695,7 @@ const Header = () => {
         <Checkbox
           onChange={handleRTLChange}
           checked={rtlEnabled}
-          disabled={!isRtlToggleAllowed}
+          disabled={false}
           sx={{
             "&.Mui-disabled": {
               color: "#c4c4c4",
