@@ -456,6 +456,8 @@ const TaskTable = (props) => {
               to={
                 ProjectDetails?.project_type?.includes("Acoustic")
                   ? `AudioTranscriptionLandingPage/${el.id}`
+                  : ProjectDetails?.project_type?.includes("OCRTableEditing")
+                  ? `OCRTable/${el.id}`
                   : `task/${el.id}`
               }
               className={classes.link}

@@ -24,7 +24,13 @@ const AnnotationStageButtons = ({
 
   return (
     <>
-      <Grid container spacing={1}>
+      <Grid container spacing={1}sx={{
+          display: 'flex',
+    flexWrap: 'nowrap',   // ✅ change from 'wrap' → 'nowrap'
+    gap: 1,
+    alignItems: 'center',
+    overflowX: 'auto'     // 
+        }}>
         {!disableBtns &&
           taskData?.annotation_users?.some((users) => users === user.id) && (
             <Grid item>

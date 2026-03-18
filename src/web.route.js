@@ -28,6 +28,7 @@ import DatasetSettingTabs from "./ui/pages/container/Dataset/DatasetSettingTabs"
 import CreateDatasetInstanceButton from "./ui/pages/container/Dataset/CreateNewDatasetInstance"
 import Transliteration from "./ui/pages/container/Transliteration/Transliteration"
 import MyOrganization from "./ui/pages/container/Organization/MyOrganization"
+import OCRTableAnnotation from './ui/pages/container/OCRTable.jsx/OCRTableAnnotation';
 
 const Projects = React.lazy(() =>
   import("./ui/pages/container/Project/ProjectDetails")
@@ -263,6 +264,24 @@ const App = () => {
               <Layout component={<ProgressList />} />
             )}
           />
+          <Route
+            path="projects/:projectId/OCRTable/:taskId"
+            element={ProtectedRouteWrapper(
+              <Layout component={<OCRTableAnnotation />} />
+            )}
+          />
+          {/* <Route
+            path="pro2"
+            element={ProtectedRouteWrapper(
+              <Layout component={<AudioTranscriptionLandingPage />} />
+            )}
+          />
+          <Route
+            path="pro3"
+            element={ProtectedRouteWrapper(
+              <Layout component={<AudioTranscriptionLandingPage />} />
+            )}
+          /> */}
           <Route
             path="projects/:projectId/AudioTranscriptionLandingPage/:taskId"
             element={ProtectedRouteWrapper(

@@ -202,8 +202,8 @@ function TaskCountAnalyticsChart(props) {
                 Pending Review Tasks
               </Typography>
               <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
-                {totalAnnotationTasksCount &&
-                  new Intl.NumberFormat("en").format(totalAnnotationTasksCount)}
+                {difftotal &&
+                  new Intl.NumberFormat("en").format(difftotal)}
               </Typography>
             </Box>:annotationChecked&&reviewChecked&&supercheckChecked?<Box className={classes.topBarInnerBox}>
               <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>

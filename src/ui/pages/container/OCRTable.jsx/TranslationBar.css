@@ -1,0 +1,80 @@
+/* components/TranslationBar.css */
+.translation-bar {
+  padding: 1rem;
+  background: white;
+  border-top: 2px solid #667eea;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.translation-input {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.translation-field {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.translation-field:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.translate-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.translate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.translation-output {
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.translation-output strong {
+  color: #667eea;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.translation-output p {
+  color: #333;
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+.transcription-note {
+  margin-top: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Responsive Translation Bar */
+@media (max-width: 768px) {
+  .translation-input {
+    flex-direction: column;
+  }
+
+  .translate-btn {
+    width: 100%;
+  }
+}
