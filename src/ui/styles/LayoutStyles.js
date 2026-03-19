@@ -2,8 +2,8 @@ import { makeStyles } from "@mui/styles";
 
 const GlobalStyles = makeStyles({
   container: {
-    maxWidth: "1272px",
     width: "100%",
+padding:"0 20px",
     margin: "-20px auto",
     // background: theme.palette.background.default,
     // fontFamily: theme.typography.fontFamily,

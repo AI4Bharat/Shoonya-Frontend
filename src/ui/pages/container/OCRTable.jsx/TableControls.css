@@ -1,0 +1,135 @@
+/* components/TableControls.css */
+.table-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #e8eccd;
+  border-bottom: 1px solid #404040;
+  flex-wrap: wrap;
+}
+
+.count-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-width: 60px;
+  padding: 0 12px;
+  border-radius: 20px;
+  background: rgb(44, 39, 153);
+  color: white;
+  gap: 6px;
+}
+
+.badge-icon {
+  font-size: 18px !important;
+}
+
+.badge-count {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.control-btn {
+  background-color: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  border-radius: 50% !important;
+  color: #e0e0e0 !important;
+  width: 40px !important;
+  height: 40px !important;
+  transition: all 0.2s ease !important;
+  position: relative;
+}
+
+.control-btn:hover {
+  background: rgb(44, 39, 153);
+  border-color: transparent !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.control-btn:disabled:hover {
+  background: #2d2d2d !important;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-plus {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.controls-divider {
+  border-color: #404040 !important;
+  height: 30px !important;
+  margin: 0 4px !important;
+}
+
+/* Menu Styles */
+.MuiMenu-paper {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #404040 !important;
+}
+
+.MuiMenuItem-root {
+  color: #e0e0e0 !important;
+}
+
+.MuiMenuItem-root:hover {
+  background-color: #404040 !important;
+}
+
+.MuiCheckbox-root {
+  color: rgb(44, 39, 153) !important;
+}
+
+.MuiCheckbox-root.Mui-checked {
+  color: rgb(44, 39, 153) !important;
+}
+
+.MuiDivider-root {
+  border-color: #404040 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table-controls {
+    padding: 8px;
+    gap: 4px;
+  }
+
+  .count-badge {
+    min-width: 50px;
+    padding: 0 8px;
+  }
+
+  .badge-icon {
+    font-size: 16px !important;
+  }
+
+  .badge-count {
+    font-size: 12px;
+  }
+
+  .control-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-controls {
+    justify-content: center;
+  }
+}
