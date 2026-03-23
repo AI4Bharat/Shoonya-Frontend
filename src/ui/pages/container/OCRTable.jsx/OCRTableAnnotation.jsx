@@ -20,11 +20,11 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import GetNextProjectAPI from '../../../../redux/actions/CL-Transcription/GetNextProject';
 import GetProjectDetailsAPI from '../../../../redux/actions/api/ProjectDetails/GetProjectDetails';
-import SaveTranscriptAPI from '../../../../redux/actions/CL-Transcription/SaveTranscript';
 import { Button } from '@mui/material';
 import PatchAnnotationOCRAPI from '../../../../redux/actions/CL-Transcription/PatchAnnoationOCR';
 import GetAnnotationsTaskOCRAPI from '../../../../redux/actions/CL-Transcription/GetAnnotationsTaskOCR';
 import AnnotationStageButtons from './AnnotationStageButtons';
+import SaveTranscriptOCRAPI from '../../../../redux/actions/CL-Transcription/SaveTranscriptOCR';
 
 function App() {
     const classes = AudioTranscriptionLandingStyle();
@@ -48,6 +48,13 @@ function App() {
 
   // Annotation stage states
   const [annotationsTaskDetails, setAnnotationsTaskDetails] = useState([]);
+    const [isActive, setIsActive] = useState(true);
+    const [lastInteraction, setLastInteraction] = useState(Date.now());
+    const inactivityThreshold = 120000; 
+  const ref = useRef(0);
+  const saveIntervalRef =  useRef(null);
+  const timeSpentIntervalRef = useRef(null);
+  
   const [disableBtns, setDisableBtns] = useState(false);
   const [disableUpdateButton, setDisableUpdateButton] = useState(false);
   const [disableSkipButton, setdisableSkipButton] = useState(false);
@@ -431,48 +438,140 @@ const convertDataToHtmlTable = (data, cols) => {
   console.log('Generated HTML table:', html);
   
   return html;
-};  // const handleAutosave = async () => {
-  //   setAutoSaveTrigger(false);
-  //   if(AnnotationsTaskDetails[0]?.annotation_status !== "labeled"){
-  //   if(!autoSave) return;
-  //   const reqBody = {
-  //     task_id: taskId,
-  //     auto_save: true,
-  //     lead_time:
-  //       (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
-  //     result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-  //   };
-  //   if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
-  //     try{
-  //       const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
-  //       const res = await fetch(obj.apiEndPoint(), {
-  //         method: "PATCH",
-  //         body: JSON.stringify(obj.getBody()),
-  //         headers: obj.getHeaders().headers,
-  //       });
-  //       if (!res.ok) {
-  //         const data = await res.json();
-  //         setSnackbarInfo({
-  //           open: true,
-  //           message: data.message,
-  //           variant: "error",
-  //         });
-  //       }
-  //       return res;
-  //     }
-  //     catch(err) {
-  //       setSnackbarInfo({
-  //         open: true,
-  //         message: "Error in autosaving "+err,
-  //         variant: "error",
-  //       });
-  //     }
-  //   }}
-  // };
+};  
+const handleAutosave = async () => {
+    setAutoSaveTrigger(false);
+
+    if(AnnotationsTaskDetails[0]?.annotation_status != "labeled"){
+
+    if(!autoSave) return;
+
+      const htmlTable = convertDataToHtmlTable(tableData, columns);
+
+    const resultData = {
+    text: htmlTable,
+  };
+    const reqBody = {
+      task_id: taskId,
+      auto_save: true,
+      lead_time:
+        (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
+      result: resultData,
+    };
+    if (AnnotationsTaskDetails[0]?.result?.text?.length>0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+
+      try{
+        const obj = new SaveTranscriptOCRAPI(annotations[0]?.id, reqBody);
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          setSnackbarInfo({
+            open: true,
+            message: data.message,
+            variant: "error",
+          });
+        }
+        return res;
+      }
+      catch(err) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving "+err,
+          variant: "error",
+        });
+      }
+    }}
+  };
   
-  // useEffect(() => {
-  //   autoSaveTrigger && handleAutosave();
-  // }, [autoSaveTrigger, autoSave, handleAutosave, user, result, taskId, annotations, taskDetails]);
+  useEffect(() => {
+     handleAutosave();
+
+  }, [autoSaveTrigger, autoSave, user,tableData, annotations, taskDetails]);
+  
+
+   useEffect(() => {
+      if(!autoSave) return;
+  
+      const handleUpdateTimeSpent = (time = 60) => {
+        // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
+        // dispatch(APITransport(apiObj));
+      };
+  
+      saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
+      timeSpentIntervalRef.current = setInterval(
+        handleUpdateTimeSpent,
+        60 * 1000
+      );
+  
+      const handleBeforeUnload = (event) => {
+        setAutoSaveTrigger(true);
+        handleUpdateTimeSpent(ref.current);
+        event.preventDefault();
+        event.returnValue = "";
+        ref.current = 0;
+      };
+  
+      const handleInteraction = () => {
+        setLastInteraction(Date.now());
+        setIsActive(true);
+      };
+  
+      const checkInactivity = () => {
+        const currentTime = Date.now();
+        if (currentTime - lastInteraction >= inactivityThreshold) {
+          setIsActive(false);
+        }
+      };
+  
+      document.addEventListener('mousemove', handleInteraction);
+      document.addEventListener('keydown', handleInteraction);
+      const interval = setInterval(checkInactivity, 1000);
+  
+      if(!isActive){
+        handleUpdateTimeSpent(ref.current);
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        ref.current = 0;
+      }
+  
+      const handleVisibilityChange = () => {
+        if (!document.hidden) {
+          // Tab is active, restart the autosave interval
+          saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
+          timeSpentIntervalRef.current = setInterval(
+            handleUpdateTimeSpent,
+            60 * 1000
+          );
+        } else {
+          setAutoSaveTrigger(true);
+          handleUpdateTimeSpent(ref.current);
+          // Tab is inactive, clear the autosave interval
+          clearInterval(saveIntervalRef.current);
+          clearInterval(timeSpentIntervalRef.current);
+          ref.current = 0;
+        }
+    };
+  
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+  
+      return () => {
+        document.removeEventListener('mousemove', handleInteraction);
+        document.removeEventListener('keydown', handleInteraction);
+        clearInterval(interval);
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+      };
+  
+      // eslint-disable-next-line
+    }, [autoSave, user, taskId, annotations, taskDetails, isActive]);
+  
 
   const getTaskData = async (id) => {
     setInitialLoading(true);
@@ -1105,7 +1204,7 @@ if (
             onRedo={handleRedo}
             undoStack={undoStack}
             redoStack={redoStack}
-            onSave={handleSave}
+            onSave={handleAutosave}
             onSaveDraft={handleSaveDraft}
             onExport={handleExport}
             onImport={handleImport}
