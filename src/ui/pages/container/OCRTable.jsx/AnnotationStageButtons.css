@@ -1,0 +1,111 @@
+/* AnnotationStageButtons.css */
+
+.annotation-controls {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.annotation-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.control-btn {
+  min-width: 70px !important;
+  height: 36px !important;
+  border-radius: 18px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  white-space: nowrap;
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.draft-btn {
+  border: 1px solid #ff9800 !important;
+  color: #ff9800 !important;
+  background: white !important;
+}
+
+.draft-btn:hover {
+  background: #fff4e5 !important;
+  border-color: #f57c00 !important;
+  color: #f57c00 !important;
+}
+
+.next-btn {
+  border: 1px solid #2196f3 !important;
+  color: #2196f3 !important;
+  background: white !important;
+}
+
+.next-btn:hover {
+  background: #e3f2fd !important;
+  border-color: #1976d2 !important;
+  color: #1976d2 !important;
+}
+
+.skip-btn {
+  border: 1px solid #f44336 !important;
+  color: #f44336 !important;
+  background: white !important;
+}
+
+.skip-btn:hover {
+  background: #ffebee !important;
+  border-color: #d32f2f !important;
+  color: #d32f2f !important;
+}
+
+.update-btn {
+  background: rgb(44, 39, 153) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.update-btn:hover {
+  background: rgb(44, 39, 153) !important;
+  transform: translateY(-2px);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  .control-btn {
+    min-width: 65px !important;
+    height: 34px !important;
+    font-size: 0.75rem !important;
+    padding: 0 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .annotation-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    width: 100%;
+  }
+
+  .control-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 32px !important;
+    font-size: 0.7rem !important;
+    padding: 0 4px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .annotation-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

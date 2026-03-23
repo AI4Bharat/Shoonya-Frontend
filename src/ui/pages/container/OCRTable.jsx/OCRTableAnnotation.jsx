@@ -10,7 +10,6 @@ import TranslationBar from './TranslationBar';
 import Sidebar from './Sidebar';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import TableControls from './TableControls';
-import AnnotationStageButtons from '../../component/CL-Transcription/AnnotationStageButtons';
 import CustomizedSnackbars from '../../component/common/Snackbar';
 import CircularIndeterminate from '../../component/common/Spinner';
 import { useDispatch ,useSelector} from 'react-redux';
@@ -25,6 +24,7 @@ import SaveTranscriptAPI from '../../../../redux/actions/CL-Transcription/SaveTr
 import { Button } from '@mui/material';
 import PatchAnnotationOCRAPI from '../../../../redux/actions/CL-Transcription/PatchAnnoationOCR';
 import GetAnnotationsTaskOCRAPI from '../../../../redux/actions/CL-Transcription/GetAnnotationsTaskOCR';
+import AnnotationStageButtons from './AnnotationStageButtons';
 
 function App() {
     const classes = AudioTranscriptionLandingStyle();
@@ -504,12 +504,19 @@ const convertDataToHtmlTable = (data, cols) => {
         setImageUrl(resp?.data?.image_url);
       }
       
-      if (tableData.length === 0 && resp?.data?.ocr_prediction_json?.text) {
-        const { rows, columns: parsedColumns } = parseHtmlTableToData(resp.data.ocr_prediction_json.text);
-        setTableData(rows);
-        setColumns(parsedColumns);
-        setOriginalHtmlTable(resp.data.ocr_prediction_json.text);
-      }
+      const annotationText = AnnotationsTaskDetails?.[0]?.result?.text;
+
+if (
+  (!annotationText || annotationText.trim() === "") &&
+  resp?.data?.ocr_prediction_json?.text
+) {
+  const { rows, columns: parsedColumns } =
+    parseHtmlTableToData(resp.data.ocr_prediction_json.text);
+
+  setTableData(rows);
+  setColumns(parsedColumns);
+  setOriginalHtmlTable(resp.data.ocr_prediction_json.text);
+}
       
     } catch (error) {
       console.error('Error fetching task data:', error);
@@ -793,14 +800,23 @@ const convertDataToHtmlTable = (data, cols) => {
       var Annotation = AnnotationsTaskDetails.filter(
         (annotation) => annotation.annotation_type === 1
       )[0];
-      setTaskData(Annotation);
-       if ( taskData?.result?.text) {
-        const { rows, columns: parsedColumns } = parseHtmlTableToData(taskData?.result.text);
-        setTableData(rows);
-        setColumns(parsedColumns);
-        setOriginalHtmlTable(taskData?.result.text);
-      }
   }, [AnnotationsTaskDetails]);
+
+  useEffect(() => {
+  const annotationText = annotations?.[0]?.result?.text;
+  const ocrText = taskData?.data?.ocr_prediction_json?.text;
+
+  const finalText =
+    annotationText && annotationText.trim() !== ""
+      ? annotationText
+      : ocrText;
+
+  if (finalText) {
+    const { rows, columns } = parseHtmlTableToData(finalText);
+    setTableData(rows);
+    setColumns(columns);
+  }
+}, [annotations, taskData]);
 
   const handleTranscribe = useCallback((text) => {
     console.log(`Transcribing to ${selectedLanguage}: ${text}`);
@@ -959,34 +975,54 @@ const convertDataToHtmlTable = (data, cols) => {
     <div className="app">
       {renderSnackBar()}
       {loading && <div className="loading-overlay"><CircularIndeterminate /></div>}
-      
+
       <div className="main-container">
         {/* Left Panel with Navigation and Image */}
         <div className="left-panel" style={{ width: `${leftWidth}%` }}>
           <div className="image-navigation">
             <div className="nav-left">
-               <Button
-              startIcon={<ArrowBackIcon />}
-              variant="contained"
-              color="primary"
-              size="small"
-              sx={{ 
-                minWidth: 'auto',
-                fontSize: '0.75rem',
-                px: 1.5,
-                py: 0.2
-              }}
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  localStorage.removeItem("labelAll");
-                }
-                navigate(`/projects/${projectId}`,  { replace : true, state: { fromBackToProject: true } } );
-              }}
-            >
-              Back
-            </Button>
+              <Button
+                startIcon={<ArrowBackIcon />}
+                variant="contained"
+                color="primary"
+                size="small"
+                sx={{
+                  minWidth: 'auto',
+                  fontSize: '0.7rem',
+                  px: 1,
+                  py: 0.3
+                }}
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.removeItem("labelAll");
+                  }
+                  navigate(`/projects/${projectId}`, { replace: true, state: { fromBackToProject: true } });
+                }}
+              >
+                Back
+              </Button>
               <span className="task-number">Task #{taskId || '12775722'}</span>
-              <div className="nav-right">
+              <Button
+                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+                variant="contained"
+                color={reviewtext.trim().length === 0 ? "primary" : "success"}
+                size="small"
+                sx={{
+                  minWidth: '70px',
+                  fontSize: '0.7rem',
+                  px: 1,
+                  py: 0.3,
+                  ml: 0.5,
+                  flexShrink: 0,
+                }}
+                onClick={handleCollapseClick}
+              >
+                Notes {reviewtext.trim().length === 0 ? "" : "*"}
+              </Button>
+
+            </div>
+            
+            <div className="nav-right">
               <AnnotationStageButtons
                 handleAnnotationClick={handleAnnotationClick}
                 onNextAnnotation={onNextAnnotation}
@@ -997,32 +1033,12 @@ const convertDataToHtmlTable = (data, cols) => {
                 filterMessage={filterMessage}
                 taskData={taskData}
               />
+
+              
             </div>
-            
-            </div>
-          
-        
           </div>
-           <Button
-              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-              variant="contained"
-              color={
-                reviewtext.trim().length === 0 ? "primary" : "success"
-              }
-              sx={{ 
-                width:"10%",
-                minWidth: '90px',
-                fontSize: '0.75rem',
-                px: 1.5,
-                py: 0.2,                
-              }}
-              onClick={handleCollapseClick}
-            // style={{ marginBottom: "20px" }}
-            >
-              Notes {reviewtext.trim().length === 0 ? "" : "*"}
-            </Button>
-           <div
-                          className={classes.collapse}
+          <div
+            className={classes.collapse}
                           style={{
                             display: showNotes ? "block" : "none",
                             paddingBottom: "16px",
@@ -1125,6 +1141,7 @@ const convertDataToHtmlTable = (data, cols) => {
               showGrid={showGrid}
               alternateRowColor={alternateRowColor}
               enableTransliteration={enableTransliteration}
+              ProjectDetails={ProjectDetails}
             />
           </div>
           

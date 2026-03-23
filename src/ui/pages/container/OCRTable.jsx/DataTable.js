@@ -19,6 +19,7 @@ const DataTable = ({
   showGrid = true,
   alternateRowColor = true,
   enableTransliteration = false,
+  ProjectDetails
 }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -131,7 +132,7 @@ const DataTable = ({
         <IndicTransliterate
           customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
           apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
-          lang={getTransliterationLang(language)}
+          lang={ProjectDetails?.tgt_language}
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onChangeText={() => {}}

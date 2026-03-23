@@ -99,16 +99,19 @@ const TableControls = ({
     <div className="table-controls">
       {/* Row Count Badge */}
       <Box
+      style={{ backgroundColor: "black" }}
         className="count-badge"
       >
         <TableRowsIcon className="badge-icon" />
-        <span className="badge-count">{totalRows}</span>
+        <span  className="badge-count">
+          {totalRows}
+        </span>
       </Box>
 
       {/* Column Count Badge */}
       <Box
         className="count-badge"
-        style={{ marginLeft: "5px" }}
+        style={{ marginLeft: "5px",backgroundColor: "black"  }}
       >
         <ViewColumnIcon className="badge-icon" />
         <span className="badge-count">{totalColumns}</span>

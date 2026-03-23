@@ -38,8 +38,8 @@
 .data-table thead {
   position: sticky;
   top: 0;
-  background: rgb(44, 39, 153);
-  color: white;
+  background: rgb(176, 211, 244);
+  color: black;
   z-index: 10;
   border-bottom: 2px solid #5a67d8;
 }
@@ -57,7 +57,7 @@
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: white;
+  color: black;
 }
 
 .data-table td {
