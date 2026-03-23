@@ -10,6 +10,7 @@ import TranslationBar from './TranslationBar';
 import Sidebar from './Sidebar';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import TableControls from './TableControls';
+import AnnotationStageButtons from '../../component/CL-Transcription/AnnotationStageButtons';
 import CustomizedSnackbars from '../../component/common/Snackbar';
 import CircularIndeterminate from '../../component/common/Spinner';
 import { useDispatch ,useSelector} from 'react-redux';
@@ -24,10 +25,11 @@ import SaveTranscriptAPI from '../../../../redux/actions/CL-Transcription/SaveTr
 import { Button } from '@mui/material';
 import PatchAnnotationOCRAPI from '../../../../redux/actions/CL-Transcription/PatchAnnoationOCR';
 import GetAnnotationsTaskOCRAPI from '../../../../redux/actions/CL-Transcription/GetAnnotationsTaskOCR';
-import AnnotationStageButtons from './AnnotationStageButtons';
 
 function App() {
     const classes = AudioTranscriptionLandingStyle();
+    const saveIntervalRef = useRef(null);
+    const ref = useRef(0);
   
   const dispatch = useDispatch();
   const { projectId, taskId } = useParams();
@@ -45,6 +47,7 @@ function App() {
   const [selectedCell, setSelectedCell] = useState(null);
     const [loadtime, setloadtime] = useState(new Date());
     let labellingMode = localStorage.getItem("labellingMode");
+  const timeSpentIntervalRef = useRef(null);
 
   // Annotation stage states
   const [annotationsTaskDetails, setAnnotationsTaskDetails] = useState([]);
@@ -61,6 +64,10 @@ function App() {
   const [showNotes, setShowNotes] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+    const [isActive, setIsActive] = useState(true);
+    const [lastInteraction, setLastInteraction] = useState(Date.now());
+    const inactivityThreshold = 120000; 
+  
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -431,48 +438,137 @@ const convertDataToHtmlTable = (data, cols) => {
   console.log('Generated HTML table:', html);
   
   return html;
-};  // const handleAutosave = async () => {
-  //   setAutoSaveTrigger(false);
-  //   if(AnnotationsTaskDetails[0]?.annotation_status !== "labeled"){
-  //   if(!autoSave) return;
-  //   const reqBody = {
-  //     task_id: taskId,
-  //     auto_save: true,
-  //     lead_time:
-  //       (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
-  //     result: (stdTranscriptionSettings.enable ? [...result, { standardised_transcription: stdTranscription }] : result),
-  //   };
-  //   if (result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
-  //     try{
-  //       const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
-  //       const res = await fetch(obj.apiEndPoint(), {
-  //         method: "PATCH",
-  //         body: JSON.stringify(obj.getBody()),
-  //         headers: obj.getHeaders().headers,
-  //       });
-  //       if (!res.ok) {
-  //         const data = await res.json();
-  //         setSnackbarInfo({
-  //           open: true,
-  //           message: data.message,
-  //           variant: "error",
-  //         });
-  //       }
-  //       return res;
-  //     }
-  //     catch(err) {
-  //       setSnackbarInfo({
-  //         open: true,
-  //         message: "Error in autosaving "+err,
-  //         variant: "error",
-  //       });
-  //     }
-  //   }}
-  // };
+};    
+
+const handleAutosave = async () => {
+    setAutoSaveTrigger(false);
+    if(AnnotationsTaskDetails[0]?.annotation_status !== "labeled"){
+    if(!autoSave) return;
+      const htmlTable = convertDataToHtmlTable(tableData, columns);
+
+    const resultData = {
+    text: htmlTable,
+  };
+    const reqBody = {
+      task_id: taskId,
+      auto_save: true,
+      lead_time:
+        (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
+      result: resultData,
+    };
+    if (AnnotationsTaskDetails[0]?.result.length && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+      try{
+        const obj = new SaveTranscriptAPI(annotations[0]?.id, reqBody);
+        const res = await fetch(obj.apiEndPoint(), {
+          method: "PATCH",
+          body: JSON.stringify(obj.getBody()),
+          headers: obj.getHeaders().headers,
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          setSnackbarInfo({
+            open: true,
+            message: data.message,
+            variant: "error",
+          });
+        }
+        return res;
+      }
+      catch(err) {
+        setSnackbarInfo({
+          open: true,
+          message: "Error in autosaving "+err,
+          variant: "error",
+        });
+      }
+    }}
+  };
   
-  // useEffect(() => {
-  //   autoSaveTrigger && handleAutosave();
-  // }, [autoSaveTrigger, autoSave, handleAutosave, user, result, taskId, annotations, taskDetails]);
+  useEffect(() => {
+    autoSaveTrigger && handleAutosave();
+  }, [autoSaveTrigger, autoSave, handleAutosave, user, tableData, taskId, annotations, taskDetails]);
+  
+
+   useEffect(() => {
+      if(!autoSave) return;
+  
+      const handleUpdateTimeSpent = (time = 60) => {
+        // const apiObj = new UpdateTimeSpentPerTask(taskId, time);
+        // dispatch(APITransport(apiObj));
+      };
+  
+      saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
+      timeSpentIntervalRef.current = setInterval(
+        handleUpdateTimeSpent,
+        60 * 1000
+      );
+  
+      const handleBeforeUnload = (event) => {
+        setAutoSaveTrigger(true);
+        handleUpdateTimeSpent(ref.current);
+        event.preventDefault();
+        event.returnValue = "";
+        ref.current = 0;
+      };
+  
+      const handleInteraction = () => {
+        setLastInteraction(Date.now());
+        setIsActive(true);
+      };
+  
+      const checkInactivity = () => {
+        const currentTime = Date.now();
+        if (currentTime - lastInteraction >= inactivityThreshold) {
+          setIsActive(false);
+        }
+      };
+  
+      document.addEventListener('mousemove', handleInteraction);
+      document.addEventListener('keydown', handleInteraction);
+      const interval = setInterval(checkInactivity, 1000);
+  
+      if(!isActive){
+        handleUpdateTimeSpent(ref.current);
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        ref.current = 0;
+      }
+  
+      const handleVisibilityChange = () => {
+        if (!document.hidden) {
+          // Tab is active, restart the autosave interval
+          saveIntervalRef.current = setInterval(() => setAutoSaveTrigger(true), 60 * 1000);
+          timeSpentIntervalRef.current = setInterval(
+            handleUpdateTimeSpent,
+            60 * 1000
+          );
+        } else {
+          setAutoSaveTrigger(true);
+          handleUpdateTimeSpent(ref.current);
+          // Tab is inactive, clear the autosave interval
+          clearInterval(saveIntervalRef.current);
+          clearInterval(timeSpentIntervalRef.current);
+          ref.current = 0;
+        }
+    };
+  
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+  
+      return () => {
+        document.removeEventListener('mousemove', handleInteraction);
+        document.removeEventListener('keydown', handleInteraction);
+        clearInterval(interval);
+        clearInterval(saveIntervalRef.current);
+        clearInterval(timeSpentIntervalRef.current);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+      };
+  
+      // eslint-disable-next-line
+    }, [autoSave, user, taskId, annotations, taskDetails, isActive]);
+  
+
 
   const getTaskData = async (id) => {
     setInitialLoading(true);
@@ -504,19 +600,12 @@ const convertDataToHtmlTable = (data, cols) => {
         setImageUrl(resp?.data?.image_url);
       }
       
-      const annotationText = AnnotationsTaskDetails?.[0]?.result?.text;
-
-if (
-  (!annotationText || annotationText.trim() === "") &&
-  resp?.data?.ocr_prediction_json?.text
-) {
-  const { rows, columns: parsedColumns } =
-    parseHtmlTableToData(resp.data.ocr_prediction_json.text);
-
-  setTableData(rows);
-  setColumns(parsedColumns);
-  setOriginalHtmlTable(resp.data.ocr_prediction_json.text);
-}
+      if (tableData.length === 0 && resp?.data?.ocr_prediction_json?.text) {
+        const { rows, columns: parsedColumns } = parseHtmlTableToData(resp.data.ocr_prediction_json.text);
+        setTableData(rows);
+        setColumns(parsedColumns);
+        setOriginalHtmlTable(resp.data.ocr_prediction_json.text);
+      }
       
     } catch (error) {
       console.error('Error fetching task data:', error);
@@ -800,23 +889,14 @@ if (
       var Annotation = AnnotationsTaskDetails.filter(
         (annotation) => annotation.annotation_type === 1
       )[0];
+      setTaskData(Annotation);
+       if ( taskData?.result?.text) {
+        const { rows, columns: parsedColumns } = parseHtmlTableToData(taskData?.result.text);
+        setTableData(rows);
+        setColumns(parsedColumns);
+        setOriginalHtmlTable(taskData?.result.text);
+      }
   }, [AnnotationsTaskDetails]);
-
-  useEffect(() => {
-  const annotationText = annotations?.[0]?.result?.text;
-  const ocrText = taskData?.data?.ocr_prediction_json?.text;
-
-  const finalText =
-    annotationText && annotationText.trim() !== ""
-      ? annotationText
-      : ocrText;
-
-  if (finalText) {
-    const { rows, columns } = parseHtmlTableToData(finalText);
-    setTableData(rows);
-    setColumns(columns);
-  }
-}, [annotations, taskData]);
 
   const handleTranscribe = useCallback((text) => {
     console.log(`Transcribing to ${selectedLanguage}: ${text}`);
@@ -975,54 +1055,34 @@ if (
     <div className="app">
       {renderSnackBar()}
       {loading && <div className="loading-overlay"><CircularIndeterminate /></div>}
-
+      
       <div className="main-container">
         {/* Left Panel with Navigation and Image */}
         <div className="left-panel" style={{ width: `${leftWidth}%` }}>
           <div className="image-navigation">
             <div className="nav-left">
-              <Button
-                startIcon={<ArrowBackIcon />}
-                variant="contained"
-                color="primary"
-                size="small"
-                sx={{
-                  minWidth: 'auto',
-                  fontSize: '0.7rem',
-                  px: 1,
-                  py: 0.3
-                }}
-                onClick={() => {
-                  if (typeof window !== "undefined") {
-                    localStorage.removeItem("labelAll");
-                  }
-                  navigate(`/projects/${projectId}`, { replace: true, state: { fromBackToProject: true } });
-                }}
-              >
-                Back
-              </Button>
+               <Button
+              startIcon={<ArrowBackIcon />}
+              variant="contained"
+              color="primary"
+              size="small"
+              sx={{ 
+                minWidth: 'auto',
+                fontSize: '0.75rem',
+                px: 1.5,
+                py: 0.2
+              }}
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  localStorage.removeItem("labelAll");
+                }
+                navigate(`/projects/${projectId}`,  { replace : true, state: { fromBackToProject: true } } );
+              }}
+            >
+              Back
+            </Button>
               <span className="task-number">Task #{taskId || '12775722'}</span>
-              <Button
-                endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
-                variant="contained"
-                color={reviewtext.trim().length === 0 ? "primary" : "success"}
-                size="small"
-                sx={{
-                  minWidth: '70px',
-                  fontSize: '0.7rem',
-                  px: 1,
-                  py: 0.3,
-                  ml: 0.5,
-                  flexShrink: 0,
-                }}
-                onClick={handleCollapseClick}
-              >
-                Notes {reviewtext.trim().length === 0 ? "" : "*"}
-              </Button>
-
-            </div>
-            
-            <div className="nav-right">
+              <div className="nav-right">
               <AnnotationStageButtons
                 handleAnnotationClick={handleAnnotationClick}
                 onNextAnnotation={onNextAnnotation}
@@ -1033,12 +1093,32 @@ if (
                 filterMessage={filterMessage}
                 taskData={taskData}
               />
-
-              
             </div>
+            
+            </div>
+          
+        
           </div>
-          <div
-            className={classes.collapse}
+           <Button
+              endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
+              variant="contained"
+              color={
+                reviewtext.trim().length === 0 ? "primary" : "success"
+              }
+              sx={{ 
+                width:"10%",
+                minWidth: '90px',
+                fontSize: '0.75rem',
+                px: 1.5,
+                py: 0.2,                
+              }}
+              onClick={handleCollapseClick}
+            // style={{ marginBottom: "20px" }}
+            >
+              Notes {reviewtext.trim().length === 0 ? "" : "*"}
+            </Button>
+           <div
+                          className={classes.collapse}
                           style={{
                             display: showNotes ? "block" : "none",
                             paddingBottom: "16px",
@@ -1141,7 +1221,6 @@ if (
               showGrid={showGrid}
               alternateRowColor={alternateRowColor}
               enableTransliteration={enableTransliteration}
-              ProjectDetails={ProjectDetails}
             />
           </div>
           
