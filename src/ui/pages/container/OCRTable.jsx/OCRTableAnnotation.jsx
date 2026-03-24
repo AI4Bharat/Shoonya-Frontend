@@ -458,7 +458,7 @@ const handleAutosave = async () => {
         (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
       result: resultData,
     };
-    if (AnnotationsTaskDetails[0]?.result?.text?.length>0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+    if (taskDetails?.annotation_users?.some((users) => users === user.id)) {
 
       try{
         const obj = new SaveTranscriptOCRAPI(annotations[0]?.id, reqBody);
