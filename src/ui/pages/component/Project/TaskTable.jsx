@@ -637,22 +637,26 @@ const TaskTable = (props) => {
     }
   }, [totalTaskCount, selectedFilters, ProjectDetails]);
 
-  useEffect(() => {
+   useEffect(() => {
     if (ProjectDetails?.project_type?.includes("Acoustic")) {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
-          `/projects/${id}/${
-            props.type === "annotation"
-              ? "AudioTranscriptionLandingPage"
-              : "ReviewAudioTranscriptionLandingPage"
+          `/projects/${id}/${props.type === "annotation"
+            ? "AudioTranscriptionLandingPage"
+            : "ReviewAudioTranscriptionLandingPage"
           }/${NextTask?.id}`
+        );
+      }
+    } else if (ProjectDetails?.project_type === "OCRTableEditing") {
+      if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
+        navigate(
+          `/projects/${id}/OCRTable/${NextTask?.id}`
         );
       }
     } else {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
-          `/projects/${id}/${props.type === "annotation" ? "task" : "review"}/${
-            NextTask?.id
+          `/projects/${id}/${props.type === "annotation" ? "task" : "review"}/${NextTask?.id
           }`
         );
       }
