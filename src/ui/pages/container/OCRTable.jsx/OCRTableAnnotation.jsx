@@ -442,7 +442,8 @@ const convertDataToHtmlTable = (data, cols) => {
 const handleAutosave = async () => {
     setAutoSaveTrigger(false);
 
-    if(AnnotationsTaskDetails[0]?.annotation_status != "labeled"){
+        if(AnnotationsTaskDetails[0]?.annotation_status != "labeled"&& annotations[0]?.task == taskId){
+
 
     if(!autoSave) return;
 
