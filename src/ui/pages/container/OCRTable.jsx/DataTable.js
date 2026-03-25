@@ -214,7 +214,6 @@ const DataTable = ({
                 </div>
               </th>
             ))}
-            <th className="actions-header">Actions</th>
           </tr>
         </thead>
         <tbody>
