@@ -1,12 +1,72 @@
 /* Updated components/DataTable.css - Light Theme */
 .data-table-wrapper {
   height: 100%;
-  overflow: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: visible !important;
 }
+/* Top textarea styles */
+.data-table-wrapper-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+
+.top-textarea-container {
+  padding: 12px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.top-editor-textarea {
+  width: 100%;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  resize: vertical!important;
+            border: "2px solid #667eea";
+          padding: "8px";
+
+}
+
+.top-editor-textarea:focus {
+  border-color: #764ba2;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.top-textarea-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+.clear-selection-btn {
+  padding: 4px 12px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.clear-selection-btn:hover {
+  background: #e0e0e0;
+  border-color: #ccc;
+}
+
+/* Active cell highlighting */
+.active-cell {
+  background-color: #e3f2fd !important;
+  box-shadow: inset 0 0 0 2px #2196f3;
+}
+
+.active-row {
+  background-color: #f5f5f5;
+}
+
 
 /* Grid line visibility */
 .data-table-wrapper.show-grid .data-table td {
@@ -30,9 +90,10 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: fixed; /* kept as is */
   min-width: 800px;
   color: #333333;
+  overflow: visible !important; /* ✅ FIX */
 }
 
 .data-table thead {
@@ -64,10 +125,26 @@
   padding: 10px 8px;
   transition: background-color 0.2s ease;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: hidden; /* keep default */
   text-overflow: ellipsis;
   color: #333333;
   height: 45px;
+}
+
+.table-cell {
+  position: relative;
+  min-height: 40px;
+  cursor: cell;
+  overflow: visible !important;
+}
+.table-cell.editing {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  width: 100%;
+}
+.data-table tbody tr {
+  height: auto !important;
 }
 
 .data-table tbody tr:hover {
@@ -164,52 +241,22 @@ tr:hover .delete-row-btn {
   background: rgba(255, 107, 107, 0.1);
 }
 
-.table-cell {
-  position: relative;
-  min-height: 40px;
-  cursor: cell;
-}
-
-.table-cell.editing {
-  padding: 0;
-  height: 45px;
-}
-
-.cell-edit-input {
-  width: 100%;
-  height: 100%;
-  padding: 10px 8px;
-  border: 2px solid rgb(44, 39, 153);
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-  background: white;
-  color: #333333;
-  font-family: inherit;
-}
-
 /* Textarea style for transliteration */
 .cell-edit-textarea {
   width: 100%;
   height: 100%;
   min-height: 45px;
   padding: 8px;
-  border: 2px solid rgb(44, 39, 153);
-  border-radius: 4px;
   font-size: 14px;
-  outline: none;
   background: white;
   color: #333333;
   font-family: inherit;
-  resize: none;
-  overflow-y: auto;
+  resize: both;
+  overflow: auto;
   line-height: 1.5;
 }
 
-.cell-edit-textarea:focus {
-  border-color: #764ba2;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-}
+
 
 /* RTL specific styles */
 [dir="rtl"] .cell-content {
@@ -219,6 +266,8 @@ tr:hover .delete-row-btn {
 [dir="rtl"] .cell-edit-input,
 [dir="rtl"] .cell-edit-textarea {
   text-align: right;
+    resize: both;
+
 }
 
 [dir="rtl"] .header-content {
@@ -287,15 +336,21 @@ tr:hover .delete-row-btn {
   left: -5px;
 }
 
-/* Scrollbar Styling - Light Theme */
+/* ✅ CRITICAL FIX: Transliteration dropdown visibility */
+.IndicTransliterate__suggestions,
+.IndicTransliterate__dropdown,
+.suggestions-container {
+  position: absolute !important;
+  z-index: 99999 !important;
+}
+
+/* Scrollbar Styling */
 .data-table-wrapper::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
 
-.data-table-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
+
 
 .data-table-wrapper::-webkit-scrollbar-thumb {
   background: #c1c1c1;
@@ -313,43 +368,127 @@ tr:hover .delete-row-btn {
   scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
-/* Responsive styles */
+/* Updated components/DataTable.css - Add responsive fixes at the bottom */
+
+/* Add these responsive fixes for small screens */
 @media (max-width: 768px) {
-  .data-table {
-    font-size: 12px;
+  .data-table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
   }
-  
+
+  .data-table {
+    min-width: 100% !important;
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+
   .data-table th,
   .data-table td {
-    padding: 8px 4px;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    min-width: 80px;
   }
-  
+
+  .data-table th {
+    font-size: 0.75rem !important;
+    padding: 8px 4px !important;
+  }
+
+  .data-table td {
+    font-size: 0.7rem !important;
+    padding: 6px 4px !important;
+  }
+
+  .row-number-header,
+  .row-number {
+    width: 40px !important;
+    min-width: 40px !important;
+  }
+
   .delete-row-btn {
     opacity: 1;
-  }
-  
-  .transcribe-btn {
-    opacity: 1;
-  }
-  
-  .cell-edit-textarea {
+    padding: 4px;
     font-size: 14px;
+  }
+
+  .cell-content span {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+
+  /* Make editing area responsive */
+  .table-cell.editing {
+    position: relative !important;
+    width: auto !important;
+  }
+
+  .cell-edit-textarea {
+    min-height: 60px !important;
+    font-size: 14px !important;
+  }
+
+  /* Top textarea responsive */
+  .top-textarea-container {
+    padding: 8px;
+  }
+
+  .top-editor-textarea {
+    min-height: 60px !important;
+    font-size: 12px !important;
+  }
+
+  .top-textarea-info {
+    font-size: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .clear-selection-btn {
+    padding: 4px 8px;
+    font-size: 10px;
   }
 }
 
-/* Touch-friendly styles */
-@media (hover: none) and (pointer: coarse) {
+/* Extra small screens */
+@media (max-width: 480px) {
+  .data-table th,
+  .data-table td {
+    min-width: 60px !important;
+    padding: 4px 2px !important;
+  }
+
+  .row-number-header,
+  .row-number {
+    width: 30px !important;
+    min-width: 30px !important;
+  }
+
   .delete-row-btn {
-    opacity: 1;
-    padding: 8px;
+    padding: 2px;
+    font-size: 12px;
   }
-  
-  .transcribe-btn {
-    opacity: 1;
-    padding: 8px;
-  }
-  
+
   .cell-edit-textarea {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 12px !important;
+    padding: 4px !important;
   }
+
+  .top-editor-textarea {
+    font-size: 12px !important;
+    min-height: 50px !important;
+    padding: 8px !important;
+  }
+}
+
+/* Ensure table container has proper overflow */
+.data-table-wrapper {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  position: relative;
+}
+
+.data-table-wrapper-container {
+  overflow-x: hidden;
+  width: 100%;
 }
