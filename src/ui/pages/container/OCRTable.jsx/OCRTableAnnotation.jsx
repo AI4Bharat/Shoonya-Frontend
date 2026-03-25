@@ -130,47 +130,36 @@ function App() {
       getProjectDetails();
       getTaskData(taskId);
     }, []);
-useEffect(() => {
-  if (AnnotationsTaskDetails && AnnotationsTaskDetails.length > 0 && 
-      annotationNotesRef.current && reviewNotesRef.current) {
-    console.log("notes", AnnotationsTaskDetails);
-    
-    // Set value for annotation notes
-    if (annotationNotesRef.current) {
-      annotationNotesRef.current.value = AnnotationsTaskDetails[0].annotation_notes ?? "";
-      
-      try {
-        const newDelta2 = annotationNotesRef.current.value !== "" ? 
-          JSON.parse(annotationNotesRef.current.value) : "";
-        annotationNotesRef.current.getEditor().setContents(newDelta2);
-      } catch (err) {
-        if (err && annotationNotesRef.current) {
-          const newDelta2 = annotationNotesRef.current.value;
-          annotationNotesRef.current.getEditor().setText(newDelta2);
-        }
-      }
-    }
-    
-    // Set value for review notes
-    if (reviewNotesRef.current) {
-      reviewNotesRef.current.value = AnnotationsTaskDetails[0].review_notes ?? "";
-      
-      try {
-        const newDelta1 = reviewNotesRef.current.value !== "" ? 
-          JSON.parse(reviewNotesRef.current.value) : "";
-        reviewNotesRef.current.getEditor().setContents(newDelta1);
-      } catch (err) {
-        if (err && reviewNotesRef.current) {
-          const newDelta1 = reviewNotesRef.current.value;
-          reviewNotesRef.current.getEditor().setText(newDelta1);
-        }
-      }
-    }
-    
-    setannotationtext(annotationNotesRef.current?.getEditor().getText() || "");
-    setreviewtext(reviewNotesRef.current?.getEditor().getText() || "");
+        useEffect(() => {
+  if (!AnnotationsTaskDetails?.length) return;
+
+  if (!annotationNotesRef.current || !reviewNotesRef.current) return;
+
+  const annotationNotes = AnnotationsTaskDetails[0].annotation_notes;
+  const reviewNotes = AnnotationsTaskDetails[0].review_notes;
+
+  const annotationEditor = annotationNotesRef.current.getEditor();
+  const reviewEditor = reviewNotesRef.current.getEditor();
+
+  try {
+    const parsed = annotationNotes ? JSON.parse(annotationNotes) : "";
+    annotationEditor.setContents(parsed);
+  } catch {
+    annotationEditor.setText(annotationNotes || "");
   }
-}, [AnnotationsTaskDetails]);  
+
+  try {
+    const parsed = reviewNotes ? JSON.parse(reviewNotes) : "";
+    reviewEditor.setContents(parsed);
+  } catch {
+    reviewEditor.setText(reviewNotes || "");
+  }
+
+  setannotationtext(annotationEditor.getText());
+  setreviewtext(reviewEditor.getText());
+
+}, [AnnotationsTaskDetails, showNotes]); 
+
 const resetNotes = () => {
   setShowNotes(false);
   if (annotationNotesRef.current) {
@@ -442,7 +431,8 @@ const convertDataToHtmlTable = (data, cols) => {
 const handleAutosave = async () => {
     setAutoSaveTrigger(false);
 
-    if(AnnotationsTaskDetails[0]?.annotation_status != "labeled"){
+        if(AnnotationsTaskDetails[0]?.annotation_status != "labeled"&& annotations[0]?.task == taskId){
+
 
     if(!autoSave) return;
 
@@ -458,7 +448,7 @@ const handleAutosave = async () => {
         (new Date() - loadtime) / 1000 + Number(annotations[0]?.lead_time ?? 0),
       result: resultData,
     };
-    if (AnnotationsTaskDetails[0]?.result?.text?.length>0 && taskDetails?.annotation_users?.some((users) => users === user.id)) {
+    if (annotations[0]?.id && taskDetails?.annotation_users?.some((users) => users === user.id)) {
 
       try{
         const obj = new SaveTranscriptOCRAPI(annotations[0]?.id, reqBody);
