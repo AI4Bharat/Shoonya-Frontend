@@ -47,14 +47,6 @@ const MyProgress = () => {
       key: "selection",
     },
   ]);
-  console.log(UserDetails?.date_joined, "UserDetails?.date_joined");
-  // const [rangeValue, setRangeValue] = useState([
-  //   format(
-  //     Date.parse(UserDetails?.date_joined, "yyyy-MM-ddTHH:mm:ss.SSSZ"),
-  //     "yyyy-MM-dd"
-  //   ),
-  //   Date.now(),
-  // ]);
   const [showPicker, setShowPicker] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
@@ -192,7 +184,6 @@ const MyProgress = () => {
     const { selection } = ranges;
     if (selection.endDate > new Date()) selection.endDate = new Date();
     setSelectRange([selection]);
-    console.log(selection, "selection");
   };
 
   const handleProgressSubmit = () => {
@@ -221,7 +212,6 @@ const MyProgress = () => {
     // setShowSpinner(true);
     setTotalsummary(true);
   };
-  console.log(UserAnalyticstotalsummary);
   const showSnackbar = () => {
     setSnackbarOpen(true);
   };

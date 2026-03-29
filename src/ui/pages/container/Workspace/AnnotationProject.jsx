@@ -35,6 +35,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import DatasetSearchPopup from "../../container/Dataset/DatasetSearchPopup";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { MenuProps } from "../../../../utils/utils";
+import ReactJson from "react-json-view";
 
 const isNum = (str) => {
   var reg = new RegExp("^[0-9]*$");
@@ -490,9 +491,7 @@ const AnnotationProject = (props) => {
               customHeadLabelRender: customColumnHead,
               customBodyRender: (value) => {
                 if (keys.includes("json") && value !== null) {
-                  const data = JSON.stringify(value);
-                  const metadata = data.replace(/\\/g, "");
-                  return metadata;
+                  return <JSONViewer data={value} />;
                 } else {
                   return value;
                 }
@@ -695,6 +694,51 @@ const AnnotationProject = (props) => {
   const handleChangeCreateAnnotationsAutomatically = (e) => {
     setsCreateannotationsAutomatically(e.target.value);
   };
+
+  const JSONViewer = ({ data, initiallyExpanded = false }) => {
+  const [expanded, setExpanded] = useState(initiallyExpanded);
+  let jsonData;
+  try {
+    jsonData = typeof data === "string" ? JSON.parse(data) : data;
+  } catch (error) {
+    return <>Invalid JSON</>;
+  }
+  if (
+    !jsonData ||
+    (typeof jsonData === "object" && Object.keys(jsonData).length === 0)
+  ) {
+    return <>Empty data</>;
+  }
+  return (
+    <Box sx={{ position: "relative" }}>
+      <IconButton
+        onClick={e => {
+          e.stopPropagation();
+          setExpanded(!expanded);
+        }}
+        sx={{
+          position: "absolute",
+          top: "2px",
+          right: "2px",
+          zIndex: 2,
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.9)" },
+        }}
+        size="small"
+      >
+        {expanded ? <span>-</span> : <span>+</span>}
+      </IconButton>
+      <ReactJson
+        src={jsonData}
+        collapsed={!expanded}
+        enableClipboard={false}
+        displayDataTypes={false}
+        name={null}
+        theme="rjv-theme"
+      />
+    </Box>
+  );
+};
 
   return (
     <ThemeProvider theme={themeDefault}>

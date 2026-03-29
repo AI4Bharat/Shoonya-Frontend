@@ -8,8 +8,6 @@ export default class SuggestAnEditAPI extends API {
    constructor(GlossaryObj,timeout = 2000) {
      super("POST", timeout, false);
      this.GlossaryObj = GlossaryObj;
-     //this.type = constants.GLOSSARY;
-    //  console.log(GlossaryObj,"GlossaryObj")
      this.endpoint = `${"https://glossary-api.ai4bharat.org/glossary-explorer"}${ENDPOINTS.Glossary}suggest`;
    }
   

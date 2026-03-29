@@ -76,7 +76,6 @@ const BasicSettings = (props) => {
     useEffect(() => {
         if (LanguageChoices && LanguageChoices.length > 0) {
             let temp = [];
-            console.log(LanguageChoices);
             LanguageChoices.forEach((element) => {
                 temp.push(element[0]
                     //     {

@@ -43,7 +43,6 @@ const UserDetail = (props) => {
   const [Role, setRole] = useState("");
 
   const UserDetail = useSelector((state) => state.getUserDetails.data);
-  console.log(UserDetail);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const SearchUserDetail = useSelector(
     (state) => state.SearchProjectCards.data
@@ -186,9 +185,8 @@ const UserDetail = (props) => {
       ) {
         return el;
       } else if (
-        el.is_active
-          ?.toString()
-          ?.toLowerCase()
+        (el.is_active === true ? "Active" : "Not Active")
+          .toLowerCase()
           .includes(SearchUserDetail?.toLowerCase())
       ) {
         return el;

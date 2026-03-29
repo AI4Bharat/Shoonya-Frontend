@@ -23,7 +23,6 @@ import Spinner from "../../component/common/Spinner";
 
 const ProjectLogs = () => {
   const { id } = useParams();
-  console.log(useParams(), "useParams");
   const [taskName, setTaskName] = useState(
     "projects.tasks.export_project_in_place"
   );
@@ -114,11 +113,14 @@ const ProjectLogs = () => {
     })
       .then(async (res) => {
         setLoading(false);
+        if (res.status == 204) {
+          return null; 
+        }
         if (!res.ok) throw await res.json();
         else return await res.json();
       })
       .then((res) => {
-        setAllLogs(res);
+        setAllLogs(res||[]);
       })
       .catch();
   };

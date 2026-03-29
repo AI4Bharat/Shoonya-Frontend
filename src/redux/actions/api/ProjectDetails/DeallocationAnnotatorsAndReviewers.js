@@ -7,9 +7,7 @@ export class DeallocateTaskById extends API {
     super("POST", timeout, false);
     this.projectId = projectId;
 
-    console.log(taskId);
     this.payload = {
-      // task_ids: Array.isArray(taskId) ? taskId.map(id => parseInt(id)) : [parseInt(taskId)],
 
       task_ids: taskId.split(',').map(i => parseInt(i)),
     };

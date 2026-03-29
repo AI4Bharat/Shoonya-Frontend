@@ -5,9 +5,7 @@ import FetchUserByIdAPI from '../../../../redux/actions/api/UserManagement/Fetch
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, IconButton, Card, CardContent, Chip, Grid, Typography, Switch, FormControlLabel, Tooltip, Paper } from '@mui/material';
-import { Input, inputClasses } from '@mui/base/Input';
-import MyProgress from '../../component/Tabs/MyProgress';
-import RecentTasks from '../../component/Tabs/RecentTasks';
+import Input from '@mui/material/Input';
 import CustomButton from "../../component/common/Button";
 import Spinner from "../../component/common/Spinner";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
@@ -87,19 +85,16 @@ const ProfilePage = () => {
       const updateProfileImageAPIObj = new UpdateProfileImageAPI(LoggedInUserId,pickedFile);
       await axios.post(updateProfileImageAPIObj.apiEndPoint(), updateProfileImageAPIObj.getBody(), updateProfileImageAPIObj.getHeaders())
         .then(response => {
-          console.log(response.status)
           if (response.status == 200 || response.status == 201) {
             const userObj = new FetchUserByIdAPI(id);
             dispatch(APITransport(userObj));
             setLoading(false);
-            console.log("updateProfileImageData -----", response);
           } else {
             setLoading(false);
           }
         })
         .catch(err => {
           setLoading(false);
-          console.log("err - ", err);
         })
       }
   }
@@ -113,7 +108,7 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true); 
     const userObj = new FetchUserByIdAPI(id);
     dispatch(APITransport(userObj));
   }, [id]);
@@ -123,11 +118,12 @@ const ProfilePage = () => {
       setUserDetails(UserDetails);
       setLoading(false);
     }
-  }, [UserDetails]);
+  }, [UserDetails, id]);
 
   return (
     <Grid container spacing={2}>
-      {loading && <Spinner />}
+            {loading && <Spinner />}
+
       {renderSnackBar()}
       {userDetails && (
         <>

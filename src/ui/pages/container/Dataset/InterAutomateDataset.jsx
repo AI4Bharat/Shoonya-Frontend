@@ -1,4 +1,11 @@
-import { Card, FormControl, Grid, MenuItem, Select, ThemeProvider, InputLabel, Typography,Switch } from "@mui/material";
+import Card from "@mui/material/Card";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
+import Switch from "@mui/material/Switch";
+import { ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import { useNavigate } from "react-router-dom";
@@ -323,7 +330,7 @@ const api_type = translationModel===1?"indic-trans": translationModel===2?"googl
                     id="language-select"
                     onChange={(e) => {
                       setLanguages(e.target.value);
-                       console.log(e.target.value,"e.target.value")}}
+                      }}
                     value={languages}
                     multiple
                     MenuProps={MenuProps}

@@ -2,8 +2,8 @@ import { makeStyles } from "@mui/styles";
 
 const GlobalStyles = makeStyles({
   container: {
-    maxWidth: "1272px",
     width: "100%",
+padding:"0 20px",
     margin: "-20px auto",
     // background: theme.palette.background.default,
     // fontFamily: theme.typography.fontFamily,
@@ -36,6 +36,10 @@ const GlobalStyles = makeStyles({
     // minHeight: "720px",
     display: "flex",
     flexDirection: "column",
+    height: "100%",
+    "@media (max-width: 900px)": {
+      height: "160%",
+    },
   },
 //   appBar: {
 //     backgroundColor: theme.palette.primary.dark,

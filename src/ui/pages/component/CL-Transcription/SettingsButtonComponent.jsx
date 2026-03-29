@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useState,useEffect } from "react";
 import { fontMenu } from "../../../../utils/SubTitlesUtils";
 import AudioTranscriptionLandingStyle from "../../../styles/AudioTranscriptionLandingStyle";
 import Checkbox from "@mui/material/Checkbox";
@@ -18,7 +18,9 @@ import TagIcon from '@mui/icons-material/Tag';
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Popup from "reactjs-popup";
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import "reactjs-popup/dist/index.css";
+import { Box } from "@mui/material";
 
 const anchorOrigin = {
   vertical: "top",
@@ -32,6 +34,7 @@ const transformOrigin = {
 
 const SettingsButtonComponent = ({
   totalSegments,
+  formatMultiHypothesis,
   setTransliteration,
   enableTransliteration,
   setRTL_Typing,
@@ -69,6 +72,29 @@ ProjectDetails,
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElLimit, setAnchorElLimit] = useState(null);
+    const [autoFormatHypothesis, setAutoFormatHypothesis] = useState(
+    JSON.parse(localStorage.getItem("userCustomTranscriptionSettings"))
+      ?.autoFormatHypothesis || false
+  );
+  const handleAutoFormatChange = () => {
+    const newValue = !autoFormatHypothesis;
+    setAutoFormatHypothesis(newValue);
+    
+    // Save to localStorage
+    localStorage.setItem(
+      "userCustomTranscriptionSettings",
+      JSON.stringify({
+        ...JSON.parse(localStorage.getItem("userCustomTranscriptionSettings") || "{}"),
+        autoFormatHypothesis: newValue,
+      })
+    );
+    
+    // If enabling auto-format, format all current subtitles
+    if (newValue && formatMultiHypothesis) {
+      formatMultiHypothesis();
+    }
+  };
+
   const handleClick = (event) => {
     const rect = event.currentTarget.getBoundingClientRect(); 
     const position = {
@@ -77,16 +103,64 @@ ProjectDetails,
     };
     handleOpenPopover(position); 
   };
+ useEffect(() => {
+  let style = document.getElementById("rtl-style");
+
+  if (!style) {
+    style = document.createElement("style");
+    style.id = "rtl-style";
+    document.head.appendChild(style);
+  }
+
+  if (enableRTL_Typing) {
+    style.innerHTML = `
+      /* Base RTL styling */
+      input, textarea {
+        direction: rtl;
+        unicode-bidi: plaintext;
+        text-align: right;
+      }
+      
+      /* Force LTR for inputs that typically contain measurements/numbers */
+      input[type="number"],
+      input.input-number,
+      input.input-measurement {
+        direction: ltr !important;
+        unicode-bidi: plaintext !important;
+        text-align: left !important;
+      }
+      
+      /* Special class for mixed content inputs */
+      .mixed-content-rtl-fix {
+        unicode-bidi: plaintext;
+        direction: ltr;
+        text-align: left;
+      }
+    `;
+  } else {
+    style.innerHTML = `
+      input, textarea {
+        direction: ltr;
+        unicode-bidi: plaintext;
+        text-align: left;
+      }
+    `;
+  }
+}, [enableRTL_Typing]);
+
+
   return (
     <>
-      <div
+      <Box
         style={{
-          marginLeft: "15px",
-          position: "absolute",
-          left: "0",
-          display: "block",
+          position:"absolute",
+          left:"15px",
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
           height: "40px",
           width: "40px",
+          minWidth:"40px",
           lineHeight: "40px",
           borderRadius: "50%",
           fontSize: "large",
@@ -96,8 +170,7 @@ ProjectDetails,
         }}
       >
         {totalSegments}
-      </div>
-
+      </Box>
       {showSplit && (
         <Tooltip title="Split Subtitle" placement="bottom">
           <IconButton
@@ -247,7 +320,7 @@ ProjectDetails,
               />
             }
           />
-        </MenuItem>
+        </MenuItem>   
         <MenuItem>
           <Popup
             contentStyle={{
@@ -357,7 +430,6 @@ ProjectDetails,
           <VisibilityIcon className={classes.rightPanelSvg} />
         </IconButton>
       </Tooltip>
-
       <Menu
         sx={{ mt: "45px" }}
         id="menu-appbar"

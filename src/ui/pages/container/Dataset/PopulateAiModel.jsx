@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  FormControlLabel,
-  ListItemText,
-  OutlinedInput,
-  Checkbox,
-  Grid,
-  Card,
-  ThemeProvider,
-  Typography,
-  Item,
-  Switch
-} from '@mui/material';
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Switch from "@mui/material/Switch";
+import { ThemeProvider } from "@mui/material/styles";
+
 import Spinner from "../../component/common/Spinner";
 import Snackbar from "../../component/common/Snackbar";
 import DatasetStyle from "../../../styles/Dataset";
@@ -22,10 +14,8 @@ import Button from "../../component/common/Button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-// import GetDatasetTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetType";
 import GetDatasetsByTypeAPI from "../../../../redux/actions/api/Dataset/GetDatasetsByType";
 import GetDataitemsByIdAPI from "../../../../redux/actions/api/Dataset/GetDataitemsById";
-import intraAutomateDatasetsAPI from "../../../../redux/actions/api/Dataset/intraAutomateDatasetsAPI";
 import MenuItems from "../../component/common/MenuItems";
 import { MenuProps } from "../../../../utils/utils";
 import themeDefault from "../../../theme/theme";
@@ -169,10 +159,8 @@ const PopulateAiModel = () => {
       if (!res.ok) throw await res.json();
       else return await res.json();
     }).then((res) => {
-      console.log(res);
       setSnackbarState({ open: true, message: res.message, variant: "success" });
     }).catch((err) => {
-      console.log(err);
       setSnackbarState({ open: true, message: err.message, variant: "error" });
     });
     setSrcDatasetType('');

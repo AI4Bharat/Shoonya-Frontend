@@ -1,16 +1,10 @@
-import {
-    Box,
-    Card,
-    Grid,
-    Tab,
-    Tabs,
-    ThemeProvider,
-    Typography,
-  } from "@mui/material";
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import { ThemeProvider } from "@mui/material/styles";
   import React, { useEffect, useState } from "react";
-  import Header from "../../component/common/Header";
   import themeDefault from "../../../theme/theme";
-  import { Link, useNavigate, useParams } from "react-router-dom";
+  import {  useNavigate, useParams } from "react-router-dom";
   import Button from "../../component/common/Button";
   import OutlinedTextField from "../../component/common/OutlinedTextField";
   import DatasetStyle from "../../../styles/Dataset";

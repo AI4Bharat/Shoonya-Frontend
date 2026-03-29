@@ -224,7 +224,6 @@ export const onSubtitleChange = (text, index, updateAcoustic, populateAcoustic) 
   const sub = copySub[index];
 
   
-  // text = splitText.join(" ");
 
   if (updateAcoustic)
     sub.acoustic_normalised_text = text;
@@ -432,7 +431,6 @@ export const isPlaying = (player) => {
 
 export const getSelectionStart = (index) => {
   const subtitles = store.getState().commonReducer.subtitles;
-  console.log(subtitles)
   return subtitles[index].text.length;
 };
 

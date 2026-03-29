@@ -8,13 +8,11 @@ import constants from "../../../constants";
 export default class GetNextTaskAPI extends API {
   constructor(projectId,projectObj, mode="annotation", timeout = 2000) {
 
-    // console.log(projectObj,"projectObjprojectObj")
     super("POST", timeout, false);
     let queryStr = "";
     this.projectId = projectId;
     this.labellingMode = localStorage.getItem("labellingMode");
     this.searchFilters = JSON.parse(localStorage.getItem("searchFilters"));
-    console.log(this.searchFilters = JSON.parse(localStorage.getItem("searchFilters")),"searchFilterssearchFilters")
     this.projectObj = projectObj;
     this.type = constants.GET_NEXT_TASK;
     if (localStorage.getItem("labelAll") ) {

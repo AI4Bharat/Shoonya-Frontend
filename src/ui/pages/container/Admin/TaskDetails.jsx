@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Button, Tab, Tabs, Box, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { JSONTree } from 'react-json-tree';
 import GetTaskDetailsAPI from "../../../../redux/actions/api/Tasks/GetTaskDetails.js";
 import { snakeToTitleCase } from '../../../../utils/utils.js';
 import GetTaskAnnotationsAPI from '../../../../redux/actions/api/Tasks/GetTaskAnnotations.js';
 import FetchUserByIdAPI from "../../../../redux/actions/api/UserManagement/FetchUserById";
-import {CircularProgress} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 
 function TaskDetails() {

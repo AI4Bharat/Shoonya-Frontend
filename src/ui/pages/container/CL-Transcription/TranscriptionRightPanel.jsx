@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef, memo } from "react";
-import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
+import { IndicTransliterate } from "@ai4bharat/indic-transliterate-transcribe";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Resizable } from "re-resizable";
@@ -109,7 +109,6 @@ const TranscriptionRightPanel = ({
   const handlePageChange = (event, value) => {
     setPage(value);
   };
-  //console.log(subtitles);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = subtitles;
@@ -397,58 +396,143 @@ const TranscriptionRightPanel = ({
 
     // eslint-disable-next-line
   }, [currentIndexToSplitTextBlock, selectionStart, limit, currentOffset]);
+    const formatMultiHypothesis = () => {
+  const elementsWithBoxHighlightClass = document.getElementsByClassName(
+    classes.boxHighlight
+  );
 
-  const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
-    const { value } = event.target;
-    const { currentTarget } = event;
+  for (let i = 0; i < elementsWithBoxHighlightClass.length; i++) {
+    const textArea = elementsWithBoxHighlightClass[i];
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const selectedText = textArea.value.substring(start, end);
 
-    // Get the appropriate text field
-    const oldText = updateAcoustic
-      ? subtitles[index]?.acoustic_normalised_text || ""
-      : subtitles[index]?.text || "";
-
-    if (oldText !== value) {
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: updateAcoustic ? "textChangeAcoustic" : "textChange",
-          index: index,
-          previousText: oldText,
-          updateAcoustic: updateAcoustic,
-        },
-      ]);
-      setRedoStack([]);
+    if (selectedText.trim() !== "") {
+      // Check if it already contains |
+      if (selectedText.includes('|')) {
+        const parts = selectedText.split('|').map(part => part.trim());
+        const formattedText = `{${parts.join(' | ')}}`;
+        
+        // Replace the selected text with formatted version
+        replaceSelectedText(formattedText, currentIndexToSplitTextBlock, i);
+        
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "multiHypothesisFormat",
+            index: i,
+            originalText: selectedText,
+            formattedText: formattedText,
+          },
+        ]);
+        setRedoStack([]);
+      }
     }
+  }
+};
 
-    const containsTripleDollar = value.includes("$$$");
+const processMultiHypothesisText = (value) => {
+  // match word|word ... ONLY when followed by a space or end of line
+  const pattern = /(?<!{)(\b[^<>{}\s]+\s*\|\s*[^<>{}\s]+\b(?:\s*\|\s*[^<>{}\s]+\b)*)(?=\s)/g;
 
-    // setEnableTransliterationSuggestion(true);
-    if (value.includes("$$")) {
-      setEnableTransliterationSuggestion(false);
-    } else {
-      setEnableTransliterationSuggestion(true);
+  return value?.replace(pattern, (match) => {
+    if (match.startsWith("{") || match.includes("<")) return match;
+
+    return `{${match}}`;
+  });
+};
+const processNoiseTags = (value) => {
+  if (!value) return value;
+   console.log(value);
+   
+  value = value.replace(/<+\s*([^<>]+?)\s*>+/g, (match, inner) => {
+    return `<${inner.trim()}>`;
+  });
+
+  // 2) Auto-wrap valid noise words from tagSuggestionList
+  const noiseList = TabsSuggestionData.map(tag => tag.toLowerCase());
+
+  // word boundary safe for multilingual text
+  const noiseRegex = new RegExp(`\\b(${noiseList.join("|")})\\b`, "gi");
+
+  value = value.replace(noiseRegex, (m) => `<${m.toLowerCase()}>`);
+
+  // 3) Collapse duplicates again to guarantee single pair
+  value = value.replace(/<+\s*([^<>]+?)\s*>+/g, (match, inner) => {
+    return `<${inner.trim().toLowerCase()}>`;
+  });
+
+  return value;
+};
+
+const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
+  const { value: eventValue } = event.target;
+  const { currentTarget } = event;
+
+  let value = eventValue;
+  const oldText = updateAcoustic
+    ? subtitles[index]?.acoustic_normalised_text || ""
+    : subtitles[index]?.text || "";
+
+  // value = processMultiHypothesisText(value);
+  
+  // Apply noise tag processing
+  // value = processNoiseTags(value);
+
+  if (updateAcoustic && !(ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true)) {
+    const verbatimText = subtitles[index]?.text || "";
+    const verbatimNoiseTags = (verbatimText.match(/<[^>]+>/g) || []).length;
+    const acousticNoiseTags = (value.match(/<[^>]+>/g) || []).length;
+    if (verbatimNoiseTags > 0 && acousticNoiseTags !== verbatimNoiseTags) {
+      setSnackbarInfo({
+        open: true,
+        message: `Validation Error: L1 has ${verbatimNoiseTags} noise tag(s) but L2 has ${acousticNoiseTags}. All noise tags from L1 must be copied to L2.`,
+        variant: "error",
+      });
     }
+  }
 
-    if (containsTripleDollar) {
-      // setEnableTransliterationSuggestion(false);
+  if (oldText !== value) {
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: updateAcoustic ? "textChangeAcoustic" : "textChange",
+        index: index,
+        previousText: oldText,
+        updateAcoustic: updateAcoustic,
+      },
+    ]);
+    setRedoStack([]);
+  }
 
-      const textBeforeTab = value.split("$$$")[0];
-      const textAfterTab = value.split("$$$")[1].split("").join("");
-      setCurrentSelectedIndex(index);
-      setTagSuggestionsAnchorEl(currentTarget);
-      setTextWithoutTripleDollar(textBeforeTab);
-      setTextAfterTripleDollar(textAfterTab);
-      setCurrentTextRefIdx(
-        index + (updateAcoustic ? currentPageData?.length : 0)
-      );
-      setCurrentSelection(event.target.selectionEnd);
-      setTagSuggestionsAcoustic(updateAcoustic);
-    }
-    const sub = onSubtitleChange(value, index, updateAcoustic, false);
-    dispatch(setSubtitles(sub, C.SUBTITLES));
-    // saveTranscriptHandler(false, false, sub);
-  };
+  const containsTripleDollar = value.includes("$$$");
 
+  // setEnableTransliterationSuggestion(true);
+  if (value.includes("$$")) {
+    setEnableTransliterationSuggestion(false);
+  } else {
+    setEnableTransliterationSuggestion(true);
+  }
+
+  if (containsTripleDollar) {
+    // setEnableTransliterationSuggestion(false);
+
+    const textBeforeTab = value.split("$$$")[0];
+    const textAfterTab = value.split("$$$")[1].split("").join("");
+    setCurrentSelectedIndex(index);
+    setTagSuggestionsAnchorEl(currentTarget);
+    setTextWithoutTripleDollar(textBeforeTab);
+    setTextAfterTripleDollar(textAfterTab);
+    setCurrentTextRefIdx(
+      index + (updateAcoustic ? currentPageData?.length : 0)
+    );
+    setCurrentSelection(event.target.selectionEnd);
+    setTagSuggestionsAcoustic(updateAcoustic);
+  }
+  const sub = onSubtitleChange(value, index, updateAcoustic, false);
+  dispatch(setSubtitles(sub, C.SUBTITLES));
+  // saveTranscriptHandler(false, false, sub);
+};
   const populateAcoustic = (index) => {
     const sub = onSubtitleChange("", index, false, true);
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -858,9 +942,10 @@ const onRedo = useCallback(() => {
           className={classes.rightPanelParentBox}
           style={{ position: "relative" }}
         >
-          <Grid className={classes.rightPanelParentGrid}>
+          <Grid className={classes.rightPanelParentGrid} sx={{paddingLeft:"40px"}}>
             <SettingsButtonComponent
               totalSegments={totalSegments}
+              formatMultiHypothesis={formatMultiHypothesis}
               setTransliteration={setTransliteration}
               enableTransliteration={enableTransliteration}
               setRTL_Typing={setRTL_Typing}
@@ -938,6 +1023,7 @@ const onRedo = useCallback(() => {
               ? "calc(102vh - 380px)"
               : "calc(102vh - 385px)",
             alignItems: "center",
+            width: "100%"
           }}
         >
           {currentPageData?.map((item, index) => {
@@ -958,6 +1044,7 @@ const onRedo = useCallback(() => {
                     bottomLeft: false,
                     topLeft: false,
                   }}
+                  size={{width:"100%"}}
                   style={{
                     alignItems: "center",
                     display: "flex",
@@ -975,6 +1062,7 @@ const onRedo = useCallback(() => {
                       parentScrollOffsetX.current,
                       parentScrollOffsetY.current
                     );
+                    ref.style.width = "100%";
                   }}
                   handleStyles={{ bottom: { height: "24px" } }}
                 >
@@ -991,33 +1079,38 @@ const onRedo = useCallback(() => {
                       flexDirection: "column",
                       justifyContent: "space-between",
                       height: "100%",
+                      width: "100%"
                     }}
                   >
                     <Box
-                      className={classes.topBox}
                       style={{
-                        paddingLeft: "16px",
-                        paddingRight: "16px",
-                        paddingTop: "14px",
-                        paddingBottom: "10px",
+                        padding: "25px 16px 10px",
+                      }}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap:{xs:"20px", md:"10px"},
+                        overflowX:"auto",
+                        overflowY:"hidden"
                       }}
                     >
                       <div
                         style={{
-                          display: "block",
-                          height: "30px",
-                          width: "90px",
-                          lineHeight: "30px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: "40px",
+                          width: "40px",
+                          minWidth: "40px",
                           borderRadius: "50%",
-                          fontSize: "medium",
+                          fontSize: "16px",
                           backgroundColor: "#2C2799",
                           color: "white",
-                          marginRight: "20px",
-                          marginLeft: "5px",
                         }}
                       >
                         {index + 1}
                       </div>
+
 
                       <TimeBoxes
                         handleTimeChange={handleTimeChange}
@@ -1028,31 +1121,24 @@ const onRedo = useCallback(() => {
 
                       <FormControl
                         sx={{
-                          width: "50%",
-                          mr: "auto",
+                          minWidth: "140px",
+                          width: "fit-content",
                           float: "left",
-                          marginRight: "10px",
                         }}
                         size="small"
                       >
-                        <InputLabel id="select-speaker">
-                          Select Speaker
-                        </InputLabel>
+                        <InputLabel id="select-speaker">Select Speaker</InputLabel>
                         <Select
                           fullWidth
                           labelId="select-speaker"
                           label="Select Speaker"
                           value={item.speaker_id}
                           onChange={(event) =>
-                            handleSpeakerChange(
-                              event.target.value,
-                              index + idxOffset
-                            )
+                            handleSpeakerChange(event.target.value, index + idxOffset)
                           }
                           style={{
                             backgroundColor: "#fff",
                             textAlign: "left",
-                            height: "32px",
                           }}
                           inputProps={{
                             "aria-label": "Without label",
@@ -1067,6 +1153,7 @@ const onRedo = useCallback(() => {
                           ))}
                         </Select>
                       </FormControl>
+
 
                       {showAdditionalOptions ? (
                         <Tooltip
@@ -1153,6 +1240,8 @@ const onRedo = useCallback(() => {
                       enableTransliteration ? (
                         <IndicTransliterate
                           customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                          enableASR={true}
+                          asrApiUrl={`${configs.BASE_URL_AUTO}/tasks/asr-api/generic/transcribe`}
                           apiKey={`JWT ${localStorage.getItem(
                             "shoonya_access_token"
                           )}`}
@@ -1169,7 +1258,6 @@ const onRedo = useCallback(() => {
                           onChangeText={() => {}}
                           onDoubleClick={(event)=>{
                             const textarea = textRefs.current[index]
-                            console.log(textarea);
                             if(textarea){
                               const start = textarea.selectionStart
                               const end = textarea.selectionEnd
@@ -1192,11 +1280,9 @@ const onRedo = useCallback(() => {
                           }}
 
                           onKeyDown={(event) => {
-                            console.log(event,"log",document.activeElement);
 
                             if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                               const textArea = textRefs.current[index];
-                              console.log("helo");
 
                               if (textArea) {
                                 const start = textArea.selectionStart;
@@ -1246,7 +1332,6 @@ const onRedo = useCallback(() => {
                                   dir={enableRTL_Typing ? "rtl" : "ltr"}
                                   onDoubleClick={(event)=>{
                                     const textarea = textRefs.current[index]
-                                    console.log(textarea);
                                     if(textarea){
                                       const start = textarea.selectionStart
                                       const end = textarea.selectionEnd
@@ -1269,11 +1354,9 @@ const onRedo = useCallback(() => {
                                   }}
         
                                   onKeyDown={(event) => {
-                                    console.log(event,"log",document.activeElement);
         
                                     if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                       const textArea = textRefs.current[index];
-                                      console.log("helo");
         
                                       if (textArea) {
                                         const start = textArea.selectionStart;
@@ -1334,7 +1417,6 @@ const onRedo = useCallback(() => {
                             onMouseUp={(e) => onMouseUp(e, index + idxOffset)}
                             onDoubleClick={(event)=>{
                               const textarea = textRefs.current[index]
-                              console.log(textarea);
                               if(textarea){
                                 const start = textarea.selectionStart
                                 const end = textarea.selectionEnd
@@ -1357,11 +1439,9 @@ const onRedo = useCallback(() => {
                             }}
   
                             onKeyDown={(event) => {
-                              console.log(event,"log",document.activeElement);
   
                               if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                 const textArea = textRefs.current[index];
-                                console.log("helo");
   
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1413,6 +1493,8 @@ const onRedo = useCallback(() => {
                         enableTransliteration ? (
                           <IndicTransliterate
                             customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
+                            enableASR={true}
+                            asrApiUrl={`${configs.BASE_URL_AUTO}/tasks/asr-api/generic/transcribe`}
                             apiKey={`JWT ${localStorage.getItem(
                               "shoonya_access_token"
                             )}`}
@@ -1420,7 +1502,6 @@ const onRedo = useCallback(() => {
                             value={item.acoustic_normalised_text}
                             onDoubleClick={(event)=>{
                               const textarea = textRefs.current[index]
-                              console.log(textarea);
                               if(textarea){
                                 const start = textarea.selectionStart
                                 const end = textarea.selectionEnd
@@ -1443,11 +1524,9 @@ const onRedo = useCallback(() => {
                             }}
   
                             onKeyDown={(event) => {
-                              console.log(event,"log",document.activeElement);
   
                               if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                 const textArea = textRefs.current[index];
-                                console.log("helo");
   
                                 if (textArea) {
                                   const start = textArea.selectionStart;
@@ -1502,7 +1581,6 @@ const onRedo = useCallback(() => {
                                     dir={enableRTL_Typing ? "rtl" : "ltr"}
                                     onDoubleClick={(event)=>{
                                       const textarea = textRefs.current[index]
-                                      console.log(textarea);
                                       if(textarea){
                                         const start = textarea.selectionStart
                                         const end = textarea.selectionEnd
@@ -1525,11 +1603,9 @@ const onRedo = useCallback(() => {
                                     }}
           
                                     onKeyDown={(event) => {
-                                      console.log(event,"log",document.activeElement);
           
                                       if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                         const textArea = textRefs.current[index];
-                                        console.log("helo");
           
                                         if (textArea) {
                                           const start = textArea.selectionStart;
@@ -1585,7 +1661,6 @@ const onRedo = useCallback(() => {
                               }}
                               onDoubleClick={(event)=>{
                                 const textarea = textRefs.current[index]
-                                console.log(textarea);
                                 if(textarea){
                                   const start = textarea.selectionStart
                                   const end = textarea.selectionEnd
@@ -1608,11 +1683,9 @@ const onRedo = useCallback(() => {
                               }}
     
                               onKeyDown={(event) => {
-                                console.log(event,"log",document.activeElement);
     
                                 if ( event.ctrlKey && event.shiftKey && event.key === "<") {
                                   const textArea = textRefs.current[index];
-                                  console.log("helo");
     
                                   if (textArea) {
                                     const start = textArea.selectionStart;

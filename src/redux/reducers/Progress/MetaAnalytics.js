@@ -10,7 +10,6 @@ let initialState = {
 
 
 const diffAnnotationReview = (payload) => {
-    console.log(payload,"payloadpayload")
    
   const respObjKeys = Object.keys(payload);
   const returnData = respObjKeys?.map((objName) => {

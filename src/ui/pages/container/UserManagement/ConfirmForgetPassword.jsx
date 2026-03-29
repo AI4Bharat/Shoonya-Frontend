@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Grid, Typography, Link, ThemeProvider, InputAdornment, FormHelperText } from "@mui/material";
+import React, { useState } from "react";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormHelperText from "@mui/material/FormHelperText";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { ThemeProvider } from "@mui/material/styles";
 import Button from "../../component/common/Button";
 import OutlinedTextField from "../../component/common/OutlinedTextField";
 import LoginStyle from "../../../styles/loginStyle";
@@ -7,13 +14,9 @@ import themeDefault from '../../../theme/theme'
 import { useParams } from "react-router-dom";
 import AppInfo from "./AppInfo";
 import ConfirmForgetPasswordAPI from "../../../../redux/actions/api/UserManagement/ConfirmForgetPassword";
-import APITransport from "../../../../redux/actions/apitransport/apitransport";
 import { useDispatch } from "react-redux";
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import CustomizedSnackbars from "../../component/common/Snackbar";
-import IconButton from "@material-ui/core/IconButton";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 
 const ConfirmForgetPassword = () => {

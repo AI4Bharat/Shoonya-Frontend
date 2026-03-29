@@ -9,7 +9,6 @@ export default class GetWorkspaceSaveButtonAPI extends API {
   constructor(id,workspaceObj, timeout = 2000) {
     super("PUT", timeout, false);
     this.workspaceObj = workspaceObj;
-    console.log(workspaceObj)
     // this.type = constants.GET_SAVE_BUTTON;
     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${id}/`;
   }

@@ -1,0 +1,84 @@
+
+.quill {
+    margin: 1rem;
+  }
+  
+   .ql-container {
+    background: #fefcfc;
+    margin-bottom: 1%;
+  
+  }
+
+  .quill .ql-snow.ql-toolbar {
+    display: block;
+  }
+  .quill > .ql-container > .ql-editor.ql-blank::before{
+    font-family: sans-serif;
+    font-style: normal;
+}
+
+  .quill .ql-editor {
+    min-height: 4em;
+    font-size: 1rem;
+    font-style: normal;
+  }
+  .quill .ql-formats button {
+    position: relative
+  }
+
+  .quill .ql-formats button:hover:after,
+  .quill .ql-formats button:active:after,
+  .quill .ql-formats button:focus:after {
+      position: absolute;
+      background: black;
+      color: white;
+      padding: .2em;
+      border-radius: .5em;
+      left: -50%;
+      top: 100%;
+      width: max-content;
+      z-index: 1;
+      font-size: 0.7rem;
+  }
+
+  .quill .ql-bold:hover:after,
+  .quill .ql-bold:active:after,
+  .quill .ql-bold:focus:after {
+     content: 'Bold Ctrl B';
+  }
+  .quill .ql-italic:hover:after,
+  .quill .ql-italic:active:after,
+  .quill .ql-italic:focus:after {
+     content: 'Italic Ctrl I';
+  }
+  .quill .ql-underline:hover:after,
+  .quill .ql-underline:active:after,
+  .quill .ql-underline:focus:after {
+     content: 'Underline Ctrl U';
+  }
+  .quill .ql-strike:hover:after,
+  .quill .ql-strike:active:after,
+  .quill .ql-strike:focus:after {
+     content: 'StrikeThrough';
+  }
+  .quill .ql-size:hover:after,
+  .quill .ql-size:active:after,
+  .quill .ql-size:focus:after {
+     content: 'Size';
+  }
+  .quill .ql-script[value="sub"]:hover:after,
+  .quill .ql-script:active:after,
+  .quill .ql-script:focus:after {
+     content: 'SubScript';
+  }
+  .quill .ql-script[value="super"]:hover:after,
+  .quill .ql-script:active:after,
+  .quill .ql-script:focus:after {
+     content: 'SuperScript';
+  }
+  .quill .ql-color:hover:after,
+  .quill .ql-color:active:after,
+  .quill .ql-color:focus:after {
+     content: 'Color';
+  }
+  

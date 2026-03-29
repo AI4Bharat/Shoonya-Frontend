@@ -4,18 +4,6 @@ import WorkspaceTable from "../../component/common/WorkspaceTable";
 
 export default function WorkSpaces(props) {
  
-  //   const classes = DatasetStyle();
-  //   const dispatch = useDispatch();
-  //   const workspaceData = useSelector(state=>state.getWorkspaces.data);
-
-  //   const getDashboardWorkspaceData = ()=>{
-  //   const workspaceObj = new GetWorkspacesAPI(1);
-  //   dispatch(APITransport(workspaceObj));
-  // }
-  
-  // useEffect(()=>{
-  //   getDashboardWorkspaceData();
-  // },[]);
     
 
   return (

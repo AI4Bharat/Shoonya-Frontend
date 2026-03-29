@@ -1,5 +1,5 @@
 // AudioTranscriptionLandingPage
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
 import "../../../../ui/pages/container/Label-Studio/cl_ui.css"
 import 'quill/dist/quill.bubble.css';
 import React, {
@@ -11,7 +11,6 @@ import React, {
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import TranscriptionRightPanel from "./TranscriptionRightPanel";
 import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -51,6 +50,7 @@ import configs from '../../../../config/config';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import CloseIcon from "@mui/icons-material/Close";
+import { TabsSuggestionData } from '../../../../utils/TabsSuggestionData/TabsSuggestionData';
 
 const AudioTranscriptionLandingPage = () => {
   const classes = AudioTranscriptionLandingStyle();
@@ -717,7 +717,54 @@ const AudioTranscriptionLandingPage = () => {
     id,
     lead_time,
   ) => {
-    setLoading(true);
+if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {    
+  for (let i = 0; i < result?.length; i++) {
+    const text = result[i]?.text || "";
+    if (!text.trim()) continue;
+    
+    const trimmedText = text.trim();
+    
+    // Simple validation: check if text matches the pattern of {} segments
+    // Pattern: one or more {} blocks separated by whitespace
+const validPattern =
+  /^(\{(?:<[^>]+>|[^{}\|<>]+(?:\s*\|\s*[^{}\|<>]+)*)\}\s*)+$/;
+    
+    if (!validPattern.test(trimmedText)) {
+  if (!["draft", "skipped"].includes(value)) {
+    setSnackbarInfo({
+      open: true,
+      message: `Segment ${
+        i + 1
+      }: Invalid format. Each segment must be like {word} or {word1 | word2} or {<noise>}`,
+      variant: "error",
+    });
+    setLoading(false);
+    return;
+  }
+  break;
+    }
+    
+    // Check noise tags validity
+    const noiseTags = trimmedText.match(/<([^>]+)>/g) || [];
+    const noiseList = TabsSuggestionData;
+    
+    for (const tag of noiseTags) {
+      const content = tag.slice(1, -1).trim();
+      if (!noiseList.includes(content)) {
+        if (!["draft", "skipped"].includes(value)) {
+          setSnackbarInfo({
+            open: true,
+            message: `Segment ${i + 1}: '<${content}>' is not a valid noise tag`,
+            variant: "error",
+          });
+          setLoading(false);
+          return;
+        }
+        break;
+      }
+    }
+  }
+}    setLoading(true);
     setAutoSave(false);
     const PatchAPIdata = {
       task_id: taskId,
@@ -976,7 +1023,6 @@ useEffect(() => {
     if (event.shiftKey && event.key === ' ') {
       event.preventDefault();
       if(player){
-        // console.log(isPlaying(player));
         if(isPlaying(player)){
           player.pause();
         }else{
@@ -1009,7 +1055,7 @@ useEffect(() => {
     <>
       {loading && <Spinner />}
       {renderSnackBar()}
-      <Grid container direction={"row"} className={classes.parentGrid}>
+      <Grid container sx={{xs:{height:"160%"}, md:{height:"100%"}}} className={classes.parentGrid}>
         <Grid md={6} xs={12} id="video" className={classes.videoParent}>
           <Button
             value="Back to Project"
@@ -1030,7 +1076,7 @@ useEffect(() => {
             // style={{ height: videoDetails?.video?.audio_only ? "100%" : "" }}
             className={classes.videoBox}
           >
-            <Typography sx={{mt: 2, ml: 4, color: "grey"}}>
+            <Typography sx={{color: "grey"}}>
               Task #{taskDetails?.id}
               <LightTooltip
                 title={assignedUsers ? assignedUsers : ""}
@@ -1057,8 +1103,19 @@ useEffect(() => {
               taskData={taskData}
               audioUrl={audioURL}
             /> : <Grid style={{ padding: "0px 20px 0px 20px" }}><audio controls preload='none' className={classes.videoPlayer}/></Grid>}
-            <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
-             <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+            <Grid container>
+             <Stack 
+                sx={{
+                  display:"flex",
+                  gap:"20px",
+                  flexDirection:{xs:"column",sm:"row"},
+                }}
+                >
+                <Box sx={{
+                  display: "flex",
+                  gap: "20px",
+                  alignItems:"center"
+                }}>
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Timeline Scale:
                 </Typography>
@@ -1075,8 +1132,12 @@ useEffect(() => {
                     player.currentTime += 0.01;
                     player.currentTime -= 0.01;
                   }}/>
-              </Stack>
-              <Stack spacing={2} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+              </Box>
+                  <Box sx={{
+                    display: "flex",
+                    gap: "20px",
+                    alignItems:"center"
+                  }}>
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Playback Speed:
                 </Typography>
@@ -1093,9 +1154,10 @@ useEffect(() => {
                   onChange={(e) => {
                     player.playbackRate = e.target.value;
                   }}/>
+              </Box>
               </Stack>
             </Grid>
-            <Grid container spacing={1} sx={{ ml: 3 }}>
+            <Grid container>
               <Grid item>
                 <Button
                   endIcon={showNotes ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
@@ -1332,7 +1394,7 @@ useEffect(() => {
       <Grid
         width={"100%"}
         position="fixed"
-        bottom={1}
+        bottom={0}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
         {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings}/>) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>} 

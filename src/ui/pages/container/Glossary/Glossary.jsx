@@ -201,7 +201,6 @@ export default function Glossary(props) {
       item_id: hashCode,
       action: 1,
     };
-    console.log(UpVotedata, "UpVotedata");
     const GlossaryObj = new UpVoteAndDownVoteAPI(UpVotedata);
     //dispatch(APITransport(GlossaryObj));
     const res = await fetch(GlossaryObj.apiEndPoint(), {

@@ -134,10 +134,8 @@ const DraftDataPopulation = () => {
       if (!res.ok) throw await res.json();
       else return await res.json();
     }).then((res) => {
-      console.log(res);
       setSnackbarState({ open: true, message: res.message, variant: "success" });
     }).catch((err) => {
-      console.log(err);
       setSnackbarState({ open: true, message: err.message, variant: "error" });
     });
     setSrcDatasetType('');

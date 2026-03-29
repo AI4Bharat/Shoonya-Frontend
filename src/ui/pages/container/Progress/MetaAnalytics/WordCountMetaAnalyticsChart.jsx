@@ -1,5 +1,8 @@
 import React from 'react';
-import { Grid, ThemeProvider, Box, Typography, Paper } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 import {
     BarChart,
     Bar,
@@ -202,7 +205,7 @@ export default function WordCountMetaAnalyticsChart(props) {
           <Box className={classes.topBarInnerBox}>
           <Typography
                 style={{
-                  fontSize: "1rem",
+                  fontSize: "0.8rem",
                   fontWeight: "600",
                   padding: "16px 0",
                 }}
@@ -211,28 +214,28 @@ export default function WordCountMetaAnalyticsChart(props) {
               </Typography>
             </Box>
         <Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Total Annotated Count
               </Typography>
-              <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalWordCount &&
                   new Intl.NumberFormat("en").format(totalWordCount)}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Pending Review  Count
               </Typography>
-              <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalAnnotationWordCount &&
                   new Intl.NumberFormat("en").format(totalAnnotationWordCount)}
               </Typography>
             </Box>
             <Box className={classes.topBarInnerBox}>
-              <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.6rem",sm:"0.875rem"}, fontWeight: "400" }}>
                 Review Completed  Count
               </Typography>
-              <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
+              <Typography sx={{ fontSize: {xs:"0.7rem", sm:"1.25rem"}, fontWeight: "400" }}>
                 {totalReviewWordCount &&
                   new Intl.NumberFormat("en").format(totalReviewWordCount)}
               </Typography>

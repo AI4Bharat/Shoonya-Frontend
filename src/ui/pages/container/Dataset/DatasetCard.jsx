@@ -1,12 +1,13 @@
-import { Box, Grid ,Button,Tooltip } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import React, { useState } from "react";
 import DatasetCard from "../../component/common/DatasetCard";
 import DatasetStyle from "../../../styles/Dataset";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import TablePagination from "@mui/material/TablePagination";
 import TablePaginationActions from "../../component/common/TablePaginationActions";
-import Spinner from "../../component/common/Spinner";
-import { useNavigate } from "react-router-dom";
 import DatasetFilterList from "./DatasetFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import InfoIcon from '@mui/icons-material/Info';
@@ -37,7 +38,6 @@ const DatasetCards = (props) => {
 
 
   const handleChangePage = (e, newPage) => {
-    console.log("newPage", newPage);
     setPage(newPage);
   };
 
@@ -78,7 +78,6 @@ const DatasetCards = (props) => {
   };
 
   const filtersApplied = areFiltersApplied(selectedFilters);
-  console.log("filtersApplied", filtersApplied);
 
     const CustomTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />

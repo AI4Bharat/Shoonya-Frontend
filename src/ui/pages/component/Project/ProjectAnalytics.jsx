@@ -170,17 +170,6 @@ const ProjectAnalytics = (props) => {
     legend: {
       display: false,
       position: "right",
-      //   legendCallback: function(chart) {
-      //     console.log(chart);
-      //     return [
-      //       <ul>
-      //         <li>z</li>
-      //         <li>zzzz</li>
-      //         <li>ppp</li>
-      //         <li>adasda</li>
-      //       </ul>
-      //     ];
-      //   }
     },
     elements: {
       arc: {
@@ -245,7 +234,6 @@ const ProjectAnalytics = (props) => {
       headers: projectObj.getHeaders().headers,
     });
     const resp = await res.json();
-    console.log(resp, "resp");
     if (resp.message) {
       setSnackbarInfo({
         open: true,
@@ -357,7 +345,6 @@ const ProjectAnalytics = (props) => {
 
   useEffect(() => {
     handleAnalyticsData();
-    console.log("248");
   }, [ProjectReport]);
 
   return (

@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
-import { Grid, ThemeProvider, Box, Typography, Paper } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import { useDispatch} from "react-redux";
 import DatasetStyle from "../../../../styles/Dataset";
-import React, { PureComponent } from "react";
+import React from "react";
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  Checkbox,
   Label,
 } from "recharts";
 import ResponsiveChartContainer from "../../../component/common/ResponsiveChartContainer"
@@ -27,6 +26,8 @@ function AudioTaskAnalyticsChart(props) {
   const [totalAnnotationTasksCount, setTotalAnnotationTasksCount] = useState();
   const [totalReviewTasksCount, setTotalReviewTasksCount] = useState();
   const [totalSuperCheckTasksCount, setTotalSuperCheckTasksCount] = useState();
+    const [difftotal,setdifftotal] =useState()
+
   const [data, setData] = useState([]);
   const [annRev,setAnnRev] = useState();
 
@@ -49,7 +50,7 @@ function AudioTaskAnalyticsChart(props) {
       allSuperCheckCumulativeTasksCount += element.sup_cumulative_tasks_count;
       languages = element.languages;
     });
-
+    setdifftotal(allAnnotatorCumulativeTasksCount-allReviewCumulativeTasksCount)
     setTotalAnnotationTasksCount(allAnnotatorCumulativeTasksCount);
     setTotalReviewTasksCount(allReviewCumulativeTasksCount);
     setTotalSuperCheckTasksCount(allSuperCheckCumulativeTasksCount)
@@ -203,16 +204,16 @@ function AudioTaskAnalyticsChart(props) {
                 Pending Review Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalAnnotationTasksCount &&
-                  new Intl.NumberFormat("en").format(totalAnnotationTasksCount)}
+                {difftotal &&
+                  new Intl.NumberFormat("en").format(difftotal)}
               </Typography>
             </Box>:annotationChecked&&reviewChecked&&supercheckChecked?<Box className={classes.topBarInnerBox}>
               <Typography style={{ fontSize: "0.875rem", fontWeight: "400" }}>
                 Pending Review Tasks
               </Typography>
               <Typography style={{ fontSize: "1.125rem", fontWeight: "400" }}>
-                {totalAnnotationTasksCount &&
-                  new Intl.NumberFormat("en").format(totalAnnotationTasksCount)}
+                {difftotal &&
+                  new Intl.NumberFormat("en").format(difftotal)}
               </Typography>
             </Box>:null}
 

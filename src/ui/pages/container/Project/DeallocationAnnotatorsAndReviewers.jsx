@@ -1,18 +1,25 @@
 import React, { useState } from "react";
 import CustomButton from "../../component/common/Button";
-import {
-  Button, Popover,Box,Grid,Typography,Radio,Select,MenuItem,Dialog, DialogActions, DialogContent, DialogContentText,  Checkbox,
-  ListItemText,
-  ListItemIcon,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Popover from "@mui/material/Popover";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Radio from "@mui/material/Radio";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import ListItemText from "@mui/material/ListItemText";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import DatasetStyle from "../../../styles/Dataset";
 import { translate } from "../../../../config/localisation";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
 import { snakeToTitleCase } from "../../../../utils/utils";
 import  DeallocationAnnotatorsAndReviewersAPI from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import CustomizedSnackbars from "../../component/common/Snackbar";
@@ -263,7 +270,6 @@ export default function DeallocationAnnotatorsAndReviewers() {
         handleok();
       } else {
         window.alert("Invalid credentials, please try again");
-        console.log(rsp_data);
       }
     } else if (userLevel === "superChecker") {
       if (pin === "9327") {

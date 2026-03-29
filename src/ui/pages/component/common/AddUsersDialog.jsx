@@ -166,7 +166,6 @@ const AddUsersDialog = ({
     }
     if (id) fetchAllUsers(userType, id, dispatch);
   }, [userType, id, projectDetails])
- console.log(selectedUsers);
   const DatasetDetails = useSelector(state => state.getDatasetDetails.data);
 
     const DatasetMembers = useSelector((state) => state.getDatasetMembers.data);
@@ -180,7 +179,6 @@ const AddUsersDialog = ({
   }, [dispatch, datasetId]);
   useEffect(() => {
     setAvailableUsers(getAvailableUsers(userType, projectDetails, workspaceAnnotators, workspaceDetails?.managers, orgUsers,DatasetMembers));
-    console.log(availableUsers,"avail");
     
   }, [projectDetails, workspaceAnnotators, workspaceDetails, orgUsers])
 
@@ -299,7 +297,6 @@ const AddUsersDialog = ({
         const existingUserIds = existingUsers.map((user) => user);
       
         const updatedUserIds = [...new Set([...existingUserIds, ...users.map((user) => user.id)])];
-      console.log(DatasetDetails,updatedUserIds,existingUserIds,"avaa");
       
         const DatasetUsersObj = {
           instance_name: DatasetDetails?.instance_name ,
