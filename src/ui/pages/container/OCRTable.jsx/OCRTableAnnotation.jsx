@@ -1,4 +1,3 @@
-// Updated App.js with task API integration
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import './Table.css';
 import ReactQuill from 'react-quill';
@@ -26,6 +25,34 @@ import GetAnnotationsTaskOCRAPI from '../../../../redux/actions/CL-Transcription
 import AnnotationStageButtons from './AnnotationStageButtons';
 import SaveTranscriptOCRAPI from '../../../../redux/actions/CL-Transcription/SaveTranscriptOCR';
 
+// Pure helper: computes updated mergedCells after a merge operation
+const computeUpdatedMergedCells = (range, existing = {}) => {
+  const { startRow, startCol, endRow, endCol } = range;
+  const newMergedCells = { ...existing };
+  const colSpan = endCol - startCol + 1;
+  const rowSpan = endRow - startRow + 1;
+
+  const firstCellKey = `${startRow}-${startCol}`;
+  newMergedCells[firstCellKey] = {
+    isFirst: true,
+    colSpan,
+    rowSpan,
+    startRow,
+    startCol,
+    endRow,
+    endCol,
+  };
+
+  for (let i = startRow; i <= endRow; i++) {
+    for (let j = startCol; j <= endCol; j++) {
+      if (i === startRow && j === startCol) continue;
+      const cellKey = `${i}-${j}`;
+      newMergedCells[cellKey] = { isFirst: false, hidden: true };
+    }
+  }
+  return newMergedCells;
+};
+
 function App() {
     const classes = AudioTranscriptionLandingStyle();
   
@@ -45,8 +72,14 @@ function App() {
   const [selectedCell, setSelectedCell] = useState(null);
     const [loadtime, setloadtime] = useState(new Date());
     let labellingMode = localStorage.getItem("labellingMode");
+const [selectedRange, setSelectedRange] = useState(null);
+const [isSelecting, setIsSelecting] = useState(false);
+const [selectionStart, setSelectionStart] = useState(null);
+const [selectionEnd, setSelectionEnd] = useState(null);
 
-  // Annotation stage states
+// Lifted mergedCells state
+const [mergedCells, setMergedCells] = useState({});
+
   const [annotationsTaskDetails, setAnnotationsTaskDetails] = useState([]);
     const [isActive, setIsActive] = useState(true);
     const [lastInteraction, setLastInteraction] = useState(Date.now());
@@ -80,14 +113,12 @@ function App() {
     const user = useSelector((state) => state.fetchLoggedInUserData.data);
     const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   
-  // Splitter state
   const [leftWidth, setLeftWidth] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const splitterRef = useRef(null);
   const [autoSave, setAutoSave] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
-  // Table settings state
   const [fontSize, setFontSize] = useState(14);
   const [enableTransliteration, setEnableTransliteration] = useState(false);
   const [enableRTL, setEnableRTL] = useState(false);
@@ -95,11 +126,9 @@ function App() {
   const [alternateRowColor, setAlternateRowColor] = useState(true);
   const [theme, setTheme] = useState({ name: "Default", primary: "#667eea", secondary: "#764ba2" });
   
-  // Undo/Redo stacks
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
 
-  // Language options
   const languages = [
     { code: 'en', name: 'English' },
     { code: 'hi', name: 'Hindi' },
@@ -112,24 +141,39 @@ function App() {
     { code: 'ml', name: 'Malayalam' },
     { code: 'pa', name: 'Punjabi' },
   ];
+
   const getProjectDetails = () => {
     const projectObj = new GetProjectDetailsAPI(projectId);
     dispatch(APITransport(projectObj));
   };
 
-
-  // Fetch task data on component mount
-    const getAnnotationsTaskData = (id) => {
-      // setLoading(true);
-      const userObj = new GetAnnotationsTaskOCRAPI(id);
-      dispatch(APITransport(userObj));
-    };
+  const getAnnotationsTaskData = (id) => {
+    const userObj = new GetAnnotationsTaskOCRAPI(id);
+    dispatch(APITransport(userObj));
+  };
   
-    useEffect(() => {
-      getAnnotationsTaskData(taskId);
-      getProjectDetails();
-      getTaskData(taskId);
-    }, []);
+  useEffect(() => {
+  const loadData = async () => {
+    setInitialLoading(true);
+    setTableData([]);
+    setColumns([]);
+    setOriginalHtmlTable('');
+    setAnnotations([]);
+    setAnnotationsTaskDetails([]);
+    setAnnotationId(null);
+    
+    await Promise.all([
+      getAnnotationsTaskData(taskId),
+      getProjectDetails(),
+      getTaskData(taskId)
+    ]);
+    
+    setInitialLoading(false);
+  };
+  
+  loadData();
+}, [taskId]);
+
         useEffect(() => {
   if (!AnnotationsTaskDetails?.length) return;
 
@@ -174,11 +218,9 @@ const resetNotes = () => {
       resetNotes();
     }, [taskId]);
   
-  
     const modules = {
       toolbar: [
         ['bold', 'italic', 'underline', 'strike'],
-        // [{ 'color': [] }],
         [{ 'script': 'sub' }, { 'script': 'super' }],
       ]
     };
@@ -219,10 +261,7 @@ const resetNotes = () => {
           )
         ) {
           filteredAnnotations = [superCheckedAnnotation];
-
-          Message =
-            "This is the Super Checker's Annotation in read only mode";
-
+          Message = "This is the Super Checker's Annotation in read only mode";
           disableDraft = true;
           disableSkip = true;
           disableUpdate = true;
@@ -249,8 +288,7 @@ const resetNotes = () => {
           disableDraft = true;
           disableSkip = true;
           disableUpdate = true;
-          Message =
-            "This is the Reviewer's Annotation in read only mode";
+          Message = "This is the Reviewer's Annotation in read only mode";
         } else {
           filteredAnnotations = [userAnnotation];
         }
@@ -260,17 +298,14 @@ const resetNotes = () => {
       ) {
         filteredAnnotations = [userAnnotation];
         disableSkip = true;
-
-        Message =
-          "Skip button is disabled, since the task is being reviewed";
+        Message = "Skip button is disabled, since the task is being reviewed";
       } else if (
         userAnnotation &&
         ["to_be_revised"].includes(userAnnotation.annotation_status)
       ) {
         filteredAnnotations = [userAnnotation];
         disableSkip = true;
-        Message =
-          "Skip button is disabled, since the task is being reviewed";
+        Message = "Skip button is disabled, since the task is being reviewed";
       } else {
         filteredAnnotations = [userAnnotation];
       }
@@ -296,19 +331,139 @@ const resetNotes = () => {
     ];
   };
 
-
   useEffect(() => {
     filterAnnotations(AnnotationsTaskDetails, user);
   }, [AnnotationsTaskDetails, user]);
 
-  const handleCollapseClick = () => {
-    // !showNotes && setShowStdTranscript(false);
-        // !showNotes ;
+// CHANGED: saveToUndo now accepts current state as parameters to avoid stale closure
+const saveToUndo = useCallback((data, cols, mc) => {
+  setUndoStack(prev => [...prev, {
+    data: JSON.parse(JSON.stringify(data)),
+    columns: JSON.parse(JSON.stringify(cols)),
+    mergedCells: JSON.parse(JSON.stringify(mc))
+  }]);
+  setRedoStack([]);
+}, []);
+
+const handleBulkDelete = useCallback(() => {
+  if (window.confirm('Are you sure you want to delete ALL table data? This action cannot be undone.')) {
+    saveToUndo(tableData, columns, mergedCells);
+    setTableData([]);
+    setColumns([]);
+    setSnackbarInfo({
+      open: true,
+      message: "All table data has been cleared",
+      variant: "success",
+    });
+    setTimeout(() => {
+      setSnackbarInfo({ open: false, message: "", variant: "success" });
+    }, 3000);
+  }
+}, [saveToUndo, tableData, columns, mergedCells]);
+
+const handleMergeCells = useCallback(() => {
+  if (!selectedRange) {
+    setSnackbarInfo({
+      open: true,
+      message: "Please select cells first (click one cell, then Shift+click another)",
+      variant: "info",
+    });
+    return;
+  }
+  
+  const { startRow, startCol, endRow, endCol } = selectedRange;
+  
+  if (startRow === endRow && startCol === endCol) {
+    setSnackbarInfo({
+      open: true,
+      message: "Please select multiple cells to merge",
+      variant: "info",
+    });
+    return;
+  }
+  
+  saveToUndo(tableData, columns, mergedCells);
+  
+  const newData = JSON.parse(JSON.stringify(tableData));
+  
+  let mergedValue = '';
+  for (let i = startRow; i <= endRow; i++) {
+    for (let j = startCol; j <= endCol; j++) {
+      const cellValue = newData[i]?.[columns[j]?.accessor];
+      if (cellValue && cellValue.trim()) {
+        mergedValue += (mergedValue ? ' ' : '') + cellValue;
+      }
+    }
+  }
+  
+  newData[startRow] = {
+    ...newData[startRow],
+    [columns[startCol].accessor]: mergedValue
+  };
+  
+  for (let i = startRow; i <= endRow; i++) {
+    for (let j = startCol; j <= endCol; j++) {
+      if (i === startRow && j === startCol) continue;
+      newData[i] = {
+        ...newData[i],
+        [columns[j].accessor]: ''
+      };
+    }
+  }
+  
+  setTableData(newData);
+  setSelectedRange(null);
+  setMergedCells(prev => computeUpdatedMergedCells(selectedRange, prev));
+  
+  setSnackbarInfo({
+    open: true,
+    message: `Merged ${(endRow - startRow + 1) * (endCol - startCol + 1)} cells`,
+    variant: "success",
+  });
+  setTimeout(() => {
+    setSnackbarInfo({ open: false, message: "", variant: "success" });
+  }, 3000);
+}, [tableData, columns, mergedCells, saveToUndo, selectedRange]);
+
+const handleCopyCell = useCallback(() => {
+  if (!selectedCell) return;
+  
+  const cellValue = tableData[selectedCell.rowIndex]?.[selectedCell.columnId];
+  if (cellValue) {
+    navigator.clipboard.writeText(cellValue);
+    setSnackbarInfo({
+      open: true,
+      message: "Cell content copied to clipboard",
+      variant: "success",
+    });
+    setTimeout(() => {
+      setSnackbarInfo({ open: false, message: "", variant: "success" });
+    }, 2000);
+  }
+}, [selectedCell, tableData]);
+
+const handleCellSelect = useCallback((cellInfo, isRange = false) => {
+  console.log("handleCellSelect called:", { cellInfo, isRange });
+  
+  if (isRange && cellInfo.range) {
+    console.log("Setting range in App:", cellInfo.range);
+    setSelectedRange(cellInfo.range);
+    setSelectedCell({ 
+      rowIndex: cellInfo.range.startRow, 
+      columnId: columns[cellInfo.range.startCol]?.accessor, 
+      value: tableData[cellInfo.range.startRow]?.[columns[cellInfo.range.startCol]?.accessor] 
+    });
+  } else {
+    console.log("Setting single cell:", cellInfo);
+    setSelectedCell(cellInfo);
+    setSelectedRange(null);
+  }
+}, [columns, tableData]);
+
+const handleCollapseClick = () => {
     setShowNotes(!showNotes);
   };
 
-  // Parse HTML table to DataTable format
-// Enhanced parseHtmlTableToData function
 const parseHtmlTableToData = (htmlString) => {
   try {
     console.log('Parsing HTML table:', htmlString);
@@ -319,10 +474,9 @@ const parseHtmlTableToData = (htmlString) => {
     
     if (!table) {
       console.warn('No table found in HTML');
-      return { rows: [], columns: [] };
+      return { rows: [], columns: [], mergedCells: {} };
     }
 
-    // Extract headers
     const headers = [];
     const headerRow = table.querySelector('thead tr');
     
@@ -340,7 +494,6 @@ const parseHtmlTableToData = (htmlString) => {
       });
     }
 
-    // If no headers found, create default columns based on first row
     if (headers.length === 0) {
       const firstRow = table.querySelector('tbody tr');
       if (firstRow) {
@@ -357,24 +510,66 @@ const parseHtmlTableToData = (htmlString) => {
       }
     }
 
-    // Extract data rows
     const rows = [];
+    const mergedCells = {};
     const tbody = table.querySelector('tbody');
+    
     if (tbody) {
       const dataRows = tbody.querySelectorAll('tr');
+      
       dataRows.forEach((row, rowIndex) => {
-        const cells = row.querySelectorAll('td');
+        const cells = row.querySelectorAll('td, th');
+        let colIndex = 0;
+        
+        cells.forEach((cell) => {
+          const colSpan = parseInt(cell.getAttribute('colSpan') || '1');
+          const rowSpan = parseInt(cell.getAttribute('rowSpan') || '1');
+          
+          if (colSpan > 1 || rowSpan > 1) {
+            const cellKey = `${rowIndex}-${colIndex}`;
+            mergedCells[cellKey] = {
+              isFirst: true,
+              colSpan: colSpan,
+              rowSpan: rowSpan,
+              startRow: rowIndex,
+              startCol: colIndex,
+              endRow: rowIndex + rowSpan - 1,
+              endCol: colIndex + colSpan - 1
+            };
+            
+            for (let i = rowIndex; i < rowIndex + rowSpan; i++) {
+              for (let j = colIndex; j < colIndex + colSpan; j++) {
+                if (i === rowIndex && j === colIndex) continue;
+                const hiddenKey = `${i}-${j}`;
+                mergedCells[hiddenKey] = {
+                  isFirst: false,
+                  hidden: true
+                };
+              }
+            }
+          }
+          
+          colIndex += colSpan;
+        });
+      });
+      
+      dataRows.forEach((row, rowIndex) => {
+        const cells = row.querySelectorAll('td, th');
         const rowData = { id: rowIndex + 1 };
         
-        cells.forEach((cell, cellIndex) => {
-          if (cellIndex < headers.length) {
-            // Handle HTML content inside cells (like <br/> tags)
+        let colIndex = 0;
+        cells.forEach((cell) => {
+          const colSpan = parseInt(cell.getAttribute('colSpan') || '1');
+          
+          if (colIndex < headers.length) {
             const cellContent = cell.innerHTML
               .replace(/<br\s*\/?>/g, '\n')
-              .replace(/<[^>]*>/g, '') // Remove any other HTML tags
+              .replace(/<[^>]*>/g, '')
               .trim();
-            rowData[headers[cellIndex].accessor] = cellContent || cell.textContent?.trim() || '';
+            rowData[headers[colIndex].accessor] = cellContent || cell.textContent?.trim() || '';
           }
+          
+          colIndex += colSpan;
         });
         
         rows.push(rowData);
@@ -383,51 +578,69 @@ const parseHtmlTableToData = (htmlString) => {
 
     console.log('Parsed rows:', rows);
     console.log('Parsed columns:', headers);
+    console.log('Detected merged cells:', mergedCells);
     
-    return { rows, columns: headers };
+    return { rows, columns: headers, mergedCells };
     
   } catch (error) {
     console.error('Error parsing HTML table:', error);
-    return { rows: [], columns: [] };
+    return { rows: [], columns: [], mergedCells: {} };
   }
 };
-  // Convert DataTable format back to HTML table
-// Enhanced convertDataToHtmlTable function
-const convertDataToHtmlTable = (data, cols) => {
+
+const convertDataToHtmlTable = (data, cols, mc = mergedCells) => {
   let html = '<table>\n';
   
-  // Create header if columns exist
   if (cols && cols.length > 0) {
-    html += '  <thead>\n    <tr>\n';
+    html += '  <thead>\n     <tr>\n';
     cols.forEach(col => {
       html += `      <th>${col.Header || col.accessor}</th>\n`;
     });
-    html += '    </tr>\n  </thead>\n';
+    html += '     </tr>\n  </thead>\n';
   }
   
-  // Create body
   if (data && data.length > 0) {
     html += '  <tbody>\n';
-    data.forEach(row => {
-      html += '    <tr>\n';
-      cols.forEach(col => {
-        const cellValue = row[col.accessor] || '';
-        // Handle potential line breaks in cell content
-        const formattedValue = cellValue.toString().replace(/\n/g, '<br/>');
-        html += `      <td>${formattedValue}</td>\n`;
-      });
-      html += '    </tr>\n';
+    data.forEach((row, rowIndex) => {
+      html += '      <tr>\n';
+      
+      let colIndex = 0;
+      while (colIndex < cols.length) {
+        const cellKey = `${rowIndex}-${colIndex}`;
+        const mergedCell = mc[cellKey];
+        
+        if (mergedCell && mergedCell.hidden) {
+          colIndex++;
+          continue;
+        }
+        
+        const colSpan = mergedCell && mergedCell.colSpan ? mergedCell.colSpan : 1;
+        const rowSpan = mergedCell && mergedCell.rowSpan ? mergedCell.rowSpan : 1;
+        
+        let cellValue = row[cols[colIndex]?.accessor] || '';
+        if (mergedCell && mergedCell.isFirst) {
+          cellValue = data[mergedCell.startRow]?.[cols[mergedCell.startCol]?.accessor] || '';
+        }
+        
+        if (colSpan > 1 || rowSpan > 1) {
+          html += `        <td colSpan="${colSpan}" rowSpan="${rowSpan}">${cellValue}</td>\n`;
+        } else {
+          html += `        <td>${cellValue}</td>\n`;
+        }
+        
+        colIndex += colSpan;
+      }
+      
+      html += '      </tr>\n';
     });
     html += '  </tbody>\n';
   }
   
   html += '</table>';
   
-  // Log the generated HTML for debugging
-  console.log('Generated HTML table:', html);
-  
   return html;
-};  
+};
+
 const handleAutosave = async () => {
     setAutoSaveTrigger(false);
 
@@ -478,9 +691,10 @@ const handleAutosave = async () => {
   };
   
   useEffect(() => {
-     handleAutosave();
+     autoSaveTrigger && handleAutosave();
 
-  }, [autoSaveTrigger, autoSave, user,tableData, annotations, taskDetails]);
+
+  }, [autoSaveTrigger, autoSave, handleAutosave,user,tableData, annotations, taskDetails,taskId]);
   
 
    useEffect(() => {
@@ -561,11 +775,18 @@ const handleAutosave = async () => {
   
       // eslint-disable-next-line
     }, [autoSave, user, taskId, annotations, taskDetails, isActive]);
-  
+
+useEffect(() => {
+  setMergedCells({});
+  setUndoStack([]);
+  setRedoStack([]);
+  setSelectedRange(null);
+}, [taskId]);
 
   const getTaskData = async (id) => {
     setInitialLoading(true);
     try {
+      
       const taskObj = new GetTaskDetailsAPI(id);
       dispatch(APITransport(taskObj));
       
@@ -588,7 +809,6 @@ const handleAutosave = async () => {
       
       setTaskData(resp);
       
-      // Get image URL from task data
       if (resp?.data?.image_url) {
         setImageUrl(resp?.data?.image_url);
       }
@@ -619,7 +839,6 @@ if (
     }
   };
 
-  // Save annotation to API
   const saveAnnotation = useCallback(async (status = 'draft') => {
     if (!annotationId || !taskId) {
       setSnackbarInfo({
@@ -639,8 +858,9 @@ if (
         task_id: taskId,
         annotation_status: status,
         result: {
-          text: htmlTable,        },
-        lead_time: 0, // You can calculate actual lead time
+          text: htmlTable,
+        },
+        lead_time: 0,
       };
 
       const apiObj = new PatchAnnotationOCRAPI(annotationId, patchData);
@@ -659,9 +879,7 @@ if (
           message: resp?.message || `Table ${status === 'labeled' ? 'submitted' : 'saved as draft'} successfully`,
           variant: "success",
         });
-        
-        // Save current state to undo stack
-        saveToUndo();
+        saveToUndo(tableData, columns, mergedCells);
       } else {
         setSnackbarInfo({
           open: true,
@@ -682,9 +900,8 @@ if (
         setSnackbarInfo({ open: false, message: "", variant: "success" });
       }, 3000);
     }
-  }, [annotationId, taskId, tableData, columns, taskData]);
+  }, [annotationId, taskId, tableData, columns, mergedCells, taskData]);
 
-  // Handle splitter drag
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDragging) return;
@@ -721,34 +938,64 @@ if (
     setIsDragging(true);
   };
 
-  // Save current state for undo
-  const saveToUndo = useCallback(() => {
-    setUndoStack(prev => [...prev, { data: tableData, columns }]);
-    setRedoStack([]);
-  }, [tableData, columns]);
+// CHANGED: handleUndo uses functional setter for setUndoStack to avoid stale closure
+const handleUndo = useCallback(() => {
+  setUndoStack(prev => {
+    if (prev.length === 0) return prev;
+    const lastState = prev[prev.length - 1];
+    setRedoStack(r => [...r, {
+      data: JSON.parse(JSON.stringify(tableData)),
+      columns: JSON.parse(JSON.stringify(columns)),
+      mergedCells: JSON.parse(JSON.stringify(mergedCells))
+    }]);
+    setTableData(JSON.parse(JSON.stringify(lastState.data)));
+    setColumns(JSON.parse(JSON.stringify(lastState.columns)));
+    setMergedCells(JSON.parse(JSON.stringify(lastState.mergedCells || {})));
+    setSelectedRange(null);
+    setSelectionStart(null);
+    setSelectionEnd(null);
+    return prev.slice(0, -1);
+  });
+}, [tableData, columns, mergedCells]);
 
-  const handleUndo = useCallback(() => {
-    if (undoStack.length === 0) return;
-    
-    const lastState = undoStack[undoStack.length - 1];
-    setRedoStack(prev => [...prev, { data: tableData, columns }]);
-    setTableData(lastState.data);
-    setColumns(lastState.columns);
-    setUndoStack(prev => prev.slice(0, -1));
-  }, [undoStack, tableData, columns]);
+// CHANGED: handleRedo uses functional setter for setRedoStack to avoid stale closure
+const handleRedo = useCallback(() => {
+  setRedoStack(prev => {
+    if (prev.length === 0) return prev;
+    const nextState = prev[prev.length - 1];
+    setUndoStack(u => [...u, {
+      data: JSON.parse(JSON.stringify(tableData)),
+      columns: JSON.parse(JSON.stringify(columns)),
+      mergedCells: JSON.parse(JSON.stringify(mergedCells))
+    }]);
+    setTableData(JSON.parse(JSON.stringify(nextState.data)));
+    setColumns(JSON.parse(JSON.stringify(nextState.columns)));
+    setMergedCells(JSON.parse(JSON.stringify(nextState.mergedCells || {})));
+    setSelectedRange(null);
+    setSelectionStart(null);
+    setSelectionEnd(null);
+    return prev.slice(0, -1);
+  });
+}, [tableData, columns, mergedCells]);
 
-  const handleRedo = useCallback(() => {
-    if (redoStack.length === 0) return;
-    
-    const nextState = redoStack[redoStack.length - 1];
-    setUndoStack(prev => [...prev, { data: tableData, columns }]);
-    setTableData(nextState.data);
-    setColumns(nextState.columns);
-    setRedoStack(prev => prev.slice(0, -1));
-  }, [redoStack, tableData, columns]);
+// CHANGED: pass current state explicitly to saveToUndo
+const handleReorderColumns = useCallback((newColumns, newData, newMergedCells) => {
+  saveToUndo(tableData, columns, mergedCells);
+  setColumns([...newColumns]);
+  setTableData([...newData]);
+  setMergedCells({...newMergedCells});
+}, [saveToUndo, tableData, columns, mergedCells]);
 
-  const handleCellEdit = useCallback((rowIndex, columnId, value) => {
-    saveToUndo();
+// CHANGED: pass current state explicitly to saveToUndo
+const handleReorderRows = useCallback((newData, newMergedCells) => {
+  saveToUndo(tableData, columns, mergedCells);
+  setTableData([...newData]);
+  setMergedCells({...newMergedCells});
+}, [saveToUndo, tableData, columns, mergedCells]);
+
+// CHANGED: pass current state explicitly to saveToUndo
+const handleCellEdit = useCallback((rowIndex, columnId, value) => {
+    saveToUndo(tableData, columns, mergedCells);
     setTableData(prevData => {
       const newData = [...prevData];
       newData[rowIndex] = {
@@ -757,19 +1004,21 @@ if (
       };
       return newData;
     });
-  }, [saveToUndo]);
+  }, [saveToUndo, tableData, columns, mergedCells]);
 
+// CHANGED: pass current state explicitly to saveToUndo
   const handleAddRow = useCallback(() => {
-    saveToUndo();
+    saveToUndo(tableData, columns, mergedCells);
     const newRow = { id: tableData.length + 1 };
     columns.forEach(col => {
       newRow[col.accessor] = '';
     });
     setTableData(prev => [...prev, newRow]);
-  }, [columns, tableData.length, saveToUndo]);
+  }, [columns, tableData, mergedCells, saveToUndo]);
 
+// CHANGED: pass current state explicitly to saveToUndo
   const handleAddColumn = useCallback(() => {
-    saveToUndo();
+    saveToUndo(tableData, columns, mergedCells);
     const newColIndex = columns.length + 1;
     const newColumn = {
       accessor: `col${newColIndex}`,
@@ -786,15 +1035,87 @@ if (
         [`col${newColIndex}`]: ''
       }))
     );
-  }, [columns.length, saveToUndo]);
+  }, [columns, tableData, mergedCells, saveToUndo]);
 
+// CHANGED: pass current state explicitly to saveToUndo
+  const handleAddRowBefore = useCallback(() => {
+    if (!selectedCell) return;
+    saveToUndo(tableData, columns, mergedCells);
+    const newRow = { id: Date.now() };
+    columns.forEach(col => { newRow[col.accessor] = ''; });
+    setTableData(prev => {
+      const next = [...prev];
+      next.splice(selectedCell.rowIndex, 0, newRow);
+      return next;
+    });
+  }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
+
+// CHANGED: pass current state explicitly to saveToUndo
+  const handleAddRowAfter = useCallback(() => {
+    if (!selectedCell) return;
+    saveToUndo(tableData, columns, mergedCells);
+    const newRow = { id: Date.now() };
+    columns.forEach(col => { newRow[col.accessor] = ''; });
+    setTableData(prev => {
+      const next = [...prev];
+      next.splice(selectedCell.rowIndex + 1, 0, newRow);
+      return next;
+    });
+  }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
+
+// CHANGED: pass current state explicitly to saveToUndo
+  const handleAddColBefore = useCallback(() => {
+    if (!selectedCell) return;
+    saveToUndo(tableData, columns, mergedCells);
+    const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
+    if (colIndex === -1) return;
+    const newAccessor = `col_${Date.now()}`;
+    const newColumn = {
+      accessor: newAccessor,
+      Header: `Column ${columns.length + 1}`,
+      type: 'text',
+      width: 150,
+      editable: true,
+    };
+    setColumns(prev => {
+      const next = [...prev];
+      next.splice(colIndex, 0, newColumn);
+      return next;
+    });
+    setTableData(prev => prev.map(row => ({ ...row, [newAccessor]: '' })));
+  }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
+
+// CHANGED: pass current state explicitly to saveToUndo
+  const handleAddColAfter = useCallback(() => {
+    if (!selectedCell) return;
+    saveToUndo(tableData, columns, mergedCells);
+    const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
+    if (colIndex === -1) return;
+    const newAccessor = `col_${Date.now()}`;
+    const newColumn = {
+      accessor: newAccessor,
+      Header: `Column ${columns.length + 1}`,
+      type: 'text',
+      width: 150,
+      editable: true,
+    };
+    setColumns(prev => {
+      const next = [...prev];
+      next.splice(colIndex + 1, 0, newColumn);
+      return next;
+    });
+    setTableData(prev => prev.map(row => ({ ...row, [newAccessor]: '' })));
+  }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
+
+// CHANGED: pass current state explicitly to saveToUndo
   const handleDeleteRow = useCallback((rowIndex) => {
-    saveToUndo();
+    saveToUndo(tableData, columns, mergedCells);
     setTableData(prev => prev.filter((_, index) => index !== rowIndex));
-  }, [saveToUndo]);
+  }, [saveToUndo, tableData, columns, mergedCells]);
 
+// CHANGED: pass current state explicitly to saveToUndo
   const handleDeleteColumn = useCallback((columnId) => {
-    saveToUndo();
+    saveToUndo(tableData, columns, mergedCells);
     setColumns(prev => prev.filter(col => col.accessor !== columnId));
     setTableData(prev => 
       prev.map(row => {
@@ -803,13 +1124,14 @@ if (
         return newRow;
       })
     );
-  }, [saveToUndo]);
+  }, [saveToUndo, tableData, columns, mergedCells]);
 
+// CHANGED: pass current state explicitly to saveToUndo
   const handleClearAll = useCallback(() => {
-    saveToUndo();
+    saveToUndo(tableData, columns, mergedCells);
     setTableData([]);
     setColumns([]);
-  }, [saveToUndo]);
+  }, [saveToUndo, tableData, columns, mergedCells]);
 
   const handleSave = useCallback(() => {
     saveAnnotation('labeled');
@@ -840,7 +1162,6 @@ if (
   }, [tableData, columns]);
 
   const handleImport = useCallback(() => {
-    // Create file input
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.html,.htm';
@@ -854,7 +1175,7 @@ if (
         const { rows, columns: newColumns } = parseHtmlTableToData(htmlContent);
         
         if (rows.length > 0) {
-          saveToUndo();
+          saveToUndo(tableData, columns, mergedCells);
           setTableData(rows);
           setColumns(newColumns);
           
@@ -880,18 +1201,19 @@ if (
     };
     
     input.click();
-  }, [saveToUndo]);
+  }, [saveToUndo, tableData, columns, mergedCells]);
 
   const handleLanguageChange = useCallback((langCode) => {
     setSelectedLanguage(langCode);
   }, []);
+
   useEffect(() => {
       var Annotation = AnnotationsTaskDetails.filter(
         (annotation) => annotation.annotation_type === 1
       )[0];
   }, [AnnotationsTaskDetails]);
 
-  useEffect(() => {
+useEffect(() => {
   const annotationText = annotations?.[0]?.result?.text;
   const ocrText = taskData?.data?.ocr_prediction_json?.text;
 
@@ -900,19 +1222,23 @@ if (
       ? annotationText
       : ocrText;
 
-  if (finalText) {
-    const { rows, columns } = parseHtmlTableToData(finalText);
+  if (finalText && finalText !== originalHtmlTable) {
+    console.log('Loading table data from:', finalText.substring(0, 100));
+    const { rows, columns: parsedColumns, mergedCells: parsedMergedCells } = parseHtmlTableToData(finalText);
     setTableData(rows);
-    setColumns(columns);
+    setColumns(parsedColumns);
+    setOriginalHtmlTable(finalText);
+    setUndoStack([]);
+    setRedoStack([]);
+    setMergedCells(parsedMergedCells);
   }
-}, [annotations, taskData]);
+}, [annotations, taskData, taskId]);
 
-  const handleTranscribe = useCallback((text) => {
+const handleTranscribe = useCallback((text) => {
     console.log(`Transcribing to ${selectedLanguage}: ${text}`);
     return `[Translated to ${selectedLanguage}]: ${text}`;
   }, [selectedLanguage]);
 
-  // Annotation stage functions
   const handleAnnotationClick = async (
     value,
     id,
@@ -928,15 +1254,13 @@ if (
   
   const PatchAPIdata = {
     task_id: taskId,
-          annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
-
+    annotation_notes: JSON.stringify(annotationNotesRef.current.getEditor().getContents()),
     annotation_status: value,
     result: resultData,
     lead_time:(new Date() - loadtime) / 1000 + Number(lead_time?.lead_time ?? 0),
   };
     if (["draft", "skipped","labeled"].includes(value) ) {
       const TaskObj = new PatchAnnotationOCRAPI(id, PatchAPIdata);
-      // dispatch(APITransport(GlossaryObj));
       const res = await fetch(TaskObj.apiEndPoint(), {
         method: "PATCH",
         body: JSON.stringify(TaskObj.getBody()),
@@ -956,7 +1280,8 @@ if (
         setAutoSave(true);
         setSnackbarInfo({
           open: true,
-          message: resp?.message ? resp?.message : "This task is having duplicate annotation. Please deallocate this task",          variant: "error",
+          message: resp?.message ? resp?.message : "This task is having duplicate annotation. Please deallocate this task",
+          variant: "error",
         });
       }
     } else {
@@ -972,17 +1297,12 @@ if (
     setLoading(false);
     setShowNotes(false);
   };
-  console.log(annotationsTaskDetails,"log");
   
     const tasksComplete = (id) => {
     if (id) {
-      // resetNotes();
-      // navigate(`/projects/${projectId}/task/${id}`, {replace: true});
       navigate(`/projects/${projectId}/OCRTable/${id}`);
       window.location.reload(true);
     } else {
-      // navigate(-1);
-      // resetNotes();
       setSnackbarInfo({
         open: true,
         message: "No more tasks to label",
@@ -1002,8 +1322,7 @@ if (
       id: projectId,
       current_task_id: taskId,
       mode: "annotation",
-            annotation_status: labellingMode,
-
+      annotation_status: labellingMode,
     };
 
     let apiObj = new GetNextProjectAPI(projectId, nextAPIData);
@@ -1036,7 +1355,6 @@ if (
       });
   };
 
-
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -1044,7 +1362,7 @@ if (
         handleClose={() =>
           setSnackbarInfo({ open: false, message: "", variant: "" })
         }
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigins={{ vertical: "top", horizontal: "right" }}
         variant={snackbar.variant}
         message={snackbar.message}
       />
@@ -1108,7 +1426,6 @@ if (
               >
                 Notes {reviewtext.trim().length === 0 ? "" : "*"}
               </Button>
-
             </div>
             
             <div className="nav-right">
@@ -1122,32 +1439,30 @@ if (
                 filterMessage={filterMessage}
                 taskData={taskData}
               />
-
-              
             </div>
           </div>
           <div
             className={classes.collapse}
-                          style={{
-                            display: showNotes ? "block" : "none",
-                            paddingBottom: "16px",
-                            height: "175px", overflow: "scroll"
-                          }}
-                        >
-                          <ReactQuill
-                            ref={annotationNotesRef}
-                            modules={modules}
-                            bounds={"#note"}
-                            formats={formats}
-                            placeholder="Annotation Notes" />
-                          <ReactQuill
-                            ref={reviewNotesRef}
-                            modules={modules}
-                            bounds={"#note"}
-                            readOnly={true}
-                            formats={formats}
-                            placeholder="Review Notes" />
-                        </div>
+            style={{
+              display: showNotes ? "block" : "none",
+              paddingBottom: "16px",
+              height: "175px", overflow: "scroll"
+            }}
+          >
+            <ReactQuill
+              ref={annotationNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              formats={formats}
+              placeholder="Annotation Notes" />
+            <ReactQuill
+              ref={reviewNotesRef}
+              modules={modules}
+              bounds={"#note"}
+              readOnly={true}
+              formats={formats}
+              placeholder="Review Notes" />
+          </div>
 
           <div className="image-container">
             {imageUrl ? (
@@ -1163,7 +1478,6 @@ if (
                 className="reference-image"
               />
             )}
-            
           </div>
         </div>
 
@@ -1212,6 +1526,14 @@ if (
             setTheme={setTheme}
             onClearAll={handleClearAll}
             selectedCell={selectedCell}
+            onBulkDelete={handleBulkDelete}
+            onMergeCells={handleMergeCells}
+            onCopyCell={handleCopyCell}
+            isCellSelected={selectedRange !== null}
+            onAddRowBefore={handleAddRowBefore}
+            onAddRowAfter={handleAddRowAfter}
+            onAddColBefore={handleAddColBefore}
+            onAddColAfter={handleAddColAfter}
           />
           
           <div className="table-container">
@@ -1221,7 +1543,9 @@ if (
               onCellEdit={handleCellEdit}
               onDeleteRow={handleDeleteRow}
               onDeleteColumn={handleDeleteColumn}
-              onCellSelect={setSelectedCell}
+              onCellSelect={handleCellSelect}
+              onReorderColumns={handleReorderColumns}
+              onReorderRows={handleReorderRows}
               language={selectedLanguage}
               transcriptionMode={transcriptionMode}
               onTranscribe={handleTranscribe}
@@ -1231,6 +1555,8 @@ if (
               alternateRowColor={alternateRowColor}
               enableTransliteration={enableTransliteration}
               ProjectDetails={ProjectDetails}
+              mergedCells={mergedCells}
+              onMergedCellsChange={setMergedCells}
             />
           </div>
           

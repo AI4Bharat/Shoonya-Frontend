@@ -77,8 +77,8 @@
 
 /* Menu Styles */
 .MuiMenu-paper {
-  background-color: #2d2d2d !important;
-  color: #e0e0e0 !important;
+  background-color: white !important;
+  color: black !important;
   border: 1px solid #404040 !important;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .MuiMenuItem-root:hover {
-  background-color: #404040 !important;
+  background-color: #bdb9b9 !important;
 }
 
 .MuiCheckbox-root {
@@ -132,4 +132,19 @@
   .table-controls {
     justify-content: center;
   }
+}
+
+
+/* Add these styles to TableControls.css */
+.delete-table-btn {
+  color: #dc3545 !important;
+}
+
+.delete-table-btn:hover {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.control-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
