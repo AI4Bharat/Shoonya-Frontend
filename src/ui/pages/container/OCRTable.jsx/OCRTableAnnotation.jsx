@@ -26,6 +26,7 @@ import AnnotationStageButtons from './AnnotationStageButtons';
 import SaveTranscriptOCRAPI from '../../../../redux/actions/CL-Transcription/SaveTranscriptOCR';
 
 // Pure helper: computes updated mergedCells after a merge operation
+// Replace the top-level helper
 const computeUpdatedMergedCells = (range, existing = {}) => {
   const { startRow, startCol, endRow, endCol } = range;
   const newMergedCells = { ...existing };
@@ -52,7 +53,6 @@ const computeUpdatedMergedCells = (range, existing = {}) => {
   }
   return newMergedCells;
 };
-
 // ── HELPERS for shifting/cleaning mergedCells indices ────────────────────────
 
 /**
@@ -559,7 +559,53 @@ const handleBulkDelete = useCallback(() => {
     }, 3000);
   
 }, [saveToUndo, tableData, columns, mergedCells]);
+const handleUnmergeCells = useCallback(() => {
+  if (!selectedCell) {
+    setSnackbarInfo({
+      open: true,
+      message: "Please select a merged cell to unmerge",
+      variant: "info",
+    });
+    return;
+  }
 
+  const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
+  const cellKey = `${selectedCell.rowIndex}-${colIndex}`;
+  const mergedCell = mergedCells[cellKey];
+
+  // Only allow unmerge if this is the first (anchor) cell of a merge
+  if (!mergedCell || !mergedCell.isFirst) {
+    setSnackbarInfo({
+      open: true,
+      message: "Selected cell is not a merged cell",
+      variant: "info",
+    });
+    return;
+  }
+
+  saveToUndo(tableData, columns, mergedCells);
+
+  // Remove all entries belonging to this merged group
+  const newMergedCells = { ...mergedCells };
+  const { startRow, startCol, endRow, endCol } = mergedCell;
+
+  for (let i = startRow; i <= endRow; i++) {
+    for (let j = startCol; j <= endCol; j++) {
+      delete newMergedCells[`${i}-${j}`];
+    }
+  }
+
+  setMergedCells(newMergedCells);
+
+  setSnackbarInfo({
+    open: true,
+    message: `Unmerged ${(endRow - startRow + 1) * (endCol - startCol + 1)} cells`,
+    variant: "success",
+  });
+  setTimeout(() => {
+    setSnackbarInfo({ open: false, message: "", variant: "success" });
+  }, 3000);
+}, [selectedCell, columns, mergedCells, tableData, saveToUndo]);
 const handleMergeCells = useCallback(() => {
   if (!selectedRange) {
     setSnackbarInfo({
@@ -569,9 +615,9 @@ const handleMergeCells = useCallback(() => {
     });
     return;
   }
-  
+
   const { startRow, startCol, endRow, endCol } = selectedRange;
-  
+
   if (startRow === endRow && startCol === endCol) {
     setSnackbarInfo({
       open: true,
@@ -580,51 +626,98 @@ const handleMergeCells = useCallback(() => {
     });
     return;
   }
-  
+
   saveToUndo(tableData, columns, mergedCells);
-  
+
   const newData = JSON.parse(JSON.stringify(tableData));
-  
+
+  // Step 1: Expand the merge range to cover any existing merged groups
+  // that overlap with the selected range
+  let expandedStartRow = startRow;
+  let expandedStartCol = startCol;
+  let expandedEndRow = endRow;
+  let expandedEndCol = endCol;
+
+  Object.values(mergedCells).forEach((cell) => {
+    if (!cell.isFirst) return;
+    // Check if this existing merge overlaps with selected range
+    const overlaps =
+      cell.startRow <= endRow &&
+      cell.endRow >= startRow &&
+      cell.startCol <= endCol &&
+      cell.endCol >= startCol;
+    if (overlaps) {
+      expandedStartRow = Math.min(expandedStartRow, cell.startRow);
+      expandedStartCol = Math.min(expandedStartCol, cell.startCol);
+      expandedEndRow = Math.max(expandedEndRow, cell.endRow);
+      expandedEndCol = Math.max(expandedEndCol, cell.endCol);
+    }
+  });
+
+  const finalRange = {
+    startRow: expandedStartRow,
+    startCol: expandedStartCol,
+    endRow: expandedEndRow,
+    endCol: expandedEndCol,
+  };
+
+  // Step 2: Collect merged value — read only isFirst cells and plain cells
+  // (skip hidden cells to avoid double-counting)
   let mergedValue = '';
-  for (let i = startRow; i <= endRow; i++) {
-    for (let j = startCol; j <= endCol; j++) {
+  for (let i = finalRange.startRow; i <= finalRange.endRow; i++) {
+    for (let j = finalRange.startCol; j <= finalRange.endCol; j++) {
+      const cellKey = `${i}-${j}`;
+      const existing = mergedCells[cellKey];
+      if (existing && !existing.isFirst && existing.hidden) continue; // skip hidden
       const cellValue = newData[i]?.[columns[j]?.accessor];
-      if (cellValue && cellValue.trim()) {
-        mergedValue += (mergedValue ? ' ' : '') + cellValue;
+      if (cellValue && String(cellValue).trim()) {
+        mergedValue += (mergedValue ? ' ' : '') + String(cellValue).trim();
       }
     }
   }
-  
-  newData[startRow] = {
-    ...newData[startRow],
-    [columns[startCol].accessor]: mergedValue
+
+  // Step 3: Put merged value on anchor, clear all others in expanded range
+  newData[finalRange.startRow] = {
+    ...newData[finalRange.startRow],
+    [columns[finalRange.startCol].accessor]: mergedValue,
   };
-  
-  for (let i = startRow; i <= endRow; i++) {
-    for (let j = startCol; j <= endCol; j++) {
-      if (i === startRow && j === startCol) continue;
+  for (let i = finalRange.startRow; i <= finalRange.endRow; i++) {
+    for (let j = finalRange.startCol; j <= finalRange.endCol; j++) {
+      if (i === finalRange.startRow && j === finalRange.startCol) continue;
       newData[i] = {
         ...newData[i],
-        [columns[j].accessor]: ''
+        [columns[j].accessor]: '',
       };
     }
   }
-  
+
+  // Step 4: Remove ALL existing merge entries that touch the expanded range
+  const cleanedMergedCells = {};
+  Object.entries(mergedCells).forEach(([key, value]) => {
+    const [r, c] = key.split('-').map(Number);
+    const inRange =
+      r >= finalRange.startRow &&
+      r <= finalRange.endRow &&
+      c >= finalRange.startCol &&
+      c <= finalRange.endCol;
+    if (!inRange) {
+      cleanedMergedCells[key] = value;
+    }
+  });
+
   setTableData(newData);
   setSelectedRange(null);
-  setMergedCells(prev => computeUpdatedMergedCells(selectedRange, prev));
-  
+  setMergedCells(computeUpdatedMergedCells(finalRange, cleanedMergedCells));
+
   setSnackbarInfo({
     open: true,
-    message: `Merged ${(endRow - startRow + 1) * (endCol - startCol + 1)} cells`,
+    message: `Merged ${(finalRange.endRow - finalRange.startRow + 1) * (finalRange.endCol - finalRange.startCol + 1)} cells`,
     variant: "success",
   });
   setTimeout(() => {
     setSnackbarInfo({ open: false, message: "", variant: "success" });
   }, 3000);
-}, [tableData, columns, mergedCells, saveToUndo, selectedRange]);
-
-const handleCopyCell = useCallback(() => {
+}, [tableData, columns, mergedCells, saveToUndo, selectedRange]);const handleCopyCell = useCallback(() => {
   if (!selectedCell) return;
   
   const cellValue = tableData[selectedCell.rowIndex]?.[selectedCell.columnId];
@@ -1752,6 +1845,8 @@ const handleTranscribe = useCallback((text) => {
             onAddRowAfter={handleAddRowAfter}
             onAddColBefore={handleAddColBefore}
             onAddColAfter={handleAddColAfter}
+              onUnmergeCells={handleUnmergeCells}
+
           />
           
           <div className="table-container">
@@ -1775,6 +1870,7 @@ const handleTranscribe = useCallback((text) => {
               ProjectDetails={ProjectDetails}
               mergedCells={mergedCells}
               onMergedCellsChange={setMergedCells}
+              
             />
           </div>
           
