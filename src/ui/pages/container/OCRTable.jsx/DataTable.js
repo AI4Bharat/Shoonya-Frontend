@@ -453,7 +453,6 @@ const DataTable = ({
           />
         )}
         <div className="top-textarea-info">
-          <span className="cell-position">Cell: {activeColumnId} / Row {activeRowIndex + 1}</span>
           <button className="clear-selection-btn" onClick={() => {
             setActiveRowIndex(null);
             setActiveColumnId(null);

@@ -53,6 +53,206 @@ const computeUpdatedMergedCells = (range, existing = {}) => {
   return newMergedCells;
 };
 
+// ── HELPERS for shifting/cleaning mergedCells indices ────────────────────────
+
+/**
+ * Rebuild mergedCells map after inserting a new row at `insertAt`.
+ * Every entry whose row index >= insertAt gets shifted down by 1.
+ */
+const shiftMergedCellsForRowInsert = (mergedCells, insertAt) => {
+  const updated = {};
+  Object.entries(mergedCells).forEach(([key, value]) => {
+    const [r, c] = key.split('-').map(Number);
+    const newR = r >= insertAt ? r + 1 : r;
+    const newKey = `${newR}-${c}`;
+    const newValue = { ...value };
+    if (newValue.isFirst) {
+      if (newValue.startRow >= insertAt) newValue.startRow += 1;
+      if (newValue.endRow >= insertAt) newValue.endRow += 1;
+    }
+    updated[newKey] = newValue;
+  });
+  return updated;
+};
+
+/**
+ * Rebuild mergedCells map after inserting a new column at `insertAt`.
+ * Every entry whose col index >= insertAt gets shifted right by 1.
+ */
+const shiftMergedCellsForColInsert = (mergedCells, insertAt) => {
+  const updated = {};
+  Object.entries(mergedCells).forEach(([key, value]) => {
+    const [r, c] = key.split('-').map(Number);
+    const newC = c >= insertAt ? c + 1 : c;
+    const newKey = `${r}-${newC}`;
+    const newValue = { ...value };
+    if (newValue.isFirst) {
+      if (newValue.startCol >= insertAt) newValue.startCol += 1;
+      if (newValue.endCol >= insertAt) newValue.endCol += 1;
+    }
+    updated[newKey] = newValue;
+  });
+  return updated;
+};
+
+/**
+ * Rebuild mergedCells map after deleting the row at `deleteAt`.
+ * Works from isFirst entries only (source of truth), then re-derives hidden entries.
+ *
+ * Cases per merged group:
+ *   A) entirely above deleteAt  → keep as-is
+ *   B) entirely below deleteAt  → shift startRow/endRow up by 1
+ *   C) spans deleteAt, isFirst row is NOT deleted → keep key, shrink endRow/rowSpan
+ *   D) spans deleteAt, isFirst row IS the deleted row → promote next row to isFirst
+ */
+const shiftMergedCellsForRowDelete = (mergedCells, deleteAt) => {
+  const firstEntries = Object.entries(mergedCells).filter(([, v]) => v.isFirst);
+  const updated = {};
+
+  firstEntries.forEach(([key, value]) => {
+    const { startRow, startCol, endRow, endCol, colSpan, rowSpan } = value;
+
+    // A) entirely above
+    if (endRow < deleteAt) {
+      updated[key] = { ...value };
+      return;
+    }
+
+    // B) entirely below
+    if (startRow > deleteAt) {
+      const newStart = startRow - 1;
+      const newEnd = endRow - 1;
+      updated[`${newStart}-${startCol}`] = { ...value, startRow: newStart, endRow: newEnd };
+      return;
+    }
+
+    // C or D: spans the deleted row
+    const newRowSpan = rowSpan - 1;
+    if (newRowSpan < 1) return; // group disappears
+    if (newRowSpan === 1 && colSpan === 1) return; // collapses to plain cell
+
+    if (startRow < deleteAt) {
+      // C: isFirst row is above the deleted row — keep key, shrink endRow
+      updated[key] = { ...value, rowSpan: newRowSpan, endRow: endRow - 1 };
+    } else {
+      // D: isFirst row IS the deleted row — promote the next physical row
+      // After deletion, what was row (startRow+1) becomes row (startRow)
+      const newStart = startRow; // row startRow+1 shifts to startRow after deletion
+      const newEnd = endRow - 1;
+      updated[`${newStart}-${startCol}`] = {
+        ...value,
+        isFirst: true,
+        startRow: newStart,
+        endRow: newEnd,
+        rowSpan: newRowSpan,
+      };
+    }
+  });
+
+  // Re-derive all hidden entries from the rebuilt isFirst entries
+  Object.values(updated).forEach((value) => {
+    if (!value.isFirst) return;
+    const { startRow, startCol, endRow, endCol } = value;
+    for (let i = startRow; i <= endRow; i++) {
+      for (let j = startCol; j <= endCol; j++) {
+        if (i === startRow && j === startCol) continue;
+        updated[`${i}-${j}`] = { isFirst: false, hidden: true };
+      }
+    }
+  });
+
+  return updated;
+};
+
+/**
+ * Rebuild mergedCells map after deleting the column at index `deleteAt`.
+ * Works from isFirst entries only, then re-derives hidden entries.
+ *
+ * Cases per merged group:
+ *   A) entirely left of deleteAt  → keep as-is
+ *   B) entirely right of deleteAt → shift startCol/endCol left by 1
+ *   C) spans deleteAt, isFirst col is NOT deleted → keep key, shrink endCol/colSpan
+ *   D) spans deleteAt, isFirst col IS the deleted col → promote next col to isFirst
+ */
+const shiftMergedCellsForColDelete = (mergedCells, deleteAt) => {
+  const firstEntries = Object.entries(mergedCells).filter(([, v]) => v.isFirst);
+  const updated = {};
+
+  firstEntries.forEach(([key, value]) => {
+    const { startRow, startCol, endRow, endCol, colSpan, rowSpan } = value;
+
+    // A) entirely left
+    if (endCol < deleteAt) {
+      updated[key] = { ...value };
+      return;
+    }
+
+    // B) entirely right
+    if (startCol > deleteAt) {
+      const newStart = startCol - 1;
+      const newEnd = endCol - 1;
+      updated[`${startRow}-${newStart}`] = { ...value, startCol: newStart, endCol: newEnd };
+      return;
+    }
+
+    // C or D: spans the deleted column
+    const newColSpan = colSpan - 1;
+    if (newColSpan < 1) return; // group disappears
+    if (newColSpan === 1 && rowSpan === 1) return; // collapses to plain cell
+
+    if (startCol < deleteAt) {
+      // C: isFirst col is left of the deleted col — keep key, shrink endCol
+      updated[key] = { ...value, colSpan: newColSpan, endCol: endCol - 1 };
+    } else {
+      // D: isFirst col IS the deleted col — promote next col to isFirst
+      const newStart = startCol; // col startCol+1 shifts to startCol after deletion
+      const newEnd = endCol - 1;
+      updated[`${startRow}-${newStart}`] = {
+        ...value,
+        isFirst: true,
+        startCol: newStart,
+        endCol: newEnd,
+        colSpan: newColSpan,
+      };
+    }
+  });
+
+  // Re-derive all hidden entries from the rebuilt isFirst entries
+  Object.values(updated).forEach((value) => {
+    if (!value.isFirst) return;
+    const { startRow, startCol, endRow, endCol } = value;
+    for (let i = startRow; i <= endRow; i++) {
+      for (let j = startCol; j <= endCol; j++) {
+        if (i === startRow && j === startCol) continue;
+        updated[`${i}-${j}`] = { isFirst: false, hidden: true };
+      }
+    }
+  });
+
+  return updated;
+};
+
+/**
+ * Given a column accessor and the columns array, find the outermost col index
+ * to use when adding before/after a merged cell group.
+ * Returns { insertBefore, insertAfter } — the correct split points.
+ */
+const getMergeAwareColBounds = (colIndex, mergedCells) => {
+  // Check if this colIndex is inside a merged group (hidden cell points to isFirst)
+  // Walk all isFirst entries to see if colIndex falls within any span
+  let spanStart = colIndex;
+  let spanEnd = colIndex;
+  Object.values(mergedCells).forEach((value) => {
+    if (value.isFirst && value.startCol <= colIndex && value.endCol >= colIndex) {
+      spanStart = value.startCol;
+      spanEnd = value.endCol;
+    }
+  });
+  return { spanStart, spanEnd };
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function App() {
     const classes = AudioTranscriptionLandingStyle();
   
@@ -1037,38 +1237,47 @@ const handleCellEdit = useCallback((rowIndex, columnId, value) => {
     );
   }, [columns, tableData, mergedCells, saveToUndo]);
 
-// CHANGED: pass current state explicitly to saveToUndo
+// FIXED: shift mergedCells row indices when inserting a row before the selected cell
   const handleAddRowBefore = useCallback(() => {
     if (!selectedCell) return;
     saveToUndo(tableData, columns, mergedCells);
+    const insertAt = selectedCell.rowIndex;
     const newRow = { id: Date.now() };
     columns.forEach(col => { newRow[col.accessor] = ''; });
     setTableData(prev => {
       const next = [...prev];
-      next.splice(selectedCell.rowIndex, 0, newRow);
+      next.splice(insertAt, 0, newRow);
       return next;
     });
+    // Shift all merged cell indices that are at or below the insertion point
+    setMergedCells(prev => shiftMergedCellsForRowInsert(prev, insertAt));
   }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
 
-// CHANGED: pass current state explicitly to saveToUndo
+// FIXED: shift mergedCells row indices when inserting a row after the selected cell
   const handleAddRowAfter = useCallback(() => {
     if (!selectedCell) return;
     saveToUndo(tableData, columns, mergedCells);
+    const insertAt = selectedCell.rowIndex + 1;
     const newRow = { id: Date.now() };
     columns.forEach(col => { newRow[col.accessor] = ''; });
     setTableData(prev => {
       const next = [...prev];
-      next.splice(selectedCell.rowIndex + 1, 0, newRow);
+      next.splice(insertAt, 0, newRow);
       return next;
     });
+    // Shift all merged cell indices that are at or below the insertion point
+    setMergedCells(prev => shiftMergedCellsForRowInsert(prev, insertAt));
   }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
 
-// CHANGED: pass current state explicitly to saveToUndo
+// FIXED: insert before the outermost start of any merged span covering the selected col
   const handleAddColBefore = useCallback(() => {
     if (!selectedCell) return;
     saveToUndo(tableData, columns, mergedCells);
     const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
     if (colIndex === -1) return;
+    // If this cell is part of a merged group, insert before the span's start
+    const { spanStart } = getMergeAwareColBounds(colIndex, mergedCells);
+    const insertAt = spanStart;
     const newAccessor = `col_${Date.now()}`;
     const newColumn = {
       accessor: newAccessor,
@@ -1079,18 +1288,22 @@ const handleCellEdit = useCallback((rowIndex, columnId, value) => {
     };
     setColumns(prev => {
       const next = [...prev];
-      next.splice(colIndex, 0, newColumn);
+      next.splice(insertAt, 0, newColumn);
       return next;
     });
     setTableData(prev => prev.map(row => ({ ...row, [newAccessor]: '' })));
+    setMergedCells(prev => shiftMergedCellsForColInsert(prev, insertAt));
   }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
 
-// CHANGED: pass current state explicitly to saveToUndo
+// FIXED: insert after the outermost end of any merged span covering the selected col
   const handleAddColAfter = useCallback(() => {
     if (!selectedCell) return;
     saveToUndo(tableData, columns, mergedCells);
     const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
     if (colIndex === -1) return;
+    // If this cell is part of a merged group, insert after the span's end
+    const { spanEnd } = getMergeAwareColBounds(colIndex, mergedCells);
+    const insertAt = spanEnd + 1;
     const newAccessor = `col_${Date.now()}`;
     const newColumn = {
       accessor: newAccessor,
@@ -1101,29 +1314,35 @@ const handleCellEdit = useCallback((rowIndex, columnId, value) => {
     };
     setColumns(prev => {
       const next = [...prev];
-      next.splice(colIndex + 1, 0, newColumn);
+      next.splice(insertAt, 0, newColumn);
       return next;
     });
     setTableData(prev => prev.map(row => ({ ...row, [newAccessor]: '' })));
+    setMergedCells(prev => shiftMergedCellsForColInsert(prev, insertAt));
   }, [selectedCell, columns, tableData, mergedCells, saveToUndo]);
 
-// CHANGED: pass current state explicitly to saveToUndo
+// FIXED: update mergedCells when deleting a row
   const handleDeleteRow = useCallback((rowIndex) => {
     saveToUndo(tableData, columns, mergedCells);
     setTableData(prev => prev.filter((_, index) => index !== rowIndex));
+    setMergedCells(prev => shiftMergedCellsForRowDelete(prev, rowIndex));
   }, [saveToUndo, tableData, columns, mergedCells]);
 
-// CHANGED: pass current state explicitly to saveToUndo
+// FIXED: update mergedCells when deleting a column
   const handleDeleteColumn = useCallback((columnId) => {
     saveToUndo(tableData, columns, mergedCells);
+    const colIndex = columns.findIndex(c => c.accessor === columnId);
     setColumns(prev => prev.filter(col => col.accessor !== columnId));
-    setTableData(prev => 
+    setTableData(prev =>
       prev.map(row => {
         const newRow = { ...row };
         delete newRow[columnId];
         return newRow;
       })
     );
+    if (colIndex !== -1) {
+      setMergedCells(prev => shiftMergedCellsForColDelete(prev, colIndex));
+    }
   }, [saveToUndo, tableData, columns, mergedCells]);
 
 // CHANGED: pass current state explicitly to saveToUndo
