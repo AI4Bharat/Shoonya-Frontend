@@ -84,8 +84,10 @@ const TableControls = ({
   setTheme,
   onClearAll,
   selectedCell,
+  onBulkDelete,
   onMergeCells,
-  onDeleteTable,
+  onCopyCell,
+  isCellSelected,
   onAddRowBefore,   // NEW
   onAddRowAfter,    // NEW
   onAddColBefore,   // NEW
@@ -96,6 +98,7 @@ const TableControls = ({
   const [anchorElTheme, setAnchorElTheme] = useState(null);
   const [anchorElAddRow, setAnchorElAddRow] = useState(null);  // NEW
   const [anchorElAddCol, setAnchorElAddCol] = useState(null);  // NEW
+const [anchorElDelete, setAnchorElDelete] = useState(null);
 
   // Apply theme to CSS variables
   useEffect(() => {
@@ -215,14 +218,14 @@ const TableControls = ({
       </Tooltip>
 
       {/* Delete Table Button */}
-      <Tooltip title="Delete Entire Table" placement="bottom">
-        <IconButton
-          className="control-btn delete-table-btn"
-          onClick={onDeleteTable}
-        >
-          <DeleteSweepIcon />
-        </IconButton>
-      </Tooltip>
+     <Tooltip title="Delete Options" placement="bottom">
+  <IconButton
+    className="control-btn delete-table-btn"
+    onClick={(e) => setAnchorElDelete(e.currentTarget)}
+  >
+    <DeleteSweepIcon />
+  </IconButton>
+</Tooltip>
 
       <Divider orientation="vertical" className="controls-divider" />
 
@@ -235,7 +238,36 @@ const TableControls = ({
           <SettingsIcon />
         </IconButton>
       </Tooltip>
-
+<Menu
+  sx={{ mt: "45px" }}
+  anchorEl={anchorElDelete}
+  anchorOrigin={anchorOrigin}
+  keepMounted
+  transformOrigin={transformOrigin}
+  open={Boolean(anchorElDelete)}
+  onClose={() => setAnchorElDelete(null)}
+>
+  <MenuItem 
+    onClick={() => {
+      onBulkDelete?.();
+      setAnchorElDelete(null);
+    }}
+    sx={{ color: "#d32f2f" }}
+  >
+    <DeleteSweepIcon sx={{ mr: 1, fontSize: 20 }} />
+    <Typography variant="body2">Delete Entire Table</Typography>
+  </MenuItem>
+  
+  <MenuItem 
+    onClick={() => {
+      setAnchorElDelete(null);
+    }}
+    sx={{ color: "#f57c00" }}
+  >
+    <DeleteSweepIcon sx={{ mr: 1, fontSize: 20 }} />
+    <Typography variant="body2">Cancel</Typography>
+  </MenuItem>
+</Menu>
       {/* Settings Menu */}
       <Menu
         sx={{ mt: "45px" }}

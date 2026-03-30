@@ -546,7 +546,6 @@ const saveToUndo = useCallback((data, cols, mc) => {
 }, []);
 
 const handleBulkDelete = useCallback(() => {
-  if (window.confirm('Are you sure you want to delete ALL table data? This action cannot be undone.')) {
     saveToUndo(tableData, columns, mergedCells);
     setTableData([]);
     setColumns([]);
@@ -558,7 +557,7 @@ const handleBulkDelete = useCallback(() => {
     setTimeout(() => {
       setSnackbarInfo({ open: false, message: "", variant: "success" });
     }, 3000);
-  }
+  
 }, [saveToUndo, tableData, columns, mergedCells]);
 
 const handleMergeCells = useCallback(() => {
