@@ -224,7 +224,8 @@
 /* Row and column headers */
 .row-number-header,
 .row-number {
-  width: 30px;
+  width: 60px;          /* was 30px — now fits drag handle + number + delete btn */
+  min-width: 60px;
   text-align: center !important;
   background: #f0f0f0;
   font-weight: 600;
@@ -233,6 +234,7 @@
   z-index: 5;
   border-right: 2px solid #ddd;
   color: #555;
+  overflow: visible;    /* ensures button is never clipped by the cell boundary */
 }
 .drag-handle-row {
   margin-right: 6px;
@@ -248,6 +250,8 @@
   font-weight: 600;
   color: #555;
   cursor: move;
+  vertical-align: top;
+  padding-top: 10px !important;
 }
 
 /* Action buttons */
@@ -282,8 +286,13 @@
   opacity: 0;
   transition: all 0.2s ease;
   margin-left: 6px;
+  flex-shrink: 0;       /* never shrinks when space is tight */
+  min-width: 24px;      /* always clickable even in cramped rows */
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-
 tr:hover .delete-row-btn {
   opacity: 0.7;
 }
