@@ -1,16 +1,91 @@
-/* Updated components/DataTable.css - Light Theme */
-.data-table-wrapper {
-  height: 100%;
-  overflow: visible !important;
-}
-/* Top textarea styles */
+
 .data-table-wrapper-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: auto;
+  width: 100%;
+  overflow: hidden;
+}
+/* Add to DataTable.css */
+.range-selected {
+  background-color: #ffe0b2 !important;
+  box-shadow: inset 0 0 0 1px #ff9800;
 }
 
+.range-selected.active-cell {
+  background-color: #ffcc80 !important;
+}
+.data-table-wrapper {
+  flex: 1;
+  overflow: auto !important;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+  min-height: 200px;
+}
+
+/* Excel-like toolbar */
+.excel-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 4px;
+  padding: 0 8px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.toolbar-group:last-child {
+  border-right: none;
+}
+
+.excel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.excel-btn:hover {
+  background: #e8f0fe;
+  border-color: #667eea;
+  transform: translateY(-1px);
+}
+
+.excel-btn:active {
+  transform: scale(0.98);
+}
+
+.excel-btn.delete-btn {
+  color: #d32f2f;
+}
+
+.excel-btn.delete-btn:hover {
+  background: #ffebee;
+  border-color: #d32f2f;
+}
+
+/* Top textarea styles */
 .top-textarea-container {
   padding: 12px;
   background: #f8f9fa;
@@ -22,10 +97,7 @@
   width: 100%;
   font-family: inherit;
   transition: all 0.2s ease;
-  resize: vertical!important;
-            border: "2px solid #667eea";
-          padding: "8px";
-
+  resize: vertical !important;
 }
 
 .top-editor-textarea:focus {
@@ -40,6 +112,16 @@
   margin-top: 8px;
   font-size: 12px;
   color: #666;
+}
+
+.cell-position {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: #667eea;
+  background: #f0f4ff;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .clear-selection-btn {
@@ -67,6 +149,58 @@
   background-color: #f5f5f5;
 }
 
+/* Table styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 800px;
+  color: #333333;
+}
+
+.data-table thead {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  z-index: 10;
+  border-bottom: 2px solid #5a67d8;
+}
+
+.data-table th {
+  padding: 12px 8px;
+  font-weight: 600;
+  text-align: left;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+.data-table td {
+  padding: 10px 8px;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333333;
+  height: 45px;
+  border: 1px solid #e0e0e0;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f0f4ff !important;
+}
+
+.data-table tbody tr:hover td {
+  background-color: #f0f4ff !important;
+}
 
 /* Grid line visibility */
 .data-table-wrapper.show-grid .data-table td {
@@ -87,77 +221,10 @@
   background-color: #ffffff;
 }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed; /* kept as is */
-  min-width: 800px;
-  color: #333333;
-  overflow: visible !important; /* ✅ FIX */
-}
-
-.data-table thead {
-  position: sticky;
-  top: 0;
-  background: rgb(176, 211, 244);
-  color: black;
-  z-index: 10;
-  border-bottom: 2px solid #5a67d8;
-}
-
-.data-table th {
-  padding: 12px 8px;
-  font-weight: 600;
-  text-align: left;
-  position: relative;
-  user-select: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: black;
-}
-
-.data-table td {
-  padding: 10px 8px;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
-  overflow: hidden; /* keep default */
-  text-overflow: ellipsis;
-  color: #333333;
-  height: 45px;
-}
-
-.table-cell {
-  position: relative;
-  min-height: 40px;
-  cursor: cell;
-  overflow: visible !important;
-}
-.table-cell.editing {
-  position: absolute;
-  z-index: 1000;
-  background: white;
-  width: 100%;
-}
-.data-table tbody tr {
-  height: auto !important;
-}
-
-.data-table tbody tr:hover {
-  background-color: #f0f4ff !important;
-}
-
-.data-table tbody tr:hover td {
-  background-color: #f0f4ff !important;
-}
-
+/* Row and column headers */
 .row-number-header,
 .row-number {
-  width: 60px;
+  width: 30px;
   text-align: center !important;
   background: #f0f0f0;
   font-weight: 600;
@@ -167,38 +234,23 @@
   border-right: 2px solid #ddd;
   color: #555;
 }
+.drag-handle-row {
+  margin-right: 6px;
+}
 
+.row-index {
+  margin-right: 10px;
+}
 .row-number {
   background: #f8f9fa;
   position: sticky;
   left: 0;
   font-weight: 600;
   color: #555;
+  cursor: move;
 }
 
-.actions-header,
-.actions-cell {
-  width: 60px;
-  text-align: center;
-  background: #f0f0f0;
-  position: sticky;
-  right: 0;
-  z-index: 5;
-  border-left: 2px solid #ddd;
-}
-
-.actions-cell {
-  background: #f8f9fa;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  position: relative;
-  justify-content: space-between;
-}
-
+/* Action buttons */
 .delete-column-btn {
   background: none;
   border: none;
@@ -241,7 +293,20 @@ tr:hover .delete-row-btn {
   background: rgba(255, 107, 107, 0.1);
 }
 
-/* Textarea style for transliteration */
+/* Table cell styles */
+.table-cell {
+  position: relative;
+  min-height: 40px;
+  cursor: cell;
+  overflow: visible !important;
+}
+
+.table-cell.editing {
+  padding: 0;
+  height: 100%;
+}
+
+/* Textarea style for editing */
 .cell-edit-textarea {
   width: 100%;
   height: 100%;
@@ -254,31 +319,18 @@ tr:hover .delete-row-btn {
   resize: both;
   overflow: auto;
   line-height: 1.5;
+  border: 2px solid #667eea;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
-
-
-/* RTL specific styles */
-[dir="rtl"] .cell-content {
-  text-align: right;
+.cell-edit-textarea:focus {
+  outline: none;
+  border-color: #764ba2;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
 
-[dir="rtl"] .cell-edit-input,
-[dir="rtl"] .cell-edit-textarea {
-  text-align: right;
-    resize: both;
-
-}
-
-[dir="rtl"] .header-content {
-  flex-direction: row-reverse;
-}
-
-[dir="rtl"] .delete-column-btn {
-  margin-left: 0;
-  margin-right: auto;
-}
-
+/* Cell content */
 .cell-content {
   display: flex;
   align-items: center;
@@ -295,23 +347,13 @@ tr:hover .delete-row-btn {
   color: #333333;
 }
 
-.transcribe-btn {
-  background: none;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  opacity: 0.5;
-  transition: all 0.2s ease;
-  color: rgb(44, 39, 153);
-  flex-shrink: 0;
-}
-
-.transcribe-btn:hover {
-  opacity: 1;
-  background: #f0f0f0;
-  transform: scale(1.1);
+/* Header content */
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  justify-content: space-between;
 }
 
 .resize-handle {
@@ -327,16 +369,55 @@ tr:hover .delete-row-btn {
 
 .resize-handle:hover,
 .resize-handle:active {
-  background: rgba(102, 126, 234, 0.2);
+  background: rgba(255, 255, 255, 0.3);
 }
 
-/* RTL resize handle adjustment */
+/* Transcribe button */
+.transcribe-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.transcribe-btn:hover {
+  opacity: 1;
+  background: #f0f0f0;
+  transform: scale(1.1);
+}
+
+/* RTL specific styles */
+[dir="rtl"] .cell-content {
+  text-align: right;
+}
+
+[dir="rtl"] .cell-edit-input,
+[dir="rtl"] .cell-edit-textarea {
+  text-align: right;
+  resize: both;
+}
+
+[dir="rtl"] .header-content {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .delete-column-btn {
+  margin-left: 0;
+  margin-right: auto;
+}
+
 [dir="rtl"] .resize-handle {
   right: auto;
   left: -5px;
 }
 
-/* ✅ CRITICAL FIX: Transliteration dropdown visibility */
+/* Transliteration dropdown visibility */
 .IndicTransliterate__suggestions,
 .IndicTransliterate__dropdown,
 .suggestions-container {
@@ -350,7 +431,9 @@ tr:hover .delete-row-btn {
   height: 12px;
 }
 
-
+.data-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
 
 .data-table-wrapper::-webkit-scrollbar-thumb {
   background: #c1c1c1;
@@ -368,9 +451,12 @@ tr:hover .delete-row-btn {
   scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
-/* Updated components/DataTable.css - Add responsive fixes at the bottom */
+/* Draggable elements */
+[draggable="true"] {
+  cursor: move;
+}
 
-/* Add these responsive fixes for small screens */
+/* Responsive styles */
 @media (max-width: 768px) {
   .data-table-wrapper {
     overflow-x: auto !important;
@@ -417,7 +503,6 @@ tr:hover .delete-row-btn {
     word-break: break-word;
   }
 
-  /* Make editing area responsive */
   .table-cell.editing {
     position: relative !important;
     width: auto !important;
@@ -428,7 +513,6 @@ tr:hover .delete-row-btn {
     font-size: 14px !important;
   }
 
-  /* Top textarea responsive */
   .top-textarea-container {
     padding: 8px;
   }
@@ -448,9 +532,55 @@ tr:hover .delete-row-btn {
     padding: 4px 8px;
     font-size: 10px;
   }
+
+  .cell-position {
+    font-size: 10px;
+  }
+
+  /* Excel toolbar responsive */
+  .excel-toolbar {
+    gap: 8px;
+    padding: 6px;
+  }
+
+  .toolbar-group {
+    padding: 0 4px;
+  }
+
+  .excel-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .excel-btn svg {
+    width: 12px;
+    height: 12px;
+  }
 }
 
-/* Extra small screens */
+@media (max-width: 640px) {
+  .excel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-group {
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 6px;
+  }
+
+  .toolbar-group:last-child {
+    border-bottom: none;
+  }
+
+  .excel-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 480px) {
   .data-table th,
   .data-table td {
@@ -481,14 +611,23 @@ tr:hover .delete-row-btn {
   }
 }
 
-/* Ensure table container has proper overflow */
-.data-table-wrapper {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  position: relative;
-}
+/* Touch-friendly styles */
+@media (hover: none) and (pointer: coarse) {
+  .delete-row-btn {
+    opacity: 1;
+    padding: 8px;
+  }
 
-.data-table-wrapper-container {
-  overflow-x: hidden;
-  width: 100%;
+  .transcribe-btn {
+    opacity: 1;
+    padding: 8px;
+  }
+
+  .cell-edit-textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .excel-btn {
+    min-height: 32px;
+  }
 }
