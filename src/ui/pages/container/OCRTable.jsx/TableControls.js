@@ -5,6 +5,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
+import CallSplitIcon from '@mui/icons-material/CallSplit';
 import Menu from "@mui/material/Menu";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -92,6 +93,7 @@ const TableControls = ({
   onAddRowAfter,    // NEW
   onAddColBefore,   // NEW
   onAddColAfter,    // NEW
+  onUnmergeCells
 }) => {
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
@@ -214,6 +216,18 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
           disabled={!selectedCell}
         >
           <MergeIcon />
+        </IconButton>
+      </Tooltip>
+     
+
+      {/* Unmerge Cells Button */}
+      <Tooltip title="Unmerge Selected Merged Cell" placement="bottom">
+        <IconButton
+          className="control-btn"
+          onClick={onUnmergeCells}
+          disabled={!selectedCell}
+        >
+          <CallSplitIcon />
         </IconButton>
       </Tooltip>
 
