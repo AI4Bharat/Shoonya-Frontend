@@ -272,6 +272,8 @@
   line-height: 1;
   opacity: 0.7;
   transition: all 0.2s ease;
+  flex-shrink: 0;        /* ← key: never shrinks */
+  margin-left: auto;     /* ← pushes it to the right */
 }
 
 .delete-column-btn:hover {
@@ -361,9 +363,16 @@ tr:hover .delete-row-btn {
 .header-content {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 19px;
   position: relative;
   justify-content: space-between;
+}
+.header-content > span {
+  max-width: calc(100% - 40px); /* 40px = space reserved for delete btn + gap */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* NO min-width: 0 — don't force shrink on short names */
 }
 
 .resize-handle {
@@ -489,6 +498,19 @@ tr:hover .delete-row-btn {
   .data-table th {
     font-size: 0.75rem !important;
     padding: 8px 4px !important;
+    padding: 12px 8px;
+  font-weight: 600;
+  text-align: left;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+  overflow: visible;     
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  
   }
 
   .data-table td {
