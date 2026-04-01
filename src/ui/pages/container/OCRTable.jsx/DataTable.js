@@ -88,12 +88,18 @@ const [headerEditValue, setHeaderEditValue] = useState('');
     }
   }, [editingCell]);
 
-  useEffect(() => {
+ useEffect(() => {
     if (activeRowIndex !== null && activeColumnId && topTextareaRef.current) {
       topTextareaRef.current.focus();
     }
   }, [activeRowIndex, activeColumnId]);
 
+  useEffect(() => {
+  if (activeRowIndex !== null && activeColumnId) {
+    const value = data[activeRowIndex]?.[activeColumnId] || '';
+    setEditValue(value);
+  }
+}, [activeRowIndex, activeColumnId]);
   // Column drag handlers
   const handleColumnDragStart = (e, colIndex) => {
     e.dataTransfer.effectAllowed = 'move';
@@ -252,17 +258,26 @@ const [headerEditValue, setHeaderEditValue] = useState('');
   };
 
   const handleTopTextareaBlur = () => {
-    if (activeRowIndex !== null && activeColumnId) {
+  if (activeRowIndex !== null && activeColumnId) {
+    const originalValue = data[activeRowIndex]?.[activeColumnId] || '';
+
+    if (editValue !== originalValue) { // ✅ KEY FIX
       onCellEdit(activeRowIndex, activeColumnId, editValue);
     }
-  };
+  }
+};
 
   const handleCellBlur = () => {
-    if (editingCell) {
+  if (editingCell) {
+    const originalValue = data[editingCell.rowIndex]?.[editingCell.columnId] || '';
+
+    if (editValue !== originalValue) { // ✅ KEY FIX
       onCellEdit(editingCell.rowIndex, editingCell.columnId, editValue);
-      setEditingCell(null);
     }
-  };
+
+    setEditingCell(null);
+  }
+};
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
