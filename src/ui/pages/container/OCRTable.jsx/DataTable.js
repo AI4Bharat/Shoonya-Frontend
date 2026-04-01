@@ -27,6 +27,8 @@ const DataTable = ({
 }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
+  const [editingHeader, setEditingHeader] = useState(null);
+const [headerEditValue, setHeaderEditValue] = useState('');
   const [columnWidths, setColumnWidths] = useState({});
   const [activeRowIndex, setActiveRowIndex] = useState(null);
   const [activeColumnId, setActiveColumnId] = useState(null);
@@ -106,6 +108,16 @@ const DataTable = ({
       setDragOverColumn(colIndex);
     }
   };
+  const handleHeaderEdit = (colIndex, newValue) => {
+  const updatedColumns = [...columns];
+  updatedColumns[colIndex] = {
+    ...updatedColumns[colIndex],
+    Header: newValue,
+  };
+
+  onReorderColumns(updatedColumns, data, mergedCells); 
+  
+};
 
  const handleColumnDragEnd = () => {
   if (draggedColumn !== null && dragOverColumn !== null && draggedColumn !== dragOverColumn) {
@@ -487,8 +499,40 @@ const DataTable = ({
       >
         <div className="header-content">
           <span className="drag-handle" title="Drag to reorder column">⋮⋮</span>
-          <span style={{ fontSize: `${fontSize}px` }}>{column.Header}</span>
-          <button 
+{editingHeader === colIndex ? (
+  <input
+    autoFocus
+    value={headerEditValue}
+    onChange={(e) => setHeaderEditValue(e.target.value)}
+    onBlur={() => {
+      handleHeaderEdit(colIndex, headerEditValue);
+      setEditingHeader(null);
+    }}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        handleHeaderEdit(colIndex, headerEditValue);
+        setEditingHeader(null);
+      } else if (e.key === 'Escape') {
+        setEditingHeader(null);
+      }
+    }}
+    style={{
+      width: "100%",
+      fontSize: `${fontSize}px`,
+      padding: "4px",
+    }}
+  />
+) : (
+  <span
+    style={{ fontSize: `${fontSize}px`, cursor: "pointer" }}
+    onDoubleClick={() => {
+      setEditingHeader(colIndex);
+      setHeaderEditValue(column.Header);
+    }}
+  >
+    {column.Header}
+  </span>
+)}          <button 
             className="delete-column-btn"
             onClick={() => onDeleteColumn(column.accessor)}
             title="Delete column"
