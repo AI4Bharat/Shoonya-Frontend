@@ -1,0 +1,638 @@
+
+.data-table-wrapper-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+/* Add to DataTable.css */
+.range-selected {
+  background-color: #ffe0b2 !important;
+  box-shadow: inset 0 0 0 1px #ff9800;
+}
+
+.range-selected.active-cell {
+  background-color: #ffcc80 !important;
+}
+.data-table-wrapper {
+  flex: 1;
+  overflow: auto !important;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+  min-height: 200px;
+}
+
+/* Excel-like toolbar */
+.excel-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 4px;
+  padding: 0 8px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.toolbar-group:last-child {
+  border-right: none;
+}
+
+.excel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.excel-btn:hover {
+  background: #e8f0fe;
+  border-color: #667eea;
+  transform: translateY(-1px);
+}
+
+.excel-btn:active {
+  transform: scale(0.98);
+}
+
+.excel-btn.delete-btn {
+  color: #d32f2f;
+}
+
+.excel-btn.delete-btn:hover {
+  background: #ffebee;
+  border-color: #d32f2f;
+}
+
+/* Top textarea styles */
+.top-textarea-container {
+  padding: 12px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.top-editor-textarea {
+  width: 100%;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  resize: vertical !important;
+}
+
+.top-editor-textarea:focus {
+  border-color: #764ba2;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.top-textarea-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+.cell-position {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: #667eea;
+  background: #f0f4ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.clear-selection-btn {
+  padding: 4px 12px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.clear-selection-btn:hover {
+  background: #e0e0e0;
+  border-color: #ccc;
+}
+
+/* Active cell highlighting */
+.active-cell {
+  background-color: #e3f2fd !important;
+  box-shadow: inset 0 0 0 2px #2196f3;
+}
+
+.active-row {
+  background-color: #f5f5f5;
+}
+
+/* Table styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 800px;
+  color: #333333;
+}
+
+.data-table thead {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  z-index: 10;
+  border-bottom: 2px solid #5a67d8;
+}
+
+.data-table th {
+  padding: 12px 8px;
+  font-weight: 600;
+  text-align: left;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+.data-table td {
+  padding: 10px 8px;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333333;
+  height: 45px;
+  border: 1px solid #e0e0e0;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f0f4ff !important;
+}
+
+.data-table tbody tr:hover td {
+  background-color: #f0f4ff !important;
+}
+
+/* Grid line visibility */
+.data-table-wrapper.show-grid .data-table td {
+  border: 1px solid #e0e0e0;
+}
+
+.data-table-wrapper.hide-grid .data-table td {
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Alternate row colors */
+.data-table.alternate-rows tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.data-table.alternate-rows tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+/* Row and column headers */
+.row-number-header,
+.row-number {
+  width: 30px;
+  text-align: center !important;
+  background: #f0f0f0;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  border-right: 2px solid #ddd;
+  color: #555;
+}
+.drag-handle-row {
+  margin-right: 6px;
+}
+
+.row-index {
+  margin-right: 10px;
+}
+.row-number {
+  background: #f8f9fa;
+  position: sticky;
+  left: 0;
+  font-weight: 600;
+  color: #555;
+  cursor: move;
+}
+
+/* Action buttons */
+.delete-column-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.delete-column-btn:hover {
+  opacity: 1;
+  color: #ff6b6b;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.delete-row-btn {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0;
+  transition: all 0.2s ease;
+  margin-left: 6px;
+}
+
+tr:hover .delete-row-btn {
+  opacity: 0.7;
+}
+
+.delete-row-btn:hover {
+  opacity: 1 !important;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+/* Table cell styles */
+.table-cell {
+  position: relative;
+  min-height: 45px;
+  cursor: cell;
+  overflow: visible !important;
+}
+
+.table-cell.editing {
+  padding: 0;
+  height: 100%;
+    min-height: 45px;
+
+}
+
+.cell-edit-textarea {
+  width: calc(100% - 4px);
+  height: 100%;
+  min-height: 45px !important;
+  padding: 6px;
+  font-size: 14px;
+  background: white;
+  color: #333333;
+  font-family: inherit;
+  resize: vertical !important;
+  overflow: auto;
+  line-height: 1.5;
+   border: none;
+  outline: 2px solid #667eea;
+  outline-offset: -2px;
+  border-radius: 0;
+  box-sizing: border-box;
+  margin: 0;
+  display: block;
+}
+
+.cell-edit-textarea:focus {
+  outline: 2px solid #667eea;
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+/* Cell content */
+.cell-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 100%;
+}
+
+.cell-content span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #333333;
+}
+
+/* Header content */
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  justify-content: space-between;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  width: 10px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 20;
+}
+
+.resize-handle:hover,
+.resize-handle:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Transcribe button */
+.transcribe-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.transcribe-btn:hover {
+  opacity: 1;
+  background: #f0f0f0;
+  transform: scale(1.1);
+}
+
+/* RTL specific styles */
+[dir="rtl"] .cell-content {
+  text-align: right;
+}
+
+[dir="rtl"] .cell-edit-input,
+[dir="rtl"] .cell-edit-textarea {
+  text-align: right;
+  resize: vertical !important;
+}
+
+[dir="rtl"] .header-content {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .delete-column-btn {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .resize-handle {
+  right: auto;
+  left: -5px;
+}
+
+/* Transliteration dropdown visibility */
+.IndicTransliterate__suggestions,
+.IndicTransliterate__dropdown,
+.suggestions-container {
+  position: absolute !important;
+  z-index: 99999 !important;
+}
+
+/* Scrollbar Styling */
+.data-table-wrapper::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.data-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.data-table-wrapper::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px;
+  border: 2px solid #f1f1f1;
+}
+
+.data-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Firefox Scrollbar */
+.data-table-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Draggable elements */
+[draggable="true"] {
+  cursor: move;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .data-table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+
+  .data-table {
+    min-width: 100% !important;
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  .data-table th,
+  .data-table td {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    min-width: 80px;
+  }
+
+  .data-table th {
+    font-size: 0.75rem !important;
+    padding: 8px 4px !important;
+  }
+
+  .data-table td {
+    font-size: 0.7rem !important;
+    padding: 6px 4px !important;
+  }
+
+  .row-number-header,
+  .row-number {
+    width: 40px !important;
+    min-width: 40px !important;
+  }
+
+  .delete-row-btn {
+    opacity: 1;
+    padding: 4px;
+    font-size: 14px;
+  }
+
+  .cell-content span {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+
+  .table-cell.editing {
+    position: relative !important;
+    width: 100% !important;
+  }
+
+  .cell-edit-textarea {
+    min-height: 60px !important;
+    font-size: 14px !important;
+  }
+
+  .top-textarea-container {
+    padding: 8px;
+  }
+
+  .top-editor-textarea {
+    min-height: 60px !important;
+    font-size: 12px !important;
+  }
+
+  .top-textarea-info {
+    font-size: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .clear-selection-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .cell-position {
+    font-size: 10px;
+  }
+
+  /* Excel toolbar responsive */
+  .excel-toolbar {
+    gap: 8px;
+    padding: 6px;
+  }
+
+  .toolbar-group {
+    padding: 0 4px;
+  }
+
+  .excel-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .excel-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .excel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-group {
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 6px;
+  }
+
+  .toolbar-group:last-child {
+    border-bottom: none;
+  }
+
+  .excel-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table th,
+  .data-table td {
+    min-width: 60px !important;
+    padding: 4px 2px !important;
+  }
+
+  .row-number-header,
+  .row-number {
+    width: 30px !important;
+    min-width: 30px !important;
+  }
+
+  .delete-row-btn {
+    padding: 2px;
+    font-size: 12px;
+  }
+
+  .cell-edit-textarea {
+    font-size: 12px !important;
+    padding: 4px !important;
+  }
+
+  .top-editor-textarea {
+    font-size: 12px !important;
+    min-height: 50px !important;
+    padding: 8px !important;
+  }
+}
+
+/* Touch-friendly styles */
+@media (hover: none) and (pointer: coarse) {
+  .delete-row-btn {
+    opacity: 1;
+    padding: 8px;
+  }
+
+  .transcribe-btn {
+    opacity: 1;
+    padding: 8px;
+  }
+
+  .cell-edit-textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .excel-btn {
+    min-height: 32px;
+  }
+}
