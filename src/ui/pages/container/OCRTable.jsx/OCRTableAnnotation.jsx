@@ -319,7 +319,8 @@ const [mergedCells, setMergedCells] = useState({});
   const [autoSave, setAutoSave] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
-  const [fontSize, setFontSize] = useState(14);
+    const [fontSize, setFontSize] = useState(JSON.parse(localStorage.getItem("OcrTranscriptionSettings"))
+    ?.fontSize || "large");
   const [enableTransliteration, setEnableTransliteration] = useState(false);
   const [enableRTL, setEnableRTL] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
