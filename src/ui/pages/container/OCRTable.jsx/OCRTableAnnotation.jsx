@@ -75,6 +75,8 @@ const shiftMergedCellsForRowInsert = (mergedCells, insertAt) => {
   return updated;
 };
 
+
+
 /**
  * Rebuild mergedCells map after inserting a new column at `insertAt`.
  * Every entry whose col index >= insertAt gets shifted right by 1.
@@ -273,12 +275,14 @@ function App() {
     const [loadtime, setloadtime] = useState(new Date());
     let labellingMode = localStorage.getItem("labellingMode");
 const [selectedRange, setSelectedRange] = useState(null);
+const [headerSelectionRange, setHeaderSelectionRange] = useState(null);
 const [isSelecting, setIsSelecting] = useState(false);
 const [selectionStart, setSelectionStart] = useState(null);
 const [selectionEnd, setSelectionEnd] = useState(null);
 
 // Lifted mergedCells state
 const [mergedCells, setMergedCells] = useState({});
+const [mergedHeaders, setMergedHeaders] = useState({});
 
   const [annotationsTaskDetails, setAnnotationsTaskDetails] = useState([]);
     const [isActive, setIsActive] = useState(true);
@@ -561,6 +565,27 @@ const handleBulkDelete = useCallback(() => {
   
 }, [saveToUndo, tableData, columns, mergedCells]);
 const handleUnmergeCells = useCallback(() => {
+  // Handle header unmerge
+  if (headerSelectionRange !== null) {
+    const { startCol, endCol } = headerSelectionRange;
+    const newMergedHeaders = { ...mergedHeaders };
+    // Find the isFirst entry that covers this range and clear it
+    Object.keys(newMergedHeaders).forEach(key => {
+      const idx = Number(key);
+      const cell = newMergedHeaders[key];
+      if (cell?.isFirst && cell.startCol <= endCol && cell.endCol >= startCol) {
+        for (let i = cell.startCol; i <= cell.endCol; i++) {
+          delete newMergedHeaders[i];
+        }
+      }
+    });
+    setMergedHeaders(newMergedHeaders);
+    setHeaderSelectionRange(null);
+    setSnackbarInfo({ open: true, message: "Headers unmerged", variant: "success" });
+    setTimeout(() => setSnackbarInfo({ open: false, message: "", variant: "success" }), 3000);
+    return;
+  }
+
   if (!selectedCell) {
     setSnackbarInfo({
       open: true,
@@ -606,8 +631,34 @@ const handleUnmergeCells = useCallback(() => {
   setTimeout(() => {
     setSnackbarInfo({ open: false, message: "", variant: "success" });
   }, 3000);
-}, [selectedCell, columns, mergedCells, tableData, saveToUndo]);
-const handleMergeCells = useCallback(() => {
+}, [selectedCell, columns, mergedCells, mergedHeaders, headerSelectionRange, tableData, saveToUndo]);
+  const handleMergeCells = useCallback(() => {
+  // Handle header merge
+  if (headerSelectionRange !== null) {
+    const { startCol, endCol } = headerSelectionRange;
+    if (startCol === endCol) {
+      setSnackbarInfo({
+        open: true,
+        message: "Please select multiple headers to merge",
+        variant: "info",
+      });
+      return;
+    }
+    const newMergedHeaders = { ...mergedHeaders };
+    for (let i = startCol; i <= endCol; i++) {
+      if (i === startCol) {
+        newMergedHeaders[i] = { isFirst: true, colSpan: endCol - startCol + 1, startCol, endCol };
+      } else {
+        newMergedHeaders[i] = { hidden: true };
+      }
+    }
+    setMergedHeaders(newMergedHeaders);
+    setHeaderSelectionRange(null);
+    setSnackbarInfo({ open: true, message: `Merged ${endCol - startCol + 1} headers`, variant: "success" });
+    setTimeout(() => setSnackbarInfo({ open: false, message: "", variant: "success" }), 3000);
+    return;
+  }
+
   if (!selectedRange) {
     setSnackbarInfo({
       open: true,
@@ -718,7 +769,8 @@ const handleMergeCells = useCallback(() => {
   setTimeout(() => {
     setSnackbarInfo({ open: false, message: "", variant: "success" });
   }, 3000);
-}, [tableData, columns, mergedCells, saveToUndo, selectedRange]);const handleCopyCell = useCallback(() => {
+  }, [tableData, columns, mergedCells, mergedHeaders, headerSelectionRange, saveToUndo, selectedRange]);
+const handleCopyCell = useCallback(() => {
   if (!selectedCell) return;
   
   const cellValue = tableData[selectedCell.rowIndex]?.[selectedCell.columnId];
@@ -1071,6 +1123,7 @@ const handleAutosave = async () => {
 
 useEffect(() => {
   setMergedCells({});
+  setMergedHeaders({});
   setUndoStack([]);
   setRedoStack([]);
   setSelectedRange(null);
@@ -1244,6 +1297,7 @@ const handleUndo = useCallback(() => {
     setTableData(JSON.parse(JSON.stringify(lastState.data)));
     setColumns(JSON.parse(JSON.stringify(lastState.columns)));
     setMergedCells(JSON.parse(JSON.stringify(lastState.mergedCells || {})));
+    setMergedHeaders(JSON.parse(JSON.stringify(lastState.mergedHeaders || {})));
     setSelectedRange(null);
     setSelectionStart(null);
     setSelectionEnd(null);
@@ -1264,6 +1318,7 @@ const handleRedo = useCallback(() => {
     setTableData(JSON.parse(JSON.stringify(nextState.data)));
     setColumns(JSON.parse(JSON.stringify(nextState.columns)));
     setMergedCells(JSON.parse(JSON.stringify(nextState.mergedCells || {})));
+    setMergedHeaders(JSON.parse(JSON.stringify(nextState.mergedHeaders || {})));
     setSelectedRange(null);
     setSelectionStart(null);
     setSelectionEnd(null);
@@ -1841,7 +1896,20 @@ const handleTranscribe = useCallback((text) => {
             onBulkDelete={handleBulkDelete}
             onMergeCells={handleMergeCells}
             onCopyCell={handleCopyCell}
-            isCellSelected={selectedRange !== null}
+           isCellSelected={
+  selectedRange !== null ||
+  (headerSelectionRange !== null && headerSelectionRange.startCol !== headerSelectionRange.endCol) ||
+  (headerSelectionRange !== null && (
+    mergedHeaders[headerSelectionRange.startCol]?.isFirst ||
+    mergedHeaders[headerSelectionRange.startCol]?.hidden
+  )) ||
+  (() => {
+    if (!selectedCell) return false;
+    const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
+    const cellKey = `${selectedCell.rowIndex}-${colIndex}`;
+    return !!mergedCells[cellKey]?.isFirst;
+  })()
+}
             onAddRowBefore={handleAddRowBefore}
             onAddRowAfter={handleAddRowAfter}
             onAddColBefore={handleAddColBefore}
@@ -1869,8 +1937,12 @@ const handleTranscribe = useCallback((text) => {
               alternateRowColor={alternateRowColor}
               enableTransliteration={enableTransliteration}
               ProjectDetails={ProjectDetails}
-              mergedCells={mergedCells}
-              onMergedCellsChange={setMergedCells}
+             mergedCells={mergedCells}
+onMergedCellsChange={setMergedCells}
+mergedHeaders={mergedHeaders}
+onMergedHeadersChange={setMergedHeaders}
+headerSelectionRange={headerSelectionRange}
+onHeaderSelectionChange={setHeaderSelectionRange}
               
             />
           </div>
