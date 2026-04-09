@@ -29,6 +29,7 @@ const DataTable = ({
   const [editValue, setEditValue] = useState('');
   const [editingHeader, setEditingHeader] = useState(null);
 const [headerEditValue, setHeaderEditValue] = useState('');
+const [activeHeaderIndex, setActiveHeaderIndex] = useState(null);
   const [columnWidths, setColumnWidths] = useState({});
   const [activeRowIndex, setActiveRowIndex] = useState(null);
   const [activeColumnId, setActiveColumnId] = useState(null);
@@ -93,6 +94,12 @@ const [headerEditValue, setHeaderEditValue] = useState('');
       topTextareaRef.current.focus();
     }
   }, [activeRowIndex, activeColumnId]);
+
+  const handleHeaderClick = (colIndex) => {
+  setActiveHeaderIndex(colIndex);
+  setActiveRowIndex(null);
+  setActiveColumnId(null);
+};
 
   // Column drag handlers
   const handleColumnDragStart = (e, colIndex) => {
@@ -391,9 +398,27 @@ const [headerEditValue, setHeaderEditValue] = useState('');
   };
 
   const renderTopTextarea = () => {
-    if (activeRowIndex === null || !activeColumnId) return null;
+    if (activeRowIndex === null && !activeColumnId && activeHeaderIndex === null) return null;
 
-    const activeValue = getActiveCellValue();
+    const activeValue = activeHeaderIndex !== null
+      ? (columns[activeHeaderIndex]?.Header || '')
+      : getActiveCellValue();
+
+    const handleChange = (val) => {
+      if (activeHeaderIndex !== null) {
+        handleHeaderEdit(activeHeaderIndex, val);
+      } else {
+        handleTopTextareaChange(val);
+      }
+    };
+
+    const handleBlur = () => {
+      if (activeHeaderIndex !== null) {
+        setActiveHeaderIndex(null);
+      } else {
+        handleTopTextareaBlur();
+      }
+    };
 
     return (
       <div className="top-textarea-container">
@@ -431,9 +456,9 @@ const [headerEditValue, setHeaderEditValue] = useState('');
                   borderRadius: "8px",
                   marginBottom: "10px",
                 }}
-                value={activeValue}
-                onChange={(e) => handleTopTextareaChange(e.target.value)}
-                onBlur={handleTopTextareaBlur}
+               value={activeValue}
+onChange={(e) => handleChange(e.target.value)}
+onBlur={handleBlur}
                 {...props}
               />
             )}
@@ -460,17 +485,18 @@ const [headerEditValue, setHeaderEditValue] = useState('');
               marginBottom: "10px",
             }}
             value={activeValue}
-            onChange={(e) => handleTopTextareaChange(e.target.value)}
-            onBlur={handleTopTextareaBlur}
+onChange={(e) => handleChange(e.target.value)}
+onBlur={handleBlur}
           />
         )}
         <div className="top-textarea-info">
-          <button className="clear-selection-btn" onClick={() => {
-            setActiveRowIndex(null);
-            setActiveColumnId(null);
-          }}>
-            Clear Selection
-          </button>
+         <button className="clear-selection-btn" onClick={() => {
+  setActiveRowIndex(null);
+  setActiveColumnId(null);
+  setActiveHeaderIndex(null);
+}}>
+  Clear Selection
+</button>
         </div>
       </div>
     );
@@ -499,40 +525,14 @@ const [headerEditValue, setHeaderEditValue] = useState('');
       >
         <div className="header-content">
           <span className="drag-handle" title="Drag to reorder column">⋮⋮</span>
-{editingHeader === colIndex ? (
-  <input
-    autoFocus
-    value={headerEditValue}
-    onChange={(e) => setHeaderEditValue(e.target.value)}
-    onBlur={() => {
-      handleHeaderEdit(colIndex, headerEditValue);
-      setEditingHeader(null);
-    }}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter') {
-        handleHeaderEdit(colIndex, headerEditValue);
-        setEditingHeader(null);
-      } else if (e.key === 'Escape') {
-        setEditingHeader(null);
-      }
-    }}
-    style={{
-      width: "100%",
-      fontSize: `${fontSize}px`,
-      padding: "4px",
-    }}
-  />
-) : (
-  <span
-    style={{ fontSize: `${fontSize}px`, cursor: "pointer" }}
-    onDoubleClick={() => {
-      setEditingHeader(colIndex);
-      setHeaderEditValue(column.Header);
-    }}
-  >
-    {column.Header}
-  </span>
-)}          <button 
+<span
+  style={{ fontSize: `${fontSize}px`, cursor: "pointer" }}
+  onDoubleClick={() => handleHeaderClick(colIndex)}
+>
+  {column.Header}
+</span>
+
+<button 
             className="delete-column-btn"
             onClick={() => onDeleteColumn(column.accessor)}
             title="Delete column"
