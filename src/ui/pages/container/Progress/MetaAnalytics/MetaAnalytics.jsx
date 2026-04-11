@@ -23,6 +23,7 @@ import SentanceCountMetaAnalyticsChart from './SentanceCountMetaAnalyticsChart';
 import exportFromJSON from 'export-from-json';
 import jsPDF from 'jspdf';
 import { KeyboardArrowDown } from "@material-ui/icons";
+import OCRMetaAnalytics from './OCRMetaAnalytics';
 const StyledMenu = styled((props) => (
   <Menu
     elevation={3}
@@ -297,9 +298,8 @@ export default function MetaAnalytics(props) {
             {analyticsData[0].projectType.includes("Conversation") && <SentanceCountMetaAnalyticsChart analyticsData={analyticsData}/>}
           </Grid>}
           if (analyticsData.length && ocrProjectTypes.includes(analyticsData[0].projectType)){
-            return (<Grid key={_index} style={{marginTop:"15px"}}>
-            <WordCountMetaAnalyticsChart analyticsData={analyticsData} graphCategory='ocrWordCount'/>
-          </Grid>)}
+            return <OCRMetaAnalytics key={_index} analyticsData={analyticsData} />
+          }
         })
       :''}
     </div>
