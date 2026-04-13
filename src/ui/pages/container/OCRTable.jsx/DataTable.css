@@ -663,3 +663,21 @@ tr:hover .delete-row-btn {
     min-height: 32px;
   }
 }
+/* Single header selected — blue border like active body cell */
+.column-header.header-selected {
+  background: linear-gradient(135deg, #4a5fd4 0%, #5a3a8a 100%) !important;
+  box-shadow: inset 0 0 0 2px #2196f3 !important;
+  outline: none;
+}
+
+/* Multiple headers selected — orange like range-selected body cells */
+.column-header.header-range-selected {
+  background-color: #ffcc80 !important;
+  box-shadow: inset 0 0 0 1px #e65100 !important;
+  color: white !important;
+}
+
+.column-header.header-range-selected .delete-column-btn,
+.column-header.header-range-selected span {
+  color: white !important;
+}
