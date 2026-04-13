@@ -388,6 +388,15 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
           <MenuItem
             key={index}
             onClick={() => {
+                localStorage.setItem(
+                "OcrTranscriptionSettings",
+                JSON.stringify({
+                  ...JSON.parse(
+                    localStorage.getItem("OcrTranscriptionSettings")
+                  ),
+                  fontSize: item.size,
+                })
+              );
               setFontSize(item.size);
               setAnchorElFont(null);
             }}
