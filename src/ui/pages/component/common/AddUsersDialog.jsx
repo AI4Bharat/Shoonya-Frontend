@@ -347,7 +347,17 @@ const AddUsersDialog = ({
           options={availableUsers}
           value={selectedUsers}
           style={{ fontSize: "1rem", paddingTop: 4, paddingBottom: 4 }}
-          getOptionLabel={(option) => option.username}
+          getOptionLabel={(option) =>
+            `${option.username} - ${option.email}`
+          }
+          filterOptions={(options, { inputValue }) => {
+            const search = inputValue.toLowerCase();
+
+            return options.filter((option) =>
+              option.username.toLowerCase().includes(search) ||
+              option.email.toLowerCase().includes(search)
+            );
+          }}
           size="small"
           renderInput={(params) => (
             <TextField
