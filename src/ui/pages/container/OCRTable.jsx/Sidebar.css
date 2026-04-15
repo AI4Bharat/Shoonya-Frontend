@@ -1,0 +1,182 @@
+/* Updated components/Sidebar.css */
+.sidebar {
+  width: 100%;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  border-bottom: 1px solid #ddd;
+  padding: 0.8rem 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 70px;
+  transition: all 0.3s ease;
+}
+
+.sidebar.mobile {
+  padding: 0.5rem;
+}
+
+.sidebar-header {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-header h3 {
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sidebar-content {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.control-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding-right: 1rem;
+  border-right: 1px solid #ddd;
+}
+
+.control-group:last-child {
+  border-right: none;
+}
+
+.control-group h4 {
+  color: #666;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap;
+}
+
+.sidebar.mobile .control-btn {
+  padding: 10px;
+  font-size: 1.1rem;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.control-btn.secondary:hover {
+  background: linear-gradient(135deg, #48c6ef 0%, #6f86d6 100%);
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+.cell-info {
+  background: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.cell-info p {
+  margin: 0;
+  color: #666;
+  white-space: nowrap;
+}
+
+.cell-info strong {
+  color: #333;
+  margin-right: 2px;
+}
+
+.cell-value {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 1024px) {
+  .sidebar-content {
+    gap: 1rem;
+  }
+  
+  .control-group {
+    padding-right: 0.8rem;
+  }
+  
+  .control-btn {
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    padding: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .sidebar-content {
+    min-width: min-content;
+  }
+  
+  .control-group h4 {
+    font-size: 0.75rem;
+  }
+  
+  .cell-info {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    min-height: 60px;
+  }
+  
+  .control-btn {
+    padding: 8px;
+  }
+  
+  .btn-icon {
+    font-size: 1rem;
+  }
+}
+
+/* Touch-friendly styles */
+@media (hover: none) and (pointer: coarse) {
+  .control-btn {
+    padding: 12px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .sidebar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
