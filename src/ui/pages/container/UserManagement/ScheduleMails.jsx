@@ -50,6 +50,7 @@ const ScheduleMails = () => {
     "SemanticTextualSimilarity(Scale5)",
     "ContextualTranslationEditing",
     "OCRTranscription",
+    'OCRTableEditing',
     "OCRTranscriptionEditing",
     "OCRSegmentCategorization",
     "OCRSegmentCategorizationEditing",
