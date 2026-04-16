@@ -165,7 +165,7 @@ const MyProgress = () => {
             filter: false,
             sort: false,
             align: "center",
-            // ADD THIS: Prevent text from wrapping in headers and cells
+            
             setCellProps: () => ({
               style: { whiteSpace: "nowrap" }
             }),
