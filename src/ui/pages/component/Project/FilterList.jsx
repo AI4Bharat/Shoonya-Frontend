@@ -34,7 +34,6 @@ const FilterList = (props) => {
   }, []);
   const { filterStatusData, currentFilters, updateFilters, pull, setpull, rejected, setRejected, pullvalue } = props;
   const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status ? currentFilters?.annotation_status : currentFilters.review_status);
-  // ADD after line 24 (after the existing useState for selectedStatus):
   const [selectedLanguage, setSelectedLanguage] = useState(currentFilters?.language ?? "");
   const [selectedDomain,   setSelectedDomain]   = useState(currentFilters?.domain   ?? "");
   const [selectedStatus2,  setSelectedStatus2]  = useState(currentFilters?.status   ?? "");
