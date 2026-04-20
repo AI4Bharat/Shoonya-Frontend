@@ -17,7 +17,7 @@ import Select from "@mui/material/Select";
 import { Stack } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import GetLanguageChoicesAPI from "../../../../redux/actions/api/Project/GetLanguageChoices";
+import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 
 const AllTasksFilterList = (props) => {
   const classes = DatasetStyle();        

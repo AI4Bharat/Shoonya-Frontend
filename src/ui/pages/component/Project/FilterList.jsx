@@ -18,9 +18,9 @@ import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { useDispatch,useSelector  } from "react-redux";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
-import GetLanguageChoicesAPI from "../../../../redux/actions/api/Project/GetLanguageChoices";
+import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import { snakeToTitleCase } from "../../../../utils/utils";
-import {  useSelector } from "react-redux";
+// import {  useSelector } from "react-redux";
 import { Stack } from "@mui/material";
 
 const FilterList = (props) => {
