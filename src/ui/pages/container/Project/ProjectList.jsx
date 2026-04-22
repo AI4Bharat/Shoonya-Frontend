@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Search from "../../component/common/Search";
 import DatasetStyle from "../../../styles/Dataset";
 import themeDefault from "../../../theme/theme";
+import CreateProjectDropdown from "../../component/Project/createprojectbutton";
 
 export default function ProjectList() {
   const [radiobutton, setRadiobutton] = useState(true);
@@ -116,6 +117,9 @@ export default function ProjectList() {
                     </FormControl>
                 </Grid>
             </Grid> */}
+            <Grid item sx={{mt:4,mb:1,mr:2,ml:2}}>
+            <CreateProjectDropdown />
+            </Grid>
         <Grid xs={3} item className={classes.fixedWidthContainer} sx={{mt:1,mb:1,mr:2,ml:2}}>
           <Search />
         </Grid>

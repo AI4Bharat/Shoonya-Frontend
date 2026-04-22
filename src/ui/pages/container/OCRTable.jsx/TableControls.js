@@ -211,24 +211,24 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
       {/* Merge Cells Button */}
       <Tooltip title="Merge Selected Adjacent Cells" placement="bottom">
         <IconButton
-          className="control-btn"
-          onClick={onMergeCells}
-          disabled={!selectedCell}
-        >
-          <MergeIcon />
-        </IconButton>
+  className="control-btn"
+  onClick={onMergeCells}
+  disabled={!isCellSelected}
+>
+  <MergeIcon />
+</IconButton>
       </Tooltip>
      
 
       {/* Unmerge Cells Button */}
       <Tooltip title="Unmerge Selected Merged Cell" placement="bottom">
         <IconButton
-          className="control-btn"
-          onClick={onUnmergeCells}
-          disabled={!selectedCell}
-        >
-          <CallSplitIcon />
-        </IconButton>
+  className="control-btn"
+  onClick={onUnmergeCells}
+  disabled={!isCellSelected}
+>
+  <CallSplitIcon />
+</IconButton>
       </Tooltip>
 
       {/* Delete Table Button */}
@@ -388,6 +388,15 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
           <MenuItem
             key={index}
             onClick={() => {
+                localStorage.setItem(
+                "OcrTranscriptionSettings",
+                JSON.stringify({
+                  ...JSON.parse(
+                    localStorage.getItem("OcrTranscriptionSettings")
+                  ),
+                  fontSize: item.size,
+                })
+              );
               setFontSize(item.size);
               setAnchorElFont(null);
             }}
