@@ -52,6 +52,7 @@ import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
+import { OCRTranscriptionShortcuts } from './OCRTranscriptionShortcuts';
 
 const filterAnnotations = (
   annotations,
@@ -1368,98 +1369,12 @@ const LabelStudioWrapper = ({
               {/* ) : (
               <div style={{ minWidth: "160px" }} />
             )} */}
-                          {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") &&
-                <>
-                  {/* OCR Shortcut Button with Dropdown */}
-                  <Tooltip title={
-                    "OCR Shortcuts: ^ _ / Shift+F Shift+D (direct insert)" }>
-                    <Button
-                      type="default"
-                      onClick={handleOcrButtonClick}
-                      endIcon={<ArrowDropDownIcon />}
-                      style={{
-                        minWidth: "160px",
-                        border: "1px solid #e6e6e6",
-                        backgroundColor: "#f0f8ff",
-                        color: "#09f" ,
-                        pt: 3,
-                        pb: 3,
-                      }}
-                      className="lsf-button"
-                    >
-                      OCR Shortcuts
-                      {copiedFormula && " ✨"}
-                    </Button>
-                  </Tooltip>
-
-                  {/* Material-UI Menu for OCR Formatting Options */}
-                  <Menu
-                    anchorEl={ocrMenuAnchorEl}
-                    open={Boolean(ocrMenuAnchorEl)}
-                    onClose={() => setOcrMenuAnchorEl(null)}
-                    PaperProps={{
-                      style: {
-                        width: '320px',
-                      },
-                    }}
-                  >
-                    <MenuItem disabled style={{ fontSize: '11px', color: '#666', fontStyle: 'italic' }}>
-                      Menu: Copies to clipboard • Shortcuts: Direct insert
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("superscript")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Superscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>^</kbd> key</div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}^{}`}$</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("subscript")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Subscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>_</kbd> key</div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}_{}`}$</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("fraction")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Fraction</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>/</kbd> key</div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\fraction{`{}{}`}</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("footnote")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Footnote</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Shift</kbd> + <kbd>F</kbd></div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\footnote{`{}`}</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("dropcap")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Dropcap</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Shift</kbd> + <kbd>D</kbd></div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\dropcap{`{}`}</span>
-                      </div>
-                    </MenuItem>
-                  </Menu>
-                </>
-              }
-
+            {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") &&
+              <OCRTranscriptionShortcuts
+                handleOcrFormatting={handleOcrFormatting}
+                copiedFormula={copiedFormula}
+              />
+            }
             {ProjectDetails?.project_type?.includes("OCR") && 
             <>
               <Tooltip title="Clear all children bboxes">
