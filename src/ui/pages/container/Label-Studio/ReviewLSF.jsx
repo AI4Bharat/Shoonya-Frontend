@@ -42,6 +42,8 @@ import {
   postReview,
   patchReview,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
+import OCRLayoutWrapper from './OCRLayoutWrapper';
+import OCRSegmentCategorizationPanel from './OCRSegmentCategorizationPanel';
 
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
@@ -213,6 +215,10 @@ const AUDIO_PROJECT_SAVE_CHECK = [
   "AcousticNormalisedTranscriptionEditing",
 ];
 
+
+
+
+
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -228,6 +234,7 @@ const LabelStudioWrapper = ({
 }) => {
   // we need a reference to a DOM node here so LSF knows where to render
   const review_status = useRef();
+  const superchecker_status = useRef();
   const LabelStudio = useRef();
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
@@ -252,6 +259,11 @@ const LabelStudioWrapper = ({
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+
+  const isOCR = ProjectDetails?.project_type?.includes("OCR");
+  const isTranscription = ProjectDetails?.project_type?.includes("OCRTranscriptionEditing");
+  const isSegCat = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  const isReviewerUser = taskData?.review_user === userData?.id;
   const filterdataitemsList = useSelector(
     (state) => state.datasetSearchPopup.data
   );
@@ -1477,399 +1489,110 @@ useEffect(() => {
     }
   }, [taskData]);
 
-  return (
-    <div>
-      {autoSave &&
-        <div style={{ textAlign: "left", marginBottom: "15px" }}>
-          <Typography variant="body" color="#000000">
-            Auto-save enabled for this scenario.
-          </Typography>
-        </div>}
-      {filterMessage && (
-        <Alert severity="info" showIcon style={{ marginBottom: "1%" }}>
-          {filterMessage}
-        </Alert>
-      )}
-      {!loader && (
-        <div
-          style={{ display: "flex", justifyContent: "space-between" }}
-          className="lsf-controls"
-        >
-          <div />
-          <div>
-            <LightTooltip title={assignedUsers ? assignedUsers : ""}>
-              <Button
-                type="default"
-                className="lsf-button"
-                style={{
-                  minWidth: "40px",
-                  border: "1px solid #e6e6e6",
-                  color: "grey",
-                  pt: 1, pl: 1, pr: 1,
-                  borderBottom: "None",
-                }}
-                > 
-                  <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
-              </Button>
-            </LightTooltip>
-            <Tooltip title="Go to next task">
-              <Button
-                type="default"
-                onClick={onNextAnnotation}
-                style={{
-                  minWidth: "160px",
-                  border: "1px solid #e6e6e6",
-                  color: "#1890ff",
-                  pt: 3,
-                  pb: 3,
-                  borderBottom: "None",
-                }}
-                className="lsf-button"
-              >
-                Next
-              </Button>
-            </Tooltip>
-            {!disableBtns && taskData?.review_user === userData?.id && (
-              <Tooltip title="Save task for later">
-                <Button
-                  type="default"
-                  onClick={() => handleAcceptClick("draft")}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#e80",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                  }}
-                  className="lsf-button"
-                >
-                  Draft
-                </Button>
-              </Tooltip>
-            )}
-            {!disableBtns && !disableButton && taskData?.review_user === userData?.id && (
-              <Tooltip title="Revise Annotation">
-                <Button
-                  value="to_be_revised"
-                  type="default"
-                  onClick={handleReviseClick}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#f5222d",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                    borderLeft: "None",
-                  }}
-                  className="lsf-button"
-                >
-                  Revise
-                </Button>
-              </Tooltip>
-            )}
-            {!disableBtns && taskData?.review_user === userData?.id && (
-              <Tooltip title="Accept Annotation">
-                <Button
-                  id="accept-button"
-                  value="Accept"
-                  type="default"
-                  aria-controls={open ? "accept-menu" : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={open ? "true" : undefined}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#52c41a",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                    borderLeft: "None",
-                  }}
-                  className="lsf-button"
-                  onClick={handleClick}
-                  endIcon={<KeyboardArrowDownIcon />}
-                >
-                  Accept
-                </Button>
-              </Tooltip>
-            )}
-                          {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") &&
-                <>
-                  {/* OCR Shortcut Button with Dropdown */}
-                  <Tooltip title={
-                    "OCR Shortcuts: ^ _ / Shift+F Shift+D (direct insert)" }>
-                    <Button
-                      type="default"
-                      onClick={handleOcrButtonClick}
-                      endIcon={<ArrowDropDownIcon />}
-                      style={{
-                        minWidth: "160px",
-                        border: "1px solid #e6e6e6",
-                        backgroundColor: "#f0f8ff",
-                        color: "#09f" ,
-                        pt: 3,
-                        pb: 3,
-                      }}
-                      className="lsf-button"
+if (!isOCR) {
+    return (
+      <div>
+        {!loader && (
+          <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
+            <Grid container spacing={0}>
+              <Grid container spacing={0} sx={{ justifyContent: "end" }}>
+                <Grid item>
+                  <LightTooltip title={assignedUsers ? assignedUsers : ""}>
+                    <Button type="default" className="lsf-button"
+                      style={{ minWidth: "40px", border: "1px solid #e6e6e6", color: "grey", borderBottom: "None" }}
                     >
-                      OCR Shortcuts
-                      {copiedFormula && " ✨"}
+                      <InfoOutlinedIcon sx={{ mb: "-3px", ml: "2px", color: "grey" }} />
                     </Button>
+                  </LightTooltip>
+                </Grid>
+                <Grid item>
+                  <Tooltip title="Go to next task">
+                    <Button value="Next" type="default" onClick={onNextAnnotation}
+                      style={{ minWidth: "160px", border: "1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None" }}
+                      className="lsf-button"
+                    >Next</Button>
                   </Tooltip>
-
-                  {/* Material-UI Menu for OCR Formatting Options */}
-                  <Menu
-                    anchorEl={ocrMenuAnchorEl}
-                    open={Boolean(ocrMenuAnchorEl)}
-                    onClose={() => setOcrMenuAnchorEl(null)}
-                    PaperProps={{
-                      style: {
-                        width: '320px',
-                      },
-                    }}
-                  >
-                    <MenuItem disabled style={{ fontSize: '11px', color: '#666', fontStyle: 'italic' }}>
-                      Menu: Copies to clipboard • Shortcuts: Direct insert
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("superscript")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Superscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>^</kbd> key</div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}^{}`}$</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("subscript")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Subscript</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>_</kbd> key</div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>${`{}_{}`}$</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("fraction")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Fraction</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>/</kbd> key</div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\fraction{`{}{}`}</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("footnote")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Footnote</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Shift</kbd> + <kbd>F</kbd></div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\footnote{`{}`}</span>
-                      </div>
-                    </MenuItem>
-
-                    <MenuItem onClick={() => handleOcrFormatting("dropcap")}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <div>
-                          <div><strong>Dropcap</strong></div>
-                          <div style={{ fontSize: '11px', color: '#666' }}>Shortcut: <kbd>Shift</kbd> + <kbd>D</kbd></div>
-                        </div>
-                        <span style={{ color: '#999', fontSize: '12px', fontFamily: 'monospace' }}>\dropcap{`{}`}</span>
-                      </div>
-                    </MenuItem>
-                  </Menu>
-                </>
-              }
-
-            {ProjectDetails?.project_type?.includes("OCR") &&
-            <Tooltip title="Clear all children bboxes">
-                <Button
-                  type="default"
-                  onClick={() => {clearAllChildren()}}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#09f",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                    color: "#f00",
-                  }}
-                  className="lsf-button"
-                >
-                  Clear All Mergings
-                </Button>
-              </Tooltip>
-            }
-            {parentMetadata !== undefined &&
-            <>
-            <Tooltip title="Show Parent Image">
-                <Button
-                  type="default"
-                  onClick={() => {window.open(parentMetadata.image_url, "_blank")}}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#09f",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                  }}
-                  className="lsf-button"
-                >
-                  Parent Image
-                </Button>
-              </Tooltip>
-            </>
-            }
-            <StyledMenu
-              id="accept-menu"
-              MenuListProps={{
-                "aria-labelledby": "accept-button",
-              }}
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-            >
-              <MenuItem
-                onClick={() => handleAcceptClick("accepted")}
-                disableRipple
-              >
-                with No Changes
-              </MenuItem>
-              <MenuItem
-                onClick={() => handleAcceptClick("accepted_with_minor_changes")}
-                disableRipple
-              >
-                with Minor Changes
-              </MenuItem>
-              <MenuItem
-                onClick={() => handleAcceptClick("accepted_with_major_changes")}
-                disableRipple
-              >
-                with Major Changes
-              </MenuItem>
-            </StyledMenu>
+                  {parentMetadata !== undefined && (
+                    <Tooltip title="Show Parent Image">
+                      <Button type="default" onClick={() => window.open(parentMetadata.image_url, "_blank")}
+                        style={{ minWidth: "160px", border: "1px solid #e6e6e6", color: "#09f", borderBottom: "None" }}
+                        className="lsf-button"
+                      >Parent Image</Button>
+                    </Tooltip>
+                  )}
+                </Grid>
+              </Grid>
+            </Grid>
           </div>
-        </div>
-      )}
-      <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
-        <div className="label-studio-root" ref={rootRef}></div>
-        <Popover
-          id={"'simple-popover'"}
-          open={Boolean(showTagSuggestionsAnchorEl)}
-          anchorEl={showTagSuggestionsAnchorEl}
-          onClose={() => {
-            setShowTagSuggestionsAnchorEl(null);
-            setTagSuggestionList(null);
-          }}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-        >
-          {tagSuggestionList}
-        </Popover>
-      </Box>
-      {parentMetadata !== undefined &&
-      <>
-        <div style={{textAlign:"center", display:"flex", justifyContent:"center"}}>
-          <div>
-            <h3>Parent MetaData</h3>
-            <JsonTable json={parentMetadata}/>
+        )}
+        <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
+          <div className="label-studio-root" ref={rootRef}></div>
+        </Box>
+        {parentMetadata !== undefined && (
+          <div style={{ textAlign: "center", display: "flex", justifyContent: "center" }}>
+            <div><h3>Parent MetaData</h3><JsonTable json={parentMetadata} /></div>
           </div>
-        </div>
-      </>
-      }
-      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") && 
-          <>
-            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%", display:"flex", justifyContent:"space-around"}}>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Languages :&nbsp;</div>
-              <select multiple onChange={handleSelectChange} value={selectedL}>
-                <option value="English">English</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Marathi">Marathi</option>
-                <option value="Tamil">Tamil</option>
-                <option value="Telugu">Telugu</option>
-                <option value="Kannada">Kannada</option>
-                <option value="Gujarati">Gujarati</option>
-                <option value="Punjabi">Punjabi</option>
-                <option value="Bengali">Bengali</option>
-                <option value="Malayalam">Malayalam</option>
-                <option value="Assamese">Assamese</option>
-                <option value="Bodo">Bodo</option>
-                <option value="Dogri">Dogri</option>
-                <option value="Kashmiri">Kashmiri</option>
-                <option value="Maithili">Maithili</option>
-                <option value="Manipuri">Manipuri</option>
-                <option value="Nepali">Nepali</option>
-                <option value="Odia">Odia</option>
-                <option value="Sindhi">Sindhi</option>
-                <option value="Sinhala">Sinhala</option>
-                <option value="Urdu">Urdu</option>
-                <option value="Santali">Santali</option>
-                <option value="Sanskrit">Sanskrit</option>
-                <option value="Goan Konkani">Goan Konkani</option>
-              </select>
-              </div>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", display:"flex"}}><div style={{margin:"auto"}}>Domain :&nbsp;</div>
-              <select style={{margin:"auto"}} onChange={(e) => {setOcrD(e.target.value); ocrDomain.current = e.target.value;}} value={ocrD}>
-                <option disabled selected></option>
-                <option value="BO">Books</option>
-                <option value="FO">Forms</option>
-                <option value="OT">Others</option>
-                <option value="TB">Textbooks</option>
-                <option value="NV">Novels</option>
-                <option value="NP">Newspapers</option>
-                <option value="MG">Magazines</option>
-                <option value="RP">Research_Papers</option>
-                <option value="FM">Form</option>
-                <option value="BR">Brochure_Posters_Leaflets</option>
-                <option value="AR">Acts_Rules</option>
-                <option value="PB">Publication</option>
-                <option value="NT">Notice</option>
-                <option value="SY">Syllabus</option>
-                <option value="QP">Question_Papers</option>
-                <option value="MN">Manual</option>
-              </select>
-              </div>
-            </div>
-            <div style={{borderStyle:"solid", borderWidth:"1px", borderColor:"#E0E0E0", paddingBottom:"1%"}}>
-              <div style={{paddingLeft:"1%", fontSize:"medium", paddingTop:"1%", paddingBottom:"1%"}}>Predictions</div>
-              {predictions?.length > 0 ?
-                (() => {
-                  try {
-                    return JSON.parse(predictions)?.map((pred, index) => (
-                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
-                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
-                      </div>
-                    ));
-                  } catch (error) {
-                    console.error("Error parsing predictions:", error);
-                    return predictions?.map((pred, index) => (
-                      <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
-                        <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
-                      </div>
-                    ));
-                  }
-                })()
-              :
-              <div style={{textAlign:"center"}}>No Predictions Present</div>}
-            </div>
-          </>
-        }
-      {loader}
+        )}
+        {!loader && isSegCat && (
+          <OCRSegmentCategorizationPanel
+            predictions={predictions} selectedL={selectedL} ocrD={ocrD}
+            handleSelectChange={handleSelectChange} setOcrD={setOcrD} ocrDomain={ocrDomain}
+          />
+        )}
+        {loader}
+        {renderSnackBar()}
+      </div>
+    );
+  }
+
+  return (
+    <OCRLayoutWrapper
+      isOCR={isOCR}
+      isTranscription={isTranscription}
+      isSegCat={isSegCat}
+      rootRef={rootRef}
+      loader={loader}
+
+      disableBtns={disableBtns}
+      disableButton={false}
+      assignedUsers={assignedUsers}
+      onDraft={() => {}}
+      onNextAnnotation={onNextAnnotation}
+      onClearMergings={clearAllChildren}
+      parentMetadata={parentMetadata}
+      handleOcrFormatting={() => {}}
+      copiedFormula={''}
+      isAnnotator={false}
+      isReviewer={false}
+      onRevise={() => {}}
+      onAccept={() => {}}
+      isSuperChecker={true}
+      onValidate={(status) => handleAcceptClick(status)}
+
+      predictions={predictions}
+      selectedL={selectedL}
+      ocrD={ocrD}
+      handleSelectChange={handleSelectChange}
+      setOcrD={setOcrD}
+      ocrDomain={ocrDomain}
+
+      lsfRef={lsfRef}
+      annotationsRaw={annotations}
+      taskId={taskId}
+      projectId={projectId}
+      selectedLanguages={selectedLanguages}
+      annotationNotesRef={annotationNotesRef}
+      load_time={load_time}
+      annotation_status={superchecker_status}
+      readOnly={disableBtns}
+      taskData={taskData}
+      userData={userData}
+    >
       {renderSnackBar()}
-    </div>
+    </OCRLayoutWrapper>
   );
+
+
 };
 
 export default function LSF() {

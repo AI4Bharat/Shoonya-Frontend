@@ -30,6 +30,7 @@ import {
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from '../../../../redux/actions/apitransport/apitransport';
+import OCRLayoutWrapper from './OCRLayoutWrapper';
 
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
@@ -58,9 +59,12 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     message: "",
     variant: "success",
   });
+  const [annotations, setAnnotations] = useState([]);
+  const load_time = useRef();
   const ocrDomain = useRef();
   const [ocrD, setOcrD] = useState("");
   const selectedLanguages = useRef([]);
+  const [disableBtns, setDisableBtns] = useState(false);
   const [selectedL, setSelectedL] = useState([]);
   const [predictions, setPredictions] = useState([]);
   const [taskData, setTaskData] = useState(undefined);
@@ -72,6 +76,11 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const [parentMetadata, setParentMetadata] = useState(undefined);
   const [assignedUsers, setAssignedUsers] = useState(null);
   let loaded = useRef();
+  const isOCR = ProjectDetails?.project_type?.includes("OCR");
+  const isTranscription = ProjectDetails?.project_type?.includes("OCRTranscriptionEditing");
+  const isSegCat = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  const isAnnotator = taskData?.annotation_users?.some((user) => user === userData.id);
+
 
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
@@ -94,11 +103,12 @@ useEffect(() => {
 
 useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
-    ([labelConfig, taskData, annotations, predictions]) => {
+    ([labelConfig, taskData, annotationsData, predictions]) => {
     if(labelConfig?.project_type?.includes("OCRTranscriptionEditing")){
       const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
       dispatch(APITransport(inputData));
     }
+    setAnnotations(annotationsData);
     let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
@@ -164,7 +174,7 @@ useEffect(() => {
     projectId,
     taskData,
     labelConfig,
-    annotations,
+    annotationsData,
     predictions,
     annotationNotesRef,
   ) {
@@ -253,7 +263,7 @@ useEffect(() => {
             });
             ls.annotationStore.selectAnnotation(c.id);
           }
-          load_time = new Date();
+          load_time.current = new Date();
         },
         onSubmitAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
@@ -508,116 +518,102 @@ useEffect(() => {
     }
   }, [taskData]);
 
-  return (
-    <div>
-      {!loader && <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
-      <Grid container spacing={0}>
-        <Grid container spacing={0} sx={{ justifyContent: "end" }}>
-          {/* <Grid item>
-          {taskData?.annotation_users?.some((user) => user === userData.id) && <Tooltip title="Save task for later">
-            <Button
-              value="Draft"
-              type="default"
-              onClick={handleDraftAnnotationClick}
-              style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#e80", pt: 3, pb: 3, borderBottom: "None"}}
-              className="lsf-button"
-            >
-              Draft
-            </Button>
-          </Tooltip>}
-          </Grid> */}
-            <Grid item>
-              <LightTooltip title={assignedUsers ? assignedUsers : ""} >
-                <Button
-                  type="default"
-                  className="lsf-button"
-                  style={{
-                    minWidth: "40px",
-                    border: "1px solid #e6e6e6",
-                    color: "grey",
-                    pt: 1, pl: 1, pr: 1,
-                    borderBottom: "None",
-                  }}
-                  > 
-                    <InfoOutlinedIcon sx={{mb: "-3px", ml: "2px", color: "grey"}}/>
-                </Button>
-              </LightTooltip>
+if (!isOCR) {
+    return (
+      <div>
+        {!loader && (
+          <div style={{ display: "flex", justifyContent: "space-between" }} className="lsf-controls">
+            <Grid container spacing={0}>
+              <Grid container spacing={0} sx={{ justifyContent: "end" }}>
+                <Grid item>
+                  <LightTooltip title={assignedUsers ? assignedUsers : ""}>
+                    <Button type="default" className="lsf-button"
+                      style={{ minWidth: "40px", border: "1px solid #e6e6e6", color: "grey", borderBottom: "None" }}
+                    >
+                      <InfoOutlinedIcon sx={{ mb: "-3px", ml: "2px", color: "grey" }} />
+                    </Button>
+                  </LightTooltip>
+                </Grid>
+                <Grid item>
+                  <Tooltip title="Go to next task">
+                    <Button value="Next" type="default" onClick={onNextAnnotation}
+                      style={{ minWidth: "160px", border: "1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None" }}
+                      className="lsf-button"
+                    >Next</Button>
+                  </Tooltip>
+                  {parentMetadata !== undefined && (
+                    <Tooltip title="Show Parent Image">
+                      <Button type="default" onClick={() => window.open(parentMetadata.image_url, "_blank")}
+                        style={{ minWidth: "160px", border: "1px solid #e6e6e6", color: "#09f", borderBottom: "None" }}
+                        className="lsf-button"
+                      >Parent Image</Button>
+                    </Tooltip>
+                  )}
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid item>
-
-            <>
-            <Tooltip title="Go to next task">
-              <Button
-                value="Next"
-                type="default"
-                onClick={onNextAnnotation}
-                style={{minWidth: "160px", border:"1px solid #e6e6e6", color: "#09f", pt: 3, pb: 3, borderBottom: "None",}}
-                className="lsf-button"
-              >
-                Next
-              </Button>
-            </Tooltip>
-            {parentMetadata !== undefined &&
-            <>
-            <Tooltip title="Show Parent Image">
-                <Button
-                  type="default"
-                  onClick={() => {window.open(parentMetadata.image_url, "_blank")}}
-                  style={{
-                    minWidth: "160px",
-                    border: "1px solid #e6e6e6",
-                    color: "#09f",
-                    pt: 3,
-                    pb: 3,
-                    borderBottom: "None",
-                  }}
-                  className="lsf-button"
-                >
-                  Parent Image
-                </Button>
-              </Tooltip>
-            </>
-            }
-
-        </>
-
-          </Grid>
-
-
-        </Grid>
-        </Grid>
-        <div/>
-
-      </div>}
-      <Box
-        sx={{border : "1px solid rgb(224 224 224)"}}
-      >
-        <div className="label-studio-root" ref={rootRef}></div>
-      </Box>
-      {parentMetadata !== undefined &&
-        <>
-          <div style={{textAlign:"center", display:"flex", justifyContent:"center"}}>
-            <div>
-              <h3>Parent MetaData</h3>
-              <JsonTable json={parentMetadata}/>
-            </div>
           </div>
-        </>
-        }
-      {!loader && ProjectDetails?.project_type?.includes("OCRSegmentCategorization") &&
-        <OCRSegmentCategorizationPanel
-          predictions={predictions}
-          selectedL={selectedL}
-          ocrD={ocrD}
-          handleSelectChange={handleSelectChange}
-          setOcrD={setOcrD}
-          ocrDomain={ocrDomain}
-        />
-      }
+        )}
+        <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
+          <div className="label-studio-root" ref={rootRef}></div>
+        </Box>
+        {parentMetadata !== undefined && (
+          <div style={{ textAlign: "center", display: "flex", justifyContent: "center" }}>
+            <div><h3>Parent MetaData</h3><JsonTable json={parentMetadata} /></div>
+          </div>
+        )}
+        {!loader && isSegCat && (
+          <OCRSegmentCategorizationPanel
+            predictions={predictions} selectedL={selectedL} ocrD={ocrD}
+            handleSelectChange={handleSelectChange} setOcrD={setOcrD} ocrDomain={ocrDomain}
+          />
+        )}
+        {loader}
+        {renderSnackBar()}
+      </div>
+    );
+  }
 
-      {loader}
+  return (
+    <OCRLayoutWrapper
+      isOCR={isOCR}
+      isTranscription={isTranscription}
+      isSegCat={isSegCat}
+      rootRef={rootRef}
+      loader={loader}
+
+      disableBtns={false}
+      assignedUsers={assignedUsers}
+      onDraft={() => {}}
+      onNextAnnotation={onNextAnnotation}
+      onClearMergings={() => {}}
+      parentMetadata={parentMetadata}
+      handleOcrFormatting={() => {}}
+      copiedFormula={''}
+      isAnnotator={isAnnotator}
+
+      predictions={predictions}
+      selectedL={selectedL}
+      ocrD={ocrD}
+      handleSelectChange={handleSelectChange}
+      setOcrD={setOcrD}
+      ocrDomain={ocrDomain}
+
+      lsfRef={lsfRef}
+    annotationsRaw={annotations}
+    taskId={taskId}
+    projectId={projectId}
+    selectedLanguages={selectedLanguages}
+    annotationNotesRef={annotationNotesRef}
+    load_time={load_time}
+    annotation_status={annotation_status}
+    readOnly={disableBtns}
+    taskData={taskData}
+    userData={userData}
+
+    >
       {renderSnackBar()}
-    </div>
+    </OCRLayoutWrapper>
   );
 };
 

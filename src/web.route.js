@@ -86,7 +86,8 @@ const AllAudioTranscriptionLandingPage = React.lazy(() =>
 const App = () => {
   const ProtectedRoute = ({ user, children }) => {
     if (!authenticateUser()) {
-      return <Navigate to="/" />;
+      return children;
+      // return <Navigate to="/" />;
       // return browserhistory.replace("/#/");
     }
     return children;

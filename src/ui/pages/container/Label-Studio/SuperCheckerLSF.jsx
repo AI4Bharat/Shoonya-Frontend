@@ -40,7 +40,7 @@ import {
 import {JsonTable} from 'react-json-to-html';
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
-
+import OCRLayoutWrapper from './OCRLayoutWrapper';
 import styles from "./lsf.module.css";
 import "./lsf.css";
 import { useSelector, useDispatch } from "react-redux";
@@ -136,6 +136,9 @@ const AUDIO_PROJECT_SAVE_CHECK = [
   "AudioTranscriptionEditing",
 ];
 
+
+
+
 const LabelStudioWrapper = ({
   reviewNotesRef,
   annotationNotesRef,
@@ -174,6 +177,11 @@ const LabelStudioWrapper = ({
   const { projectId, taskId } = useParams();
   const userData = useSelector((state) => state.fetchLoggedInUserData.data);
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
+
+  const isOCR = ProjectDetails?.project_type?.includes("OCR");
+  const isTranscription = ProjectDetails?.project_type?.includes("OCRTranscriptionEditing");
+  const isSegCat = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
+  const isSuperCheckerUser = taskData?.super_check_user === userData?.id;
   const filterdataitemsList = useSelector(
     (state) => state.datasetSearchPopup.data
   );
@@ -1196,6 +1204,55 @@ useEffect(() => {
       }
     }
   }, [taskData]);
+  if (isOCR) {
+    return (
+      <OCRLayoutWrapper
+        isOCR={isOCR}
+        isTranscription={isTranscription}
+        isSegCat={isSegCat}
+        rootRef={rootRef}
+        loader={loader}
+
+        disableBtns={!isSuperCheckerUser}
+        disableButton={false}
+        assignedUsers={assignedUsers}
+        onDraft={() => handleAcceptClick("draft")}
+        onNextAnnotation={onNextAnnotation}
+        onClearMergings={clearAllChildren}
+        parentMetadata={parentMetadata}
+        handleOcrFormatting={() => {}}
+        copiedFormula={''}
+        isAnnotator={false}
+        isReviewer={false}
+        onRevise={() => {}}
+        onAccept={() => {}}
+        isSuperChecker={true}
+        onValidate={(status) => handleAcceptClick(status)}
+        onReject={handleRejectClick}
+
+        predictions={predictions}
+        selectedL={selectedL}
+        ocrD={ocrD}
+        handleSelectChange={handleSelectChange}
+        setOcrD={setOcrD}
+        ocrDomain={ocrDomain}
+
+        lsfRef={lsfRef}
+        annotationsRaw={annotations}
+        taskId={taskId}
+        projectId={projectId}
+        selectedLanguages={selectedLanguages}
+        annotationNotesRef={superCheckerNotesRef}
+        load_time={load_time}
+        annotation_status={review_status}
+        readOnly={!isSuperCheckerUser}
+        taskData={taskData}
+        userData={userData}
+      >
+        {renderSnackBar()}
+      </OCRLayoutWrapper>
+    );
+  }
 
   return (
     <div>
