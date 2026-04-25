@@ -79,7 +79,7 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const isOCR = ProjectDetails?.project_type?.includes("OCR");
   const isTranscription = ProjectDetails?.project_type?.includes("OCRTranscriptionEditing");
   const isSegCat = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-  const isAnnotator = taskData?.annotation_users?.some((user) => user === userData.id);
+  const isAnnotator = taskData?.annotation_users?.some((user) => user === userData?.id);
 
 
   useEffect(() => {
@@ -178,7 +178,6 @@ useEffect(() => {
     predictions,
     annotationNotesRef,
   ) {
-    let load_time;
     let interfaces = [];
     if (predictions == null) predictions = [];
     LabelStudio.current = ProjectDetails?.project_type?.includes("OCR") ? LabelStudio1 : LabelStudio2;
@@ -600,16 +599,24 @@ if (!isOCR) {
       ocrDomain={ocrDomain}
 
       lsfRef={lsfRef}
-    annotationsRaw={annotations}
-    taskId={taskId}
-    projectId={projectId}
-    selectedLanguages={selectedLanguages}
-    annotationNotesRef={annotationNotesRef}
-    load_time={load_time}
-    annotation_status={annotation_status}
-    readOnly={disableBtns}
-    taskData={taskData}
-    userData={userData}
+      annotationsRaw={annotations}
+      taskId={taskId}
+      projectId={projectId}
+      selectedLanguages={selectedLanguages}
+      annotationNotesRef={annotationNotesRef}
+      load_time={load_time}
+      annotation_status={annotation_status}
+      readOnly={disableBtns}
+      taskData={taskData}
+      userData={userData}
+
+      isReviewer={false}
+      isSuperChecker={false}
+      onRevise={() => {}}
+      onAccept={() => {}}
+      onValidate={() => {}}
+      onReject={() => {}}
+      disableButton={false}
 
     >
       {renderSnackBar()}

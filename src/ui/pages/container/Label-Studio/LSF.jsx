@@ -206,7 +206,7 @@ const LabelStudioWrapper = ({
   const isOCR = ProjectDetails?.project_type?.includes("OCR");
   const isTranscription = ProjectDetails?.project_type?.includes("OCRTranscriptionEditing");
   const isSegCat = ProjectDetails?.project_type?.includes("OCRSegmentCategorization");
-  const isAnnotator = taskData?.annotation_users?.some((user) => user === userData.id);
+  const isAnnotator = taskData?.annotation_users?.some((user) => user === userData?.id);
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
