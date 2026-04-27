@@ -182,7 +182,7 @@ export function LSFAnnotationPanel({
     return (
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', height: '100%', gap: '10px',
+        justifyContent: 'center', minHeight: '120px', gap: '10px',
         color: '#9ca3af', fontSize: '13px', padding: '32px', textAlign: 'center',
       }}>
         <div style={{
@@ -203,9 +203,10 @@ export function LSFAnnotationPanel({
     <div
       ref={panelRef}
       style={{
-        height: '100%', overflowY: 'auto',
+        height: '100%', minHeight: 0, overflowY: 'auto', overflowX: 'hidden',
         background: '#f3f4f6', padding: '10px',
         display: 'flex', flexDirection: 'column', gap: '6px',
+        boxSizing: 'border-box',
       }}
     >
       {/* Header */}

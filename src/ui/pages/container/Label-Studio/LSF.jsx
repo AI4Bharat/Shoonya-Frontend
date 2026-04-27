@@ -54,6 +54,8 @@ import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/Dataset
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
 import { OCRTranscriptionShortcuts } from './OCRTranscriptionShortcuts';
 
+const isPreview = process.env.REACT_APP_OCR_PREVIEW === "true";
+
 const filterAnnotations = (
   annotations,
   user,

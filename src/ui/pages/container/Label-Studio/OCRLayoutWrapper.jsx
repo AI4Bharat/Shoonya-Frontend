@@ -57,6 +57,7 @@ const LSF_SUPPRESS_CSS = `
 }
 
 /* Workspace fills height */
+/* Workspace fills height */
 .ocr-layout-active [class*="workspace__"],
 .ocr-layout-active [class*="Workspace__"],
 .ocr-layout-active [class*="MainContent"],
@@ -65,6 +66,20 @@ const LSF_SUPPRESS_CSS = `
   max-height: 100% !important;
   overflow: hidden !important;
 }
+
+/* Prevent LSF root from expanding beyond its container */
+.ocr-layout-active .label-studio-root {
+  height: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Kill any full-viewport-width elements inside LSF */
+.ocr-layout-active .label-studio-root * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 `;
 
 function injectCSS() {
@@ -529,53 +544,71 @@ export default function OCRLayoutWrapper({
           }}
         >
           {/* rootRef div is rendered here by the caller — see integration below */}
-          <div ref={rootRef} style={{ height: '100%', width: '100%' }} />
+          <div ref={rootRef} style={{ height: '100%', width: '100%', overflow: 'hidden', boxSizing: 'border-box' }} />
         </div>
 
         {/* Right: annotation panel */}
+        {/* Right: annotation panel — fixed width, fully contained, independent scroll */}
         <div
           style={{
-            width: '340px',
+            width: '360px',
+            maxWidth: '360px',
             flexShrink: 0,
             display: 'flex',
             flexDirection: 'column',
             background: '#fff',
+            height: '100%',
             overflow: 'hidden',
+            boxSizing: 'border-box',
+            contain: 'layout paint',
           }}
         >
-          {/* Phase 2 will mount OCRAnnotationPanel here */}
-          {/* For now: show OCRSegmentCategorizationPanel or a placeholder */}
-            <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            {/* Annotation cards — always shown for transcription */}
-                <LSFAnnotationPanel
-                    lsfRef={lsfRef}
-                    annotationsRaw={annotationsRaw}
-                    taskId={taskId}
-                    projectId={projectId}
-                    selectedLanguages={selectedLanguages}
-                    ocrDomain={ocrDomain}
-                    annotationNotesRef={annotationNotesRef}
-                    load_time={load_time}
-                    annotation_status={annotation_status}
-                    readOnly={readOnly}
-                    taskData={taskData}
-                    userData={userData}
-                />
+          {/* Annotation cards — scrollable, fills available height */}
+          <div style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            boxSizing: 'border-box',
+          }}>
+            <LSFAnnotationPanel
+              lsfRef={lsfRef}
+              annotationsRaw={annotationsRaw}
+              taskId={taskId}
+              projectId={projectId}
+              selectedLanguages={selectedLanguages}
+              ocrDomain={ocrDomain}
+              annotationNotesRef={annotationNotesRef}
+              load_time={load_time}
+              annotation_status={annotation_status}
+              readOnly={readOnly}
+              taskData={taskData}
+              userData={userData}
+            />
+          </div>
 
-            {/* Seg-cat filters + predictions — shown below cards for OCRSegmentCategorization */}
-                {isSegCat && (
-                    <div style={{ flexShrink: 0, borderTop: '1px solid #e5e7eb' }}>
-                        <OCRSegmentCategorizationPanel
-                            predictions={predictions}
-                            selectedL={selectedL}
-                            ocrD={ocrD}
-                            handleSelectChange={handleSelectChange}
-                            setOcrD={setOcrD}
-                            ocrDomain={ocrDomain}
-                        />
-                    </div>
-                )}
+          {/* Seg-cat filters + predictions — pinned to bottom, does not scroll with cards */}
+          {isSegCat && (
+            <div style={{
+              flexShrink: 0,
+              borderTop: '1px solid #e5e7eb',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              maxHeight: '45%',
+              boxSizing: 'border-box',
+            }}>
+              <OCRSegmentCategorizationPanel
+                predictions={predictions}
+                selectedL={selectedL}
+                ocrD={ocrD}
+                handleSelectChange={handleSelectChange}
+                setOcrD={setOcrD}
+                ocrDomain={ocrDomain}
+              />
             </div>
+          )}
         </div>
       </div>
 
