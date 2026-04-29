@@ -48,7 +48,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import configs from '../../../../config/config';
-import { AUDIO_URL_MAPPINGS } from '../../../../utils/audioUrlMappings';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import CloseIcon from "@mui/icons-material/Close";
@@ -386,18 +385,18 @@ const AudioTranscriptionLandingPage = () => {
       }else{
         setWaveSurfer(true);
       }
-      const audioUrl = String(resp?.data?.audio_url);
-      const mapping = AUDIO_URL_MAPPINGS.find((m) => audioUrl.includes(m.sourcePrefix));
       const fetchAudioData = await fetch(
-        mapping
-          ? audioUrl.replace(mapping.sourcePrefix, `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=${mapping.audioUrlParam}`)
-          : audioUrl,
-        {
-          method: "GET",
-          headers: (audioUrl.includes("sarvam-benchmark.objectstore.e2enetworks.net") || audioUrl.startsWith("https://objectstore.e2enetworks.net"))
-            ? {}
-            : ProjectObj.getHeaders().headers
-        })
+    (String(resp?.data?.audio_url).includes("https://asr-transcription.objectstore.e2enetworks.net/") 
+        ? String(resp?.data?.audio_url).replace("https://asr-transcription.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=asr-transcription/`)
+        : String(resp?.data?.audio_url).includes("https://indic-asr-public.objectstore.e2enetworks.net/") 
+        ? String(resp?.data?.audio_url).replace("https://indic-asr-public.objectstore.e2enetworks.net/", `${configs.BASE_URL_AUTO}/task/get_audio_file/?audio_url=speechteam/`)
+        : String(resp?.data?.audio_url)),
+    {
+        method: "GET",
+        headers: (String(resp?.data?.audio_url).includes("sarvam-benchmark.objectstore.e2enetworks.net") || String(resp?.data?.audio_url).startsWith("https://objectstore.e2enetworks.net"))
+        ? {}
+        : ProjectObj.getHeaders().headers
+      })
       if (!fetchAudioData.ok){
         setAudioURL(resp?.data?.audio_url)
       }else{
