@@ -47,7 +47,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az afd endpoint purge --resource-group shoonya-dev --profile-name shoonya-prod-cdn --endpoint-name shoonya-prod-cdn-endpoint --content-paths "/*"
+          az afd endpoint purge --no-wait --resource-group shoonya-dev --profile-name shoonya-prod-cdn --endpoint-name shoonya-prod-cdn-endpoint --content-paths "/*"
 
     - name: Azure logout
       run: |
