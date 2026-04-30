@@ -8,7 +8,7 @@ export const AUDIO_URL_MAPPINGS = [
     audioUrlParam: "speechteam/",
   },
   {
-    sourcePrefix: "https://www.sosnm1.shakticloud.ai:9024/iitmnewbkt/",
+    sourcePrefix: "https://sosnm1.shakticloud.ai:9024/iitmnewbkt/",
     audioUrlParam: "iitmnewbkt/",
   },
 ];
