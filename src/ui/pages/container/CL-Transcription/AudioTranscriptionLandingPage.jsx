@@ -48,7 +48,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import getTaskAssignedUsers from '../../../../utils/getTaskAssignedUsers';
 import LightTooltip from "../../component/common/Tooltip";
 import configs from '../../../../config/config';
-import { AUDIO_URL_MAPPINGS } from '../../../../utils/audioUrlMappings';
+import { AUDIO_URL_MAPPINGS, isPublicAudioUrl } from '../../../../utils/audioUrlMappings';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import CloseIcon from "@mui/icons-material/Close";
@@ -394,9 +394,7 @@ const AudioTranscriptionLandingPage = () => {
           : audioUrl,
         {
           method: "GET",
-          headers: (audioUrl.includes("sarvam-benchmark.objectstore.e2enetworks.net") || audioUrl.startsWith("https://objectstore.e2enetworks.net"))
-            ? {}
-            : ProjectObj.getHeaders().headers
+          headers: isPublicAudioUrl(audioUrl) ? {} : ProjectObj.getHeaders().headers
         })
       if (!fetchAudioData.ok){
         setAudioURL(resp?.data?.audio_url)
