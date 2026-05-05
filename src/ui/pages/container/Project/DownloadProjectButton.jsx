@@ -45,6 +45,7 @@ function DownloadProjectButton(props) {
   const [loading, setLoading] = useState(false);
  const[taskValue ,setTaskValue]= useState(taskStatus)
   const apiLoading = useSelector(state => state.apiStatus.loading);
+  const apiStatus = useSelector(state => state.apiStatus);
   const open = Boolean(anchorEl);
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -62,6 +63,16 @@ function DownloadProjectButton(props) {
   useEffect(() => {
     setLoading(apiLoading);
   }, [apiLoading])
+
+  useEffect(() => {
+    if (apiStatus.message) {
+      setSnackbarInfo({
+        open: true,
+        message: apiStatus.message,
+        variant: apiStatus.error ? "error" : "success",
+      });
+    }
+  }, [apiStatus])
 
 
   // const getDownloadProject = async () => {

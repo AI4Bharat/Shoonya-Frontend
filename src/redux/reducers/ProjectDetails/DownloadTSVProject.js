@@ -19,7 +19,9 @@ function TsvDownload(content) {
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
 		case constants.DOWNLOAD_PROJECT_TSV:
-			TsvDownload(action.payload);
+			if (typeof action.payload === "string") {
+				TsvDownload(action.payload);
+			}
 			return {
 				...state,
 				data: state.data + 1,
