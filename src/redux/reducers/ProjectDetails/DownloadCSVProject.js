@@ -19,7 +19,9 @@ function CsvDownload(content) {
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
 		case constants.DOWNLOAD_PROJECT_CSV:
-			CsvDownload(action.payload);
+			if (typeof action.payload === "string") {
+				CsvDownload(action.payload);
+			}
 			return {
 				...state,
 				data: state.data + 1,

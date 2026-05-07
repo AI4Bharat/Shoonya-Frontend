@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { CSVDownload, CSVLink } from "react-csv";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import DownloadProjectCsvAPI from '../../../../redux/actions/api/ProjectDetails/DownloadCSVProject';
-import DownloadJSONProjectAPI from '../../../../redux/actions/api/ProjectDetails/DownloadJSONProject';
-import DownloadProjectTsvAPI from '../../../../redux/actions/api/ProjectDetails/DownloadTSVProject';
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useSelector } from "react-redux";
+import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import configs from "../../../../config/config";
+import ENDPOINTS from "../../../../config/apiendpoint";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -32,23 +30,15 @@ const StyledMenu = styled((props) => (
     borderRadius: 6,
     marginTop: theme.spacing(1),
     minWidth: 100,
-
-
   },
 }));
 
 
 function DownloadProjectButton(props) {
-  const { taskStatus,SetTask,downloadMetadataToggle} = props;
+  const { taskStatus, SetTask, downloadMetadataToggle } = props;
   const [anchorEl, setAnchorEl] = useState(null);
-  const [downloadres, setdownloadres] = useState(false);
   const [loading, setLoading] = useState(false);
- const[taskValue ,setTaskValue]= useState(taskStatus)
-  const apiLoading = useSelector(state => state.apiStatus.loading);
-  const open = Boolean(anchorEl);
   const { id } = useParams();
-  const dispatch = useDispatch();
-  let csvLink = React.createRef()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -58,120 +48,55 @@ function DownloadProjectButton(props) {
     (state) => state.fetchLoggedInUserData.data
   );
 
-
-  useEffect(() => {
-    setLoading(apiLoading);
-  }, [apiLoading])
-
-
-  // const getDownloadProject = async () => {
-  //   const projectObj = new DownloadProjectButtonAPI(id);
-
-  //   dispatch(APITransport(projectObj));
-
-  // }
-  // let DownloadProject =  useSelector(state => state.downloadProjectButton.data);
-
-
-  // const DownloadJSONProject = async () => {
-  //   const projectObj = new DownloadJSONProjectAPI(id);
-
-  //   dispatch(APITransport(projectObj));
-
-  // }
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
-
   };
-  const handleDownloadJSONProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
-    const projectObj = new DownloadJSONProjectAPI(id,taskStatus,downloadMetadataToggle);
-    dispatch(APITransport(projectObj));
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: "success",
-    //     variant: "success",
-    //   })
 
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   })
-    // }
-   
-  };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const handleDownloadCSVProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
-    setLoading(true)
-    const projectObj = new DownloadProjectCsvAPI(id,taskStatus,downloadMetadataToggle);
-    dispatch(APITransport(projectObj));
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: "success",
-    //     variant: "success",
-    //   })
+  const handleDownload = async (exportType) => {
+    handleClose();
+    setLoading(true);
 
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   })
-    // }
-   
+    try {
+      const url = `${configs.BASE_URL}${ENDPOINTS.getProjects}${id}/download/?export_type=${exportType}&task_status=${taskStatus}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      const resp = await res.json();
+
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message || "The report has been generated and sent to your email.",
+          variant: "success",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message || "Failed to generate the report.",
+          variant: "error",
+        });
+      }
+    } catch (err) {
+      setSnackbarInfo({
+        open: true,
+        message: "Request failed. Please try again.",
+        variant: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDownloadTSVProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
-    setLoading(true)
-    const projectObj = new DownloadProjectTsvAPI(id,taskStatus,downloadMetadataToggle);
-    dispatch(APITransport(projectObj));
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: "success",
-    //     variant: "success",
-    //   })
-
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   })
-    // }
-    
-  };
- 
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -185,40 +110,37 @@ function DownloadProjectButton(props) {
       />
     );
   };
+
   return (
     <div>
       {renderSnackBar()}
       <Button
-        sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2,width:"300px" }}
+        sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2, width: "300px" }}
         id="demo-customized-button"
-        // aria-controls={open ? 'demo-customized-menu' : undefined}
-        // aria-haspopup="true"
-        // aria-expanded={open ? 'true' : undefined}
         variant="contained"
-        disabled= {taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role? false: true } 
+        disabled={loading || (taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role ? false : true)}
         onClick={handleClick}
-        endIcon={<KeyboardArrowDownIcon />}
+        endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
       >
-        Download Project
+        {loading ? "Generating Report..." : "Download Project"}
       </Button>
       <StyledMenu
-        sytle={{ width: "20px" }}
+        style={{ width: "20px" }}
         id="demo-customized-menu"
         MenuListProps={{
           'aria-labelledby': 'demo-customized-button',
         }}
         anchorEl={anchorEl}
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
-
       >
-        <MenuItem onClick={handleDownloadCSVProject}>
+        <MenuItem onClick={() => handleDownload("CSV")}>
           CSV
         </MenuItem>
-        <MenuItem onClick={handleDownloadTSVProject}>
+        <MenuItem onClick={() => handleDownload("TSV")}>
           TSV
         </MenuItem>
-        <MenuItem onClick={handleDownloadJSONProject} >
+        <MenuItem onClick={() => handleDownload("JSON")}>
           JSON
         </MenuItem>
       </StyledMenu>
