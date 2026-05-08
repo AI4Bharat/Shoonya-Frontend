@@ -612,6 +612,7 @@ const AdvancedOperation = (props) => {
               taskStatus={taskStatus}
               SetTask={setTaskStatus}
               downloadMetadataToggle={downloadMetadataToggle}
+              buttonType="download"
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -668,6 +669,15 @@ const AdvancedOperation = (props) => {
                   ))}
                 </Select>
               </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <DownloadProjectButton
+              taskStatus={taskStatus}
+              SetTask={setTaskStatus}
+              downloadMetadataToggle={downloadMetadataToggle}
+              buttonType="email"
+            />
           </Grid>
 
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
