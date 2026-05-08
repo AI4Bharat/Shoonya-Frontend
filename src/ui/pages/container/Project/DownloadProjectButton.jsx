@@ -35,7 +35,7 @@ const StyledMenu = styled((props) => (
 
 
 function DownloadProjectButton(props) {
-  const { taskStatus, SetTask, downloadMetadataToggle, buttonType="download" } = props;
+  const { taskStatus, SetTask, downloadMetadataToggle, buttonType = "download" } = props;
   const [anchorElEmail, setAnchorElEmail] = useState(null);
   const [anchorElDownload, setAnchorElDownload] = useState(null);
   const [loadingEmail, setLoadingEmail] = useState(false);
@@ -97,7 +97,7 @@ function DownloadProjectButton(props) {
           const downloadUrl = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = downloadUrl;
-          
+
           const now = new Date();
           const pad = (n) => n.toString().padStart(2, '0');
           const dateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}`;
@@ -172,7 +172,7 @@ function DownloadProjectButton(props) {
             onClick={handleClickEmail}
             endIcon={loadingEmail ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
           >
-            {loadingEmail ? "Sending..." : "Email Project"}
+            {loadingEmail ? "Sending..." : "Email Project Data"}
           </Button>
           <StyledMenu
             id="email-customized-menu"
