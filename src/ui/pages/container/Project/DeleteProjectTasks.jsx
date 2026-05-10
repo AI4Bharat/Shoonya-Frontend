@@ -23,6 +23,7 @@ import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function DeleteProjectTasks() {
     const classes = DatasetStyle();
@@ -42,8 +43,8 @@ export default function DeleteProjectTasks() {
     });
     const loggedInUserData = useSelector(
         (state) => state.fetchLoggedInUserData.data
-      );
-    
+    );
+
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -78,7 +79,7 @@ export default function DeleteProjectTasks() {
         return parseInt(str);
     });
 
-    const handleok = async() => {
+    const handleok = async () => {
         setOpenDialog(false);
         setAnchorEl(null);
         setProjectTaskStartId();
@@ -88,18 +89,18 @@ export default function DeleteProjectTasks() {
             project_task_start_id: parseInt(projectTaskStartId),
             project_task_end_id: parseInt(projectTaskEndId)
         }
-        
 
-        const  ProjectTaskIDs = {
+
+        const ProjectTaskIDs = {
             project_task_ids: value
         }
 
         if (radiobutton === true) {
-             projectObj = new DeleteProjectTasksAPI(id, ProjectTaskStartAndEndID)
+            projectObj = new DeleteProjectTasksAPI(id, ProjectTaskStartAndEndID)
 
 
         } else {
-             projectObj = new DeleteProjectTasksAPI(id, ProjectTaskIDs)
+            projectObj = new DeleteProjectTasksAPI(id, ProjectTaskIDs)
         }
         const res = await fetch(projectObj.apiEndPoint(), {
             method: "POST",
@@ -150,35 +151,44 @@ export default function DeleteProjectTasks() {
     const emailId = localStorage.getItem("email_id");
     const [password, setPassword] = useState("");
     const handleConfirm = async () => {
-      const apiObj = new LoginAPI(emailId, password);
+        const apiObj = new LoginAPI(emailId, password);
         const res = await fetch(apiObj.apiEndPoint(), {
-        method: "POST",
-        body: JSON.stringify(apiObj.getBody()),
-        headers: apiObj.getHeaders().headers,
+            method: "POST",
+            body: JSON.stringify(apiObj.getBody()),
+            headers: apiObj.getHeaders().headers,
         });
         const rsp_data = await res.json();
         if (res.ok) {
-        handleok();
-        }else{
-        window.alert("Invalid credentials, please try again");
+            handleok();
+        } else {
+            window.alert("Invalid credentials, please try again");
         }
     };
 
     return (
         <div >
             {renderSnackBar()}
-            <Button
-                sx={{
-                    borderRadius: 3,
-                    width: "100%"
-                }}
-                aria-describedby={Id}
-                variant="contained"
-                onClick={handleClick}
-                disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ?true:false}
-                color="error">
-                Delete Project Tasks
-            </Button>
+            <Tooltip
+                title={
+                    userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role
+                        ? "Only Admins can delete project tasks"
+                        : "Permanently delete tasks from this project by range or specific IDs"
+                }
+                arrow
+            >
+                <Button
+                    sx={{
+                        borderRadius: 3,
+                        width: "100%"
+                    }}
+                    aria-describedby={Id}
+                    variant="contained"
+                    onClick={handleClick}
+                    disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ? true : false}
+                    color="error">
+                    Delete Project Tasks
+                </Button>
+            </Tooltip>
 
             <Popover
                 Id={Id}
@@ -191,7 +201,7 @@ export default function DeleteProjectTasks() {
                 }}
             >
 
-                  <Grid container className={classes.root} >
+                <Grid container className={classes.root} >
                     <Grid item style={{ flexGrow: "1", padding: "10px" }}>
                         <FormControl >
                             <RadioGroup
@@ -209,94 +219,94 @@ export default function DeleteProjectTasks() {
                         </FormControl>
                     </Grid>
                 </Grid>
-              {radiobutton === true &&
-              <>
-                <Grid
-                    container
-                    direction='row'
-                    sx={{
-                        alignItems: "center",
-                        p: 1
-                    }}
-                >
-
-                    <Grid
-                        items
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={5}
-                        xl={5}
-                    >
-                        <Typography variant="body2" fontWeight='700' label="Required">
-                            Project Task Start ID:
-                        </Typography>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        xl={6}
-                        sm={6}
-                    >
-                        <TextField
-                            size="small"
-                            variant="outlined"
-                            value={projectTaskStartId}
-                            onChange={(e) => setProjectTaskStartId(e.target.value)}
-                            inputProps={{
-                                style: {
-                                    fontSize: "16px"
-                                }
+                {radiobutton === true &&
+                    <>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                p: 1
                             }}
-                        />
+                        >
 
-                    </Grid>
-                </Grid>
-                <Grid
-                    container
-                    direction='row'
-                    sx={{
-                        alignItems: "center",
-                        p: 1
-                    }}
-                >
-                    <Grid
-                        items
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={5}
-                        xl={5}
-                    >
-                        <Typography variant="body2" fontWeight='700' label="Required">
-                            Project Task End ID:
-                        </Typography>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        xl={6}
-                        sm={6}
-                    >
-                        <TextField
-                            size="small"
-                            variant="outlined"
-                            value={projectTaskEndId}
-                            onChange={(e) => setProjectTaskEndId(e.target.value)}
-                            inputProps={{
-                                style: {
-                                    fontSize: "16px"
-                                }
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={5}
+                                xl={5}
+                            >
+                                <Typography variant="body2" fontWeight='700' label="Required">
+                                    Project Task Start ID:
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={6}
+                                sm={6}
+                            >
+                                <TextField
+                                    size="small"
+                                    variant="outlined"
+                                    value={projectTaskStartId}
+                                    onChange={(e) => setProjectTaskStartId(e.target.value)}
+                                    inputProps={{
+                                        style: {
+                                            fontSize: "16px"
+                                        }
+                                    }}
+                                />
+
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction='row'
+                            sx={{
+                                alignItems: "center",
+                                p: 1
                             }}
-                        />
-                    </Grid>
-   
-                </Grid>
-                </>}
+                        >
+                            <Grid
+                                items
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={5}
+                                xl={5}
+                            >
+                                <Typography variant="body2" fontWeight='700' label="Required">
+                                    Project Task End ID:
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                lg={12}
+                                xl={6}
+                                sm={6}
+                            >
+                                <TextField
+                                    size="small"
+                                    variant="outlined"
+                                    value={projectTaskEndId}
+                                    onChange={(e) => setProjectTaskEndId(e.target.value)}
+                                    inputProps={{
+                                        style: {
+                                            fontSize: "16px"
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                        </Grid>
+                    </>}
                 {radiobutton === false &&
                     <Grid
                         container
@@ -315,7 +325,7 @@ export default function DeleteProjectTasks() {
                             xl={5}
                         >
                             <Typography variant="body2" fontWeight='700' label="Required">
-                            Project Task IDs:
+                                Project Task IDs:
                             </Typography>
                         </Grid>
                         <Grid
@@ -374,18 +384,18 @@ export default function DeleteProjectTasks() {
                 <DialogContent>
 
                     <DialogContentText id="alert-dialog-description">
-                    Are you  sure want to delete these tasks? Please note this action cannot be undone.
+                        Are you  sure want to delete these tasks? Please note this action cannot be undone.
                     </DialogContentText>
                     <TextField
-                            autoFocus
-                            margin="dense"
-                            id="password"
-                            label="Password"
-                            type="password"
-                            fullWidth
-                            variant="standard"
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
+                        autoFocus
+                        margin="dense"
+                        id="password"
+                        label="Password"
+                        type="password"
+                        fullWidth
+                        variant="standard"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}
@@ -393,7 +403,7 @@ export default function DeleteProjectTasks() {
                         color="error"
                         size="small"
                         className={classes.clearAllBtn} >
-                            Cancel
+                        Cancel
                     </Button>
                     <Button onClick={handleConfirm}
                         variant="contained"
