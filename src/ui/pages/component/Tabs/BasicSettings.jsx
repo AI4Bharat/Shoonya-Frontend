@@ -20,7 +20,6 @@ import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/
 import CustomButton from "../common/Button";
 import CustomizedSnackbars from "../common/Snackbar";
 import Spinner from "../common/Spinner";
-import Tooltip from "@mui/material/Tooltip";
 
 
 
@@ -443,37 +442,29 @@ const BasicSettings = (props) => {
                             md: "normal" 
                         }}}
                 >
-                    <Tooltip title="Discard changes and go back to the project list" arrow>
-                      <span style={{ display: "block" }}>
-                        <CustomButton sx={{ 
+                    <CustomButton sx={{ 
+                        width: { 
+                            xs: "100%", 
+                            sm: "300px" 
+                        }, 
+                        marginBottom: { 
+                            xs: 2, 
+                            md: 0 
+                        }, 
+                        marginRight: { 
+                            md: 2 
+                        }}}
+                        onClick={() => navigate(`/projects/:id/`)}
+                        // onClick={handleCancel}
+                        label="Cancel" />
+                    <CustomButton 
+                        sx={{ 
                             width: { 
                                 xs: "100%", 
                                 sm: "300px" 
-                            }, 
-                            marginBottom: { 
-                                xs: 2, 
-                                md: 0 
-                            }, 
-                            marginRight: { 
-                                md: 2 
                             }}}
-                            onClick={() => navigate(`/projects/:id/`)}
-                            // onClick={handleCancel}
-                            label="Cancel" />
-                      </span>
-                    </Tooltip>
-                    <Tooltip title="Save all changes to this project" arrow>
-                      <span style={{ display: "block" }}>
-                        <CustomButton 
-                            sx={{ 
-                                width: { 
-                                    xs: "100%", 
-                                    sm: "300px" 
-                                }}}
-                            onClick={handleSave}
-                            label="Save" />
-                      </span>
-                    </Tooltip>
+                        onClick={handleSave}
+                        label="Save" />
                 </Grid>
             </Grid>
         </ThemeProvider>
