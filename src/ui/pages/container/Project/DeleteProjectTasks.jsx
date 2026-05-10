@@ -23,6 +23,7 @@ import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function DeleteProjectTasks() {
     const classes = DatasetStyle();
@@ -167,7 +168,15 @@ export default function DeleteProjectTasks() {
     return (
         <div >
             {renderSnackBar()}
-            <Button
+            <Tooltip
+                title={
+                  userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role
+                    ? "Only Admins can delete project tasks"
+                    : "Permanently delete tasks from this project by range or specific IDs"
+                }
+                arrow
+            >
+                <Button
                 sx={{
                     borderRadius: 3,
                     width: "100%"
@@ -179,6 +188,7 @@ export default function DeleteProjectTasks() {
                 color="error">
                 Delete Project Tasks
             </Button>
+            </Tooltip>
 
             <Popover
                 Id={Id}

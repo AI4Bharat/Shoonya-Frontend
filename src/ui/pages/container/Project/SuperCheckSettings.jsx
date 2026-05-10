@@ -11,6 +11,7 @@ import SuperCheckSettingsAPI from "../../../../redux/actions/api/ProjectDetails/
 import { useDispatch } from "react-redux";
 import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
+import Tooltip from "@mui/material/Tooltip";
 
 
 export default function SuperCheckSettings(props) {
@@ -91,17 +92,19 @@ export default function SuperCheckSettings(props) {
     return (
         <div >
             {renderSnackBar()}
-            <Button
-                sx={{
-                    borderRadius: 3,
-                    width: "100%"
-                }}
-                aria-describedby={Id}
-                variant="contained"
-                onClick={handleClick}
-            >
-                Super Check Settings
-            </Button>
+            <Tooltip title="Configure the super-check sampling percentage (K%) and revision loop count" arrow>
+                <Button
+                    sx={{
+                        borderRadius: 3,
+                        width: "100%"
+                    }}
+                    aria-describedby={Id}
+                    variant="contained"
+                    onClick={handleClick}
+                >
+                    Super Check Settings
+                </Button>
+            </Tooltip>
 
             <Popover
                 Id={Id}
