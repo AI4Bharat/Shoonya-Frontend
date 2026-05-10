@@ -18,15 +18,16 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import DatasetStyle from "../../../styles/Dataset";
 import { translate } from "../../../../config/localisation";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { snakeToTitleCase } from "../../../../utils/utils";
-import  DeallocationAnnotatorsAndReviewersAPI from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
+import DeallocationAnnotatorsAndReviewersAPI from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import { DeallocateTaskById } from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import { Tab, Tabs } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 let AnnotationStatus = [
@@ -169,8 +170,8 @@ export default function DeallocationAnnotatorsAndReviewers() {
     setSuperCheckStatus([]);
     setdataIds("");
 
-    if(dealocateTasksBy === "taskId"){
-      const projectObj = new DeallocateTaskById(id, dataIds, userLevel,reviewerssUser,reviewStatus);
+    if (dealocateTasksBy === "taskId") {
+      const projectObj = new DeallocateTaskById(id, dataIds, userLevel, reviewerssUser, reviewStatus);
       const res = await fetch(projectObj.apiEndPoint(), {
         method: "POST",
         body: JSON.stringify(projectObj.getBody()),
@@ -194,38 +195,38 @@ export default function DeallocationAnnotatorsAndReviewers() {
       }
     } else {
 
-    const projectObj = new DeallocationAnnotatorsAndReviewersAPI(
-      id,
-      userLevel,
-      annotatorsUser,
-      reviewerssUser,
-      annotationStatus,
-      reviewStatus,
-      superCheckersUser,
-      superCheckStatus
-    );
-    // dispatch(APITransport(projectObj));
-    const res = await fetch(projectObj.apiEndPoint(), {
-      method: "POST",
-      body: JSON.stringify(projectObj.getBody()),
-      headers: projectObj.getHeaders().headers,
-    });
-    const resp = await res.json();
-    // setLoading(false);
-    if (res.ok) {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "success",
+      const projectObj = new DeallocationAnnotatorsAndReviewersAPI(
+        id,
+        userLevel,
+        annotatorsUser,
+        reviewerssUser,
+        annotationStatus,
+        reviewStatus,
+        superCheckersUser,
+        superCheckStatus
+      );
+      // dispatch(APITransport(projectObj));
+      const res = await fetch(projectObj.apiEndPoint(), {
+        method: "POST",
+        body: JSON.stringify(projectObj.getBody()),
+        headers: projectObj.getHeaders().headers,
       });
-    } else {
-      setSnackbarInfo({
-        open: true,
-        message: resp?.message,
-        variant: "error",
-      });
+      const resp = await res.json();
+      // setLoading(false);
+      if (res.ok) {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "success",
+        });
+      } else {
+        setSnackbarInfo({
+          open: true,
+          message: resp?.message,
+          variant: "error",
+        });
+      }
     }
-  }
   };
 
   const renderSnackBar = () => {
@@ -241,18 +242,18 @@ export default function DeallocationAnnotatorsAndReviewers() {
       />
     );
   };
- 
+
 
   const [tabValue, setTabValue] = useState(0);
-    const handleTabChange = (e, v) => {
-        if(v === 0){
-            setDealocateTasksBy("taskId");
-        } else {
-            setDealocateTasksBy("userId");
-        }
-        setTabValue(v);
-
+  const handleTabChange = (e, v) => {
+    if (v === 0) {
+      setDealocateTasksBy("taskId");
+    } else {
+      setDealocateTasksBy("userId");
     }
+    setTabValue(v);
+
+  }
 
   const emailId = localStorage.getItem("email_id");
   const [password, setPassword] = useState("");
@@ -283,16 +284,27 @@ export default function DeallocationAnnotatorsAndReviewers() {
   return (
     <div>
       {renderSnackBar()}
-     <CustomButton
-        sx={{
-          borderRadius: 3,
-          width: "100%",
-        }}
-        onClick={handleClickOpen}
-        label="Deallocate User Tasks"
-        color="error"
-        disabled = {(userRole?.WorkspaceManager === loggedInUserData?.role )?true:false}
-      />
+      <Tooltip
+        title={
+          userRole?.WorkspaceManager === loggedInUserData?.role
+            ? "Only Admins can deallocate user tasks"
+            : "Deallocate assigned tasks from annotators, reviewers, or super-checkers"
+        }
+        arrow
+      >
+        <span style={{ display: "block", width: "100%" }}>
+          <CustomButton
+            sx={{
+              borderRadius: 3,
+              width: "100%",
+            }}
+            onClick={handleClickOpen}
+            label="Deallocate User Tasks"
+            color="error"
+            disabled={(userRole?.WorkspaceManager === loggedInUserData?.role) ? true : false}
+          />
+        </span>
+      </Tooltip>
 
       <Popover
         Id={Id}
@@ -307,14 +319,14 @@ export default function DeallocationAnnotatorsAndReviewers() {
         <Grid container className={classes.root}>
           <Grid item style={{ flexGrow: "1", padding: "10px" }}>
             <FormControl>
-              <Box sx={{mb:2,}} >
+              <Box sx={{ mb: 2, }} >
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="user-tabs">
-                    <Tab label="Deallocate by Task ID" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
-                    <Tab label="Deallocate by user ID" sx={{ fontSize: 17, fontWeight: '700' }} />
+                  <Tab label="Deallocate by Task ID" sx={{ fontSize: 17, fontWeight: '700', marginRight: '28px !important' }} />
+                  <Tab label="Deallocate by user ID" sx={{ fontSize: 17, fontWeight: '700' }} />
                 </Tabs>
-            </Box>
+              </Box>
             </FormControl>
-              <Grid
+            <Grid
               container
               direction="row"
               sx={{
@@ -322,7 +334,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
                 p: 1,
                 width: "370px",
               }}
-            > 
+            >
               <FormControl>
                 <RadioGroup
                   row
@@ -335,14 +347,14 @@ export default function DeallocationAnnotatorsAndReviewers() {
                       key={userLevel}
                       value={userLevel}
                       control={<Radio />}
-                      label={userLevel} 
+                      label={userLevel}
                       onClick={() => handleUserLevelChange(userLevel)}
                     />
                   ))}
                 </RadioGroup>
               </FormControl>
-              </Grid>
-            
+            </Grid>
+
           </Grid>
         </Grid>
 
@@ -377,13 +389,13 @@ export default function DeallocationAnnotatorsAndReviewers() {
         )}
         {userLevel === "annotation" && dealocateTasksBy === "userId" && (
           <>
-          <Grid
+            <Grid
               container
               direction="row"
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"350px"
+                width: "350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -392,7 +404,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
                 </Typography>
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-              <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small">
                   <Select
                     labelId="demo-simple-select-helper-label"
                     id="demo-simple-select-helper"
@@ -415,7 +427,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"350px"
+                width: "350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -426,43 +438,43 @@ export default function DeallocationAnnotatorsAndReviewers() {
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
                 <FormControl fullWidth size="small">
 
-                <Select
-                labelId="Select-Task-Statuses"
-                multiple
-                value={annotationStatus}
-                onChange={handleChangeAnnotationStatus}
-                renderValue={(annotationStatus) => annotationStatus.join(", ")}
-                MenuProps={MenuProps}
-               
-              >
-                {AnnotationStatus.map((option) => (
-                  <MenuItem
-                    sx={{ textTransform: "capitalize" }}
-                    key={option}
-                    value={option}
+                  <Select
+                    labelId="Select-Task-Statuses"
+                    multiple
+                    value={annotationStatus}
+                    onChange={handleChangeAnnotationStatus}
+                    renderValue={(annotationStatus) => annotationStatus.join(", ")}
+                    MenuProps={MenuProps}
+
                   >
-                    {/* <ListItemIcon>
+                    {AnnotationStatus.map((option) => (
+                      <MenuItem
+                        sx={{ textTransform: "capitalize" }}
+                        key={option}
+                        value={option}
+                      >
+                        {/* <ListItemIcon>
                       <Checkbox checked={annotationStatus.indexOf(option) > -1} />
                     </ListItemIcon> */}
-                    <ListItemText primary={snakeToTitleCase(option)} />
-                  </MenuItem>
-                ))}
-              </Select>
-                  
+                        <ListItemText primary={snakeToTitleCase(option)} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+
                 </FormControl>
               </Grid>
             </Grid>
           </>
         )}
-        {userLevel === "review"  && dealocateTasksBy === "userId" && (
+        {userLevel === "review" && dealocateTasksBy === "userId" && (
           <>
-          <Grid
+            <Grid
               container
               direction="row"
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"350px"
+                width: "350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -471,12 +483,12 @@ export default function DeallocationAnnotatorsAndReviewers() {
                 </Typography>
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-              <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small">
                   <Select
                     labelId="demo-simple-select-helper-label"
                     id="demo-simple-select-helper"
                     value={reviewerssUser}
-                     onChange={(e) => setReviewersUser(e.target.value)}
+                    onChange={(e) => setReviewersUser(e.target.value)}
                     sx={{
                       textAlign: "left",
                     }}
@@ -494,7 +506,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"350px"
+                width: "350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -504,28 +516,28 @@ export default function DeallocationAnnotatorsAndReviewers() {
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
                 <FormControl fullWidth size="small">
-                <Select
-                labelId="Select-Task-Statuses"
-                multiple
-                value={reviewStatus}
-                onChange={handleChangeReviewStatus}
-                renderValue={(reviewStatus) => reviewStatus.join(", ")}
-                MenuProps={MenuProps}
-               
-              >
-                {ReviewStatus.map((option) => (
-                  <MenuItem
-                    sx={{ textTransform: "capitalize" }}
-                    key={option}
-                    value={option}
+                  <Select
+                    labelId="Select-Task-Statuses"
+                    multiple
+                    value={reviewStatus}
+                    onChange={handleChangeReviewStatus}
+                    renderValue={(reviewStatus) => reviewStatus.join(", ")}
+                    MenuProps={MenuProps}
+
                   >
-                    {/* <ListItemIcon>
+                    {ReviewStatus.map((option) => (
+                      <MenuItem
+                        sx={{ textTransform: "capitalize" }}
+                        key={option}
+                        value={option}
+                      >
+                        {/* <ListItemIcon>
                       <Checkbox checked={annotationStatus.indexOf(option) > -1} />
                     </ListItemIcon> */}
-                    <ListItemText primary={snakeToTitleCase(option)} />
-                  </MenuItem>
-                ))}
-              </Select>
+                        <ListItemText primary={snakeToTitleCase(option)} />
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </FormControl>
               </Grid>
             </Grid>
@@ -533,13 +545,13 @@ export default function DeallocationAnnotatorsAndReviewers() {
         )}
         {userLevel === "superChecker" && dealocateTasksBy === "userId" && (
           <>
-          <Grid
+            <Grid
               container
               direction="row"
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"350px"
+                width: "350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -548,12 +560,12 @@ export default function DeallocationAnnotatorsAndReviewers() {
                 </Typography>
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
-              <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small">
                   <Select
                     labelId="demo-simple-select-helper-label"
                     id="demo-simple-select-helper"
                     value={superCheckersUser}
-                     onChange={(e) => setSuperCheckersUser(e.target.value)}
+                    onChange={(e) => setSuperCheckersUser(e.target.value)}
                     sx={{
                       textAlign: "left",
                     }}
@@ -571,7 +583,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
               sx={{
                 alignItems: "center",
                 p: 1,
-                width:"350px"
+                width: "350px"
               }}
             >
               <Grid items xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -581,28 +593,28 @@ export default function DeallocationAnnotatorsAndReviewers() {
               </Grid>
               <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
                 <FormControl fullWidth size="small">
-                <Select
-                labelId="Select-Task-Statuses"
-                multiple
-                value={superCheckStatus}
-                onChange={handleChangeSuperCheckerStatus}
-                renderValue={(superCheckStatus) => superCheckStatus.join(", ")}
-                MenuProps={MenuProps}
-               
-              >
-                {SuperChecker.map((option) => (
-                  <MenuItem
-                    sx={{ textTransform: "capitalize" }}
-                    key={option}
-                    value={option}
+                  <Select
+                    labelId="Select-Task-Statuses"
+                    multiple
+                    value={superCheckStatus}
+                    onChange={handleChangeSuperCheckerStatus}
+                    renderValue={(superCheckStatus) => superCheckStatus.join(", ")}
+                    MenuProps={MenuProps}
+
                   >
-                    {/* <ListItemIcon>
+                    {SuperChecker.map((option) => (
+                      <MenuItem
+                        sx={{ textTransform: "capitalize" }}
+                        key={option}
+                        value={option}
+                      >
+                        {/* <ListItemIcon>
                       <Checkbox checked={annotationStatus.indexOf(option) > -1} />
                     </ListItemIcon> */}
-                    <ListItemText primary={snakeToTitleCase(option)} />
-                  </MenuItem>
-                ))}
-              </Select>
+                        <ListItemText primary={snakeToTitleCase(option)} />
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </FormControl>
               </Grid>
             </Grid>
@@ -634,54 +646,54 @@ export default function DeallocationAnnotatorsAndReviewers() {
       </Popover>
 
       <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogContent>
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>
 
-                    <DialogContentText id="alert-dialog-description">
-                    Are you sure want to Deallocate User Tasks ? 
-                    </DialogContentText>
-                    {(userLevel === "annotation" || userLevel === "review") && <TextField
-                            autoFocus
-                            margin="dense"
-                            id="password"
-                            label="Password"
-                            type="password"
-                            fullWidth
-                            variant="standard"
-                            onChange={(e) => setPassword(e.target.value)}
-                          />}
-                    {userLevel === "superChecker" && <TextField
-                            autoFocus
-                            margin="dense"
-                            id="pin"
-                            label="Pin"
-                            type="pin"
-                            fullWidth
-                            variant="standard"
-                            onChange={(e) => setPin(e.target.value)}
-                          />}
-                          
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        className={classes.clearAllBtn} >
-                          Cancel
-                    </Button>
-                    <Button onClick={handleConfirm}
-                        variant="contained"
-                        color="error"
-                        size="small" className={classes.clearAllBtn} autoFocus >
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure want to Deallocate User Tasks ?
+          </DialogContentText>
+          {(userLevel === "annotation" || userLevel === "review") && <TextField
+            autoFocus
+            margin="dense"
+            id="password"
+            label="Password"
+            type="password"
+            fullWidth
+            variant="standard"
+            onChange={(e) => setPassword(e.target.value)}
+          />}
+          {userLevel === "superChecker" && <TextField
+            autoFocus
+            margin="dense"
+            id="pin"
+            label="Pin"
+            type="pin"
+            fullWidth
+            variant="standard"
+            onChange={(e) => setPin(e.target.value)}
+          />}
+
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}
+            variant="outlined"
+            color="error"
+            size="small"
+            className={classes.clearAllBtn} >
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm}
+            variant="contained"
+            color="error"
+            size="small" className={classes.clearAllBtn} autoFocus >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
