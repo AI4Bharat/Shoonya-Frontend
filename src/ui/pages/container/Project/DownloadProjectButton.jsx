@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {  useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
-import Tooltip from "@mui/material/Tooltip";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -188,30 +187,19 @@ function DownloadProjectButton(props) {
   return (
     <div>
       {renderSnackBar()}
-      <Tooltip
-        title={
-          userRole.WorkspaceManager === loggedInUserData?.role
-            ? "Only Admins can download project data"
-            : taskStatus.length === 0
-              ? "Select at least one task status above to enable download"
-              : "Download project tasks as CSV, TSV, or JSON"
-        }
-        arrow
+      <Button
+        sx={{ borderRadius: 3, width:"100%" }}
+        id="demo-customized-button"
+        // aria-controls={open ? 'demo-customized-menu' : undefined}
+        // aria-haspopup="true"
+        // aria-expanded={open ? 'true' : undefined}
+        variant="contained"
+        disabled= {taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role? false: true } 
+        onClick={handleClick}
+        endIcon={<KeyboardArrowDownIcon />}
       >
-        <Button
-          sx={{ borderRadius: 3, width:"100%" }}
-          id="demo-customized-button"
-          // aria-controls={open ? 'demo-customized-menu' : undefined}
-          // aria-haspopup="true"
-          // aria-expanded={open ? 'true' : undefined}
-          variant="contained"
-          disabled= {taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role? false: true } 
-          onClick={handleClick}
-          endIcon={<KeyboardArrowDownIcon />}
-        >
-          Download Project
-        </Button>
-      </Tooltip>
+        Download Project
+      </Button>
       <StyledMenu
         sytle={{ width: "20px" }}
         id="demo-customized-menu"
