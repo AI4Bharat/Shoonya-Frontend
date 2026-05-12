@@ -161,11 +161,11 @@ function DownloadProjectButton(props) {
 
   if (buttonType === "email") {
     return (
-      <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+      <div style={{ width: "100%" }}>
         {renderSnackBar()}
-        <div>
+        <div style={{ width: "100%" }}>
           <Button
-            sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2, width: "300px" }}
+            sx={{ p: 2, borderRadius: 3, width: "100%" }}
             id="email-customized-button"
             variant="contained"
             disabled={loadingEmail || isDisabled}
@@ -190,11 +190,11 @@ function DownloadProjectButton(props) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+    <div style={{ width: "100%" }}>
       {renderSnackBar()}
-      <div>
+      <div style={{ width: "100%" }}>
         <Button
-          sx={{ inlineSize: "max-content", p: 2, borderRadius: 3, ml: 2, width: "300px" }}
+          sx={{ p: 2, borderRadius: 3, width: "100%" }}
           id="download-customized-button"
           variant="contained"
           disabled={loadingDownload || isDisabled}
