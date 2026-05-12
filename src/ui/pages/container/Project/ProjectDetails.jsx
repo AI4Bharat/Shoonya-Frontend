@@ -35,6 +35,7 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 import SuperCheckerTasks from "../../component/Project/SuperCheckerTasks";
 import SuperChecker from "../../component/Project/SuperChecker";
 import ProjectAnalytics from "../../component/Project/ProjectAnalytics";
+import BookmarkButton from "./BookmarkButton";
 
 const menuOptions = [
   { name: "Tasks", isChecked: false, component: () => null },
@@ -450,8 +451,9 @@ const Projects = () => {
             alignItems="center"
             sx={{ mb: 3 }}
           >
-            <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
-              <Typography variant="h3">{ProjectDetails.title}</Typography>
+            <Grid item xs={12} sm={12} md={10} lg={10} xl={10} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="h3" sx={{ mr: 2 }}>{ProjectDetails.title}</Typography>
+              {id && <BookmarkButton projectId={id} isBookmarked={ProjectDetails.is_bookmarked} />}
             </Grid>
 
             {(userRole.WorkspaceManager === loggedInUserData?.role ||

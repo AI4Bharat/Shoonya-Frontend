@@ -9,9 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import ProjectFilterList from "../../component/common/ProjectFilterList";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
+import BookmarkButton from "./BookmarkButton";
 
 const ProjectCardList = (props) => {
-  const { projectData, selectedFilters, setsSelectedFilters } = props;
+  const { projectData, selectedFilters, setsSelectedFilters, bookmarkedProjectIds } = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const popoverOpen = Boolean(anchorEl);
   const filterId = popoverOpen ? "simple-popover" : undefined;
@@ -150,6 +151,18 @@ const ProjectCardList = (props) => {
       },
     },
     {
+      name: "Bookmarked",
+      label: "Bookmarked",
+      options: {
+        filter: false,
+        sort: false,
+        align: "center",
+        setCellHeaderProps: (sort) => ({
+          style: { height: "70px", fontSize: "16px", padding: "16px" },
+        }),
+      },
+    },
+    {
       name: "Action",
       label: "Action",
       options: {
@@ -177,6 +190,10 @@ const ProjectCardList = (props) => {
             el.tgt_language == null ? "-" : el.tgt_language,
             el.project_mode,
             el.workspace_id,
+            <BookmarkButton
+              projectId={el.id}
+              isBookmarked={el.is_bookmarked || bookmarkedProjectIds?.has(el.id)}
+            />,
             <Link to={`/projects/${el.id}`} style={{ textDecoration: "none" }}>
               <CustomButton
                 sx={{ borderRadius: 2, marginRight: 2 }}
