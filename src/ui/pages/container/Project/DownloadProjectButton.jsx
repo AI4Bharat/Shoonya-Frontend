@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { CSVDownload, CSVLink } from "react-csv";
-import APITransport from '../../../../redux/actions/apitransport/apitransport';
-import DownloadProjectCsvAPI from '../../../../redux/actions/api/ProjectDetails/DownloadCSVProject';
-import DownloadJSONProjectAPI from '../../../../redux/actions/api/ProjectDetails/DownloadJSONProject';
-import DownloadProjectTsvAPI from '../../../../redux/actions/api/ProjectDetails/DownloadTSVProject';
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useSelector } from "react-redux";
+import { useParams } from 'react-router-dom';
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
+import configs from "../../../../config/config";
+import ENDPOINTS from "../../../../config/apiendpoint";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -32,23 +30,17 @@ const StyledMenu = styled((props) => (
     borderRadius: 6,
     marginTop: theme.spacing(1),
     minWidth: 100,
-
-
   },
 }));
 
 
 function DownloadProjectButton(props) {
-  const { taskStatus,SetTask,downloadMetadataToggle} = props;
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [downloadres, setdownloadres] = useState(false);
-  const [loading, setLoading] = useState(false);
- const[taskValue ,setTaskValue]= useState(taskStatus)
-  const apiLoading = useSelector(state => state.apiStatus.loading);
-  const open = Boolean(anchorEl);
+  const { taskStatus, SetTask, downloadMetadataToggle, buttonType = "download" } = props;
+  const [anchorElEmail, setAnchorElEmail] = useState(null);
+  const [anchorElDownload, setAnchorElDownload] = useState(null);
+  const [loadingEmail, setLoadingEmail] = useState(false);
+  const [loadingDownload, setLoadingDownload] = useState(false);
   const { id } = useParams();
-  const dispatch = useDispatch();
-  let csvLink = React.createRef()
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -58,120 +50,97 @@ function DownloadProjectButton(props) {
     (state) => state.fetchLoggedInUserData.data
   );
 
+  const handleClickEmail = (event) => setAnchorElEmail(event.currentTarget);
+  const handleCloseEmail = () => setAnchorElEmail(null);
 
-  useEffect(() => {
-    setLoading(apiLoading);
-  }, [apiLoading])
+  const handleClickDownload = (event) => setAnchorElDownload(event.currentTarget);
+  const handleCloseDownload = () => setAnchorElDownload(null);
 
+  const handleExport = async (exportType, delivery) => {
+    if (delivery === "email") {
+      handleCloseEmail();
+      setLoadingEmail(true);
+    } else {
+      handleCloseDownload();
+      setLoadingDownload(true);
+    }
 
-  // const getDownloadProject = async () => {
-  //   const projectObj = new DownloadProjectButtonAPI(id);
+    try {
+      const url = `${configs.BASE_URL}${ENDPOINTS.getProjects}${id}/download/?export_type=${exportType}&task_status=${taskStatus}&delivery=${delivery}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `JWT ${localStorage.getItem('shoonya_access_token')}`,
+        },
+        body: JSON.stringify({}),
+      });
 
-  //   dispatch(APITransport(projectObj));
+      if (delivery === "email") {
+        const resp = await res.json();
+        if (res.ok) {
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message || "The report has been generated and sent to your email.",
+            variant: "success",
+          });
+        } else {
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message || "Failed to generate the report.",
+            variant: "error",
+          });
+        }
+      } else {
+        if (res.ok) {
+          const blob = await res.blob();
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
 
-  // }
-  // let DownloadProject =  useSelector(state => state.downloadProjectButton.data);
+          const now = new Date();
+          const pad = (n) => n.toString().padStart(2, '0');
+          const dateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}`;
+          const randomHex = Math.random().toString(16).substring(2, 10);
+          let fileName = `project-${id}-at-${dateTime}-${randomHex}.${exportType.toLowerCase()}`;
+          const contentDisposition = res.headers.get('Content-Disposition');
+          if (contentDisposition) {
+            const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+            if (fileNameMatch && fileNameMatch.length === 2) {
+              fileName = fileNameMatch[1];
+            }
+          }
+          link.setAttribute('download', fileName);
+          document.body.appendChild(link);
+          link.click();
+          link.parentNode.removeChild(link);
 
-
-  // const DownloadJSONProject = async () => {
-  //   const projectObj = new DownloadJSONProjectAPI(id);
-
-  //   dispatch(APITransport(projectObj));
-
-  // }
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-
+          setSnackbarInfo({
+            open: true,
+            message: "Download complete.",
+            variant: "success",
+          });
+        } else {
+          const resp = await res.json();
+          setSnackbarInfo({
+            open: true,
+            message: resp?.message || "Failed to download the report.",
+            variant: "error",
+          });
+        }
+      }
+    } catch (err) {
+      setSnackbarInfo({
+        open: true,
+        message: "Request failed. Please try again.",
+        variant: "error",
+      });
+    } finally {
+      if (delivery === "email") setLoadingEmail(false);
+      else setLoadingDownload(false);
+    }
   };
-  const handleDownloadJSONProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
-    const projectObj = new DownloadJSONProjectAPI(id,taskStatus,downloadMetadataToggle);
-    dispatch(APITransport(projectObj));
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: "success",
-    //     variant: "success",
-    //   })
 
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   })
-    // }
-   
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleDownloadCSVProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
-    setLoading(true)
-    const projectObj = new DownloadProjectCsvAPI(id,taskStatus,downloadMetadataToggle);
-    dispatch(APITransport(projectObj));
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: "success",
-    //     variant: "success",
-    //   })
-
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   })
-    // }
-   
-  };
-
-  const handleDownloadTSVProject = async () => {
-    // SetTask([]) //used to clear the selected task statuses
-    setLoading(true)
-    const projectObj = new DownloadProjectTsvAPI(id,taskStatus,downloadMetadataToggle);
-    dispatch(APITransport(projectObj));
-    // const res = await fetch(projectObj.apiEndPoint(), {
-    //   method: "POST",
-    //   body: JSON.stringify(projectObj.getBody()),
-    //   headers: projectObj.getHeaders().headers,
-    // });
-    // const resp = await res.json();
-    // setLoading(false);
-    // if (res.ok) {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: "success",
-    //     variant: "success",
-    //   })
-
-    // } else {
-    //   setSnackbarInfo({
-    //     open: true,
-    //     message: resp?.message,
-    //     variant: "error",
-    //   })
-    // }
-    
-  };
- 
   const renderSnackBar = () => {
     return (
       <CustomizedSnackbars
@@ -185,43 +154,66 @@ function DownloadProjectButton(props) {
       />
     );
   };
-  return (
-    <div>
-      {renderSnackBar()}
-      <Button
-        sx={{ borderRadius: 3, width:"100%" }}
-        id="demo-customized-button"
-        // aria-controls={open ? 'demo-customized-menu' : undefined}
-        // aria-haspopup="true"
-        // aria-expanded={open ? 'true' : undefined}
-        variant="contained"
-        disabled= {taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role? false: true } 
-        onClick={handleClick}
-        endIcon={<KeyboardArrowDownIcon />}
-      >
-        Download Project
-      </Button>
-      <StyledMenu
-        sytle={{ width: "20px" }}
-        id="demo-customized-menu"
-        MenuListProps={{
-          'aria-labelledby': 'demo-customized-button',
-        }}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
 
-      >
-        <MenuItem onClick={handleDownloadCSVProject}>
-          CSV
-        </MenuItem>
-        <MenuItem onClick={handleDownloadTSVProject}>
-          TSV
-        </MenuItem>
-        <MenuItem onClick={handleDownloadJSONProject} >
-          JSON
-        </MenuItem>
-      </StyledMenu>
+  const isDisabled = taskStatus.length > 0 && userRole.WorkspaceManager !== loggedInUserData?.role ? false : true;
+
+  // ... (keeping state and handlers the same)
+
+  if (buttonType === "email") {
+    return (
+      <div style={{ width: "100%" }}>
+        {renderSnackBar()}
+        <div style={{ width: "100%" }}>
+          <Button
+            sx={{ p: 2, borderRadius: 3, width: "100%" }}
+            id="email-customized-button"
+            variant="contained"
+            disabled={loadingEmail || isDisabled}
+            onClick={handleClickEmail}
+            endIcon={loadingEmail ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
+          >
+            {loadingEmail ? "Sending..." : "Email Project Data"}
+          </Button>
+          <StyledMenu
+            id="email-customized-menu"
+            anchorEl={anchorElEmail}
+            open={Boolean(anchorElEmail)}
+            onClose={handleCloseEmail}
+          >
+            <MenuItem onClick={() => handleExport("CSV", "email")}>CSV</MenuItem>
+            <MenuItem onClick={() => handleExport("TSV", "email")}>TSV</MenuItem>
+            <MenuItem onClick={() => handleExport("JSON", "email")}>JSON</MenuItem>
+          </StyledMenu>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ width: "100%" }}>
+      {renderSnackBar()}
+      <div style={{ width: "100%" }}>
+        <Button
+          sx={{ p: 2, borderRadius: 3, width: "100%" }}
+          id="download-customized-button"
+          variant="contained"
+          disabled={loadingDownload || isDisabled}
+          onClick={handleClickDownload}
+          endIcon={loadingDownload ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
+        >
+          {loadingDownload ? "Downloading..." : "Download Project"}
+        </Button>
+        <StyledMenu
+          id="download-customized-menu"
+          anchorEl={anchorElDownload}
+          open={Boolean(anchorElDownload)}
+          onClose={handleCloseDownload}
+        >
+          <MenuItem onClick={() => handleExport("CSV", "download")}>CSV</MenuItem>
+          <MenuItem onClick={() => handleExport("TSV", "download")}>TSV</MenuItem>
+          <MenuItem onClick={() => handleExport("JSON", "download")}>JSON</MenuItem>
+        </StyledMenu>
+      </div>
     </div>
   );
 }
