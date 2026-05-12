@@ -12,7 +12,6 @@ import {
   ListItemIcon,
   Card,
   Typography,
-  Switch,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
@@ -34,6 +33,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DownloadProjectButton from "../../container/Project/DownloadProjectButton";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import Spinner from "../../component/common/Spinner";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 import TaskReviewsAPI from "../../../../redux/actions/api/ProjectDetails/TaskReviews";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
@@ -47,8 +48,6 @@ import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
-import GetSaveButtonAPI from "../../../../redux/actions/api/ProjectDetails/EditUpdate";
-import { FormControlLabel } from "@mui/material";
 
 
 const ProgressType = [
@@ -97,7 +96,6 @@ const AdvancedOperation = (props) => {
   const [newDetails, setNewDetails] = useState();
   const [OpenExportProjectDialog, setOpenExportProjectDialog] = useState(false);
   const [datasetId, setDatasetId] = useState("");
-  const [pullDataLoading, setPullDataLoading] = useState(false);
   const [projectType, setProjectType] = useState("");
   const [taskReviews, setTaskReviews] = useState("")
   const { id } = useParams();
@@ -139,57 +137,6 @@ const AdvancedOperation = (props) => {
   useEffect(() => {
     getProjectDetails();
   }, []);
-  const [copyL1ToL2, setCopyL1ToL2] = useState(
-    ProjectDetails?.metadata_json?.copy_l1_to_l2  ?? true)
-
-
-      const handleCopyL1ToL2Toggle = async (e) => {
-        setLoading(true);
-            const newValue = e.target.checked;
-    
-    setCopyL1ToL2(newValue);
-
-      const currentMetadata = ProjectDetails.metadata_json || {};
-    const updatedMetadata = {
-      ...currentMetadata,
-      copy_l1_to_l2: newValue
-    };
-
-          const sendData = {
-              title: ProjectDetails.title,
-            project_type: ProjectDetails.project_type,
-            project_mode: ProjectDetails.project_mode,
-              metadata_json: updatedMetadata
-          }
-          const projectObj = new GetSaveButtonAPI(id, sendData);
-          dispatch(APITransport(projectObj));
-          const res = await fetch(projectObj.apiEndPoint(), {
-              method: "PUT",
-              body: JSON.stringify(projectObj.getBody()),
-              headers: projectObj.getHeaders().headers,
-          });
-          const resp = await res.json();
-          setLoading(false);
-          if (res.ok) {
-              setSnackbarInfo({
-                  open: true,
-                  message: "success",
-                  variant: "success",
-              })
-  
-          } else {
-              setSnackbarInfo({
-                  open: true,
-                  message: resp?.message,
-                  variant: "error",
-              })
-          }
-          getProjectDetails();
-        setLoading(false);
-  
-      }
-  
-
 
   useEffect(() => {
     setNewDetails({
@@ -369,16 +316,16 @@ const AdvancedOperation = (props) => {
   //     setSpinner(false);
   // }, [apiMessage, apiError])
 
-const getPullNewDataAPI = async () => {
-  setPullDataLoading(true); 
-  const projectObj = new GetPullNewDataAPI(id);
-  try {
+  const getPullNewDataAPI = async () => {
+    const projectObj = new GetPullNewDataAPI(id);
+    //dispatch(APITransport(projectObj));
     const res = await fetch(projectObj.apiEndPoint(), {
       method: "POST",
       body: JSON.stringify(projectObj.getBody()),
       headers: projectObj.getHeaders().headers,
     });
     const resp = await res.json();
+    setLoading(false);
     if (res.ok) {
       setSnackbarInfo({
         open: true,
@@ -392,16 +339,7 @@ const getPullNewDataAPI = async () => {
         variant: "error",
       });
     }
-  } catch (error) {
-    setSnackbarInfo({
-      open: true,
-      message: "An error occurred",
-      variant: "error",
-    });
-  } finally {
-    setPullDataLoading(false); 
-  }
-};
+  };
 
   const ArchiveProject = useSelector((state) => state.getArchiveProject.data);
   const [isArchived, setIsArchived] = useState(false);
@@ -492,76 +430,65 @@ const getPullNewDataAPI = async () => {
   };
   return (
     <ThemeProvider theme={themeDefault}>
-      {(loading || pullDataLoading) && <Spinner />}
+      {loading && <Spinner />}
       <Grid>{renderSnackBar()}</Grid>
 
       <div className={classes.rootdiv}>
         <Grid
           container
-          columns={16}
-          justifyContent="space-between"
-          alignItems="flex-start"
-        >
-        <Grid
-          container
+          // direction="row"
+          direction="column"
           xs={12}
-          sm={3}
-          gap={4}
+          md={12}
+          lg={4}
+          xl={4}
+          sm={12}
+          spacing={1}
+          rowGap={2}
+          sx={{ float: "left" }}
+          columnSpacing={2}
         >
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <CustomButton
               sx={{
+                inlineSize: "max-content",
+                pl: 2,
                 borderRadius: 3,
-                width: "100%",
+                ml: 2,
+                width: "300px",
               }}
               onClick={handlePublishProject}
               label="Publish Project"
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <CustomButton
               sx={{
+                inlineSize: "max-content",
+                p: 2,
                 borderRadius: 3,
-                width: "100%",
+                ml: 2,
+                width: "300px",
               }}
               color="error"
               onClick={handleClickOpen}
               label={isArchived ? "Archived" : "Archive"}
-              disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role?true:false}
+              disabled ={userRole.WorkspaceManager === loggedInUserData?.role?true:false}
             />
           </Grid>
-          {ProjectDetails?.project_type == 'AcousticNormalisedTranscriptionEditing' ?(
-                    <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={copyL1ToL2}
-                  onChange={handleCopyL1ToL2Toggle}
-                  color="primary"
-                />
-              }
-              label="Auto-copy L1 to L2"
-              labelPlacement="start"
-              sx={{ 
-                width: "100%",
-                justifyContent: "space-between",
-                margin: 0,
-                "& .MuiFormControlLabel-label": {
-                  marginLeft: "8px"
-                }
-              }}
-            />
-          </Grid>
-          ):null}
-
 
           <Grid
             item
             xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+            xl={12}
+            sx={{ ml: 2, height: "20px", mb: 2 }}
           >
-          {userRole.WorkspaceManager === loggedInUserData?.role ? null :
-            <FormControl size="small" sx={{ width : "100%" }}>
+                        {userRole.WorkspaceManager === loggedInUserData?.role ? null :
+<FormControl size="small" className={classes.formControl}>
               <InputLabel
                 id="Select-Task-Statuses"
                 sx={{ fontSize: "16px", padding: "3px" }}
@@ -596,81 +523,102 @@ const getPullNewDataAPI = async () => {
 
         <Grid
           container
+          // direction="row"
           xs={12}
-          sm={4}
-          gap={4}
-          sx={{
-            mt:{ 
-              xs : 4, 
-              sm : 0
-            },
-          }}
+          md={12}
+          lg={4}
+          xl={4}
+          sm={12}
+          spacing={1}
+          rowGap={2}
+          sx={{ float: "left" }}
+          columnSpacing={2}
         >
           {ProjectDetails.project_type == 'ContextualTranslationEditing' ? (
             <Grid
               item
               xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+
             >
               <CustomButton
                 sx={{
+                  inlineSize: "max-content",
+                  p: 2,
                   borderRadius: 3,
-                  width: "100%",
+                  ml: 2,
+                  width: "300px",
+
                 }}
                 onClick={handleDownloadProjectAnnotations}
                 label="Downoload Project Annotations" />
             </Grid>) : " "}
-          <Grid item xs={12}>
+          {/* <div className={classes.divider} ></div> */}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
               <CustomButton
                 sx={{
+                  inlineSize: "max-content",
+                  p: 2,
                   borderRadius: 3,
-                  width: "100%",
+                  ml: 2,
+                  width: "300px",
                 }}
                 onClick={handleOpenExportProjectDialog}
                 label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role  ? true : false}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
 
               />
             ) : (
               <CustomButton
                 sx={{
+                  inlineSize: "max-content",
+                  p: 2,
                   borderRadius: 3,
-                  width: "100%",
+                  ml: 2,
+                  width: "300px",
                 }}
                 onClick={handleExportProject}
                 label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role  ? true : false}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
 
               />
             )}
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {ProjectDetails.sampling_mode == "f" || ProjectDetails.sampling_mode == "b" ? (
               <CustomButton
                 sx={{
+                  inlineSize: "max-content",
+                  p: 2,
                   borderRadius: 3,
-                  width: "100%",
+                  ml: 2,
+                  width: "300px",
                 }}
                 onClick={handlePullNewData}
                 label="Pull New Data Items from Source Dataset"
-                disabled={pullDataLoading || userRole.WorkspaceManager === loggedInUserData?.role? true:false}
+                disabled={userRole.WorkspaceManager === loggedInUserData?.role ? true : false}
               />
             ) : (
               " "
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DownloadProjectButton
               taskStatus={taskStatus}
               SetTask={setTaskStatus}
               downloadMetadataToggle={downloadMetadataToggle}
+              buttonType="download"
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeleteProjectTasks />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DeallocationAnnotatorsAndReviewers />
           </Grid>
 
@@ -678,15 +626,16 @@ const getPullNewDataAPI = async () => {
 
         <Grid
           container
+          // direction="row"
           xs={12}
-          sm={3}
-          gap={4}
-          sx={{
-            marginTop:{
-              xs : 4,
-              sm : 0
-            }
-          }}
+          md={12}
+          lg={4}
+          xl={4}
+          sm={12}
+          spacing={1}
+          rowGap={2}
+          columnSpacing={2}
+          sx={{ mb: "10px" }}
         >
           {/* <div className={classes.divider} ></div> */}
           {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -698,8 +647,10 @@ const getPullNewDataAPI = async () => {
               onChange={handleReviewToggle}
             />
           </Grid> */}
-          <Grid item xs={12}>
-              <FormControl size="small" sx={{ width : "100%" }}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}
+            sx={{ ml: 2 }}
+          >
+              <FormControl size="small" className={classes.formControl}>
                 <InputLabel id="task-Reviews-label" sx={{ fontSize: "16px" }}>
                   Project Stage
                 </InputLabel>
@@ -709,8 +660,7 @@ const getPullNewDataAPI = async () => {
                   value={taskReviews}
                   label="Task Reviews"
                   onChange={handleReviewToggle}
-                  disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role ?true:false}
-                  // getOptionDisabled={(option) => option.disabled}
+                // getOptionDisabled={(option) => option.disabled}
                 >
                   {projectStage.map((type, index) => (
                     <MenuItem value={type.value} key={index} disabled={type.disabled} >
@@ -721,16 +671,25 @@ const getPullNewDataAPI = async () => {
               </FormControl>
           </Grid>
 
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <DownloadProjectButton
+              taskStatus={taskStatus}
+              SetTask={setTaskStatus}
+              downloadMetadataToggle={downloadMetadataToggle}
+              buttonType="email"
+            />
+          </Grid>
+
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
             userRole.OrganizationOwner === loggedInUserData?.role ||
             userRole.Admin === loggedInUserData?.role) ? ProjectDetails?.project_stage == 3 : false ||
           ProjectDetails?.review_supercheckers?.some(
             (superchecker) => superchecker.id === loggedInUserData?.id
           )) &&
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}
+            >
               <SuperCheckSettings ProjectDetails={ProjectDetails} />
             </Grid>}
-        </Grid>
         </Grid>
 
 
