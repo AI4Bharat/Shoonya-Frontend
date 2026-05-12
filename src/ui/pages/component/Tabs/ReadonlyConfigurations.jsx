@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import CustomButton from "../../component/common/Button";
 import GetWorkspacesDetailsAPI from "../../../../redux/actions/api/WorkspaceDetails/GetWorkspaceDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import Tooltip from "@mui/material/Tooltip";
 
 const ReadonlyConfigurations = (props) => {
   const classes = DatasetStyle();
@@ -132,10 +133,14 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
                     to={`/datasets/${dataset?.instance_id}`}
                     style={{ textDecoration: "none" }}
                     >
-                    <CustomButton
-                        sx={{ borderRadius: 2 }}
-                        label="View Dataset"
-                    />
+                    <Tooltip title="Navigate to the dataset used by this project" arrow>
+                      <span style={{ display: "inline-block" }}>
+                        <CustomButton
+                            sx={{ borderRadius: 2 }}
+                            label="View Dataset"
+                        />
+                      </span>
+                    </Tooltip>
                 </Link>
                 </Box>
               </Grid>
@@ -171,10 +176,14 @@ const workspaceDetails = useSelector(state => state.getWorkspaceDetails.data);
                     to={`/workspaces/${ProjectDetails.workspace_id}`}
                     style={{ textDecoration: "none" }}
                     >
-                    <CustomButton
-                        sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
-                        label="View Workspace"
-                    />
+                    <Tooltip title="Navigate to the workspace that contains this project" arrow>
+                      <span style={{ display: "inline-block" }}>
+                        <CustomButton
+                            sx={{ borderRadius: 2,marginLeft:2 ,marginRight: 2 }}
+                            label="View Workspace"
+                        />
+                      </span>
+                    </Tooltip>
                 </Link>
                 </Box>
               </Grid>
