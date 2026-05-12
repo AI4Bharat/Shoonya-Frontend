@@ -66,7 +66,7 @@ function DownloadProjectButton(props) {
     }
 
     try {
-      const url = `${configs.BASE_URL}${ENDPOINTS.getProjects}${id}/download/?export_type=${exportType}&task_status=${taskStatus}&delivery=${delivery}`;
+      const url = `${configs.BASE_URL_AUTO}${ENDPOINTS.getProjects}${id}/download/?export_type=${exportType}&task_status=${taskStatus}&delivery=${delivery}`;
       const res = await fetch(url, {
         method: "POST",
         headers: {
