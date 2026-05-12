@@ -285,11 +285,7 @@ export default function DeallocationAnnotatorsAndReviewers() {
     <div>
       {renderSnackBar()}
      <Tooltip
-        title={
-          userRole?.WorkspaceManager === loggedInUserData?.role
-            ? "Only Admins can deallocate user tasks"
-            : "Deallocate assigned tasks from annotators, reviewers, or super-checkers"
-        }
+        title="Deallocate assigned tasks from annotators, reviewers, or super-checkers"
         arrow
       >
         <span style={{ display: "block", width: "100%" }}>

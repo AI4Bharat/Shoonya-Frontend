@@ -468,9 +468,7 @@ const getPullNewDataAPI = async () => {
           <Grid item xs={12}>
             <Tooltip
               title={
-                userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role
-                  ? "Only Admins can archive or unarchive a project"
-                  : isArchived
+                isArchived
                   ? "Click to unarchive this project"
                   : "Archive this project to hide it from active lists"
               }
@@ -560,11 +558,7 @@ const getPullNewDataAPI = async () => {
             </Grid>
           <Grid item xs={12}>
             <Tooltip
-              title={
-                userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role
-                  ? "Only Admins can export the project into a dataset"
-                  : "Export all annotated tasks into an output dataset"
-              }
+              title="Export all annotated tasks into an output dataset"
               arrow
             >
               <span style={{ display: "block", width: "100%" }}>
@@ -601,8 +595,6 @@ const getPullNewDataAPI = async () => {
                 title={
                   pullDataLoading
                     ? "Pulling data — please wait"
-                    : userRole.WorkspaceManager === loggedInUserData?.role
-                    ? "Only Admins can pull new data items"
                     : "Pull new data items from the source dataset into this project"
                 }
                 arrow

@@ -189,13 +189,7 @@ function DownloadProjectButton(props) {
     <div>
       {renderSnackBar()}
       <Tooltip
-        title={
-          userRole.WorkspaceManager === loggedInUserData?.role
-            ? "Only Admins can download project data"
-            : taskStatus.length === 0
-              ? "Select at least one task status above to enable download"
-              : "Download project tasks as CSV, TSV, or JSON"
-        }
+        title="Download project tasks as CSV, TSV, or JSON"
         arrow
       >
         <Button

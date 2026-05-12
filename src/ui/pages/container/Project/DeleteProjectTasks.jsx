@@ -169,11 +169,7 @@ export default function DeleteProjectTasks() {
         <div >
             {renderSnackBar()}
             <Tooltip
-                title={
-                  userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role
-                    ? "Only Admins can delete project tasks"
-                    : "Permanently delete tasks from this project by range or specific IDs"
-                }
+                title="Permanently delete tasks from this project by range or specific IDs"
                 arrow
             >
                 <Button
