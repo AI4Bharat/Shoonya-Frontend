@@ -11,6 +11,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import configs from "../../../../config/config";
 import ENDPOINTS from "../../../../config/apiendpoint";
+import Tooltip from "@mui/material/Tooltip";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -164,16 +165,21 @@ function DownloadProjectButton(props) {
       <div style={{ width: "100%" }}>
         {renderSnackBar()}
         <div style={{ width: "100%" }}>
-          <Button
-            sx={{ p: 2, borderRadius: 3, width: "100%" }}
-            id="email-customized-button"
-            variant="contained"
-            disabled={loadingEmail || isDisabled}
-            onClick={handleClickEmail}
-            endIcon={loadingEmail ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
+          <Tooltip
+            title="Email the project report as CSV, TSV, or JSON to your registered address"
+            arrow
           >
-            {loadingEmail ? "Sending..." : "Email Project Data"}
-          </Button>
+            <Button
+              sx={{ p: 2, borderRadius: 3, width: "100%" }}
+              id="email-customized-button"
+              variant="contained"
+              disabled={loadingEmail || isDisabled}
+              onClick={handleClickEmail}
+              endIcon={loadingEmail ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
+            >
+              {loadingEmail ? "Sending..." : "Email Project Data"}
+            </Button>
+          </Tooltip>
           <StyledMenu
             id="email-customized-menu"
             anchorEl={anchorElEmail}
@@ -193,16 +199,21 @@ function DownloadProjectButton(props) {
     <div style={{ width: "100%" }}>
       {renderSnackBar()}
       <div style={{ width: "100%" }}>
-        <Button
-          sx={{ p: 2, borderRadius: 3, width: "100%" }}
-          id="download-customized-button"
-          variant="contained"
-          disabled={loadingDownload || isDisabled}
-          onClick={handleClickDownload}
-          endIcon={loadingDownload ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
+        <Tooltip
+          title="Download project tasks as CSV, TSV, or JSON"
+          arrow
         >
-          {loadingDownload ? "Downloading..." : "Download Project"}
-        </Button>
+          <Button
+            sx={{ p: 2, borderRadius: 3, width: "100%" }}
+            id="download-customized-button"
+            variant="contained"
+            disabled={loadingDownload || isDisabled}
+            onClick={handleClickDownload}
+            endIcon={loadingDownload ? <CircularProgress size={20} color="inherit" /> : <KeyboardArrowDownIcon />}
+          >
+            {loadingDownload ? "Downloading..." : "Download Project"}
+          </Button>
+        </Tooltip>
         <StyledMenu
           id="download-customized-menu"
           anchorEl={anchorElDownload}

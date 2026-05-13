@@ -20,6 +20,7 @@ import TextField from "@mui/material/TextField";
 import LoginAPI from "../../../../redux/actions/api/UserManagement/Login";
 import { DeallocateTaskById } from "../../../../redux/actions/api/ProjectDetails/DeallocationAnnotatorsAndReviewers";
 import { Tab, Tabs } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 
 let AnnotationStatus = [
@@ -277,16 +278,23 @@ export default function DeallocationAnnotatorsAndReviewers() {
   return (
     <div>
       {renderSnackBar()}
-     <CustomButton
-        sx={{
-          borderRadius: 3,
-          width: "100%",
-        }}
-        onClick={handleClickOpen}
-        label="Deallocate User Tasks"
-        color="error"
-        disabled = {(userRole?.WorkspaceManager === loggedInUserData?.role )?true:false}
-      />
+     <Tooltip
+        title="Deallocate assigned tasks from annotators, reviewers, or super-checkers"
+        arrow
+      >
+        <span style={{ display: "block", width: "100%" }}>
+         <CustomButton
+            sx={{
+              borderRadius: 3,
+              width: "100%",
+            }}
+            onClick={handleClickOpen}
+            label="Deallocate User Tasks"
+            color="error"
+            disabled = {(userRole?.WorkspaceManager === loggedInUserData?.role )?true:false}
+          />
+        </span>
+      </Tooltip>
 
       <Popover
         Id={Id}
