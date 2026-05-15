@@ -118,7 +118,7 @@ const ProjectCardList = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px", padding: "16px" },
+          style: { height: "30px", fontSize: "16px", padding: "16px" },
         }),
       },
     },
@@ -130,7 +130,7 @@ const ProjectCardList = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px", padding: "16px" },
+          style: { height: "30px", fontSize: "16px", padding: "16px" },
         }),
       },
     },
@@ -144,7 +144,7 @@ const ProjectCardList = (props) => {
 
         setCellProps: () => ({ 
           style: {
-            height: "70px", fontSize: "16px",
+            height: "30px", fontSize: "16px",
           padding: "16px",
           whiteSpace: "normal", 
           overflowWrap: "break-word",
@@ -161,7 +161,7 @@ const ProjectCardList = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px", padding: "16px" },
+          style: { height: "30px", fontSize: "16px", padding: "16px" },
         }),
       },
     },
@@ -173,7 +173,7 @@ const ProjectCardList = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px", padding: "16px" },
+          style: { height: "30px", fontSize: "16px", padding: "16px" },
         }),
       },
     },
@@ -186,7 +186,7 @@ const ProjectCardList = (props) => {
         align: "center",
         display: 'false', 
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px", padding: "16px" },
+          style: { height: "30px", fontSize: "16px", padding: "16px" },
         }),
       },
     },
@@ -198,7 +198,7 @@ const ProjectCardList = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px", padding: "16px" },
+          style: { height: "30px", fontSize: "16px", padding: "16px" },
         }),
       },
     },
@@ -210,7 +210,7 @@ const ProjectCardList = (props) => {
         sort: false,
         align: "center",
         setCellHeaderProps: (sort) => ({
-          style: { height: "70px", fontSize: "16px" },
+          style: { height: "30px", fontSize: "16px" },
         }),
       },
     },
