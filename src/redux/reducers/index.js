@@ -47,6 +47,7 @@ import getOrganizationProjectReports from './Organization/GetOrganizationProject
 import getDatasetProjects from './Dataset/GetDatasetProjects';
 import getDatasetMembers from './Dataset/GetDatasetMembers';
 import getDatasetDownloadCSV from './Dataset/GetDatasetDownloadCSV';
+import getSampleDatasetDownloadCSV from './Dataset/GetSampleDatasetDownloadCSV';
 import CreateNewDatasetInstance from './Dataset/CreateNewDatasetInstance';
 import GetDatasetType from './Dataset/GetDatasetType';
 import Uploaddata from './Dataset/Uploaddata';
@@ -153,6 +154,7 @@ const index = {
     getDatasetProjects,
     getDatasetMembers,
     getDatasetDownloadCSV,
+    getSampleDatasetDownloadCSV,
     CreateNewDatasetInstance,
     GetDatasetType,
     Uploaddata,
