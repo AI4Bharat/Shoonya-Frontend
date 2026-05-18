@@ -939,7 +939,7 @@ const onRedo = useCallback(() => {
       {renderSnackBar()}
       <Grid sx={{ margin: 0 }}>
         <Box
-          className={classes.rightPanelParentBox}
+          className={`${classes.rightPanelParentBox} rtl-typing-scope`}
           style={{ position: "relative" }}
         >
           <Grid className={classes.rightPanelParentGrid} sx={{paddingLeft:"40px"}}>

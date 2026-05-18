@@ -1055,7 +1055,7 @@ useEffect(() => {
     <>
       {loading && <Spinner />}
       {renderSnackBar()}
-      <Grid container sx={{xs:{height:"160%"}, md:{height:"100%"}}} className={classes.parentGrid}>
+      <Grid container sx={{xs:{height:"160%"}, md:{height:"100%"}}} className={`${classes.parentGrid} rtl-typing-scope`}>
         <Grid md={6} xs={12} id="video" className={classes.videoParent}>
           <Button
             value="Back to Project"
