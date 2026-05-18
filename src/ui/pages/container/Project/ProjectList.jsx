@@ -125,7 +125,7 @@ export default function ProjectList() {
         </Grid>
       </Grid>
       <Box>
-        <Box sx={{ marginTop: "20px" ,marginLeft:'15px',marginRight:'15px',height:"600px",overflowY:"auto"}}>
+        <Box sx={{ marginTop: "20px" ,marginLeft:'15px',marginRight:'15px',height:"900px",overflowY:"auto"}}>
           {radiobutton ? (
             <ProjectCardList
               projectData={projectData}
