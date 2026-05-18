@@ -1,5 +1,5 @@
-// Updated components/DataTable.js
-import React, { useState, useRef, useEffect } from 'react';
+// Updated components/DataTable.js - Add drag-and-drop functionality
+import React, { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import './DataTable.css';
 import configs from '../../../../config/config';
@@ -11,6 +11,8 @@ const DataTable = ({
   onDeleteRow, 
   onDeleteColumn,
   onCellSelect,
+  onReorderColumns,
+  onReorderRows,
   language,
   transcriptionMode,
   onTranscribe,
@@ -19,18 +21,38 @@ const DataTable = ({
   showGrid = true,
   alternateRowColor = true,
   enableTransliteration = false,
-  ProjectDetails
+  ProjectDetails,
+  mergedCells,
+  onMergedCellsChange,
+  mergedHeaders = {},
+  onMergedHeadersChange,
+  headerSelectionRange,
+  onHeaderSelectionChange,
 }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState('');
+  const [editingHeader, setEditingHeader] = useState(null);
+const [headerEditValue, setHeaderEditValue] = useState('');
+const [activeHeaderIndex, setActiveHeaderIndex] = useState(null);
+const [selectedHeaders, setSelectedHeaders] = useState([]);
   const [columnWidths, setColumnWidths] = useState({});
   const [activeRowIndex, setActiveRowIndex] = useState(null);
   const [activeColumnId, setActiveColumnId] = useState(null);
+  const [selectionRange, setSelectionRange] = useState(null);
+  const [selectionStart, setSelectionStart] = useState(null);
+  
+  // Drag state
+  const [draggedColumn, setDraggedColumn] = useState(null);
+  const [dragOverColumn, setDragOverColumn] = useState(null);
+  const [draggedRow, setDraggedRow] = useState(null);
+  const [dragOverRow, setDragOverRow] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   const tableRef = useRef(null);
   const editInputRef = useRef(null);
   const topTextareaRef = useRef(null);
-  
-  // Map language codes to IndicTransliterate supported languages
+  const headerAnchorRef = useRef(null);
+
   const getTransliterationLang = (langCode) => {
     const langMap = {
       'hi': 'hi',
@@ -73,19 +95,243 @@ const DataTable = ({
     }
   }, [editingCell]);
 
-  // Focus top textarea when active cell changes
   useEffect(() => {
     if (activeRowIndex !== null && activeColumnId && topTextareaRef.current) {
       topTextareaRef.current.focus();
     }
   }, [activeRowIndex, activeColumnId]);
 
-  const handleCellClick = (rowIndex, columnId, value) => {
-    setEditingCell({ rowIndex, columnId });
-    setEditValue(value || '');
-    setActiveRowIndex(rowIndex);
-    setActiveColumnId(columnId);
-    onCellSelect({ rowIndex, columnId, value });
+  const handleHeaderClick = (colIndex) => {
+  setActiveHeaderIndex(colIndex);
+  setActiveRowIndex(null);
+  setActiveColumnId(null);
+};
+
+
+const handleHeaderSelect = (colIndex, e) => {
+  e.preventDefault();
+  setEditingCell(null);
+  
+  if (e.shiftKey && headerAnchorRef.current !== null) {
+    const start = Math.min(headerAnchorRef.current, colIndex);
+    const end = Math.max(headerAnchorRef.current, colIndex);
+    const range = [];
+    for (let i = start; i <= end; i++) range.push(i);
+    setSelectedHeaders(range);
+    if (typeof onHeaderSelectionChange === 'function') {
+      onHeaderSelectionChange({ startCol: start, endCol: end });
+    }
+  } else {
+    headerAnchorRef.current = colIndex;
+    setSelectedHeaders([colIndex]);
+    if (typeof onHeaderSelectionChange === 'function') {
+      onHeaderSelectionChange({ startCol: colIndex, endCol: colIndex });
+    }
+  }
+};
+
+const handleMergeHeaders = () => {
+  if (selectedHeaders.length < 2) return;
+  const sorted = [...selectedHeaders].sort((a, b) => a - b);
+  const startCol = sorted[0];
+  const endCol = sorted[sorted.length - 1];
+  const newMergedHeaders = { ...mergedHeaders };
+
+  sorted.forEach((colIndex, i) => {
+    if (i === 0) {
+      newMergedHeaders[colIndex] = {
+        isFirst: true,
+        colSpan: sorted.length,
+        startCol,
+        endCol,
+      };
+    } else {
+      newMergedHeaders[colIndex] = { hidden: true };
+    }
+  });
+
+  onMergedHeadersChange(newMergedHeaders);
+setSelectedHeaders([]);
+};
+
+const handleUnmergeHeaders = () => {
+  if (selectedHeaders.length === 0) return;
+  const newMergedHeaders = { ...mergedHeaders };
+
+  selectedHeaders.forEach(colIndex => {
+    const cell = newMergedHeaders[colIndex];
+    if (cell?.isFirst) {
+      for (let i = cell.startCol; i <= cell.endCol; i++) {
+        delete newMergedHeaders[i];
+      }
+    } else if (cell?.hidden) {
+      // find the parent and unmerge all
+      Object.keys(newMergedHeaders).forEach(key => {
+        const c = newMergedHeaders[key];
+        if (c?.isFirst && c.startCol <= colIndex && c.endCol >= colIndex) {
+          for (let i = c.startCol; i <= c.endCol; i++) {
+            delete newMergedHeaders[i];
+          }
+        }
+      });
+    }
+  });
+
+ onMergedHeadersChange(newMergedHeaders);
+setSelectedHeaders([]);
+};
+
+  // Column drag handlers
+  const handleColumnDragStart = (e, colIndex) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', colIndex);
+    setDraggedColumn(colIndex);
+    setIsDragging(true);
+  };
+
+  const handleColumnDragOver = (e, colIndex) => {
+    e.preventDefault();
+    if (draggedColumn !== null && draggedColumn !== colIndex) {
+      setDragOverColumn(colIndex);
+    }
+  };
+  const handleHeaderEdit = (colIndex, newValue) => {
+  const updatedColumns = [...columns];
+  updatedColumns[colIndex] = {
+    ...updatedColumns[colIndex],
+    Header: newValue,
+  };
+
+  onReorderColumns(updatedColumns, data, mergedCells); 
+  // reuse existing function to update columns
+};
+
+ const handleColumnDragEnd = () => {
+  if (draggedColumn !== null && dragOverColumn !== null && draggedColumn !== dragOverColumn) {
+    // Reorder columns
+    const newColumns = [...columns];
+    const [movedColumn] = newColumns.splice(draggedColumn, 1);
+    newColumns.splice(dragOverColumn, 0, movedColumn);
+    
+    // Reorder data for each row
+    const newData = data.map(row => {
+      const newRow = {};
+      newColumns.forEach((col, newIndex) => {
+        const oldIndex = columns.findIndex(c => c.accessor === col.accessor);
+        newRow[col.accessor] = row[columns[oldIndex]?.accessor] || '';
+      });
+      return { ...row, ...newRow };
+    });
+    
+    // Update merged cells column positions
+    const newMergedCells = {};
+    Object.keys(mergedCells).forEach(key => {
+      const [row, col] = key.split('-').map(Number);
+      let newCol = col;
+      
+      if (col === draggedColumn) {
+        newCol = dragOverColumn;
+      } else if (col > draggedColumn && col <= dragOverColumn) {
+        newCol = col - 1;
+      } else if (col < draggedColumn && col >= dragOverColumn) {
+        newCol = col + 1;
+      }
+      
+      const newKey = `${row}-${newCol}`;
+      newMergedCells[newKey] = { ...mergedCells[key] };
+      
+      if (mergedCells[key].isFirst) {
+        newMergedCells[newKey].startCol = newCol;
+        newMergedCells[newKey].endCol = newCol + (mergedCells[key].colSpan - 1);
+      }
+    });
+    
+    onReorderColumns(newColumns, newData, newMergedCells);
+  }
+  setDraggedColumn(null);
+  setDragOverColumn(null);
+  setIsDragging(false);
+};
+
+  // Row drag handlers
+  const handleRowDragStart = (e, rowIndex) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', rowIndex);
+    setDraggedRow(rowIndex);
+    setIsDragging(true);
+  };
+
+  const handleRowDragOver = (e, rowIndex) => {
+    e.preventDefault();
+    if (draggedRow !== null && draggedRow !== rowIndex) {
+      setDragOverRow(rowIndex);
+    }
+  };
+
+  const handleRowDragEnd = () => {
+  if (draggedRow !== null && dragOverRow !== null && draggedRow !== dragOverRow) {
+    // Reorder the data
+    const newData = [...data];
+    const [movedRow] = newData.splice(draggedRow, 1);
+    newData.splice(dragOverRow, 0, movedRow);
+    
+    // Also update merged cells positions
+    const newMergedCells = {};
+    Object.keys(mergedCells).forEach(key => {
+      const [row, col] = key.split('-').map(Number);
+      let newRow = row;
+      
+      if (row === draggedRow) {
+        newRow = dragOverRow;
+      } else if (row > draggedRow && row <= dragOverRow) {
+        newRow = row - 1;
+      } else if (row < draggedRow && row >= dragOverRow) {
+        newRow = row + 1;
+      }
+      
+      const newKey = `${newRow}-${col}`;
+      newMergedCells[newKey] = { ...mergedCells[key] };
+      
+      // Update startRow and endRow in merged cell info
+      if (mergedCells[key].isFirst) {
+        newMergedCells[newKey].startRow = newRow;
+        newMergedCells[newKey].endRow = newRow + (mergedCells[key].rowSpan - 1);
+      }
+    });
+    
+    onReorderRows(newData, newMergedCells);
+  }
+  setDraggedRow(null);
+  setDragOverRow(null);
+  setIsDragging(false);
+};
+
+  const handleCellClick = (rowIndex, columnId, value, event) => {
+    if (typeof onHeaderSelectionChange === 'function') onHeaderSelectionChange(null);
+setSelectedHeaders([]);
+    if (event && event.shiftKey && selectionStart) {
+      const startColIndex = columns.findIndex(col => col.accessor === selectionStart.columnId);
+      const endColIndex = columns.findIndex(col => col.accessor === columnId);
+      headerAnchorRef.current = null;
+      
+      const range = {
+        startRow: Math.min(selectionStart.rowIndex, rowIndex),
+        endRow: Math.max(selectionStart.rowIndex, rowIndex),
+        startCol: Math.min(startColIndex, endColIndex),
+        endCol: Math.max(startColIndex, endColIndex),
+      };
+      
+      setSelectionRange(range);
+      onCellSelect({ range, rowIndex, columnId, value }, true);
+    } else {
+      setSelectionStart({ rowIndex, columnId });
+      setSelectionRange(null);
+      setEditingCell({ rowIndex, columnId });
+      setEditValue(value || '');
+      setActiveRowIndex(rowIndex);
+      setActiveColumnId(columnId);
+      onCellSelect({ rowIndex, columnId, value });
+    }
   };
 
   const handleTopTextareaChange = (newValue) => {
@@ -99,14 +345,12 @@ const DataTable = ({
     if (activeRowIndex !== null && activeColumnId) {
       onCellEdit(activeRowIndex, activeColumnId, editValue);
     }
-    // Don't clear active cell on blur, keep it selected
   };
 
   const handleCellBlur = () => {
     if (editingCell) {
       onCellEdit(editingCell.rowIndex, editingCell.columnId, editValue);
       setEditingCell(null);
-      // Keep active cell selected but close inline editor
     }
   };
 
@@ -152,7 +396,6 @@ const DataTable = ({
     }
   };
 
-  // Render editable cell with transliteration support (for inline editing)
   const renderEditableCell = (rowIndex, columnId, value) => {
     if (enableTransliteration) {
       return (
@@ -230,7 +473,6 @@ const DataTable = ({
     );
   };
 
-  // Get current active cell value
   const getActiveCellValue = () => {
     if (activeRowIndex !== null && activeColumnId && data[activeRowIndex]) {
       return data[activeRowIndex][activeColumnId] || '';
@@ -238,15 +480,32 @@ const DataTable = ({
     return '';
   };
 
-  // Render top textarea editor
   const renderTopTextarea = () => {
-    if (activeRowIndex === null || !activeColumnId) return null;
+    if (activeRowIndex === null && !activeColumnId && activeHeaderIndex === null) return null;
 
-    const activeValue = getActiveCellValue();
+    const activeValue = activeHeaderIndex !== null
+      ? (columns[activeHeaderIndex]?.Header || '')
+      : getActiveCellValue();
 
-    if (enableTransliteration) {
-      return (
-        <div className="top-textarea-container">
+    const handleChange = (val) => {
+      if (activeHeaderIndex !== null) {
+        handleHeaderEdit(activeHeaderIndex, val);
+      } else {
+        handleTopTextareaChange(val);
+      }
+    };
+
+    const handleBlur = () => {
+      if (activeHeaderIndex !== null) {
+        setActiveHeaderIndex(null);
+      } else {
+        handleTopTextareaBlur();
+      }
+    };
+
+    return (
+      <div className="top-textarea-container">
+        {enableTransliteration ? (
           <IndicTransliterate
             customApiURL={`${configs.BASE_URL_AUTO}/tasks/xlit-api/generic/transliteration/`}
             apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
@@ -258,10 +517,7 @@ const DataTable = ({
             enableSuggestion={true}
             suggestionLimit={5}
             suggestionPosition="bottom"
-            containerStyles={{
-              width: "100%",
-              position: "relative",
-            }}
+            containerStyles={{ width: "100%", position: "relative" }}
             renderComponent={(props) => (
               <textarea
                 ref={topTextareaRef}
@@ -279,70 +535,51 @@ const DataTable = ({
                   fontFamily: "inherit",
                   lineHeight: "1.5",
                   boxSizing: "border-box",
-                  border: "2px solid #667eea",
+                  border: "2px solid #e0e0e0",
                   borderRadius: "8px",
                   marginBottom: "10px",
                 }}
-                value={activeValue}
-                onChange={(e) => handleTopTextareaChange(e.target.value)}
-                onBlur={handleTopTextareaBlur}
+               value={activeValue}
+               onChange={(e) => handleChange(e.target.value)}
+               onBlur={handleBlur}
                 {...props}
               />
             )}
           />
-          <div className="top-textarea-info">
-            <button 
-              className="clear-selection-btn"
-              onClick={() => {
-                setActiveRowIndex(null);
-                setActiveColumnId(null);
-              }}
-            >
-              Clear Selection
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="top-textarea-container">
-        <textarea
-          ref={topTextareaRef}
-          className="top-editor-textarea"
-          dir={enableRTL ? 'rtl' : 'ltr'}
-          style={{
-            fontSize: `${fontSize}px`,
-            width: "100%",
-            minHeight: "80px",
-            resize: "vertical",
-            outline: "none",
-            padding: "12px",
-            background: "white",
-            color: "#333",
-            fontFamily: "inherit",
-            lineHeight: "1.5",
-            boxSizing: "border-box",
-            border: "2px solid #667eea",
-            borderRadius: "8px",
-            marginBottom: "10px",
-          }}
-          placeholder={`Editing: Row ${activeRowIndex + 1}, Column ${activeColumnId}`}
-          value={activeValue}
-          onChange={(e) => handleTopTextareaChange(e.target.value)}
-          onBlur={handleTopTextareaBlur}
-        />
-        <div className="top-textarea-info">
-          <span>Editing: Row {activeRowIndex + 1}, Column {activeColumnId}</span>
-          <button 
-            className="clear-selection-btn"
-            onClick={() => {
-              setActiveRowIndex(null);
-              setActiveColumnId(null);
+        ) : (
+          <textarea
+            ref={topTextareaRef}
+            className="top-editor-textarea"
+            dir={enableRTL ? 'rtl' : 'ltr'}
+            style={{
+              fontSize: `${fontSize}px`,
+              width: "100%",
+              minHeight: "80px",
+              resize: "vertical",
+              outline: "none",
+              padding: "12px",
+              background: "white",
+              color: "#333",
+              fontFamily: "inherit",
+              lineHeight: "1.5",
+              boxSizing: "border-box",
+              border: "2px solid #e0e0e0",
+              borderRadius: "8px",
+              marginBottom: "10px",
             }}
-          >
-            Clear Selection
-          </button>
+            value={activeValue}
+            onChange={(e) => handleChange(e.target.value)}
+            onBlur={handleBlur}
+          />
+        )}
+        <div className="top-textarea-info">
+         <button className="clear-selection-btn" onClick={() => {
+          setActiveRowIndex(null);
+          setActiveColumnId(null);
+          setActiveHeaderIndex(null);
+        }}>
+          Clear Selection
+        </button>
         </div>
       </div>
     );
@@ -351,81 +588,133 @@ const DataTable = ({
   return (
     <div className="data-table-wrapper-container">
       {renderTopTextarea()}
+      
       <div className={`data-table-wrapper ${showGrid ? 'show-grid' : 'hide-grid'}`} ref={tableRef}>
         <table className={`data-table ${alternateRowColor ? 'alternate-rows' : ''}`}>
           <thead>
-            <tr>
-              <th className="row-number-header">#</th>
-              {columns.map((column) => (
-                <th 
-                  key={column.accessor}
-                  style={{ width: columnWidths[column.accessor] }}
-                  className="column-header"
-                >
-                  <div className="header-content">
-                    <span style={{ fontSize: `${fontSize}px` }}>{column.Header}</span>
-                    <button 
-                      className="delete-column-btn"
-                      onClick={() => onDeleteColumn(column.accessor)}
-                      title="Delete column"
-                    >
-                      ×
-                    </button>
-                    <div 
-                      className="resize-handle"
-                      onMouseDown={(e) => startResize(e, column.accessor)}
-                    />
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
+  <tr>
+    <th className="row-number-header">
+      <span className="drag-handle-column-title" title="Drag to reorder column">⋮⋮</span>
+      #
+    </th>
+   {columns.map((column, colIndex) => {
+  if (mergedHeaders[colIndex]?.hidden) return null;
+  return (
+    <th 
+      key={column.accessor}
+      colSpan={mergedHeaders[colIndex]?.colSpan || 1}
+      style={{ width: columnWidths[column.accessor] }}
+      className={`column-header 
+        ${draggedColumn === colIndex ? 'dragging' : ''} 
+        ${dragOverColumn === colIndex ? 'drag-over' : ''}
+        ${selectedHeaders.length === 1 && selectedHeaders.includes(colIndex) ? 'header-selected' : ''}
+${selectedHeaders.length > 1 && selectedHeaders.includes(colIndex) ? 'header-range-selected' : ''}
+        ${mergedHeaders[colIndex]?.isFirst ? 'merged-header' : ''}`}
+      draggable={!editingCell}
+      onDragStart={(e) => handleColumnDragStart(e, colIndex)}
+      onDragOver={(e) => handleColumnDragOver(e, colIndex)}
+      onDragEnd={handleColumnDragEnd}
+      onClick={(e) => { e.preventDefault(); handleHeaderSelect(colIndex, e); }}
+    >
+      <div className="header-content">
+        <span className="drag-handle" title="Drag to reorder column">⋮⋮</span>
+        <span
+          style={{ fontSize: `${fontSize}px`, cursor: "pointer" }}
+          onDoubleClick={() => handleHeaderClick(colIndex)}
+        >
+          {column.Header}
+        </span>
+        <button 
+          className="delete-column-btn"
+          onClick={() => onDeleteColumn(column.accessor)}
+          title="Delete column"
+        >
+          ×
+        </button>
+        <div 
+          className="resize-handle"
+          onMouseDown={(e) => startResize(e, column.accessor)}
+        />
+      </div>
+    </th>
+  );
+})}
+  </tr>
+</thead>
           <tbody>
             {data.map((row, rowIndex) => (
-              <tr 
-                key={row.id || rowIndex} 
-                className={activeRowIndex === rowIndex ? 'active-row' : ''}
+<tr 
+  key={row.id || rowIndex} 
+  className={activeRowIndex === rowIndex ? 'active-row' : ''}
+                draggable={!editingCell}
+                onDragStart={(e) => handleRowDragStart(e, rowIndex)}
+                onDragOver={(e) => handleRowDragOver(e, rowIndex)}
+                onDragEnd={handleRowDragEnd}
               >
-                <td className="row-number">
-                  {rowIndex + 1}
-                  <button 
-                    className="delete-row-btn"
-                    onClick={() => onDeleteRow(rowIndex)}
-                    title="Delete row"
-                  >
-                    ×
-                  </button>
-                </td>
-                {columns.map((column) => {
+<td className="row-number" 
+  draggable={!editingCell}
+  onDragStart={(e) => handleRowDragStart(e, rowIndex)}
+  onDragOver={(e) => handleRowDragOver(e, rowIndex)}
+  onDragEnd={handleRowDragEnd}
+>
+  <span className="drag-handle-row" title="Drag to reorder row">⋮⋮</span>
+  <span className="row-index">{rowIndex + 1}</span>
+  <button 
+    className="delete-row-btn"
+    onClick={() => onDeleteRow(rowIndex)}
+    title="Delete row"
+  >
+    ×
+  </button>
+</td>
+                {columns.map((column, colIndex) => {
+                  const cellKey = `${rowIndex}-${colIndex}`;
+                  const mergedCell = mergedCells[cellKey];
+                  
+                  if (mergedCell && mergedCell.hidden) {
+                    return null;
+                  }
+                  
+                  const colSpan = mergedCell && mergedCell.colSpan ? mergedCell.colSpan : 1;
+                  const rowSpan = mergedCell && mergedCell.rowSpan ? mergedCell.rowSpan : 1;
+                  
+                  let displayValue = row[column.accessor];
+                  if (mergedCell && mergedCell.isFirst) {
+                    displayValue = data[mergedCell.startRow]?.[columns[mergedCell.startCol]?.accessor] || '';
+                  }
+                  
                   const isEditing = editingCell && 
                     editingCell.rowIndex === rowIndex && 
                     editingCell.columnId === column.accessor;
                   const isActive = activeRowIndex === rowIndex && activeColumnId === column.accessor;
+                  const isInRange = selectionRange && 
+                    rowIndex >= selectionRange.startRow && 
+                    rowIndex <= selectionRange.endRow &&
+                    colIndex >= selectionRange.startCol && 
+                    colIndex <= selectionRange.endCol;
                   
                   return (
                     <td 
                       key={column.accessor}
-                      className={`table-cell ${isEditing ? 'editing' : ''} ${isActive ? 'active-cell' : ''}`}
-                      onClick={() => !isEditing && handleCellClick(rowIndex, column.accessor, row[column.accessor])}
-                      style={{ width: columnWidths[column.accessor] }}
+                      colSpan={colSpan}
+                      rowSpan={rowSpan}
+                      className={`table-cell ${isEditing ? 'editing' : ''} ${isActive ? 'active-cell' : ''} ${isInRange ? 'range-selected' : ''}`}
+                      onClick={(e) => !isEditing && handleCellClick(rowIndex, column.accessor, displayValue, e)}
+                      style={{ width: colSpan > 1 ? (columnWidths[column.accessor] || 150) * colSpan : (columnWidths[column.accessor] || 150) }}
                     >
                       {isEditing ? (
-                        renderEditableCell(rowIndex, column.accessor, row[column.accessor])
+                        renderEditableCell(rowIndex, column.accessor, displayValue)
                       ) : (
                         <div 
                           className="cell-content"
                           dir={enableRTL ? 'rtl' : 'ltr'}
                           style={{ fontSize: `${fontSize}px` }}
                         >
-                          <span>{row[column.accessor]}</span>
+                          <span>{displayValue}</span>
                           {transcriptionMode && (
                             <button
                               className="transcribe-btn"
-                              onClick={() => handleTranscribeClick(
-                                rowIndex, 
-                                column.accessor, 
-                                row[column.accessor]
-                              )}
+                              onClick={() => handleTranscribeClick(rowIndex, column.accessor, displayValue)}
                               title="Transcribe to selected language"
                             >
                               🔄
@@ -436,7 +725,6 @@ const DataTable = ({
                     </td>
                   );
                 })}
-
               </tr>
             ))}
           </tbody>

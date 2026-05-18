@@ -472,3 +472,4 @@ const BasicSettings = (props) => {
 }
 
 export default BasicSettings;
+

@@ -5,6 +5,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
+import CallSplitIcon from '@mui/icons-material/CallSplit';
 import Menu from "@mui/material/Menu";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -24,6 +25,8 @@ import TranslateIcon from "@mui/icons-material/Translate";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import SaveIcon from "@mui/icons-material/Save";
 import ImportExportIcon from "@mui/icons-material/ImportExport";
+import MergeIcon from "@mui/icons-material/Merge";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import "./TableControls.css";
 
 const anchorOrigin = {
@@ -82,10 +85,22 @@ const TableControls = ({
   setTheme,
   onClearAll,
   selectedCell,
+  onBulkDelete,
+  onMergeCells,
+  onCopyCell,
+  isCellSelected,
+  onAddRowBefore,   // NEW
+  onAddRowAfter,    // NEW
+  onAddColBefore,   // NEW
+  onAddColAfter,    // NEW
+  onUnmergeCells
 }) => {
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
+  const [anchorElAddRow, setAnchorElAddRow] = useState(null);  // NEW
+  const [anchorElAddCol, setAnchorElAddCol] = useState(null);  // NEW
+const [anchorElDelete, setAnchorElDelete] = useState(null);
 
   // Apply theme to CSS variables
   useEffect(() => {
@@ -95,58 +110,138 @@ const TableControls = ({
     }
   }, [theme]);
 
+  const hasSelectedCell = !!selectedCell;
+
   return (
     <div className="table-controls">
       {/* Row Count Badge */}
-      <Box
-        className="count-badge"
-      >
+      <Box className="count-badge">
         <TableRowsIcon className="badge-icon" />
-        <span  className="badge-count">
-          {totalRows}
-        </span>
+        <span className="badge-count">{totalRows}</span>
       </Box>
 
       {/* Column Count Badge */}
-      <Box
-        className="count-badge"
-        style={{ marginLeft: "5px"}}
-      >
+      <Box className="count-badge" style={{ marginLeft: "5px" }}>
         <ViewColumnIcon className="badge-icon" />
         <span className="badge-count">{totalColumns}</span>
       </Box>
 
-      <Divider
-        orientation="vertical"
-        className="controls-divider"
-      />
+      <Divider orientation="vertical" className="controls-divider" />
 
-      {/* Add Row Button */}
+      {/* Add Row Button — now opens a dropdown */}
       <Tooltip title="Add Row" placement="bottom">
         <IconButton
           className="control-btn"
-          onClick={onAddRow}
+          onClick={(e) => setAnchorElAddRow(e.currentTarget)}
         >
           <TableRowsIcon />
           <span className="btn-plus">+</span>
         </IconButton>
       </Tooltip>
 
-      {/* Add Column Button */}
+      {/* Add Row Menu */}
+      <Menu
+        sx={{ mt: "45px" }}
+        anchorEl={anchorElAddRow}
+        anchorOrigin={anchorOrigin}
+        keepMounted
+        transformOrigin={transformOrigin}
+        open={Boolean(anchorElAddRow)}
+        onClose={() => setAnchorElAddRow(null)}
+      >
+        <MenuItem
+          disabled={!hasSelectedCell}
+          onClick={() => { onAddRowBefore?.(); setAnchorElAddRow(null); }}
+        >
+          <Typography variant="body2">↑ Add Row Before</Typography>
+        </MenuItem>
+        <MenuItem
+          disabled={!hasSelectedCell}
+          onClick={() => { onAddRowAfter?.(); setAnchorElAddRow(null); }}
+        >
+          <Typography variant="body2">↓ Add Row After</Typography>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => { onAddRow(); setAnchorElAddRow(null); }}>
+          <Typography variant="body2">+ Add Row at End</Typography>
+        </MenuItem>
+      </Menu>
+
+      {/* Add Column Button — now opens a dropdown */}
       <Tooltip title="Add Column" placement="bottom">
         <IconButton
           className="control-btn"
-          onClick={onAddColumn}
+          onClick={(e) => setAnchorElAddCol(e.currentTarget)}
         >
           <ViewColumnIcon />
           <span className="btn-plus">+</span>
         </IconButton>
       </Tooltip>
 
-      <Divider
-        orientation="vertical"
-        className="controls-divider"
-      />
+      {/* Add Column Menu */}
+      <Menu
+        sx={{ mt: "45px" }}
+        anchorEl={anchorElAddCol}
+        anchorOrigin={anchorOrigin}
+        keepMounted
+        transformOrigin={transformOrigin}
+        open={Boolean(anchorElAddCol)}
+        onClose={() => setAnchorElAddCol(null)}
+      >
+        <MenuItem
+          disabled={!hasSelectedCell}
+          onClick={() => { onAddColBefore?.(); setAnchorElAddCol(null); }}
+        >
+          <Typography variant="body2">← Add Column Before</Typography>
+        </MenuItem>
+        <MenuItem
+          disabled={!hasSelectedCell}
+          onClick={() => { onAddColAfter?.(); setAnchorElAddCol(null); }}
+        >
+          <Typography variant="body2">→ Add Column After</Typography>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => { onAddColumn(); setAnchorElAddCol(null); }}>
+          <Typography variant="body2">+ Add Column at End</Typography>
+        </MenuItem>
+      </Menu>
+
+      <Divider orientation="vertical" className="controls-divider" />
+
+      {/* Merge Cells Button */}
+      <Tooltip title="Merge Selected Adjacent Cells" placement="bottom">
+        <IconButton
+  className="control-btn"
+  onClick={onMergeCells}
+  disabled={!isCellSelected}
+>
+  <MergeIcon />
+</IconButton>
+      </Tooltip>
+     
+
+      {/* Unmerge Cells Button */}
+      <Tooltip title="Unmerge Selected Merged Cell" placement="bottom">
+        <IconButton
+  className="control-btn"
+  onClick={onUnmergeCells}
+  disabled={!isCellSelected}
+>
+  <CallSplitIcon />
+</IconButton>
+      </Tooltip>
+
+      {/* Delete Table Button */}
+     <Tooltip title="Delete Options" placement="bottom">
+  <IconButton
+    className="control-btn delete-table-btn"
+    onClick={(e) => setAnchorElDelete(e.currentTarget)}
+  >
+    <DeleteSweepIcon />
+  </IconButton>
+</Tooltip>
+
+      <Divider orientation="vertical" className="controls-divider" />
 
       {/* Settings Button */}
       <Tooltip title="Table Settings" placement="bottom">
@@ -157,7 +252,36 @@ const TableControls = ({
           <SettingsIcon />
         </IconButton>
       </Tooltip>
-
+<Menu
+  sx={{ mt: "45px" }}
+  anchorEl={anchorElDelete}
+  anchorOrigin={anchorOrigin}
+  keepMounted
+  transformOrigin={transformOrigin}
+  open={Boolean(anchorElDelete)}
+  onClose={() => setAnchorElDelete(null)}
+>
+  <MenuItem 
+    onClick={() => {
+      onBulkDelete?.();
+      setAnchorElDelete(null);
+    }}
+    sx={{ color: "#d32f2f" }}
+  >
+    <DeleteSweepIcon sx={{ mr: 1, fontSize: 20 }} />
+    <Typography variant="body2">Delete Entire Table</Typography>
+  </MenuItem>
+  
+  <MenuItem 
+    onClick={() => {
+      setAnchorElDelete(null);
+    }}
+    sx={{ color: "#f57c00" }}
+  >
+    <DeleteSweepIcon sx={{ mr: 1, fontSize: 20 }} />
+    <Typography variant="body2">Cancel</Typography>
+  </MenuItem>
+</Menu>
       {/* Settings Menu */}
       <Menu
         sx={{ mt: "45px" }}
@@ -176,7 +300,7 @@ const TableControls = ({
             </Typography>
           </MenuItem>
         )}
-        
+
         <MenuItem>
           <FormControlLabel
             label="Show Grid Lines"
@@ -239,57 +363,6 @@ const TableControls = ({
         </MenuItem>
       </Menu>
 
-      {/* Theme Button */}
-      {/* <Tooltip title="Color Theme" placement="bottom">
-        <IconButton
-          className="control-btn"
-          onClick={(event) => setAnchorElTheme(event.currentTarget)}
-        >
-          <ColorLensIcon />
-        </IconButton>
-      </Tooltip> */}
-
-      {/* Theme Menu */}
-      {/* <Menu
-        sx={{ mt: "45px" }}
-        id="theme-menu"
-        anchorEl={anchorElTheme}
-        anchorOrigin={anchorOrigin}
-        keepMounted
-        transformOrigin={transformOrigin}
-        open={Boolean(anchorElTheme)}
-        onClose={() => setAnchorElTheme(null)}
-      >
-        {colorThemes.map((themeOption, index) => (
-          <MenuItem 
-            key={index} 
-            onClick={() => {
-              setTheme(themeOption);
-              setAnchorElTheme(null);
-            }}
-          >
-            <CheckIcon
-              style={{
-                visibility: theme?.name === themeOption.name ? "visible" : "hidden",
-                color: themeOption.primary,
-              }}
-            />
-            <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
-              <Box 
-                sx={{ 
-                  width: 20, 
-                  height: 20, 
-                  borderRadius: "50%", 
-                  background: `linear-gradient(135deg, ${themeOption.primary} 0%, ${themeOption.secondary} 100%)`,
-                  mr: 1
-                }} 
-              />
-              <Typography>{themeOption.name}</Typography>
-            </Box>
-          </MenuItem>
-        ))}
-      </Menu> */}
-
       {/* Font Size Button */}
       <Tooltip title="Font Size" placement="bottom">
         <IconButton
@@ -312,9 +385,18 @@ const TableControls = ({
         onClose={() => setAnchorElFont(null)}
       >
         {fontSizeMenu.map((item, index) => (
-          <MenuItem 
-            key={index} 
+          <MenuItem
+            key={index}
             onClick={() => {
+                localStorage.setItem(
+                "OcrTranscriptionSettings",
+                JSON.stringify({
+                  ...JSON.parse(
+                    localStorage.getItem("OcrTranscriptionSettings")
+                  ),
+                  fontSize: item.size,
+                })
+              );
               setFontSize(item.size);
               setAnchorElFont(null);
             }}
@@ -335,10 +417,7 @@ const TableControls = ({
         ))}
       </Menu>
 
-      <Divider
-        orientation="vertical"
-        className="controls-divider"
-      />
+      <Divider orientation="vertical" className="controls-divider" />
 
       {/* Undo Button */}
       <Tooltip title="Undo" placement="bottom">
@@ -362,40 +441,14 @@ const TableControls = ({
         </IconButton>
       </Tooltip>
 
-      <Divider
-        orientation="vertical"
-        className="controls-divider"
-      />
+      <Divider orientation="vertical" className="controls-divider" />
 
       {/* Save Button */}
       <Tooltip title="Save" placement="bottom">
-        <IconButton
-          className="control-btn"
-          onClick={onSave}
-        >
+        <IconButton className="control-btn" onClick={onSave}>
           <SaveIcon />
         </IconButton>
       </Tooltip>
-
-      {/* Export Button */}
-      {/* <Tooltip title="Export" placement="bottom">
-        <IconButton
-          className="control-btn"
-          onClick={onExport}
-        >
-          <ImportExportIcon />
-        </IconButton>
-      </Tooltip> */}
-
-      {/* Import Button */}
-      {/* <Tooltip title="Import" placement="bottom">
-        <IconButton
-          className="control-btn"
-          onClick={onImport}
-        >
-          <TextFieldsIcon />
-        </IconButton>
-      </Tooltip> */}
     </div>
   );
 };

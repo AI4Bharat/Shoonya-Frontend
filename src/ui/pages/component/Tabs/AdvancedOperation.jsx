@@ -8,6 +8,7 @@ import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { ThemeProvider } from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
 import React, { useEffect, useState } from "react";
 import themeDefault from "../../../theme/theme";
 import {  useParams } from "react-router-dom";
@@ -450,27 +451,42 @@ const getPullNewDataAPI = async () => {
           gap={4}
         >
           <Grid item xs={12}>
-            <CustomButton
-              sx={{
-                borderRadius: 3,
-                width: "100%",
-              }}
-              onClick={handlePublishProject}
-              label="Publish Project"
-            />
+            <Tooltip title="Publish this project to make it live" arrow>
+              <span style={{ display: "block", width: "100%" }}>
+                <CustomButton
+                  sx={{
+                    borderRadius: 3,
+                    width: "100%",
+                  }}
+                  onClick={handlePublishProject}
+                  label="Publish Project"
+                />
+              </span>
+            </Tooltip>
           </Grid>
 
           <Grid item xs={12}>
-            <CustomButton
-              sx={{
-                borderRadius: 3,
-                width: "100%",
-              }}
-              color="error"
-              onClick={handleClickOpen}
-              label={isArchived ? "Archived" : "Archive"}
-              disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role?true:false}
-            />
+            <Tooltip
+              title={
+                isArchived
+                  ? "Click to unarchive this project"
+                  : "Archive this project to hide it from active lists"
+              }
+              arrow
+            >
+              <span style={{ display: "block", width: "100%" }}>
+                <CustomButton
+                  sx={{
+                    borderRadius: 3,
+                    width: "100%",
+                  }}
+                  color="error"
+                  onClick={handleClickOpen}
+                  label={isArchived ? "Archived" : "Archive"}
+                  disabled ={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role?true:false}
+                />
+              </span>
+            </Tooltip>
           </Grid>
 
           <Grid
@@ -528,24 +544,33 @@ const getPullNewDataAPI = async () => {
               item
               xs={12}
             >
-              <CustomButton
-                sx={{
-                  borderRadius: 3,
-                  width: "100%",
-                }}
-                onClick={handleDownloadProjectAnnotations}
-                label="Downoload Project Annotations" />
+              <Tooltip title="Download all project annotations as a file" arrow>
+                <span style={{ display: "block", width: "100%" }}>
+                  <CustomButton
+                    sx={{
+                      borderRadius: 3,
+                      width: "100%",
+                    }}
+                    onClick={handleDownloadProjectAnnotations}
+                    label="Downoload Project Annotations" />
+                </span>
+              </Tooltip>
             </Grid>
           <Grid item xs={12}>
-            {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
-              <CustomButton
-                sx={{
-                  borderRadius: 3,
-                  width: "100%",
-                }}
-                onClick={handleOpenExportProjectDialog}
-                label="Export Project into Dataset"
-                disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role  ? true : false}
+            <Tooltip
+              title="Export all annotated tasks into an output dataset"
+              arrow
+            >
+              <span style={{ display: "block", width: "100%" }}>
+                {ProjectTypes?.output_dataset?.save_type === "new_record" ? (
+                  <CustomButton
+                    sx={{
+                      borderRadius: 3,
+                      width: "100%",
+                    }}
+                    onClick={handleOpenExportProjectDialog}
+                    label="Export Project into Dataset"
+                    disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role  ? true : false}
 
               />
             ) : (
@@ -558,21 +583,34 @@ const getPullNewDataAPI = async () => {
                 label="Export Project into Dataset"
                 disabled={userRole.WorkspaceManager === loggedInUserData?.role || userRole.OrganizationOwner === loggedInUserData?.role  ? true : false}
 
-              />
-            )}
+                  />
+                )}
+              </span>
+            </Tooltip>
           </Grid>
 
           <Grid item xs={12}>
             {ProjectDetails.sampling_mode == "f" || ProjectDetails.sampling_mode == "b" ? (
-              <CustomButton
-                sx={{
-                  borderRadius: 3,
-                  width: "100%",
-                }}
-                onClick={handlePullNewData}
-                label="Pull New Data Items from Source Dataset"
-                disabled={pullDataLoading || userRole.WorkspaceManager === loggedInUserData?.role? true:false}
-              />
+              <Tooltip
+                title={
+                  pullDataLoading
+                    ? "Pulling data — please wait"
+                    : "Pull new data items from the source dataset into this project"
+                }
+                arrow
+              >
+                <span style={{ display: "block", width: "100%" }}>
+                  <CustomButton
+                    sx={{
+                      borderRadius: 3,
+                      width: "100%",
+                    }}
+                    onClick={handlePullNewData}
+                    label="Pull New Data Items from Source Dataset"
+                    disabled={pullDataLoading || userRole.WorkspaceManager === loggedInUserData?.role? true:false}
+                  />
+                </span>
+              </Tooltip>
             ) : (
               " "
             )}
