@@ -484,6 +484,14 @@ const AudioTranscriptionLandingStyle = makeStyles({
     backgroundColor: "rgb(0 87 158)",
     border: "1px solid rgba(255, 255, 255, 0.3)",
     color: "#fff !important",
+    "&::selection": {
+      backgroundColor: "#ffd54f",
+      color: "#000000",
+    },
+    "&::-moz-selection": {
+      backgroundColor: "#ffd54f",
+      color: "#000000",
+    },
   },
 
   wordCount: {
