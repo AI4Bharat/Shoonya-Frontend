@@ -591,7 +591,7 @@ useEffect(() => {
       <Box
         sx={{border : "1px solid rgb(224 224 224)"}}
       >
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div className={`label-studio-root ${ProjectDetails?.project_type?.includes("OCR") ? "ocr-project-style" : ""}`} ref={rootRef}></div>
       </Box>
       {parentMetadata !== undefined &&
         <>

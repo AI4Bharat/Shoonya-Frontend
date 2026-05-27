@@ -82,14 +82,16 @@
      content: 'Color';
   }
 
-.label-studio-root textarea,
-.label-studio-root input,
-.label-studio-root [contenteditable="true"],
-.label-studio-root .lsf-region-item__desc,
-.label-studio-root div,
-.label-studio-root span,
-.label-studio-root p {
+/* Force auto-direction layout for text elements *ONLY* inside OCR projects to support mixed LTR/RTL text direction */
+.ocr-project-style textarea,
+.ocr-project-style input,
+.ocr-project-style [contenteditable="true"],
+.ocr-project-style .lsf-region-item__desc,
+.ocr-project-style div,
+.ocr-project-style span,
+.ocr-project-style p {
   unicode-bidi: plaintext !important;
   text-align: start !important;
 }
+
 
