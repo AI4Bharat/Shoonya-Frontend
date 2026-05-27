@@ -81,4 +81,15 @@
   .quill .ql-color:focus:after {
      content: 'Color';
   }
-  
+
+
+.label-studio-root textarea,
+.label-studio-root input,
+.label-studio-root [contenteditable="true"],
+.label-studio-root .lsf-region-item__desc,
+.label-studio-root div,
+.label-studio-root span,
+.label-studio-root p {
+  unicode-bidi: plaintext !important;
+  text-align: start !important;
+}
