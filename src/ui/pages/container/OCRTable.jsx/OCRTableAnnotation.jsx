@@ -305,6 +305,8 @@ const [mergedHeaders, setMergedHeaders] = useState({});
   const [showNotes, setShowNotes] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [ocrRerunLoading, setOcrRerunLoading] = useState(false);
+  const [ocrRerunPollingId, setOcrRerunPollingId] = useState(null);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -315,6 +317,10 @@ const [mergedHeaders, setMergedHeaders] = useState({});
     );
     const ProjectDetails = useSelector((state) => state.getProjectDetails?.data);
     const user = useSelector((state) => state.fetchLoggedInUserData.data);
+    const canRerunOcr =
+      user?.role === 4 || // WORKSPACE_MANAGER
+      user?.role === 5 || // ORGANIZATION_OWNER
+      user?.role === 6;   // ADMIN
     const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   
   const [leftWidth, setLeftWidth] = useState(50);
@@ -357,6 +363,14 @@ const [mergedHeaders, setMergedHeaders] = useState({});
     dispatch(APITransport(userObj));
   };
   
+  useEffect(() => {
+  return () => {
+    if (ocrRerunPollingId) {
+      clearInterval(ocrRerunPollingId);
+    }
+  };
+}, [ocrRerunPollingId]);
+
   useEffect(() => {
   const loadData = async () => {
     setInitialLoading(true);
@@ -1185,6 +1199,133 @@ if (
     }
   };
 
+  const handleRerunOcr = useCallback(async () => {
+  if (!taskId) return;
+
+  setOcrRerunLoading(true);
+  setSnackbarInfo({ open: false, message: "", variant: "success" });
+
+  try {
+    const response = await fetch(
+      `/api/task/${taskId}/regenerate_ocr/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${localStorage.getItem("shoonya_token")}`,
+        },
+        body: JSON.stringify({}),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setSnackbarInfo({
+        open: true,
+        message: data?.message || "Failed to queue OCR regeneration.",
+        variant: "error",
+      });
+      setOcrRerunLoading(false);
+      return;
+    }
+
+    const celeryTaskId = data.celery_task_id;
+
+    // Poll Celery task status every 3 seconds
+    const pollIntervalId = setInterval(async () => {
+      try {
+        const pollRes = await fetch(
+          `/api/task/${taskId}/`,
+          {
+            headers: {
+              Authorization: `Token ${localStorage.getItem("shoonya_token")}`,
+            },
+          }
+        );
+
+        if (!pollRes.ok) {
+          clearInterval(pollIntervalId);
+          setOcrRerunLoading(false);
+          setSnackbarInfo({
+            open: true,
+            message: "Error polling task status.",
+            variant: "error",
+          });
+          return;
+        }
+
+        const taskResp = await pollRes.json();
+
+        // Celery result endpoint
+        const celeryRes = await fetch(
+          `/api/task-results/${celeryTaskId}/`,
+          {
+            headers: {
+              Authorization: `Token ${localStorage.getItem("shoonya_token")}`,
+            },
+          }
+        );
+
+        if (celeryRes.ok) {
+          const celeryData = await celeryRes.json();
+          const celeryStatus = celeryData?.status;
+
+          if (celeryStatus === "SUCCESS") {
+            clearInterval(pollIntervalId);
+            setOcrRerunPollingId(null);
+            setOcrRerunLoading(false);
+
+            // Reload task data to pick up new ocr_prediction_json
+            if (taskResp?.data?.ocr_prediction_json?.text) {
+              const { rows, columns: parsedColumns } =
+                parseHtmlTableToData(taskResp.data.ocr_prediction_json.text);
+              setTableData(rows);
+              setColumns(parsedColumns);
+              setOriginalHtmlTable(taskResp.data.ocr_prediction_json.text);
+            }
+
+            setSnackbarInfo({
+              open: true,
+              message: "OCR regenerated successfully.",
+              variant: "success",
+            });
+
+          } else if (celeryStatus === "FAILURE") {
+            clearInterval(pollIntervalId);
+            setOcrRerunPollingId(null);
+            setOcrRerunLoading(false);
+            setSnackbarInfo({
+              open: true,
+              message: celeryData?.result || "OCR regeneration failed.",
+              variant: "error",
+            });
+          }
+          // PENDING / STARTED — keep polling
+        }
+      } catch (pollError) {
+        clearInterval(pollIntervalId);
+        setOcrRerunLoading(false);
+        setSnackbarInfo({
+          open: true,
+          message: "Unexpected error while polling OCR status.",
+          variant: "error",
+        });
+      }
+    }, 3000);
+
+    setOcrRerunPollingId(pollIntervalId);
+
+  } catch (err) {
+    setOcrRerunLoading(false);
+    setSnackbarInfo({
+      open: true,
+      message: "Network error queuing OCR regeneration.",
+      variant: "error",
+    });
+  }
+}, [taskId]);
+
   const saveAnnotation = useCallback(async (status = 'draft') => {
     if (!annotationId || !taskId) {
       setSnackbarInfo({
@@ -1896,27 +2037,50 @@ const handleTranscribe = useCallback((text) => {
             onBulkDelete={handleBulkDelete}
             onMergeCells={handleMergeCells}
             onCopyCell={handleCopyCell}
-           isCellSelected={
-  selectedRange !== null ||
-  (headerSelectionRange !== null && headerSelectionRange.startCol !== headerSelectionRange.endCol) ||
-  (headerSelectionRange !== null && (
-    mergedHeaders[headerSelectionRange.startCol]?.isFirst ||
-    mergedHeaders[headerSelectionRange.startCol]?.hidden
-  )) ||
-  (() => {
-    if (!selectedCell) return false;
-    const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
-    const cellKey = `${selectedCell.rowIndex}-${colIndex}`;
-    return !!mergedCells[cellKey]?.isFirst;
-  })()
-}
+            isCellSelected={
+              selectedRange !== null ||
+              (headerSelectionRange !== null && headerSelectionRange.startCol !== headerSelectionRange.endCol) ||
+              (headerSelectionRange !== null && (
+                mergedHeaders[headerSelectionRange.startCol]?.isFirst ||
+                mergedHeaders[headerSelectionRange.startCol]?.hidden
+              )) ||
+              (() => {
+                if (!selectedCell) return false;
+                const colIndex = columns.findIndex(c => c.accessor === selectedCell.columnId);
+                const cellKey = `${selectedCell.rowIndex}-${colIndex}`;
+                return !!mergedCells[cellKey]?.isFirst;
+              })()
+            }
             onAddRowBefore={handleAddRowBefore}
             onAddRowAfter={handleAddRowAfter}
             onAddColBefore={handleAddColBefore}
             onAddColAfter={handleAddColAfter}
-              onUnmergeCells={handleUnmergeCells}
-
-          />
+            onUnmergeCells={handleUnmergeCells}
+            ProjectDetails={ProjectDetails}
+          >
+            {canRerunOcr && (
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={ocrRerunLoading}
+                onClick={handleRerunOcr}
+                sx={{
+                  ml: 1,
+                  minWidth: 120,
+                  borderColor: "primary.main",
+                  color: "primary.main",
+                  "&:hover": { borderColor: "primary.dark", color: "primary.dark" },
+                }}
+                startIcon={
+                  ocrRerunLoading ? (
+                    <CircularIndeterminate size={16} />
+                  ) : null
+                }
+              >
+                {ocrRerunLoading ? "Running OCR…" : "Re-run OCR"}
+              </Button>
+            )}
+          </TableControls>
           
           <div className="table-container">
             <DataTable

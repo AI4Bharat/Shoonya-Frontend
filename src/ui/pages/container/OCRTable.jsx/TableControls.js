@@ -93,7 +93,8 @@ const TableControls = ({
   onAddRowAfter,    // NEW
   onAddColBefore,   // NEW
   onAddColAfter,    // NEW
-  onUnmergeCells
+  onUnmergeCells,
+  children,
 }) => {
   const [anchorElSettings, setAnchorElSettings] = useState(null);
   const [anchorElFont, setAnchorElFont] = useState(null);
@@ -449,6 +450,7 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
           <SaveIcon />
         </IconButton>
       </Tooltip>
+      {children}
     </div>
   );
 };

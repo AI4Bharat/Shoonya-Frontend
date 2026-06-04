@@ -143,6 +143,9 @@ const AdvancedOperation = (props) => {
   const [copyL1ToL2, setCopyL1ToL2] = useState(
     ProjectDetails?.metadata_json?.copy_l1_to_l2  ?? true)
 
+    const [ocrProvider, setOcrProvider] = useState(
+    ProjectDetails?.metadata_json?.ocr_provider ?? ""
+);
 
       const handleCopyL1ToL2Toggle = async (e) => {
         setLoading(true);
@@ -189,7 +192,62 @@ const AdvancedOperation = (props) => {
         setLoading(false);
   
       }
-  
+      
+      const handleOcrProviderChange = async (e) => {
+    setLoading(true);
+    const newValue = e.target.value;
+    setOcrProvider(newValue);
+
+    const currentMetadata = ProjectDetails?.metadata_json || {};
+    const updatedMetadata = {
+        ...currentMetadata,
+        ocr_provider: newValue || null,
+    };
+
+    const sendData = {
+        title: ProjectDetails.title,
+        project_type: ProjectDetails.project_type,
+        project_mode: ProjectDetails.project_mode,
+        metadata_json: updatedMetadata,
+    };
+
+    const projectObj = new GetSaveButtonAPI(id, sendData);
+    dispatch(APITransport(projectObj));
+
+    try {
+        const res = await fetch(projectObj.apiEndPoint(), {
+            method: "PUT",
+            body: JSON.stringify(projectObj.getBody()),
+            headers: projectObj.getHeaders().headers,
+        });
+        const resp = await res.json();
+
+        if (res.ok) {
+            setSnackbarInfo({
+                open: true,
+                message: "OCR provider updated successfully.",
+                variant: "success",
+            });
+        } else {
+            setSnackbarInfo({
+                open: true,
+                message: resp?.message || "Failed to update OCR provider.",
+                variant: "error",
+            });
+            // Revert local state on failure
+            setOcrProvider(ProjectDetails?.metadata_json?.ocr_provider ?? "");
+        }
+    } catch (err) {
+        setSnackbarInfo({
+            open: true,
+            message: "Network error updating OCR provider.",
+            variant: "error",
+        });
+        setOcrProvider(ProjectDetails?.metadata_json?.ocr_provider ?? "");
+    } finally {
+        setLoading(false);
+    }
+};
 
 
   useEffect(() => {
@@ -568,6 +626,38 @@ const getPullNewDataAPI = async () => {
                 }
               }}
             />
+
+            {ProjectDetails?.project_type?.includes("OCR") && (
+    <Grid item xs={12} style={{ marginTop: "16px" }}>
+        <FormControl fullWidth size="small">
+            <InputLabel id="ocr-provider-label">
+                OCR Provider
+            </InputLabel>
+            <Select
+                labelId="ocr-provider-label"
+                id="ocr-provider-select"
+                value={ocrProvider}
+                label="OCR Provider"
+                onChange={handleOcrProviderChange}
+                disabled={loading}
+            >
+                <MenuItem value="">
+                    <em>Use server default</em>
+                </MenuItem>
+                <MenuItem value="openai">OpenAI Vision (GPT-4o)</MenuItem>
+                <MenuItem value="google">Google Cloud Vision</MenuItem>
+            </Select>
+            <Typography
+                variant="caption"
+                color="text.secondary"
+                style={{ marginTop: "4px" }}
+            >
+                Sets the OCR provider for all tasks in this project.
+                Can be overridden per task using the Re-run OCR button.
+            </Typography>
+        </FormControl>
+    </Grid>
+)}
           </Grid>
           ):null}
 

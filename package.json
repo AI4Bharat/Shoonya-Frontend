@@ -41,7 +41,7 @@
     "react-json-to-html": "^0.0.6",
     "react-json-tree": "^0.18.0",
     "react-quill": "^2.0.0",
-    "react-quilljs": "^1.3.3",
+    "react-quilljs": "^1.3.4",
     "react-redux": "^8.0.2",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
