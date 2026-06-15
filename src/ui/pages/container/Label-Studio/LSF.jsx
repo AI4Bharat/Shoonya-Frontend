@@ -52,6 +52,7 @@ import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
+import { formatAnnotations, formatPredictions, formatTaskData, cleanResultTexts, insertLrm } from "./ocrBidiHelper";
 
 const filterAnnotations = (
   annotations,
@@ -384,8 +385,8 @@ const LabelStudioWrapper = ({
         },
 
         task: {
-          annotations: filteredAnnotations,
-          predictions: predictions,
+          annotations: projectType?.includes("OCR") ? formatAnnotations(filteredAnnotations) : filteredAnnotations,
+          predictions: projectType?.includes("OCR") ? formatPredictions(predictions) : predictions,
           id: taskData.id,
           data: taskData.data,
         },
@@ -405,6 +406,9 @@ const LabelStudioWrapper = ({
 
         onSubmitAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
+          if (projectType.includes("OCR")) {
+            temp = cleanResultTexts(temp);
+          }
           let ids = new Set();
           let countLables = 0;
           if (projectType.includes("OCRTranscriptionEditing")){
@@ -509,6 +513,9 @@ const LabelStudioWrapper = ({
 
         onUpdateAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
+          if (projectType.includes("OCR")) {
+            temp = cleanResultTexts(temp);
+          }
           let ids = new Set();
           let countLables = 0;
           if (projectType.includes("OCRTranscriptionEditing")){
@@ -1596,7 +1603,7 @@ const LabelStudioWrapper = ({
                     return JSON.parse(predictions)?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
                       </div>
                     ));
                   } catch (error) {
@@ -1604,7 +1611,7 @@ const LabelStudioWrapper = ({
                     return predictions?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
                       </div>
                     ));
                   }

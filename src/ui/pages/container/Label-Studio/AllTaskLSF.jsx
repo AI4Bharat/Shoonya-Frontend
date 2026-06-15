@@ -39,6 +39,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+import { formatAnnotations, formatPredictions, formatTaskData, cleanResultTexts, insertLrm } from "./ocrBidiHelper";
 //used just in postAnnotation to support draft status update.
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
@@ -237,8 +238,8 @@ useEffect(() => {
         },
 
         task: {
-          annotations: annotations,
-          predictions: predictions,
+          annotations: ProjectDetails?.project_type?.includes("OCR") ? formatAnnotations(annotations) : annotations,
+          predictions: ProjectDetails?.project_type?.includes("OCR") ? formatPredictions(predictions) : predictions,
           id: taskData.id,
           data: taskData.data,
         },
@@ -256,6 +257,9 @@ useEffect(() => {
         },
         onSubmitAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
+          if (ProjectDetails?.project_type?.includes("OCR")) {
+            temp = cleanResultTexts(temp);
+          }
           let ids = new Set();
           let countLables = 0;         
           temp.map((curr) => {
@@ -277,7 +281,7 @@ useEffect(() => {
             showLoader();
             if (taskData.annotation_status !== "freezed") {
               postAnnotation(
-                annotation.serializeAnnotation(),
+                temp,
                 taskData.id,
                 userData.id,
                 load_time,
@@ -328,6 +332,9 @@ useEffect(() => {
 
         onUpdateAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
+          if (ProjectDetails?.project_type?.includes("OCR")) {
+            temp = cleanResultTexts(temp);
+          }
           let ids = new Set();
           let countLables = 0;   
           temp.map((curr) => {
@@ -664,7 +671,7 @@ useEffect(() => {
                     return JSON.parse(predictions)?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
                       </div>
                     ));
                   } catch (error) {
@@ -672,7 +679,7 @@ useEffect(() => {
                     return predictions?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
                       </div>
                     ));
                   }

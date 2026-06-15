@@ -47,6 +47,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
+import { formatAnnotations, formatPredictions, formatTaskData, cleanResultTexts, insertLrm } from "./ocrBidiHelper";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -347,8 +348,8 @@ useEffect(() => {
 
         task: {
           // annotations: annotations.filter((annotation) => !annotation.parent_annotation).concat(annotations.filter((annotation) => annotation.id === taskData.correct_annotation)),
-          annotations: filteredAnnotations,
-          predictions: predictions,
+          annotations: projectType?.includes("OCR") ? formatAnnotations(filteredAnnotations) : filteredAnnotations,
+          predictions: projectType?.includes("OCR") ? formatPredictions(predictions) : predictions,
           id: taskData.id,
           data: taskData.data,
         },
@@ -405,6 +406,9 @@ useEffect(() => {
 
         onUpdateAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
+          if (projectType.includes("OCR")) {
+            temp = cleanResultTexts(temp);
+          }
           let ids = new Set();
           let countLables = 0;
           if (projectType.includes("OCRTranscriptionEditing")){
@@ -454,6 +458,9 @@ useEffect(() => {
               setAutoSave(false);
               showLoader();
               let temp = annotation.serializeAnnotation();
+              if (projectType.includes("OCR")) {
+                temp = cleanResultTexts(temp);
+              }
 
               for (let i = 0; i < temp.length; i++) {
                 if(temp[i].type === "relation"){
@@ -743,6 +750,9 @@ useEffect(() => {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
+        if (ProjectDetails?.project_type?.includes("OCR")) {
+          temp = cleanResultTexts(temp);
+        }
         for (let i = 0; i < temp.length; i++) {
           if(temp[i].type === "relation"){
             continue;
@@ -788,6 +798,9 @@ useEffect(() => {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
+        if (ProjectDetails?.project_type?.includes("OCR")) {
+          temp = cleanResultTexts(temp);
+        }
         for (let i = 0; i < temp.length; i++) {
           if (temp[i].parentID !== undefined){
             delete temp[i].parentID;
@@ -1597,7 +1610,7 @@ useEffect(() => {
                     return JSON.parse(predictions)?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
                       </div>
                     ));
                   } catch (error) {
@@ -1605,7 +1618,7 @@ useEffect(() => {
                     return predictions?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
                       </div>
                     ));
                   }
