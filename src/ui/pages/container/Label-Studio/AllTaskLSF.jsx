@@ -91,21 +91,40 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
       }
     };
 
-    const interval = setInterval(() => {
-      const elements = document.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]');
-      elements.forEach(applyBidi);
-    }, 1000);
+    // 1. Initial application for elements already in the DOM
+    document.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]').forEach(applyBidi);
 
+    // 2. Set up the MutationObserver to watch for newly added LSF nodes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) { // Ensure it's an Element node
+            // Check if the new node itself needs bidi
+            if (node.matches && node.matches('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]')) {
+              applyBidi(node);
+            }
+            // Check if it contains children that need bidi
+            const elements = node.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]');
+            elements.forEach(applyBidi);
+          }
+        });
+      });
+    });
+
+    // Observe the body or a specific Label Studio container ID
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // 3. Handle live typing
     const handleInput = (e) => {
-      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.getAttribute('contenteditable') === 'true') {
+      if (e.target.matches && e.target.matches('textarea, input, [contenteditable="true"]')) {
         applyBidi(e.target);
       }
     };
     
     document.addEventListener('input', handleInput);
-
+    
     return () => {
-      clearInterval(interval);
+      observer.disconnect();
       document.removeEventListener('input', handleInput);
     };
   }, [ProjectDetails]);
