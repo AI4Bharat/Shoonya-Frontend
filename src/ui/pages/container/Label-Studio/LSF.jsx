@@ -52,7 +52,8 @@ import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
-import { formatAnnotations, formatPredictions, formatTaskData, cleanResultTexts, insertLrm } from "./ocrBidiHelper";
+import { formatAnnotations, formatPredictions, cleanResultTexts } from "./ocrBidiHelper";
+
 
 const filterAnnotations = (
   annotations,
@@ -205,6 +206,40 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  // Fix for OCR bidi mixed text
+  useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return;
+    const RTL_REGEX = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    
+    const applyBidi = (el) => {
+      if (el.getAttribute('dir') !== 'auto') el.setAttribute('dir', 'auto');
+      const textContent = el.value || el.innerText || '';
+      if (RTL_REGEX.test(textContent)) {
+        el.style.setProperty('text-align', 'right', 'important');
+      } else {
+        el.style.setProperty('text-align', 'start', 'important');
+      }
+    };
+
+    const interval = setInterval(() => {
+      const elements = document.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]');
+      elements.forEach(applyBidi);
+    }, 1000);
+
+    const handleInput = (e) => {
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.getAttribute('contenteditable') === 'true') {
+        applyBidi(e.target);
+      }
+    };
+    
+    document.addEventListener('input', handleInput);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('input', handleInput);
+    };
+  }, [ProjectDetails]);
 
   useEffect(() => {
     if(filterdataitemsList.results !== undefined){
@@ -841,6 +876,9 @@ const LabelStudioWrapper = ({
               annotations[i].result[0].id
           ) {
             temp = annotation.serializeAnnotation();
+            if (ProjectDetails?.project_type?.includes("OCR")) {
+              temp = cleanResultTexts(temp);
+            }
             if (annotations[i].annotation_type !== 1) continue;
             for (let i = 0; i < temp.length; i++) {
               if(temp[i].type === "relation"){
@@ -893,6 +931,9 @@ const LabelStudioWrapper = ({
               annotations[i].result[0].id
           ) {
             temp = annotation.serializeAnnotation();
+            if (ProjectDetails?.project_type?.includes("OCR")) {
+              temp = cleanResultTexts(temp);
+            }
             if (annotations[i].annotation_type !== 1) continue;
             for (let i = 0; i < temp.length; i++) {
               if (temp[i].parentID !== undefined){
@@ -1059,8 +1100,19 @@ const LabelStudioWrapper = ({
         const start = activeEl.selectionStart;
         const end = activeEl.selectionEnd;
         const text = activeEl.value;
+        const newValue = text.substring(0, start) + formula + text.substring(end);
 
-        activeEl.value = text.substring(0, start) + formula + text.substring(end);
+        // React-controlled input/textarea update workaround
+        const valueSetter = Object.getOwnPropertyDescriptor(
+          activeEl.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        if (valueSetter) {
+          valueSetter.call(activeEl, newValue);
+        } else {
+          activeEl.value = newValue;
+        }
         activeEl.selectionStart = activeEl.selectionEnd = start + formula.length;
 
         // Trigger input event
@@ -1168,11 +1220,16 @@ const LabelStudioWrapper = ({
       editor = target.closest('[contenteditable="true"]');
     } else if (target.closest('.ant-typography')) {
       editor = target.closest('.ant-typography');
+    } else if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT') {
+      editor = target;
     }
 
     if (editor) {
       setIsTextareaFocused(true);
       setFocusedEditor(editor);
+      if (editor.getAttribute('dir') !== 'auto') {
+        editor.setAttribute('dir', 'auto');
+      }
       console.log('✓ Editor focused - shortcuts should work');
     }
   };
@@ -1192,22 +1249,22 @@ const LabelStudioWrapper = ({
     }, 150);
   };
 
-  // Setup editor listeners
+  // Setup editor listeners — just set dir="auto" and attach focus/blur
   useEffect(() => {
     const setupListeners = () => {
-      const editors = document.querySelectorAll('.ant-typography, [contenteditable="true"]');
+      const elements = document.querySelectorAll('.ant-typography, [contenteditable="true"], textarea, input, .lsf-region-item__desc');
 
-      editors.forEach(editor => {
-        editor.removeEventListener('focus', handleEditorFocus);
-        editor.removeEventListener('blur', handleEditorBlur);
-        editor.removeEventListener('click', handleEditorFocus);
-
-        editor.addEventListener('focus', handleEditorFocus, true);
-        editor.addEventListener('blur', handleEditorBlur, true);
-        editor.addEventListener('click', handleEditorFocus, true);
+      elements.forEach(el => {
+        if (!el.dataset.listenerAttached) {
+          el.addEventListener('focus', handleEditorFocus, true);
+          el.addEventListener('blur', handleEditorBlur, true);
+          el.addEventListener('click', handleEditorFocus, true);
+          el.dataset.listenerAttached = 'true';
+        }
+        if (el.getAttribute('dir') !== 'auto') {
+          el.setAttribute('dir', 'auto');
+        }
       });
-
-      console.log('Setup focus listeners on', editors.length, 'editors');
     };
 
     setupListeners();
@@ -1603,7 +1660,7 @@ const LabelStudioWrapper = ({
                     return JSON.parse(predictions)?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
+                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   } catch (error) {
@@ -1611,7 +1668,7 @@ const LabelStudioWrapper = ({
                     return predictions?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
+                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   }

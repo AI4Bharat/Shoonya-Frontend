@@ -38,9 +38,8 @@ import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
+import { formatAnnotations, formatPredictions, cleanResultTexts } from "./ocrBidiHelper";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
-import { formatAnnotations, formatPredictions, formatTaskData, cleanResultTexts, insertLrm } from "./ocrBidiHelper";
-//used just in postAnnotation to support draft status update.
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
@@ -76,6 +75,41 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  // Fix for OCR bidi mixed text
+  useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return;
+    const RTL_REGEX = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    
+    const applyBidi = (el) => {
+      if (el.getAttribute('dir') !== 'auto') el.setAttribute('dir', 'auto');
+      const textContent = el.value || el.innerText || '';
+      if (RTL_REGEX.test(textContent)) {
+        el.style.setProperty('text-align', 'right', 'important');
+      } else {
+        el.style.setProperty('text-align', 'start', 'important');
+      }
+    };
+
+    const interval = setInterval(() => {
+      const elements = document.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]');
+      elements.forEach(applyBidi);
+    }, 1000);
+
+    const handleInput = (e) => {
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.getAttribute('contenteditable') === 'true') {
+        applyBidi(e.target);
+      }
+    };
+    
+    document.addEventListener('input', handleInput);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('input', handleInput);
+    };
+  }, [ProjectDetails]);
+
 
 
 useEffect(() => {
@@ -671,7 +705,7 @@ useEffect(() => {
                     return JSON.parse(predictions)?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
+                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   } catch (error) {
@@ -679,7 +713,7 @@ useEffect(() => {
                     return predictions?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={ProjectDetails?.project_type?.includes("OCR") ? insertLrm(pred.text) : pred.text}/>
+                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   }

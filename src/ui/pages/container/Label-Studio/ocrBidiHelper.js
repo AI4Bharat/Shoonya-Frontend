@@ -9,21 +9,36 @@ const LRI = '\u2066';
 // Pop Directional Isolate (PDI)
 const PDI = '\u2069';
 
-// Regex to find sequences of English letters, numbers, spaces, and common math/unit symbols.
-// It ensures the match starts with an optional sign (+/-) and alphanumeric character, and ends with alphanumeric, superscript, or sign.
-const ISOLATE_REGEX = /([\-\+]?[a-zA-Z0-9][a-zA-Z0-9\s\.\-\+\/\*\u2070-\u209F\u00B2\u00B3\u00B9\^]*[a-zA-Z0-9\u2070-\u209F\u00B2\u00B3\u00B9\-\+]|[\-\+]?[a-zA-Z0-9])/g;
+// Regex to find sequences of English letters, numbers, spaces, common math/unit symbols,
+// and enclosing parentheses, brackets, curly braces, or quotes.
+// Parentheses and brackets are included in the middle class to preserve option grouping (like (a) Waldo) within a single LTR run.
+const ISOLATE_REGEX = /([\(\[\{\'\"]*[\-\+]?[a-zA-Z0-9][a-zA-Z0-9\s\.\-\+\/\*\(\)\[\]\{\}\u2070-\u209F\u00B2\u00B3\u00B9\^=%,;:_'"?!~<>@#$&|]*[a-zA-Z0-9\u2070-\u209F\u00B2\u00B3\u00B9\-\+\)\]\}\'\"]|[\(\[\{\'\"]*[\-\+]?[a-zA-Z0-9][\)\]\}\'\"]*)/g;
+
+// Right-to-Left Mark (RLM)
+const RLM = '\u200F';
+// Regex to check if text contains Arabic/Urdu characters
+const RTL_REGEX = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
 
 /**
  * Wraps LTR sequences (like "20 N" or "2ms-2") in LRI and PDI characters.
- * This completely isolates the block from the surrounding RTL paragraph,
- * ensuring neutral characters (like spaces or hyphens) inside the block
- * are rendered purely left-to-right.
+ * Also prepends RLM to lines containing RTL text to force overall RTL paragraph direction.
  */
 export const insertLrm = (text) => {
   if (typeof text !== 'string') return text;
-  // First remove any existing isolation marks to avoid double-wrapping
-  const cleaned = text.replace(/[\u2066\u2069\u200E]/g, '');
-  return cleaned.replace(ISOLATE_REGEX, `${LRI}$1${PDI}`);
+  // First remove any existing isolation/direction marks to avoid double-wrapping
+  const cleaned = text.replace(/[\u2066\u2069\u200E\u200F]/g, '');
+  
+  // Process line by line to ensure correct bidi resolution per line
+  const lines = cleaned.split('\n');
+  const processedLines = lines.map(line => {
+    let isolated = line.replace(ISOLATE_REGEX, `${LRI}$1${PDI}`);
+    if (RTL_REGEX.test(line)) {
+      isolated = RLM + isolated;
+    }
+    return isolated;
+  });
+  
+  return processedLines.join('\n');
 };
 
 /**
@@ -31,7 +46,7 @@ export const insertLrm = (text) => {
  */
 export const stripLrm = (text) => {
   if (typeof text !== 'string') return text;
-  return text.replace(/[\u2066\u2069\u200E]/g, '');
+  return text.replace(/[\u2066\u2069\u200E\u200F]/g, '');
 };
 
 export const formatResultTexts = (result) => {
