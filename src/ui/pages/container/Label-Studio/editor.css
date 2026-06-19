@@ -83,13 +83,13 @@
   }
 
 
-.label-studio-root textarea,
-.label-studio-root input,
-.label-studio-root [contenteditable="true"],
-.label-studio-root .lsf-region-item__desc,
-.label-studio-root div,
-.label-studio-root span,
-.label-studio-root p {
+.ocr-project textarea,
+.ocr-project input,
+.ocr-project [contenteditable="true"],
+.ocr-project .lsf-region-item__desc,
+.ocr-project div,
+.ocr-project span,
+.ocr-project p {
   unicode-bidi: plaintext !important;
   text-align: start !important;
 }
