@@ -81,4 +81,15 @@
   .quill .ql-color:focus:after {
      content: 'Color';
   }
-  
+
+
+.ocr-project textarea,
+.ocr-project input,
+.ocr-project [contenteditable="true"],
+.ocr-project .lsf-region-item__desc,
+.ocr-project div,
+.ocr-project span,
+.ocr-project p {
+  unicode-bidi: plaintext !important;
+  text-align: start !important;
+}
