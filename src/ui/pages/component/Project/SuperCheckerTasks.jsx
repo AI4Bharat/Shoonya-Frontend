@@ -713,7 +713,7 @@ const renderSnackBar = () => {
                 selectedFilters.supercheck_status === "skipped" 
               ) && (
                 <Grid item xs={12} sm={12} md={3}>
-                  <Tooltip title={deallocateDisabled }>
+                  <Tooltip title={ProjectDetails?.project_type?.includes("OCR") ? "Deallocation is disabled for OCR projects" : deallocateDisabled}>
                     <Box>
                       <CustomButton
                         sx={{
@@ -724,7 +724,7 @@ const renderSnackBar = () => {
                         }}
                         label={"De-allocate Tasks"}
                         onClick={() => setDeallocateDialog(true)}
-                        disabled={deallocateDisabled }
+                        disabled={deallocateDisabled || ProjectDetails?.project_type?.includes("OCR")}
                         color={"warning"}
                       />
                     </Box>
