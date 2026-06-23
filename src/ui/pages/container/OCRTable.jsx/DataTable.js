@@ -95,92 +95,96 @@ const [selectedHeaders, setSelectedHeaders] = useState([]);
     }
   }, [editingCell]);
 
-  useEffect(() => {
+ useEffect(() => {
     if (activeRowIndex !== null && activeColumnId && topTextareaRef.current) {
       topTextareaRef.current.focus();
     }
   }, [activeRowIndex, activeColumnId]);
 
+useEffect(() => {
+    if (activeRowIndex !== null && activeColumnId) {
+      const value = data[activeRowIndex]?.[activeColumnId] || '';
+      setEditValue(value);
+    }
+  }, [activeRowIndex, activeColumnId]);
+
   const handleHeaderClick = (colIndex) => {
-  setActiveHeaderIndex(colIndex);
-  setActiveRowIndex(null);
-  setActiveColumnId(null);
-};
+    setActiveHeaderIndex(colIndex);
+    setActiveRowIndex(null);
+    setActiveColumnId(null);
+  };
 
-
-const handleHeaderSelect = (colIndex, e) => {
-  e.preventDefault();
-  setEditingCell(null);
-  
-  if (e.shiftKey && headerAnchorRef.current !== null) {
-    const start = Math.min(headerAnchorRef.current, colIndex);
-    const end = Math.max(headerAnchorRef.current, colIndex);
-    const range = [];
-    for (let i = start; i <= end; i++) range.push(i);
-    setSelectedHeaders(range);
-    if (typeof onHeaderSelectionChange === 'function') {
-      onHeaderSelectionChange({ startCol: start, endCol: end });
-    }
-  } else {
-    headerAnchorRef.current = colIndex;
-    setSelectedHeaders([colIndex]);
-    if (typeof onHeaderSelectionChange === 'function') {
-      onHeaderSelectionChange({ startCol: colIndex, endCol: colIndex });
-    }
-  }
-};
-
-const handleMergeHeaders = () => {
-  if (selectedHeaders.length < 2) return;
-  const sorted = [...selectedHeaders].sort((a, b) => a - b);
-  const startCol = sorted[0];
-  const endCol = sorted[sorted.length - 1];
-  const newMergedHeaders = { ...mergedHeaders };
-
-  sorted.forEach((colIndex, i) => {
-    if (i === 0) {
-      newMergedHeaders[colIndex] = {
-        isFirst: true,
-        colSpan: sorted.length,
-        startCol,
-        endCol,
-      };
-    } else {
-      newMergedHeaders[colIndex] = { hidden: true };
-    }
-  });
-
-  onMergedHeadersChange(newMergedHeaders);
-setSelectedHeaders([]);
-};
-
-const handleUnmergeHeaders = () => {
-  if (selectedHeaders.length === 0) return;
-  const newMergedHeaders = { ...mergedHeaders };
-
-  selectedHeaders.forEach(colIndex => {
-    const cell = newMergedHeaders[colIndex];
-    if (cell?.isFirst) {
-      for (let i = cell.startCol; i <= cell.endCol; i++) {
-        delete newMergedHeaders[i];
+  const handleHeaderSelect = (colIndex, e) => {
+    e.preventDefault();
+    setEditingCell(null);
+    
+    if (e.shiftKey && headerAnchorRef.current !== null) {
+      const start = Math.min(headerAnchorRef.current, colIndex);
+      const end = Math.max(headerAnchorRef.current, colIndex);
+      const range = [];
+      for (let i = start; i <= end; i++) range.push(i);
+      setSelectedHeaders(range);
+      if (typeof onHeaderSelectionChange === 'function') {
+        onHeaderSelectionChange({ startCol: start, endCol: end });
       }
-    } else if (cell?.hidden) {
-      // find the parent and unmerge all
-      Object.keys(newMergedHeaders).forEach(key => {
-        const c = newMergedHeaders[key];
-        if (c?.isFirst && c.startCol <= colIndex && c.endCol >= colIndex) {
-          for (let i = c.startCol; i <= c.endCol; i++) {
-            delete newMergedHeaders[i];
-          }
-        }
-      });
+    } else {
+      headerAnchorRef.current = colIndex;
+      setSelectedHeaders([colIndex]);
+      if (typeof onHeaderSelectionChange === 'function') {
+        onHeaderSelectionChange({ startCol: colIndex, endCol: colIndex });
+      }
     }
-  });
+  };
 
- onMergedHeadersChange(newMergedHeaders);
-setSelectedHeaders([]);
-};
+  const handleMergeHeaders = () => {
+    if (selectedHeaders.length < 2) return;
+    const sorted = [...selectedHeaders].sort((a, b) => a - b);
+    const startCol = sorted[0];
+    const endCol = sorted[sorted.length - 1];
+    const newMergedHeaders = { ...mergedHeaders };
 
+    sorted.forEach((colIndex, i) => {
+      if (i === 0) {
+        newMergedHeaders[colIndex] = {
+          isFirst: true,
+          colSpan: sorted.length,
+          startCol,
+          endCol,
+        };
+      } else {
+        newMergedHeaders[colIndex] = { hidden: true };
+      }
+    });
+
+    onMergedHeadersChange(newMergedHeaders);
+    setSelectedHeaders([]);
+  };
+
+  const handleUnmergeHeaders = () => {
+    if (selectedHeaders.length === 0) return;
+    const newMergedHeaders = { ...mergedHeaders };
+
+    selectedHeaders.forEach(colIndex => {
+      const cell = newMergedHeaders[colIndex];
+      if (cell?.isFirst) {
+        for (let i = cell.startCol; i <= cell.endCol; i++) {
+          delete newMergedHeaders[i];
+        }
+      } else if (cell?.hidden) {
+        Object.keys(newMergedHeaders).forEach(key => {
+          const c = newMergedHeaders[key];
+          if (c?.isFirst && c.startCol <= colIndex && c.endCol >= colIndex) {
+            for (let i = c.startCol; i <= c.endCol; i++) {
+              delete newMergedHeaders[i];
+            }
+          }
+        });
+      }
+    });
+
+    onMergedHeadersChange(newMergedHeaders);
+    setSelectedHeaders([]);
+  };
   // Column drag handlers
   const handleColumnDragStart = (e, colIndex) => {
     e.dataTransfer.effectAllowed = 'move';
@@ -342,17 +346,26 @@ setSelectedHeaders([]);
   };
 
   const handleTopTextareaBlur = () => {
-    if (activeRowIndex !== null && activeColumnId) {
+  if (activeRowIndex !== null && activeColumnId) {
+    const originalValue = data[activeRowIndex]?.[activeColumnId] || '';
+
+    if (editValue !== originalValue) { // ✅ KEY FIX
       onCellEdit(activeRowIndex, activeColumnId, editValue);
     }
-  };
+  }
+};
 
   const handleCellBlur = () => {
-    if (editingCell) {
+  if (editingCell) {
+    const originalValue = data[editingCell.rowIndex]?.[editingCell.columnId] || '';
+
+    if (editValue !== originalValue) { // ✅ KEY FIX
       onCellEdit(editingCell.rowIndex, editingCell.columnId, editValue);
-      setEditingCell(null);
     }
-  };
+
+    setEditingCell(null);
+  }
+};
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
