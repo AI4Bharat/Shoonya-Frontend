@@ -38,7 +38,7 @@ import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
-import { formatAnnotations, formatPredictions, cleanResultTexts } from "./ocrBidiHelper";
+import { formatAnnotations, formatPredictions, cleanResultTexts, handleBidiInput } from "./ocrBidiHelper";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
@@ -79,16 +79,8 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   // Fix for OCR bidi mixed text
   useEffect(() => {
     if (!ProjectDetails?.project_type?.includes("OCR")) return;
-    const RTL_REGEX = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-    
     const applyBidi = (el) => {
       if (el.getAttribute('dir') !== 'auto') el.setAttribute('dir', 'auto');
-      const textContent = el.value || el.innerText || '';
-      if (RTL_REGEX.test(textContent)) {
-        el.style.setProperty('text-align', 'right', 'important');
-      } else {
-        el.style.setProperty('text-align', 'start', 'important');
-      }
     };
 
     // 1. Initial application for elements already in the DOM
@@ -115,17 +107,11 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
     observer.observe(document.body, { childList: true, subtree: true });
 
     // 3. Handle live typing
-    const handleInput = (e) => {
-      if (e.target.matches && e.target.matches('textarea, input, [contenteditable="true"]')) {
-        applyBidi(e.target);
-      }
-    };
-    
-    document.addEventListener('input', handleInput);
+    document.addEventListener('input', handleBidiInput);
     
     return () => {
       observer.disconnect();
-      document.removeEventListener('input', handleInput);
+      document.removeEventListener('input', handleBidiInput);
     };
   }, [ProjectDetails]);
 
