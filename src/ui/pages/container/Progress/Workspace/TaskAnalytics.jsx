@@ -95,6 +95,7 @@ const TaskAnalytics = () => {
   ]
   const ocrProjectTypes=[
     'OCRTranscriptionEditing',
+    "OCRTESTTranscriptionEditing",
     'OCRTableEditing',
     'OCRSegmentCategorizationEditing'
   ]
