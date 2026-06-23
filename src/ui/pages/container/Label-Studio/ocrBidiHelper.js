@@ -11,7 +11,6 @@ const PDI = '\u2069';
 
 // Regex to find sequences of English letters, numbers, spaces, common math/unit symbols,
 // and enclosing parentheses, brackets, curly braces, or quotes.
-// Parentheses and brackets are included in the middle class to preserve option grouping (like (a) Waldo) within a single LTR run.
 const ISOLATE_REGEX = /([\(\[\{\'\"]*[\-\+]?[a-zA-Z0-9][a-zA-Z0-9\s\.\-\+\/\*\(\)\[\]\{\}\u2070-\u209F\u00B2\u00B3\u00B9\^=%,;:_'"?!~<>@#$&|]*[a-zA-Z0-9\u2070-\u209F\u00B2\u00B3\u00B9\-\+\)\]\}\'\"]|[\(\[\{\'\"]*[\-\+]?[a-zA-Z0-9][\)\]\}\'\"]*)/g;
 
 // Right-to-Left Mark (RLM)
@@ -115,4 +114,50 @@ export const formatTaskData = (data) => {
     }
   }
   return copy;
+};
+
+export const handleBidiInput = (e) => {
+  if (e.target.matches && e.target.matches('textarea, input, [contenteditable="true"]')) {
+    const el = e.target;
+    const val = el.value || el.innerText || '';
+    const formatted = insertLrm(val);
+    
+    if (val !== formatted) {
+      const oldStart = el.selectionStart;
+      
+      let cleanCharsBeforeCursor = 0;
+      for (let i = 0; i < oldStart; i++) {
+        if (!['\u2066', '\u2069', '\u200E', '\u200F'].includes(val[i])) {
+          cleanCharsBeforeCursor++;
+        }
+      }
+      
+      const valueSetter = Object.getOwnPropertyDescriptor(
+        el.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype,
+        'value'
+      )?.set;
+
+      if (valueSetter) {
+        valueSetter.call(el, formatted);
+      } else {
+        el.value = formatted;
+      }
+      
+      let newStart = 0;
+      let cleanCount = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (cleanCount === cleanCharsBeforeCursor) {
+          newStart = i;
+          break;
+        }
+        if (!['\u2066', '\u2069', '\u200E', '\u200F'].includes(formatted[i])) {
+          cleanCount++;
+        }
+      }
+      if (cleanCount === cleanCharsBeforeCursor && newStart === 0) newStart = formatted.length;
+      
+      el.selectionStart = el.selectionEnd = newStart;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
 };
