@@ -83,6 +83,7 @@ const TaskAnalytics = (props) => {
   ]
   const ocrProjectTypes=[
     'OCRTranscriptionEditing',
+    "OCRTESTTranscriptionEditing",
     'OCRTableEditing',
     'OCRSegmentCategorizationEditing' 
   ]
@@ -322,7 +323,7 @@ const TaskAnalytics = (props) => {
           if (analyticsData.length &&
             (['MonolingualTranslation', 'TranslationEditing', 'SemanticTextualSimilarity_Scale5', 'ContextualTranslationEditing', 'SentenceSplitting', 'ContextualSentenceVerification', 'ContextualSentenceVerificationAndDomainClassification'].includes(analyticsData[0].projectType) ||
               ['ConversationTranslation', 'ConversationTranslationEditing', 'ConversationVerification'].includes(analyticsData[0].projectType) ||
-              ['OCRTranscriptionEditing','OCRSegmentCategorizationEditing'].includes(analyticsData[0].projectType))
+              ['OCRTranscriptionEditing','OCRTESTTranscriptionEditing','OCRSegmentCategorizationEditing'].includes(analyticsData[0].projectType))
           ) {
             return <Grid key={_index} style={{ marginTop: "15px" }}>
               <TaskCountAnalyticsChart analyticsData={analyticsData} 
