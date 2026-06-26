@@ -81,4 +81,20 @@
   .quill .ql-color:focus:after {
      content: 'Color';
   }
-  
+/* Mixed LTR/RTL bidi support for OCR projects.
+   unicode-bidi: plaintext resolves each line's direction independently.
+   For the green box, insertLrm (JS) injects RLM + LRI/PDI to control
+   direction per line. display: inline-block makes plaintext work on the
+   originally inline .lsf-region-item__desc element. */
+.ocr-project-style textarea,
+.ocr-project-style input,
+.ocr-project-style [contenteditable="true"] {
+  unicode-bidi: plaintext !important;
+}
+
+.ocr-project-style .lsf-region-item__desc,
+.ocr-project-style .lsf-region-item__text {
+  display: inline-block !important;
+  width: 100%;
+  unicode-bidi: plaintext !important;
+}

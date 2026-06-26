@@ -180,6 +180,10 @@ const TaskTable = (props) => {
   const tableRef = useRef(null);
   const [displayWidth, setDisplayWidth] = useState(0);
 
+  const isOCRType = ProjectDetails?.project_type === "OCRTranscriptionEditing";
+  const isAnnotatorOrReviewer = [1, 2].includes(userDetails?.role); 
+
+
   useEffect(() => {
     const handleResize = () => {
       setDisplayWidth(window.innerWidth);
@@ -276,7 +280,9 @@ const TaskTable = (props) => {
   const unassignTasks = async () => {
     setDeallocateDialog(false);
     if (
-      ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"
+      ProjectDetails?.project_type ===
+        "AcousticNormalisedTranscriptionEditing" ||
+      ProjectDetails?.project_type === "OCRTranscriptionEditing"
     ) {
       setSnackbarInfo({
         open: true,
@@ -1132,7 +1138,10 @@ const TaskTable = (props) => {
                         }}
                         label={"De-allocate Tasks"}
                         onClick={() => setDeallocateDialog(true)}
-                        disabled={deallocateDisabled}
+                        disabled={
+                          deallocateDisabled ||
+                          (isOCRType && isAnnotatorOrReviewer)
+                        }
                         color={"warning"}
                       />
                     </Box>

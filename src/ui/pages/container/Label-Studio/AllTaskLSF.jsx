@@ -38,8 +38,8 @@ import "./lsf.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
+import { formatAnnotations, formatPredictions, cleanResultTexts, handleBidiInput } from "./ocrBidiHelper";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
-//used just in postAnnotation to support draft status update.
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
   // we need a reference to a DOM node here so LSF knows where to render
@@ -75,6 +75,46 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  // Fix for OCR bidi mixed text
+  useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return;
+    const applyBidi = (el) => {
+      if (el.getAttribute('dir') !== 'auto') el.setAttribute('dir', 'auto');
+    };
+
+    // 1. Initial application for elements already in the DOM
+    document.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]').forEach(applyBidi);
+
+    // 2. Set up the MutationObserver to watch for newly added LSF nodes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) { // Ensure it's an Element node
+            // Check if the new node itself needs bidi
+            if (node.matches && node.matches('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]')) {
+              applyBidi(node);
+            }
+            // Check if it contains children that need bidi
+            const elements = node.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]');
+            elements.forEach(applyBidi);
+          }
+        });
+      });
+    });
+
+    // Observe the body or a specific Label Studio container ID
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // 3. Handle live typing
+    document.addEventListener('input', handleBidiInput);
+    
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('input', handleBidiInput);
+    };
+  }, [ProjectDetails]);
+
 
 
 useEffect(() => {
@@ -237,8 +277,8 @@ useEffect(() => {
         },
 
         task: {
-          annotations: annotations,
-          predictions: predictions,
+          annotations: ProjectDetails?.project_type?.includes("OCR") ? formatAnnotations(annotations) : annotations,
+          predictions: ProjectDetails?.project_type?.includes("OCR") ? formatPredictions(predictions) : predictions,
           id: taskData.id,
           data: taskData.data,
         },
@@ -256,6 +296,9 @@ useEffect(() => {
         },
         onSubmitAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
+          if (ProjectDetails?.project_type?.includes("OCR")) {
+            temp = cleanResultTexts(temp);
+          }
           let ids = new Set();
           let countLables = 0;         
           temp.map((curr) => {
@@ -277,7 +320,7 @@ useEffect(() => {
             showLoader();
             if (taskData.annotation_status !== "freezed") {
               postAnnotation(
-                annotation.serializeAnnotation(),
+                temp,
                 taskData.id,
                 userData.id,
                 load_time,
@@ -328,6 +371,9 @@ useEffect(() => {
 
         onUpdateAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
+          if (ProjectDetails?.project_type?.includes("OCR")) {
+            temp = cleanResultTexts(temp);
+          }
           let ids = new Set();
           let countLables = 0;   
           temp.map((curr) => {
@@ -591,7 +637,7 @@ useEffect(() => {
       <Box
         sx={{border : "1px solid rgb(224 224 224)"}}
       >
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div className={`label-studio-root ${ProjectDetails?.project_type?.includes("OCR") ? "ocr-project-style" : ""}`} ref={rootRef}></div>
       </Box>
       {parentMetadata !== undefined &&
         <>
@@ -664,7 +710,7 @@ useEffect(() => {
                     return JSON.parse(predictions)?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   } catch (error) {
@@ -672,7 +718,7 @@ useEffect(() => {
                     return predictions?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   }
