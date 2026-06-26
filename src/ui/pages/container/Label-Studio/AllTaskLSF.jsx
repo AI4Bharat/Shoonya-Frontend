@@ -91,7 +91,7 @@ useEffect(() => {
 useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
-    if(labelConfig?.project_type?.includes("OCRTranscriptionEditing") || abelConfig?.project_type?.includes("OCRTESTTranscriptionEditing") ){
+    if(labelConfig?.project_type?.includes("OCRTranscriptionEditing")){
       const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
       dispatch(APITransport(inputData));
     }

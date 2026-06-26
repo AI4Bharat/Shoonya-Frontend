@@ -95,7 +95,6 @@ export default function MetaAnalytics(props) {
 
       const ocrProjectTypes=[
         'OCRTranscriptionEditing',
-        "OCRTESTTranscriptionEditing",
         'OCRTableEditing',
         'OCRSegmentCategorizationEditing '
       ]
