@@ -266,8 +266,13 @@ function App() {
   
   const [tableData, setTableData] = useState([]);
   const [columns, setColumns] = useState([]);
+  const [newTableRows, setNewTableRows] = useState(5);
+  const [newTableCols, setNewTableCols] = useState(5);
   const [originalHtmlTable, setOriginalHtmlTable] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [zoom, setZoom] = useState(1);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
 
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [transcriptionMode, setTranscriptionMode] = useState(false);
@@ -564,6 +569,47 @@ const handleBulkDelete = useCallback(() => {
     }, 3000);
   
 }, [saveToUndo, tableData, columns, mergedCells]);
+
+const handleCreateNewTable = useCallback(() => {
+  saveToUndo(tableData, columns, mergedCells);
+  
+  const initialColumns = [];
+  for (let i = 1; i <= newTableCols; i++) {
+    initialColumns.push({
+      accessor: `col${i}`,
+      Header: `Column ${i}`,
+      type: 'text',
+      width: 150,
+      editable: true,
+    });
+  }
+  
+  const initialRows = [];
+  for (let j = 1; j <= newTableRows; j++) {
+    const row = { id: j };
+    initialColumns.forEach(col => {
+      row[col.accessor] = '';
+    });
+    initialRows.push(row);
+  }
+  
+  setColumns(initialColumns);
+  setTableData(initialRows);
+  setMergedCells({});
+  setMergedHeaders({});
+  setSelectedRange(null);
+  setHeaderSelectionRange(null);
+  setSelectedCell(null);
+  
+  setSnackbarInfo({
+    open: true,
+    message: `Created a new table with ${newTableRows} rows and ${newTableCols} columns`,
+    variant: "success",
+  });
+  setTimeout(() => {
+    setSnackbarInfo({ open: false, message: "", variant: "success" });
+  }, 3000);
+}, [saveToUndo, tableData, columns, mergedCells, newTableRows, newTableCols]);
 const handleUnmergeCells = useCallback(() => {
   // Handle header unmerge
   if (headerSelectionRange !== null) {
@@ -1524,7 +1570,7 @@ const handleCellEdit = useCallback((rowIndex, columnId, value) => {
       variant: "success",
     });
     setTimeout(() => {
-      setSnackbarInfo({ open: false, message: "", variant: "success" });
+      setSnackbarInfo(prev => ({ ...prev, open: false }));
     }, 3000);
   }, [tableData, columns]);
 
@@ -1535,32 +1581,56 @@ const handleCellEdit = useCallback((rowIndex, columnId, value) => {
     
     input.onchange = (e) => {
       const file = e.target.files[0];
+      if (!file) return;
+
+      const fileName = file.name.toLowerCase();
+      if (!fileName.endsWith('.html') && !fileName.endsWith('.htm')) {
+        setSnackbarInfo({
+          open: true,
+          message: "Unsupported file type. Please upload a .html or .htm file",
+          variant: "error",
+        });
+        setTimeout(() => {
+          setSnackbarInfo({ open: false, message: "", variant: "success" });
+        }, 3000);
+        return;
+      }
+
       const reader = new FileReader();
       
       reader.onload = (event) => {
         const htmlContent = event.target.result;
-        const { rows, columns: newColumns } = parseHtmlTableToData(htmlContent);
-        
-        if (rows.length > 0) {
-          saveToUndo(tableData, columns, mergedCells);
-          setTableData(rows);
-          setColumns(newColumns);
+        try {
+          const { rows, columns: newColumns } = parseHtmlTableToData(htmlContent);
           
+          if (rows.length > 0 && newColumns.length > 0) {
+            saveToUndo(tableData, columns, mergedCells);
+            setTableData(rows);
+            setColumns(newColumns);
+            
+            setSnackbarInfo({
+              open: true,
+              message: "Table imported successfully",
+              variant: "success",
+            });
+          } else {
+            setSnackbarInfo({
+              open: true,
+              message: "Invalid file: No HTML table structure (<table> element) found in the file",
+              variant: "error",
+            });
+          }
+        } catch (err) {
+          console.error("Error parsing imported HTML table:", err);
           setSnackbarInfo({
             open: true,
-            message: "Table imported successfully",
-            variant: "success",
-          });
-        } else {
-          setSnackbarInfo({
-            open: true,
-            message: "No valid table found in file",
+            message: "Failed to parse file: The HTML structure is malformed or invalid",
             variant: "error",
           });
         }
         
         setTimeout(() => {
-          setSnackbarInfo({ open: false, message: "", variant: "success" });
+          setSnackbarInfo(prev => ({ ...prev, open: false }));
         }, 3000);
       };
       
@@ -1569,6 +1639,49 @@ const handleCellEdit = useCallback((rowIndex, columnId, value) => {
     
     input.click();
   }, [saveToUndo, tableData, columns, mergedCells]);
+
+  const handleZoomIn = useCallback(() => {
+    setZoom(prev => Math.min(prev + 0.25, 4));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setZoom(prev => Math.max(prev - 0.25, 0.5));
+  }, []);
+
+  const handleZoomReset = useCallback(() => {
+    setZoom(1);
+  }, []);
+
+  const handleImageMouseDown = useCallback((e) => {
+    if (zoom <= 1) return; // Only allow panning when zoomed in
+    e.preventDefault();
+    setIsPanning(true);
+    
+    const container = document.querySelector('.image-container');
+    if (container) {
+      setPanStart({
+        x: e.clientX,
+        y: e.clientY,
+        scrollLeft: container.scrollLeft,
+        scrollTop: container.scrollTop
+      });
+    }
+  }, [zoom]);
+
+  const handleImageMouseMove = useCallback((e) => {
+    if (!isPanning) return;
+    const container = document.querySelector('.image-container');
+    if (container) {
+      const dx = e.clientX - panStart.x;
+      const dy = e.clientY - panStart.y;
+      container.scrollLeft = panStart.scrollLeft - dx;
+      container.scrollTop = panStart.scrollTop - dy;
+    }
+  }, [isPanning, panStart]);
+
+  const handleImageMouseUp = useCallback(() => {
+    setIsPanning(false);
+  }, []);
 
   const handleLanguageChange = useCallback((langCode) => {
     setSelectedLanguage(langCode);
@@ -1746,11 +1859,11 @@ const handleTranscribe = useCallback((text) => {
   }
 
   return (
-    <div className="app">
+    <div className="app" dir="ltr">
       {renderSnackBar()}
       {loading && <div className="loading-overlay"><CircularIndeterminate /></div>}
 
-      <div className="main-container">
+      <div className="main-container" dir="ltr">
         {/* Left Panel with Navigation and Image */}
         <div className="left-panel" style={{ width: `${leftWidth}%` }}>
           <div className="image-navigation">
@@ -1832,19 +1945,27 @@ const handleTranscribe = useCallback((text) => {
           </div>
 
           <div className="image-container">
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt="Table Reference"
-                className="reference-image"
-              />
-            ) : (
-              <img 
-                src="/api/placeholder/400/600" 
-                alt="Table Reference" 
-                className="reference-image"
-              />
-            )}
+            <img
+              src={imageUrl || "/api/placeholder/400/600"}
+              alt="Table Reference"
+              className="reference-image"
+              onMouseDown={handleImageMouseDown}
+              onMouseMove={handleImageMouseMove}
+              onMouseUp={handleImageMouseUp}
+              onMouseLeave={handleImageMouseUp}
+              style={{
+                width: zoom === 1 ? '100%' : `${100 * zoom}%`,
+                maxWidth: 'none',
+                height: 'auto',
+                cursor: zoom > 1 ? (isPanning ? 'grabbing' : 'grab') : 'default',
+                transition: isPanning ? 'none' : 'width 0.2s ease-out',
+              }}
+            />
+            <div className="image-zoom-controls">
+              <button onClick={handleZoomIn} title="Zoom In">+</button>
+              <button onClick={handleZoomOut} title="Zoom Out">−</button>
+              <button onClick={handleZoomReset} title="Reset Zoom">Reset</button>
+            </div>
           </div>
         </div>
 
@@ -1919,32 +2040,67 @@ const handleTranscribe = useCallback((text) => {
           />
           
           <div className="table-container">
-            <DataTable
-              data={tableData}
-              columns={columns}
-              onCellEdit={handleCellEdit}
-              onDeleteRow={handleDeleteRow}
-              onDeleteColumn={handleDeleteColumn}
-              onCellSelect={handleCellSelect}
-              onReorderColumns={handleReorderColumns}
-              onReorderRows={handleReorderRows}
-              language={selectedLanguage}
-              transcriptionMode={transcriptionMode}
-              onTranscribe={handleTranscribe}
-              fontSize={fontSize}
-              enableRTL={enableRTL}
-              showGrid={showGrid}
-              alternateRowColor={alternateRowColor}
-              enableTransliteration={enableTransliteration}
-              ProjectDetails={ProjectDetails}
-             mergedCells={mergedCells}
-onMergedCellsChange={setMergedCells}
-mergedHeaders={mergedHeaders}
-onMergedHeadersChange={setMergedHeaders}
-headerSelectionRange={headerSelectionRange}
-onHeaderSelectionChange={setHeaderSelectionRange}
-              
-            />
+            {columns.length === 0 ? (
+              <div className="create-table-placeholder">
+                <h3>No table data found</h3>
+                <p>Add a new table to start annotating.</p>
+                <div className="create-table-inputs">
+                  <div className="input-group">
+                    <label>Rows</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max="100" 
+                      value={newTableRows} 
+                      onChange={(e) => setNewTableRows(Math.max(1, parseInt(e.target.value) || 1))} 
+                    />
+                  </div>
+                  <div className="input-group">
+                    <label>Columns</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max="20" 
+                      value={newTableCols} 
+                      onChange={(e) => setNewTableCols(Math.max(1, parseInt(e.target.value) || 1))} 
+                    />
+                  </div>
+                </div>
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  onClick={handleCreateNewTable}
+                >
+                  Create Table
+                </Button>
+              </div>
+            ) : (
+              <DataTable
+                data={tableData}
+                columns={columns}
+                onCellEdit={handleCellEdit}
+                onDeleteRow={handleDeleteRow}
+                onDeleteColumn={handleDeleteColumn}
+                onCellSelect={handleCellSelect}
+                onReorderColumns={handleReorderColumns}
+                onReorderRows={handleReorderRows}
+                language={selectedLanguage}
+                transcriptionMode={transcriptionMode}
+                onTranscribe={handleTranscribe}
+                fontSize={fontSize}
+                enableRTL={enableRTL}
+                showGrid={showGrid}
+                alternateRowColor={alternateRowColor}
+                enableTransliteration={enableTransliteration}
+                ProjectDetails={ProjectDetails}
+                mergedCells={mergedCells}
+                onMergedCellsChange={setMergedCells}
+                mergedHeaders={mergedHeaders}
+                onMergedHeadersChange={setMergedHeaders}
+                headerSelectionRange={headerSelectionRange}
+                onHeaderSelectionChange={setHeaderSelectionRange}
+              />
+            )}
           </div>
           
           {transcriptionMode && (

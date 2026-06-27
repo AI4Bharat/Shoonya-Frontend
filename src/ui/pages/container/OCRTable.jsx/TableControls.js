@@ -24,7 +24,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import TranslateIcon from "@mui/icons-material/Translate";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import SaveIcon from "@mui/icons-material/Save";
-import ImportExportIcon from "@mui/icons-material/ImportExport";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import MergeIcon from "@mui/icons-material/Merge";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import "./TableControls.css";
@@ -438,6 +439,22 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
           disabled={redoStack?.length === 0}
         >
           <RedoIcon />
+        </IconButton>
+      </Tooltip>
+
+      <Divider orientation="vertical" className="controls-divider" />
+
+      {/* Import Button */}
+      <Tooltip title="Import HTML Table" placement="bottom">
+        <IconButton className="control-btn" onClick={onImport}>
+          <CloudUploadIcon />
+        </IconButton>
+      </Tooltip>
+
+      {/* Export Button */}
+      <Tooltip title="Export HTML Table" placement="bottom">
+        <IconButton className="control-btn" onClick={onExport}>
+          <CloudDownloadIcon />
         </IconButton>
       </Tooltip>
 
