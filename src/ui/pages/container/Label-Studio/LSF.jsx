@@ -416,6 +416,14 @@ const LabelStudioWrapper = ({
             });
             ls.annotationStore.selectAnnotation(c.id);
           }
+          if (projectType.includes("OCRTranscriptionEditing")) {
+            setTimeout(() => {
+              const annotation = ls.annotationStore.selected;
+              if (annotation && annotation.regionStore && annotation.regionStore.regions && annotation.regionStore.regions.length > 0) {
+                annotation.selectArea(annotation.regionStore.regions[0]);
+              }
+            }, 500);
+          }
           load_time.current = new Date();
         },
 
