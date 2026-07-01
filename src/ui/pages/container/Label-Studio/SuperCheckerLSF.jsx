@@ -1374,7 +1374,7 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
-                                    {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") || ProjectDetails?.project_type?.includes("OCRTESTTranscriptionEditing") &&
+                                    {(ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") || ProjectDetails?.project_type?.includes("OCRTESTTranscriptionEditing")) &&
                 <>
                   {/* OCR Shortcut Button with Dropdown */}
                   <Tooltip title={

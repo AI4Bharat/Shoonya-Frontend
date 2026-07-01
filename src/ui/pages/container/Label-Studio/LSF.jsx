@@ -1409,7 +1409,7 @@ useEffect(() => {
               <div style={{ minWidth: "160px" }} />
             )} */}
 
-              {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing")||ProjectDetails?.project_type?.includes("OCRTESTTranscriptionEditing") &&
+              {(ProjectDetails?.project_type?.includes("OCRTranscriptionEditing")||ProjectDetails?.project_type?.includes("OCRTESTTranscriptionEditing")) &&
               
                 <>
                   {/* OCR Shortcut Button with Dropdown */}
