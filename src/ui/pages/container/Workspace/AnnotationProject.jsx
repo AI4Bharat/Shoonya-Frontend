@@ -8,7 +8,9 @@ import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
 import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
 import { ThemeProvider } from "@mui/material/styles";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import tableTheme from "../../../theme/tableTheme";
 import CancelIcon from "@mui/icons-material/Cancel";
 import React, { useEffect, useState, useRef } from "react";
@@ -87,9 +89,9 @@ const AnnotationProject = (props) => {
   const [sourceLanguage, setSourceLanguage] = useState("");
   const [targetLanguage, setTargetLanguage] = useState("");
   const [samplingMode, setSamplingMode] = useState(null);
-  const [random, setRandom] = useState("");
-  const [batchSize, setBatchSize] = useState();
-  const [batchNumber, setBatchNumber] = useState([]);
+  const [random, setRandom] = useState(10);
+  const [batchSize, setBatchSize] = useState(10);
+  const [batchNumber, setBatchNumber] = useState(1);
   const [samplingParameters, setSamplingParameters] = useState(null);
   const [selectedInstances, setSelectedInstances] = useState([]);
   const [confirmed, setConfirmed] = useState(false);
@@ -558,15 +560,15 @@ const AnnotationProject = (props) => {
   }, [selectedType]);
 
   useEffect(() => {
-    if (batchSize && batchNumber) {
+    if (samplingMode === "b" && batchSize && batchNumber) {
       setSamplingParameters({
         batch_size: batchSize,
         batch_number: new Function("return [" + [batchNumber] + "]")(),
       });
-    } else {
-      setSamplingParameters(null);
+    } else if (samplingMode !== "b") {
+      // don't override if another mode already set samplingParameters
     }
-  }, [batchSize, batchNumber]);
+  }, [batchSize, batchNumber, samplingMode]);
 
   const onSelectDomain = (value) => {
     setSelectedDomain(value);
@@ -607,6 +609,14 @@ const AnnotationProject = (props) => {
     setSamplingMode(value);
     if (value === "f") {
       setSamplingParameters({});
+    } else if (value === "r") {
+      setSamplingParameters(random ? { fraction: parseFloat(random / 100) } : null);
+    } else if (value === "b") {
+      setSamplingParameters(
+        batchSize && batchNumber
+          ? { batch_size: batchSize, batch_number: new Function("return [" + [batchNumber] + "]")() }
+          : null
+      );
     }
   };
 
@@ -759,7 +769,7 @@ const AnnotationProject = (props) => {
                 className={classes.projectsettingGrid}
               >
                 <Typography gutterBottom component="div" label="Required">
-                  Title:
+                  Title: <span style={{ color: 'red' }}>*</span> <Tooltip title="Enter a unique name for your project." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                 </Typography>
               </Grid>
               <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -780,7 +790,7 @@ const AnnotationProject = (props) => {
               xl={12}
             >
               <Typography gutterBottom component="div">
-                Description:
+                Description: <span style={{ color: 'red' }}>*</span> <Tooltip title="Provide a brief description of your project's goals and scope." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
               </Typography>
             </Grid>
             <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -802,7 +812,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a Category to Work in:
+                    Select a Category to Work in: <span style={{ color: 'red' }}>*</span> <Tooltip title="Choose the domain/category this project belongs to (e.g., Translation, Audio, Monolingual)." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -826,7 +836,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select a Project Type:
+                    Select a Project Type: <span style={{ color: 'red' }}>*</span> <Tooltip title="Select the type of annotation task for this project (e.g., TranslationEditing, AudioTranscription)." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -857,7 +867,7 @@ const AnnotationProject = (props) => {
                     xl={12}
                   >
                     <Typography gutterBottom component="div">
-                      Variable Parameters:
+                      Variable Parameters: <Tooltip title="Specify variable parameters specific to the selected project type." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -1098,7 +1108,7 @@ const AnnotationProject = (props) => {
                       xl={12}
                     >
                       <Typography gutterBottom component="div">
-                        Select sources to fetch data from:
+                        Select sources to fetch data from: <span style={{ color: 'red' }}>*</span> <Tooltip title="Select one or more dataset instances to pull data from for this project." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                       </Typography>
                     </Grid>
 
@@ -1248,7 +1258,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Select Sampling Type:
+                    Select Sampling Type: <span style={{ color: 'red' }}>*</span> <Tooltip title="Choose how data will be sampled. 'Random' picks a percentage, 'Batch' picks by batch number, 'Full' takes all data." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -1273,7 +1283,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Filter String:
+                    Filter String: <Tooltip title="Optional filter to narrow down dataset rows fetched for this project. Leave empty to fetch all rows." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
 
@@ -1299,7 +1309,7 @@ const AnnotationProject = (props) => {
                   className={classes.projectsettingGrid}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Sampling Percentage:
+                    Sampling Percentage: <Tooltip title="Enter the percentage (0–100) of dataset rows to randomly sample for this project." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -1322,7 +1332,7 @@ const AnnotationProject = (props) => {
                   className={classes.projectsettingGrid}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Enter Batch size:
+                    Enter Batch size: <Tooltip title="Specify the number of dataset rows to include in each batch." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -1347,7 +1357,7 @@ const AnnotationProject = (props) => {
                   className={classes.projectsettingGrid}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Enter Batch Number:
+                    Enter Batch Number: <Tooltip title="Enter the batch number to identify which batch of data to use (e.g., 1 for the first batch)." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -1375,7 +1385,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Annotators Per Task:
+                    Annotators Per Task: <Tooltip title="Set the number of annotators required to complete each task in this project." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -1398,7 +1408,7 @@ const AnnotationProject = (props) => {
                   className={classes.projectsettingGrid}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Project Stage:
+                    Project Stage: <Tooltip title="Select the workflow stage for your project (Annotation, Review, or Super-Check)." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -1426,7 +1436,7 @@ const AnnotationProject = (props) => {
                   className={classes.projectsettingGrid}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Create Annotations Automatically:
+                    Create Annotations Automatically: <Tooltip title="Choose whether annotations should be created automatically after tasks are assigned." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
@@ -1456,7 +1466,7 @@ const AnnotationProject = (props) => {
                       className={classes.projectsettingGrid}
                     >
                       <Typography gutterBottom component="div" label="Required">
-                        Acoustic Enabled Stage:
+                        Acoustic Enabled Stage: <Tooltip title="Select the project stage at which acoustic normalization is enabled." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                       </Typography>
                     </Grid>
                     <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
