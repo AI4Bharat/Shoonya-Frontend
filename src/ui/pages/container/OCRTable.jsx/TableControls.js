@@ -118,13 +118,13 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
       {/* Row Count Badge */}
       <Box className="count-badge">
         <TableRowsIcon className="badge-icon" />
-        <span className="badge-count">{totalRows}</span>
+        <span className="badge-count">Rows: {totalRows}</span>
       </Box>
 
       {/* Column Count Badge */}
       <Box className="count-badge" style={{ marginLeft: "5px" }}>
         <ViewColumnIcon className="badge-icon" />
-        <span className="badge-count">{totalColumns}</span>
+        <span className="badge-count">Cols: {totalColumns}</span>
       </Box>
 
       <Divider orientation="vertical" className="controls-divider" />
