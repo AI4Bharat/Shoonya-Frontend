@@ -276,7 +276,10 @@ const TaskTable = (props) => {
   const unassignTasks = async () => {
     setDeallocateDialog(false);
     if (
-      ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"
+      ProjectDetails?.project_type ===
+        "AcousticNormalisedTranscriptionEditing" ||
+      ProjectDetails?.project_type === "OCRTranscriptionEditing" 
+       || ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
     ) {
       setSnackbarInfo({
         open: true,

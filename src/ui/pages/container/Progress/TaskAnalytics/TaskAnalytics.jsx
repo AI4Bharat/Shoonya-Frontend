@@ -65,7 +65,8 @@ const TaskAnalytics = (props) => {
     'AudioTranscription',
     'AudioSegmentation',
     'AudioTranscriptionEditing',
-    'AcousticNormalisedTranscriptionEditing'
+    'AcousticNormalisedTranscriptionEditing',
+    'VerbatimTranscriptionCharacterTagging'
   ]
   const translationProjectTypes=[
     'MonolingualTranslation',
@@ -312,7 +313,7 @@ const TaskAnalytics = (props) => {
       {loading && <Spinner />}
       {taskAnalyticsData.length ?
         taskAnalyticsData.map((analyticsData, _index) => {
-          if (analyticsData.length && ['AudioTranscription', 'AudioSegmentation', 'AudioTranscriptionEditing', 'AcousticNormalisedTranscriptionEditing'].includes(analyticsData[0].projectType)) {
+          if (analyticsData.length && ['AudioTranscription', 'AudioSegmentation', 'AudioTranscriptionEditing', 'VerbatimTranscriptionCharacterTagging', 'AcousticNormalisedTranscriptionEditing'].includes(analyticsData[0].projectType)) {
             return (<Grid key={_index} style={{ marginTop: "15px" }}>
               <AudioTaskAnalyticsChart analyticsData={analyticsData} 
               annotationChecked={annotationChecked}

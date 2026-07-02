@@ -955,7 +955,8 @@ const AnnotationProject = (props) => {
                 selectedType === "AudioTranscription" ||
                 selectedType === "AudioSegmentation" ||
                 selectedType === "AudioTranscriptionEditing" ||
-                selectedType === "AcousticNormalisedTranscriptionEditing") && (
+                selectedType === "AcousticNormalisedTranscriptionEditing" ||
+                selectedType === "VerbatimTranscriptionCharacterTagging") && (
                 <>
                   <Grid
                     className={classes.projectsettingGrid}
@@ -1445,7 +1446,7 @@ const AnnotationProject = (props) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                {selectedType === "AcousticNormalisedTranscriptionEditing" && (
+                {selectedType === "AcousticNormalisedTranscriptionEditing" || selectedType === "VerbatimTranscriptionCharacterTagging" && (
                   <>
                     <Grid
                       xs={12}

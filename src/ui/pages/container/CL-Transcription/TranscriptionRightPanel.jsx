@@ -116,7 +116,8 @@ const TranscriptionRightPanel = ({
   // const currentPageData = subtitles?.slice(startIndex, endIndex);
   const idxOffset = itemsPerPage * (page - 1);
   const showAcousticText =
-    ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" &&
+    (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"  ||
+    ProjectDetails?.project_type == 'VerbatimTranscriptionCharacterTagging') &&
     ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
