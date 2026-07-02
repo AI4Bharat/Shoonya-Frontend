@@ -211,6 +211,7 @@ const AUDIO_PROJECT_SAVE_CHECK = [
   "AudioTranscription",
   "AudioTranscriptionEditing",
   "AcousticNormalisedTranscriptionEditing",
+  "VerbatimTranscriptionCharacterTagging"
 ];
 
 const LabelStudioWrapper = ({

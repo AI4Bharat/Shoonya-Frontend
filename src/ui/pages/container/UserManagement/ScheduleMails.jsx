@@ -50,6 +50,7 @@ const ScheduleMails = () => {
     "AudioTranscriptionEditing",
     "StandardizedTranscriptionEditing",
     "AcousticNormalisedTranscriptionEditing",
+    "VerbatimTranscriptionCharacterTagging",
     "MonolingualTranslation",
     "TranslationEditing",
     "SemanticTextualSimilarity(Scale5)",
