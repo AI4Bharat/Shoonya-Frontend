@@ -78,7 +78,8 @@ const TaskAnalytics = () => {
     'AudioTranscription',
     'AudioSegmentation',
     'AudioTranscriptionEditing',
-    'AcousticNormalisedTranscriptionEditing'
+    'AcousticNormalisedTranscriptionEditing',
+    'VerbatimTranscriptionCharacterTagging'
   ]
   const translationProjectTypes=[
     'MonolingualTranslation',
