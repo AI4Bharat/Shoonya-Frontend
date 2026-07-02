@@ -867,7 +867,7 @@ const AnnotationProject = (props) => {
                     xl={12}
                   >
                     <Typography gutterBottom component="div">
-                      Variable Parameters: <Tooltip title="Specify variable parameters specific to the selected project type." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
+                      Variable Parameters: <Tooltip title={`Provide extra configuration settings (like target language or model name) to inject into every task for this project. Format as a JSON object, e.g., {"output_language": "Hindi"}.`} arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
@@ -1283,7 +1283,7 @@ const AnnotationProject = (props) => {
                   xl={12}
                 >
                   <Typography gutterBottom component="div">
-                    Filter String: <Tooltip title="Optional filter to narrow down dataset rows fetched for this project. Leave empty to fetch all rows." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
+                    Filter String: <Tooltip title="Optional filter to narrow down dataset rows. Leave empty to fetch all rows. Format: field=value (e.g. language=Hindi). Use __ for lookups: language__icontains=hindi (contains), id__gt=100 (greater than), text__isnull=true (empty). Combine multiple filters with &amp; (e.g. language=Hindi&amp;id__gt=100)." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
 
@@ -1436,7 +1436,7 @@ const AnnotationProject = (props) => {
                   className={classes.projectsettingGrid}
                 >
                   <Typography gutterBottom component="div" label="Required">
-                    Create Annotations Automatically: <Tooltip title="Choose whether annotations should be created automatically after tasks are assigned." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
+                    Create Annotations Automatically: <Tooltip title="Choose whether already annotated tasks should be created automatically. Please choose this if you already have labeled or reviewed tasks." arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                   </Typography>
                 </Grid>
                 <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
