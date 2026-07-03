@@ -323,8 +323,19 @@ const [mergedHeaders, setMergedHeaders] = useState({});
     const taskDetails = useSelector((state) => state.getTaskDetails?.data);
   
   const [leftWidth, setLeftWidth] = useState(50);
+  const [leftHeight, setLeftHeight] = useState(45);
+  const [isVertical, setIsVertical] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const splitterRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsVertical(window.innerWidth <= 900);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [autoSave, setAutoSave] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
 
@@ -1300,10 +1311,16 @@ if (
       
       const container = document.querySelector('.main-container');
       const containerRect = container.getBoundingClientRect();
-      const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
       
-      const constrainedWidth = Math.min(Math.max(newLeftWidth, 20), 80);
-      setLeftWidth(constrainedWidth);
+      if (window.innerWidth <= 900) {
+        const newLeftHeight = ((e.clientY - containerRect.top) / containerRect.height) * 100;
+        const constrainedHeight = Math.min(Math.max(newLeftHeight, 20), 80);
+        setLeftHeight(constrainedHeight);
+      } else {
+        const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+        const constrainedWidth = Math.min(Math.max(newLeftWidth, 20), 80);
+        setLeftWidth(constrainedWidth);
+      }
     };
 
     const handleMouseUp = () => {
@@ -1315,7 +1332,7 @@ if (
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
+      document.body.style.cursor = window.innerWidth <= 900 ? 'row-resize' : 'col-resize';
       document.body.style.userSelect = 'none';
     }
 
@@ -1865,7 +1882,13 @@ const handleTranscribe = useCallback((text) => {
 
       <div className="main-container" dir="ltr">
         {/* Left Panel with Navigation and Image */}
-        <div className="left-panel" style={{ width: `${leftWidth}%` }}>
+        <div 
+          className="left-panel" 
+          style={{ 
+            width: isVertical ? '100%' : `${leftWidth}%`,
+            height: isVertical ? `${leftHeight}%` : '100%'
+          }}
+        >
           <div className="image-navigation">
             <div className="nav-left">
               <Button
@@ -1948,7 +1971,7 @@ const handleTranscribe = useCallback((text) => {
             <img
               src={imageUrl || "/api/placeholder/400/600"}
               alt="Table Reference"
-              className="reference-image"
+              className={`reference-image ${zoom > 1 ? 'zoomed' : ''}`}
               onMouseDown={handleImageMouseDown}
               onMouseMove={handleImageMouseMove}
               onMouseUp={handleImageMouseUp}
@@ -1961,11 +1984,11 @@ const handleTranscribe = useCallback((text) => {
                 transition: isPanning ? 'none' : 'width 0.2s ease-out',
               }}
             />
-            <div className="image-zoom-controls">
-              <button onClick={handleZoomIn} title="Zoom In">+</button>
-              <button onClick={handleZoomOut} title="Zoom Out">−</button>
-              <button onClick={handleZoomReset} title="Reset Zoom">Reset</button>
-            </div>
+          </div>
+          <div className="image-zoom-controls">
+            <button onClick={handleZoomIn} title="Zoom In">+</button>
+            <button onClick={handleZoomOut} title="Zoom Out">−</button>
+            <button onClick={handleZoomReset} title="Reset Zoom">Reset</button>
           </div>
         </div>
 
@@ -1983,7 +2006,13 @@ const handleTranscribe = useCallback((text) => {
         </div>
         
         {/* Right Panel */}
-        <div className="right-panel" style={{ width: `${100 - leftWidth}%` }}>
+        <div 
+          className="right-panel" 
+          style={{ 
+            width: isVertical ? '100%' : `${100 - leftWidth}%`,
+            height: isVertical ? `${100 - leftHeight}%` : '100%'
+          }}
+        >
           {/* Table Controls */}
           <TableControls
             totalRows={tableData.length}
