@@ -266,7 +266,6 @@ const SuperCheckerTasks = (props) => {
         let row = [
           el.id,
           el.input_data_id ?? "",
-          el.input_data_metadata_json ?? "",
         ];
         row.push(
           ...Object.keys(el.data)
@@ -289,7 +288,7 @@ const SuperCheckerTasks = (props) => {
         return row;
         
       });
-      let colList = ["id", "input_data_id", "dataset_metadata"];
+      let colList = ["id", "input_data_id"];
       colList.push(
         ...Object.keys(taskList[0].data).filter(
           (el) => !excludeCols.includes(el)
@@ -306,22 +305,11 @@ const SuperCheckerTasks = (props) => {
             sort: false,
             align: "center",
             customHeadLabelRender: customColumnHead,
-            customBodyRender: col === "dataset_metadata" ? (value) => {
-              if (value === null || value === undefined || value === "" || value === "null" || (typeof value === "object" && Object.keys(value).length === 0)) {
-                return "null";
-              }
-              if (typeof value === "object") {
-                return Object.entries(value)
-                  .map(([key, val]) => `${key}: ${typeof val === "object" ? JSON.stringify(val) : val}`)
-                  .join(", ");
-              }
-              return String(value);
-            } : undefined,
           },
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList.filter((col) => col !== "input_data_id" && col !== "dataset_metadata"));
+      setSelectedColumns(colList.filter((col) => col !== "input_data_id"));
       setTasks(data);
     } else {
       setTasks([]);
