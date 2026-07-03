@@ -45,7 +45,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .nav-right {
@@ -133,6 +134,11 @@
   user-select: none;
   -webkit-user-drag: none;
   margin: auto;
+}
+
+.reference-image.zoomed {
+  max-height: none !important;
+  max-width: none !important;
 }
 
 .image-zoom-controls {
@@ -316,10 +322,9 @@
   }
 
   .left-panel {
-    width: 100% !important;
-    height: 45% !important;
     border-right: none;
     border-bottom: 1px solid #ddd;
+    min-height: 20% !important;
   }
 
   .image-container {
@@ -327,12 +332,41 @@
   }
 
   .right-panel {
-    width: 100% !important;
-    height: 55% !important;
   }
 
   .splitter {
-    display: none;
+    width: 100% !important;
+    height: 5px !important;
+    cursor: row-resize !important;
+    flex-direction: row !important;
+    margin: 2px 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    display: flex !important;
+  }
+
+  .splitter-line {
+    width: 30px !important;
+    height: 2px !important;
+  }
+
+  .splitter-handle {
+    flex-direction: row !important;
+    padding: 0 4px !important;
+  }
+
+  .splitter-dots {
+    transform: none !important;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .splitter {
+      height: 16px !important;
+    }
+    .splitter-line {
+      width: 40px !important;
+      height: 3px !important;
+    }
   }
 
   .image-navigation {
