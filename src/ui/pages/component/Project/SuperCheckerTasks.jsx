@@ -264,8 +264,7 @@ const SuperCheckerTasks = (props) => {
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
         let row = [
-          el.id,
-          el.input_data_id ?? "",
+          el.id
         ];
         row.push(
           ...Object.keys(el.data)
@@ -288,7 +287,7 @@ const SuperCheckerTasks = (props) => {
         return row;
         
       });
-      let colList = ["id", "input_data_id"];
+      let colList = ["id"];
       colList.push(
         ...Object.keys(taskList[0].data).filter(
           (el) => !excludeCols.includes(el)
@@ -309,7 +308,7 @@ const SuperCheckerTasks = (props) => {
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList.filter((col) => col !== "input_data_id"));
+      setSelectedColumns(colList);
       setTasks(data);
     } else {
       setTasks([]);
