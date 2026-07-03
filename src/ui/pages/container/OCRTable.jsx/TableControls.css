@@ -25,6 +25,38 @@
   user-select: none;
 }
 
+.count-badge-interactive {
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.count-badge-interactive:hover {
+  background: rgba(44, 39, 153, 0.15) !important;
+  border-color: rgba(44, 39, 153, 0.5) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(44, 39, 153, 0.15);
+}
+
+.count-badge-interactive:hover .badge-plus {
+  transform: scale(1.25);
+}
+
+.count-badge-interactive:active {
+  transform: translateY(0);
+}
+
+.badge-plus {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0004ff;
+  margin-left: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
 .badge-icon {
   font-size: 18px !important;
 }
