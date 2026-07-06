@@ -127,6 +127,46 @@ const getSuggestedTag = (baseChar, pos) => {
   return `${likely}-${a}`;
 };
 
+// ---------------------------------------------------------------------------
+// getWordTagInfo
+// Finds every taggable base character's position (in left-to-right order)
+// within a word's core (untagged) text, and lines it up against the tags
+// already sitting in the " <tag> <tag> ..." group right after the word.
+// Tags are always written in the same left-to-right order as the
+// characters they belong to (see handleCharacterTagSelection), so the K-th
+// tag in that group always belongs to the K-th taggable character.
+//
+// This is deliberately computed FRESH from the actual subtitle text every
+// time it's needed, instead of from a separate in-memory record of "which
+// character has which tag": the text is what gets persisted/reloaded, so
+// deriving the correspondence straight from it means tagging still works
+// correctly after a page refresh (when any in-memory bookkeeping would
+// have been reset to empty, even though the text itself still has its
+// tags) - previously, refreshing meant the app "forgot" that a character
+// was already tagged and appended a duplicate tag instead of replacing it.
+//
+// The tag-zone match below tolerates ANY amount of whitespace (\s*, not a
+// single fixed space) between the word and its first tag, and between
+// tags. This matters because a tag is written back out with clean single
+// spacing every time it's edited, but the field is still a free-typing
+// textarea - a stray extra space or a dropped space typed in by hand must
+// not make the parser lose track of tags that are genuinely still there,
+// which is exactly what caused already-tagged characters to look
+// "untagged" and get a duplicate tag appended instead of their existing
+// one being replaced.
+// ---------------------------------------------------------------------------
+const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
+  const taggableCharIndexes = [];
+  for (let i = coreWordStart; i < coreWordEnd; i++) {
+    if (mappings[text[i]]) taggableCharIndexes.push(i);
+  }
+  const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
+  const tagZoneStr = tagZoneMatch[0];
+  const tagZoneEnd = coreWordEnd + tagZoneStr.length;
+  const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
+  return { taggableCharIndexes, tagZoneStr, tagZoneEnd, tokens };
+};
+
 const getCharIndexAtPoint = (textarea, clientX, clientY) => {
   const style = window.getComputedStyle(textarea);
   const mirror = document.createElement("div");
@@ -287,7 +327,7 @@ const TranscriptionRightPanel = ({
   const [currentSelection, setCurrentSelection] = useState(null);
   const langDictSet = new Set(langDict[targetlang]);
   const [charTagMappings, setCharTagMappings] = useState({});
-  const [isVCTCProject, setIsVCTCProject] = useState(false);
+  const [isVCTCProject, setIsVCTCProject] = useState(true);
   const [charTagPopoverOpen, setCharTagPopoverOpen] = useState(false);
   const [charTagAnchorEl, setCharTagAnchorEl] = useState(null);
   const [charTagMappingsData, setCharTagMappingsData] = useState([]);
@@ -461,7 +501,7 @@ const TranscriptionRightPanel = ({
 
   // Check for VCTC project and load character tag mappings
   useEffect(() => {
-    if (ProjectDetails?.project_type === 'VerbatimTranscriptionCharacterTagging') {
+    if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
       setIsVCTCProject(true);
       const langCode = 'ta';
       if (langCode && languageTagMappings[langCode]) {
@@ -693,14 +733,22 @@ const processNoiseTags = (value) => {
   // separated by a space - e.g. "எடுத்தான் <TH-DH> <d-th> <th-dh>" - the
   // word itself is never broken up with an inline tag.
   //
-  // charTagAssignments tracks, per subtitle, which CHARACTER (identified by
-  // its position in the current text) has been given which tag. A tagged
-  // word's core characters are never touched by a tag edit - only the
-  // space-separated tag group that follows the word grows/shrinks - so no
-  // stored position belonging to THIS word ever needs to shift. Only
-  // assignments belonging to words further right in the text (which
-  // physically moved because this word's tag group changed size) need
-  // shifting, by the exact amount the tag group grew or shrank.
+  // Which character a given tag belongs to is derived FRESH from the text
+  // every time (see getWordTagInfo), by matching each taggable base
+  // character in the word (left to right) against the tags already in the
+  // group (left to right). This is what makes tagging survive a page
+  // refresh: the correspondence isn't stored anywhere that could be lost
+  // (like component state), it's recovered from the persisted text itself.
+  //
+  // The word/tag boundary scan below stops at "<" (going forward) or ">"
+  // (going backward), not just at whitespace. This guards against a tag
+  // ever getting silently swallowed into the "core word" - and therefore
+  // becoming invisible to getWordTagInfo - if the space that's supposed to
+  // separate the word from its tags (or one tag from the next) is ever
+  // missing or doubled, which can happen since this is a free-typing
+  // textarea. Without this guard, a genuinely already-tagged character
+  // could stop being recognized as tagged and get a duplicate tag
+  // appended instead of its existing tag being replaced.
   // ---------------------------------------------------------------------
   const handleCharacterTagSelection = (subIndex, charIndex, tag) => {
     const sub = [...subtitles];
@@ -712,30 +760,35 @@ const processNoiseTags = (value) => {
     }
 
     let coreWordStart = charIndex;
-    while (coreWordStart > 0 && !/\s/.test(text[coreWordStart - 1])) coreWordStart--;
+    while (
+      coreWordStart > 0 &&
+      !/\s/.test(text[coreWordStart - 1]) &&
+      text[coreWordStart - 1] !== '>'
+    ) coreWordStart--;
     let coreWordEnd = charIndex;
-    while (coreWordEnd < text.length && !/\s/.test(text[coreWordEnd])) coreWordEnd++;
+    while (
+      coreWordEnd < text.length &&
+      !/\s/.test(text[coreWordEnd]) &&
+      text[coreWordEnd] !== '<'
+    ) coreWordEnd++;
 
-    // The run of " <tag>" groups immediately following the word - this is
-    // the word's current tag group, bounded by the next real word/space.
-    const tagZoneMatch = text.slice(coreWordEnd).match(/^(?: <[^>]*>)*/);
-    const tagZoneStr = tagZoneMatch[0];
-    const tagZoneEnd = coreWordEnd + tagZoneStr.length;
-    const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
+    const { taggableCharIndexes, tagZoneEnd, tokens } = getWordTagInfo(
+      text,
+      coreWordStart,
+      coreWordEnd,
+      charTagMappings
+    );
 
-    const existingForSub = charTagAssignments[subIndex] || [];
-    const wordEntries = existingForSub
-      .filter((a) => a.charIndex >= coreWordStart && a.charIndex < coreWordEnd)
-      .sort((a, b) => a.charIndex - b.charIndex);
-    const existingIdx = wordEntries.findIndex((a) => a.charIndex === charIndex);
-    // This character's position among the word's OTHER already-tagged
-    // characters, in left-to-right order - i.e. which tag token is/will be
-    // theirs, regardless of the order characters were tagged in.
-    const rank = wordEntries.filter((a) => a.charIndex < charIndex).length;
+    // This character's position among ALL taggable characters of the word,
+    // in left-to-right order. The K-th tag in the group belongs to the
+    // K-th taggable character, so this character already has a tag exactly
+    // when its rank falls within the tokens already present.
+    const rank = taggableCharIndexes.indexOf(charIndex);
+    const alreadyTagged = rank !== -1 && rank < tokens.length;
 
     // Re-selecting the tag that's already assigned to this character is a
     // no-op - it can't be "selected again".
-    if (existingIdx !== -1 && wordEntries[existingIdx].tag === tag) {
+    if (alreadyTagged && tokens[rank] === `<${tag}>`) {
       setCharTagPopoverOpen(false);
       setCharTagAnchorEl(null);
       if (charTagTimeoutRef.current) {
@@ -745,33 +798,25 @@ const processNoiseTags = (value) => {
       return;
     }
 
-    if (existingIdx !== -1) {
+    if (alreadyTagged) {
+      // Replace this character's existing tag in place.
       tokens[rank] = `<${tag}>`;
-    } else {
+    } else if (rank !== -1) {
+      // Brand-new tag for this character: insert it at its correct rank
+      // among the word's tags, preserving left-to-right order.
       tokens.splice(rank, 0, `<${tag}>`);
+    } else {
+      // Not a taggable character - shouldn't happen, since the click
+      // handler only calls this for characters that are keys of
+      // charTagMappings, but guard anyway rather than losing the tag.
+      tokens.push(`<${tag}>`);
     }
     const newTagZone = tokens.map((t) => ` ${t}`).join('');
 
     const newText = text.slice(0, coreWordEnd) + newTagZone + text.slice(tagZoneEnd);
-    const delta = newTagZone.length - tagZoneStr.length;
 
     sub[subIndex] = { ...sub[subIndex], acoustic_normalised_text: newText };
     dispatch(setSubtitles(sub, C.SUBTITLES));
-
-    const updatedAssignments =
-      existingIdx !== -1
-        ? existingForSub.map((a) => (a.charIndex === charIndex ? { ...a, tag } : a))
-        : [...existingForSub, { charIndex, tag }];
-
-    setCharTagAssignments((prev) => ({
-      ...prev,
-      [subIndex]:
-        delta === 0
-          ? updatedAssignments
-          : updatedAssignments.map((a) =>
-              a.charIndex >= tagZoneEnd ? { ...a, charIndex: a.charIndex + delta } : a
-            ),
-    }));
 
     // Close popover
     setCharTagPopoverOpen(false);
@@ -1989,13 +2034,31 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
     const suggested = getSuggestedTag(charAtCursor, pos);
 
-    // Look up whether this character already has a tag assigned, so the
-    // popover can highlight it instead of treating this as a brand-new tag.
-    const subIdxForTag = index + idxOffset;
-    const existingAssignment = (charTagAssignments[subIdxForTag] || []).find(
-      (a) => a.charIndex === charIndex
+    // Look up whether this character already has a tag, derived fresh
+    // from the current text (see getWordTagInfo) so it's correct even
+    // right after a page refresh, when there is no in-memory record of
+    // previous tagging left to consult.
+    let coreWordStart = charIndex;
+    while (
+      coreWordStart > 0 &&
+      !/\s/.test(textarea.value[coreWordStart - 1]) &&
+      textarea.value[coreWordStart - 1] !== '>'
+    ) coreWordStart--;
+    let coreWordEnd = charIndex;
+    while (
+      coreWordEnd < textarea.value.length &&
+      !/\s/.test(textarea.value[coreWordEnd]) &&
+      textarea.value[coreWordEnd] !== '<'
+    ) coreWordEnd++;
+    const { taggableCharIndexes, tokens } = getWordTagInfo(
+      textarea.value,
+      coreWordStart,
+      coreWordEnd,
+      charTagMappings
     );
-    const currentTag = existingAssignment ? existingAssignment.tag : null;
+    const rank = taggableCharIndexes.indexOf(charIndex);
+    const currentTag =
+      rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
 
     handleCharTagPopover({
       anchorEl: textarea,
@@ -2018,7 +2081,6 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                                         handleCharTagPopover(null);
                                       }
                                     }}
-                                    placeholder={isVCTCProject ? "Hover over a character to tag (e.g., க → k)" : ""}
                                   />
                                 </div>
                               );
@@ -2137,13 +2199,31 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
     const suggested = getSuggestedTag(charAtCursor, pos);
 
-    // Look up whether this character already has a tag assigned, so the
-    // popover can highlight it instead of treating this as a brand-new tag.
-    const subIdxForTag = index + idxOffset;
-    const existingAssignment = (charTagAssignments[subIdxForTag] || []).find(
-      (a) => a.charIndex === charIndex
+    // Look up whether this character already has a tag, derived fresh
+    // from the current text (see getWordTagInfo) so it's correct even
+    // right after a page refresh, when there is no in-memory record of
+    // previous tagging left to consult.
+    let coreWordStart = charIndex;
+    while (
+      coreWordStart > 0 &&
+      !/\s/.test(textarea.value[coreWordStart - 1]) &&
+      textarea.value[coreWordStart - 1] !== '>'
+    ) coreWordStart--;
+    let coreWordEnd = charIndex;
+    while (
+      coreWordEnd < textarea.value.length &&
+      !/\s/.test(textarea.value[coreWordEnd]) &&
+      textarea.value[coreWordEnd] !== '<'
+    ) coreWordEnd++;
+    const { taggableCharIndexes, tokens } = getWordTagInfo(
+      textarea.value,
+      coreWordStart,
+      coreWordEnd,
+      charTagMappings
     );
-    const currentTag = existingAssignment ? existingAssignment.tag : null;
+    const rank = taggableCharIndexes.indexOf(charIndex);
+    const currentTag =
+      rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
 
     handleCharTagPopover({
       anchorEl: textarea,
@@ -2161,7 +2241,6 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     handleCharTagPopover(null);
   }
 }}
-                              placeholder={isVCTCProject ? "Hover over a character to tag (e.g., க → k)" : ""}
                             />
                           </div>
                         ))}
