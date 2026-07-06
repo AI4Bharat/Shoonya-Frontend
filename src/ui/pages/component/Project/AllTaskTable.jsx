@@ -139,7 +139,8 @@ const AllTaskTable = (props) => {
         );
         AllTaskData[0].task_status && row.push(el.task_status);
         row.push( <>
-          <Link to={ProjectDetails?.project_type?.includes("Acoustic") ?
+          <Link to={ProjectDetails?.project_type?.includes("Acoustic") ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging" ?
           `AllAudioTranscriptionLandingPage/${el.id}` : `Alltask/${el.id}`} className={classes.link}>
           <CustomButton
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}

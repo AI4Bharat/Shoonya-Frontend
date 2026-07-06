@@ -547,7 +547,8 @@ const getPullNewDataAPI = async () => {
               </span>
             </Tooltip>
           </Grid>
-          {ProjectDetails?.project_type == 'AcousticNormalisedTranscriptionEditing' ?(
+          {ProjectDetails?.project_type == 'AcousticNormalisedTranscriptionEditing' ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"?(
                     <Grid item xs={12}>
             <FormControlLabel
               control={

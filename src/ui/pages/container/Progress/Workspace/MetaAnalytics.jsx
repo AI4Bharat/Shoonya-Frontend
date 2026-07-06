@@ -74,7 +74,8 @@ export default function MetaAnalytics(props) {
     'AudioTranscription',
     'AudioSegmentation',
     'AudioTranscriptionEditing',
-    'AcousticNormalisedTranscriptionEditing'
+    'AcousticNormalisedTranscriptionEditing',
+    'VerbatimTranscriptionCharacterTagging'
   ]
   const translationProjectTypes = [
     'MonolingualTranslation',

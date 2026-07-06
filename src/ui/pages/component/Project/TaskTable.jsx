@@ -276,7 +276,10 @@ const TaskTable = (props) => {
   const unassignTasks = async () => {
     setDeallocateDialog(false);
     if (
-      ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"
+      ProjectDetails?.project_type ===
+        "AcousticNormalisedTranscriptionEditing" ||
+      ProjectDetails?.project_type === "OCRTranscriptionEditing" 
+       || ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
     ) {
       setSnackbarInfo({
         open: true,
@@ -457,7 +460,8 @@ const TaskTable = (props) => {
           row.push(
             <Link
               to={
-                ProjectDetails?.project_type?.includes("Acoustic")
+                ProjectDetails?.project_type?.includes("Acoustic") ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
                   ? `AudioTranscriptionLandingPage/${el.id}`
                   : ProjectDetails?.project_type?.includes("OCRTableEditing")
                   ? `OCRTable/${el.id}`
@@ -490,7 +494,8 @@ const TaskTable = (props) => {
           row.push(
             <Link
               to={
-                ProjectDetails?.project_type?.includes("Acoustic")
+                ProjectDetails?.project_type?.includes("Acoustic") ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
                   ? `ReviewAudioTranscriptionLandingPage/${el.id}`
                   : `review/${el.id}`
               }
@@ -641,7 +646,8 @@ const TaskTable = (props) => {
   }, [totalTaskCount, selectedFilters, ProjectDetails]);
 
    useEffect(() => {
-    if (ProjectDetails?.project_type?.includes("Acoustic")) {
+    if (ProjectDetails?.project_type?.includes("Acoustic")||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging") {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
           `/projects/${id}/${props.type === "annotation"
