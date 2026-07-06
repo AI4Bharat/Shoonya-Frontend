@@ -226,7 +226,8 @@ const SuperCheckerTasks = (props) => {
   ]);
 
   useEffect(() => {
-    if (ProjectDetails?.project_type?.includes("Acoustic")) {
+    if (ProjectDetails?.project_type?.includes("Acoustic")||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging") {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
           `/projects/${id}/SuperCheckerAudioTranscriptionLandingPage/${
@@ -273,7 +274,8 @@ const SuperCheckerTasks = (props) => {
         taskList[0].supercheck_status && row.push(el.supercheck_status);
         row.push(
           <Link
-            to={(ProjectDetails?.project_type?.includes("Acoustic"))
+            to={(ProjectDetails?.project_type?.includes("Acoustic")) ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
             ? `SuperCheckerAudioTranscriptionLandingPage/${el.id}` : `SuperChecker/${el.id}`} className={classes.link}>
             <CustomButton
               disabled={ProjectDetails.is_archived}
