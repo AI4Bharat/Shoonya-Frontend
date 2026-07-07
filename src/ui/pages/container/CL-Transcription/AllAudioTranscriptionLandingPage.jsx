@@ -20,6 +20,8 @@ import Stack from "@mui/material/Stack";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Portal from "@mui/material/Portal";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
@@ -91,6 +93,7 @@ const AllAudioTranscriptionLandingPage = () => {
   const [advancedWaveformSettings, setAdvancedWaveformSettings] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState(null);
   const [waveSurfer, setWaveSurfer] = useState(true);
+  const [repeatCount, setRepeatCount] = useState(0);
   const [audioURL, setAudioURL] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const dialogRef = useRef(null);
@@ -642,6 +645,26 @@ const AllAudioTranscriptionLandingPage = () => {
                     player.playbackRate = e.target.value;
                   }}/>
               </Stack>
+              <Stack spacing={1} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+                <Typography fontSize={14} fontWeight={"medium"} color="#555">
+                  Repeat Count:
+                </Typography>
+                <Select
+                  value={repeatCount}
+                  onChange={(e) => setRepeatCount(Number(e.target.value))}
+                  size="small"
+                  sx={{
+                    height: 30,
+                    fontSize: 14,
+                    minWidth: 100,
+                  }}
+                >
+                  <MenuItem value={0}>Play Once</MenuItem>
+                  <MenuItem value={1}>Repeat 1x</MenuItem>
+                  <MenuItem value={2}>Repeat 2x</MenuItem>
+                  <MenuItem value={-1}>Infinite</MenuItem>
+                </Select>
+              </Stack>
             </Grid>
             <Grid container spacing={1} sx={{ ml: 3 }}>
               <Grid item>
@@ -835,7 +858,7 @@ const AllAudioTranscriptionLandingPage = () => {
         position="fixed"
         bottom={1}
       >
-        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} />) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
+        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings} repeatCount={repeatCount}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskData?.id} waveformSettings={waveformSettings} repeatCount={repeatCount} />) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
       </Grid>
       {popoverOpen && (
         <Portal>
