@@ -21,6 +21,8 @@ import Slider from "@mui/material/Slider";
 import Stack from "@mui/material/Stack";
 import CircularProgress from "@mui/material/CircularProgress";
 import Portal from "@mui/material/Portal";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
@@ -118,6 +120,7 @@ const SuperCheckerAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(false);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
+  const [repeatCount, setRepeatCount] = useState(0);
   const [audioURL, setAudioURL] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const dialogRef = useRef(null);
@@ -1181,6 +1184,26 @@ useEffect(() => {
                     player.playbackRate = e.target.value;
                   }}/>
               </Stack>
+              <Stack spacing={1} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+                <Typography fontSize={14} fontWeight={"medium"} color="#555">
+                  Repeat Count:
+                </Typography>
+                <Select
+                  value={repeatCount}
+                  onChange={(e) => setRepeatCount(Number(e.target.value))}
+                  size="small"
+                  sx={{
+                    height: 30,
+                    fontSize: 14,
+                    minWidth: 100,
+                  }}
+                >
+                  <MenuItem value={0}>Play Once</MenuItem>
+                  <MenuItem value={1}>Repeat 1x</MenuItem>
+                  <MenuItem value={2}>Repeat 2x</MenuItem>
+                  <MenuItem value={-1}>Infinite</MenuItem>
+                </Select>
+              </Stack>
             </Grid>
             <Grid container spacing={1} sx={{ ml: 3 }}>
               <Grid item>
@@ -1418,7 +1441,7 @@ useEffect(() => {
         bottom={1}
         // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} />) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
+        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings} repeatCount={repeatCount}/> : <Timeline currentTime={currentTime} playing={playing} taskID={taskDetailList} waveformSettings={waveformSettings} repeatCount={repeatCount} />) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
       </Grid>
       {popoverOpen && (
         <Portal>
