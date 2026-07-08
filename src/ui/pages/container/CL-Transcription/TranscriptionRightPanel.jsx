@@ -2015,7 +2015,6 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                                     {...props}
                               onClick={(event) => {
   if (!isVCTCProject) return;
-  console.log(event);
   
 
   const textarea = event.target;
@@ -2181,10 +2180,8 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                               }`}
                               style={{ fontSize: fontSize, height: "100%" }}
                               onClick={(event) => {
-  console.log(isVCTCProject);
   
                                 if (!isVCTCProject) return;
-  console.log("hellooooo");
   
 
   const textarea = event.target;
