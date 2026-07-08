@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+//FilterList.jsx
+
+import React, { useState,useEffect  } from "react";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
@@ -14,14 +16,30 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
+import { useDispatch,useSelector  } from "react-redux";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 import { snakeToTitleCase } from "../../../../utils/utils";
-import {  useSelector } from "react-redux";
+// import {  useSelector } from "react-redux";
 import { Stack } from "@mui/material";
 
 const FilterList = (props) => {
   const classes = DatasetStyle();
+  const dispatch = useDispatch();
+  const languageChoices = useSelector((state) => state.getLanguageChoices?.data ?? []);
+
+  useEffect(() => {
+    const obj = new GetLanguageChoicesAPI();
+    dispatch(APITransport(obj));
+  }, []);
   const { filterStatusData, currentFilters, updateFilters, pull, setpull, rejected, setRejected, pullvalue } = props;
   const [selectedStatus, setSelectedStatus] = useState(!!currentFilters?.annotation_status ? currentFilters?.annotation_status : currentFilters.review_status);
+  const [selectedLanguage, setSelectedLanguage] = useState(currentFilters?.language ?? "");
+  const [selectedDomain,   setSelectedDomain]   = useState(currentFilters?.domain   ?? "");
+  const [selectedStatus2,  setSelectedStatus2]  = useState(currentFilters?.status   ?? "");
+
+  const STATUS_OPTIONS   = ["completed", "incomplete", "in_progress"];
+  const DOMAIN_OPTIONS   = ["medical", "legal", "finance", "general"];
   const ProjectDetails = useSelector((state) => state.getProjectDetails.data);
   const userDetails = useSelector((state) => state.fetchLoggedInUserData.data);
   const pulledstatus = currentFilters?.annotation_status ? ["Pulled By reviewer", "Not Pulled By reviewer"]
@@ -31,6 +49,9 @@ const FilterList = (props) => {
     updateFilters({
       ...currentFilters,
       [statusvalue]: selectedStatus,
+        language: selectedLanguage,
+        status:   selectedStatus2,
+        domain:   selectedDomain,
     })
     props.handleClose();
   };
@@ -156,8 +177,46 @@ const FilterList = (props) => {
             />
               </FormControl> : null}
             </Stack>
+            
+
+            <Stack direction="column" spacing={2} sx={{ ml: 2, minWidth: 140 }}>
+
+              <FormControl size="small" fullWidth>
+                <InputLabel sx={{ fontSize: "14px", position: "inherit", top: "22px", left: "-3px" }}>
+                  Language
+                </InputLabel>
+                <Select value={selectedLanguage} defaultValue="" onChange={(e) => setSelectedLanguage(e.target.value)}>
+                  <MenuItem value="">All</MenuItem>
+                  {languageChoices.map((l) => (
+                    <MenuItem key={l.value} value={l.value}>{l.label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" fullWidth>
+                <InputLabel sx={{ fontSize: "14px", position: "inherit", top: "22px", left: "-3px" }}>
+                  Status
+                </InputLabel>
+                <Select value={selectedStatus2} defaultValue="" onChange={(e) => setSelectedStatus2(e.target.value)}>
+                  <MenuItem value="">All</MenuItem>
+                  {STATUS_OPTIONS.map((s) => <MenuItem key={s} value={s}>{snakeToTitleCase(s)}</MenuItem>)}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" fullWidth>
+                <InputLabel sx={{ fontSize: "14px", position: "inherit", top: "22px", left: "-3px" }}>
+                  Domain
+                </InputLabel>
+                <Select value={selectedDomain} defaultValue="" onChange={(e) => setSelectedDomain(e.target.value)}>
+                  <MenuItem value="">All</MenuItem>
+                  {DOMAIN_OPTIONS.map((d) => <MenuItem key={d} value={d}>{snakeToTitleCase(d)}</MenuItem>)}
+                </Select>
+              </FormControl>
+
+            </Stack>
 
           </Stack>
+          
           <Divider />
           <Box
             sx={{
