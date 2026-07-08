@@ -57,6 +57,7 @@ const ScheduleMails = () => {
     "ContextualTranslationEditing",
     "OCRTranscription",
     "OCRTranscriptionEditing",
+    'OCRTESTTranscriptionEditing',
     'OCRTableEditing',
     "OCRSegmentCategorization",
     "OCRSegmentCategorizationEditing",

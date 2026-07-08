@@ -325,11 +325,11 @@ useEffect(() => {
 useEffect(() => {
   getProjectsandTasks(projectId, taskId).then(
     ([labelConfig, taskData, annotations, predictions]) => {
-    if(labelConfig?.project_type?.includes("OCRTranscriptionEditing")){
+    if(labelConfig?.project_type?.includes("OCRTranscriptionEditing") || labelConfig?.project_type?.includes("OCRTESTTranscriptionEditing") || labelConfig?.project_type?.includes("OCRTESTTranscriptionEditing")){
       const inputData = new DatasetSearchPopupAPI({"instance_ids":labelConfig.datasets[0].instance_id,"dataset_type":"OCRDocument","search_keys":{"id":taskData.input_data}});
       dispatch(APITransport(inputData));
     }
-    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing");
+    let sidePanel = labelConfig?.project_type?.includes("OCRSegmentCategorization") || labelConfig?.project_type?.includes("OCRTranscriptionEditing") || labelConfig?.project_type?.includes("OCRTESTTranscriptionEditing");
     let showLabelsOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let selectAfterCreateOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");
     let continousLabelingOnly = labelConfig?.project_type?.includes("OCRSegmentCategorization");    
@@ -627,7 +627,7 @@ useEffect(() => {
           }
           let ids = new Set();
           let countLables = 0;         
-          if (projectType.includes("OCRTranscriptionEditing")){
+          if (projectType.includes("OCRTranscriptionEditing") || projectType.includes("OCRTESTTranscriptionEditing")){
             addLabelsToBboxes(temp);
           }
           temp.map((curr) => {
@@ -927,7 +927,7 @@ useEffect(() => {
         ([labelConfig, taskData, annotations, predictions]) => {
 
           setNotes(taskData, annotations);
-          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data): labelConfig.project_type === "OCRTranscriptionEditing" ? OCRConfigJS: labelConfig.label_config;
+          let tempLabelConfig = labelConfig.project_type === "ConversationTranslation" || labelConfig.project_type === "ConversationTranslationEditing" ? generateLabelConfig(taskData.data) : labelConfig.project_type === "ConversationVerification" ? conversationVerificationLabelConfig(taskData.data): labelConfig.project_type === "OCRTranscriptionEditing" || labelConfig.project_type === "OCRESTTranscriptionEditing" ? OCRConfigJS: labelConfig.label_config;
           if (labelConfig.project_type.includes("OCRSegmentCategorization")){
             tempLabelConfig = labelConfigJS;
           }
@@ -1660,7 +1660,7 @@ useEffect(() => {
                 </Button>
               </Tooltip>
             )}
-                          {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") &&
+                          {ProjectDetails?.project_type?.includes("OCRTranscriptionEditing") || ProjectDetails?.project_type?.includes("OCRESTTranscriptionEditing") &&
                 <>
                   {/* OCR Shortcut Button with Dropdown */}
                   <Tooltip title={
