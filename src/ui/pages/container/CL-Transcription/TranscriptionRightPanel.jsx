@@ -327,7 +327,7 @@ const TranscriptionRightPanel = ({
   const [currentSelection, setCurrentSelection] = useState(null);
   const langDictSet = new Set(langDict[targetlang]);
   const [charTagMappings, setCharTagMappings] = useState({});
-  const [isVCTCProject, setIsVCTCProject] = useState(true);
+  const [isVCTCProject, setIsVCTCProject] = useState(false);
   const [charTagPopoverOpen, setCharTagPopoverOpen] = useState(false);
   const [charTagAnchorEl, setCharTagAnchorEl] = useState(null);
   const [charTagMappingsData, setCharTagMappingsData] = useState([]);
@@ -501,9 +501,16 @@ const TranscriptionRightPanel = ({
 
   // Check for VCTC project and load character tag mappings
   useEffect(() => {
-    if (ProjectDetails?.project_type === 'AcousticNormalisedTranscriptionEditing') {
+
+    if (ProjectDetails?.project_type === 'VerbatimTranscriptionCharacterTagging') {
       setIsVCTCProject(true);
-      const langCode = 'ta';
+      console.log("helo");
+      
+    const matchedLang = LanguageCode.languages.find(
+      (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
+    );
+    const langCode = matchedLang?.code;
+
       if (langCode && languageTagMappings[langCode]) {
         setCharTagMappings(languageTagMappings[langCode]);
       }
@@ -2008,6 +2015,7 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                                     {...props}
                               onClick={(event) => {
   if (!isVCTCProject) return;
+  
 
   const textarea = event.target;
   const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
@@ -2172,7 +2180,9 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                               }`}
                               style={{ fontSize: fontSize, height: "100%" }}
                               onClick={(event) => {
-  if (!isVCTCProject) return;
+  
+                                if (!isVCTCProject) return;
+  
 
   const textarea = event.target;
   const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
