@@ -7,7 +7,13 @@ import { setSubtitles } from "../../../../redux/actions/Common";
 import C from "../../../../redux/constants";
 import DT from "duration-time-conversion";
 
-const Timeline2 = ({ key, details, waveformSettings }) => {
+const Timeline2 = ({ key, details, waveformSettings, repeatCount }) => {
+  const repeatCountRef = useRef(repeatCount);
+  useEffect(() => {
+    repeatCountRef.current = repeatCount;
+  }, [repeatCount]);
+  const activeRegionRef = useRef(null);
+  const playCountRegionRef = useRef(0);
   const waveSurf = useRef(null);
   const miniMap = useRef(null);
   const regions = useRef(null);
@@ -18,6 +24,8 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
   const [currentSubsCopy, setCurrentSubsCopy] = useState([]);
   const dispatch = useDispatch();
   const [regionsInit, setRegionsInit] = useState(false);
+  const [waveSurfInstance, setWaveSurfInstance] = useState(null);
+  const [regionsPluginInstance, setRegionsPluginInstance] = useState(null);
 
   const updateRegions = (currentSubs) => {
     if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null && currentSubs.length > 0) {
@@ -109,6 +117,8 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
         ],
       });
       regions.current = waveSurf.current.registerPlugin(RegionsPlugin.create());
+      setWaveSurfInstance(waveSurf.current);
+      setRegionsPluginInstance(regions.current);
     }
     if (details?.data?.audio_url !== undefined && miniMap.current === null) {
       miniMap.current = WaveSurfer.create({
@@ -120,6 +130,18 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
       });
       miniMapRegions.current = miniMap.current.registerPlugin(RegionsPlugin.create());
     }
+    return () => {
+      if (waveSurf.current) {
+        waveSurf.current.destroy();
+        waveSurf.current = null;
+        setWaveSurfInstance(null);
+        setRegionsPluginInstance(null);
+      }
+      if (miniMap.current) {
+        miniMap.current.destroy();
+        miniMap.current = null;
+      }
+    };
   }, [details]);
 
   useEffect(() => {
@@ -164,6 +186,8 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
         ],
       });
       regions.current = waveSurf.current.registerPlugin(RegionsPlugin.create());
+      setWaveSurfInstance(waveSurf.current);
+      setRegionsPluginInstance(regions.current);
       waveSurf.current.on('decode', () => {
         currentSubs?.map((sub) => {
           regions.current.addRegion({
@@ -213,30 +237,39 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
     updateRegions(currentSubs);
   }, [details, currentSubs])
 
-  if (waveSurf !== null && regions.current !== null) {
-    let activeRegion = null
-    regions.current.on('region-out', (region) => {
-      if (activeRegion === region) {
-        waveSurf.current.pause();
-        activeRegion = null;
-      }
-    })
-    regions.current.on('region-double-clicked', (region, e) => {
-      e.stopPropagation();
-      activeRegion = region;
-      region.play();
-    })
-    waveSurf.current.on('interaction', () => {
-      activeRegion = null;
-    })
-  }
-
   const updateSub = useCallback((currentSubsCopy) => {
     dispatch(setSubtitles(currentSubsCopy, C.SUBTITLES));
   }, [dispatch]);
 
-  if (waveSurf !== null && regions.current !== null) {
-    regions.current.on('region-updated', (region) => {
+  useEffect(() => {
+    if (!regionsPluginInstance || !waveSurfInstance) return;
+
+    const onRegionOut = (region) => {
+      if (activeRegionRef.current === region) {
+        playCountRegionRef.current++;
+        if (repeatCountRef.current === -1 || playCountRegionRef.current <= repeatCountRef.current) {
+          region.play();
+        } else {
+          waveSurfInstance.pause();
+          activeRegionRef.current = null;
+          playCountRegionRef.current = 0;
+        }
+      }
+    };
+
+    const onRegionDoubleClicked = (region, e) => {
+      e.stopPropagation();
+      activeRegionRef.current = region;
+      playCountRegionRef.current = 0;
+      region.play();
+    };
+
+    const onInteraction = () => {
+      activeRegionRef.current = null;
+      playCountRegionRef.current = 0;
+    };
+
+    const onRegionUpdated = (region) => {
       if (currentSubsCopy.length > 0) {
         if (region?.content?.innerHTML) {
           currentSubsCopy[region.id - 1].text = region?.content?.innerHTML;
@@ -256,15 +289,27 @@ const Timeline2 = ({ key, details, waveformSettings }) => {
           }
         }
         updateSub(currentSubsCopy);
-        if (region.start.toFixed(3) === parseFloat(DT.t2d(currentSubsCopy[region.id -1].start_time))){
+        if (region.start.toFixed(3) === parseFloat(DT.t2d(currentSubsCopy[region.id - 1].start_time))) {
           player.currentTime = region.end;
-        }else{
+        } else {
           player.currentTime = region.start;
         }
         updateRegions(currentSubsCopy);
       }
-    })
-  }
+    };
+
+    regionsPluginInstance.on('region-out', onRegionOut);
+    regionsPluginInstance.on('region-double-clicked', onRegionDoubleClicked);
+    regionsPluginInstance.on('region-updated', onRegionUpdated);
+    waveSurfInstance.on('interaction', onInteraction);
+
+    return () => {
+      regionsPluginInstance.un('region-out', onRegionOut);
+      regionsPluginInstance.un('region-double-clicked', onRegionDoubleClicked);
+      regionsPluginInstance.un('region-updated', onRegionUpdated);
+      waveSurfInstance.un('interaction', onInteraction);
+    };
+  }, [regionsPluginInstance, waveSurfInstance, currentSubsCopy, currentSubs, player]);
 
   return (
     <>

@@ -21,6 +21,8 @@ import Slider from "@mui/material/Slider";
 import Stack from "@mui/material/Stack";
 import CircularProgress from "@mui/material/CircularProgress";
 import Portal from "@mui/material/Portal";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Timeline from "./TimeLine";
@@ -202,6 +204,7 @@ const ReviewAudioTranscriptionLandingPage = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [waveSurfer, setWaveSurfer] = useState(true);
   const [autoSaveTrigger, setAutoSaveTrigger] = useState(false);
+  const [repeatCount, setRepeatCount] = useState(0);
   const [audioURL, setAudioURL] = useState("");
 
   // useEffect(() => {
@@ -1248,44 +1251,73 @@ useEffect(() => {
               taskData={taskDetailList}
               audioUrl={audioURL}
             /> : <Grid style={{ padding: "0px 20px 0px 20px" }}><audio controls preload='none'className={classes.videoPlayer}/></Grid>}
-            <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end">
-             <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
-                <Typography fontSize={14} fontWeight={"medium"} color="#555">
-                  Timeline Scale:
-                </Typography>
-                <Slider
-                  sx={{
-                    width: 140,
-                  }}
-                  color="primary"
-                  aria-label="Scale"
-                  min={2} max={player ? Math.floor(player.duration * 2) : 100} step={1}
-                  value={duration}
-                  onChange={(e) => {
-                    setDuration(e.target.value);
-                    player.currentTime += 0.01;
-                    player.currentTime -= 0.01;
-                  }}/>
-              </Stack>
-              <Stack spacing={2} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
-                <Typography fontSize={14} fontWeight={"medium"} color="#555">
-                  Playback Speed:
-                </Typography>
-                <Slider
-                  sx={{
-                    width: 140,
-                  }}
-                  color="primary"
-                  aria-label="Playback Spped"
-                  marks
-                  min={0.25} max={2.0} step={0.25}
-                  defaultValue={1.0}
-                  valueLabelDisplay="auto"
-                  onChange={(e) => {
-                    player.playbackRate = e.target.value;
-                  }}/>
-              </Stack>
-            </Grid>
+             <Grid container spacing={1} sx={{ pt: 1, pl: 2, pr : 3}} justifyContent="flex-end" alignItems="center">
+              <Grid item>
+                <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+                  <Typography fontSize={14} fontWeight={"medium"} color="#555">
+                    Timeline Scale:
+                  </Typography>
+                  <Slider
+                    sx={{
+                      width: 140,
+                    }}
+                    color="primary"
+                    aria-label="Scale"
+                    min={2} max={player ? Math.floor(player.duration * 2) : 100} step={1}
+                    value={duration}
+                    onChange={(e) => {
+                      setDuration(e.target.value);
+                      player.currentTime += 0.01;
+                      player.currentTime -= 0.01;
+                    }}/>
+                </Stack>
+              </Grid>
+              <Grid item>
+                <Stack spacing={2} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+                  <Typography fontSize={14} fontWeight={"medium"} color="#555">
+                    Playback Speed:
+                  </Typography>
+                  <Slider
+                    sx={{
+                      width: 140,
+                    }}
+                    color="primary"
+                    aria-label="Playback Spped"
+                    marks
+                    min={0.25} max={2.0} step={0.25}
+                    defaultValue={1.0}
+                    valueLabelDisplay="auto"
+                    onChange={(e) => {
+                      player.playbackRate = e.target.value;
+                    }}/>
+                </Stack>
+              </Grid>
+              <Grid item>
+                <Stack spacing={1} direction="row" sx={{ mb: 1, ml: 3 }} alignItems="center" justifyContent="flex-end" width="fit-content">
+                  <Typography fontSize={14} fontWeight={"medium"} color="#555">
+                    Repeat Count:
+                  </Typography>
+                  <LightTooltip title="Double-click on any segment in the audio waveform to play it in a loop" placement="top">
+                    <InfoOutlinedIcon sx={{ color: "grey", fontSize: 18, cursor: "pointer", mr: 0.5 }} />
+                  </LightTooltip>
+                  <Select
+                    value={repeatCount}
+                    onChange={(e) => setRepeatCount(Number(e.target.value))}
+                    size="small"
+                    sx={{
+                      height: 30,
+                      fontSize: 14,
+                      minWidth: 100,
+                    }}
+                  >
+                    <MenuItem value={0}>Play Once</MenuItem>
+                    <MenuItem value={1}>Repeat 1x</MenuItem>
+                    <MenuItem value={2}>Repeat 2x</MenuItem>
+                    <MenuItem value={-1}>Infinite</MenuItem>
+                  </Select>
+                </Stack>
+              </Grid>
+             </Grid>
             <Grid container spacing={1} sx={{ ml: 3 }}>
               <Grid item>
               <Button
@@ -1550,7 +1582,7 @@ useEffect(() => {
         bottom={1}
       // style={fullscreen ? { visibility: "hidden" } : {}}
       >
-        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings}/> : <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList} waveformSettings={waveformSettings}/>) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
+        {audioURL ? (waveSurfer ? <Timeline2 key={taskDetails?.data?.audio_url} details={taskDetails} waveformSettings={waveSurferWaveformSettings} repeatCount={repeatCount}/> : <Timeline currentTime={currentTime} playing={playing}  taskID={taskDetailList} waveformSettings={waveformSettings} repeatCount={repeatCount}/>) : <div style={{marginLeft:"49%", marginBottom:"2%"}}><CircularProgress/></div>}
       </Grid>
       {popoverOpen && (
         <Portal>
