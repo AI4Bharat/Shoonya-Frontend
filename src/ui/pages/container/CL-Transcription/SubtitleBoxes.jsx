@@ -3,6 +3,7 @@ import React, {
     useCallback,
     useState,
     createRef,
+    useRef,
     memo,
   } from "react";
   import isEqual from "lodash/isEqual";
@@ -56,7 +57,12 @@ import React, {
   let playUntil = 0;
   
   export default memo(
-    function ({ render, currentTime, duration }) {
+    function ({ render, currentTime, duration, repeatCount }) {
+      const cleanupRef = useRef(null);
+      const repeatCountRef = useRef(repeatCount);
+      useEffect(() => {
+        repeatCountRef.current = repeatCount;
+      }, [repeatCount]);
       const { taskId } = useParams();
       const classes = AudioTranscriptionLandingStyle();
       const dispatch = useDispatch();
@@ -372,30 +378,53 @@ import React, {
 
       const handleDoubleClick = (sub) => {
         if (!player) return;
-        playUntil = sub.endTime;
+
+        if (cleanupRef.current) cleanupRef.current();
+
+        let currentPlayCount = 0;
+        const playUntil = sub.endTime;
+        const playStart = sub.startTime;
+
+        const onTimeUpdate = () => {
+          if (player.currentTime >= playUntil) {
+            currentPlayCount++;
+            if (repeatCountRef.current === -1 || currentPlayCount <= repeatCountRef.current) {
+              player.currentTime = playStart;
+              player.play();
+            } else {
+              player.pause();
+              cleanup();
+            }
+          }
+        };
+
+        const onPause = () => {
+          cleanup();
+        };
+
+        const cleanup = () => {
+          player.removeEventListener("timeupdate", onTimeUpdate);
+          player.removeEventListener("pause", onPause);
+          if (cleanupRef.current === cleanup) {
+            cleanupRef.current = null;
+          }
+        };
+
+        cleanupRef.current = cleanup;
+
         player.currentTime = sub.startTime;
         player.play();
         player.addEventListener("timeupdate", onTimeUpdate);
         player.addEventListener("pause", onPause);
-        return () => {
-          player.removeEventListener("timeupdate", onTimeUpdate);
-          player.removeEventListener("pause", onPause);
-        };
       };
 
-      const onTimeUpdate = () => {
-        if(playUntil && player.currentTime >= playUntil) {
-          playUntil = 0;
-          player.pause();
-          player.removeEventListener("timeupdate", onTimeUpdate);
-          player.removeEventListener("pause", onPause);
-        }
-      };
-      const onPause = () => {
-        playUntil = 0;
-        player.removeEventListener("timeupdate", onTimeUpdate);
-        player.removeEventListener("pause", onPause);
-      };
+      useEffect(() => {
+        return () => {
+          if (cleanupRef.current) {
+            cleanupRef.current();
+          }
+        };
+      }, []);
   
       const renderSnackBar = () => {
         return (
