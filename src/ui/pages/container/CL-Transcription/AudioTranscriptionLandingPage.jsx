@@ -1166,6 +1166,9 @@ useEffect(() => {
                 <Typography fontSize={14} fontWeight={"medium"} color="#555">
                   Repeat Count:
                 </Typography>
+                <LightTooltip title="Double-click on any segment in the audio waveform to play it in a loop" placement="top">
+                  <InfoOutlinedIcon sx={{ color: "grey", fontSize: 18, cursor: "pointer", mr: 0.5 }} />
+                </LightTooltip>
                 <Select
                   value={repeatCount}
                   onChange={(e) => setRepeatCount(Number(e.target.value))}
