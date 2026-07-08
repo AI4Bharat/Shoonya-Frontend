@@ -867,7 +867,7 @@ const AnnotationProject = (props) => {
                     xl={12}
                   >
                     <Typography gutterBottom component="div">
-                      Variable Parameters: <Tooltip title={`Provide extra configuration settings (like target language or model name) to inject into every task for this project. Format as a JSON object, e.g., {"output_language": "Hindi"}.`} arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
+                      Variable Parameters: <Tooltip title={`Provide extra configuration settings (like target language or model name) to inject into every task for this project. Format it as  a string: "language": "Bengali"`} arrow placement="top"><InfoOutlinedIcon fontSize="small" sx={{ color: 'primary.main', ml: 0.5, verticalAlign: 'middle' }} /></Tooltip>
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={12} lg={12} xl={12} sm={12}>
