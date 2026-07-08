@@ -1446,8 +1446,8 @@ const AnnotationProject = (props) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                {selectedType === "AcousticNormalisedTranscriptionEditing" || selectedType === "VerbatimTranscriptionCharacterTagging" && (
-                  <>
+                {(selectedType === "AcousticNormalisedTranscriptionEditing" ||
+                  selectedType === "VerbatimTranscriptionCharacterTagging") && (<>
                     <Grid
                       xs={12}
                       sm={12}
@@ -1460,25 +1460,34 @@ const AnnotationProject = (props) => {
                         Acoustic Enabled Stage:
                       </Typography>
                     </Grid>
+
                     <Grid item md={12} lg={12} xl={12} sm={12} xs={12}>
+
                       <FormControl fullWidth className={classes.formControl}>
                         <Select
                           labelId="acoustic-label"
                           id="acoustic-select"
-                          value={acousticEnabledStage}
-                          onChange={(e) =>
-                            setAcousticEnabledStage(e.target.value)
-                          }
+                          value={acousticEnabledStage ?? ""}
+                          onChange={(e) => setAcousticEnabledStage(e.target.value)}
+                          displayEmpty
                         >
                           {projectStage.map((type, index) => (
-                            <MenuItem value={type.value} key={index}>
+                            <MenuItem
+                              value={type.value}
+                              key={index}
+                              onClick={() => {
+                                if (acousticEnabledStage === type.value) {
+                                  setAcousticEnabledStage(null);
+                                }
+                              }}
+                            >
                               {type.name.split(/(?<=^\S+)\s/)[0]}
                             </MenuItem>
                           ))}
                         </Select>
                       </FormControl>
                     </Grid>
-                                          {selectedType == 'AcousticNormalisedTranscriptionEditing' ?(
+                                          {(selectedType == 'AcousticNormalisedTranscriptionEditing'|| selectedType === 'VerbatimTranscriptionCharacterTagging') ?(
                                 <Grid item xs={12}>
                         <FormControlLabel
                           control={
