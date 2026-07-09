@@ -757,9 +757,10 @@ const processNoiseTags = (value) => {
   // could stop being recognized as tagged and get a duplicate tag
   // appended instead of its existing tag being replaced.
   // ---------------------------------------------------------------------
-  const handleCharacterTagSelection = (subIndex, charIndex, tag) => {
+  const handleCharacterTagSelection = (subIndex, charIndex, tag, isL1 = false) => {
     const sub = [...subtitles];
-    const text = sub[subIndex]?.acoustic_normalised_text || '';
+    const fieldKey = isL1 ? 'text' : 'acoustic_normalised_text';
+    const text = sub[subIndex]?.[fieldKey] || '';
 
     if (charIndex === null || charIndex < 0 || charIndex >= text.length) {
       console.warn("Invalid character index for tagging:", charIndex);
@@ -822,7 +823,7 @@ const processNoiseTags = (value) => {
 
     const newText = text.slice(0, coreWordEnd) + newTagZone + text.slice(tagZoneEnd);
 
-    sub[subIndex] = { ...sub[subIndex], acoustic_normalised_text: newText };
+    sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
     dispatch(setSubtitles(sub, C.SUBTITLES));
 
     // Close popover
@@ -831,8 +832,79 @@ const processNoiseTags = (value) => {
     if (charTagTimeoutRef.current) {
       clearTimeout(charTagTimeoutRef.current);
       charTagTimeoutRef.current = null;
-  }
-};
+    }
+  };
+
+  const handleTextareaClick = (event, subIndex, isL1) => {
+    if (!isVCTCProject) return;
+
+    const textarea = event.target;
+    const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
+
+    if (charIndex === -1) {
+      handleCharTagPopover(null);
+      return;
+    }
+
+    const charAtCursor = textarea.value[charIndex] || '';
+
+    if (charAtCursor && charTagMappings[charAtCursor]) {
+      // Select exactly that character so the native selection highlight
+      // gives visual feedback for which letter was picked.
+      textarea.setSelectionRange(charIndex, charIndex + 1);
+      const mappings = charTagMappings[charAtCursor];
+
+      // Clear any pending timeout
+      if (charTagTimeoutRef.current) {
+        clearTimeout(charTagTimeoutRef.current);
+        charTagTimeoutRef.current = null;
+      }
+
+      const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
+      const suggested = getSuggestedTag(charAtCursor, pos);
+
+      // Look up whether this character already has a tag, derived fresh
+      // from the current text (see getWordTagInfo) so it's correct even
+      // right after a page refresh, when there is no in-memory record of
+      // previous tagging left to consult.
+      let coreWordStart = charIndex;
+      while (
+        coreWordStart > 0 &&
+        !/\s/.test(textarea.value[coreWordStart - 1]) &&
+        textarea.value[coreWordStart - 1] !== '>'
+      ) coreWordStart--;
+      let coreWordEnd = charIndex;
+      while (
+        coreWordEnd < textarea.value.length &&
+        !/\s/.test(textarea.value[coreWordEnd]) &&
+        textarea.value[coreWordEnd] !== '<'
+      ) coreWordEnd++;
+      const { taggableCharIndexes, tokens } = getWordTagInfo(
+        textarea.value,
+        coreWordStart,
+        coreWordEnd,
+        charTagMappings
+      );
+      const rank = taggableCharIndexes.indexOf(charIndex);
+      const currentTag =
+        rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
+
+      handleCharTagPopover({
+        anchorEl: textarea,
+        mappings: mappings,
+        selectedText: charAtCursor,
+        index: subIndex,
+        position: { x: event.clientX, y: event.clientY },
+        suggestedTag: suggested,
+        currentTag: currentTag,
+        onTagSelect: (tag) => {
+          handleCharacterTagSelection(subIndex, charIndex, tag, isL1);
+        }
+      });
+    } else {
+      handleCharTagPopover(null);
+    }
+  };
 
 const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   const { value: eventValue } = event.target;
@@ -1761,6 +1833,10 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                                     }, 200);
                                   }}
                                   {...props}
+                                  onClick={(event) => {
+                                    if (props.onClick) props.onClick(event);
+                                    handleTextareaClick(event, index + idxOffset, true);
+                                  }}
                                 />
                                 {/* <span id="charNum" className={classes.wordCount}>
                         {targetLength(index)}
@@ -1855,6 +1931,9 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                                 setShowPopOver(false);
                               }, 200);
                             }}
+                             onClick={(event) => {
+                               handleTextareaClick(event, index + idxOffset, true);
+                             }}
                           />
                           {/* <span id="charNum" className={classes.wordCount}>
                         {targetLength(index)}
@@ -2012,79 +2091,11 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                                       showAcousticText &&
                                       populateAcoustic(index + idxOffset)
                                     }
-                                    {...props}
-                              onClick={(event) => {
-  if (!isVCTCProject) return;
-  
-
-  const textarea = event.target;
-  const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
-
-  if (charIndex === -1) {
-    handleCharTagPopover(null);
-    return;
-  }
-
-  const charAtCursor = textarea.value[charIndex] || '';
-
-  if (charAtCursor && charTagMappings[charAtCursor]) {
-    // Select exactly that character so the native selection highlight
-    // gives visual feedback for which letter was picked.
-    textarea.setSelectionRange(charIndex, charIndex + 1);
-    const mappings = charTagMappings[charAtCursor];
-
-    // Clear any pending timeout
-    if (charTagTimeoutRef.current) {
-      clearTimeout(charTagTimeoutRef.current);
-      charTagTimeoutRef.current = null;
-    }
-
-    const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
-    const suggested = getSuggestedTag(charAtCursor, pos);
-
-    // Look up whether this character already has a tag, derived fresh
-    // from the current text (see getWordTagInfo) so it's correct even
-    // right after a page refresh, when there is no in-memory record of
-    // previous tagging left to consult.
-    let coreWordStart = charIndex;
-    while (
-      coreWordStart > 0 &&
-      !/\s/.test(textarea.value[coreWordStart - 1]) &&
-      textarea.value[coreWordStart - 1] !== '>'
-    ) coreWordStart--;
-    let coreWordEnd = charIndex;
-    while (
-      coreWordEnd < textarea.value.length &&
-      !/\s/.test(textarea.value[coreWordEnd]) &&
-      textarea.value[coreWordEnd] !== '<'
-    ) coreWordEnd++;
-    const { taggableCharIndexes, tokens } = getWordTagInfo(
-      textarea.value,
-      coreWordStart,
-      coreWordEnd,
-      charTagMappings
-    );
-    const rank = taggableCharIndexes.indexOf(charIndex);
-    const currentTag =
-      rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
-
-    handleCharTagPopover({
-      anchorEl: textarea,
-      mappings: mappings,
-      selectedText: charAtCursor,
-      index: index + idxOffset,
-      position: { x: event.clientX, y: event.clientY },
-      suggestedTag: suggested,
-      currentTag: currentTag,
-      onTagSelect: (tag) => {
-        handleCharacterTagSelection(index + idxOffset, charIndex, tag);
-      }
-    });
-  } else {
-    handleCharTagPopover(null);
-  }
-}}
-                                    onMouseLeave={() => {
+                                     {...props}
+                                     onClick={(event) => {
+                                       handleTextareaClick(event, index + idxOffset, false);
+                                     }}
+                                     onMouseLeave={() => {
                                       if (handleCharTagPopover) {
                                         handleCharTagPopover(null);
                                       }
@@ -2179,78 +2190,9 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                                   : ""
                               }`}
                               style={{ fontSize: fontSize, height: "100%" }}
-                              onClick={(event) => {
-  
-                                if (!isVCTCProject) return;
-  
-
-  const textarea = event.target;
-  const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
-
-  if (charIndex === -1) {
-    handleCharTagPopover(null);
-    return;
-  }
-
-  const charAtCursor = textarea.value[charIndex] || '';
-
-  if (charAtCursor && charTagMappings[charAtCursor]) {
-    // Select exactly that character so the native selection highlight
-    // gives visual feedback for which letter was picked.
-    textarea.setSelectionRange(charIndex, charIndex + 1);
-    const mappings = charTagMappings[charAtCursor];
-
-    // Clear any pending timeout
-    if (charTagTimeoutRef.current) {
-      clearTimeout(charTagTimeoutRef.current);
-      charTagTimeoutRef.current = null;
-    }
-
-    const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
-    const suggested = getSuggestedTag(charAtCursor, pos);
-
-    // Look up whether this character already has a tag, derived fresh
-    // from the current text (see getWordTagInfo) so it's correct even
-    // right after a page refresh, when there is no in-memory record of
-    // previous tagging left to consult.
-    let coreWordStart = charIndex;
-    while (
-      coreWordStart > 0 &&
-      !/\s/.test(textarea.value[coreWordStart - 1]) &&
-      textarea.value[coreWordStart - 1] !== '>'
-    ) coreWordStart--;
-    let coreWordEnd = charIndex;
-    while (
-      coreWordEnd < textarea.value.length &&
-      !/\s/.test(textarea.value[coreWordEnd]) &&
-      textarea.value[coreWordEnd] !== '<'
-    ) coreWordEnd++;
-    const { taggableCharIndexes, tokens } = getWordTagInfo(
-      textarea.value,
-      coreWordStart,
-      coreWordEnd,
-      charTagMappings
-    );
-    const rank = taggableCharIndexes.indexOf(charIndex);
-    const currentTag =
-      rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
-
-    handleCharTagPopover({
-      anchorEl: textarea,
-      mappings: mappings,
-      selectedText: charAtCursor,
-      index: index + idxOffset,
-      position: { x: event.clientX, y: event.clientY },
-      suggestedTag: suggested,
-      currentTag: currentTag,
-      onTagSelect: (tag) => {
-        handleCharacterTagSelection(index + idxOffset, charIndex, tag);
-      }
-    });
-  } else {
-    handleCharTagPopover(null);
-  }
-}}
+                                       onClick={(event) => {
+                                handleTextareaClick(event, index + idxOffset, false);
+                              }}
                             />
                           </div>
                         ))}
