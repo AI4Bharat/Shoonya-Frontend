@@ -806,6 +806,39 @@ const processNoiseTags = (value) => {
       return;
     }
 
+    // Wrap the tagged character in { } right in the text so it stays
+    // visibly highlighted - including after a page refresh, since this is
+    // part of the persisted text itself rather than separate component
+    // state. This covers a character being tagged for the first time, AND
+    // a character that was already tagged but doesn't yet have the { }
+    // wrap (e.g. tags saved before this highlighting existed) - in that
+    // case the wrap is added in now instead of being skipped. A character
+    // that's already wrapped is left as-is so it never gets wrapped twice.
+    //
+    // The wrap covers the WHOLE orthographic cluster, not just the bare
+    // base consonant: any Tamil dependent vowel sign (matra, e.g. ு/ா/ொ)
+    // or pulli/virama immediately following the base character is pulled
+    // inside the braces too. Wrapping only the bare consonant would strand
+    // its matra outside the braces (e.g. "{ட}ு" instead of "{டு}"), which
+    // visually splits a single syllable apart and renders garbled.
+    const dependentMarksMatch = text
+      .slice(charIndex + 1)
+      .match(/^[\u0BBE-\u0BCD\u0BD7]+/);
+    const clusterLength = 1 + (dependentMarksMatch ? dependentMarksMatch[0].length : 0);
+    const alreadyWrapped =
+      text[charIndex - 1] === '{' && text[charIndex + clusterLength] === '}';
+    let workingText = text;
+    let workingCoreWordEnd = coreWordEnd;
+    let workingTagZoneEnd = tagZoneEnd;
+    if (rank !== -1 && !alreadyWrapped) {
+      workingText =
+        workingText.slice(0, charIndex) +
+        '{' + workingText.slice(charIndex, charIndex + clusterLength) + '}' +
+        workingText.slice(charIndex + clusterLength);
+      workingCoreWordEnd += 2;
+      workingTagZoneEnd += 2;
+    }
+
     if (alreadyTagged) {
       // Replace this character's existing tag in place.
       tokens[rank] = `<${tag}>`;
@@ -821,7 +854,7 @@ const processNoiseTags = (value) => {
     }
     const newTagZone = tokens.map((t) => ` ${t}`).join('');
 
-    const newText = text.slice(0, coreWordEnd) + newTagZone + text.slice(tagZoneEnd);
+    const newText = workingText.slice(0, workingCoreWordEnd) + newTagZone + workingText.slice(workingTagZoneEnd);
 
     sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
     dispatch(setSubtitles(sub, C.SUBTITLES));
