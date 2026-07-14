@@ -34,6 +34,7 @@ import addUserTypes from "../../../../constants/addUserTypes";
 import AddWorkspaceDialog from "../Workspace/AddWorkspaceDialog";
 import Spinner from "../../component/common/Spinner";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import AssignMembersDialog from "./bulkassignmembers";
 import { useSelector, useDispatch } from "react-redux";
 import WorkspaceSetting from "../Tabs/WorkspaceSetting";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
@@ -93,6 +94,7 @@ const DetailsViewPage = (props) => {
 
   };
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [assignMembersDialogOpen, setAssignMembersDialogOpen] = useState(false);
   const [csvFile, setCsvFile] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userType, setUserType] = useState(Object.keys(UserRolesList)[0]);
@@ -164,6 +166,13 @@ const DetailsViewPage = (props) => {
   };
   const handleUserDialogClose = () => {
     setAddUserDialogOpen(false);
+  };
+
+  const handleAssignMembersDialogOpen = () => {
+    setAssignMembersDialogOpen(true);
+  };
+  const handleAssignMembersDialogClose = () => {
+    setAssignMembersDialogOpen(false);
   };
 
   const renderSnackBar = () => {
@@ -608,9 +617,9 @@ const DetailsViewPage = (props) => {
                   <Grid item xs={12} sm={6}>
                     <CustomButton
                       className={classes.annotatorsButton}
-                      label={"Invite Users to Organisation"}
+                      label={"Assign members to projects"}
                       sx={{ width: "100%", mb: 2 }}
-                      onClick={handleUserDialogOpen}
+                      onClick={handleAssignMembersDialogOpen}
                     />
                   </Grid>
                 </Grid>
@@ -645,6 +654,10 @@ const DetailsViewPage = (props) => {
                       ? "Request admin to add users to organization"
                       : "Invite users to organization"
                   }
+                />
+                <AssignMembersDialog
+                  isOpen={assignMembersDialogOpen}
+                  handleDialogClose={handleAssignMembersDialogClose}
                 />
               </>
             )}
