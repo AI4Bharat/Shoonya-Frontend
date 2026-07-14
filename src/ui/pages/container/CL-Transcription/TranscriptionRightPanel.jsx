@@ -126,35 +126,6 @@ const getSuggestedTag = (baseChar, pos) => {
   if (likely === a) return `${a}-${b}`;
   return `${likely}-${a}`;
 };
-
-// ---------------------------------------------------------------------------
-// getWordTagInfo
-// Finds every taggable base character's position (in left-to-right order)
-// within a word's core (untagged) text, and lines it up against the tags
-// already sitting in the " <tag> <tag> ..." group right after the word.
-// Tags are always written in the same left-to-right order as the
-// characters they belong to (see handleCharacterTagSelection), so the K-th
-// tag in that group always belongs to the K-th taggable character.
-//
-// This is deliberately computed FRESH from the actual subtitle text every
-// time it's needed, instead of from a separate in-memory record of "which
-// character has which tag": the text is what gets persisted/reloaded, so
-// deriving the correspondence straight from it means tagging still works
-// correctly after a page refresh (when any in-memory bookkeeping would
-// have been reset to empty, even though the text itself still has its
-// tags) - previously, refreshing meant the app "forgot" that a character
-// was already tagged and appended a duplicate tag instead of replacing it.
-//
-// The tag-zone match below tolerates ANY amount of whitespace (\s*, not a
-// single fixed space) between the word and its first tag, and between
-// tags. This matters because a tag is written back out with clean single
-// spacing every time it's edited, but the field is still a free-typing
-// textarea - a stray extra space or a dropped space typed in by hand must
-// not make the parser lose track of tags that are genuinely still there,
-// which is exactly what caused already-tagged characters to look
-// "untagged" and get a duplicate tag appended instead of their existing
-// one being replaced.
-// ---------------------------------------------------------------------------
 const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
   const taggableCharIndexes = [];
   for (let i = coreWordStart; i < coreWordEnd; i++) {
@@ -165,6 +136,43 @@ const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
   const tagZoneEnd = coreWordEnd + tagZoneStr.length;
   const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
   return { taggableCharIndexes, tagZoneStr, tagZoneEnd, tokens };
+};
+
+const VIRAMA_CHARS = new Set([
+  '\u094D', // Devanagari virama
+  '\u0BCD', // Tamil pulli
+  '\u0D4D', // Malayalam chandrakkala
+  '\u0C4D', // Telugu virama
+  '\u0CCD', // Kannada virama
+  '\u09CD', // Bengali virama
+  '\u0ACD', // Gujarati virama
+  '\u0A4D', // Gurmukhi virama
+  '\u0B4D', // Oriya virama
+]);
+
+const getSyllableClusterLength = (text, startIndex, mappings) => {
+  let i = startIndex + 1;
+  while (i < text.length) {
+    let marksEnd = i;
+    while (marksEnd < text.length && /\p{M}/u.test(text[marksEnd])) {
+      marksEnd++;
+    }
+    if (marksEnd === i) break; // no combining marks here - cluster is done
+
+    const endedOnVirama = VIRAMA_CHARS.has(text[marksEnd - 1]);
+    const nextChar = text[marksEnd];
+    const nextIsLetter = marksEnd < text.length && /\p{L}/u.test(nextChar);
+    const nextIsIndependentlyTaggable = nextIsLetter && !!mappings[nextChar];
+
+    if (endedOnVirama && nextIsLetter && !nextIsIndependentlyTaggable) {
+      i = marksEnd + 1;
+      continue;
+    }
+
+    i = marksEnd;
+    break;
+  }
+  return i - startIndex;
 };
 
 const getCharIndexAtPoint = (textarea, clientX, clientY) => {
@@ -735,28 +743,6 @@ const processNoiseTags = (value) => {
     }
   }
 };
-  // ---------------------------------------------------------------------
-  // Tags for a word are always placed together AFTER the whole word, each
-  // separated by a space - e.g. "எடுத்தான் <TH-DH> <d-th> <th-dh>" - the
-  // word itself is never broken up with an inline tag.
-  //
-  // Which character a given tag belongs to is derived FRESH from the text
-  // every time (see getWordTagInfo), by matching each taggable base
-  // character in the word (left to right) against the tags already in the
-  // group (left to right). This is what makes tagging survive a page
-  // refresh: the correspondence isn't stored anywhere that could be lost
-  // (like component state), it's recovered from the persisted text itself.
-  //
-  // The word/tag boundary scan below stops at "<" (going forward) or ">"
-  // (going backward), not just at whitespace. This guards against a tag
-  // ever getting silently swallowed into the "core word" - and therefore
-  // becoming invisible to getWordTagInfo - if the space that's supposed to
-  // separate the word from its tags (or one tag from the next) is ever
-  // missing or doubled, which can happen since this is a free-typing
-  // textarea. Without this guard, a genuinely already-tagged character
-  // could stop being recognized as tagged and get a duplicate tag
-  // appended instead of its existing tag being replaced.
-  // ---------------------------------------------------------------------
   const handleCharacterTagSelection = (subIndex, charIndex, tag, isL1 = false) => {
     const sub = [...subtitles];
     const fieldKey = isL1 ? 'text' : 'acoustic_normalised_text';
@@ -805,26 +791,7 @@ const processNoiseTags = (value) => {
       }
       return;
     }
-
-    // Wrap the tagged character in { } right in the text so it stays
-    // visibly highlighted - including after a page refresh, since this is
-    // part of the persisted text itself rather than separate component
-    // state. This covers a character being tagged for the first time, AND
-    // a character that was already tagged but doesn't yet have the { }
-    // wrap (e.g. tags saved before this highlighting existed) - in that
-    // case the wrap is added in now instead of being skipped. A character
-    // that's already wrapped is left as-is so it never gets wrapped twice.
-    //
-    // The wrap covers the WHOLE orthographic cluster, not just the bare
-    // base consonant: any Tamil dependent vowel sign (matra, e.g. ு/ா/ொ)
-    // or pulli/virama immediately following the base character is pulled
-    // inside the braces too. Wrapping only the bare consonant would strand
-    // its matra outside the braces (e.g. "{ட}ு" instead of "{டு}"), which
-    // visually splits a single syllable apart and renders garbled.
-    const dependentMarksMatch = text
-      .slice(charIndex + 1)
-      .match(/^[\u0BBE-\u0BCD\u0BD7]+/);
-    const clusterLength = 1 + (dependentMarksMatch ? dependentMarksMatch[0].length : 0);
+    const clusterLength = getSyllableClusterLength(text, charIndex, charTagMappings);
     const alreadyWrapped =
       text[charIndex - 1] === '{' && text[charIndex + clusterLength] === '}';
     let workingText = text;
