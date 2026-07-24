@@ -512,12 +512,11 @@ const TranscriptionRightPanel = ({
 
     if (ProjectDetails?.project_type === 'VerbatimTranscriptionCharacterTagging') {
       setIsVCTCProject(true);
-      console.log("helo");
       
-    const matchedLang = LanguageCode.languages.find(
-      (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
-    );
-    const langCode = matchedLang?.code;
+      const matchedLang = LanguageCode.languages.find(
+        (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
+      );
+      const langCode = matchedLang?.code;
 
       if (langCode && languageTagMappings[langCode]) {
         setCharTagMappings(languageTagMappings[langCode]);
@@ -780,9 +779,60 @@ const processNoiseTags = (value) => {
     const rank = taggableCharIndexes.indexOf(charIndex);
     const alreadyTagged = rank !== -1 && rank < tokens.length;
 
-    // Re-selecting the tag that's already assigned to this character is a
-    // no-op - it can't be "selected again".
-    if (alreadyTagged && tokens[rank] === `<${tag}>`) {
+    // Determine if the clicked character/syllable is already wrapped in braces
+    let openBraceIndex = -1;
+    let closeBraceIndex = -1;
+    for (let i = charIndex - 1; i >= coreWordStart; i--) {
+      if (text[i] === '{') { openBraceIndex = i; break; }
+      if (text[i] === '}' || text[i] === '<' || text[i] === '>') break;
+    }
+    for (let i = charIndex; i < coreWordEnd; i++) {
+      if (text[i] === '}') { closeBraceIndex = i; break; }
+      if (text[i] === '{' || text[i] === '<' || text[i] === '>') break;
+    }
+    const alreadyWrapped = openBraceIndex !== -1 && closeBraceIndex !== -1 && openBraceIndex < closeBraceIndex;
+
+    const currentTagClean = alreadyTagged ? tokens[rank].replace(/^<|>$/g, '').trim().toLowerCase() : '';
+    const targetTagClean = (tag || '').trim().toLowerCase();
+
+    // Deselect feature: Clicking the tag that is already assigned removes it
+    if (alreadyTagged && currentTagClean === targetTagClean) {
+      tokens.splice(rank, 1);
+
+      let workingText = text;
+      let workingCoreWordEnd = coreWordEnd;
+      let workingTagZoneEnd = tagZoneEnd;
+
+      if (alreadyWrapped) {
+        workingText =
+          workingText.slice(0, openBraceIndex) +
+          workingText.slice(openBraceIndex + 1, closeBraceIndex) +
+          workingText.slice(closeBraceIndex + 1);
+        workingCoreWordEnd -= 2;
+        workingTagZoneEnd -= 2;
+      }
+
+      const newTagZone = tokens.length > 0 ? tokens.map((t) => ` ${t}`).join('') : '';
+      const newText =
+        workingText.slice(0, workingCoreWordEnd) +
+        newTagZone +
+        workingText.slice(workingTagZoneEnd);
+
+      // Record state in undoStack for Ctrl+Z / Undo support
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: isL1 ? "textChange" : "textChangeAcoustic",
+          index: subIndex,
+          previousText: text,
+          updateAcoustic: !isL1,
+        },
+      ]);
+      setRedoStack([]);
+
+      sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+
       setCharTagPopoverOpen(false);
       setCharTagAnchorEl(null);
       if (charTagTimeoutRef.current) {
@@ -791,12 +841,12 @@ const processNoiseTags = (value) => {
       }
       return;
     }
+
     const clusterLength = getSyllableClusterLength(text, charIndex, charTagMappings);
-    const alreadyWrapped =
-      text[charIndex - 1] === '{' && text[charIndex + clusterLength] === '}';
     let workingText = text;
     let workingCoreWordEnd = coreWordEnd;
     let workingTagZoneEnd = tagZoneEnd;
+
     if (rank !== -1 && !alreadyWrapped) {
       workingText =
         workingText.slice(0, charIndex) +
@@ -810,18 +860,31 @@ const processNoiseTags = (value) => {
       // Replace this character's existing tag in place.
       tokens[rank] = `<${tag}>`;
     } else if (rank !== -1) {
-      // Brand-new tag for this character: insert it at its correct rank
-      // among the word's tags, preserving left-to-right order.
-      tokens.splice(rank, 0, `<${tag}>`);
+      if (rank < tokens.length) {
+        // Replace tag at rank so only one tag per syllable exists
+        tokens[rank] = `<${tag}>`;
+      } else {
+        // Insert new tag at rank
+        tokens.splice(rank, 0, `<${tag}>`);
+      }
     } else {
-      // Not a taggable character - shouldn't happen, since the click
-      // handler only calls this for characters that are keys of
-      // charTagMappings, but guard anyway rather than losing the tag.
       tokens.push(`<${tag}>`);
     }
     const newTagZone = tokens.map((t) => ` ${t}`).join('');
 
     const newText = workingText.slice(0, workingCoreWordEnd) + newTagZone + workingText.slice(workingTagZoneEnd);
+
+    // Record state in undoStack for Ctrl+Z / Undo support
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: isL1 ? "textChange" : "textChangeAcoustic",
+        index: subIndex,
+        previousText: text,
+        updateAcoustic: !isL1,
+      },
+    ]);
+    setRedoStack([]);
 
     sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
     dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -2295,12 +2358,12 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     </div>
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
       {charTagMappingsData.map((tag, idx) => {
-        const isSuggested = tag === charTagSuggested;
         const isSelected = tag === charTagCurrentSelected;
+        const isSuggested = !charTagCurrentSelected && tag === charTagSuggested;
         return (
           <div
             key={idx}
-            title={isSelected ? 'Currently selected tag' : (isSuggested ? 'Suggested for this position' : undefined)}
+            title={isSelected ? 'Currently selected tag (click to deselect)' : (isSuggested ? 'Suggested for this position' : undefined)}
             style={{
               padding: '6px 10px',
               cursor: 'pointer',
