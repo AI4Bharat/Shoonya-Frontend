@@ -512,12 +512,11 @@ const TranscriptionRightPanel = ({
 
     if (ProjectDetails?.project_type === 'VerbatimTranscriptionCharacterTagging') {
       setIsVCTCProject(true);
-      console.log("helo");
       
-    const matchedLang = LanguageCode.languages.find(
-      (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
-    );
-    const langCode = matchedLang?.code;
+      const matchedLang = LanguageCode.languages.find(
+        (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
+      );
+      const langCode = matchedLang?.code;
 
       if (langCode && languageTagMappings[langCode]) {
         setCharTagMappings(languageTagMappings[langCode]);
@@ -780,13 +779,25 @@ const processNoiseTags = (value) => {
     const rank = taggableCharIndexes.indexOf(charIndex);
     const alreadyTagged = rank !== -1 && rank < tokens.length;
 
-    // Deselect feature: Clicking the tag that is already assigned removes it
-    if (alreadyTagged && tokens[rank] === `<${tag}>`) {
-      tokens.splice(rank, 1);
+    // Determine if the clicked character/syllable is already wrapped in braces
+    let openBraceIndex = -1;
+    let closeBraceIndex = -1;
+    for (let i = charIndex - 1; i >= coreWordStart; i--) {
+      if (text[i] === '{') { openBraceIndex = i; break; }
+      if (text[i] === '}' || text[i] === '<' || text[i] === '>') break;
+    }
+    for (let i = charIndex; i < coreWordEnd; i++) {
+      if (text[i] === '}') { closeBraceIndex = i; break; }
+      if (text[i] === '{' || text[i] === '<' || text[i] === '>') break;
+    }
+    const alreadyWrapped = openBraceIndex !== -1 && closeBraceIndex !== -1 && openBraceIndex < closeBraceIndex;
 
-      const clusterLength = getSyllableClusterLength(text, charIndex, charTagMappings);
-      const alreadyWrapped =
-        text[charIndex - 1] === '{' && text[charIndex + clusterLength] === '}';
+    const currentTagClean = alreadyTagged ? tokens[rank].replace(/^<|>$/g, '').trim().toLowerCase() : '';
+    const targetTagClean = (tag || '').trim().toLowerCase();
+
+    // Deselect feature: Clicking the tag that is already assigned removes it
+    if (alreadyTagged && currentTagClean === targetTagClean) {
+      tokens.splice(rank, 1);
 
       let workingText = text;
       let workingCoreWordEnd = coreWordEnd;
@@ -794,9 +805,9 @@ const processNoiseTags = (value) => {
 
       if (alreadyWrapped) {
         workingText =
-          workingText.slice(0, charIndex - 1) +
-          workingText.slice(charIndex, charIndex + clusterLength) +
-          workingText.slice(charIndex + clusterLength + 1);
+          workingText.slice(0, openBraceIndex) +
+          workingText.slice(openBraceIndex + 1, closeBraceIndex) +
+          workingText.slice(closeBraceIndex + 1);
         workingCoreWordEnd -= 2;
         workingTagZoneEnd -= 2;
       }
@@ -806,6 +817,18 @@ const processNoiseTags = (value) => {
         workingText.slice(0, workingCoreWordEnd) +
         newTagZone +
         workingText.slice(workingTagZoneEnd);
+
+      // Record state in undoStack for Ctrl+Z / Undo support
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: isL1 ? "textChange" : "textChangeAcoustic",
+          index: subIndex,
+          previousText: text,
+          updateAcoustic: !isL1,
+        },
+      ]);
+      setRedoStack([]);
 
       sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
       dispatch(setSubtitles(sub, C.SUBTITLES));
@@ -818,12 +841,12 @@ const processNoiseTags = (value) => {
       }
       return;
     }
+
     const clusterLength = getSyllableClusterLength(text, charIndex, charTagMappings);
-    const alreadyWrapped =
-      text[charIndex - 1] === '{' && text[charIndex + clusterLength] === '}';
     let workingText = text;
     let workingCoreWordEnd = coreWordEnd;
     let workingTagZoneEnd = tagZoneEnd;
+
     if (rank !== -1 && !alreadyWrapped) {
       workingText =
         workingText.slice(0, charIndex) +
@@ -850,6 +873,18 @@ const processNoiseTags = (value) => {
     const newTagZone = tokens.map((t) => ` ${t}`).join('');
 
     const newText = workingText.slice(0, workingCoreWordEnd) + newTagZone + workingText.slice(workingTagZoneEnd);
+
+    // Record state in undoStack for Ctrl+Z / Undo support
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: isL1 ? "textChange" : "textChangeAcoustic",
+        index: subIndex,
+        previousText: text,
+        updateAcoustic: !isL1,
+      },
+    ]);
+    setRedoStack([]);
 
     sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
     dispatch(setSubtitles(sub, C.SUBTITLES));
