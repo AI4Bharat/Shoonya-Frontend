@@ -4,10 +4,6 @@ export const AUDIO_URL_MAPPINGS = [
     audioUrlParam: "asr-transcription/",
   },
   {
-    sourcePrefix: "https://indic-asr-public.objectstore.e2enetworks.net/",
-    audioUrlParam: "speechteam/",
-  },
-  {
     sourcePrefix: "https://sosnm1.shakticloud.ai:9024/iitmnewbkt/",
     audioUrlParam: "iitmnewbkt/",
   },
@@ -15,6 +11,7 @@ export const AUDIO_URL_MAPPINGS = [
 
 export const PUBLIC_AUDIO_URL_PATTERNS = [
   { pattern: "sarvam-benchmark.objectstore.e2enetworks.net", matcher: "includes" },
+  { pattern: "indic-asr-public.objectstore.e2enetworks.net", matcher: "includes" },
   { pattern: "https://objectstore.e2enetworks.net", matcher: "startsWith" },
 ];
 
