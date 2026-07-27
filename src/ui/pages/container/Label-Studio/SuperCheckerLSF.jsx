@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.snow.css';
+import installLabelStudioBidiPatch from "../../../../hooks/installLabelStudioBidiPatch";
+import "../../../../styles/labelstudio-rtl.css";
 import LabelStudio1 from "./lsf-build/static/js/main";
 import LabelStudio2 from "@heartexlabs/label-studio";
 import Button from "@mui/material/Button";
@@ -47,7 +49,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
-import { formatAnnotations, formatPredictions, cleanResultTexts, handleBidiInput } from "./ocrBidiHelper";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -155,6 +156,19 @@ const LabelStudioWrapper = ({
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
+  const bidiCleanupRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (bidiCleanupRef.current) {
+        bidiCleanupRef.current();
+        bidiCleanupRef.current = null;
+      }
+      if (lsfRef.current) {
+        lsfRef.current.destroy();
+      }
+    };
+  }, []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
@@ -188,46 +202,6 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
-
-  // Fix for OCR bidi mixed text
-  useEffect(() => {
-    if (!ProjectDetails?.project_type?.includes("OCR")) return;
-    const applyBidi = (el) => {
-      if (el.getAttribute('dir') !== 'auto') el.setAttribute('dir', 'auto');
-    };
-
-    // 1. Initial application for elements already in the DOM
-    document.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]').forEach(applyBidi);
-
-    // 2. Set up the MutationObserver to watch for newly added LSF nodes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === 1) { // Ensure it's an Element node
-            // Check if the new node itself needs bidi
-            if (node.matches && node.matches('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]')) {
-              applyBidi(node);
-            }
-            // Check if it contains children that need bidi
-            const elements = node.querySelectorAll('.lsf-region-item__desc, .lsf-region-item__text, .ant-typography, textarea, input, [contenteditable="true"]');
-            elements.forEach(applyBidi);
-          }
-        });
-      });
-    });
-
-    // Observe the body or a specific Label Studio container ID
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // 3. Handle live typing
-    document.addEventListener('input', handleBidiInput);
-    
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('input', handleBidiInput);
-    };
-  }, [ProjectDetails]);
-
 
 
 useEffect(() => {
@@ -371,6 +345,10 @@ useEffect(() => {
     }
 
     if (rootRef.current) {
+      if (bidiCleanupRef.current) {
+        bidiCleanupRef.current();
+        bidiCleanupRef.current = null;
+      }
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
@@ -387,38 +365,33 @@ useEffect(() => {
         },
 
         task: {
-          // annotations: annotations.filter((annotation) => !annotation.parent_annotation).concat(annotations.filter((annotation) => annotation.id === taskData.correct_annotation)),
-          annotations: projectType?.includes("OCR") ? formatAnnotations(filteredAnnotations) : filteredAnnotations,
-          predictions: projectType?.includes("OCR") ? formatPredictions(predictions) : predictions,
+          annotations: filteredAnnotations,
+          predictions: predictions,
           id: taskData.id,
           data: taskData.data,
         },
         keymap: keymap,
 
         onLabelStudioLoad: function (ls) {
-          // if (taskData.correct_annotation) {
-          //   let annotation = annotations.find(
-          //     (annotation) =>
-          //       annotation.id === taskData.correct_annotation
-          //   );
-          //   ls.annotationStore.selectAnnotation(annotation.result[0].id);
-          // } else {
-          // let hasReview = false;
-          // for (let i = 0; i < annotations.length; i++) {
-          //   if (annotations[i].parent_annotation) {
-          //     ls.annotationStore.selectAnnotation(annotations[i].result[0].id);
-          //     // hasReview = true;
-          //     break;
-          //   }
-          // }
-          // if (!hasReview) {
-          //   var c = ls.annotationStore.addAnnotation({
-          //     userGenerate: true,
-          //   });
-          //   ls.annotationStore.selectAnnotation(c.id);
-          // }
-          // }
           load_time.current = new Date();
+
+          requestAnimationFrame(() => {
+            if (rootRef.current && ProjectDetails?.project_type?.includes("OCR")) {
+              bidiCleanupRef.current = installLabelStudioBidiPatch(rootRef.current, {
+                targetLanguage:
+                  taskData?.data?.target_language ||
+                  taskData?.data?.tgt_language ||
+                  taskData?.data?.language ||
+                  taskData?.target_language ||
+                  taskData?.tgt_language ||
+                  taskData?.language ||
+                  ProjectDetails?.tgt_language ||
+                  ProjectDetails?.target_language ||
+                  ProjectDetails?.src_language ||
+                  "",
+              });
+            }
+          });
         },
 
         onSkipTask: function (annotation) {
@@ -446,9 +419,6 @@ useEffect(() => {
 
         onUpdateAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
-          if (projectType.includes("OCR")) {
-            temp = cleanResultTexts(temp);
-          }
           let ids = new Set();
           let countLables = 0;
           if (projectType.includes("OCRTranscriptionEditing")){
@@ -498,9 +468,6 @@ useEffect(() => {
               setAutoSave(false);
               showLoader();
               let temp = annotation.serializeAnnotation();
-              if (projectType.includes("OCR")) {
-                temp = cleanResultTexts(temp);
-              }
 
               for (let i = 0; i < temp.length; i++) {
                 if(temp[i].type === "relation"){
@@ -790,10 +757,6 @@ useEffect(() => {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
-        if (ProjectDetails?.project_type?.includes("OCR")) {
-          temp = cleanResultTexts(temp);
-        }
-
         for (let i = 0; i < temp.length; i++) {
           if(temp[i].type === "relation"){
             continue;
@@ -839,10 +802,6 @@ useEffect(() => {
       if (taskData?.annotation_status !== "freezed") {
         let annotation = lsfRef.current.store.annotationStore.selected;
         let temp = annotation.serializeAnnotation();
-        if (ProjectDetails?.project_type?.includes("OCR")) {
-          temp = cleanResultTexts(temp);
-        }
-
         for (let i = 0; i < temp.length; i++) {
           if (temp[i].parentID !== undefined){
             delete temp[i].parentID;
@@ -1000,19 +959,8 @@ useEffect(() => {
         const start = activeEl.selectionStart;
         const end = activeEl.selectionEnd;
         const text = activeEl.value;
-        const newValue = text.substring(0, start) + formula + text.substring(end);
 
-        // React-controlled input/textarea update workaround
-        const valueSetter = Object.getOwnPropertyDescriptor(
-          activeEl.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype,
-          'value'
-        )?.set;
-
-        if (valueSetter) {
-          valueSetter.call(activeEl, newValue);
-        } else {
-          activeEl.value = newValue;
-        }
+        activeEl.value = text.substring(0, start) + formula + text.substring(end);
         activeEl.selectionStart = activeEl.selectionEnd = start + formula.length;
 
         // Trigger input event
@@ -1120,16 +1068,11 @@ useEffect(() => {
       editor = target.closest('[contenteditable="true"]');
     } else if (target.closest('.ant-typography')) {
       editor = target.closest('.ant-typography');
-    } else if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT') {
-      editor = target;
     }
 
     if (editor) {
       setIsTextareaFocused(true);
       setFocusedEditor(editor);
-      if (editor.getAttribute('dir') !== 'auto') {
-        editor.setAttribute('dir', 'auto');
-      }
       console.log('✓ Editor focused - shortcuts should work');
     }
   };
@@ -1149,22 +1092,22 @@ useEffect(() => {
     }, 150);
   };
 
-  // Setup editor listeners — just set dir="auto" and attach focus/blur
+  // Setup editor listeners
   useEffect(() => {
     const setupListeners = () => {
-      const elements = document.querySelectorAll('.ant-typography, [contenteditable="true"], textarea, input, .lsf-region-item__desc');
+      const editors = document.querySelectorAll('.ant-typography, [contenteditable="true"]');
 
-      elements.forEach(el => {
-        if (!el.dataset.listenerAttached) {
-          el.addEventListener('focus', handleEditorFocus, true);
-          el.addEventListener('blur', handleEditorBlur, true);
-          el.addEventListener('click', handleEditorFocus, true);
-          el.dataset.listenerAttached = 'true';
-        }
-        if (el.getAttribute('dir') !== 'auto') {
-          el.setAttribute('dir', 'auto');
-        }
+      editors.forEach(editor => {
+        editor.removeEventListener('focus', handleEditorFocus);
+        editor.removeEventListener('blur', handleEditorBlur);
+        editor.removeEventListener('click', handleEditorFocus);
+
+        editor.addEventListener('focus', handleEditorFocus, true);
+        editor.addEventListener('blur', handleEditorBlur, true);
+        editor.addEventListener('click', handleEditorFocus, true);
       });
+
+      console.log('Setup focus listeners on', editors.length, 'editors');
     };
 
     setupListeners();
@@ -1580,7 +1523,7 @@ useEffect(() => {
         </div>
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
-        <div className={`label-studio-root ${ProjectDetails?.project_type?.includes("OCR") ? "ocr-project-style" : ""}`} ref={rootRef}></div>
+        <div className="label-studio-root" ref={rootRef}></div>
         <Popover
           id={"'simple-popover'"}
           open={Boolean(showTagSuggestionsAnchorEl)}
@@ -1668,7 +1611,7 @@ useEffect(() => {
                     return JSON.parse(predictions)?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   } catch (error) {
@@ -1676,7 +1619,7 @@ useEffect(() => {
                     return predictions?.map((pred, index) => (
                       <div style={{paddingLeft:"2%", display:"flex", paddingRight:"2%", paddingBottom:"1%"}}>
                         <div style={{padding:"1%", margin:"auto", color:"#9E9E9E"}}>{index}</div>
-                        <textarea readOnly dir="auto" style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
+                        <textarea readOnly style={{width:"100%", borderColor:"#E0E0E0"}} value={pred.text}/>
                       </div>
                     ));
                   }
