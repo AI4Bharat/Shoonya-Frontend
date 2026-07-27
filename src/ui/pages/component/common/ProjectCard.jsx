@@ -10,6 +10,7 @@ import themeDefault from "../../../theme/theme";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import DatasetStyle from "../../../styles/Dataset";
 import UserMappedByProjectStage from "../../../../utils/UserMappedByRole/UserMappedByProjectStage";
+import BookmarkButton from "../../container/Project/BookmarkButton";
 
 
 const ProjectCard = (props) => {
@@ -31,17 +32,23 @@ const ProjectCard = (props) => {
           p: 2,
         }}
       >
-        <Typography
-          variant="body2"
-          sx={{
-            background: "#FFD981",
-            p: 1,
-            borderRadius: 5,
-            width: "fit-content",
-          }}
-        >
-          {projectObj.project_mode}
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Typography
+            variant="body2"
+            sx={{
+              background: "#FFD981",
+              p: 1,
+              borderRadius: 5,
+              width: "fit-content",
+            }}
+          >
+            {projectObj.project_mode}
+          </Typography>
+          <BookmarkButton 
+            projectId={projectObj.id} 
+            isBookmarked={projectObj.is_bookmarked} 
+          />
+        </Box>
         <Typography
           variant="h6"
           sx={{

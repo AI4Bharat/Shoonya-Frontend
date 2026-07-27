@@ -21,7 +21,9 @@ const initialState = {
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
 		case constants.DOWNLOAD_PROJECT_JSON:
-			jsonDownload(action.payload);
+			if (!action.payload.message) {
+				jsonDownload(action.payload);
+			}
 			return {
 				...state,
 				data: state.data + 1,

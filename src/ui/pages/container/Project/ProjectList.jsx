@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Radio, Box, Grid, Typography, ThemeProvider } from "@mui/material";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -13,12 +13,72 @@ import Search from "../../component/common/Search";
 import DatasetStyle from "../../../styles/Dataset";
 import themeDefault from "../../../theme/theme";
 import tableTheme from "../../../theme/tableTheme";
+import { getUserProjects } from "../../../../utils/bookmarkService";
+import CustomizedSnackbars from "../../component/common/Snackbar";
 
-export default function ProjectList() {
+const ProjectList = React.memo(function ProjectList() {
   const [radiobutton, setRadiobutton] = useState(true);
   const classes = DatasetStyle();
   const dispatch = useDispatch();
+  const apiLoading = useSelector((state) => state.apiStatus.loading);
+  const projectData = useSelector((state) => state.getProjects.data);
   const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
+  const [bookmarkedProjects, setBookmarkedProjects] = useState([]);
+  const fetchBookmarkedProjects = async () => {
+    try {
+      const data = await getUserProjects();
+      setBookmarkedProjects(data.results || []);
+    } catch (error) {
+      console.error('Error fetching bookmarked projects:', error);
+      setSnackbarInfo({
+        open: true,
+        message: "Failed to fetch bookmarked projects",
+        variant: "error",
+      });
+    }
+  };
+  useEffect(() => {
+    fetchBookmarkedProjects();
+  }, []);
+  const bookmarkedProjectIds = useMemo(() => {
+    return new Set(bookmarkedProjects.map(project => project.id));
+  }, [bookmarkedProjects]);
+  const displayedProjects = useMemo(() => {
+    if (!projectData || !Array.isArray(projectData)) return [];
+    const bookmarked = [];
+    const nonBookmarked = [];
+    for (let i = 0; i < projectData.length; i++) {
+      const project = projectData[i];
+      const isBookmarked = project.is_bookmarked || bookmarkedProjectIds.has(project.id);
+      
+      if (isBookmarked) {
+        bookmarked.push(project);
+      } else {
+        nonBookmarked.push(project);
+      }
+    }
+    return [...bookmarked, ...nonBookmarked];
+  }, [projectData, bookmarkedProjectIds]);
+
+  const renderSnackBar = () => {
+    return (
+      <CustomizedSnackbars
+        open={snackbar.open}
+        handleClose={() =>
+          setSnackbarInfo({ open: false, message: "", variant: "" })
+        }
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        variant={snackbar.variant}
+        message={snackbar.message}
+      />
+    );
+  };
+
   const [selectedFilters, setsSelectedFilters] = useState(() => {
     const savedFilters = localStorage.getItem("projectSelectedFilters");
     return savedFilters
@@ -28,8 +88,7 @@ export default function ProjectList() {
           project_user_type: "",
           archived_projects: "",
         }});
-  const apiLoading = useSelector((state) => state.apiStatus.loading);
-  const projectData = useSelector((state) => state.getProjects.data);
+
   
   const getDashboardprojectData = () => {
     setLoading(true);
@@ -62,6 +121,7 @@ export default function ProjectList() {
   return (
     <ThemeProvider theme={themeDefault}>
       {loading && <Spinner />}
+      {renderSnackBar()}
 
       {/* <Grid container direction="row" columnSpacing={3} rowSpacing={2} sx={{ position: "static", bottom: "-51px", left: "20px" }} > */}
       <Grid container className={classes.root}>
@@ -120,12 +180,13 @@ export default function ProjectList() {
         <Box sx={{ marginTop: "20px" ,marginLeft:'15px',marginRight:'15px'}}>
           {radiobutton ? (
             <ProjectCardList
-              projectData={projectData}
+              projectData={displayedProjects}
               selectedFilters={selectedFilters} 
               setsSelectedFilters={setsSelectedFilters} 
+              bookmarkedProjectIds={bookmarkedProjectIds}
             />
           ) : (
-            <ProjectCard projectData={projectData}
+            <ProjectCard projectData={displayedProjects}
              selectedFilters={selectedFilters} 
             setsSelectedFilters={setsSelectedFilters}  />
           )}
@@ -133,4 +194,6 @@ export default function ProjectList() {
       </Box>
     </ThemeProvider>
   );
-}
+});
+
+export default ProjectList;

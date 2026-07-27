@@ -226,7 +226,8 @@ const SuperCheckerTasks = (props) => {
   ]);
 
   useEffect(() => {
-    if (ProjectDetails?.project_type?.includes("Acoustic")) {
+    if (ProjectDetails?.project_type?.includes("Acoustic")||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging") {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
           `/projects/${id}/SuperCheckerAudioTranscriptionLandingPage/${
@@ -264,7 +265,9 @@ const SuperCheckerTasks = (props) => {
   useEffect(() => {
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
-        let row = [el.id];
+        let row = [
+          el.id
+        ];
         row.push(
           ...Object.keys(el.data)
             .filter((key) => !excludeCols.includes(key))
@@ -273,7 +276,8 @@ const SuperCheckerTasks = (props) => {
         taskList[0].supercheck_status && row.push(el.supercheck_status);
         row.push(
           <Link
-            to={(ProjectDetails?.project_type?.includes("Acoustic"))
+            to={(ProjectDetails?.project_type?.includes("Acoustic")) ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
             ? `SuperCheckerAudioTranscriptionLandingPage/${el.id}` : `SuperChecker/${el.id}`} className={classes.link}>
             <CustomButton
               disabled={ProjectDetails.is_archived}
@@ -713,7 +717,7 @@ const renderSnackBar = () => {
                 selectedFilters.supercheck_status === "skipped" 
               ) && (
                 <Grid item xs={12} sm={12} md={3}>
-                  <Tooltip title={deallocateDisabled }>
+                  <Tooltip title={ProjectDetails?.project_type?.includes("OCR") ? "Deallocation is disabled for OCR projects" : deallocateDisabled}>
                     <Box>
                       <CustomButton
                         sx={{
@@ -724,7 +728,7 @@ const renderSnackBar = () => {
                         }}
                         label={"De-allocate Tasks"}
                         onClick={() => setDeallocateDialog(true)}
-                        disabled={deallocateDisabled }
+                        disabled={deallocateDisabled || ProjectDetails?.project_type?.includes("OCR")}
                         color={"warning"}
                       />
                     </Box>

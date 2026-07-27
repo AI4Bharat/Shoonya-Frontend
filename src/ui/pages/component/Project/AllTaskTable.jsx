@@ -22,6 +22,7 @@ import CustomButton from '../common/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import AllTaskSearchPopup from './AllTaskSearchPopup';
 import Skeleton from "@mui/material/Skeleton";
+import ColumnList from "../common/ColumnList";
 
 const excludeCols = [
   "context",
@@ -126,7 +127,11 @@ const AllTaskTable = (props) => {
   useEffect(() => {
     if (AllTaskData?.length > 0 && AllTaskData[0]?.data) {
       const data = AllTaskData.map((el) => {
-        let row = [el.id];
+        let row = [
+          el.id,
+          el.input_data_id ?? "",
+          el.input_data_metadata_json ?? "",
+        ];
         row.push(
           ...Object.keys(el.data)
             .filter((key) => !excludeCols.includes(key))
@@ -134,7 +139,8 @@ const AllTaskTable = (props) => {
         );
         AllTaskData[0].task_status && row.push(el.task_status);
         row.push( <>
-          <Link to={ProjectDetails?.project_type?.includes("Acoustic") ?
+          <Link to={ProjectDetails?.project_type?.includes("Acoustic") ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging" ?
           `AllAudioTranscriptionLandingPage/${el.id}` : `Alltask/${el.id}`} className={classes.link}>
           <CustomButton
               onClick={() => { console.log("task id === ", el.id); localStorage.removeItem("labelAll") }}
@@ -148,7 +154,7 @@ const AllTaskTable = (props) => {
         return row;
         
       });
-      let colList = ["id"];
+      let colList = ["id", "input_data_id", "dataset_metadata"];
       colList.push(
         ...Object.keys(AllTaskData[0].data).filter(
           (el) => !excludeCols.includes(el)
@@ -165,12 +171,23 @@ const AllTaskTable = (props) => {
             sort: false,
             align: "center",
             customHeadLabelRender: customColumnHead,
+            customBodyRender: col === "dataset_metadata" ? (value) => {
+              if (value === null || value === undefined || value === "" || value === "null" || (typeof value === "object" && Object.keys(value).length === 0)) {
+                return "null";
+              }
+              if (typeof value === "object") {
+                return Object.entries(value)
+                  .map(([key, val]) => `${key}: ${typeof val === "object" ? JSON.stringify(val) : val}`)
+                  .join(", ");
+              }
+              return String(value);
+            } : undefined,
           },
         };
       });
       console.log("colss", cols);
       setColumns(cols);
-      setSelectedColumns(colList);
+      setSelectedColumns(colList.filter((col) => col !== "input_data_id" && col !== "dataset_metadata"));
       setTasks(data);
     } else {
       setTasks([]);
@@ -229,11 +246,11 @@ const handleSearchClose = () => {
     // const buttonSXStyle = { borderRadius: 2, margin: 2 }
     return (
       <Box className={classes.filterToolbarContainer} sx={{ height: "80px" }}>
-        {/* <ColumnList
-                columns={columns}
-                setColumns={setSelectedColumns}
-                selectedColumns={selectedColumns}
-            /> */}
+        <ColumnList
+          columns={columns}
+          setColumns={setSelectedColumns}
+          selectedColumns={selectedColumns}
+        />
         <Tooltip title="Filter Table">
           <Button onClick={handleShowFilter}>
             <FilterListIcon />

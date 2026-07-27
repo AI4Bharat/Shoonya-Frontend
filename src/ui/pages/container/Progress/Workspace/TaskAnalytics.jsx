@@ -77,7 +77,8 @@ const TaskAnalytics = () => {
     'AudioTranscription',
     'AudioSegmentation',
     'AudioTranscriptionEditing',
-    'AcousticNormalisedTranscriptionEditing'
+    'AcousticNormalisedTranscriptionEditing',
+    'VerbatimTranscriptionCharacterTagging'
   ]
   const translationProjectTypes=[
     'MonolingualTranslation',
@@ -95,6 +96,8 @@ const TaskAnalytics = () => {
   ]
   const ocrProjectTypes=[
     'OCRTranscriptionEditing',
+    "OCRTESTTranscriptionEditing",
+    'OCRTableEditing',
     'OCRSegmentCategorizationEditing'
   ]
 

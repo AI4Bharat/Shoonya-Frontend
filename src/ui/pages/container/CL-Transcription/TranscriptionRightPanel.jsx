@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef, memo } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState, useRef, memo } from "react";
 import { IndicTransliterate } from "@ai4bharat/indic-transliterate";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -72,6 +72,170 @@ import { Add, MoreVert, Remove } from "@material-ui/icons";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import configs from "../../../../config/config";
 
+const languageTagMappings = {
+  'ta': {
+    'க': ['k-kh', 'k-g', 'k-gh', 'kh-k', 'kh-g', 'kh-gh', 'g-k', 'g-kh', 'g-gh', 'gh-k', 'gh-kh', 'gh-g'], // velar stops
+    'ப': ['p-ph', 'p-b', 'p-bh', 'ph-p', 'ph-b', 'ph-bh', 'b-p', 'b-ph', 'b-bh', 'bh-p', 'bh-ph', 'bh-b'], // bilabial stops
+    'த': ['t-th', 't-d', 't-dh', 'th-t', 'th-d', 'th-dh', 'd-t', 'd-th', 'd-dh', 'dh-t', 'dh-th', 'dh-d'], // dental stops
+    'ட': ['T-TH', 'T-D', 'T-DH', 'TH-T', 'TH-D', 'TH-DH', 'D-T', 'D-TH', 'D-DH', 'DH-T', 'DH-TH', 'DH-D'], // retroflex stops
+    'ச': ['s-ch', 's-cch', 'ch-s', 'ch-cch', 'cch-s', 'cch-ch'], // alveolar fricatives and affricate
+    'ஜ': ['j-jh', 'jh-j'] // palatal affricate
+  },
+  'ml': {
+    'ഫ': ['ph-f', 'f-ph'] // f vs ph
+  },
+  'mr': {
+    'ज': ['z-j'],   // j vs z
+    'झ': ['zh-jh'], // jh vs zh
+    'च': ['ts-ch'], // ch vs ts
+    'ஃப' /* not used */: undefined, // placeholder removed below
+    'फ': ['ph-f']   // f vs ph
+  },
+  'en': {
+    'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
+  }
+};
+
+const TAMIL_PULLI = "\u0BCD";
+const tamilSeries = {
+  'க': { nasal: 'ங', pair: ['k', 'g'], posSound: { init: 'k', gem: 'k', nas: 'g', vow: 'gh' } },
+  'ப': { nasal: 'ம', pair: ['p', 'b'], posSound: { init: 'p', gem: 'p', nas: 'b', vow: 'b' } },
+  'த': { nasal: 'ந', pair: ['t', 'd'], posSound: { init: 't', gem: 't', nas: 'd', vow: 'd' } },
+  'ட': { nasal: 'ண', pair: ['T', 'D'], posSound: { init: 'T', gem: 'T', nas: 'D', vow: 'D' } },
+  'ச': { nasal: 'ஞ', pair: ['s', 'ch'], posSound: { init: 's', gem: 'cch', nas: 'ch', vow: 's' } },
+};
+
+const detectCharPosition = (text, charIndex, baseChar) => {
+  const prevChar = charIndex > 0 ? text[charIndex - 1] : null;
+  if (prevChar === null || /\s/.test(prevChar) || /[.,!?;:]/.test(prevChar)) return 'init';
+  if (prevChar === TAMIL_PULLI) {
+    const beforePulli = charIndex > 1 ? text[charIndex - 2] : null;
+    const series = tamilSeries[baseChar];
+    if (beforePulli === baseChar) return 'gem';
+    if (series && beforePulli === series.nasal) return 'nas';
+  }
+  return 'vow';
+};
+
+const getSuggestedTag = (baseChar, pos) => {
+  const s = tamilSeries[baseChar];
+  if (!s) return null;
+  const likely = s.posSound[pos];
+  const [a, b] = s.pair;
+  if (likely === b) return `${b}-${a}`;
+  if (likely === a) return `${a}-${b}`;
+  return `${likely}-${a}`;
+};
+const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
+  const taggableCharIndexes = [];
+  for (let i = coreWordStart; i < coreWordEnd; i++) {
+    if (mappings[text[i]]) taggableCharIndexes.push(i);
+  }
+  const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
+  const tagZoneStr = tagZoneMatch[0];
+  const tagZoneEnd = coreWordEnd + tagZoneStr.length;
+  const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
+  return { taggableCharIndexes, tagZoneStr, tagZoneEnd, tokens };
+};
+
+const VIRAMA_CHARS = new Set([
+  '\u094D', // Devanagari virama
+  '\u0BCD', // Tamil pulli
+  '\u0D4D', // Malayalam chandrakkala
+  '\u0C4D', // Telugu virama
+  '\u0CCD', // Kannada virama
+  '\u09CD', // Bengali virama
+  '\u0ACD', // Gujarati virama
+  '\u0A4D', // Gurmukhi virama
+  '\u0B4D', // Oriya virama
+]);
+
+const getSyllableClusterLength = (text, startIndex, mappings) => {
+  let i = startIndex + 1;
+  while (i < text.length) {
+    let marksEnd = i;
+    while (marksEnd < text.length && /\p{M}/u.test(text[marksEnd])) {
+      marksEnd++;
+    }
+    if (marksEnd === i) break; // no combining marks here - cluster is done
+
+    const endedOnVirama = VIRAMA_CHARS.has(text[marksEnd - 1]);
+    const nextChar = text[marksEnd];
+    const nextIsLetter = marksEnd < text.length && /\p{L}/u.test(nextChar);
+    const nextIsIndependentlyTaggable = nextIsLetter && !!mappings[nextChar];
+
+    if (endedOnVirama && nextIsLetter && !nextIsIndependentlyTaggable) {
+      i = marksEnd + 1;
+      continue;
+    }
+
+    i = marksEnd;
+    break;
+  }
+  return i - startIndex;
+};
+
+const getCharIndexAtPoint = (textarea, clientX, clientY) => {
+  const style = window.getComputedStyle(textarea);
+  const mirror = document.createElement("div");
+
+  const propsToCopy = [
+    "boxSizing", "width",
+    "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
+    "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth",
+    "fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing",
+    "lineHeight", "textTransform", "wordSpacing", "tabSize",
+  ];
+  propsToCopy.forEach((p) => { mirror.style[p] = style[p]; });
+
+  const rect = textarea.getBoundingClientRect();
+  mirror.style.position = "fixed";
+  mirror.style.top = `${rect.top}px`;
+  mirror.style.left = `${rect.left}px`;
+  mirror.style.height = `${textarea.clientHeight}px`;
+  mirror.style.whiteSpace = "pre-wrap";
+  mirror.style.wordWrap = "break-word";
+  mirror.style.overflow = "hidden";
+  mirror.style.visibility = "hidden";
+  mirror.style.pointerEvents = "none";
+  mirror.style.margin = "0";
+  mirror.style.zIndex = "-1";
+
+  const text = textarea.value || "";
+  const spans = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "\n") {
+      mirror.appendChild(document.createElement("br"));
+      spans.push(null);
+      continue;
+    }
+    const span = document.createElement("span");
+    span.textContent = ch;
+    mirror.appendChild(span);
+    spans.push(span);
+  }
+
+  document.body.appendChild(mirror);
+  mirror.scrollTop = textarea.scrollTop;
+  mirror.scrollLeft = textarea.scrollLeft;
+
+  let foundIndex = -1;
+  for (let i = 0; i < spans.length; i++) {
+    const span = spans[i];
+    if (!span) continue;
+    const r = span.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) continue;
+    if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
+      foundIndex = i;
+      break;
+    }
+  }
+
+  document.body.removeChild(mirror);
+  return foundIndex;
+};
+
 const TranscriptionRightPanel = ({
   currentIndex,
   AnnotationsTaskDetails,
@@ -116,7 +280,8 @@ const TranscriptionRightPanel = ({
   // const currentPageData = subtitles?.slice(startIndex, endIndex);
   const idxOffset = itemsPerPage * (page - 1);
   const showAcousticText =
-    ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing" &&
+    (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"  ||
+    ProjectDetails?.project_type == 'VerbatimTranscriptionCharacterTagging') &&
     ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
@@ -169,6 +334,20 @@ const TranscriptionRightPanel = ({
   const [currentTextRefIdx, setCurrentTextRefIdx] = useState(null);
   const [currentSelection, setCurrentSelection] = useState(null);
   const langDictSet = new Set(langDict[targetlang]);
+  const [charTagMappings, setCharTagMappings] = useState({});
+  const [isVCTCProject, setIsVCTCProject] = useState(false);
+  const [charTagPopoverOpen, setCharTagPopoverOpen] = useState(false);
+  const [charTagAnchorEl, setCharTagAnchorEl] = useState(null);
+  const [charTagMappingsData, setCharTagMappingsData] = useState([]);
+  const [charTagSelectedText, setCharTagSelectedText] = useState('');
+  const [charTagIndex, setCharTagIndex] = useState(null);
+  const [charTagOnSelect, setCharTagOnSelect] = useState(null);
+  const [charTagSuggested, setCharTagSuggested] = useState(null);
+  const [charTagCurrentSelected, setCharTagCurrentSelected] = useState(null);
+  const [charTagAssignments, setCharTagAssignments] = useState({});
+  const [charTagClickPos, setCharTagClickPos] = useState(null);
+  const [charTagPopoverStyle, setCharTagPopoverStyle] = useState(null);
+  const charTagPopoverRef = useRef(null);
 
   useEffect(() => {
     currentPageData?.length &&
@@ -328,6 +507,100 @@ const TranscriptionRightPanel = ({
     };
   }, [enableTransliteration, setTransliteration]);
 
+  // Check for VCTC project and load character tag mappings
+  useEffect(() => {
+
+    if (ProjectDetails?.project_type === 'VerbatimTranscriptionCharacterTagging') {
+      setIsVCTCProject(true);
+      
+      const matchedLang = LanguageCode.languages.find(
+        (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
+      );
+      const langCode = matchedLang?.code;
+
+      if (langCode && languageTagMappings[langCode]) {
+        setCharTagMappings(languageTagMappings[langCode]);
+      }
+    } else {
+      setIsVCTCProject(false);
+      setCharTagMappings({});
+    }
+  }, [ProjectDetails]);
+
+  // Close popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (charTagPopoverOpen && charTagAnchorEl) {
+        const popover = document.querySelector('.char-tag-popover');
+        if (popover && !popover.contains(event.target) && event.target !== charTagAnchorEl) {
+          setCharTagPopoverOpen(false);
+          setCharTagAnchorEl(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [charTagPopoverOpen, charTagAnchorEl]);
+
+  // Local handler for character tagging popover
+  const charTagTimeoutRef = useRef(null);
+
+  const handleCharTagPopover = (data) => {
+    // Clear any pending timeout
+    if (charTagTimeoutRef.current) {
+      clearTimeout(charTagTimeoutRef.current);
+      charTagTimeoutRef.current = null;
+    }
+
+    // If data is null, close the popover after a delay
+    if (!data) {
+      charTagTimeoutRef.current = setTimeout(() => {
+        setCharTagPopoverOpen(false);
+        setCharTagAnchorEl(null);
+        charTagTimeoutRef.current = null;
+      }, 300);
+      return;
+    }
+
+    // Check if anchorEl exists
+    if (!data.anchorEl) return;
+
+    // Store the data in state
+    setCharTagAnchorEl(data.anchorEl);
+    setCharTagMappingsData(data.mappings || []);
+    setCharTagSelectedText(data.selectedText || '');
+    setCharTagIndex(data.index || 0);
+    setCharTagOnSelect(() => data.onTagSelect || null);
+    setCharTagSuggested(data.suggestedTag || null);
+    setCharTagCurrentSelected(data.currentTag || null);
+    setCharTagClickPos(data.position || null);
+    setCharTagPopoverOpen(true);
+  };
+
+  // Re-measures the popover's actual rendered size and clamps it to the
+  // viewport, flipping above the click point if there's no room below.
+  useLayoutEffect(() => {
+    if (!charTagPopoverOpen || !charTagClickPos || !charTagPopoverRef.current) return;
+    const popEl = charTagPopoverRef.current;
+    const pw = popEl.offsetWidth;
+    const ph = popEl.offsetHeight;
+    const margin = 8;
+
+    let left = charTagClickPos.x - pw / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - pw - margin));
+
+    let top = charTagClickPos.y + 18;
+    if (top + ph > window.innerHeight - margin) {
+      top = charTagClickPos.y - ph - 12;
+    }
+    top = Math.max(margin, top);
+
+    setCharTagPopoverStyle({ top, left });
+  }, [charTagPopoverOpen, charTagClickPos, charTagMappingsData]);
+
   const getPayload = (offset = currentOffset, lim = limit) => {
     const payloadObj = new GetAnnotationsTaskAPI(
       taskId
@@ -469,6 +742,232 @@ const processNoiseTags = (value) => {
     }
   }
 };
+  const handleCharacterTagSelection = (subIndex, charIndex, tag, isL1 = false) => {
+    const sub = [...subtitles];
+    const fieldKey = isL1 ? 'text' : 'acoustic_normalised_text';
+    const text = sub[subIndex]?.[fieldKey] || '';
+
+    if (charIndex === null || charIndex < 0 || charIndex >= text.length) {
+      console.warn("Invalid character index for tagging:", charIndex);
+      return;
+    }
+
+    let coreWordStart = charIndex;
+    while (
+      coreWordStart > 0 &&
+      !/\s/.test(text[coreWordStart - 1]) &&
+      text[coreWordStart - 1] !== '>'
+    ) coreWordStart--;
+    let coreWordEnd = charIndex;
+    while (
+      coreWordEnd < text.length &&
+      !/\s/.test(text[coreWordEnd]) &&
+      text[coreWordEnd] !== '<'
+    ) coreWordEnd++;
+
+    const { taggableCharIndexes, tagZoneEnd, tokens } = getWordTagInfo(
+      text,
+      coreWordStart,
+      coreWordEnd,
+      charTagMappings
+    );
+
+    // This character's position among ALL taggable characters of the word,
+    // in left-to-right order. The K-th tag in the group belongs to the
+    // K-th taggable character, so this character already has a tag exactly
+    // when its rank falls within the tokens already present.
+    const rank = taggableCharIndexes.indexOf(charIndex);
+    const alreadyTagged = rank !== -1 && rank < tokens.length;
+
+    // Determine if the clicked character/syllable is already wrapped in braces
+    let openBraceIndex = -1;
+    let closeBraceIndex = -1;
+    for (let i = charIndex - 1; i >= coreWordStart; i--) {
+      if (text[i] === '{') { openBraceIndex = i; break; }
+      if (text[i] === '}' || text[i] === '<' || text[i] === '>') break;
+    }
+    for (let i = charIndex; i < coreWordEnd; i++) {
+      if (text[i] === '}') { closeBraceIndex = i; break; }
+      if (text[i] === '{' || text[i] === '<' || text[i] === '>') break;
+    }
+    const alreadyWrapped = openBraceIndex !== -1 && closeBraceIndex !== -1 && openBraceIndex < closeBraceIndex;
+
+    const currentTagClean = alreadyTagged ? tokens[rank].replace(/^<|>$/g, '').trim().toLowerCase() : '';
+    const targetTagClean = (tag || '').trim().toLowerCase();
+
+    // Deselect feature: Clicking the tag that is already assigned removes it
+    if (alreadyTagged && currentTagClean === targetTagClean) {
+      tokens.splice(rank, 1);
+
+      let workingText = text;
+      let workingCoreWordEnd = coreWordEnd;
+      let workingTagZoneEnd = tagZoneEnd;
+
+      if (alreadyWrapped) {
+        workingText =
+          workingText.slice(0, openBraceIndex) +
+          workingText.slice(openBraceIndex + 1, closeBraceIndex) +
+          workingText.slice(closeBraceIndex + 1);
+        workingCoreWordEnd -= 2;
+        workingTagZoneEnd -= 2;
+      }
+
+      const newTagZone = tokens.length > 0 ? tokens.map((t) => ` ${t}`).join('') : '';
+      const newText =
+        workingText.slice(0, workingCoreWordEnd) +
+        newTagZone +
+        workingText.slice(workingTagZoneEnd);
+
+      // Record state in undoStack for Ctrl+Z / Undo support
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: isL1 ? "textChange" : "textChangeAcoustic",
+          index: subIndex,
+          previousText: text,
+          updateAcoustic: !isL1,
+        },
+      ]);
+      setRedoStack([]);
+
+      sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+
+      setCharTagPopoverOpen(false);
+      setCharTagAnchorEl(null);
+      if (charTagTimeoutRef.current) {
+        clearTimeout(charTagTimeoutRef.current);
+        charTagTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    const clusterLength = getSyllableClusterLength(text, charIndex, charTagMappings);
+    let workingText = text;
+    let workingCoreWordEnd = coreWordEnd;
+    let workingTagZoneEnd = tagZoneEnd;
+
+    if (rank !== -1 && !alreadyWrapped) {
+      workingText =
+        workingText.slice(0, charIndex) +
+        '{' + workingText.slice(charIndex, charIndex + clusterLength) + '}' +
+        workingText.slice(charIndex + clusterLength);
+      workingCoreWordEnd += 2;
+      workingTagZoneEnd += 2;
+    }
+
+    if (alreadyTagged) {
+      // Replace this character's existing tag in place.
+      tokens[rank] = `<${tag}>`;
+    } else if (rank !== -1) {
+      if (rank < tokens.length) {
+        // Replace tag at rank so only one tag per syllable exists
+        tokens[rank] = `<${tag}>`;
+      } else {
+        // Insert new tag at rank
+        tokens.splice(rank, 0, `<${tag}>`);
+      }
+    } else {
+      tokens.push(`<${tag}>`);
+    }
+    const newTagZone = tokens.map((t) => ` ${t}`).join('');
+
+    const newText = workingText.slice(0, workingCoreWordEnd) + newTagZone + workingText.slice(workingTagZoneEnd);
+
+    // Record state in undoStack for Ctrl+Z / Undo support
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: isL1 ? "textChange" : "textChangeAcoustic",
+        index: subIndex,
+        previousText: text,
+        updateAcoustic: !isL1,
+      },
+    ]);
+    setRedoStack([]);
+
+    sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
+    dispatch(setSubtitles(sub, C.SUBTITLES));
+
+    // Close popover
+    setCharTagPopoverOpen(false);
+    setCharTagAnchorEl(null);
+    if (charTagTimeoutRef.current) {
+      clearTimeout(charTagTimeoutRef.current);
+      charTagTimeoutRef.current = null;
+    }
+  };
+
+  const handleTextareaClick = (event, subIndex, isL1) => {
+    if (!isVCTCProject) return;
+
+    const textarea = event.target;
+    const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
+
+    if (charIndex === -1) {
+      handleCharTagPopover(null);
+      return;
+    }
+
+    const charAtCursor = textarea.value[charIndex] || '';
+
+    if (charAtCursor && charTagMappings[charAtCursor]) {
+      // Select exactly that character so the native selection highlight
+      // gives visual feedback for which letter was picked.
+      textarea.setSelectionRange(charIndex, charIndex + 1);
+      const mappings = charTagMappings[charAtCursor];
+
+      // Clear any pending timeout
+      if (charTagTimeoutRef.current) {
+        clearTimeout(charTagTimeoutRef.current);
+        charTagTimeoutRef.current = null;
+      }
+
+      const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
+      const suggested = getSuggestedTag(charAtCursor, pos);
+
+      // Look up whether this character already has a tag, derived fresh
+      // from the current text (see getWordTagInfo) so it's correct even
+      // right after a page refresh, when there is no in-memory record of
+      // previous tagging left to consult.
+      let coreWordStart = charIndex;
+      while (
+        coreWordStart > 0 &&
+        !/\s/.test(textarea.value[coreWordStart - 1]) &&
+        textarea.value[coreWordStart - 1] !== '>'
+      ) coreWordStart--;
+      let coreWordEnd = charIndex;
+      while (
+        coreWordEnd < textarea.value.length &&
+        !/\s/.test(textarea.value[coreWordEnd]) &&
+        textarea.value[coreWordEnd] !== '<'
+      ) coreWordEnd++;
+      const { taggableCharIndexes, tokens } = getWordTagInfo(
+        textarea.value,
+        coreWordStart,
+        coreWordEnd,
+        charTagMappings
+      );
+      const rank = taggableCharIndexes.indexOf(charIndex);
+      const currentTag =
+        rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
+
+      handleCharTagPopover({
+        anchorEl: textarea,
+        mappings: mappings,
+        selectedText: charAtCursor,
+        index: subIndex,
+        position: { x: event.clientX, y: event.clientY },
+        suggestedTag: suggested,
+        currentTag: currentTag,
+        onTagSelect: (tag) => {
+          handleCharacterTagSelection(subIndex, charIndex, tag, isL1);
+        }
+      });
+    } else {
+      handleCharTagPopover(null);
+    }
+  };
 
 const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   const { value: eventValue } = event.target;
@@ -521,27 +1020,28 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     if (containsTripleDollar) {
       // setEnableTransliterationSuggestion(false);
 
-    const textBeforeTab = value.split("$$$")[0];
-    const textAfterTab = value.split("$$$")[1].split("").join("");
-    setCurrentSelectedIndex(index);
-    setTagSuggestionsAnchorEl(currentTarget);
-    setTextWithoutTripleDollar(textBeforeTab);
-    setTextAfterTripleDollar(textAfterTab);
-    setCurrentTextRefIdx(
-      index + (updateAcoustic ? currentPageData?.length : 0)
-    );
-    setCurrentSelection(event.target.selectionEnd);
-    setTagSuggestionsAcoustic(updateAcoustic);
-  }
-  const sub = onSubtitleChange(value, index, updateAcoustic, false);
-  dispatch(setSubtitles(sub, C.SUBTITLES));
-  // saveTranscriptHandler(false, false, sub);
-};
+      const textBeforeTab = value.split("$$$")[0];
+      const textAfterTab = value.split("$$$")[1].split("").join("");
+      setCurrentSelectedIndex(index);
+      setTagSuggestionsAnchorEl(currentTarget);
+      setTextWithoutTripleDollar(textBeforeTab);
+      setTextAfterTripleDollar(textAfterTab);
+      setCurrentTextRefIdx(
+        index + (updateAcoustic ? currentPageData?.length : 0)
+      );
+      setCurrentSelection(event.target.selectionEnd);
+      setTagSuggestionsAcoustic(updateAcoustic);
+    }
+    const sub = onSubtitleChange(value, index, updateAcoustic, false);
+    dispatch(setSubtitles(sub, C.SUBTITLES));
+    // saveTranscriptHandler(false, false, sub);
+  };
+
   const populateAcoustic = (index) => {
     if( ProjectDetails?.metadata_json?.copy_l1_to_l2 ?? true){
       const sub = onSubtitleChange("", index, false, true);
-    dispatch(setSubtitles(sub, C.SUBTITLES))
-  };
+      dispatch(setSubtitles(sub, C.SUBTITLES));
+    };
   };
 
   const saveTranscriptHandler = async (isFinal) => {
@@ -640,35 +1140,35 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   };
 
   const handleDoubleHashes = () => {
-   
-  const elementsWithBoxHighlightClass = document.getElementsByClassName(
-    classes.boxHighlight
-  );
+     
+    const elementsWithBoxHighlightClass = document.getElementsByClassName(
+      classes.boxHighlight
+    );
 
-  let index = "";
-  for (let i = 0; i < elementsWithBoxHighlightClass.length; i++) {
-    const textVal = elementsWithBoxHighlightClass[i];
-    const cursorStart = textVal.selectionStart;
-    const cursorEnd = textVal.selectionEnd;
-    const selectedText = textVal.value.substring(cursorStart, cursorEnd);
+    let index = "";
+    for (let i = 0; i < elementsWithBoxHighlightClass.length; i++) {
+      const textVal = elementsWithBoxHighlightClass[i];
+      const cursorStart = textVal.selectionStart;
+      const cursorEnd = textVal.selectionEnd;
+      const selectedText = textVal.value.substring(cursorStart, cursorEnd);
 
-    if (selectedText !== "") {
-      index = i;
-      const doubleHashedText = `##${selectedText}##`;
+      if (selectedText !== "") {
+        index = i;
+        const doubleHashedText = `##${selectedText}##`;
 
-      replaceSelectedText(doubleHashedText, currentIndexToSplitTextBlock, index);
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "doubleHash",
-          index: i,
-          originalText: selectedText,
-          hashedText: doubleHashedText,
-        },
-      ]);
-      setRedoStack([]);
+        replaceSelectedText(doubleHashedText, currentIndexToSplitTextBlock, index);
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "doubleHash",
+            index: i,
+            originalText: selectedText,
+            hashedText: doubleHashedText,
+          },
+        ]);
+        setRedoStack([]);
+      }
     }
-  }
 
   };
 
@@ -776,91 +1276,89 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     classes.boxHighlight,
   ]);
 
-const onRedo = useCallback(() => {
-  if (redoStack?.length > 0) {
-    const lastAction = redoStack[redoStack.length - 1];
+  const onRedo = useCallback(() => {
+    if (redoStack?.length > 0) {
+      const lastAction = redoStack[redoStack.length - 1];
 
-    if (lastAction.type === "textChange") {
-      // Handle verbatim text redo
-      const currentText = subtitles[lastAction.index]?.text || "";
+      if (lastAction.type === "textChange") {
+        // Handle verbatim text redo
+        const currentText = subtitles[lastAction.index]?.text || "";
 
-      // Redo text change
-      const sub = onSubtitleChange(
-        lastAction.previousText,
-        lastAction.index,
-        false
-      );
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-
-      // Push undo version of this action
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "textChange",
-          index: lastAction.index,
-          previousText: currentText,
-          updateAcoustic: false
-        },
-      ]);
-    }
-    else if (lastAction.type === "textChangeAcoustic") {
-      // Handle acoustic text redo
-      const currentText = subtitles[lastAction.index]?.acoustic_normalised_text || "";
-
-      const sub = onSubtitleChange(
-        lastAction.previousText,
-        lastAction.index,
-        true // updateAcoustic flag
-      );
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-
-      setUndoStack((prevState) => [
-        ...prevState,
-        {
-          type: "textChangeAcoustic",
-          index: lastAction.index,
-          previousText: currentText,
-          updateAcoustic: true
-        },
-      ]);
-    }
-
-    else if (lastAction.type === "doubleHash") {
-      // Redo double-hash action
-      const elementsWithBoxHighlightClass = document.getElementsByClassName(
-        classes.boxHighlight
-      );
-      const textArea = elementsWithBoxHighlightClass[lastAction.index];
-      if (textArea) {
-        textArea.value = textArea.value.replace(
-          lastAction.originalText,
-          lastAction.hashedText
-        );
-
+        // Redo text change
         const sub = onSubtitleChange(
-          textArea.value,
-          currentIndexToSplitTextBlock,
-          lastAction.index
+          lastAction.previousText,
+          lastAction.index,
+          false
         );
         dispatch(setSubtitles(sub, C.SUBTITLES));
+
+        // Push undo version of this action
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "textChange",
+            index: lastAction.index,
+            previousText: currentText,
+            updateAcoustic: false
+          },
+        ]);
+      }
+      else if (lastAction.type === "textChangeAcoustic") {
+        // Handle acoustic text redo
+        const currentText = subtitles[lastAction.index]?.acoustic_normalised_text || "";
+
+        const sub = onSubtitleChange(
+          lastAction.previousText,
+          lastAction.index,
+          true // updateAcoustic flag
+        );
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+
+        setUndoStack((prevState) => [
+          ...prevState,
+          {
+            type: "textChangeAcoustic",
+            index: lastAction.index,
+            previousText: currentText,
+            updateAcoustic: true
+          },
+        ]);
       }
 
-      setUndoStack((prevState) => [...prevState, lastAction]);
+      else if (lastAction.type === "doubleHash") {
+        // Redo double-hash action
+        const elementsWithBoxHighlightClass = document.getElementsByClassName(
+          classes.boxHighlight
+        );
+        const textArea = elementsWithBoxHighlightClass[lastAction.index];
+        if (textArea) {
+          textArea.value = textArea.value.replace(
+            lastAction.originalText,
+            lastAction.hashedText
+          );
+
+          const sub = onSubtitleChange(
+            textArea.value,
+            currentIndexToSplitTextBlock,
+            lastAction.index
+          );
+          dispatch(setSubtitles(sub, C.SUBTITLES));
+        }
+
+        setUndoStack((prevState) => [...prevState, lastAction]);
+      }
+
+      else {
+        // Redo other actions
+        const sub = onRedoAction(lastAction);
+        dispatch(setSubtitles(sub, C.SUBTITLES));
+        setUndoStack((prevState) => [...prevState, lastAction]);
+      }
+
+      // Remove from redo stack
+      setRedoStack((prev) => prev.slice(0, prev.length - 1));
     }
-
-    else {
-      // Redo other actions
-      const sub = onRedoAction(lastAction);
-      dispatch(setSubtitles(sub, C.SUBTITLES));
-      setUndoStack((prevState) => [...prevState, lastAction]);
-    }
-
-    // Remove from redo stack
-    setRedoStack((prev) => prev.slice(0, prev.length - 1));
-  }
-}, [redoStack, subtitles, dispatch, currentIndexToSplitTextBlock, classes.boxHighlight]);
-
-
+  }, [redoStack, subtitles, dispatch, currentIndexToSplitTextBlock, classes.boxHighlight]);
 
   useEffect(() => {
       const handleKeyDown = (event) => {
@@ -980,7 +1478,6 @@ const onRedo = useCallback(() => {
               setPauseOnType={setPauseOnType}
               annotationId={annotationId}
               handleOpenPopover={handleOpenPopover}
-
             />
           </Grid>
           {showAcousticText && (
@@ -1033,7 +1530,7 @@ const onRedo = useCallback(() => {
         >
           {currentPageData?.map((item, index) => {
             return (
-              <React.Fragment>
+              <React.Fragment key={index}>
                 <Resizable
                   bounds="parent"
                   default={{ height: "240px" }}
@@ -1399,6 +1896,10 @@ const onRedo = useCallback(() => {
                                     }, 200);
                                   }}
                                   {...props}
+                                  onClick={(event) => {
+                                    if (props.onClick) props.onClick(event);
+                                    handleTextareaClick(event, index + idxOffset, true);
+                                  }}
                                 />
                                 {/* <span id="charNum" className={classes.wordCount}>
                         {targetLength(index)}
@@ -1493,6 +1994,9 @@ const onRedo = useCallback(() => {
                                 setShowPopOver(false);
                               }, 200);
                             }}
+                             onClick={(event) => {
+                               handleTextareaClick(event, index + idxOffset, true);
+                             }}
                           />
                           {/* <span id="charNum" className={classes.wordCount}>
                         {targetLength(index)}
@@ -1650,7 +2154,15 @@ const onRedo = useCallback(() => {
                                       showAcousticText &&
                                       populateAcoustic(index + idxOffset)
                                     }
-                                    {...props}
+                                     {...props}
+                                     onClick={(event) => {
+                                       handleTextareaClick(event, index + idxOffset, false);
+                                     }}
+                                     onMouseLeave={() => {
+                                      if (handleCharTagPopover) {
+                                        handleCharTagPopover(null);
+                                      }
+                                    }}
                                   />
                                 </div>
                               );
@@ -1741,6 +2253,9 @@ const onRedo = useCallback(() => {
                                   : ""
                               }`}
                               style={{ fontSize: fontSize, height: "100%" }}
+                                       onClick={(event) => {
+                                handleTextareaClick(event, index + idxOffset, false);
+                              }}
                             />
                           </div>
                         ))}
@@ -1766,22 +2281,6 @@ const onRedo = useCallback(() => {
             );
           })}
         </Box>
-        {/* <Box
-          className={classes.paginationBox}
-        // style={{
-        //   ...(!xl && {
-        //     bottom: "-11%",
-        //   }),
-        // }}
-        >
-          <Pagination
-            color="primary"
-            // count={Math.ceil(subtitles?.length / itemsPerPage)}
-            count={1}
-            page={page}
-            onChange={handlePageChange}
-          />
-        </Box> */}
         {openConfirmDialog && (
           <ConfirmDialog
             openDialog={openConfirmDialog}
@@ -1801,7 +2300,6 @@ const onRedo = useCallback(() => {
             setTagSuggestionsAnchorEl={setTagSuggestionsAnchorEl}
             textWithoutTripleDollar={textWithoutTripleDollar}
             textAfterTripleDollar={textAfterTripleDollar}
-            // saveTranscriptHandler={saveTranscriptHandler}
             setEnableTransliterationSuggestion={
               setEnableTransliterationSuggestion
             }
@@ -1810,6 +2308,108 @@ const onRedo = useCallback(() => {
             ref={textRefs.current[currentTextRefIdx]}
           />
         )}
+        {/* Character Tagging Popover */}
+{/* Character Tagging Popover */}
+{charTagPopoverOpen && charTagAnchorEl && charTagMappingsData.length > 0 && (
+  <div
+    ref={charTagPopoverRef}
+    className="char-tag-popover"
+    style={{
+      position: 'fixed',
+      top: charTagPopoverStyle?.top ?? (charTagClickPos?.y ?? 0) + 18,
+      left: charTagPopoverStyle?.left ?? (charTagClickPos?.x ?? 0),
+      visibility: charTagPopoverStyle ? 'visible' : 'hidden',
+      backgroundColor: 'white',
+      border: '2px solid #2C2799',
+      borderRadius: '8px',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+      padding: '8px',
+      zIndex: 99999,
+      minWidth: '180px',
+      maxWidth: '260px',
+      maxHeight: '260px',
+      overflowY: 'auto',
+    }}
+    onMouseEnter={() => {
+      // Clear close timeout when mouse enters popover
+      if (charTagTimeoutRef.current) {
+        clearTimeout(charTagTimeoutRef.current);
+        charTagTimeoutRef.current = null;
+      }
+    }}
+    onMouseLeave={() => {
+      // Close popover when mouse leaves popover
+      setCharTagPopoverOpen(false);
+      setCharTagAnchorEl(null);
+    }}
+  >
+    <div style={{ 
+      padding: '6px 12px', 
+      fontWeight: 'bold', 
+      borderBottom: '2px solid #2C2799',
+      color: '#2C2799',
+      fontSize: '14px',
+      marginBottom: '4px',
+      position: 'sticky',
+      top: 0,
+      backgroundColor: 'white',
+    }}>
+      Tag for "{charTagSelectedText}"
+    </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+      {charTagMappingsData.map((tag, idx) => {
+        const isSelected = tag === charTagCurrentSelected;
+        const isSuggested = !charTagCurrentSelected && tag === charTagSuggested;
+        return (
+          <div
+            key={idx}
+            title={isSelected ? 'Currently selected tag (click to deselect)' : (isSuggested ? 'Suggested for this position' : undefined)}
+            style={{
+              padding: '6px 10px',
+              cursor: 'pointer',
+              borderRadius: '6px',
+              transition: 'all 0.2s',
+              fontSize: '13px',
+              fontFamily: 'monospace',
+              backgroundColor: isSelected ? '#d6336c' : (isSuggested ? '#e8e0ff' : '#f8f8f8'),
+              color: isSelected ? '#fff' : 'inherit',
+              border: isSelected ? '1.5px solid #d6336c' : (isSuggested ? '1.5px solid #2C2799' : '1px solid transparent'),
+            }}
+            onMouseEnter={(e) => {
+              if (isSelected) return;
+              e.currentTarget.style.backgroundColor = '#e8e0ff';
+              e.currentTarget.style.borderColor = '#2C2799';
+            }}
+            onMouseLeave={(e) => {
+              if (isSelected) return;
+              e.currentTarget.style.backgroundColor = isSuggested ? '#e8e0ff' : '#f8f8f8';
+              e.currentTarget.style.borderColor = isSuggested ? '#2C2799' : 'transparent';
+            }}
+            onClick={() => {
+              console.log("Tag clicked:", tag);
+              if (charTagOnSelect) {
+                charTagOnSelect(tag);
+              }
+              setCharTagPopoverOpen(false);
+              setCharTagAnchorEl(null);
+              if (charTagTimeoutRef.current) {
+                clearTimeout(charTagTimeoutRef.current);
+                charTagTimeoutRef.current = null;
+              }
+            }}
+          >
+            <code style={{ fontSize: '14px' }}>{tag}</code>
+            {isSelected ? (
+              <span style={{ marginLeft: 4, fontSize: 10 }}>●</span>
+            ) : isSuggested ? (
+              <span style={{ marginLeft: 4, fontSize: 10, color: '#2C2799' }}>●</span>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
       </Grid>
     </>
   );

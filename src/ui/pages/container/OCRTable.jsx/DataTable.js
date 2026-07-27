@@ -112,22 +112,71 @@ const handleHeaderSelect = (colIndex, e) => {
   e.preventDefault();
   setEditingCell(null);
   
+  let startCol = colIndex;
+  let endCol = colIndex;
+  
   if (e.shiftKey && headerAnchorRef.current !== null) {
-    const start = Math.min(headerAnchorRef.current, colIndex);
-    const end = Math.max(headerAnchorRef.current, colIndex);
+    startCol = Math.min(headerAnchorRef.current, colIndex);
+    endCol = Math.max(headerAnchorRef.current, colIndex);
     const range = [];
-    for (let i = start; i <= end; i++) range.push(i);
+    for (let i = startCol; i <= endCol; i++) range.push(i);
     setSelectedHeaders(range);
     if (typeof onHeaderSelectionChange === 'function') {
-      onHeaderSelectionChange({ startCol: start, endCol: end });
+      onHeaderSelectionChange({ startCol, endCol });
     }
   } else {
     headerAnchorRef.current = colIndex;
     setSelectedHeaders([colIndex]);
     if (typeof onHeaderSelectionChange === 'function') {
-      onHeaderSelectionChange({ startCol: colIndex, endCol: colIndex });
+      onHeaderSelectionChange({ startCol, endCol });
     }
   }
+  
+  // Select entire column cells range
+  const range = {
+    startRow: 0,
+    endRow: data.length - 1,
+    startCol,
+    endCol,
+  };
+  setSelectionRange(range);
+  setSelectionStart({ rowIndex: 0, columnId: columns[startCol]?.accessor });
+  setEditValue('');
+  setActiveRowIndex(null);
+  setActiveColumnId(null);
+  
+  onCellSelect({
+    range,
+    rowIndex: 0,
+    columnId: columns[startCol]?.accessor,
+    value: data[0]?.[columns[startCol]?.accessor]
+  }, true);
+};
+
+const handleRowHeaderSelect = (rowIndex, e) => {
+  e.preventDefault();
+  setEditingCell(null);
+  if (typeof onHeaderSelectionChange === 'function') onHeaderSelectionChange(null);
+  setSelectedHeaders([]);
+  
+  const range = {
+    startRow: rowIndex,
+    endRow: rowIndex,
+    startCol: 0,
+    endCol: columns.length - 1,
+  };
+  setSelectionRange(range);
+  setSelectionStart({ rowIndex, columnId: columns[0]?.accessor });
+  setEditValue('');
+  setActiveRowIndex(null);
+  setActiveColumnId(null);
+  
+  onCellSelect({
+    range,
+    rowIndex,
+    columnId: columns[0]?.accessor,
+    value: data[rowIndex]?.[columns[0]?.accessor]
+  }, true);
 };
 
 const handleMergeHeaders = () => {
@@ -511,7 +560,7 @@ setSelectedHeaders([]);
             apiKey={`JWT ${localStorage.getItem('shoonya_access_token')}`}
             lang={ProjectDetails?.tgt_language}
             value={activeValue}
-            onChange={(e) => handleTopTextareaChange(e.target.value)}
+            onChange={(e) => handleChange(e.target.value)}
             onChangeText={() => {}}
             enabled={true}
             enableSuggestion={true}
@@ -608,7 +657,7 @@ setSelectedHeaders([]);
         ${draggedColumn === colIndex ? 'dragging' : ''} 
         ${dragOverColumn === colIndex ? 'drag-over' : ''}
         ${selectedHeaders.length === 1 && selectedHeaders.includes(colIndex) ? 'header-selected' : ''}
-${selectedHeaders.length > 1 && selectedHeaders.includes(colIndex) ? 'header-range-selected' : ''}
+        ${selectedHeaders.length > 1 && selectedHeaders.includes(colIndex) ? 'header-range-selected' : ''}
         ${mergedHeaders[colIndex]?.isFirst ? 'merged-header' : ''}`}
       draggable={!editingCell}
       onDragStart={(e) => handleColumnDragStart(e, colIndex)}
@@ -626,7 +675,7 @@ ${selectedHeaders.length > 1 && selectedHeaders.includes(colIndex) ? 'header-ran
         </span>
         <button 
           className="delete-column-btn"
-          onClick={() => onDeleteColumn(column.accessor)}
+          onClick={(e) => { e.stopPropagation(); onDeleteColumn(column.accessor); }}
           title="Delete column"
         >
           ×
@@ -656,12 +705,13 @@ ${selectedHeaders.length > 1 && selectedHeaders.includes(colIndex) ? 'header-ran
   onDragStart={(e) => handleRowDragStart(e, rowIndex)}
   onDragOver={(e) => handleRowDragOver(e, rowIndex)}
   onDragEnd={handleRowDragEnd}
+  onClick={(e) => handleRowHeaderSelect(rowIndex, e)}
 >
   <span className="drag-handle-row" title="Drag to reorder row">⋮⋮</span>
   <span className="row-index">{rowIndex + 1}</span>
   <button 
     className="delete-row-btn"
-    onClick={() => onDeleteRow(rowIndex)}
+    onClick={(e) => { e.stopPropagation(); onDeleteRow(rowIndex); }}
     title="Delete row"
   >
     ×

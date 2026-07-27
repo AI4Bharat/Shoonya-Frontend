@@ -293,7 +293,7 @@ const Duration = memo(({ currentTime }) => {
   );
 });
 
-const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
+const Timeline = ({ currentTime, playing ,taskID, waveformSettings, repeatCount }) => {
   const $footer = useRef();
   const classes = AudioTranscriptionLandingStyle();
   const player = useSelector((state) => state.commonReducer.player);
@@ -352,6 +352,7 @@ const Timeline = ({ currentTime, playing ,taskID, waveformSettings }) => {
               playing={playing}
               currentTime={currentTime}
               duration={player.duration}
+              repeatCount={repeatCount}
             />
           </>
         )}

@@ -173,6 +173,12 @@ const MyProgress = () => {
             filter: false,
             sort: false,
             align: "center",
+            setCellProps: () => ({
+              style: { whiteSpace: "nowrap" }
+            }),
+            setCellHeaderProps: () => ({
+              style: { whiteSpace: "nowrap" }
+            }),
           },
         });
         tempSelected.push(key);
@@ -210,8 +216,8 @@ const MyProgress = () => {
         radiobutton === "AnnotatationReports"
           ? "annotation"
           : radiobutton === "ReviewerReports"
-          ? "review"
-          : "supercheck",
+            ? "review"
+            : "supercheck",
       start_date: format(selectRange[0].startDate, "yyyy-MM-dd"),
       end_date: format(selectRange[0].endDate, "yyyy-MM-dd"),
     };
@@ -286,9 +292,9 @@ const MyProgress = () => {
               marginLeft: "0px",
             },
             "& .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input":
-              {
-                marginRight: "10px",
-              },
+            {
+              marginRight: "10px",
+            },
           }}
         />
 
@@ -374,7 +380,7 @@ const MyProgress = () => {
         direction="row"
         justifyContent="start"
         alignItems="center"
-        // sx={{ marginLeft: "50px" }}
+      // sx={{ marginLeft: "50px" }}
       >
         <Grid>
           <Typography
@@ -642,7 +648,11 @@ const MyProgress = () => {
         )}
         {UserAnalytics?.length > 0 ? (
           <ThemeProvider theme={tableTheme}>
-            <div ref={tableRef}>
+            <div ref={tableRef} style={{
+              width: "100%",
+              overflowX: "auto",
+              display: "block"
+            }}>
               {isBrowser ? (
                 <MUIDataTable
                   key={`table-${displayWidth}`}
@@ -650,8 +660,8 @@ const MyProgress = () => {
                     radiobutton === "AnnotatationReports"
                       ? "Annotation Report"
                       : radiobutton === "ReviewerReports"
-                      ? "Reviewer Report"
-                      : "Super Checker Report"
+                        ? "Reviewer Report"
+                        : "Super Checker Report"
                   }
                   data={reportData}
                   columns={columns.filter((col) =>

@@ -67,7 +67,7 @@ ChartJS.register(
 ChartJS.register(CategoryScale);
 
 const ProgressType = [{ ProgressTypename: "daily" }, { ProgressTypename: "weekly" }, { ProgressTypename: "monthly" }, { ProgressTypename: "yearly" }]
-const AudioTypes = ["AcousticNormalisedTranscriptionEditing", "AudioSegmentation", "AudioTranscription", "AudioTranscriptionEditing"]
+const AudioTypes = ["AcousticNormalisedTranscriptionEditing","VerbatimTranscriptionCharacterTagging", "AudioSegmentation", "AudioTranscription", "AudioTranscriptionEditing"]
 
 const footer = (tooltipItems) => {
   let sum = 0;

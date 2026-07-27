@@ -24,7 +24,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import TranslateIcon from "@mui/icons-material/Translate";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import SaveIcon from "@mui/icons-material/Save";
-import ImportExportIcon from "@mui/icons-material/ImportExport";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import MergeIcon from "@mui/icons-material/Merge";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import "./TableControls.css";
@@ -114,29 +115,29 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
 
   return (
     <div className="table-controls">
-      {/* Row Count Badge */}
-      <Box className="count-badge">
-        <TableRowsIcon className="badge-icon" />
-        <span className="badge-count">{totalRows}</span>
-      </Box>
-
-      {/* Column Count Badge */}
-      <Box className="count-badge" style={{ marginLeft: "5px" }}>
-        <ViewColumnIcon className="badge-icon" />
-        <span className="badge-count">{totalColumns}</span>
-      </Box>
-
-      <Divider orientation="vertical" className="controls-divider" />
-
-      {/* Add Row Button — now opens a dropdown */}
-      <Tooltip title="Add Row" placement="bottom">
-        <IconButton
-          className="control-btn"
+      {/* Row Count Badge (Interactive button to add rows) */}
+      <Tooltip title="Row Options (Add/Manage Rows)" placement="bottom">
+        <Box 
+          className="count-badge count-badge-interactive"
           onClick={(e) => setAnchorElAddRow(e.currentTarget)}
         >
-          <TableRowsIcon />
-          <span className="btn-plus">+</span>
-        </IconButton>
+          <TableRowsIcon className="badge-icon" />
+          <span className="badge-count">Rows: {totalRows}</span>
+          <span className="badge-plus">+</span>
+        </Box>
+      </Tooltip>
+
+      {/* Column Count Badge (Interactive button to add columns) */}
+      <Tooltip title="Column Options (Add/Manage Columns)" placement="bottom">
+        <Box 
+          className="count-badge count-badge-interactive" 
+          style={{ marginLeft: "5px" }}
+          onClick={(e) => setAnchorElAddCol(e.currentTarget)}
+        >
+          <ViewColumnIcon className="badge-icon" />
+          <span className="badge-count">Cols: {totalColumns}</span>
+          <span className="badge-plus">+</span>
+        </Box>
       </Tooltip>
 
       {/* Add Row Menu */}
@@ -166,17 +167,6 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
           <Typography variant="body2">+ Add Row at End</Typography>
         </MenuItem>
       </Menu>
-
-      {/* Add Column Button — now opens a dropdown */}
-      <Tooltip title="Add Column" placement="bottom">
-        <IconButton
-          className="control-btn"
-          onClick={(e) => setAnchorElAddCol(e.currentTarget)}
-        >
-          <ViewColumnIcon />
-          <span className="btn-plus">+</span>
-        </IconButton>
-      </Tooltip>
 
       {/* Add Column Menu */}
       <Menu
@@ -438,6 +428,22 @@ const [anchorElDelete, setAnchorElDelete] = useState(null);
           disabled={redoStack?.length === 0}
         >
           <RedoIcon />
+        </IconButton>
+      </Tooltip>
+
+      <Divider orientation="vertical" className="controls-divider" />
+
+      {/* Import Button */}
+      <Tooltip title="Import HTML Table" placement="bottom">
+        <IconButton className="control-btn" onClick={onImport}>
+          <CloudUploadIcon />
+        </IconButton>
+      </Tooltip>
+
+      {/* Export Button */}
+      <Tooltip title="Export HTML Table" placement="bottom">
+        <IconButton className="control-btn" onClick={onExport}>
+          <CloudDownloadIcon />
         </IconButton>
       </Tooltip>
 

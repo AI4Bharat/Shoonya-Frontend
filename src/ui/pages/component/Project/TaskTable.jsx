@@ -276,7 +276,10 @@ const TaskTable = (props) => {
   const unassignTasks = async () => {
     setDeallocateDialog(false);
     if (
-      ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"
+      ProjectDetails?.project_type ===
+        "AcousticNormalisedTranscriptionEditing" ||
+      ProjectDetails?.project_type === "OCRTranscriptionEditing" 
+       || ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
     ) {
       setSnackbarInfo({
         open: true,
@@ -438,7 +441,10 @@ const TaskTable = (props) => {
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
         const email = props.type === "review" ? el.annotator_mail : "";
-        let row = [el.id, ...(!!email ? [el.annotator_mail] : [])];
+        let row = [
+          el.id,
+          ...(!!email ? [el.annotator_mail] : []),
+        ];
         row.push(
           ...Object.keys(el.data)
             .filter((key) => !excludeCols.includes(key))
@@ -454,7 +460,8 @@ const TaskTable = (props) => {
           row.push(
             <Link
               to={
-                ProjectDetails?.project_type?.includes("Acoustic")
+                ProjectDetails?.project_type?.includes("Acoustic") ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
                   ? `AudioTranscriptionLandingPage/${el.id}`
                   : ProjectDetails?.project_type?.includes("OCRTableEditing")
                   ? `OCRTable/${el.id}`
@@ -487,7 +494,8 @@ const TaskTable = (props) => {
           row.push(
             <Link
               to={
-                ProjectDetails?.project_type?.includes("Acoustic")
+                ProjectDetails?.project_type?.includes("Acoustic") ||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging"
                   ? `ReviewAudioTranscriptionLandingPage/${el.id}`
                   : `review/${el.id}`
               }
@@ -638,7 +646,8 @@ const TaskTable = (props) => {
   }, [totalTaskCount, selectedFilters, ProjectDetails]);
 
    useEffect(() => {
-    if (ProjectDetails?.project_type?.includes("Acoustic")) {
+    if (ProjectDetails?.project_type?.includes("Acoustic")||
+    ProjectDetails?.project_type === "VerbatimTranscriptionCharacterTagging") {
       if (labellingStarted && Object?.keys(NextTask)?.length > 0) {
         navigate(
           `/projects/${id}/${props.type === "annotation"
@@ -1121,7 +1130,7 @@ const TaskTable = (props) => {
                 selectedFilters.review_status === "draft" ||
                 selectedFilters.review_status === "skipped") && (
                 <Grid item xs={12} sm={12} md={3}>
-                  <Tooltip title={deallocateDisabled}>
+                  <Tooltip title={ProjectDetails?.project_type?.includes("OCR") ? "Deallocation is disabled for OCR projects" : deallocateDisabled}>
                     <Box>
                       <CustomButton
                         sx={{
@@ -1132,7 +1141,7 @@ const TaskTable = (props) => {
                         }}
                         label={"De-allocate Tasks"}
                         onClick={() => setDeallocateDialog(true)}
-                        disabled={deallocateDisabled}
+                        disabled={deallocateDisabled || ProjectDetails?.project_type?.includes("OCR")}
                         color={"warning"}
                       />
                     </Box>

@@ -65,7 +65,8 @@ const TaskAnalytics = (props) => {
     'AudioTranscription',
     'AudioSegmentation',
     'AudioTranscriptionEditing',
-    'AcousticNormalisedTranscriptionEditing'
+    'AcousticNormalisedTranscriptionEditing',
+    'VerbatimTranscriptionCharacterTagging'
   ]
   const translationProjectTypes=[
     'MonolingualTranslation',
@@ -83,6 +84,8 @@ const TaskAnalytics = (props) => {
   ]
   const ocrProjectTypes=[
     'OCRTranscriptionEditing',
+    "OCRTESTTranscriptionEditing",
+    'OCRTableEditing',
     'OCRSegmentCategorizationEditing' 
   ]
 
@@ -310,7 +313,7 @@ const TaskAnalytics = (props) => {
       {loading && <Spinner />}
       {taskAnalyticsData.length ?
         taskAnalyticsData.map((analyticsData, _index) => {
-          if (analyticsData.length && ['AudioTranscription', 'AudioSegmentation', 'AudioTranscriptionEditing', 'AcousticNormalisedTranscriptionEditing'].includes(analyticsData[0].projectType)) {
+          if (analyticsData.length && ['AudioTranscription', 'AudioSegmentation', 'AudioTranscriptionEditing', 'VerbatimTranscriptionCharacterTagging', 'AcousticNormalisedTranscriptionEditing'].includes(analyticsData[0].projectType)) {
             return (<Grid key={_index} style={{ marginTop: "15px" }}>
               <AudioTaskAnalyticsChart analyticsData={analyticsData} 
               annotationChecked={annotationChecked}
@@ -321,7 +324,7 @@ const TaskAnalytics = (props) => {
           if (analyticsData.length &&
             (['MonolingualTranslation', 'TranslationEditing', 'SemanticTextualSimilarity_Scale5', 'ContextualTranslationEditing', 'SentenceSplitting', 'ContextualSentenceVerification', 'ContextualSentenceVerificationAndDomainClassification'].includes(analyticsData[0].projectType) ||
               ['ConversationTranslation', 'ConversationTranslationEditing', 'ConversationVerification'].includes(analyticsData[0].projectType) ||
-              ['OCRTranscriptionEditing','OCRSegmentCategorizationEditing'].includes(analyticsData[0].projectType))
+              ['OCRTranscriptionEditing','OCRTESTTranscriptionEditing','OCRSegmentCategorizationEditing'].includes(analyticsData[0].projectType))
           ) {
             return <Grid key={_index} style={{ marginTop: "15px" }}>
               <TaskCountAnalyticsChart analyticsData={analyticsData} 
