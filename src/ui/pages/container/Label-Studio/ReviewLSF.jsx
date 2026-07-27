@@ -45,6 +45,7 @@ import {
   postReview,
   patchReview,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
+import fetchAudioBlobUrl from "../../../../utils/fetchAudioBlobUrl";
 
 import { useParams, useNavigate } from "react-router-dom";
 import useFullPageLoader from "../../../../hooks/useFullPageLoader";
@@ -899,7 +900,7 @@ useEffect(() => {
     if (userData?.id && loaded.current !== taskId) {
       loaded.current = taskId;
       getProjectsandTasks(projectId, taskId).then(
-        ([labelConfig, taskData, annotations, predictions]) => {
+        async ([labelConfig, taskData, annotations, predictions]) => {
           // both have loaded!
           // console.log("[labelConfig, taskData, annotations, predictions]", [
           //   labelConfig,
@@ -912,6 +913,12 @@ useEffect(() => {
           if (labelConfig.project_type.includes("OCRSegmentCategorization")){
             tempLabelConfig = labelConfigJS;
           }
+
+          // Proxy-fetch audio from private buckets and inject blob URL
+          if (taskData?.data?.audio_url) {
+            taskData.data.audio_url = await fetchAudioBlobUrl(taskData.data.audio_url);
+          }
+
           setLabelConfig(tempLabelConfig);
           setAnnotations(annotations);
           setTaskData(taskData);
