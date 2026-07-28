@@ -282,7 +282,7 @@ const TranscriptionRightPanel = ({
   const showAcousticText =
     (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"  ||
     ProjectDetails?.project_type == 'VerbatimTranscriptionCharacterTagging') &&
-    ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
+    (ProjectDetails?.metadata_json?.acoustic_enabled_stage == null || ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage);
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -830,8 +830,8 @@ const processNoiseTags = (value) => {
       ]);
       setRedoStack([]);
 
-      sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
-      dispatch(setSubtitles(sub, C.SUBTITLES));
+      const updatedSubsRemove = onSubtitleChange(newText, subIndex, !isL1, false);
+      dispatch(setSubtitles(updatedSubsRemove, C.SUBTITLES));
 
       setCharTagPopoverOpen(false);
       setCharTagAnchorEl(null);
@@ -886,8 +886,8 @@ const processNoiseTags = (value) => {
     ]);
     setRedoStack([]);
 
-    sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
-    dispatch(setSubtitles(sub, C.SUBTITLES));
+    const updatedSubsAdd = onSubtitleChange(newText, subIndex, !isL1, false);
+    dispatch(setSubtitles(updatedSubsAdd, C.SUBTITLES));
 
     // Close popover
     setCharTagPopoverOpen(false);

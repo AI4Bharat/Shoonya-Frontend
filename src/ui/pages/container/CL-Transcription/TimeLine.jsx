@@ -337,6 +337,8 @@ const Timeline = ({ currentTime, playing ,taskID, waveformSettings, repeatCount 
     return () => window.removeEventListener("wheel", onWheelThrottle);
   }, [onWheel]);
 
+  const sub = useSelector((state) => state.commonReducer?.subtitles);
+
   return (
     <Box className={classes.timeLineParent} ref={$footer}>
       {player &&
@@ -353,6 +355,7 @@ const Timeline = ({ currentTime, playing ,taskID, waveformSettings, repeatCount 
               currentTime={currentTime}
               duration={player.duration}
               repeatCount={repeatCount}
+              result={sub}
             />
           </>
         )}
