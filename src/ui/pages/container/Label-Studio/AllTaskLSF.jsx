@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useRef } from "react";
+import "./editor.css";
 import LabelStudio1 from "./lsf-build/static/js/main";
 import LabelStudio2 from "@heartexlabs/label-studio";
-import installLabelStudioBidiPatch from "../../../../hooks/installLabelStudioBidiPatch";
-import "../../../../styles/labelstudio-rtl.css";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Alert from "@mui/material/Alert";
@@ -41,6 +40,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+import { observeOcrRtlDirection } from "./ocrRtlDirection";
 //used just in postAnnotation to support draft status update.
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
@@ -52,14 +52,9 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   const annotation_status = useRef(ProjectDetails.project_stage == 2 ? "labeled": "accepted");
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
-  const bidiCleanupRef = useRef(null);
 
   useEffect(() => {
     return () => {
-      if (bidiCleanupRef.current) {
-        bidiCleanupRef.current();
-        bidiCleanupRef.current = null;
-      }
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
@@ -90,6 +85,11 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return undefined;
+    return observeOcrRtlDirection(rootRef.current);
+  }, [ProjectDetails?.project_type]);
 
 
 useEffect(() => {
@@ -236,10 +236,6 @@ useEffect(() => {
     }
 
     if (rootRef.current) {
-      if (bidiCleanupRef.current) {
-        bidiCleanupRef.current();
-        bidiCleanupRef.current = null;
-      }
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
@@ -272,24 +268,6 @@ useEffect(() => {
             ls.annotationStore.selectAnnotation(c.id);
           }
           load_time = new Date();
-
-          requestAnimationFrame(() => {
-            if (rootRef.current && ProjectDetails?.project_type?.includes("OCR")) {
-              bidiCleanupRef.current = installLabelStudioBidiPatch(rootRef.current, {
-                targetLanguage:
-                  taskData?.data?.target_language ||
-                  taskData?.data?.tgt_language ||
-                  taskData?.data?.language ||
-                  taskData?.target_language ||
-                  taskData?.tgt_language ||
-                  taskData?.language ||
-                  ProjectDetails?.tgt_language ||
-                  ProjectDetails?.target_language ||
-                  ProjectDetails?.src_language ||
-                  "",
-              });
-            }
-          });
         },
         onSubmitAnnotation: function (ls, annotation) {
           let temp = annotation.serializeAnnotation();
@@ -448,11 +426,6 @@ useEffect(() => {
   // we're running an effect on component mount and rendering LSF inside rootRef node
   localStorage.setItem("TaskData", JSON.stringify(taskData));
   useEffect(() => {
-    if (localStorage.getItem('rtl') === "true") {
-      var style = document.createElement('style');
-      style.innerHTML = 'input, textarea { direction: RTL; }'
-      document.head.appendChild(style);
-    }
     if (
       userData?.id && loaded.current !== taskId
     ) {
@@ -628,7 +601,14 @@ useEffect(() => {
       <Box
         sx={{border : "1px solid rgb(224 224 224)"}}
       >
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div
+          className={`label-studio-root ${
+            ProjectDetails?.project_type?.includes("OCR")
+              ? "ocr-project-style"
+              : ""
+          }`}
+          ref={rootRef}
+        ></div>
       </Box>
       {parentMetadata !== undefined &&
         <>
