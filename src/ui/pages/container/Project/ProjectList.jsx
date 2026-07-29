@@ -35,7 +35,7 @@ export default function ProjectList() {
         }});
   const apiLoading = useSelector((state) => state.apiStatus.loading);
   const projectData = useSelector((state) => state.getProjects.data);
-  
+  const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
   const getDashboardprojectData = () => {
     setLoading(true);
     const projectObj = new GetProjectsAPI(selectedFilters);
@@ -118,7 +118,7 @@ export default function ProjectList() {
                 </Grid>
             </Grid> */}
             <Grid item sx={{mt:4,mb:1,mr:2,ml:2}}>
-            <CreateProjectDropdown />
+            <CreateProjectDropdown userRole={loggedInUserData?.role || loggedInUserData?.role_id} />
             </Grid>
         <Grid xs={3} item className={classes.fixedWidthContainer} sx={{mt:1,mb:1,mr:2,ml:2}}>
           <Search />
