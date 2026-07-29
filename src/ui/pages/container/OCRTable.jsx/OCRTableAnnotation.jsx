@@ -1961,11 +1961,11 @@ const handleTranscribe = useCallback((text) => {
                 transition: isPanning ? 'none' : 'width 0.2s ease-out',
               }}
             />
-            <div className="image-zoom-controls">
-              <button onClick={handleZoomIn} title="Zoom In">+</button>
-              <button onClick={handleZoomOut} title="Zoom Out">−</button>
-              <button onClick={handleZoomReset} title="Reset Zoom">Reset</button>
-            </div>
+          </div>
+          <div className="image-zoom-controls">
+            <button onClick={handleZoomIn} title="Zoom In">+</button>
+            <button onClick={handleZoomOut} title="Zoom Out">−</button>
+            <button onClick={handleZoomReset} title="Reset Zoom">Reset</button>
           </div>
         </div>
 
