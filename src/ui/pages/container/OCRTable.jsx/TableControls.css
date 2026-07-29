@@ -14,12 +14,15 @@
   align-items: center;
   justify-content: center;
   height: 40px;
-  min-width: 60px;
-  padding: 0 12px;
+  min-width: 80px;
+  padding: 0 14px;
   border-radius: 20px;
-  background: rgb(44, 39, 153);
-  color: white;
+  background: rgba(44, 39, 153, 0.08);
+  border: 1px solid rgba(44, 39, 153, 0.3);
+  color: rgb(44, 39, 153);
   gap: 6px;
+  cursor: default;
+  user-select: none;
 }
 
 .badge-icon {
@@ -84,7 +87,7 @@
   }
 
   .count-badge {
-    min-width: 50px;
+    min-width: 65px;
     padding: 0 8px;
   }
 
