@@ -37,6 +37,7 @@ import ExportProjectDialog from "../../component/common/ExportProjectDialog";
 import GetProjectTypeDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectTypeDetails";
 import getDownloadProjectAnnotationsAPI from "../../../../redux/actions/api/ProjectDetails/getDownloadProjectAnnotations";
 import DeallocationAnnotatorsAndReviewers from "../../container/Project/DeallocationAnnotatorsAndReviewers";
+import TasksassignDialog from "../../container/Project/manualtaskassign";
 import SuperCheckSettings from "../../container/Project/SuperCheckSettings";
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import TextField from '@mui/material/TextField';
@@ -674,6 +675,9 @@ const getPullNewDataAPI = async () => {
                   ))}
                 </Select>
               </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <TasksassignDialog/>
           </Grid>
 
           {((userRole.WorkspaceManager === loggedInUserData?.role ||
