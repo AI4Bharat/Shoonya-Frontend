@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill from 'react-quill';
 import "./editor.css"
 import 'quill/dist/quill.bubble.css';
-import { installLabelStudioBidiPatch } from "../../../../hooks/installLabelStudioBidiPatch";
-import "../../../../styles/labelstudio-rtl.css";
 import LabelStudio1 from "./lsf-build/static/js/main";
 import LabelStudio2 from "@heartexlabs/label-studio";
 import Button from "@mui/material/Button";
@@ -54,6 +52,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
+import { observeOcrRtlDirection } from "./ocrRtlDirection";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -235,7 +234,6 @@ const LabelStudioWrapper = ({
   const rootRef = useRef();
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
-  const bidiCleanupRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
@@ -263,10 +261,6 @@ const LabelStudioWrapper = ({
   let loaded = useRef();
   useEffect(() => {
     return () => {
-      if (bidiCleanupRef.current) {
-        bidiCleanupRef.current();
-        bidiCleanupRef.current = null;
-      }
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
@@ -283,6 +277,11 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return undefined;
+    return observeOcrRtlDirection(rootRef.current);
+  }, [ProjectDetails?.project_type]);
 
 
 useEffect(() => {
@@ -435,10 +434,6 @@ useEffect(() => {
     if (disableLSFControls) setAutoSave(false);
 
     if (rootRef.current) {
-      if (bidiCleanupRef.current) {
-        bidiCleanupRef.current();
-        bidiCleanupRef.current = null;
-      }
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
@@ -465,24 +460,6 @@ useEffect(() => {
 
         onLabelStudioLoad: function (ls) {
           load_time.current = new Date();
-
-          requestAnimationFrame(() => {
-            if (rootRef.current && ProjectDetails?.project_type?.includes("OCR")) {
-              bidiCleanupRef.current = installLabelStudioBidiPatch(rootRef.current, {
-                targetLanguage:
-                  taskData?.data?.target_language ||
-                  taskData?.data?.tgt_language ||
-                  taskData?.data?.language ||
-                  taskData?.target_language ||
-                  taskData?.tgt_language ||
-                  taskData?.language ||
-                  ProjectDetails?.tgt_language ||
-                  ProjectDetails?.target_language ||
-                  ProjectDetails?.src_language ||
-                  "",
-              });
-            }
-          });
         },
 
         onSkipTask: function (annotation) {
@@ -890,11 +867,6 @@ useEffect(() => {
   }, [])
 
   useEffect(() => {
-    if (localStorage.getItem("rtl") === "true") {
-      var style = document.createElement("style");
-      style.innerHTML = "input, textarea { direction: RTL; }";
-      document.head.appendChild(style);
-    }
     if (userData?.id && loaded.current !== taskId) {
       loaded.current = taskId;
       getProjectsandTasks(projectId, taskId).then(
@@ -1775,7 +1747,14 @@ useEffect(() => {
         </div>
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div
+          className={`label-studio-root ${
+            ProjectDetails?.project_type?.includes("OCR")
+              ? "ocr-project-style"
+              : ""
+          }`}
+          ref={rootRef}
+        ></div>
         <Popover
           id={"'simple-popover'"}
           open={Boolean(showTagSuggestionsAnchorEl)}

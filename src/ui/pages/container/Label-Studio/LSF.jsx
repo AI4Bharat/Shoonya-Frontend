@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactQuill from "react-quill";
 import "./editor.css";
 import "quill/dist/quill.snow.css";
-import { installLabelStudioBidiPatch } from "../../../../hooks/installLabelStudioBidiPatch";
-import "../../../../styles/labelstudio-rtl.css";
 import LabelStudio1 from "./lsf-build/static/js/main";
 import LabelStudio2 from "@heartexlabs/label-studio";
 import Button from "@mui/material/Button";
@@ -54,6 +52,7 @@ import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
+import { observeOcrRtlDirection } from "./ocrRtlDirection";
 
 const filterAnnotations = (
   annotations,
@@ -181,7 +180,6 @@ const LabelStudioWrapper = ({
   );
   // this reference will be populated when LSF initialized and can be used somewhere else
   const lsfRef = useRef();
-  const bidiCleanupRef = useRef(null);
   const LabelStudio = useRef();
   const navigate = useNavigate();
   const [labelConfig, setLabelConfig] = useState();
@@ -210,11 +208,12 @@ const LabelStudioWrapper = ({
   }, [taskData]);
 
   useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return undefined;
+    return observeOcrRtlDirection(rootRef.current);
+  }, [ProjectDetails?.project_type]);
+
+  useEffect(() => {
     return () => {
-      if (bidiCleanupRef.current) {
-        bidiCleanupRef.current();
-        bidiCleanupRef.current = null;
-      }
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
@@ -384,10 +383,6 @@ const LabelStudioWrapper = ({
       setAutoSave(false);
 
     if (rootRef.current) {
-      if (bidiCleanupRef.current) {
-        bidiCleanupRef.current();
-        bidiCleanupRef.current = null;
-      }
       if (lsfRef.current) {
         lsfRef.current.destroy();
       }
@@ -421,24 +416,6 @@ const LabelStudioWrapper = ({
             ls.annotationStore.selectAnnotation(c.id);
           }
           load_time.current = new Date();
-
-          requestAnimationFrame(() => {
-            if (rootRef.current && ProjectDetails?.project_type?.includes("OCR")) {
-              bidiCleanupRef.current = installLabelStudioBidiPatch(rootRef.current, {
-                targetLanguage:
-                  taskData?.data?.target_language ||
-                  taskData?.data?.tgt_language ||
-                  taskData?.data?.language ||
-                  taskData?.target_language ||
-                  taskData?.tgt_language ||
-                  taskData?.language ||
-                  ProjectDetails?.tgt_language ||
-                  ProjectDetails?.target_language ||
-                  ProjectDetails?.src_language ||
-                  "",
-              });
-            }
-          });
         },
 
         onSubmitAnnotation: function (ls, annotation) {
@@ -667,11 +644,6 @@ const LabelStudioWrapper = ({
   // we're running an effect on component mount and rendering LSF inside rootRef node
   localStorage.setItem("TaskData", JSON.stringify(taskData));
   useEffect(() => {
-    if (localStorage.getItem("rtl") === "true") {
-      var style = document.createElement("style");
-      style.innerHTML = "input, textarea { direction: RTL; }";
-      document.head.appendChild(style);
-    }
     if (userData?.id && loaded.current !== taskId) {
       if (Object.keys(ProjectDetails).length === 0) {
         const projectObj = new GetProjectDetailsAPI(projectId);
@@ -1546,7 +1518,14 @@ const LabelStudioWrapper = ({
         </div>
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div
+          className={`label-studio-root ${
+            ProjectDetails?.project_type?.includes("OCR")
+              ? "ocr-project-style"
+              : ""
+          }`}
+          ref={rootRef}
+        ></div>
         <Popover
           id={"'simple-popover'"}
           open={Boolean(showTagSuggestionsAnchorEl)}

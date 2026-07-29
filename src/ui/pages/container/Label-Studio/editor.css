@@ -81,4 +81,40 @@
   .quill .ql-color:focus:after {
      content: 'Color';
   }
-  
+
+/*
+ * OCR-only presentation for mixed RTL/LTR annotation text. The active editor
+ * receives LTR isolates from ocrRtlDirection.js; those markers are removed
+ * before API transport.
+ */
+html[data-rtl-typing="true"] .ocr-project-style textarea,
+html[data-rtl-typing="true"] .ocr-project-style input[type="text"],
+html[data-rtl-typing="true"] .ocr-project-style [contenteditable="true"] {
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-align: right;
+}
+
+/*
+ * Keep an RTL paragraph base even when the first isolated run is English,
+ * such as "(a)".
+ */
+html[data-rtl-typing="true"] .ocr-project-style textarea:focus,
+html[data-rtl-typing="true"] .ocr-project-style input[type="text"]:focus,
+html[data-rtl-typing="true"] .ocr-project-style [contenteditable="true"]:focus {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+/* Label Studio's saved annotation preview (the green region panel). */
+html[data-rtl-typing="true"] .ocr-project-style .lsf-region-item__desc,
+html[data-rtl-typing="true"] .ocr-project-style .lsf-region-item__text,
+html[data-rtl-typing="true"]
+  .ocr-project-style
+  [data-testid="textarea-region"]
+  [id^="TextAreaRegion-"]
+  > span:first-child {
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-align: right;
+}
