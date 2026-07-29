@@ -20,6 +20,8 @@ import DownloadDatasetButton from "./DownloadDataSetButton";
 import DeleteDataItems from "./DeleteDataItems";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import DeduplicateDataItems from "../../container/Dataset/DeduplicateDataItems";
+import Button from "@mui/material/Button";
+import SampleDatasetDownloadButton from "./SampleDatasetDownloadButton";
 
 
 const style = {
@@ -174,13 +176,16 @@ export default function DatasetSettings() {
 
                 <DownloadDatasetButton />
               </Grid>
-              <Grid item xs={12} sm={5} lg={3}>
-                <CustomButton
-                  sx={{ width: "100%" }}
-                  label={translate("button.uploadData")}
-                  onClick={handleUpload}
-                />
-              </Grid>
+                <Grid item xs={12} sm={5} lg={3}>
+                  <Button
+                  variant="contained"
+                    sx={{ width: "100%" }}
+                    onClick={handleUpload}
+                  >
+                    {translate("button.uploadData")}
+                    <SampleDatasetDownloadButton datasetId={datasetId} />
+                  </Button>
+                </Grid>
 
               <Grid item xs={12} sm={5} lg={3}>
                 <DeleteDataItems />
