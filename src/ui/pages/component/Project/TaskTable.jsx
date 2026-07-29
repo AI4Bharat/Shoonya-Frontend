@@ -448,7 +448,6 @@ const TaskTable = (props) => {
         let row = [
           el.id,
           ...(!!email ? [el.annotator_mail] : []),
-          el.input_data_id ?? "",
         ];
         row.push(
           ...Object.keys(el.data)
@@ -526,7 +525,7 @@ const TaskTable = (props) => {
       const annotatorEmail = taskList[0]?.hasOwnProperty("annotator_mail");
       const email =
         props.type === "review" && annotatorEmail ? "Annotator Email" : "";
-      let colList = ["id", ...(!!email ? [email] : []), "input_data_id"];
+      let colList = ["id", ...(!!email ? [email] : [])];
       colList.push(
         ...Object.keys(taskList[0].data).filter(
           (el) => !excludeCols.includes(el)
@@ -547,7 +546,7 @@ const TaskTable = (props) => {
         };
       });
       setColumns(cols);
-      setSelectedColumns(colList.filter((col) => col !== "input_data_id"));
+      setSelectedColumns(colList);
       setTasks(data);
     } else {
       setTasks([]);

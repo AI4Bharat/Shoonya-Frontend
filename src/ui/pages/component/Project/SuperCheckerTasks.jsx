@@ -263,7 +263,9 @@ const SuperCheckerTasks = (props) => {
   useEffect(() => {
     if (taskList?.length > 0 && taskList[0]?.data) {
       const data = taskList.map((el) => {
-        let row = [el.id];
+        let row = [
+          el.id
+        ];
         row.push(
           ...Object.keys(el.data)
             .filter((key) => !excludeCols.includes(key))
