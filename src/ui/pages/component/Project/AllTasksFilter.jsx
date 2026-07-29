@@ -10,12 +10,32 @@ import Box from "@mui/material/Box";
 import { translate } from "../../../../config/localisation";
 import DatasetStyle from "../../../styles/Dataset";
 import { snakeToTitleCase } from "../../../../utils/utils";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import { Stack } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import APITransport from "../../../../redux/actions/apitransport/apitransport";
+import GetLanguageChoicesAPI from "../../../../redux/actions/api/ProjectDetails/GetLanguageChoices";
 
 const AllTasksFilterList = (props) => {
   const classes = DatasetStyle();        
-  const { filterStatusData, currentFilters, updateFilters,onchange} = props;
+  const { filterStatusData, currentFilters, updateFilters, onchange } = props;
+  const dispatch = useDispatch();
   const [selectedStatus, setSelectedStatus] = useState(currentFilters.task_status);
   const [selectAnnotator, setSelectAnnotator] = useState("All");
+  const [selectedLanguage, setSelectedLanguage] = useState(currentFilters?.language ?? "");
+  const [selectedDomain,   setSelectedDomain]   = useState(currentFilters?.domain   ?? "");
+
+  const languageChoices = useSelector((state) => state.getLanguageChoices?.data ?? []);
+
+  const DOMAIN_OPTIONS = ["medical", "legal", "finance", "general"];
+
+  useEffect(() => {
+    const obj = new GetLanguageChoicesAPI();
+    dispatch(APITransport(obj));
+  }, []);
 
   const handleStatusChange = (e) => {
     onchange()
@@ -26,8 +46,10 @@ const AllTasksFilterList = (props) => {
     updateFilters({
         ...currentFilters,
         task_status: selectedStatus,
+        language:    selectedLanguage,
+        domain:      selectedDomain,
       })
-}, [selectedStatus])
+}, [selectedStatus, selectedLanguage, selectedDomain])
 
   
 
@@ -104,6 +126,41 @@ const AllTasksFilterList = (props) => {
                     ))} */}
 
             </FormGroup>
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+
+  <FormControl size="small" sx={{ minWidth: 140 }}>
+    <InputLabel sx={{ fontSize: "14px", position: "inherit", top: "22px", left: "-3px" }}>
+      Language
+    </InputLabel>
+    <Select
+      value={selectedLanguage}
+      defaultValue=""
+      onChange={(e) => setSelectedLanguage(e.target.value)}
+    >
+      <MenuItem value="">All</MenuItem>
+      {languageChoices.map((l) => (
+        <MenuItem key={l.value} value={l.value}>{l.label}</MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+
+  <FormControl size="small" sx={{ minWidth: 140 }}>
+    <InputLabel sx={{ fontSize: "14px", position: "inherit", top: "22px", left: "-3px" }}>
+      Domain
+    </InputLabel>
+    <Select
+      value={selectedDomain}
+      defaultValue=""
+      onChange={(e) => setSelectedDomain(e.target.value)}
+    >
+      <MenuItem value="">All</MenuItem>
+      {DOMAIN_OPTIONS.map((d) => (
+        <MenuItem key={d} value={d}>{snakeToTitleCase(d)}</MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+
+</Stack>
             <Divider />
             <Box 
               sx={{

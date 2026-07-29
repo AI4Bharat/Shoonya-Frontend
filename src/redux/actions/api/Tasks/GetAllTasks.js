@@ -11,14 +11,16 @@ import constants from "../../../constants";
      this.type = constants.GET_ALL_TASKS;
      let queryString = `?project_id=${projectId}${pageNo ? "&page="+pageNo : ""}${currentRowPerPage ?"&records="+currentRowPerPage : ""}`;
      for (let key in selectedFilters) {
-        if (selectedFilters[key] && selectedFilters[key] !== -1) {
-          if(key=="task_status"){  
-              queryString +=  `&${key}=${JSON.stringify(selectedFilters[key])}`
-          }else{
-            queryString +=  `&${key}=${selectedFilters[key]}`
-          }
-        }
-      }
+  const val = selectedFilters[key];
+  if (!val && val !== 0) continue;
+  if (val === -1) continue;
+  if (Array.isArray(val)) {
+    queryString += `&${key}=${encodeURIComponent(JSON.stringify(val))}`;
+  } else {
+    queryString += `&${key}=${encodeURIComponent(val)}`;
+  }
+}
+
      this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getTasks+queryString}`;
    }
 
