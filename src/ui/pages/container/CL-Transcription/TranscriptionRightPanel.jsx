@@ -91,9 +91,9 @@ const languageTagMappings = {
     'ஃப' /* not used */: undefined, // placeholder removed below
     'फ': ['ph-f']   // f vs ph
   },
-  'en': {
-    'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
-  }
+};
+const UNIVERSAL_CHAR_TAGS = {
+  'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
 };
 
 const TAMIL_PULLI = "\u0BCD";
@@ -512,15 +512,15 @@ const TranscriptionRightPanel = ({
 
     if (ProjectDetails?.project_type === 'VerbatimTranscriptionCharacterTagging') {
       setIsVCTCProject(true);
-      
+
       const matchedLang = LanguageCode.languages.find(
         (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
       );
       const langCode = matchedLang?.code;
+      const langMappings = (langCode && languageTagMappings[langCode]) || {};
 
-      if (langCode && languageTagMappings[langCode]) {
-        setCharTagMappings(languageTagMappings[langCode]);
-      }
+      // Merge language-specific tags with the always-on universal ones
+      setCharTagMappings({ ...langMappings, ...UNIVERSAL_CHAR_TAGS });
     } else {
       setIsVCTCProject(false);
       setCharTagMappings({});
