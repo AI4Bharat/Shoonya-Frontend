@@ -53,6 +53,11 @@ import userRole from "../../../../utils/UserMappedByRole/Roles";
 import NotificationAPI from "../../../../redux/actions/api/Notification/Notification";
 import UpdateUIPrefsAPI from "../../../../redux/actions/api/UserManagement/UpdateUIPrefs";
 
+const syncOcrRtlTypingState = (enabled) => {
+  document.documentElement.dataset.rtlTyping = String(enabled);
+  window.dispatchEvent(new Event("rtltypingchange"));
+};
+
 const Header = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElSettings, setAnchorElSettings] = useState(null);
@@ -169,6 +174,10 @@ const Header = () => {
     getLoggedInUserData();
   }, []);
 
+  useEffect(() => {
+    syncOcrRtlTypingState(localStorage.getItem("rtl") === "true");
+  }, []);
+
   const onLogoutClick = () => {
     handleCloseUserMenu();
     dispatch(Logout());
@@ -274,6 +283,8 @@ const handleRTLChange = (event) => {
       }
     `;
   }
+
+  syncOcrRtlTypingState(event.target.checked);
 };
   const handleTranscriptionFlowChange = async (event) => {
     const obj = new UpdateUIPrefsAPI(event.target.checked);
