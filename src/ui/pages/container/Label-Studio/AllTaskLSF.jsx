@@ -35,6 +35,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { translate } from '../../../../config/localisation';
 import { labelConfigJS } from './labelConfigJSX';
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
+import { observeOcrRtlDirection } from "./ocrRtlDirection";
 //used just in postAnnotation to support draft status update.
 
 const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader, resetNotes}) => {
@@ -71,6 +72,11 @@ const LabelStudioWrapper = ({annotationNotesRef, loader, showLoader, hideLoader,
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return undefined;
+    return observeOcrRtlDirection(rootRef.current);
+  }, [ProjectDetails?.project_type]);
 
   console.log("projectId, taskId", projectId, taskId);
   // debugger
@@ -601,7 +607,14 @@ useEffect(() => {
       <Box
         sx={{border : "1px solid rgb(224 224 224)"}}
       >
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div
+          className={`label-studio-root ${
+            ProjectDetails?.project_type?.includes("OCR")
+              ? "ocr-project-style"
+              : ""
+          }`}
+          ref={rootRef}
+        ></div>
       </Box>
       {parentMetadata !== undefined &&
         <>
