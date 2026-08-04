@@ -282,7 +282,10 @@ const TranscriptionRightPanel = ({
   const showAcousticText =
     (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"  ||
     ProjectDetails?.project_type == 'VerbatimTranscriptionCharacterTagging') &&
-    (ProjectDetails?.metadata_json?.acoustic_enabled_stage == null || ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage);
+    ProjectDetails?.metadata_json &&
+    'acoustic_enabled_stage' in ProjectDetails.metadata_json &&
+    ProjectDetails.metadata_json.acoustic_enabled_stage !== null &&
+    ProjectDetails.metadata_json.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
