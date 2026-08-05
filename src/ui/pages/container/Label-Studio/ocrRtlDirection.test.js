@@ -120,4 +120,150 @@ describe("OCR mixed-direction text isolation", () => {
     root.remove();
     delete document.documentElement.dataset.rtlTyping;
   });
+
+  it("deletes visible character immediately on single Backspace press", () => {
+    const root = document.createElement("div");
+    const textarea = document.createElement("textarea");
+
+    root.appendChild(textarea);
+    document.body.appendChild(root);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    textarea.focus();
+
+    for (const character of "(a)دو") {
+      const beforeInput = new Event("beforeinput", {
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperties(beforeInput, {
+        inputType: { value: "insertText" },
+        data: { value: character },
+        isComposing: { value: false },
+      });
+      textarea.dispatchEvent(beforeInput);
+    }
+
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(a)دو");
+
+    // Position caret right after (a) -> visible offset 3
+    textarea.setSelectionRange(5, 5);
+
+    const backspaceInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(backspaceInput, {
+      inputType: { value: "deleteContentBackward" },
+      isComposing: { value: false },
+    });
+    textarea.dispatchEvent(backspaceInput);
+
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(aدو");
+    expect(textarea.value).toBe(`${LRI}(a${PDI}دو`);
+
+    stopObserving();
+    root.remove();
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("deletes an entire emoji without leaving a broken surrogate", () => {
+    const root = document.createElement("div");
+    const textarea = document.createElement("textarea");
+
+    textarea.value = "(a)😀دو";
+    root.appendChild(textarea);
+    document.body.appendChild(root);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    textarea.focus();
+    const caretAfterEmoji = textarea.value.indexOf(PDI);
+    textarea.setSelectionRange(caretAfterEmoji, caretAfterEmoji);
+
+    const backspaceInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(backspaceInput, {
+      inputType: { value: "deleteContentBackward" },
+      isComposing: { value: false },
+    });
+    textarea.dispatchEvent(backspaceInput);
+
+    expect(textarea.value).toBe(`${LRI}(a)${PDI}دو`);
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(a)دو");
+    expect(textarea.selectionStart).toBe(5);
+    expect(textarea.selectionEnd).toBe(5);
+
+    stopObserving();
+    root.remove();
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("deletes an entire emoji with forward Delete", () => {
+    const root = document.createElement("div");
+    const textarea = document.createElement("textarea");
+
+    textarea.value = "(a)😀دو";
+    root.appendChild(textarea);
+    document.body.appendChild(root);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    textarea.focus();
+    const caretBeforeEmoji = textarea.value.indexOf("😀");
+    textarea.setSelectionRange(caretBeforeEmoji, caretBeforeEmoji);
+
+    const deleteInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(deleteInput, {
+      inputType: { value: "deleteContentForward" },
+      isComposing: { value: false },
+    });
+    textarea.dispatchEvent(deleteInput);
+
+    expect(textarea.value).toBe(`${LRI}(a)${PDI}دو`);
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(a)دو");
+    expect(textarea.selectionStart).toBe(5);
+    expect(textarea.selectionEnd).toBe(5);
+
+    stopObserving();
+    root.remove();
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("does not treat a collapsed cut as Backspace", () => {
+    const root = document.createElement("div");
+    const textarea = document.createElement("textarea");
+
+    textarea.value = "(a)دو";
+    root.appendChild(textarea);
+    document.body.appendChild(root);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    textarea.focus();
+    textarea.setSelectionRange(5, 5);
+
+    const cutInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(cutInput, {
+      inputType: { value: "deleteByCut" },
+      isComposing: { value: false },
+    });
+    textarea.dispatchEvent(cutInput);
+
+    expect(cutInput.defaultPrevented).toBe(false);
+    expect(textarea.value).toBe(`${LRI}(a)${PDI}دو`);
+
+    stopObserving();
+    root.remove();
+    delete document.documentElement.dataset.rtlTyping;
+  });
 });
