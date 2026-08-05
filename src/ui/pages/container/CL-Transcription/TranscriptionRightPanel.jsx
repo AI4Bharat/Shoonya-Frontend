@@ -129,7 +129,8 @@ const getSuggestedTag = (baseChar, pos) => {
 const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
   const taggableCharIndexes = [];
   for (let i = coreWordStart; i < coreWordEnd; i++) {
-    if (mappings[text[i]]) taggableCharIndexes.push(i);
+    const resolved = resolveTaggableChar(text, i, mappings);
+    if (resolved && resolved.baseIndex === i) taggableCharIndexes.push(i);
   }
   const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
   const tagZoneStr = tagZoneMatch[0];
@@ -150,6 +151,38 @@ const VIRAMA_CHARS = new Set([
   '\u0B4D', // Oriya virama
 ]);
 
+const NUKTA = '\u093C'; // combining nukta mark (used in ज़, ड़, ढ़, फ़, etc.)
+
+const resolveTaggableChar = (text, index, mappings) => {
+  if (index < 0 || index >= text.length) return null;
+
+  // Clicked directly on a nukta mark -> resolve back to its base character.
+  if (text[index] === NUKTA && index > 0) {
+    const combined = text[index - 1] + text[index];
+    if (mappings[combined]) {
+      return { key: combined, baseIndex: index - 1, length: 2 };
+    }
+   
+    return null;
+  }
+
+  // Clicked on a base consonant immediately followed by a nukta.
+  if (index + 1 < text.length && text[index + 1] === NUKTA) {
+    const combined = text[index] + text[index + 1];
+    if (mappings[combined]) {
+      return { key: combined, baseIndex: index, length: 2 };
+    }
+    // Same reasoning as above — this is base+nukta, not the bare base.
+    return null;
+  }
+
+  // Ordinary single-codepoint character, not adjacent to a nukta.
+  if (mappings[text[index]]) {
+    return { key: text[index], baseIndex: index, length: 1 };
+  }
+
+  return null;
+};
 const getSyllableClusterLength = (text, startIndex, mappings) => {
   let i = startIndex + 1;
   while (i < text.length) {
@@ -912,12 +945,13 @@ const processNoiseTags = (value) => {
       return;
     }
 
-    const charAtCursor = textarea.value[charIndex] || '';
+  const resolved = resolveTaggableChar(textarea.value, charIndex, charTagMappings);
 
-    if (charAtCursor && charTagMappings[charAtCursor]) {
-      // Select exactly that character so the native selection highlight
-      // gives visual feedback for which letter was picked.
-      textarea.setSelectionRange(charIndex, charIndex + 1);
+    if (resolved) {
+      const { key: charAtCursor, baseIndex, length } = resolved;
+      // Select the full letter (base + nukta, if present) so the native
+      // selection highlight gives visual feedback for which letter was picked.
+      textarea.setSelectionRange(baseIndex, baseIndex + length);
       const mappings = charTagMappings[charAtCursor];
 
       // Clear any pending timeout
@@ -926,20 +960,20 @@ const processNoiseTags = (value) => {
         charTagTimeoutRef.current = null;
       }
 
-      const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
+      const pos = detectCharPosition(textarea.value, baseIndex, charAtCursor);
       const suggested = getSuggestedTag(charAtCursor, pos);
 
       // Look up whether this character already has a tag, derived fresh
       // from the current text (see getWordTagInfo) so it's correct even
       // right after a page refresh, when there is no in-memory record of
       // previous tagging left to consult.
-      let coreWordStart = charIndex;
+      let coreWordStart = baseIndex;
       while (
         coreWordStart > 0 &&
         !/\s/.test(textarea.value[coreWordStart - 1]) &&
         textarea.value[coreWordStart - 1] !== '>'
       ) coreWordStart--;
-      let coreWordEnd = charIndex;
+let coreWordEnd = baseIndex;
       while (
         coreWordEnd < textarea.value.length &&
         !/\s/.test(textarea.value[coreWordEnd]) &&
@@ -951,7 +985,7 @@ const processNoiseTags = (value) => {
         coreWordEnd,
         charTagMappings
       );
-      const rank = taggableCharIndexes.indexOf(charIndex);
+const rank = taggableCharIndexes.indexOf(baseIndex);
       const currentTag =
         rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
 
@@ -963,8 +997,8 @@ const processNoiseTags = (value) => {
         position: { x: event.clientX, y: event.clientY },
         suggestedTag: suggested,
         currentTag: currentTag,
-        onTagSelect: (tag) => {
-          handleCharacterTagSelection(subIndex, charIndex, tag, isL1);
+      onTagSelect: (tag) => {
+          handleCharacterTagSelection(subIndex, baseIndex, tag, isL1);
         }
       });
     } else {
