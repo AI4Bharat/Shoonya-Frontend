@@ -92,8 +92,7 @@ const languageTagMappings = {
     'फ': ['ph-f']   // f vs ph
   },
   'en': {
-    'ज़': ['zh-z', 'zh-j'], // zh vs z / j context-based
-   
+    'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
   }
 };
 
@@ -130,9 +129,7 @@ const getSuggestedTag = (baseChar, pos) => {
 const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
   const taggableCharIndexes = [];
   for (let i = coreWordStart; i < coreWordEnd; i++) {
-    const resolved = resolveTaggableChar(text, i, mappings);
-    
-    if (resolved && resolved.baseIndex === i) taggableCharIndexes.push(i);
+    if (mappings[text[i]]) taggableCharIndexes.push(i);
   }
   const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
   const tagZoneStr = tagZoneMatch[0];
@@ -152,36 +149,6 @@ const VIRAMA_CHARS = new Set([
   '\u0A4D', // Gurmukhi virama
   '\u0B4D', // Oriya virama
 ]);
-const NUKTA = '\u093C'; // combining nukta mark (used in ज़, ड़, ढ़, फ़, etc.)
-
-
-const resolveTaggableChar = (text, index, mappings) => {
-  if (index < 0 || index >= text.length) return null;
-
-  // Clicked directly on the nukta mark itself -> snap back to its base char.
-  if (text[index] === NUKTA && index > 0) {
-    const combined = text[index - 1] + text[index];
-    if (mappings[combined]) {
-      return { key: combined, baseIndex: index - 1, length: 2 };
-    }
-    index = index - 1;
-  }
-
-  // Clicked on the base consonant that's immediately followed by a nukta.
-  if (index + 1 < text.length && text[index + 1] === NUKTA) {
-    const combined = text[index] + text[index + 1];
-    if (mappings[combined]) {
-      return { key: combined, baseIndex: index, length: 2 };
-    }
-  }
-
-  // Ordinary single-codepoint character (covers all your existing letters).
-  if (mappings[text[index]]) {
-    return { key: text[index], baseIndex: index, length: 1 };
-  }
-
-  return null;
-};
 
 const getSyllableClusterLength = (text, startIndex, mappings) => {
   let i = startIndex + 1;
@@ -934,73 +901,76 @@ const processNoiseTags = (value) => {
     }
   };
 
- const handleTextareaClick = (event, subIndex, isL1) => {
-  if (!isVCTCProject) return;
+  const handleTextareaClick = (event, subIndex, isL1) => {
+    if (!isVCTCProject) return;
 
-  const textarea = event.target;
-  const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
+    const textarea = event.target;
+    const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
 
-  if (charIndex === -1) {
-    handleCharTagPopover(null);
-    return;
-  }
-
-  const resolved = resolveTaggableChar(textarea.value, charIndex, charTagMappings);
-
-  if (resolved) {
-    const { key: charAtCursor, baseIndex, length } = resolved;
-
-    // Select the full letter (base + nukta, if present) for visual feedback.
-    textarea.setSelectionRange(baseIndex, baseIndex + length);
-    const mappings = charTagMappings[charAtCursor];
-
-    if (charTagTimeoutRef.current) {
-      clearTimeout(charTagTimeoutRef.current);
-      charTagTimeoutRef.current = null;
+    if (charIndex === -1) {
+      handleCharTagPopover(null);
+      return;
     }
 
-    const pos = detectCharPosition(textarea.value, baseIndex, charAtCursor);
-    const suggested = getSuggestedTag(charAtCursor, pos);
+    const charAtCursor = textarea.value[charIndex] || '';
 
-    let coreWordStart = baseIndex;
-    while (
-      coreWordStart > 0 &&
-      !/\s/.test(textarea.value[coreWordStart - 1]) &&
-      textarea.value[coreWordStart - 1] !== '>'
-    ) coreWordStart--;
-    let coreWordEnd = baseIndex;
-    while (
-      coreWordEnd < textarea.value.length &&
-      !/\s/.test(textarea.value[coreWordEnd]) &&
-      textarea.value[coreWordEnd] !== '<'
-    ) coreWordEnd++;
+    if (charAtCursor && charTagMappings[charAtCursor]) {
+      // Select exactly that character so the native selection highlight
+      // gives visual feedback for which letter was picked.
+      textarea.setSelectionRange(charIndex, charIndex + 1);
+      const mappings = charTagMappings[charAtCursor];
 
-    const { taggableCharIndexes, tokens } = getWordTagInfo(
-      textarea.value,
-      coreWordStart,
-      coreWordEnd,
-      charTagMappings
-    );
-    const rank = taggableCharIndexes.indexOf(baseIndex);
-    const currentTag =
-      rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
-
-    handleCharTagPopover({
-      anchorEl: textarea,
-      mappings: mappings,
-      selectedText: charAtCursor,
-      index: subIndex,
-      position: { x: event.clientX, y: event.clientY },
-      suggestedTag: suggested,
-      currentTag: currentTag,
-      onTagSelect: (tag) => {
-        handleCharacterTagSelection(subIndex, baseIndex, tag, isL1);
+      // Clear any pending timeout
+      if (charTagTimeoutRef.current) {
+        clearTimeout(charTagTimeoutRef.current);
+        charTagTimeoutRef.current = null;
       }
-    });
-  } else {
-    handleCharTagPopover(null);
-  }
-};
+
+      const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
+      const suggested = getSuggestedTag(charAtCursor, pos);
+
+      // Look up whether this character already has a tag, derived fresh
+      // from the current text (see getWordTagInfo) so it's correct even
+      // right after a page refresh, when there is no in-memory record of
+      // previous tagging left to consult.
+      let coreWordStart = charIndex;
+      while (
+        coreWordStart > 0 &&
+        !/\s/.test(textarea.value[coreWordStart - 1]) &&
+        textarea.value[coreWordStart - 1] !== '>'
+      ) coreWordStart--;
+      let coreWordEnd = charIndex;
+      while (
+        coreWordEnd < textarea.value.length &&
+        !/\s/.test(textarea.value[coreWordEnd]) &&
+        textarea.value[coreWordEnd] !== '<'
+      ) coreWordEnd++;
+      const { taggableCharIndexes, tokens } = getWordTagInfo(
+        textarea.value,
+        coreWordStart,
+        coreWordEnd,
+        charTagMappings
+      );
+      const rank = taggableCharIndexes.indexOf(charIndex);
+      const currentTag =
+        rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
+
+      handleCharTagPopover({
+        anchorEl: textarea,
+        mappings: mappings,
+        selectedText: charAtCursor,
+        index: subIndex,
+        position: { x: event.clientX, y: event.clientY },
+        suggestedTag: suggested,
+        currentTag: currentTag,
+        onTagSelect: (tag) => {
+          handleCharacterTagSelection(subIndex, charIndex, tag, isL1);
+        }
+      });
+    } else {
+      handleCharTagPopover(null);
+    }
+  };
 
 const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
   const { value: eventValue } = event.target;
