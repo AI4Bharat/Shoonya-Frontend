@@ -681,7 +681,7 @@ const AnnotationProject = (props) => {
       project_type: selectedType,
       dataset_id: selectedInstances,
       label_config: "string",
-      variable_parameters: temp,
+      // variable_parameters: temp,
       project_mode: "Annotation",
       required_annotators_per_task: selectedAnnotatorsNum,
       project_stage: taskReviews,
@@ -844,7 +844,7 @@ const AnnotationProject = (props) => {
               </>
             )}
 
-            {selectedType &&
+            {/* {selectedType &&
               variableParameters?.[selectedType]?.variable_parameters !==
                 undefined && (
                 <>
@@ -870,7 +870,7 @@ const AnnotationProject = (props) => {
                     />
                   </Grid>
                 </>
-              )}
+              )} */}
             {(selectedDomain === "Translation" ||
               selectedDomain === "Conversation") &&
               (selectedType === "TranslationEditing" ||
@@ -996,7 +996,7 @@ const AnnotationProject = (props) => {
 
             {instanceIds && (
               <>
-                {selectedVariableParameters.map((parameter, index) => (
+                {/* {selectedVariableParameters.map((parameter, index) => (
                   <>
                     {selectedType === "Conversation" &&
                       (selectedType === "ContextualTranslationEditing" ||
@@ -1087,7 +1087,7 @@ const AnnotationProject = (props) => {
                       )}
                     </Grid>
                   </>
-                ))}
+                ))} */}
                 {selectedType && Object.keys(instanceIds).length > 0 && (
                   <>
                     <Grid
@@ -1554,8 +1554,7 @@ const AnnotationProject = (props) => {
                   selectedType &&
                   selectedInstances &&
                   domains &&
-                  samplingMode &&
-                  selectedVariableParameters
+                  samplingMode
                     ? false
                     : true
                 }
