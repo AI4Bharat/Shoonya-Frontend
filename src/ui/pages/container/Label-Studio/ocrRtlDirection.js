@@ -21,6 +21,10 @@ const BIDI_ISOLATE_REGEX = /[\u2066\u2067\u2068\u2069]/g;
 const BIDI_ISOLATE_CHARACTER = /[\u2066\u2067\u2068\u2069]/;
 
 const RTL_CHARACTER = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]/;
+const GRAPHEME_SEGMENTER =
+  typeof Intl !== "undefined" && typeof Intl.Segmenter === "function"
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+    : null;
 
 const rtlTypingIsEnabled = () =>
   document.documentElement.dataset.rtlTyping === "true";
@@ -157,6 +161,37 @@ const setControlSelection = (element, start, end = start) => {
   );
 };
 
+const graphemeBoundaries = (value) => {
+  if (GRAPHEME_SEGMENTER) {
+    return [
+      ...Array.from(GRAPHEME_SEGMENTER.segment(value), ({ index }) => index),
+      value.length,
+    ];
+  }
+
+  let offset = 0;
+  const boundaries = [offset];
+  for (const character of value) {
+    offset += character.length;
+    boundaries.push(offset);
+  }
+  return boundaries;
+};
+
+const adjacentGraphemeBoundary = (value, offset, isForward) => {
+  const boundaries = graphemeBoundaries(value);
+
+  if (isForward) {
+    return boundaries.find((boundary) => boundary > offset) ?? value.length;
+  }
+
+  for (let index = boundaries.length - 1; index >= 0; index -= 1) {
+    if (boundaries[index] < offset) return boundaries[index];
+  }
+
+  return 0;
+};
+
 const insertTextAtLogicalCaret = (element, insertedText) => {
   const originalValue = element.value;
   const plainValue = stripOcrBidiIsolates(originalValue);
@@ -173,6 +208,56 @@ const insertTextAtLogicalCaret = (element, insertedText) => {
     insertedText +
     plainValue.slice(selectionEnd);
   const nextCaret = selectionStart + insertedText.length;
+
+  setNativeControlValue(element, wrapOcrLtrRuns(nextPlainValue));
+  setControlSelection(element, nextCaret);
+  element.dispatchEvent(new Event("input", { bubbles: true }));
+
+  queueMicrotask(() => {
+    if (element === document.activeElement) setControlSelection(element, nextCaret);
+  });
+};
+
+const deleteTextAtLogicalCaret = (element, isForward = false) => {
+  const originalValue = element.value;
+  const plainValue = stripOcrBidiIsolates(originalValue);
+  const selectionStart = visibleOffset(
+    originalValue,
+    element.selectionStart ?? originalValue.length,
+  );
+  const selectionEnd = visibleOffset(
+    originalValue,
+    element.selectionEnd ?? originalValue.length,
+  );
+
+  let nextPlainValue = plainValue;
+  let nextCaret = selectionStart;
+
+  if (selectionStart !== selectionEnd) {
+    nextPlainValue =
+      plainValue.slice(0, selectionStart) + plainValue.slice(selectionEnd);
+    nextCaret = selectionStart;
+  } else if (!isForward && selectionStart > 0) {
+    const previousBoundary = adjacentGraphemeBoundary(
+      plainValue,
+      selectionStart,
+      false,
+    );
+    nextPlainValue =
+      plainValue.slice(0, previousBoundary) + plainValue.slice(selectionStart);
+    nextCaret = previousBoundary;
+  } else if (isForward && selectionStart < plainValue.length) {
+    const nextBoundary = adjacentGraphemeBoundary(
+      plainValue,
+      selectionStart,
+      true,
+    );
+    nextPlainValue =
+      plainValue.slice(0, selectionStart) + plainValue.slice(nextBoundary);
+    nextCaret = selectionStart;
+  } else {
+    return;
+  }
 
   setNativeControlValue(element, wrapOcrLtrRuns(nextPlainValue));
   setControlSelection(element, nextCaret);
@@ -282,6 +367,27 @@ export const observeOcrRtlDirection = (root) => {
       !rtlTypingIsEnabled() ||
       !isNativeTextControlInsideRoot(root, event.target)
     ) {
+      return;
+    }
+
+    if (
+      event.inputType === "deleteContentBackward" ||
+      event.inputType === "deleteContentForward" ||
+      event.inputType === "deleteByCut"
+    ) {
+      if (
+        event.inputType === "deleteByCut" &&
+        event.target.selectionStart === event.target.selectionEnd
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      deleteTextAtLogicalCaret(
+        event.target,
+        event.inputType === "deleteContentForward",
+      );
       return;
     }
 
