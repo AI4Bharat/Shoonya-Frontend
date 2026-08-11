@@ -71,6 +71,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import { Add, MoreVert, Remove } from "@material-ui/icons";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import configs from "../../../../config/config";
+import { canOpenCharacterTagging } from "./characterTaggingVisibility";
 
 const languageTagMappings = {
   'ta': {
@@ -935,7 +936,16 @@ const processNoiseTags = (value) => {
   };
 
   const handleTextareaClick = (event, subIndex, isL1) => {
-    if (!isVCTCProject) return;
+    const canTagCurrentField = canOpenCharacterTagging({
+      isCharacterTaggingProject: isVCTCProject,
+      isL1,
+      hasL2: showAcousticText,
+    });
+
+    if (!canTagCurrentField) {
+      handleCharTagPopover(null);
+      return;
+    }
 
     const textarea = event.target;
     const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
