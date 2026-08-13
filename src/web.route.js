@@ -54,6 +54,9 @@ const DatasetDetails = React.lazy(() =>
 const AutomateDatasets = React.lazy(() =>
   import("./ui/pages/container/Dataset/AutomateDatasets")
 );
+const CreateDatasetAndProject = React.lazy(() =>
+  import("./ui/pages/container/Dataset/CreateDatasetAndProject")
+);
 const LSF = React.lazy(() => import("./ui/pages/container/Label-Studio/LSF"));
 const ReviewLSF = React.lazy(() =>
   import("./ui/pages/container/Label-Studio/ReviewLSF")
@@ -240,6 +243,15 @@ const App = () => {
             path="datasets/automate"
             element={ProtectedRouteWrapper(
               <Layout component={<AutomateDatasets />} Backbutton={true} />
+            )}
+          />
+          <Route
+            path="datasets/create-dataset-and-project"
+            element={ProtectedRouteWrapper(
+              <Layout
+                component={<CreateDatasetAndProject />}
+                Backbutton={true}
+              />
             )}
           />
           <Route
