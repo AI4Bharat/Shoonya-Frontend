@@ -1,3 +1,6 @@
+import React, { useState } from "react";
+import { createRoot } from "react-dom/client";
+import { act } from "react-dom/test-utils";
 import {
   observeOcrRtlDirection,
   stripOcrBidiIsolates,
@@ -264,6 +267,209 @@ describe("OCR mixed-direction text isolation", () => {
 
     stopObserving();
     root.remove();
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("keeps a Backspace deletion in a controlled Label Studio-style textarea", () => {
+    const previousActEnvironment = globalThis.IS_REACT_ACT_ENVIRONMENT;
+    globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const ControlledTextarea = () => {
+      const [value, setValue] = useState("(a)دو");
+      return (
+        <textarea value={value} onChange={(event) => setValue(event.target.value)} />
+      );
+    };
+
+    const reactRoot = createRoot(container);
+    act(() => reactRoot.render(<ControlledTextarea />));
+
+    const stopObserving = observeOcrRtlDirection(container);
+    const textarea = container.querySelector("textarea");
+    textarea.focus();
+    textarea.setSelectionRange(5, 5);
+
+    const backspaceInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(backspaceInput, {
+      inputType: { value: "deleteContentBackward" },
+      isComposing: { value: false },
+    });
+
+    act(() => textarea.dispatchEvent(backspaceInput));
+
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(aدو");
+    expect(textarea.value).toBe(`${LRI}(a${PDI}دو`);
+
+    stopObserving();
+    act(() => reactRoot.unmount());
+    container.remove();
+    globalThis.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment;
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("uses keydown when beforeinput is unavailable without deleting twice", () => {
+    const root = document.createElement("div");
+    const textarea = document.createElement("textarea");
+
+    textarea.value = `${LRI}(a)${PDI}دو`;
+    root.appendChild(textarea);
+    document.body.appendChild(root);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    textarea.focus();
+    textarea.setSelectionRange(5, 5);
+
+    const keydown = new KeyboardEvent("keydown", {
+      key: "Backspace",
+      bubbles: true,
+      cancelable: true,
+    });
+    textarea.dispatchEvent(keydown);
+
+    expect(keydown.defaultPrevented).toBe(true);
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(aدو");
+
+    const beforeInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(beforeInput, {
+      inputType: { value: "deleteContentBackward" },
+      isComposing: { value: false },
+    });
+    textarea.dispatchEvent(beforeInput);
+
+    expect(beforeInput.defaultPrevented).toBe(true);
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(aدو");
+
+    stopObserving();
+    root.remove();
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("deletes one visible character from a contenteditable OCR editor", () => {
+    const root = document.createElement("div");
+    const editor = document.createElement("div");
+    const text = document.createTextNode(`${LRI}(a)${PDI}دو`);
+
+    editor.setAttribute("contenteditable", "true");
+    editor.appendChild(text);
+    root.appendChild(editor);
+    document.body.appendChild(root);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    editor.focus();
+
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.setStart(text, 5);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    const backspaceInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(backspaceInput, {
+      inputType: { value: "deleteContentBackward" },
+      isComposing: { value: false },
+    });
+    editor.dispatchEvent(backspaceInput);
+
+    expect(backspaceInput.defaultPrevented).toBe(true);
+    expect(editor.textContent).toBe(`${LRI}(a${PDI}دو`);
+    expect(stripOcrBidiIsolates(editor.textContent)).toBe("(aدو");
+
+    const caretRange = selection.getRangeAt(0);
+    expect(caretRange.startOffset).toBe(4);
+    expect(caretRange.collapsed).toBe(true);
+
+    stopObserving();
+    root.remove();
+    selection.removeAllRanges();
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("deletes selected text from a contenteditable OCR editor", () => {
+    const root = document.createElement("div");
+    const editor = document.createElement("div");
+    const text = document.createTextNode(`${LRI}(ab)${PDI}دو`);
+
+    editor.setAttribute("contenteditable", "true");
+    editor.appendChild(text);
+    root.appendChild(editor);
+    document.body.appendChild(root);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    editor.focus();
+
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.setStart(text, 2);
+    range.setEnd(text, 4);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    const backspaceInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(backspaceInput, {
+      inputType: { value: "deleteContentBackward" },
+      isComposing: { value: false },
+    });
+    editor.dispatchEvent(backspaceInput);
+
+    expect(stripOcrBidiIsolates(editor.textContent)).toBe("()دو");
+
+    stopObserving();
+    root.remove();
+    selection.removeAllRanges();
+    delete document.documentElement.dataset.rtlTyping;
+  });
+
+  it("handles Backspace in text controls rendered inside portal/modal containers outside root", () => {
+    const root = document.createElement("div");
+    const modal = document.createElement("div");
+    modal.className = "lsf-modal";
+    const textarea = document.createElement("textarea");
+    textarea.value = `${LRI}(a)${PDI}دو`;
+
+    modal.appendChild(textarea);
+    document.body.appendChild(root);
+    document.body.appendChild(modal);
+    document.documentElement.dataset.rtlTyping = "true";
+
+    const stopObserving = observeOcrRtlDirection(root);
+    textarea.focus();
+    textarea.setSelectionRange(5, 5);
+
+    const backspaceInput = new Event("beforeinput", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(backspaceInput, {
+      inputType: { value: "deleteContentBackward" },
+      isComposing: { value: false },
+    });
+    textarea.dispatchEvent(backspaceInput);
+
+    expect(backspaceInput.defaultPrevented).toBe(true);
+    expect(stripOcrBidiIsolates(textarea.value)).toBe("(aدو");
+
+    stopObserving();
+    root.remove();
+    modal.remove();
     delete document.documentElement.dataset.rtlTyping;
   });
 });
