@@ -441,7 +441,7 @@ describe("OCR mixed-direction text isolation", () => {
   it("handles Backspace in text controls rendered inside portal/modal containers outside root", () => {
     const root = document.createElement("div");
     const modal = document.createElement("div");
-    modal.className = "ant-modal";
+    modal.className = "lsf-modal";
     const textarea = document.createElement("textarea");
     textarea.value = `${LRI}(a)${PDI}دو`;
 

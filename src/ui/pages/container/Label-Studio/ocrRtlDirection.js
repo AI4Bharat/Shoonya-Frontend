@@ -427,12 +427,12 @@ const insertContentEditableAtLogicalCaret = (element, insertedText) => {
 
 const isTextControlInsideRoot = (root, target) =>
   target?.nodeType === 1 &&
-  (root.contains(target) || Boolean(target.closest('.lsf-portal, .ant-modal, .ant-popover, [role="dialog"]'))) &&
+  (root.contains(target) || Boolean(target.closest('.lsf-portal, .lsf-modal, .lsf-modal-portal, .ant-modal, .ant-popover, [role="dialog"]'))) &&
   target.matches(OCR_TEXT_CONTROL_SELECTOR);
 
 const isNativeTextControlInsideRoot = (root, target) =>
   target?.nodeType === 1 &&
-  (root.contains(target) || Boolean(target.closest('.lsf-portal, .ant-modal, .ant-popover, [role="dialog"]'))) &&
+  (root.contains(target) || Boolean(target.closest('.lsf-portal, .lsf-modal, .lsf-modal-portal, .ant-modal, .ant-popover, [role="dialog"]'))) &&
   target.matches(OCR_NATIVE_TEXT_CONTROL_SELECTOR);
 
 const applyDirection = (element, enabled) => {
