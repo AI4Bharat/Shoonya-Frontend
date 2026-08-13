@@ -29,6 +29,9 @@ const GRAPHEME_SEGMENTER =
 const rtlTypingIsEnabled = () =>
   document.documentElement.dataset.rtlTyping === "true";
 
+const isContentEditableControl = (element) =>
+  element.matches?.('[contenteditable="true"]');
+
 export const stripOcrBidiIsolates = (value) =>
   typeof value === "string" ? value.replace(BIDI_ISOLATE_REGEX, "") : value;
 
@@ -85,6 +88,10 @@ const domOffsetFromVisibleOffset = (value, visibleOffsetValue) => {
 };
 
 const setNativeControlValue = (element, value) => {
+  const tracker = element._valueTracker;
+  if (tracker) {
+    tracker.setValue(element.value);
+  }
   const prototype =
     element.tagName === "TEXTAREA"
       ? window.HTMLTextAreaElement.prototype
@@ -99,7 +106,7 @@ const setNativeControlValue = (element, value) => {
 };
 
 const normalizeTextControl = (element) => {
-  if (element.isContentEditable) return false;
+  if (isContentEditableControl(element)) return false;
 
   const originalValue = element.value;
   const wrappedValue = wrapOcrLtrRuns(originalValue);
@@ -130,13 +137,14 @@ const normalizeSavedTextDisplay = (element) => {
 };
 
 const removeTextControlIsolates = (element) => {
-  const originalValue = element.isContentEditable
+  const isContentEditable = isContentEditableControl(element);
+  const originalValue = isContentEditable
     ? element.textContent
     : element.value;
   const plainValue = stripOcrBidiIsolates(originalValue);
   if (plainValue === originalValue) return false;
 
-  if (element.isContentEditable) {
+  if (isContentEditable) {
     element.textContent = plainValue;
     return true;
   }
@@ -159,6 +167,86 @@ const setControlSelection = (element, start, end = start) => {
     domOffsetFromVisibleOffset(element.value, start),
     domOffsetFromVisibleOffset(element.value, end),
   );
+};
+
+const contentEditableOffset = (element, container, offset) => {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.setEnd(container, offset);
+  return range.toString().length;
+};
+
+const getContentEditableSelection = (element) => {
+  const selection = window.getSelection();
+  const fallbackOffset = element.textContent.length;
+
+  if (!selection || selection.rangeCount === 0) {
+    return { start: fallbackOffset, end: fallbackOffset };
+  }
+
+  const range = selection.getRangeAt(0);
+  if (
+    !element.contains(range.startContainer) ||
+    !element.contains(range.endContainer)
+  ) {
+    return { start: fallbackOffset, end: fallbackOffset };
+  }
+
+  return {
+    start: contentEditableOffset(
+      element,
+      range.startContainer,
+      range.startOffset,
+    ),
+    end: contentEditableOffset(element, range.endContainer, range.endOffset),
+  };
+};
+
+const setContentEditableSelection = (
+  element,
+  visibleStart,
+  visibleEnd = visibleStart,
+) => {
+  const value = element.textContent;
+  const start = domOffsetFromVisibleOffset(value, visibleStart);
+  const end = domOffsetFromVisibleOffset(value, visibleEnd);
+  const walker = document.createTreeWalker(
+    element,
+    window.NodeFilter.SHOW_TEXT,
+  );
+  const textNodes = [];
+  let node = walker.nextNode();
+
+  while (node) {
+    textNodes.push(node);
+    node = walker.nextNode();
+  }
+
+  const locateOffset = (targetOffset) => {
+    let remaining = targetOffset;
+
+    for (const textNode of textNodes) {
+      if (remaining <= textNode.data.length) {
+        return { node: textNode, offset: remaining };
+      }
+      remaining -= textNode.data.length;
+    }
+
+    const lastTextNode = textNodes[textNodes.length - 1];
+    return lastTextNode
+      ? { node: lastTextNode, offset: lastTextNode.data.length }
+      : { node: element, offset: 0 };
+  };
+
+  const startPosition = locateOffset(start);
+  const endPosition = locateOffset(end);
+  const range = document.createRange();
+  range.setStart(startPosition.node, startPosition.offset);
+  range.setEnd(endPosition.node, endPosition.offset);
+
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
 };
 
 const graphemeBoundaries = (value) => {
@@ -268,14 +356,83 @@ const deleteTextAtLogicalCaret = (element, isForward = false) => {
   });
 };
 
+const deleteContentEditableAtLogicalCaret = (element, isForward = false) => {
+  const originalValue = element.textContent;
+  const plainValue = stripOcrBidiIsolates(originalValue);
+  const selection = getContentEditableSelection(element);
+  const selectionStart = visibleOffset(originalValue, selection.start);
+  const selectionEnd = visibleOffset(originalValue, selection.end);
+
+  let nextPlainValue = plainValue;
+  let nextCaret = selectionStart;
+
+  if (selectionStart !== selectionEnd) {
+    nextPlainValue =
+      plainValue.slice(0, selectionStart) + plainValue.slice(selectionEnd);
+  } else if (!isForward && selectionStart > 0) {
+    const previousBoundary = adjacentGraphemeBoundary(
+      plainValue,
+      selectionStart,
+      false,
+    );
+    nextPlainValue =
+      plainValue.slice(0, previousBoundary) + plainValue.slice(selectionStart);
+    nextCaret = previousBoundary;
+  } else if (isForward && selectionStart < plainValue.length) {
+    const nextBoundary = adjacentGraphemeBoundary(
+      plainValue,
+      selectionStart,
+      true,
+    );
+    nextPlainValue =
+      plainValue.slice(0, selectionStart) + plainValue.slice(nextBoundary);
+  } else {
+    return;
+  }
+
+  element.textContent = wrapOcrLtrRuns(nextPlainValue);
+  setContentEditableSelection(element, nextCaret);
+  element.dispatchEvent(new Event("input", { bubbles: true }));
+
+  queueMicrotask(() => {
+    if (element === document.activeElement) {
+      setContentEditableSelection(element, nextCaret);
+    }
+  });
+};
+
+const insertContentEditableAtLogicalCaret = (element, insertedText) => {
+  const originalValue = element.textContent;
+  const plainValue = stripOcrBidiIsolates(originalValue);
+  const selection = getContentEditableSelection(element);
+  const selectionStart = visibleOffset(originalValue, selection.start);
+  const selectionEnd = visibleOffset(originalValue, selection.end);
+
+  const nextPlainValue =
+    plainValue.slice(0, selectionStart) +
+    insertedText +
+    plainValue.slice(selectionEnd);
+  const nextCaret = selectionStart + insertedText.length;
+
+  element.textContent = wrapOcrLtrRuns(nextPlainValue);
+  setContentEditableSelection(element, nextCaret);
+  element.dispatchEvent(new Event("input", { bubbles: true }));
+
+  queueMicrotask(() => {
+    if (element === document.activeElement) {
+      setContentEditableSelection(element, nextCaret);
+    }
+  });
+};
+
 const isTextControlInsideRoot = (root, target) =>
   target?.nodeType === 1 &&
-  root.contains(target) &&
+  (root.contains(target) || Boolean(target.closest('.lsf-portal, .ant-modal, .ant-popover, [role="dialog"]'))) &&
   target.matches(OCR_TEXT_CONTROL_SELECTOR);
 
 const isNativeTextControlInsideRoot = (root, target) =>
   target?.nodeType === 1 &&
-  root.contains(target) &&
+  (root.contains(target) || Boolean(target.closest('.lsf-portal, .ant-modal, .ant-popover, [role="dialog"]'))) &&
   target.matches(OCR_NATIVE_TEXT_CONTROL_SELECTOR);
 
 const applyDirection = (element, enabled) => {
@@ -341,6 +498,7 @@ export const observeOcrRtlDirection = (root) => {
   observer.observe(root, { childList: true, subtree: true });
 
   let isComposing = false;
+  let pendingKeyboardDeletion = null;
   const handleFocusIn = (event) => {
     if (rtlTypingIsEnabled() && isTextControlInsideRoot(root, event.target)) {
       event.target.setAttribute("dir", "rtl");
@@ -360,12 +518,48 @@ export const observeOcrRtlDirection = (root) => {
     isComposing = false;
     if (rtlTypingIsEnabled()) normalizeTextControl(event.target);
   };
+  const deleteAtLogicalCaret = (element, isForward) => {
+    if (isNativeTextControlInsideRoot(root, element)) {
+      deleteTextAtLogicalCaret(element, isForward);
+    } else {
+      deleteContentEditableAtLogicalCaret(element, isForward);
+    }
+  };
+  const handleKeyDown = (event) => {
+    const isBackward = event.key === "Backspace";
+    const isForward = event.key === "Delete";
+
+    if (
+      (!isBackward && !isForward) ||
+      event.defaultPrevented ||
+      event.isComposing ||
+      isComposing ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      (event.shiftKey && isForward) ||
+      !rtlTypingIsEnabled() ||
+      !isTextControlInsideRoot(root, event.target)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    deleteAtLogicalCaret(event.target, isForward);
+
+    const deletion = { target: event.target, isForward };
+    pendingKeyboardDeletion = deletion;
+    queueMicrotask(() => {
+      if (pendingKeyboardDeletion === deletion) pendingKeyboardDeletion = null;
+    });
+  };
   const handleBeforeInput = (event) => {
     if (
       isComposing ||
       event.isComposing ||
       !rtlTypingIsEnabled() ||
-      !isNativeTextControlInsideRoot(root, event.target)
+      !isTextControlInsideRoot(root, event.target)
     ) {
       return;
     }
@@ -376,18 +570,31 @@ export const observeOcrRtlDirection = (root) => {
       event.inputType === "deleteByCut"
     ) {
       if (
+        pendingKeyboardDeletion?.target === event.target &&
+        event.inputType !== "deleteByCut"
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        pendingKeyboardDeletion = null;
+        return;
+      }
+
+      if (
         event.inputType === "deleteByCut" &&
-        event.target.selectionStart === event.target.selectionEnd
+        (isNativeTextControlInsideRoot(root, event.target)
+          ? event.target.selectionStart === event.target.selectionEnd
+          : (() => {
+              const selection = getContentEditableSelection(event.target);
+              return selection.start === selection.end;
+            })())
       ) {
         return;
       }
 
       event.preventDefault();
       event.stopPropagation();
-      deleteTextAtLogicalCaret(
-        event.target,
-        event.inputType === "deleteContentForward",
-      );
+      const isForward = event.inputType === "deleteContentForward";
+      deleteAtLogicalCaret(event.target, isForward);
       return;
     }
 
@@ -401,7 +608,11 @@ export const observeOcrRtlDirection = (root) => {
 
     event.preventDefault();
     event.stopPropagation();
-    insertTextAtLogicalCaret(event.target, insertedText);
+    if (isNativeTextControlInsideRoot(root, event.target)) {
+      insertTextAtLogicalCaret(event.target, insertedText);
+    } else {
+      insertContentEditableAtLogicalCaret(event.target, insertedText);
+    }
   };
   const handleInput = (event) => {
     if (
@@ -418,6 +629,7 @@ export const observeOcrRtlDirection = (root) => {
   document.addEventListener("focusout", handleFocusOut, true);
   document.addEventListener("compositionstart", handleCompositionStart, true);
   document.addEventListener("compositionend", handleCompositionEnd, true);
+  document.addEventListener("keydown", handleKeyDown, true);
   document.addEventListener("beforeinput", handleBeforeInput, true);
   document.addEventListener("input", handleInput, true);
   window.addEventListener("rtltypingchange", handleRtlTypingChange);
@@ -432,6 +644,7 @@ export const observeOcrRtlDirection = (root) => {
     document.removeEventListener("focusout", handleFocusOut, true);
     document.removeEventListener("compositionstart", handleCompositionStart, true);
     document.removeEventListener("compositionend", handleCompositionEnd, true);
+    document.removeEventListener("keydown", handleKeyDown, true);
     document.removeEventListener("beforeinput", handleBeforeInput, true);
     document.removeEventListener("input", handleInput, true);
     window.removeEventListener("rtltypingchange", handleRtlTypingChange);
