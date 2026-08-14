@@ -72,6 +72,10 @@ export default function DatasetList() {
   const handleAutomateButton = (e) => {
     navigate("/datasets/automate");
   };
+
+  const handleCreateDatasetAndProject = (e) => {
+    navigate("/datasets/create-dataset-and-project");
+  };
    useEffect(() => {
       setLoading(apiLoading);
   }, [apiLoading])
@@ -137,6 +141,19 @@ export default function DatasetList() {
           disabled = {userRole.Admin === loggedInUserData?.role? false : true}
           onClick={handleAutomateButton}
           label="Automate Datasets"
+        />
+        <CustomButton
+          sx={{
+            p: 2,
+            borderRadius: 3,
+            mt: 2,
+            mb: 2,
+            ml: 2,
+            justifyContent: "flex-end",
+          }}
+          disabled = {userRole.Admin === loggedInUserData?.role? false : true}
+          onClick={handleCreateDatasetAndProject}
+          label="Create Dataset & Project"
         />
         <Box sx={{ p: 1,overflow:"hidden" }}>
           {radiobutton ? (
