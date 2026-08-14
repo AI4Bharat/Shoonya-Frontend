@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Card,
-  Chip,
   FormControl,
   Grid,
   InputLabel,
@@ -13,16 +12,18 @@ import {
   Step,
   StepLabel,
   Stepper,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Tabs,
   ThemeProvider,
   Typography,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
 import Button from "../../component/common/Button";
@@ -32,7 +33,7 @@ import CustomizedSnackbars from "../../component/common/Snackbar";
 import config from "../../../../config/config";
 import ENDPOINTS from "../../../../config/apiendpoint";
 
-const STEPS = ["Upload CSV", "Configure Dataset", "Processing", "Create Project"];
+const DATASET_STEPS = ["Upload CSV", "Configure Dataset", "Processing"];
 const CATEGORIES = ["Read", "Extempore"];
 const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_INTERVAL_MS = 30000;
@@ -46,6 +47,7 @@ const CreateDatasetAndProject = () => {
   const navigate = useNavigate();
   const loggedInUserData = useSelector((state) => state.fetchLoggedInUserData.data);
 
+  const [mainTab, setMainTab] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", variant: "" });
@@ -71,7 +73,8 @@ const CreateDatasetAndProject = () => {
   const [pipelineStartedAt, setPipelineStartedAt] = useState(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  // Step 3: vendor/language/category form + phase 2 result
+  // Create Project tab: dataset selection + vendor/category form + result
+  const [projectInstanceId, setProjectInstanceId] = useState("");
   const [workspaces, setWorkspaces] = useState([]);
   const [workspaceId, setWorkspaceId] = useState("");
   const [category, setCategory] = useState("");
@@ -90,8 +93,10 @@ const CreateDatasetAndProject = () => {
       if (!res.ok) throw new Error("Failed to fetch existing datasets");
       const data = await res.json();
       setExistingInstances(Array.isArray(data) ? data : []);
+      return Array.isArray(data) ? data : [];
     } catch (err) {
       showError(err.message || "Failed to fetch existing datasets");
+      return [];
     }
   };
 
@@ -120,7 +125,7 @@ const CreateDatasetAndProject = () => {
     }
   }, [validation]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ---- Step 0: upload + validate ----
+  // ---- Dataset tab / Step 0: upload + validate ----
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -146,7 +151,7 @@ const CreateDatasetAndProject = () => {
 
   const goToConfigStep = () => setActiveStep(1);
 
-  // ---- Step 1: start phase 1 pipeline ----
+  // ---- Dataset tab / Step 1: start phase 1 pipeline ----
   const handleStartPipeline = async () => {
     if (!csvFile) return;
     setLoading(true);
@@ -180,7 +185,7 @@ const CreateDatasetAndProject = () => {
     }
   };
 
-  // ---- Step 2: poll phase 1 progress ----
+  // ---- Dataset tab / Step 2: poll phase 1 progress ----
   useEffect(() => {
     if (!taskId || activeStep !== 2) return;
     let cancelled = false;
@@ -213,6 +218,12 @@ const CreateDatasetAndProject = () => {
         setPipelineState(data);
         if (data.state === "SUCCESS") {
           setPipelineResult(data.result);
+          // Make the freshly created/updated dataset show up as the default
+          // selection over on the Create Project tab.
+          if (data.result?.dataset_instance_id) {
+            setProjectInstanceId(data.result.dataset_instance_id);
+            fetchExistingInstances();
+          }
           if (data.result?.categories_present?.length === 1) {
             setCategory(data.result.categories_present[0]);
           }
@@ -237,7 +248,7 @@ const CreateDatasetAndProject = () => {
     };
   }, [taskId, activeStep]);
 
-  // ---- Step 2: live elapsed-time ticker, purely for display ----
+  // ---- Dataset tab / Step 2: live elapsed-time ticker, purely for display ----
   useEffect(() => {
     if (!pipelineStartedAt || activeStep !== 2) return;
     const tick = () => setElapsedSeconds(Math.floor((Date.now() - pipelineStartedAt) / 1000));
@@ -252,11 +263,9 @@ const CreateDatasetAndProject = () => {
     return `${m}m ${s}s`;
   };
 
-  const goToProjectStep = () => setActiveStep(3);
-
-  // ---- Step 3: create project(s) for chosen vendor/category ----
+  // ---- Create Project tab: create project(s) for chosen dataset/vendor/category ----
   const handleCreateProjects = async () => {
-    if (!pipelineResult || !workspaceId || !category) return;
+    if (!projectInstanceId || !workspaceId || !category) return;
     setLoading(true);
     try {
       const res = await fetch(
@@ -265,7 +274,7 @@ const CreateDatasetAndProject = () => {
           method: "POST",
           headers: { ...authHeaders(), "Content-Type": "application/json" },
           body: JSON.stringify({
-            instance_id: pipelineResult.dataset_instance_id,
+            instance_id: projectInstanceId,
             workspace_id: workspaceId,
             category,
           }),
@@ -281,12 +290,49 @@ const CreateDatasetAndProject = () => {
     }
   };
 
+  // ---- Create Project tab: pull unassigned tasks into an existing
+  // under-capacity project instead of creating a new one ----
+  const handlePullIntoExisting = async (projectId, projectTitle, domain) => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${baseUrl()}${ENDPOINTS.getDatasets}instances/pull_pipeline_project_items/`,
+        {
+          method: "POST",
+          headers: { ...authHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify({
+            instance_id: projectInstanceId,
+            domain,
+            project_id: projectId,
+          }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to pull data items");
+      setSnackbar({
+        open: true,
+        message: data.message || `Pulled new items into '${projectTitle}'.`,
+        variant: "success",
+      });
+      // Re-check the dataset now that some previously-unassigned tasks have
+      // been claimed by the existing project -- may reveal a fresh deficit
+      // count, or now be ready to create the next batch.
+      handleCreateProjects();
+    } catch (err) {
+      showError(err.message || "Failed to pull data items");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const stepDetail = (name) =>
     pipelineState?.steps?.find((s) => s.name === name);
 
   const audioStep = stepDetail("audio_upload");
   const failedUploads = audioStep?.failures || pipelineResult?.failed_uploads || [];
   const generatedCsv = stepDetail("generate_csv")?.csv_content || pipelineResult?.generated_csv;
+  const duplicateRows =
+    stepDetail("generate_csv")?.duplicate_rows || pipelineResult?.duplicate_rows || [];
 
   const downloadGeneratedCsv = () => {
     if (!generatedCsv) return;
@@ -466,9 +512,9 @@ const CreateDatasetAndProject = () => {
 
       {!pipelineState?.steps?.length && !pipelineError && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Waiting for the pipeline to report its first step (CSV validation) — this is
-          usually within a few seconds. If it stays here for several minutes, the
-          Celery worker likely isn't picking up the task (check the worker terminal).
+          Just started — this usually shows progress within a few seconds. If
+          nothing appears here after several minutes, something's stuck on the
+          server side; please contact the admin/developer for help.
         </Alert>
       )}
 
@@ -513,31 +559,90 @@ const CreateDatasetAndProject = () => {
         </Box>
       )}
 
+      {duplicateRows.length > 0 && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="subtitle2" color="text.secondary">
+            Skipped Duplicates ({duplicateRows.length}) — already in this dataset from an earlier upload
+          </Typography>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Audio URL</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {duplicateRows.map((d, i) => (
+                <TableRow key={i}>
+                  <TableCell>{d.audio_url}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+      )}
+
       {pipelineResult && (
         <Box sx={{ mt: 3 }}>
           <Alert severity="success" sx={{ mb: 2 }}>
-            Dataset <b>{pipelineResult.dataset_instance_name}</b> (#
-            {pipelineResult.dataset_instance_id}) is ready —{" "}
-            {pipelineResult.uploaded_count}/{pipelineResult.total_input_rows} rows
-            uploaded.
+            Dataset{" "}
+            <Link to={`/datasets/${pipelineResult.dataset_instance_id}`}>
+              <b>{pipelineResult.dataset_instance_name}</b>
+            </Link>{" "}
+            (#{pipelineResult.dataset_instance_id}) is ready —{" "}
+            {pipelineResult.inserted_count}/{pipelineResult.total_input_rows} new rows
+            added.
+            {pipelineResult.duplicate_count > 0 &&
+              ` ${pipelineResult.duplicate_count} row(s) were already in this dataset and were skipped.`}
           </Alert>
-          <Button label="Next: Create Project" onClick={goToProjectStep} />
+          <Button
+            label="Go to Create Project tab"
+            onClick={() => setMainTab(1)}
+          />
         </Box>
       )}
     </Card>
   );
 
-  const renderStepProject = () => (
+  const renderCreateDatasetTab = () => (
+    <>
+      <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
+        {DATASET_STEPS.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+
+      {activeStep === 0 && renderStepUpload()}
+      {activeStep === 1 && renderStepConfig()}
+      {activeStep === 2 && renderStepProcessing()}
+    </>
+  );
+
+  const renderCreateProjectTab = () => (
     <Card sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
-        Create Project
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 2 }}>
-        Dataset: <b>{pipelineResult?.dataset_instance_name}</b> &nbsp;|&nbsp; Language:{" "}
-        <b>{pipelineResult?.language}</b>
+        Create Project From Dataset
       </Typography>
 
       <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <InputLabel>Dataset</InputLabel>
+            <Select
+              value={projectInstanceId}
+              label="Dataset"
+              onChange={(e) => setProjectInstanceId(e.target.value)}
+            >
+              {existingInstances.map((inst) => (
+                <MenuItem key={inst.instance_id} value={inst.instance_id}>
+                  {inst.instance_name} (#{inst.instance_id})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
             <InputLabel>Vendor (Workspace)</InputLabel>
@@ -575,7 +680,7 @@ const CreateDatasetAndProject = () => {
         <Grid item xs={12} sx={{ mt: 1 }}>
           <Button
             label="Create Project(s)"
-            disabled={!workspaceId || !category}
+            disabled={!projectInstanceId || !workspaceId || !category}
             onClick={handleCreateProjects}
           />
         </Grid>
@@ -583,6 +688,9 @@ const CreateDatasetAndProject = () => {
 
       {projectResult && (
         <Box sx={{ mt: 3 }}>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            Language: <b>{projectResult.language}</b>
+          </Typography>
           {projectResult.created_projects.length > 0 ? (
             <>
               <Alert severity="success" sx={{ mb: 2 }}>
@@ -600,7 +708,9 @@ const CreateDatasetAndProject = () => {
                 <TableBody>
                   {projectResult.created_projects.map((p) => (
                     <TableRow key={p.project_id}>
-                      <TableCell>{p.title}</TableCell>
+                      <TableCell>
+                        <Link to={`/projects/${p.project_id}`}>{p.title}</Link>
+                      </TableCell>
                       <TableCell>{p.part}</TableCell>
                       <TableCell>{p.batch_number}</TableCell>
                       <TableCell>{p.task_count}</TableCell>
@@ -615,15 +725,37 @@ const CreateDatasetAndProject = () => {
 
           {projectResult.skipped_groups.length > 0 && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle2">
-                Waiting for more data (below task limit):
+              <Typography variant="subtitle2" gutterBottom>
+                Waiting for the next batch (below task limit):
               </Typography>
               {projectResult.skipped_groups.map((g, i) => (
-                <Chip
-                  key={i}
-                  sx={{ mr: 1, mt: 1 }}
-                  label={`${g.domain}: ${g.unassigned_count}/${g.limit}`}
-                />
+                <Alert key={i} severity="info" sx={{ mb: 1 }}>
+                  <b>{g.domain}</b>: {g.unassigned_count}/{g.limit} unassigned
+                  {g.existing_project_title && (
+                    <>
+                      {" "}— existing project <b>{g.existing_project_title}</b> is below capacity.
+                    </>
+                  )}
+                  {g.message && (
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {g.message}
+                    </Typography>
+                  )}
+                  {g.existing_project_id && (
+                    <Box sx={{ mt: 1 }}>
+                      <Button
+                        label={`Pull ${g.unassigned_count} Task(s) Into '${g.existing_project_title}'`}
+                        onClick={() =>
+                          handlePullIntoExisting(
+                            g.existing_project_id,
+                            g.existing_project_title,
+                            g.domain
+                          )
+                        }
+                      />
+                    </Box>
+                  )}
+                </Alert>
               ))}
             </Box>
           )}
@@ -643,18 +775,14 @@ const CreateDatasetAndProject = () => {
         <Typography variant="h4" gutterBottom>
           Create Dataset & Project
         </Typography>
-        <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
-          {STEPS.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
 
-        {activeStep === 0 && renderStepUpload()}
-        {activeStep === 1 && renderStepConfig()}
-        {activeStep === 2 && renderStepProcessing()}
-        {activeStep === 3 && renderStepProject()}
+        <Tabs value={mainTab} onChange={(e, v) => setMainTab(v)} sx={{ mb: 3 }}>
+          <Tab label="Create Dataset" />
+          <Tab label="Create Project" />
+        </Tabs>
+
+        {mainTab === 0 && renderCreateDatasetTab()}
+        {mainTab === 1 && renderCreateProjectTab()}
 
         <CustomizedSnackbars
           open={snackbar.open}
