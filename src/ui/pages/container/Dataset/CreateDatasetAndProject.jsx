@@ -27,14 +27,15 @@ import { Link, useNavigate } from "react-router-dom";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
 import Button from "../../component/common/Button";
-import OutlinedTextField from "../../component/common/OutlinedTextField";
 import Spinner from "../../component/common/Spinner";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import config from "../../../../config/config";
 import ENDPOINTS from "../../../../config/apiendpoint";
+import LanguageCode from "../../../../utils/LanguageCode";
 
-const DATASET_STEPS = ["Upload CSV", "Configure Dataset", "Processing"];
+const DATASET_STEPS = ["Configure Dataset", "Upload CSV", "Processing"];
 const CATEGORIES = ["Read", "Extempore"];
+const LANGUAGE_OPTIONS = LanguageCode.languages.map((l) => l.label);
 const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_INTERVAL_MS = 30000;
 
@@ -57,10 +58,11 @@ const CreateDatasetAndProject = () => {
   const [validation, setValidation] = useState(null);
 
   // Step 1: dataset configuration
-  const [datasetName, setDatasetName] = useState("");
+  const [datasetLanguage, setDatasetLanguage] = useState("");
   const [useExistingDataset, setUseExistingDataset] = useState(false);
   const [existingInstanceId, setExistingInstanceId] = useState("");
   const [existingInstances, setExistingInstances] = useState([]);
+  const [existingDatasetLanguage, setExistingDatasetLanguage] = useState(null);
   const [deduplicate, setDeduplicate] = useState(false);
   const organisationId = loggedInUserData?.organization?.id || 1;
 
@@ -81,6 +83,7 @@ const CreateDatasetAndProject = () => {
   const [projectResult, setProjectResult] = useState(null);
 
   const showError = (message) => setSnackbar({ open: true, message, variant: "error" });
+  const showInfo = (message) => setSnackbar({ open: true, message, variant: "info" });
 
   const baseUrl = () => config.BASE_URL_AUTO;
 
@@ -92,8 +95,11 @@ const CreateDatasetAndProject = () => {
       );
       if (!res.ok) throw new Error("Failed to fetch existing datasets");
       const data = await res.json();
-      setExistingInstances(Array.isArray(data) ? data : []);
-      return Array.isArray(data) ? data : [];
+      // Backend returns oldest-first (order_by instance_id); reverse so the
+      // most recently created dataset shows up first in these dropdowns.
+      const ordered = Array.isArray(data) ? [...data].reverse() : [];
+      setExistingInstances(ordered);
+      return ordered;
     } catch (err) {
       showError(err.message || "Failed to fetch existing datasets");
       return [];
@@ -119,13 +125,33 @@ const CreateDatasetAndProject = () => {
     fetchWorkspaces();
   }, []);
 
+  // Fetch the selected existing dataset's language so a CSV language
+  // mismatch can be flagged right after validation, before the user ever
+  // clicks "Start Pipeline" (matching the new-dataset path's early warning).
   useEffect(() => {
-    if (validation?.languages?.length === 1 && !datasetName) {
-      setDatasetName(`${validation.languages[0]}_JT`);
+    if (!useExistingDataset || !existingInstanceId) {
+      setExistingDatasetLanguage(null);
+      return;
     }
-  }, [validation]); // eslint-disable-line react-hooks/exhaustive-deps
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(
+          `${baseUrl()}${ENDPOINTS.getDatasets}instances/${existingInstanceId}/pipeline_dataset_language/`,
+          { headers: authHeaders() }
+        );
+        const data = await res.json();
+        if (!cancelled) setExistingDatasetLanguage(res.ok ? data.language : null);
+      } catch {
+        if (!cancelled) setExistingDatasetLanguage(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [useExistingDataset, existingInstanceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ---- Dataset tab / Step 0: upload + validate ----
+  // ---- Dataset tab / Step 1: upload + validate ----
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -149,7 +175,7 @@ const CreateDatasetAndProject = () => {
     }
   };
 
-  const goToConfigStep = () => setActiveStep(1);
+  const goToUploadStep = () => setActiveStep(1);
 
   // ---- Dataset tab / Step 1: start phase 1 pipeline ----
   const handleStartPipeline = async () => {
@@ -164,6 +190,7 @@ const CreateDatasetAndProject = () => {
         formData.append("existing_instance_id", existingInstanceId);
       } else {
         formData.append("dataset_name", datasetName);
+        formData.append("language", datasetLanguage);
       }
       const res = await fetch(
         `${baseUrl()}${ENDPOINTS.getDatasets}instances/start_pipeline/`,
@@ -251,11 +278,14 @@ const CreateDatasetAndProject = () => {
   // ---- Dataset tab / Step 2: live elapsed-time ticker, purely for display ----
   useEffect(() => {
     if (!pipelineStartedAt || activeStep !== 2) return;
+    // Stop once the pipeline has reached a terminal state instead of
+    // ticking forever while the user stays on the Processing step.
+    if (pipelineState?.state === "SUCCESS" || pipelineState?.state === "FAILURE") return;
     const tick = () => setElapsedSeconds(Math.floor((Date.now() - pipelineStartedAt) / 1000));
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [pipelineStartedAt, activeStep]);
+  }, [pipelineStartedAt, activeStep, pipelineState?.state]);
 
   const formatElapsed = (totalSeconds) => {
     const m = Math.floor(totalSeconds / 60);
@@ -282,44 +312,33 @@ const CreateDatasetAndProject = () => {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create project(s)");
-      setProjectResult(data);
+      // Accumulated `projectResult` reflects everything created across all
+      // clicks so far, so "did this specific click do anything" has to be
+      // reported separately -- otherwise, once anything has ever been
+      // created, the accumulated list is always non-empty and a later
+      // no-op click would look identical to one that made progress.
+      if (!(data.created_projects?.length) && !(data.topped_up_projects?.length)) {
+        showInfo(
+          "No project met its task-limit threshold yet, and there was nothing to top up."
+        );
+      }
+      // Accumulate across clicks (e.g. one click tops up an existing
+      // project + creates a batch, a later click creates the next one)
+      // instead of replacing -- otherwise a click with nothing to top up
+      // silently erases an earlier click's top-up notice from view.
+      setProjectResult((prev) => ({
+        language: data.language,
+        created_projects: [
+          ...(prev?.created_projects || []),
+          ...(data.created_projects || []),
+        ],
+        topped_up_projects: [
+          ...(prev?.topped_up_projects || []),
+          ...(data.topped_up_projects || []),
+        ],
+      }));
     } catch (err) {
       showError(err.message || "Failed to create project(s)");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ---- Create Project tab: pull unassigned tasks into an existing
-  // under-capacity project instead of creating a new one ----
-  const handlePullIntoExisting = async (projectId, projectTitle, domain) => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${baseUrl()}${ENDPOINTS.getDatasets}instances/pull_pipeline_project_items/`,
-        {
-          method: "POST",
-          headers: { ...authHeaders(), "Content-Type": "application/json" },
-          body: JSON.stringify({
-            instance_id: projectInstanceId,
-            domain,
-            project_id: projectId,
-          }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to pull data items");
-      setSnackbar({
-        open: true,
-        message: data.message || `Pulled new items into '${projectTitle}'.`,
-        variant: "success",
-      });
-      // Re-check the dataset now that some previously-unassigned tasks have
-      // been claimed by the existing project -- may reveal a fresh deficit
-      // count, or now be ready to create the next batch.
-      handleCreateProjects();
-    } catch (err) {
-      showError(err.message || "Failed to pull data items");
     } finally {
       setLoading(false);
     }
@@ -333,6 +352,24 @@ const CreateDatasetAndProject = () => {
   const generatedCsv = stepDetail("generate_csv")?.csv_content || pipelineResult?.generated_csv;
   const duplicateRows =
     stepDetail("generate_csv")?.duplicate_rows || pipelineResult?.duplicate_rows || [];
+  // Only enforced client-side for the new-dataset path -- when adding to an
+  // existing dataset, the backend already validates the CSV's language
+  // against that dataset's actual stored language.
+  // The dataset's own language: whichever's relevant for the path in use --
+  // the picked language for a new dataset, or the fetched existing one for
+  // an existing dataset (null while that fetch is in flight/unavailable, in
+  // which case there's nothing yet to compare against).
+  const targetDatasetLanguage = useExistingDataset ? existingDatasetLanguage : datasetLanguage;
+  const csvLanguageMismatch =
+    !!targetDatasetLanguage &&
+    validation?.valid &&
+    validation.languages.length === 1 &&
+    validation.languages[0] !== targetDatasetLanguage;
+
+  // Enforced naming convention: <Language>-<Part>-childDS. Part is fixed to
+  // "PartA" for now since all current data is Part A -- revisit once Part B
+  // data shows up and derive it from the CSV's own column instead.
+  const datasetName = datasetLanguage ? `${datasetLanguage}-PartA-childDS` : "";
 
   const downloadGeneratedCsv = () => {
     if (!generatedCsv) return;
@@ -346,6 +383,94 @@ const CreateDatasetAndProject = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  const renderStepConfig = () => (
+    <Card sx={{ p: 3 }}>
+      <Typography variant="h6" gutterBottom>
+        Configure Dataset
+      </Typography>
+
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <label>
+            <input
+              type="checkbox"
+              checked={useExistingDataset}
+              onChange={(e) => setUseExistingDataset(e.target.checked)}
+            />
+            &nbsp;Add to an existing dataset instead of creating a new one
+          </label>
+        </Grid>
+
+        {useExistingDataset ? (
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel>Existing Dataset</InputLabel>
+              <Select
+                value={existingInstanceId}
+                label="Existing Dataset"
+                onChange={(e) => setExistingInstanceId(e.target.value)}
+              >
+                {existingInstances.map((inst) => (
+                  <MenuItem key={inst.instance_id} value={inst.instance_id}>
+                    {inst.instance_name} (#{inst.instance_id})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        ) : (
+          <>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Language</InputLabel>
+                <Select
+                  value={datasetLanguage}
+                  label="Language"
+                  onChange={(e) => setDatasetLanguage(e.target.value)}
+                >
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <MenuItem key={lang} value={lang}>
+                      {lang}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            {datasetLanguage && (
+              <Grid item xs={12}>
+                <Typography variant="body2" color="text.secondary">
+                  Dataset name will be saved as: <b>{datasetName}</b>
+                </Typography>
+              </Grid>
+            )}
+          </>
+        )}
+
+        <Grid item xs={12}>
+          <label>
+            <input
+              type="checkbox"
+              checked={deduplicate}
+              onChange={(e) => setDeduplicate(e.target.checked)}
+            />
+            &nbsp;Delete Duplicate Records
+          </label>
+        </Grid>
+
+        <Grid item xs={12} sx={{ mt: 2 }}>
+          <Button
+            label="Next"
+            disabled={
+              (!useExistingDataset && !datasetLanguage) ||
+              (useExistingDataset && !existingInstanceId)
+            }
+            onClick={goToUploadStep}
+          />
+        </Grid>
+      </Grid>
+    </Card>
+  );
 
   const renderStepUpload = () => (
     <Card sx={{ p: 3 }}>
@@ -384,86 +509,24 @@ const CreateDatasetAndProject = () => {
             Types: <b>{validation.types.join(", ") || "-"}</b> &nbsp;|&nbsp;
             Parts: <b>{validation.parts.join(", ") || "-"}</b>
           </Typography>
+          {csvLanguageMismatch && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              This CSV is <b>{validation.languages[0]}</b>, but the dataset
+              you're {useExistingDataset ? "adding to" : "creating"} is for{" "}
+              <b>{targetDatasetLanguage}</b>. Go back and either pick a
+              matching {useExistingDataset ? "dataset" : "language"} or
+              upload a CSV in that language.
+            </Alert>
+          )}
           <Box sx={{ mt: 2 }}>
             <Button
-              label="Next"
-              disabled={!validation.valid}
-              onClick={goToConfigStep}
+              label="Start Pipeline"
+              disabled={!validation.valid || csvLanguageMismatch}
+              onClick={handleStartPipeline}
             />
           </Box>
         </Box>
       )}
-    </Card>
-  );
-
-  const renderStepConfig = () => (
-    <Card sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Configure Dataset
-      </Typography>
-
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <label>
-            <input
-              type="checkbox"
-              checked={useExistingDataset}
-              onChange={(e) => setUseExistingDataset(e.target.checked)}
-            />
-            &nbsp;Add to an existing dataset instead of creating a new one
-          </label>
-        </Grid>
-
-        {useExistingDataset ? (
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel>Existing Dataset</InputLabel>
-              <Select
-                value={existingInstanceId}
-                label="Existing Dataset"
-                onChange={(e) => setExistingInstanceId(e.target.value)}
-              >
-                {existingInstances.map((inst) => (
-                  <MenuItem key={inst.instance_id} value={inst.instance_id}>
-                    {inst.instance_name} (#{inst.instance_id})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        ) : (
-          <Grid item xs={12}>
-            <Typography gutterBottom>Dataset Name</Typography>
-            <OutlinedTextField
-              fullWidth
-              value={datasetName}
-              onChange={(e) => setDatasetName(e.target.value)}
-            />
-          </Grid>
-        )}
-
-        <Grid item xs={12}>
-          <label>
-            <input
-              type="checkbox"
-              checked={deduplicate}
-              onChange={(e) => setDeduplicate(e.target.checked)}
-            />
-            &nbsp;Delete Duplicate Records
-          </label>
-        </Grid>
-
-        <Grid item xs={12} sx={{ mt: 2 }}>
-          <Button
-            label="Start Pipeline"
-            disabled={
-              (!useExistingDataset && !datasetName) ||
-              (useExistingDataset && !existingInstanceId)
-            }
-            onClick={handleStartPipeline}
-          />
-        </Grid>
-      </Grid>
     </Card>
   );
 
@@ -613,8 +676,8 @@ const CreateDatasetAndProject = () => {
         ))}
       </Stepper>
 
-      {activeStep === 0 && renderStepUpload()}
-      {activeStep === 1 && renderStepConfig()}
+      {activeStep === 0 && renderStepConfig()}
+      {activeStep === 1 && renderStepUpload()}
       {activeStep === 2 && renderStepProcessing()}
     </>
   );
@@ -632,7 +695,10 @@ const CreateDatasetAndProject = () => {
             <Select
               value={projectInstanceId}
               label="Dataset"
-              onChange={(e) => setProjectInstanceId(e.target.value)}
+              onChange={(e) => {
+                setProjectInstanceId(e.target.value);
+                setProjectResult(null);
+              }}
             >
               {existingInstances.map((inst) => (
                 <MenuItem key={inst.instance_id} value={inst.instance_id}>
@@ -666,7 +732,10 @@ const CreateDatasetAndProject = () => {
             <Select
               value={category}
               label="Category"
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                setProjectResult(null);
+              }}
             >
               {CATEGORIES.map((c) => (
                 <MenuItem key={c} value={c}>
@@ -691,6 +760,21 @@ const CreateDatasetAndProject = () => {
           <Typography variant="body2" sx={{ mb: 1 }}>
             Language: <b>{projectResult.language}</b>
           </Typography>
+
+          {projectResult.topped_up_projects?.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              {projectResult.topped_up_projects.map((t, i) => (
+                <Alert key={i} severity="info" sx={{ mb: 1 }}>
+                  Topped up{" "}
+                  <Link to={`/projects/${t.project_id}`}>
+                    <b>{t.title}</b>
+                  </Link>{" "}
+                  with {t.pulled_count} newly-unassigned task(s).
+                </Alert>
+              ))}
+            </Box>
+          )}
+
           {projectResult.created_projects.length > 0 ? (
             <>
               <Alert severity="success" sx={{ mb: 2 }}>
@@ -720,44 +804,9 @@ const CreateDatasetAndProject = () => {
               </Table>
             </>
           ) : (
-            <Alert severity="info">No project met its task-limit threshold yet.</Alert>
-          )}
-
-          {projectResult.skipped_groups.length > 0 && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Waiting for the next batch (below task limit):
-              </Typography>
-              {projectResult.skipped_groups.map((g, i) => (
-                <Alert key={i} severity="info" sx={{ mb: 1 }}>
-                  <b>{g.domain}</b>: {g.unassigned_count}/{g.limit} unassigned
-                  {g.existing_project_title && (
-                    <>
-                      {" "}— existing project <b>{g.existing_project_title}</b> is below capacity.
-                    </>
-                  )}
-                  {g.message && (
-                    <Typography variant="body2" sx={{ mt: 0.5 }}>
-                      {g.message}
-                    </Typography>
-                  )}
-                  {g.existing_project_id && (
-                    <Box sx={{ mt: 1 }}>
-                      <Button
-                        label={`Pull ${g.unassigned_count} Task(s) Into '${g.existing_project_title}'`}
-                        onClick={() =>
-                          handlePullIntoExisting(
-                            g.existing_project_id,
-                            g.existing_project_title,
-                            g.domain
-                          )
-                        }
-                      />
-                    </Box>
-                  )}
-                </Alert>
-              ))}
-            </Box>
+            !projectResult.topped_up_projects?.length && (
+              <Alert severity="info">No project met its task-limit threshold yet.</Alert>
+            )
           )}
 
           <Box sx={{ mt: 3 }}>
@@ -775,6 +824,36 @@ const CreateDatasetAndProject = () => {
         <Typography variant="h4" gutterBottom>
           Create Dataset & Project
         </Typography>
+
+        <Alert severity="info" sx={{ mb: 3 }}>
+          This tool is built specifically for the Josh Talks (JT) child-speech
+          dataset workflow (e.g. Bodhan) and automates that workflow with a
+          set of fixed settings. A sample input CSV in the expected format is
+          available here:{" "}
+          <a href="/sample-files/bodhan_sample.csv" download>
+            Bodhan Transcription sample CSV
+          </a>
+          .
+          <ul style={{ margin: "4px 0 0 0", paddingLeft: "20px" }}>
+            <li>
+              <b>Dataset</b>: type <code>SpeechConversation</code>,
+              organisation fixed to AI4Bharat, audio uploaded
+              on ShaktiCloud, one dataset per language.
+            </li>
+            <li>
+              <b>Project</b>: description "Child speech data", sampling mode
+              Batch, stage Review, automatic annotation enabled, source/target
+              language both set to the dataset's own language (transcription,
+              not translation), task limit 1000 (Read) / 1200 (Extempore) per
+              project. Project type is chosen by language: Tamil gets
+              Verbatim Transcription with Character Tagging (acoustic stage:
+              Review); Marathi/English/Sindhi/Urdu/Malayalam get the same
+              project type with no acoustic stage; every other language gets
+              Acoustic-Normalised Transcription Editing with no acoustic
+              stage.
+            </li>
+          </ul>
+        </Alert>
 
         <Tabs value={mainTab} onChange={(e, v) => setMainTab(v)} sx={{ mb: 3 }}>
           <Tab label="Create Dataset" />
