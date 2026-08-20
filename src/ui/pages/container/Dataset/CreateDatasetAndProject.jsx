@@ -27,7 +27,6 @@ import { Link, useNavigate } from "react-router-dom";
 import themeDefault from "../../../theme/theme";
 import DatasetStyle from "../../../styles/Dataset";
 import Button from "../../component/common/Button";
-import OutlinedTextField from "../../component/common/OutlinedTextField";
 import Spinner from "../../component/common/Spinner";
 import CustomizedSnackbars from "../../component/common/Snackbar";
 import config from "../../../../config/config";
@@ -60,10 +59,6 @@ const CreateDatasetAndProject = () => {
 
   // Step 1: dataset configuration
   const [datasetLanguage, setDatasetLanguage] = useState("");
-  const [datasetNameSuffix, setDatasetNameSuffix] = useState("");
-  // Enforced naming convention: <Language>-JT-<anything>, so the dataset's
-  // own name always accurately reflects the single language it holds.
-  const datasetName = datasetLanguage ? `${datasetLanguage}-JT-${datasetNameSuffix}` : "";
   const [useExistingDataset, setUseExistingDataset] = useState(false);
   const [existingInstanceId, setExistingInstanceId] = useState("");
   const [existingInstances, setExistingInstances] = useState([]);
@@ -371,6 +366,11 @@ const CreateDatasetAndProject = () => {
     validation.languages.length === 1 &&
     validation.languages[0] !== targetDatasetLanguage;
 
+  // Enforced naming convention: <Language>-<Part>-childDS. Part is fixed to
+  // "PartA" for now since all current data is Part A -- revisit once Part B
+  // data shows up and derive it from the CSV's own column instead.
+  const datasetName = datasetLanguage ? `${datasetLanguage}-PartA-childDS` : "";
+
   const downloadGeneratedCsv = () => {
     if (!generatedCsv) return;
     const blob = new Blob([generatedCsv], { type: "text/csv;charset=utf-8;" });
@@ -437,23 +437,13 @@ const CreateDatasetAndProject = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom>
-                Dataset Name{" "}
-                {datasetLanguage && (
-                  <Typography component="span" variant="body2" color="text.secondary">
-                    (will be saved as <b>{datasetName || `${datasetLanguage}-JT-`}</b>)
-                  </Typography>
-                )}
-              </Typography>
-              <OutlinedTextField
-                fullWidth
-                disabled={!datasetLanguage}
-                placeholder={datasetLanguage ? `${datasetLanguage}-JT-...` : "Pick a language first"}
-                value={datasetNameSuffix}
-                onChange={(e) => setDatasetNameSuffix(e.target.value)}
-              />
-            </Grid>
+            {datasetLanguage && (
+              <Grid item xs={12}>
+                <Typography variant="body2" color="text.secondary">
+                  Dataset name will be saved as: <b>{datasetName}</b>
+                </Typography>
+              </Grid>
+            )}
           </>
         )}
 
@@ -472,7 +462,7 @@ const CreateDatasetAndProject = () => {
           <Button
             label="Next"
             disabled={
-              (!useExistingDataset && (!datasetLanguage || !datasetNameSuffix)) ||
+              (!useExistingDataset && !datasetLanguage) ||
               (useExistingDataset && !existingInstanceId)
             }
             onClick={goToUploadStep}
