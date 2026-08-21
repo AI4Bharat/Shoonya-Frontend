@@ -1697,7 +1697,7 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                         >
                           {speakerIdList?.map((speaker, index) => (
                             <MenuItem key={index} value={speaker.name}>
-                              {speaker.name} ({speaker.gender})
+                              Speaker {speaker.speaker_id}
                             </MenuItem>
                           ))}
                         </Select>

@@ -208,7 +208,7 @@ const DatasetDetails = () => {
                      <Grid item xs={12} sm={12} md={12} lg={12} xl={12}  sx={{ mb: 2 ,mt:3}}>
                         <Grid container spacing={2}>
                             {datasetData?.map((des, i) => (
-                                <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+                                <Grid item xs={12} sm={6} md={4}>
                                     <DatasetDescription
                                         name={des.name}
                                         value={des.value}
@@ -217,7 +217,7 @@ const DatasetDetails = () => {
                                 </Grid>
                             ))}
                             {remainingText !== null && (
-                                <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+                                <Grid item xs={12} sm={6} md={4}>
                                     <DatasetDescription
                                         name={
                                             <>
