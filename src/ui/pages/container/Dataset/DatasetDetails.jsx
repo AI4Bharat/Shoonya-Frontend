@@ -19,6 +19,8 @@ import DatasetDescription from './DatasetDescription';
 import userRole from "../../../../utils/UserMappedByRole/Roles";
 import DatasetReports from '../../component/common/DatasetReports';
 import Spinner from '../../component/common/Spinner';
+import config from "../../../../config/config";
+import ENDPOINTS from "../../../../config/apiendpoint";
 
 const DatasetDetails = () => {
 
@@ -30,9 +32,10 @@ const DatasetDetails = () => {
         [
             { name: "Dataset ID", value: null },
             { name: "Description", value: null },
-            { name: "dataset Type", value: null },    
+            { name: "dataset Type", value: null },
         ]
     )
+    const [remainingText, setRemainingText] = useState(null);
   const apiLoading = useSelector((state) => state.apiStatus.loading);
 
     const dispatch = useDispatch();
@@ -70,6 +73,52 @@ const DatasetDetails = () => {
            
         ])
     }, [DatasetDetails.instance_id]);
+
+    // "Remaining (not yet in any project)" -- per-category (Read/Extempore)
+    // when the dataset has them, otherwise one combined count across the
+    // whole dataset regardless of category.
+    useEffect(() => {
+        if (!datasetId) {
+            setRemainingText(null);
+            return;
+        }
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch(
+                    `${config.BASE_URL_AUTO}${ENDPOINTS.getDatasets}instances/${datasetId}/pipeline_dataset_stats/`,
+                    {
+                        headers: {
+                            Authorization: `JWT ${localStorage.getItem("shoonya_access_token")}`,
+                        },
+                    }
+                );
+                if (!res.ok) {
+                    if (!cancelled) setRemainingText(null);
+                    return;
+                }
+                const data = await res.json();
+                if (cancelled) return;
+                const categories = data.categories || {};
+                if (Object.keys(categories).length > 0) {
+                    setRemainingText(
+                        Object.entries(categories)
+                            .map(([cat, { unassigned, total }]) => `${cat}: ${unassigned} / ${total}`)
+                            .join("  |  ")
+                    );
+                } else if (data.combined) {
+                    setRemainingText(`${data.combined.unassigned} / ${data.combined.total}`);
+                } else {
+                    setRemainingText(null);
+                }
+            } catch {
+                if (!cancelled) setRemainingText(null);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [datasetId]);
 
     const handleOpenSettings = () => {
         // navigate(`/projects/${id}/projectsetting`);
@@ -167,6 +216,23 @@ const DatasetDetails = () => {
                                     />
                                 </Grid>
                             ))}
+                            {remainingText !== null && (
+                                <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+                                    <DatasetDescription
+                                        name={
+                                            <>
+                                                Remaining
+                                                <br />
+                                                <Typography component="span" variant="caption" color="text.secondary">
+                                                    (not yet in any project)
+                                                </Typography>
+                                            </>
+                                        }
+                                        value={remainingText}
+                                        index={datasetData.length}
+                                    />
+                                </Grid>
+                            )}
                         </Grid>
                     </Grid>
                     <Box >
