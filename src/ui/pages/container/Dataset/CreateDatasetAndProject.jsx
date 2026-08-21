@@ -81,6 +81,7 @@ const CreateDatasetAndProject = () => {
   const [workspaceId, setWorkspaceId] = useState("");
   const [category, setCategory] = useState("");
   const [projectResult, setProjectResult] = useState(null);
+  const [datasetStats, setDatasetStats] = useState(null);
 
   const showError = (message) => setSnackbar({ open: true, message, variant: "error" });
   const showInfo = (message) => setSnackbar({ open: true, message, variant: "info" });
@@ -150,6 +151,30 @@ const CreateDatasetAndProject = () => {
       cancelled = true;
     };
   }, [useExistingDataset, existingInstanceId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Create Project tab: how many of the selected dataset's items are still
+  // unassigned (not yet pulled into any project), per category -- so the
+  // user can see what's actually left before picking a category/clicking.
+  const fetchDatasetStats = async (instanceId) => {
+    if (!instanceId) {
+      setDatasetStats(null);
+      return;
+    }
+    try {
+      const res = await fetch(
+        `${baseUrl()}${ENDPOINTS.getDatasets}instances/${instanceId}/pipeline_dataset_stats/`,
+        { headers: authHeaders() }
+      );
+      const data = await res.json();
+      setDatasetStats(res.ok ? data.categories : null);
+    } catch {
+      setDatasetStats(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchDatasetStats(projectInstanceId);
+  }, [projectInstanceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- Dataset tab / Step 1: upload + validate ----
   const handleFileChange = async (e) => {
@@ -337,6 +362,7 @@ const CreateDatasetAndProject = () => {
           ...(data.topped_up_projects || []),
         ],
       }));
+      fetchDatasetStats(projectInstanceId);
     } catch (err) {
       showError(err.message || "Failed to create project(s)");
     } finally {
@@ -708,6 +734,30 @@ const CreateDatasetAndProject = () => {
             </Select>
           </FormControl>
         </Grid>
+
+        {projectInstanceId && (
+          <Grid item xs={12}>
+            {datasetStats === null ? (
+              <Typography variant="body2" color="text.secondary">
+                Loading remaining item counts…
+              </Typography>
+            ) : Object.keys(datasetStats).length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                This dataset has no items yet.
+              </Typography>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                Remaining (not yet in any project):{" "}
+                {Object.entries(datasetStats)
+                  .map(
+                    ([cat, { unassigned, total }]) =>
+                      `${cat}: ${unassigned} / ${total}`
+                  )
+                  .join("  |  ")}
+              </Typography>
+            )}
+          </Grid>
+        )}
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
