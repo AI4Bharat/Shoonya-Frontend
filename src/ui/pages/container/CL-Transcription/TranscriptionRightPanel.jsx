@@ -86,11 +86,11 @@ const languageTagMappings = {
     'ഫ': ['ph-f', 'f-ph'] // f vs ph
   },
   'mr': {
-    'ज': ['z-j'],   // j vs z
-    'झ': ['zh-jh'], // jh vs zh
-    'च': ['ts-ch'], // ch vs ts
+    'ज': ['z-j', 'j-z'],     // j vs z
+    'झ': ['zh-jh', 'jh-zh'], // jh vs zh
+    'च': ['ts-ch', 'ch-ts'], // ch vs ts
     'ஃப' /* not used */: undefined, // placeholder removed below
-    'फ': ['ph-f']   // f vs ph
+    'फ': ['ph-f', 'f-ph']    // f vs ph
   },
   'en': {
     'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
