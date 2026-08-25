@@ -93,7 +93,7 @@ const languageTagMappings = {
     'फ': ['ph-f', 'f-ph']    // f vs ph
   },
   'en': {
-    'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
+    'ज़': ['zh-z'] // zh vs z
   }
 };
 
