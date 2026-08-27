@@ -184,7 +184,7 @@ const resolveTaggableChar = (text, index, mappings) => {
 
   return null;
 };
-const getSyllableClusterLength = (text, startIndex, mappings) => {
+export const getSyllableClusterLength = (text, startIndex, mappings) => {
   let i = startIndex + 1;
   while (i < text.length) {
     let marksEnd = i;
@@ -193,10 +193,19 @@ const getSyllableClusterLength = (text, startIndex, mappings) => {
     }
     if (marksEnd === i) break; // no combining marks here - cluster is done
 
-    const endedOnVirama = VIRAMA_CHARS.has(text[marksEnd - 1]);
+    const lastMark = text[marksEnd - 1];
+
+    // Tamil pulli belongs to the current consonant.
+    // Do not include the consonant that follows it.
+    if (lastMark === TAMIL_PULLI) {
+      i = marksEnd;
+      break;
+    }
+
+    const endedOnVirama = VIRAMA_CHARS.has(lastMark);
     const nextChar = text[marksEnd];
     const nextIsLetter = marksEnd < text.length && /\p{L}/u.test(nextChar);
-    const nextIsIndependentlyTaggable = nextIsLetter && !!mappings[nextChar];
+    const nextIsIndependentlyTaggable = nextIsLetter && Boolean(mappings?.[nextChar]);
 
     if (endedOnVirama && nextIsLetter && !nextIsIndependentlyTaggable) {
       i = marksEnd + 1;
@@ -958,10 +967,13 @@ const processNoiseTags = (value) => {
   const resolved = resolveTaggableChar(textarea.value, charIndex, charTagMappings);
 
     if (resolved) {
-      const { key: charAtCursor, baseIndex, length } = resolved;
-      // Select the full letter (base + nukta, if present) so the native
-      // selection highlight gives visual feedback for which letter was picked.
-      textarea.setSelectionRange(baseIndex, baseIndex + length);
+      const { key: charAtCursor, baseIndex } = resolved;
+      const selectionLength = getSyllableClusterLength(
+        textarea.value,
+        baseIndex,
+        charTagMappings
+      );
+      textarea.setSelectionRange(baseIndex, baseIndex + selectionLength);
       const mappings = charTagMappings[charAtCursor];
 
       // Clear any pending timeout
