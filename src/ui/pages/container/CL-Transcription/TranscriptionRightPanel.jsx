@@ -127,18 +127,6 @@ const getSuggestedTag = (baseChar, pos) => {
   if (likely === a) return `${a}-${b}`;
   return `${likely}-${a}`;
 };
-const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
-  const taggableCharIndexes = [];
-  for (let i = coreWordStart; i < coreWordEnd; i++) {
-    const resolved = resolveTaggableChar(text, i, mappings);
-    if (resolved && resolved.baseIndex === i) taggableCharIndexes.push(i);
-  }
-  const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
-  const tagZoneStr = tagZoneMatch[0];
-  const tagZoneEnd = coreWordEnd + tagZoneStr.length;
-  const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
-  return { taggableCharIndexes, tagZoneStr, tagZoneEnd, tokens };
-};
 
 const VIRAMA_CHARS = new Set([
   '\u094D', // Devanagari virama
@@ -154,62 +142,153 @@ const VIRAMA_CHARS = new Set([
 
 const NUKTA = '\u093C'; // combining nukta mark (used in ज़, ड़, ढ़, फ़, etc.)
 
-const resolveTaggableChar = (text, index, mappings) => {
-  if (index < 0 || index >= text.length) return null;
+const getSyllableClusters = (text, lang = "mr") => {
+  if (!text) return [];
+  const clusters = [];
+  let i = 0;
 
-  // Clicked directly on a nukta mark -> resolve back to its base character.
-  if (text[index] === NUKTA && index > 0) {
-    const combined = text[index - 1] + text[index];
-    if (mappings[combined]) {
-      return { key: combined, baseIndex: index - 1, length: 2 };
-    }
-   
-    return null;
-  }
-
-  // Clicked on a base consonant immediately followed by a nukta.
-  if (index + 1 < text.length && text[index + 1] === NUKTA) {
-    const combined = text[index] + text[index + 1];
-    if (mappings[combined]) {
-      return { key: combined, baseIndex: index, length: 2 };
-    }
-    // Same reasoning as above — this is base+nukta, not the bare base.
-    return null;
-  }
-
-  // Ordinary single-codepoint character, not adjacent to a nukta.
-  if (mappings[text[index]]) {
-    return { key: text[index], baseIndex: index, length: 1 };
-  }
-
-  return null;
-};
-const getSyllableClusterLength = (text, startIndex, mappings) => {
-  let i = startIndex + 1;
   while (i < text.length) {
-    let marksEnd = i;
-    while (marksEnd < text.length && /\p{M}/u.test(text[marksEnd])) {
-      marksEnd++;
-    }
-    if (marksEnd === i) break; // no combining marks here - cluster is done
-
-    const endedOnVirama = VIRAMA_CHARS.has(text[marksEnd - 1]);
-    const nextChar = text[marksEnd];
-    const nextIsLetter = marksEnd < text.length && /\p{L}/u.test(nextChar);
-    const nextIsIndependentlyTaggable = nextIsLetter && !!mappings[nextChar];
-
-    if (endedOnVirama && nextIsLetter && !nextIsIndependentlyTaggable) {
-      i = marksEnd + 1;
+    if (/\s/.test(text[i])) {
+      clusters.push({ start: i, end: i + 1, text: text[i], isSpace: true });
+      i++;
       continue;
     }
 
-    i = marksEnd;
-    break;
+    if (text[i] === "{" || text[i] === "}" || text[i] === "<" || text[i] === ">") {
+      clusters.push({ start: i, end: i + 1, text: text[i], isBracket: true });
+      i++;
+      continue;
+    }
+
+    const start = i;
+    while (i < text.length) {
+      if (/\p{L}/u.test(text[i])) {
+        i++;
+      }
+      while (i < text.length && /\p{M}/u.test(text[i])) {
+        i++;
+      }
+
+      // Indic conjuncts: continue across virama to include following consonant
+      // Tamil: stops before the following consonant (pulli is attached to preceding consonant only)
+      if (
+        lang !== "ta" &&
+        i > start &&
+        VIRAMA_CHARS.has(text[i - 1]) &&
+        text[i - 1] !== TAMIL_PULLI &&
+        i < text.length &&
+        /\p{L}/u.test(text[i])
+      ) {
+        continue;
+      }
+      break;
+    }
+
+    if (i === start) {
+      i++;
+    }
+
+    clusters.push({ start, end: i, text: text.slice(start, i) });
   }
-  return i - startIndex;
+
+  return clusters;
 };
 
-const getCharIndexAtPoint = (textarea, clientX, clientY) => {
+const resolveTaggableChar = (text, index, mappings, lang = "mr") => {
+  if (index < 0 || index >= text.length || !mappings) return null;
+
+  const clusters = getSyllableClusters(text, lang);
+  const cluster = clusters.find((c) => index >= c.start && index < c.end);
+  if (!cluster || cluster.isSpace || cluster.isBracket) return null;
+
+  const candidates = [];
+  for (let offset = 0; offset < cluster.text.length; offset++) {
+    // Check 2-character nukta sequence
+    if (offset + 1 < cluster.text.length && cluster.text[offset + 1] === NUKTA) {
+      const combined = cluster.text[offset] + cluster.text[offset + 1];
+      const nfc = combined.normalize ? combined.normalize("NFC") : combined;
+      const nfd = combined.normalize ? combined.normalize("NFD") : combined;
+      const matchedKey = mappings[combined]
+        ? combined
+        : mappings[nfc]
+        ? nfc
+        : mappings[nfd]
+        ? nfd
+        : null;
+
+      if (matchedKey) {
+        candidates.push({
+          key: matchedKey,
+          baseIndex: cluster.start + offset,
+          length: 2,
+        });
+      }
+      // Advance past nukta: if unmapped, never fall back to treating base consonant as plain consonant
+      offset++;
+      continue;
+    }
+
+    // Check single character
+    const ch = cluster.text[offset];
+    if (mappings[ch]) {
+      candidates.push({
+        key: ch,
+        baseIndex: cluster.start + offset,
+        length: 1,
+      });
+    }
+  }
+
+  if (candidates.length === 0) return null;
+
+  if (candidates.length === 1) {
+    return {
+      ...candidates[0],
+      clusterStart: cluster.start,
+      clusterEnd: cluster.end,
+      clusterText: cluster.text,
+    };
+  }
+
+  // Deterministically choose the candidate closest to the click index
+  const closest = candidates.reduce((prev, curr) => {
+    return Math.abs(curr.baseIndex - index) < Math.abs(prev.baseIndex - index)
+      ? curr
+      : prev;
+  });
+
+  return {
+    ...closest,
+    clusterStart: cluster.start,
+    clusterEnd: cluster.end,
+    clusterText: cluster.text,
+    allCandidates: candidates,
+  };
+};
+
+const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings, lang = "mr") => {
+  const coreWord = text.slice(coreWordStart, coreWordEnd);
+  const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
+  const tagZoneStr = tagZoneMatch ? tagZoneMatch[0] : "";
+  const tagZoneEnd = coreWordEnd + tagZoneStr.length;
+  const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
+
+  const wrappedGroups = [];
+  const braceRegex = /\{([^{}]+)\}/g;
+  let match;
+  while ((match = braceRegex.exec(coreWord)) !== null) {
+    wrappedGroups.push({
+      start: coreWordStart + match.index,
+      end: coreWordStart + match.index + match[0].length,
+      inner: match[1],
+    });
+  }
+
+  return { wrappedGroups, tagZoneStr, tagZoneEnd, tokens };
+};
+
+const getCharIndexAtPoint = (textarea, clientX, clientY, lang = "mr") => {
+  if (!textarea || typeof window === "undefined") return -1;
   const style = window.getComputedStyle(textarea);
   const mirror = document.createElement("div");
 
@@ -220,7 +299,9 @@ const getCharIndexAtPoint = (textarea, clientX, clientY) => {
     "fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing",
     "lineHeight", "textTransform", "wordSpacing", "tabSize",
   ];
-  propsToCopy.forEach((p) => { mirror.style[p] = style[p]; });
+  propsToCopy.forEach((p) => {
+    mirror.style[p] = style[p];
+  });
 
   const rect = textarea.getBoundingClientRect();
   mirror.style.position = "fixed";
@@ -237,17 +318,26 @@ const getCharIndexAtPoint = (textarea, clientX, clientY) => {
 
   const text = textarea.value || "";
   const spans = [];
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (ch === "\n") {
-      mirror.appendChild(document.createElement("br"));
-      spans.push(null);
-      continue;
+  const lines = text.split("\n");
+  let globalCharOffset = 0;
+
+  for (let l = 0; l < lines.length; l++) {
+    const lineText = lines[l];
+    const clusters = getSyllableClusters(lineText, lang);
+    for (const cluster of clusters) {
+      const span = document.createElement("span");
+      span.textContent = cluster.text;
+      mirror.appendChild(span);
+      spans.push({
+        span,
+        start: globalCharOffset + cluster.start,
+        end: globalCharOffset + cluster.end,
+      });
     }
-    const span = document.createElement("span");
-    span.textContent = ch;
-    mirror.appendChild(span);
-    spans.push(span);
+    if (l < lines.length - 1) {
+      mirror.appendChild(document.createElement("br"));
+      globalCharOffset += lineText.length + 1; // +1 for \n
+    }
   }
 
   document.body.appendChild(mirror);
@@ -256,12 +346,16 @@ const getCharIndexAtPoint = (textarea, clientX, clientY) => {
 
   let foundIndex = -1;
   for (let i = 0; i < spans.length; i++) {
-    const span = spans[i];
-    if (!span) continue;
-    const r = span.getBoundingClientRect();
+    const item = spans[i];
+    const r = item.span.getBoundingClientRect();
     if (r.width === 0 && r.height === 0) continue;
-    if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
-      foundIndex = i;
+    if (
+      clientX >= r.left &&
+      clientX <= r.right &&
+      clientY >= r.top &&
+      clientY <= r.bottom
+    ) {
+      foundIndex = item.start;
       break;
     }
   }
@@ -779,55 +873,60 @@ const processNoiseTags = (value) => {
     }
   }
 };
-  const handleCharacterTagSelection = (subIndex, charIndex, tag, isL1 = false) => {
+  const matchedLang = LanguageCode.languages.find(
+    (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
+  );
+  const currentLangCode = matchedLang?.code || "mr";
+
+  const handleCharacterTagSelection = (subIndex, resolvedInfo, tag, isL1 = false) => {
     const sub = [...subtitles];
     const fieldKey = isL1 ? 'text' : 'acoustic_normalised_text';
     const text = sub[subIndex]?.[fieldKey] || '';
 
-    if (charIndex === null || charIndex < 0 || charIndex >= text.length) {
-      console.warn("Invalid character index for tagging:", charIndex);
+    if (!resolvedInfo) {
+      console.warn("Invalid resolvedInfo for tagging");
       return;
     }
 
-    let coreWordStart = charIndex;
+    const { key: charAtCursor, baseIndex, clusterStart, clusterEnd } = resolvedInfo;
+
+    let coreWordStart = clusterStart;
     while (
       coreWordStart > 0 &&
       !/\s/.test(text[coreWordStart - 1]) &&
       text[coreWordStart - 1] !== '>'
     ) coreWordStart--;
-    let coreWordEnd = charIndex;
+    let coreWordEnd = clusterEnd;
     while (
       coreWordEnd < text.length &&
       !/\s/.test(text[coreWordEnd]) &&
       text[coreWordEnd] !== '<'
     ) coreWordEnd++;
 
-    const { taggableCharIndexes, tagZoneEnd, tokens } = getWordTagInfo(
+    const { wrappedGroups, tagZoneEnd, tokens } = getWordTagInfo(
       text,
       coreWordStart,
       coreWordEnd,
-      charTagMappings
+      charTagMappings,
+      currentLangCode
     );
 
-    // This character's position among ALL taggable characters of the word,
-    // in left-to-right order. The K-th tag in the group belongs to the
-    // K-th taggable character, so this character already has a tag exactly
-    // when its rank falls within the tokens already present.
-    const rank = taggableCharIndexes.indexOf(charIndex);
-    const alreadyTagged = rank !== -1 && rank < tokens.length;
+    // Check if this cluster is already wrapped in braces {...}
+    const existingGroupIdx = wrappedGroups.findIndex(
+      (g) => clusterStart >= g.start && clusterEnd <= g.end
+    );
+    const alreadyWrapped = existingGroupIdx !== -1;
 
-    // Determine if the clicked character/syllable is already wrapped in braces
-    let openBraceIndex = -1;
-    let closeBraceIndex = -1;
-    for (let i = charIndex - 1; i >= coreWordStart; i--) {
-      if (text[i] === '{') { openBraceIndex = i; break; }
-      if (text[i] === '}' || text[i] === '<' || text[i] === '>') break;
+    let rank = -1;
+    let alreadyTagged = false;
+    if (alreadyWrapped) {
+      rank = existingGroupIdx;
+      alreadyTagged = rank < tokens.length;
+    } else {
+      // Rank among wrapped groups is the count of groups before this cluster
+      rank = wrappedGroups.filter((g) => g.start < clusterStart).length;
+      alreadyTagged = false;
     }
-    for (let i = charIndex; i < coreWordEnd; i++) {
-      if (text[i] === '}') { closeBraceIndex = i; break; }
-      if (text[i] === '{' || text[i] === '<' || text[i] === '>') break;
-    }
-    const alreadyWrapped = openBraceIndex !== -1 && closeBraceIndex !== -1 && openBraceIndex < closeBraceIndex;
 
     const currentTagClean = alreadyTagged ? tokens[rank].replace(/^<|>$/g, '').trim().toLowerCase() : '';
     const targetTagClean = (tag || '').trim().toLowerCase();
@@ -840,11 +939,13 @@ const processNoiseTags = (value) => {
       let workingCoreWordEnd = coreWordEnd;
       let workingTagZoneEnd = tagZoneEnd;
 
-      if (alreadyWrapped) {
+      // Remove {...} surrounding this cluster only when no other tag remains on that cluster
+      const group = wrappedGroups[existingGroupIdx];
+      if (group) {
         workingText =
-          workingText.slice(0, openBraceIndex) +
-          workingText.slice(openBraceIndex + 1, closeBraceIndex) +
-          workingText.slice(closeBraceIndex + 1);
+          workingText.slice(0, group.start) +
+          group.inner +
+          workingText.slice(group.end);
         workingCoreWordEnd -= 2;
         workingTagZoneEnd -= 2;
       }
@@ -879,33 +980,20 @@ const processNoiseTags = (value) => {
       return;
     }
 
-    const clusterLength = getSyllableClusterLength(text, charIndex, charTagMappings);
     let workingText = text;
     let workingCoreWordEnd = coreWordEnd;
     let workingTagZoneEnd = tagZoneEnd;
 
-    if (rank !== -1 && !alreadyWrapped) {
+    if (!alreadyWrapped) {
       workingText =
-        workingText.slice(0, charIndex) +
-        '{' + workingText.slice(charIndex, charIndex + clusterLength) + '}' +
-        workingText.slice(charIndex + clusterLength);
+        workingText.slice(0, clusterStart) +
+        '{' + workingText.slice(clusterStart, clusterEnd) + '}' +
+        workingText.slice(clusterEnd);
       workingCoreWordEnd += 2;
       workingTagZoneEnd += 2;
-    }
-
-    if (alreadyTagged) {
-      // Replace this character's existing tag in place.
-      tokens[rank] = `<${tag}>`;
-    } else if (rank !== -1) {
-      if (rank < tokens.length) {
-        // Replace tag at rank so only one tag per syllable exists
-        tokens[rank] = `<${tag}>`;
-      } else {
-        // Insert new tag at rank
-        tokens.splice(rank, 0, `<${tag}>`);
-      }
+      tokens.splice(rank, 0, `<${tag}>`);
     } else {
-      tokens.push(`<${tag}>`);
+      tokens[rank] = `<${tag}>`;
     }
     const newTagZone = tokens.map((t) => ` ${t}`).join('');
 
@@ -948,20 +1036,19 @@ const processNoiseTags = (value) => {
     }
 
     const textarea = event.target;
-    const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
+    const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY, currentLangCode);
 
     if (charIndex === -1) {
       handleCharTagPopover(null);
       return;
     }
 
-  const resolved = resolveTaggableChar(textarea.value, charIndex, charTagMappings);
+    const resolved = resolveTaggableChar(textarea.value, charIndex, charTagMappings, currentLangCode);
 
     if (resolved) {
-      const { key: charAtCursor, baseIndex, length } = resolved;
-      // Select the full letter (base + nukta, if present) so the native
-      // selection highlight gives visual feedback for which letter was picked.
-      textarea.setSelectionRange(baseIndex, baseIndex + length);
+      const { key: charAtCursor, baseIndex, clusterStart, clusterEnd } = resolved;
+      // Select the full cluster so native selection highlight covers the whole syllable/conjunct
+      textarea.setSelectionRange(clusterStart, clusterEnd);
       const mappings = charTagMappings[charAtCursor];
 
       // Clear any pending timeout
@@ -973,31 +1060,32 @@ const processNoiseTags = (value) => {
       const pos = detectCharPosition(textarea.value, baseIndex, charAtCursor);
       const suggested = getSuggestedTag(charAtCursor, pos);
 
-      // Look up whether this character already has a tag, derived fresh
-      // from the current text (see getWordTagInfo) so it's correct even
-      // right after a page refresh, when there is no in-memory record of
-      // previous tagging left to consult.
-      let coreWordStart = baseIndex;
+      let coreWordStart = clusterStart;
       while (
         coreWordStart > 0 &&
         !/\s/.test(textarea.value[coreWordStart - 1]) &&
         textarea.value[coreWordStart - 1] !== '>'
       ) coreWordStart--;
-let coreWordEnd = baseIndex;
+      let coreWordEnd = clusterEnd;
       while (
         coreWordEnd < textarea.value.length &&
         !/\s/.test(textarea.value[coreWordEnd]) &&
         textarea.value[coreWordEnd] !== '<'
       ) coreWordEnd++;
-      const { taggableCharIndexes, tokens } = getWordTagInfo(
+
+      const { wrappedGroups, tokens } = getWordTagInfo(
         textarea.value,
         coreWordStart,
         coreWordEnd,
-        charTagMappings
+        charTagMappings,
+        currentLangCode
       );
-const rank = taggableCharIndexes.indexOf(baseIndex);
-      const currentTag =
-        rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
+
+      const existingGroupIdx = wrappedGroups.findIndex(
+        (g) => clusterStart >= g.start && clusterEnd <= g.end
+      );
+      const alreadyTagged = existingGroupIdx !== -1 && existingGroupIdx < tokens.length;
+      const currentTag = alreadyTagged ? tokens[existingGroupIdx].replace(/^<|>$/g, '') : null;
 
       handleCharTagPopover({
         anchorEl: textarea,
@@ -1007,8 +1095,8 @@ const rank = taggableCharIndexes.indexOf(baseIndex);
         position: { x: event.clientX, y: event.clientY },
         suggestedTag: suggested,
         currentTag: currentTag,
-      onTagSelect: (tag) => {
-          handleCharacterTagSelection(subIndex, baseIndex, tag, isL1);
+        onTagSelect: (tag) => {
+          handleCharacterTagSelection(subIndex, resolved, tag, isL1);
         }
       });
     } else {
