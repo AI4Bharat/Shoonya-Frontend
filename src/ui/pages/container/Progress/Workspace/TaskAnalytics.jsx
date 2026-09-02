@@ -19,6 +19,8 @@ import { MenuProps } from "../../../../../utils/utils";
 import CustomButton from "../../../component/common/Button";
 import AudioTaskAnalyticsChart from "../TaskAnalytics/AudioTaskAnalyticsChart";
 import TaskCountAnalyticsChart from "../TaskAnalytics/TaskCountAnalyticsChart";
+import { format } from "date-fns";
+import TaskAnalyticsDateRangeFilter from "../../../component/common/TaskAnalyticsDateRangeFilter";
 
 
 const TaskAnalytics = () => {
@@ -26,6 +28,7 @@ const TaskAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("ContextualTranslationEditing");
+  const [dateRange, setDateRange] = useState(null);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
   const taskAnalyticsData = useSelector(
@@ -33,8 +36,21 @@ const TaskAnalytics = () => {
   );
 
   const getTaskAnalyticsdata = () => {
-    setLoading(true)
-    const userObj = new WorkspaceTaskAnalyticsAPI(workspaceDetails?.id,selectedType);
+    if (!workspaceDetails?.id) return;
+
+    setLoading(true);
+    const startDate = dateRange
+      ? format(dateRange.startDate, "yyyy-MM-dd")
+      : null;
+    const endDate = dateRange
+      ? format(dateRange.endDate, "yyyy-MM-dd")
+      : null;
+    const userObj = new WorkspaceTaskAnalyticsAPI(
+      workspaceDetails?.id,
+      selectedType,
+      startDate,
+      endDate
+    );
     dispatch(APITransport(userObj));
   };
 
@@ -69,7 +85,7 @@ const TaskAnalytics = () => {
 
   useEffect(() => {
     getTaskAnalyticsdata();
-  }, [workspaceDetails]);
+  }, [workspaceDetails?.id]);
 
   const handleSubmit = async () => {
     getTaskAnalyticsdata();
@@ -118,8 +134,14 @@ const TaskAnalytics = () => {
             </Select>
           </FormControl>
         </Grid>
+        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+          <TaskAnalyticsDateRangeFilter
+            value={dateRange}
+            onChange={setDateRange}
+          />
+        </Grid>
         <CustomButton label="Submit" sx={{ width:"120px", mt: 3 }} onClick={handleSubmit}
-              disabled={loading} />
+              disabled={loading || !workspaceDetails?.id} />
 
       </Grid>
       {loading && <Spinner />}
