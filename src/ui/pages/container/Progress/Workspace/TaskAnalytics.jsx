@@ -23,6 +23,8 @@ import exportFromJSON from 'export-from-json';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { FilterList, KeyboardArrowDown } from "@material-ui/icons";
+import { format } from "date-fns";
+import TaskAnalyticsDateRangeFilter from "../../../component/common/TaskAnalyticsDateRangeFilter";
 const StyledMenu = styled((props) => (
   <Menu
     elevation={3}
@@ -57,6 +59,7 @@ const TaskAnalytics = () => {
   const [reviewChecked, setReviewChecked] = useState(true);
   const [supercheckChecked, setSupercheckChecked] = useState(false);
   const [showFilterBox, setShowFilterBox] = useState(false);
+  const [dateRange, setDateRange] = useState(null);
 
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const workspaceDetails = useSelector((state) => state.getWorkspaceDetails.data);
@@ -68,8 +71,21 @@ const TaskAnalytics = () => {
   const open = Boolean(anchorEl);
 
   const getTaskAnalyticsdata = () => {
-    setLoading(true)
-    const userObj = new WorkspaceTaskAnalyticsAPI(workspaceDetails?.id,selectedType);
+    if (!workspaceDetails?.id) return;
+
+    setLoading(true);
+    const startDate = dateRange
+      ? format(dateRange.startDate, "yyyy-MM-dd")
+      : null;
+    const endDate = dateRange
+      ? format(dateRange.endDate, "yyyy-MM-dd")
+      : null;
+    const userObj = new WorkspaceTaskAnalyticsAPI(
+      workspaceDetails.id,
+      selectedType,
+      startDate,
+      endDate
+    );
     dispatch(APITransport(userObj));
   };
 
@@ -108,7 +124,7 @@ const TaskAnalytics = () => {
 
   useEffect(() => {
     getTaskAnalyticsdata();
-  }, [workspaceDetails]);
+  }, [workspaceDetails?.id]);
 
   const handleSubmit = async () => {
     getTaskAnalyticsdata();
@@ -225,6 +241,7 @@ const TaskAnalytics = () => {
     setAnnotationChecked(true);
     setReviewChecked(true);
     setSupercheckChecked(true);
+    setDateRange(null);
     setShowFilterBox(false); 
   };
 
@@ -262,6 +279,11 @@ const TaskAnalytics = () => {
                 ))}
               </Select>
             </FormControl>
+
+            <TaskAnalyticsDateRangeFilter
+              value={dateRange}
+              onChange={setDateRange}
+            />
 
             <Box display="flex" flexDirection="column">
             <LightTooltip 
