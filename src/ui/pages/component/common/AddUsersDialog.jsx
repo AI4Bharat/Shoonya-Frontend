@@ -350,7 +350,7 @@ const AddUsersDialog = ({
           options={availableUsers}
           value={selectedUsers}
           style={{ fontSize: "1rem", paddingTop: 4, paddingBottom: 4 }}
-          getOptionLabel={(option) => option.username}
+          getOptionLabel={(option) => option.username + (option.email ? " (" + option.email + ")" : "")}
           size="small"
           renderInput={(params) => (
             <TextField
