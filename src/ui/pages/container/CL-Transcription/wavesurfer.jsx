@@ -27,37 +27,65 @@ const Timeline2 = ({ key, details, waveformSettings, repeatCount }) => {
   const [waveSurfInstance, setWaveSurfInstance] = useState(null);
   const [regionsPluginInstance, setRegionsPluginInstance] = useState(null);
 
-  const updateRegions = (currentSubs) => {
-    if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null && currentSubs.length > 0) {
-      regions.current.clearRegions();
-      miniMapRegions.current.clearRegions();
-      currentSubs?.map((sub) => {
-        regions.current.addRegion({
-          id: sub.id,
-          start: sub.startTime,
-          end: sub.endTime,
-          content: sub.text,
-          drag: true,
-          resize: true,
-          contentEditable: true,
-          color: sub.speaker_id === "Speaker 1"
+  const updateRegions = useCallback((currentSubs) => {
+    if (details?.data !== undefined && waveSurf.current !== null && miniMap.current !== null && regions.current !== null && miniMapRegions.current !== null && currentSubs && currentSubs.length > 0) {
+      const existingRegions = regions.current.getRegions() || [];
+      const existingMiniMapRegions = miniMapRegions.current.getRegions() || [];
+
+      const canUpdateInPlace = existingRegions.length === currentSubs.length && existingMiniMapRegions.length === currentSubs.length;
+
+      if (canUpdateInPlace) {
+        currentSubs.forEach((sub, idx) => {
+          const color = sub.speaker_id === "Speaker 1"
             ? "rgb(0, 87, 158, 0.2)"
             : sub.speaker_id === "Speaker 0"
               ? "rgb(123, 29, 0, 0.2)"
-              : "rgb(0, 0, 0, 0.6)",
+              : "rgb(0, 0, 0, 0.6)";
+
+          existingRegions[idx].setOptions({
+            start: sub.startTime,
+            end: sub.endTime,
+            content: sub.text,
+            color: color,
+          });
+
+          existingMiniMapRegions[idx].setOptions({
+            start: sub.startTime,
+            end: sub.endTime,
+            color: sub.text === "" ? "rgb(255, 0, 0, 0.5)" : "rgb(0, 255, 0, 0.5)",
+          });
         });
-        miniMapRegions.current.addRegion({
-          start: sub.startTime,
-          end: sub.endTime,
-          color: sub.text === ""
-            ? "rgb(255, 0, 0, 0.5)"
-            : "rgb(0, 255, 0, 0.5)",
-          drag: false,
-          resize: false,
+      } else {
+        regions.current.clearRegions();
+        miniMapRegions.current.clearRegions();
+        currentSubs?.forEach((sub) => {
+          regions.current.addRegion({
+            id: sub.id,
+            start: sub.startTime,
+            end: sub.endTime,
+            content: sub.text,
+            drag: true,
+            resize: true,
+            contentEditable: true,
+            color: sub.speaker_id === "Speaker 1"
+              ? "rgb(0, 87, 158, 0.2)"
+              : sub.speaker_id === "Speaker 0"
+                ? "rgb(123, 29, 0, 0.2)"
+                : "rgb(0, 0, 0, 0.6)",
+          });
+          miniMapRegions.current.addRegion({
+            start: sub.startTime,
+            end: sub.endTime,
+            color: sub.text === ""
+              ? "rgb(255, 0, 0, 0.5)"
+              : "rgb(0, 255, 0, 0.5)",
+            drag: false,
+            resize: false,
+          });
         });
-      })
+      }
     }
-  };
+  }, [details]);
 
   useEffect(() => {
     if (result) {

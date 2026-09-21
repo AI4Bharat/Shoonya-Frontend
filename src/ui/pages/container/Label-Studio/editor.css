@@ -2,7 +2,7 @@
 .quill {
     margin: 1rem;
   }
-  
+
    .ql-container {
     background: #fefcfc;
     margin-bottom: 1%;
@@ -81,4 +81,25 @@
   .quill .ql-color:focus:after {
      content: 'Color';
   }
-  
+
+/* OCR-only presentation for mixed RTL/LTR annotation text. */
+html[data-rtl-typing="true"] .ocr-project-style textarea,
+html[data-rtl-typing="true"] .ocr-project-style input[type="text"],
+html[data-rtl-typing="true"] .ocr-project-style [contenteditable="true"] {
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-align: right;
+}
+
+/* Label Studio's saved annotation preview (the green region panel). */
+html[data-rtl-typing="true"] .ocr-project-style .lsf-region-item__desc,
+html[data-rtl-typing="true"] .ocr-project-style .lsf-region-item__text,
+html[data-rtl-typing="true"]
+  .ocr-project-style
+  [data-testid="textarea-region"]
+  [id^="TextAreaRegion-"]
+  > span:first-child {
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-align: right;
+}

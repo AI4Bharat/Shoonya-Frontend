@@ -229,7 +229,7 @@ const DatasetStyle = makeStyles({
     lineHeight: "22px",
     "&:first-letter": { textTransform: "capitalize" },
     display: "-webkit-box",
-    "-webkit-line-clamp": "2",
+    "-webkit-line-clamp": "4",
     "-webkit-box-orient": "vertical",
     overflow: "hidden",
     "@media (max-width:400px)": {

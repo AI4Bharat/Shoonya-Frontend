@@ -71,6 +71,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import { Add, MoreVert, Remove } from "@material-ui/icons";
 import TransliterationAPI from "../../../../redux/actions/api/Transliteration/TransliterationAPI";
 import configs from "../../../../config/config";
+import { canOpenCharacterTagging } from "./characterTaggingVisibility";
 
 const languageTagMappings = {
   'ta': {
@@ -85,11 +86,11 @@ const languageTagMappings = {
     'ഫ': ['ph-f', 'f-ph'] // f vs ph
   },
   'mr': {
-    'ज': ['z-j'],   // j vs z
-    'झ': ['zh-jh'], // jh vs zh
-    'च': ['ts-ch'], // ch vs ts
+    'ज': ['z-j', 'j-z'],     // j vs z
+    'झ': ['zh-jh', 'jh-zh'], // jh vs zh
+    'च': ['ts-ch', 'ch-ts'], // ch vs ts
     'ஃப' /* not used */: undefined, // placeholder removed below
-    'फ': ['ph-f']   // f vs ph
+    'फ': ['ph-f', 'f-ph']    // f vs ph
   },
   'en': {
     'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
@@ -127,47 +128,167 @@ const getSuggestedTag = (baseChar, pos) => {
   return `${likely}-${a}`;
 };
 
-// ---------------------------------------------------------------------------
-// getWordTagInfo
-// Finds every taggable base character's position (in left-to-right order)
-// within a word's core (untagged) text, and lines it up against the tags
-// already sitting in the " <tag> <tag> ..." group right after the word.
-// Tags are always written in the same left-to-right order as the
-// characters they belong to (see handleCharacterTagSelection), so the K-th
-// tag in that group always belongs to the K-th taggable character.
-//
-// This is deliberately computed FRESH from the actual subtitle text every
-// time it's needed, instead of from a separate in-memory record of "which
-// character has which tag": the text is what gets persisted/reloaded, so
-// deriving the correspondence straight from it means tagging still works
-// correctly after a page refresh (when any in-memory bookkeeping would
-// have been reset to empty, even though the text itself still has its
-// tags) - previously, refreshing meant the app "forgot" that a character
-// was already tagged and appended a duplicate tag instead of replacing it.
-//
-// The tag-zone match below tolerates ANY amount of whitespace (\s*, not a
-// single fixed space) between the word and its first tag, and between
-// tags. This matters because a tag is written back out with clean single
-// spacing every time it's edited, but the field is still a free-typing
-// textarea - a stray extra space or a dropped space typed in by hand must
-// not make the parser lose track of tags that are genuinely still there,
-// which is exactly what caused already-tagged characters to look
-// "untagged" and get a duplicate tag appended instead of their existing
-// one being replaced.
-// ---------------------------------------------------------------------------
-const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings) => {
-  const taggableCharIndexes = [];
-  for (let i = coreWordStart; i < coreWordEnd; i++) {
-    if (mappings[text[i]]) taggableCharIndexes.push(i);
+const VIRAMA_CHARS = new Set([
+  '\u094D', // Devanagari virama
+  '\u0BCD', // Tamil pulli
+  '\u0D4D', // Malayalam chandrakkala
+  '\u0C4D', // Telugu virama
+  '\u0CCD', // Kannada virama
+  '\u09CD', // Bengali virama
+  '\u0ACD', // Gujarati virama
+  '\u0A4D', // Gurmukhi virama
+  '\u0B4D', // Oriya virama
+]);
+
+const NUKTA = '\u093C'; // combining nukta mark (used in ज़, ड़, ढ़, फ़, etc.)
+
+const getSyllableClusters = (text, lang = "mr") => {
+  if (!text) return [];
+  const clusters = [];
+  let i = 0;
+
+  while (i < text.length) {
+    if (/\s/.test(text[i])) {
+      clusters.push({ start: i, end: i + 1, text: text[i], isSpace: true });
+      i++;
+      continue;
+    }
+
+    if (text[i] === "{" || text[i] === "}" || text[i] === "<" || text[i] === ">") {
+      clusters.push({ start: i, end: i + 1, text: text[i], isBracket: true });
+      i++;
+      continue;
+    }
+
+    const start = i;
+    while (i < text.length) {
+      if (/\p{L}/u.test(text[i])) {
+        i++;
+      }
+      while (i < text.length && /\p{M}/u.test(text[i])) {
+        i++;
+      }
+
+      // Indic conjuncts: continue across virama to include following consonant
+      // Tamil: stops before the following consonant (pulli is attached to preceding consonant only)
+      if (
+        lang !== "ta" &&
+        i > start &&
+        VIRAMA_CHARS.has(text[i - 1]) &&
+        text[i - 1] !== TAMIL_PULLI &&
+        i < text.length &&
+        /\p{L}/u.test(text[i])
+      ) {
+        continue;
+      }
+      break;
+    }
+
+    if (i === start) {
+      i++;
+    }
+
+    clusters.push({ start, end: i, text: text.slice(start, i) });
   }
-  const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
-  const tagZoneStr = tagZoneMatch[0];
-  const tagZoneEnd = coreWordEnd + tagZoneStr.length;
-  const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
-  return { taggableCharIndexes, tagZoneStr, tagZoneEnd, tokens };
+
+  return clusters;
 };
 
-const getCharIndexAtPoint = (textarea, clientX, clientY) => {
+const resolveTaggableChar = (text, index, mappings, lang = "mr") => {
+  if (index < 0 || index >= text.length || !mappings) return null;
+
+  const clusters = getSyllableClusters(text, lang);
+  const cluster = clusters.find((c) => index >= c.start && index < c.end);
+  if (!cluster || cluster.isSpace || cluster.isBracket) return null;
+
+  const candidates = [];
+  for (let offset = 0; offset < cluster.text.length; offset++) {
+    // Check 2-character nukta sequence
+    if (offset + 1 < cluster.text.length && cluster.text[offset + 1] === NUKTA) {
+      const combined = cluster.text[offset] + cluster.text[offset + 1];
+      const nfc = combined.normalize ? combined.normalize("NFC") : combined;
+      const nfd = combined.normalize ? combined.normalize("NFD") : combined;
+      const matchedKey = mappings[combined]
+        ? combined
+        : mappings[nfc]
+        ? nfc
+        : mappings[nfd]
+        ? nfd
+        : null;
+
+      if (matchedKey) {
+        candidates.push({
+          key: matchedKey,
+          baseIndex: cluster.start + offset,
+          length: 2,
+        });
+      }
+      // Advance past nukta: if unmapped, never fall back to treating base consonant as plain consonant
+      offset++;
+      continue;
+    }
+
+    // Check single character
+    const ch = cluster.text[offset];
+    if (mappings[ch]) {
+      candidates.push({
+        key: ch,
+        baseIndex: cluster.start + offset,
+        length: 1,
+      });
+    }
+  }
+
+  if (candidates.length === 0) return null;
+
+  if (candidates.length === 1) {
+    return {
+      ...candidates[0],
+      clusterStart: cluster.start,
+      clusterEnd: cluster.end,
+      clusterText: cluster.text,
+    };
+  }
+
+  // Deterministically choose the candidate closest to the click index
+  const closest = candidates.reduce((prev, curr) => {
+    return Math.abs(curr.baseIndex - index) < Math.abs(prev.baseIndex - index)
+      ? curr
+      : prev;
+  });
+
+  return {
+    ...closest,
+    clusterStart: cluster.start,
+    clusterEnd: cluster.end,
+    clusterText: cluster.text,
+    allCandidates: candidates,
+  };
+};
+
+const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings, lang = "mr") => {
+  const coreWord = text.slice(coreWordStart, coreWordEnd);
+  const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
+  const tagZoneStr = tagZoneMatch ? tagZoneMatch[0] : "";
+  const tagZoneEnd = coreWordEnd + tagZoneStr.length;
+  const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
+
+  const wrappedGroups = [];
+  const braceRegex = /\{([^{}]+)\}/g;
+  let match;
+  while ((match = braceRegex.exec(coreWord)) !== null) {
+    wrappedGroups.push({
+      start: coreWordStart + match.index,
+      end: coreWordStart + match.index + match[0].length,
+      inner: match[1],
+    });
+  }
+
+  return { wrappedGroups, tagZoneStr, tagZoneEnd, tokens };
+};
+
+const getCharIndexAtPoint = (textarea, clientX, clientY, lang = "mr") => {
+  if (!textarea || typeof window === "undefined") return -1;
   const style = window.getComputedStyle(textarea);
   const mirror = document.createElement("div");
 
@@ -178,7 +299,9 @@ const getCharIndexAtPoint = (textarea, clientX, clientY) => {
     "fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing",
     "lineHeight", "textTransform", "wordSpacing", "tabSize",
   ];
-  propsToCopy.forEach((p) => { mirror.style[p] = style[p]; });
+  propsToCopy.forEach((p) => {
+    mirror.style[p] = style[p];
+  });
 
   const rect = textarea.getBoundingClientRect();
   mirror.style.position = "fixed";
@@ -195,17 +318,26 @@ const getCharIndexAtPoint = (textarea, clientX, clientY) => {
 
   const text = textarea.value || "";
   const spans = [];
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (ch === "\n") {
-      mirror.appendChild(document.createElement("br"));
-      spans.push(null);
-      continue;
+  const lines = text.split("\n");
+  let globalCharOffset = 0;
+
+  for (let l = 0; l < lines.length; l++) {
+    const lineText = lines[l];
+    const clusters = getSyllableClusters(lineText, lang);
+    for (const cluster of clusters) {
+      const span = document.createElement("span");
+      span.textContent = cluster.text;
+      mirror.appendChild(span);
+      spans.push({
+        span,
+        start: globalCharOffset + cluster.start,
+        end: globalCharOffset + cluster.end,
+      });
     }
-    const span = document.createElement("span");
-    span.textContent = ch;
-    mirror.appendChild(span);
-    spans.push(span);
+    if (l < lines.length - 1) {
+      mirror.appendChild(document.createElement("br"));
+      globalCharOffset += lineText.length + 1; // +1 for \n
+    }
   }
 
   document.body.appendChild(mirror);
@@ -214,12 +346,16 @@ const getCharIndexAtPoint = (textarea, clientX, clientY) => {
 
   let foundIndex = -1;
   for (let i = 0; i < spans.length; i++) {
-    const span = spans[i];
-    if (!span) continue;
-    const r = span.getBoundingClientRect();
+    const item = spans[i];
+    const r = item.span.getBoundingClientRect();
     if (r.width === 0 && r.height === 0) continue;
-    if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
-      foundIndex = i;
+    if (
+      clientX >= r.left &&
+      clientX <= r.right &&
+      clientY >= r.top &&
+      clientY <= r.bottom
+    ) {
+      foundIndex = item.start;
       break;
     }
   }
@@ -274,7 +410,10 @@ const TranscriptionRightPanel = ({
   const showAcousticText =
     (ProjectDetails?.project_type === "AcousticNormalisedTranscriptionEditing"  ||
     ProjectDetails?.project_type == 'VerbatimTranscriptionCharacterTagging') &&
-    ProjectDetails?.metadata_json?.acoustic_enabled_stage <= stage;
+    ProjectDetails?.metadata_json &&
+    'acoustic_enabled_stage' in ProjectDetails.metadata_json &&
+    ProjectDetails.metadata_json.acoustic_enabled_stage !== null &&
+    ProjectDetails.metadata_json.acoustic_enabled_stage <= stage;
   const [snackbar, setSnackbarInfo] = useState({
     open: false,
     message: "",
@@ -504,12 +643,11 @@ const TranscriptionRightPanel = ({
 
     if (ProjectDetails?.project_type === 'VerbatimTranscriptionCharacterTagging') {
       setIsVCTCProject(true);
-      console.log("helo");
       
-    const matchedLang = LanguageCode.languages.find(
-      (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
-    );
-    const langCode = matchedLang?.code;
+      const matchedLang = LanguageCode.languages.find(
+        (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
+      );
+      const langCode = matchedLang?.code;
 
       if (langCode && languageTagMappings[langCode]) {
         setCharTagMappings(languageTagMappings[langCode]);
@@ -735,68 +873,104 @@ const processNoiseTags = (value) => {
     }
   }
 };
-  // ---------------------------------------------------------------------
-  // Tags for a word are always placed together AFTER the whole word, each
-  // separated by a space - e.g. "எடுத்தான் <TH-DH> <d-th> <th-dh>" - the
-  // word itself is never broken up with an inline tag.
-  //
-  // Which character a given tag belongs to is derived FRESH from the text
-  // every time (see getWordTagInfo), by matching each taggable base
-  // character in the word (left to right) against the tags already in the
-  // group (left to right). This is what makes tagging survive a page
-  // refresh: the correspondence isn't stored anywhere that could be lost
-  // (like component state), it's recovered from the persisted text itself.
-  //
-  // The word/tag boundary scan below stops at "<" (going forward) or ">"
-  // (going backward), not just at whitespace. This guards against a tag
-  // ever getting silently swallowed into the "core word" - and therefore
-  // becoming invisible to getWordTagInfo - if the space that's supposed to
-  // separate the word from its tags (or one tag from the next) is ever
-  // missing or doubled, which can happen since this is a free-typing
-  // textarea. Without this guard, a genuinely already-tagged character
-  // could stop being recognized as tagged and get a duplicate tag
-  // appended instead of its existing tag being replaced.
-  // ---------------------------------------------------------------------
-  const handleCharacterTagSelection = (subIndex, charIndex, tag, isL1 = false) => {
+  const matchedLang = LanguageCode.languages.find(
+    (lang) => lang.active && lang.label === ProjectDetails?.tgt_language
+  );
+  const currentLangCode = matchedLang?.code || "mr";
+
+  const handleCharacterTagSelection = (subIndex, resolvedInfo, tag, isL1 = false) => {
     const sub = [...subtitles];
     const fieldKey = isL1 ? 'text' : 'acoustic_normalised_text';
     const text = sub[subIndex]?.[fieldKey] || '';
 
-    if (charIndex === null || charIndex < 0 || charIndex >= text.length) {
-      console.warn("Invalid character index for tagging:", charIndex);
+    if (!resolvedInfo) {
+      console.warn("Invalid resolvedInfo for tagging");
       return;
     }
 
-    let coreWordStart = charIndex;
+    const { key: charAtCursor, baseIndex, clusterStart, clusterEnd } = resolvedInfo;
+
+    let coreWordStart = clusterStart;
     while (
       coreWordStart > 0 &&
       !/\s/.test(text[coreWordStart - 1]) &&
       text[coreWordStart - 1] !== '>'
     ) coreWordStart--;
-    let coreWordEnd = charIndex;
+    let coreWordEnd = clusterEnd;
     while (
       coreWordEnd < text.length &&
       !/\s/.test(text[coreWordEnd]) &&
       text[coreWordEnd] !== '<'
     ) coreWordEnd++;
 
-    const { taggableCharIndexes, tagZoneEnd, tokens } = getWordTagInfo(
+    const { wrappedGroups, tagZoneEnd, tokens } = getWordTagInfo(
       text,
       coreWordStart,
       coreWordEnd,
-      charTagMappings
+      charTagMappings,
+      currentLangCode
     );
 
-    // This character's position among ALL taggable characters of the word,
-    // in left-to-right order. The K-th tag in the group belongs to the
-    // K-th taggable character, so this character already has a tag exactly
-    // when its rank falls within the tokens already present.
-    const rank = taggableCharIndexes.indexOf(charIndex);
-    const alreadyTagged = rank !== -1 && rank < tokens.length;
+    // Check if this cluster is already wrapped in braces {...}
+    const existingGroupIdx = wrappedGroups.findIndex(
+      (g) => clusterStart >= g.start && clusterEnd <= g.end
+    );
+    const alreadyWrapped = existingGroupIdx !== -1;
 
-    // Re-selecting the tag that's already assigned to this character is a
-    // no-op - it can't be "selected again".
-    if (alreadyTagged && tokens[rank] === `<${tag}>`) {
+    let rank = -1;
+    let alreadyTagged = false;
+    if (alreadyWrapped) {
+      rank = existingGroupIdx;
+      alreadyTagged = rank < tokens.length;
+    } else {
+      // Rank among wrapped groups is the count of groups before this cluster
+      rank = wrappedGroups.filter((g) => g.start < clusterStart).length;
+      alreadyTagged = false;
+    }
+
+    const currentTagClean = alreadyTagged ? tokens[rank].replace(/^<|>$/g, '').trim().toLowerCase() : '';
+    const targetTagClean = (tag || '').trim().toLowerCase();
+
+    // Deselect feature: Clicking the tag that is already assigned removes it
+    if (alreadyTagged && currentTagClean === targetTagClean) {
+      tokens.splice(rank, 1);
+
+      let workingText = text;
+      let workingCoreWordEnd = coreWordEnd;
+      let workingTagZoneEnd = tagZoneEnd;
+
+      // Remove {...} surrounding this cluster only when no other tag remains on that cluster
+      const group = wrappedGroups[existingGroupIdx];
+      if (group) {
+        workingText =
+          workingText.slice(0, group.start) +
+          group.inner +
+          workingText.slice(group.end);
+        workingCoreWordEnd -= 2;
+        workingTagZoneEnd -= 2;
+      }
+
+      const newTagZone = tokens.length > 0 ? tokens.map((t) => ` ${t}`).join('') : '';
+      const newText =
+        workingText.slice(0, workingCoreWordEnd) +
+        newTagZone +
+        workingText.slice(workingTagZoneEnd);
+
+      // Record state in undoStack for Ctrl+Z / Undo support
+      setUndoStack((prevState) => [
+        ...prevState,
+        {
+          type: isL1 ? "textChange" : "textChangeAcoustic",
+          index: subIndex,
+          previousText: text,
+          updateAcoustic: !isL1,
+        },
+      ]);
+      setRedoStack([]);
+
+      const updatedSubsRemove = onSubtitleChange(newText, subIndex, !isL1, false);
+      dispatch(setSubtitles(updatedSubsRemove, C.SUBTITLES));
+
       setCharTagPopoverOpen(false);
       setCharTagAnchorEl(null);
       if (charTagTimeoutRef.current) {
@@ -806,58 +980,39 @@ const processNoiseTags = (value) => {
       return;
     }
 
-    // Wrap the tagged character in { } right in the text so it stays
-    // visibly highlighted - including after a page refresh, since this is
-    // part of the persisted text itself rather than separate component
-    // state. This covers a character being tagged for the first time, AND
-    // a character that was already tagged but doesn't yet have the { }
-    // wrap (e.g. tags saved before this highlighting existed) - in that
-    // case the wrap is added in now instead of being skipped. A character
-    // that's already wrapped is left as-is so it never gets wrapped twice.
-    //
-    // The wrap covers the WHOLE orthographic cluster, not just the bare
-    // base consonant: any Tamil dependent vowel sign (matra, e.g. ு/ா/ொ)
-    // or pulli/virama immediately following the base character is pulled
-    // inside the braces too. Wrapping only the bare consonant would strand
-    // its matra outside the braces (e.g. "{ட}ு" instead of "{டு}"), which
-    // visually splits a single syllable apart and renders garbled.
-    const dependentMarksMatch = text
-      .slice(charIndex + 1)
-      .match(/^[\u0BBE-\u0BCD\u0BD7]+/);
-    const clusterLength = 1 + (dependentMarksMatch ? dependentMarksMatch[0].length : 0);
-    const alreadyWrapped =
-      text[charIndex - 1] === '{' && text[charIndex + clusterLength] === '}';
     let workingText = text;
     let workingCoreWordEnd = coreWordEnd;
     let workingTagZoneEnd = tagZoneEnd;
-    if (rank !== -1 && !alreadyWrapped) {
+
+    if (!alreadyWrapped) {
       workingText =
-        workingText.slice(0, charIndex) +
-        '{' + workingText.slice(charIndex, charIndex + clusterLength) + '}' +
-        workingText.slice(charIndex + clusterLength);
+        workingText.slice(0, clusterStart) +
+        '{' + workingText.slice(clusterStart, clusterEnd) + '}' +
+        workingText.slice(clusterEnd);
       workingCoreWordEnd += 2;
       workingTagZoneEnd += 2;
-    }
-
-    if (alreadyTagged) {
-      // Replace this character's existing tag in place.
-      tokens[rank] = `<${tag}>`;
-    } else if (rank !== -1) {
-      // Brand-new tag for this character: insert it at its correct rank
-      // among the word's tags, preserving left-to-right order.
       tokens.splice(rank, 0, `<${tag}>`);
     } else {
-      // Not a taggable character - shouldn't happen, since the click
-      // handler only calls this for characters that are keys of
-      // charTagMappings, but guard anyway rather than losing the tag.
-      tokens.push(`<${tag}>`);
+      tokens[rank] = `<${tag}>`;
     }
     const newTagZone = tokens.map((t) => ` ${t}`).join('');
 
     const newText = workingText.slice(0, workingCoreWordEnd) + newTagZone + workingText.slice(workingTagZoneEnd);
 
-    sub[subIndex] = { ...sub[subIndex], [fieldKey]: newText };
-    dispatch(setSubtitles(sub, C.SUBTITLES));
+    // Record state in undoStack for Ctrl+Z / Undo support
+    setUndoStack((prevState) => [
+      ...prevState,
+      {
+        type: isL1 ? "textChange" : "textChangeAcoustic",
+        index: subIndex,
+        previousText: text,
+        updateAcoustic: !isL1,
+      },
+    ]);
+    setRedoStack([]);
+
+    const updatedSubsAdd = onSubtitleChange(newText, subIndex, !isL1, false);
+    dispatch(setSubtitles(updatedSubsAdd, C.SUBTITLES));
 
     // Close popover
     setCharTagPopoverOpen(false);
@@ -869,22 +1024,31 @@ const processNoiseTags = (value) => {
   };
 
   const handleTextareaClick = (event, subIndex, isL1) => {
-    if (!isVCTCProject) return;
+    const canTagCurrentField = canOpenCharacterTagging({
+      isCharacterTaggingProject: isVCTCProject,
+      isL1,
+      hasL2: showAcousticText,
+    });
+
+    if (!canTagCurrentField) {
+      handleCharTagPopover(null);
+      return;
+    }
 
     const textarea = event.target;
-    const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY);
+    const charIndex = getCharIndexAtPoint(textarea, event.clientX, event.clientY, currentLangCode);
 
     if (charIndex === -1) {
       handleCharTagPopover(null);
       return;
     }
 
-    const charAtCursor = textarea.value[charIndex] || '';
+    const resolved = resolveTaggableChar(textarea.value, charIndex, charTagMappings, currentLangCode);
 
-    if (charAtCursor && charTagMappings[charAtCursor]) {
-      // Select exactly that character so the native selection highlight
-      // gives visual feedback for which letter was picked.
-      textarea.setSelectionRange(charIndex, charIndex + 1);
+    if (resolved) {
+      const { key: charAtCursor, baseIndex, clusterStart, clusterEnd } = resolved;
+      // Select the full cluster so native selection highlight covers the whole syllable/conjunct
+      textarea.setSelectionRange(clusterStart, clusterEnd);
       const mappings = charTagMappings[charAtCursor];
 
       // Clear any pending timeout
@@ -893,34 +1057,35 @@ const processNoiseTags = (value) => {
         charTagTimeoutRef.current = null;
       }
 
-      const pos = detectCharPosition(textarea.value, charIndex, charAtCursor);
+      const pos = detectCharPosition(textarea.value, baseIndex, charAtCursor);
       const suggested = getSuggestedTag(charAtCursor, pos);
 
-      // Look up whether this character already has a tag, derived fresh
-      // from the current text (see getWordTagInfo) so it's correct even
-      // right after a page refresh, when there is no in-memory record of
-      // previous tagging left to consult.
-      let coreWordStart = charIndex;
+      let coreWordStart = clusterStart;
       while (
         coreWordStart > 0 &&
         !/\s/.test(textarea.value[coreWordStart - 1]) &&
         textarea.value[coreWordStart - 1] !== '>'
       ) coreWordStart--;
-      let coreWordEnd = charIndex;
+      let coreWordEnd = clusterEnd;
       while (
         coreWordEnd < textarea.value.length &&
         !/\s/.test(textarea.value[coreWordEnd]) &&
         textarea.value[coreWordEnd] !== '<'
       ) coreWordEnd++;
-      const { taggableCharIndexes, tokens } = getWordTagInfo(
+
+      const { wrappedGroups, tokens } = getWordTagInfo(
         textarea.value,
         coreWordStart,
         coreWordEnd,
-        charTagMappings
+        charTagMappings,
+        currentLangCode
       );
-      const rank = taggableCharIndexes.indexOf(charIndex);
-      const currentTag =
-        rank !== -1 && rank < tokens.length ? tokens[rank].replace(/^<|>$/g, '') : null;
+
+      const existingGroupIdx = wrappedGroups.findIndex(
+        (g) => clusterStart >= g.start && clusterEnd <= g.end
+      );
+      const alreadyTagged = existingGroupIdx !== -1 && existingGroupIdx < tokens.length;
+      const currentTag = alreadyTagged ? tokens[existingGroupIdx].replace(/^<|>$/g, '') : null;
 
       handleCharTagPopover({
         anchorEl: textarea,
@@ -931,7 +1096,7 @@ const processNoiseTags = (value) => {
         suggestedTag: suggested,
         currentTag: currentTag,
         onTagSelect: (tag) => {
-          handleCharacterTagSelection(subIndex, charIndex, tag, isL1);
+          handleCharacterTagSelection(subIndex, resolved, tag, isL1);
         }
       });
     } else {
@@ -1620,7 +1785,7 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
                         >
                           {speakerIdList?.map((speaker, index) => (
                             <MenuItem key={index} value={speaker.name}>
-                              {speaker.name} ({speaker.gender})
+                              Speaker {speaker.speaker_id} ({speaker.gender})
                             </MenuItem>
                           ))}
                         </Select>
@@ -2328,12 +2493,12 @@ const changeTranscriptHandler = (event, index, updateAcoustic = false) => {
     </div>
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
       {charTagMappingsData.map((tag, idx) => {
-        const isSuggested = tag === charTagSuggested;
         const isSelected = tag === charTagCurrentSelected;
+        const isSuggested = !charTagCurrentSelected && tag === charTagSuggested;
         return (
           <div
             key={idx}
-            title={isSelected ? 'Currently selected tag' : (isSuggested ? 'Suggested for this position' : undefined)}
+            title={isSelected ? 'Currently selected tag (click to deselect)' : (isSuggested ? 'Suggested for this position' : undefined)}
             style={{
               padding: '6px 10px',
               cursor: 'pointer',

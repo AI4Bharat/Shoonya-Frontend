@@ -25,7 +25,7 @@ const DatasetDescription = (props) => {
     return (
         <ThemeProvider theme={themeDefault}>
 
-<Card  style={{ minHeight: '100px', maxHeight: '100px',backgroundColor: ImageArray[index].color ,display: 'flex'}}>
+<Card  style={{ minHeight: '100px',backgroundColor: ImageArray[index].color ,display: 'flex'}}>
             <Grid container >
                 <Grid item xs={3} sm={3} md={3} lg={3} xl={3} style={{ display: 'flex', marginTop: "21px", justifyContent: 'center', }}>
                     <div className={classes.descCardIcon} style={{  color: ImageArray[index].iconColor, backgroundColor: ImageArray[index].color }}>

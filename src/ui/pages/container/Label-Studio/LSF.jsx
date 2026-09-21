@@ -38,6 +38,7 @@ import {
   deleteAnnotation,
   fetchAnnotation,
 } from "../../../../redux/actions/api/LSFAPI/LSFAPI";
+import fetchAudioBlobUrl from "../../../../utils/fetchAudioBlobUrl";
 import GetProjectDetailsAPI from "../../../../redux/actions/api/ProjectDetails/GetProjectDetails";
 import APITransport from "../../../../redux/actions/apitransport/apitransport";
 
@@ -56,6 +57,7 @@ import LightTooltip from "../../component/common/Tooltip";
 import { addLabelsToBboxes, labelConfigJS } from "./labelConfigJSX";
 import DatasetSearchPopupAPI from "../../../../redux/actions/api/Dataset/DatasetSearchPopup";
 import { OCRConfigJS } from "../../../../utils/LabelConfig/OCRTranscriptionEditing";
+import { observeOcrRtlDirection } from "./ocrRtlDirection";
 
 const filterAnnotations = (
   annotations,
@@ -209,6 +211,11 @@ const LabelStudioWrapper = ({
   useEffect(() => {
     setPredictions(taskData?.data?.ocr_prediction_json);
   }, [taskData]);
+
+  useEffect(() => {
+    if (!ProjectDetails?.project_type?.includes("OCR")) return undefined;
+    return observeOcrRtlDirection(rootRef.current);
+  }, [ProjectDetails?.project_type]);
 
   useEffect(() => {
     if(filterdataitemsList.results !== undefined){
@@ -646,11 +653,6 @@ const LabelStudioWrapper = ({
   // we're running an effect on component mount and rendering LSF inside rootRef node
   localStorage.setItem("TaskData", JSON.stringify(taskData));
   useEffect(() => {
-    if (localStorage.getItem("rtl") === "true") {
-      var style = document.createElement("style");
-      style.innerHTML = "input, textarea { direction: RTL; }";
-      document.head.appendChild(style);
-    }
     if (userData?.id && loaded.current !== taskId) {
       if (Object.keys(ProjectDetails).length === 0) {
         const projectObj = new GetProjectDetailsAPI(projectId);
@@ -658,7 +660,7 @@ const LabelStudioWrapper = ({
       } else {
         loaded.current = taskId;
         getProjectsandTasks(projectId, taskId).then(
-          ([labelConfig, taskData, annotations, predictions]) => {
+          async ([labelConfig, taskData, annotations, predictions]) => {
             if (
               annotations.message?.includes("not a part of this project") ||
               annotations.detail?.includes("Not found")
@@ -687,6 +689,12 @@ const LabelStudioWrapper = ({
             if (labelConfig.project_type.includes("OCRSegmentCategorization")) {
               tempLabelConfig = labelConfigJS;
             }
+
+            // Proxy-fetch audio from private buckets and inject blob URL
+            if (taskData?.data?.audio_url) {
+              taskData.data.audio_url = await fetchAudioBlobUrl(taskData.data.audio_url);
+            }
+
             setAnnotations(annotations);
             setLabelConfig(tempLabelConfig);
             setTaskData(taskData);
@@ -1561,7 +1569,14 @@ useEffect(() => {
         </div>
       )}
       <Box sx={{ border: "1px solid rgb(224 224 224)" }}>
-        <div className="label-studio-root" ref={rootRef}></div>
+        <div
+          className={`label-studio-root ${
+            ProjectDetails?.project_type?.includes("OCR")
+              ? "ocr-project-style"
+              : ""
+          }`}
+          ref={rootRef}
+        ></div>
         <Popover
           id={"'simple-popover'"}
           open={Boolean(showTagSuggestionsAnchorEl)}

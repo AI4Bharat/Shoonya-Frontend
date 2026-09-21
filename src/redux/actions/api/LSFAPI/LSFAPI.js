@@ -1,5 +1,29 @@
 import axiosInstance from "../../../../utils/API_Instance/API_Instance";
 
+const stripBidiIsolates = (value) => {
+  if (typeof value === "string") {
+    return value.replace(/[\u2066\u2067\u2068\u2069]/g, "");
+  }
+  if (Array.isArray(value)) return value.map(stripBidiIsolates);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        key,
+        stripBidiIsolates(entry),
+      ]),
+    );
+  }
+  return value;
+};
+
+const cleanOcrBidiIsolates = (value) => {
+  const isOcrBidiEditor =
+    typeof document !== "undefined" &&
+    document.documentElement.dataset.ocrBidiActive === "true";
+
+  return isOcrBidiEditor ? stripBidiIsolates(value) : value;
+};
+
 const fetchProject = async (projectID) => {
   try {
     let response = await axiosInstance.get(`/projects/${projectID}`);
@@ -49,7 +73,7 @@ const postAnnotation = async (
     
     await axiosInstance
       .post(`/annotation/`, {
-        result: result,
+        result: cleanOcrBidiIsolates(result),
         task: task,
         completed_by: completed_by,
         lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
@@ -79,7 +103,7 @@ const postReview = async (
 ) => {
   try {
     await axiosInstance.post(`/annotation/`, {
-      result: result,
+      result: cleanOcrBidiIsolates(result),
       task: task,
       completed_by: completed_by,
       parent_annotation: parentAnnotation,
@@ -111,7 +135,9 @@ const patchAnnotation = async (
 ) => {
   try {
     const res = await axiosInstance.patch(`/annotation/${annotationID}/`, {
-      ...(annotation_status !== "skipped" && { result: result }),
+      ...(annotation_status !== "skipped" && {
+        result: cleanOcrBidiIsolates(result),
+      }),
       ...(annotation_status && {
         lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
         annotation_status: annotation_status,
@@ -145,7 +171,7 @@ const patchReview = async (
     await axiosInstance.patch(`/annotation/${annotationID}/`, {
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status: review_status,
-      result: result,
+      result: cleanOcrBidiIsolates(result),
       task_id: taskId,
       review_notes: reviewnotes,
       ...((review_status === "to_be_revised" ||
@@ -154,7 +180,7 @@ const patchReview = async (
         review_status === "accepted_with_major_changes") && {
         lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
         annotation_status: review_status,
-        result: result,
+        result: cleanOcrBidiIsolates(result),
         parent_annotation: parentAnnotation,
         review_notes: reviewnotes,
       }),
@@ -192,7 +218,7 @@ const patchSuperChecker = async (
       lead_time: (new Date() - load_time) / 1000 + Number(lead_time ?? 0),
       annotation_status: review_status,
       task_id: taskId,
-      result: result,
+      result: cleanOcrBidiIsolates(result),
       parent_annotation: parentAnnotation,
       supercheck_notes: superchecknotes,
       ...(languages && {languages: languages.current}),
