@@ -19,6 +19,8 @@ import AudioTaskAnalyticsChart from "./AudioTaskAnalyticsChart";
 import TaskCountAnalyticsChart from "./TaskCountAnalyticsChart";
 import { MenuProps } from "../../../../../utils/utils";
 import CustomButton from "../../../component/common/Button";
+import { format } from "date-fns";
+import TaskAnalyticsDateRangeFilter from "../../../component/common/TaskAnalyticsDateRangeFilter";
 
 
 const TaskAnalytics = (props) => {
@@ -26,14 +28,29 @@ const TaskAnalytics = (props) => {
   const [loading, setLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
   const [selectedType, setSelectedType] = useState("ContextualTranslationEditing");
+  const [dateRange, setDateRange] = useState(null);
   const ProjectTypes = useSelector((state) => state.getProjectDomains.data);
   const taskAnalyticsData = useSelector(
     (state) => state.getTaskAnalyticsData.data
   );
+  const organizationId = props.loggedInUserData?.organization?.id;
 
   const getTaskAnalyticsdata = () => {
-     setLoading(true)
-    const userObj = new TaskAnalyticsDataAPI(selectedType);
+    if (!organizationId) return;
+
+    setLoading(true);
+    const startDate = dateRange
+      ? format(dateRange.startDate, "yyyy-MM-dd")
+      : null;
+    const endDate = dateRange
+      ? format(dateRange.endDate, "yyyy-MM-dd")
+      : null;
+    const userObj = new TaskAnalyticsDataAPI(
+      organizationId,
+      selectedType,
+      startDate,
+      endDate
+    );
     dispatch(APITransport(userObj));
   };
 
@@ -68,7 +85,7 @@ const TaskAnalytics = (props) => {
 
   useEffect(() => {
     getTaskAnalyticsdata();
-  }, []);
+  }, [organizationId]);
 
   const handleSubmit = async () => {
     getTaskAnalyticsdata();
@@ -117,8 +134,14 @@ const TaskAnalytics = (props) => {
             </Select>
           </FormControl>
         </Grid>
+        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+          <TaskAnalyticsDateRangeFilter
+            value={dateRange}
+            onChange={setDateRange}
+          />
+        </Grid>
         <CustomButton label="Submit" sx={{ width:"120px", mt: 3 }} onClick={handleSubmit}
-              disabled={loading} />
+              disabled={loading || !organizationId} />
 
       </Grid>
       {loading && <Spinner />}

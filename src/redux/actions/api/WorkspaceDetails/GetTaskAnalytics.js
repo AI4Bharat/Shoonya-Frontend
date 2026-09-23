@@ -2,15 +2,23 @@ import API from "../../../api";
 import ENDPOINTS from "../../../../config/apiendpoint";
 import constants from "../../../constants";
  
- export default class WorkspaceTaskAnalyticsAPI extends API {
-   constructor(wsId,project_type_filter, timeout = 2000) {
-     super("GET", timeout, false);
-     this.type = constants.WS_TASK_ANALYTICS;
-     project_type_filter=='AllTypes'?
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${wsId}/cumulative_tasks_count_all/`
-     :
-     this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${wsId}/cumulative_tasks_count_all/?project_type_filter=${project_type_filter}`
-   }
+export default class WorkspaceTaskAnalyticsAPI extends API {
+  constructor(wsId, projectTypeFilter, startDate, endDate, timeout = 2000) {
+    super("GET", timeout, false);
+    this.type = constants.WS_TASK_ANALYTICS;
+    const queryParams = new URLSearchParams();
+
+    if (projectTypeFilter !== "AllTypes") {
+      queryParams.set("project_type_filter", projectTypeFilter);
+    }
+    if (startDate && endDate) {
+      queryParams.set("start_date", startDate);
+      queryParams.set("end_date", endDate);
+    }
+
+    const queryString = queryParams.toString();
+    this.endpoint = `${super.apiEndPointAuto()}${ENDPOINTS.getWorkspaces}${wsId}/cumulative_tasks_count_all/${queryString ? `?${queryString}` : ""}`;
+  }
  
    processResponse(res) {
      super.processResponse(res);
