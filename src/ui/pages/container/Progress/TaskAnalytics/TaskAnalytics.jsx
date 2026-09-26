@@ -15,6 +15,8 @@ import exportFromJSON from 'export-from-json';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { FilterList, KeyboardArrowDown } from "@material-ui/icons";
+import { format } from "date-fns";
+import TaskAnalyticsDateRangeFilter from "../../../component/common/TaskAnalyticsDateRangeFilter";
 const StyledMenu = styled((props) => (
   <Menu
     elevation={3}
@@ -51,13 +53,28 @@ const TaskAnalytics = (props) => {
   const [reviewChecked, setReviewChecked] = useState(true);
   const [supercheckChecked, setSupercheckChecked] = useState(false);
   const [showFilterBox, setShowFilterBox] = useState(false);
+  const [dateRange, setDateRange] = useState(null);
+  const organizationId = props.loggedInUserData?.organization?.id;
 
   const open = Boolean(anchorEl);
 
 
   const getTaskAnalyticsdata = () => {
+    if (!organizationId) return;
+
     setLoading(true);
-    const userObj = new TaskAnalyticsDataAPI(selectedType);
+    const startDate = dateRange
+      ? format(dateRange.startDate, "yyyy-MM-dd")
+      : null;
+    const endDate = dateRange
+      ? format(dateRange.endDate, "yyyy-MM-dd")
+      : null;
+    const userObj = new TaskAnalyticsDataAPI(
+      organizationId,
+      selectedType,
+      startDate,
+      endDate
+    );
     dispatch(APITransport(userObj));
   };
 
@@ -97,7 +114,7 @@ const TaskAnalytics = (props) => {
 
   useEffect(() => {
     getTaskAnalyticsdata();
-  }, []);
+  }, [organizationId]);
 
   useEffect(() => {
     if (taskAnalyticsData.length > 0) {
@@ -213,6 +230,7 @@ const TaskAnalytics = (props) => {
     setAnnotationChecked(true);
     setReviewChecked(true);
     setSupercheckChecked(true);
+    setDateRange(null);
     setShowFilterBox(false); 
   };
 
@@ -249,6 +267,11 @@ const TaskAnalytics = (props) => {
                 ))}
               </Select>
             </FormControl>
+
+            <TaskAnalyticsDateRangeFilter
+              value={dateRange}
+              onChange={setDateRange}
+            />
 
             <Box display="flex" flexDirection="column">
             <LightTooltip 
