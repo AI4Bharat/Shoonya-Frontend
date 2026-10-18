@@ -94,7 +94,11 @@ const CreateDatasetAndProject = () => {
   const [projectJobState, setProjectJobState] = useState(null);
   const [projectJobError, setProjectJobError] = useState(null);
   const [projectJobTransientNotice, setProjectJobTransientNotice] = useState(null);
-  const isCreatingProjects = projectJobState === "PROGRESS";
+  // Covers the POST itself -- projectJobState only flips to "PROGRESS" once
+  // the server responds, which left the button clickable for the whole
+  // round-trip (the gap a double-click would land in).
+  const [isSubmittingProjectJob, setIsSubmittingProjectJob] = useState(false);
+  const isCreatingProjects = isSubmittingProjectJob || projectJobState === "PROGRESS";
 
   const showError = (message) => setSnackbar({ open: true, message, variant: "error" });
   const showInfo = (message) => setSnackbar({ open: true, message, variant: "info" });
@@ -341,6 +345,7 @@ const CreateDatasetAndProject = () => {
     if (!projectInstanceId || !workspaceId || !category) return;
     if (isCreatingProjects) return; // belt-and-suspenders; button is disabled too
     setLoading(true);
+    setIsSubmittingProjectJob(true);
     setProjectJobError(null);
     setProjectJobTransientNotice(null);
     try {
@@ -370,9 +375,10 @@ const CreateDatasetAndProject = () => {
         showInfo("A project-creation job was already in progress -- tracking it now.");
       }
     } catch (err) {
-      showError(err.message || "Failed to create project(s)");
+      showError(err.message || "Failed to create project");
     } finally {
       setLoading(false);
+      setIsSubmittingProjectJob(false);
     }
   };
 
@@ -885,7 +891,7 @@ const CreateDatasetAndProject = () => {
 
         <Grid item xs={12} sx={{ mt: 1 }}>
           <Button
-            label={isCreatingProjects ? "Creating project(s)..." : "Create Project(s)"}
+            label={isCreatingProjects ? "Creating project..." : "Create Project"}
             disabled={
               !projectInstanceId || !workspaceId || !category || isCreatingProjects
             }
@@ -898,7 +904,7 @@ const CreateDatasetAndProject = () => {
         <Box sx={{ mt: 2 }}>
           <LinearProgress />
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Creating project(s) -- this can take a little while for large datasets.
+            Creating project -- this can take a little while for large datasets.
             Feel free to leave this page; it'll keep running, and the result will be
             here if you come back and check.
           </Typography>
