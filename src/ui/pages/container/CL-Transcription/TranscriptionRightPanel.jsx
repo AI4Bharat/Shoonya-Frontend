@@ -93,9 +93,27 @@ const languageTagMappings = {
     'फ': ['ph-f', 'f-ph']    // f vs ph
   },
   'en': {
-    'ज़': ['zh-z', 'zh-j'] // zh vs z / j context-based
+    'ज़': ['zh-z'] // zh vs z
+  },
+  'ur': {
+    '*': ['zabar_omission', 'zer_omission', 'pesh_omission', 'tashdeed_omission'] // diacritic omissions, any character
+  },
+  'sd': {
+    '*': ['gemination_omission'] // any character
   }
 };
+
+// Mapping key whose tags apply to every letter instead of a specific character
+const ANY_CHAR_TAG_KEY = '*';
+
+const isAnyCharTaggable = (ch, mappings) =>
+  !!mappings[ANY_CHAR_TAG_KEY] && /\p{L}/u.test(ch);
+
+// Right-to-left languages store tags before the word, so they display on its left
+const TAGS_BEFORE_WORD_LANGS = new Set(['ur']);
+
+const formatTagZone = (tokens, tagsBeforeWord) =>
+  tokens.map((t) => (tagsBeforeWord ? `${t} ` : ` ${t}`)).join('');
 
 const TAMIL_PULLI = "\u0BCD";
 const tamilSeries = {
@@ -214,6 +232,8 @@ const resolveTaggableChar = (text, index, mappings, lang = "mr") => {
         ? nfc
         : mappings[nfd]
         ? nfd
+        : isAnyCharTaggable(cluster.text[offset], mappings)
+        ? ANY_CHAR_TAG_KEY
         : null;
 
       if (matchedKey) {
@@ -230,9 +250,14 @@ const resolveTaggableChar = (text, index, mappings, lang = "mr") => {
 
     // Check single character
     const ch = cluster.text[offset];
-    if (mappings[ch]) {
+    const key = mappings[ch]
+      ? ch
+      : isAnyCharTaggable(ch, mappings)
+      ? ANY_CHAR_TAG_KEY
+      : null;
+    if (key) {
       candidates.push({
-        key: ch,
+        key,
         baseIndex: cluster.start + offset,
         length: 1,
       });
@@ -268,9 +293,13 @@ const resolveTaggableChar = (text, index, mappings, lang = "mr") => {
 
 const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings, lang = "mr") => {
   const coreWord = text.slice(coreWordStart, coreWordEnd);
-  const tagZoneMatch = text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
+  const tagsBeforeWord = TAGS_BEFORE_WORD_LANGS.has(lang);
+  const tagZoneMatch = tagsBeforeWord
+    ? text.slice(0, coreWordStart).match(/(?:<[^>]*>\s*)*$/)
+    : text.slice(coreWordEnd).match(/^(?:\s*<[^>]*>)*/);
   const tagZoneStr = tagZoneMatch ? tagZoneMatch[0] : "";
-  const tagZoneEnd = coreWordEnd + tagZoneStr.length;
+  const tagZoneStart = tagsBeforeWord ? coreWordStart - tagZoneStr.length : coreWordEnd;
+  const tagZoneEnd = tagZoneStart + tagZoneStr.length;
   const tokens = tagZoneStr.match(/<[^>]+>/g) || [];
 
   const wrappedGroups = [];
@@ -284,7 +313,7 @@ const getWordTagInfo = (text, coreWordStart, coreWordEnd, mappings, lang = "mr")
     });
   }
 
-  return { wrappedGroups, tagZoneStr, tagZoneEnd, tokens };
+  return { wrappedGroups, tagZoneStr, tagZoneStart, tagZoneEnd, tokens, tagsBeforeWord };
 };
 
 const getCharIndexAtPoint = (textarea, clientX, clientY, lang = "mr") => {
@@ -903,7 +932,7 @@ const processNoiseTags = (value) => {
       text[coreWordEnd] !== '<'
     ) coreWordEnd++;
 
-    const { wrappedGroups, tagZoneEnd, tokens } = getWordTagInfo(
+    const { wrappedGroups, tagZoneStart, tagZoneEnd, tokens, tagsBeforeWord } = getWordTagInfo(
       text,
       coreWordStart,
       coreWordEnd,
@@ -936,7 +965,7 @@ const processNoiseTags = (value) => {
       tokens.splice(rank, 1);
 
       let workingText = text;
-      let workingCoreWordEnd = coreWordEnd;
+      let workingTagZoneStart = tagZoneStart;
       let workingTagZoneEnd = tagZoneEnd;
 
       // Remove {...} surrounding this cluster only when no other tag remains on that cluster
@@ -946,13 +975,16 @@ const processNoiseTags = (value) => {
           workingText.slice(0, group.start) +
           group.inner +
           workingText.slice(group.end);
-        workingCoreWordEnd -= 2;
-        workingTagZoneEnd -= 2;
+        // A tag zone after the word shifts left by the two removed braces
+        if (!tagsBeforeWord) {
+          workingTagZoneStart -= 2;
+          workingTagZoneEnd -= 2;
+        }
       }
 
-      const newTagZone = tokens.length > 0 ? tokens.map((t) => ` ${t}`).join('') : '';
+      const newTagZone = formatTagZone(tokens, tagsBeforeWord);
       const newText =
-        workingText.slice(0, workingCoreWordEnd) +
+        workingText.slice(0, workingTagZoneStart) +
         newTagZone +
         workingText.slice(workingTagZoneEnd);
 
@@ -981,7 +1013,7 @@ const processNoiseTags = (value) => {
     }
 
     let workingText = text;
-    let workingCoreWordEnd = coreWordEnd;
+    let workingTagZoneStart = tagZoneStart;
     let workingTagZoneEnd = tagZoneEnd;
 
     if (!alreadyWrapped) {
@@ -989,15 +1021,18 @@ const processNoiseTags = (value) => {
         workingText.slice(0, clusterStart) +
         '{' + workingText.slice(clusterStart, clusterEnd) + '}' +
         workingText.slice(clusterEnd);
-      workingCoreWordEnd += 2;
-      workingTagZoneEnd += 2;
+      // A tag zone after the word shifts right by the two added braces
+      if (!tagsBeforeWord) {
+        workingTagZoneStart += 2;
+        workingTagZoneEnd += 2;
+      }
       tokens.splice(rank, 0, `<${tag}>`);
     } else {
       tokens[rank] = `<${tag}>`;
     }
-    const newTagZone = tokens.map((t) => ` ${t}`).join('');
+    const newTagZone = formatTagZone(tokens, tagsBeforeWord);
 
-    const newText = workingText.slice(0, workingCoreWordEnd) + newTagZone + workingText.slice(workingTagZoneEnd);
+    const newText = workingText.slice(0, workingTagZoneStart) + newTagZone + workingText.slice(workingTagZoneEnd);
 
     // Record state in undoStack for Ctrl+Z / Undo support
     setUndoStack((prevState) => [
@@ -1090,7 +1125,7 @@ const processNoiseTags = (value) => {
       handleCharTagPopover({
         anchorEl: textarea,
         mappings: mappings,
-        selectedText: charAtCursor,
+        selectedText: charAtCursor === ANY_CHAR_TAG_KEY ? resolved.clusterText : charAtCursor,
         index: subIndex,
         position: { x: event.clientX, y: event.clientY },
         suggestedTag: suggested,

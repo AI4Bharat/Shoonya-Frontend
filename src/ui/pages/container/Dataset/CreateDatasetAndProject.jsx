@@ -83,6 +83,23 @@ const CreateDatasetAndProject = () => {
   const [projectResult, setProjectResult] = useState(null);
   const [datasetStats, setDatasetStats] = useState(null);
 
+  // Create Project tab: Phase 2 job tracking. Project creation runs as a
+  // background job (not a single blocking request) because it can take
+  // long enough to exceed a normal request timeout -- previously that left
+  // the page showing a raw JSON-parse error on a request that was actually
+  // still completing on the server, which once led to someone re-clicking
+  // and ending up with duplicate/corrupted projects. Mirrors the Phase 1
+  // (taskId/pipelineState) polling above.
+  const [projectJobId, setProjectJobId] = useState(null);
+  const [projectJobState, setProjectJobState] = useState(null);
+  const [projectJobError, setProjectJobError] = useState(null);
+  const [projectJobTransientNotice, setProjectJobTransientNotice] = useState(null);
+  // Covers the POST itself -- projectJobState only flips to "PROGRESS" once
+  // the server responds, which left the button clickable for the whole
+  // round-trip (the gap a double-click would land in).
+  const [isSubmittingProjectJob, setIsSubmittingProjectJob] = useState(false);
+  const isCreatingProjects = isSubmittingProjectJob || projectJobState === "PROGRESS";
+
   const showError = (message) => setSnackbar({ open: true, message, variant: "error" });
   const showInfo = (message) => setSnackbar({ open: true, message, variant: "info" });
 
@@ -319,9 +336,18 @@ const CreateDatasetAndProject = () => {
   };
 
   // ---- Create Project tab: create project(s) for chosen dataset/vendor/category ----
+  // ---- Create Project tab: start phase 2 job (project creation) ----
+  // Only starts the background job and records its id -- the polling
+  // effect below picks up from there and reports the actual outcome, so
+  // this click can return almost instantly instead of blocking on the
+  // whole pipeline (which is what used to time out).
   const handleCreateProjects = async () => {
     if (!projectInstanceId || !workspaceId || !category) return;
+    if (isCreatingProjects) return; // belt-and-suspenders; button is disabled too
     setLoading(true);
+    setIsSubmittingProjectJob(true);
+    setProjectJobError(null);
+    setProjectJobTransientNotice(null);
     try {
       const res = await fetch(
         `${baseUrl()}${ENDPOINTS.getDatasets}instances/create_pipeline_projects/`,
@@ -336,39 +362,106 @@ const CreateDatasetAndProject = () => {
         }
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create project(s)");
-      // Accumulated `projectResult` reflects everything created across all
-      // clicks so far, so "did this specific click do anything" has to be
-      // reported separately -- otherwise, once anything has ever been
-      // created, the accumulated list is always non-empty and a later
-      // no-op click would look identical to one that made progress.
-      if (!(data.created_projects?.length) && !(data.topped_up_projects?.length)) {
-        showInfo(
-          "No project met its task-limit threshold yet, and there was nothing to top up."
-        );
+      // 409 means a job for this dataset+category is already running
+      // (e.g. a previous click's job hasn't finished, or another tab/
+      // teammate started one) -- that's not a failure, just pick up
+      // polling the job that's already in flight instead of erroring out.
+      if (res.status !== 202 && res.status !== 409) {
+        throw new Error(data.message || "Failed to start project creation");
       }
-      // Accumulate across clicks (e.g. one click tops up an existing
-      // project + creates a batch, a later click creates the next one)
-      // instead of replacing -- otherwise a click with nothing to top up
-      // silently erases an earlier click's top-up notice from view.
-      setProjectResult((prev) => ({
-        language: data.language,
-        created_projects: [
-          ...(prev?.created_projects || []),
-          ...(data.created_projects || []),
-        ],
-        topped_up_projects: [
-          ...(prev?.topped_up_projects || []),
-          ...(data.topped_up_projects || []),
-        ],
-      }));
-      fetchDatasetStats(projectInstanceId);
+      setProjectJobId(data.job_id);
+      setProjectJobState("PROGRESS");
+      if (res.status === 409) {
+        showInfo("A project-creation job was already in progress -- tracking it now.");
+      }
     } catch (err) {
-      showError(err.message || "Failed to create project(s)");
+      showError(err.message || "Failed to create project");
     } finally {
       setLoading(false);
+      setIsSubmittingProjectJob(false);
     }
   };
+
+  // ---- Create Project tab: poll phase 2 job status ----
+  useEffect(() => {
+    if (!projectJobId || projectJobState !== "PROGRESS") return;
+    let cancelled = false;
+    let currentInterval = POLL_INTERVAL_MS;
+
+    const scheduleNext = (interval) => {
+      currentInterval = Math.min(interval, MAX_POLL_INTERVAL_MS);
+      setTimeout(poll, currentInterval);
+    };
+
+    const poll = async () => {
+      try {
+        const res = await fetch(
+          `${baseUrl()}${ENDPOINTS.getDatasets}instances/pipeline_job_status/?job_id=${projectJobId}`,
+          { headers: authHeaders() }
+        );
+        const data = await res.json();
+        if (cancelled) return;
+
+        // Transient backend/DB hiccup (still JSON, non-2xx) -- back off and
+        // keep polling instead of stopping, and don't claim the job failed.
+        if (!res.ok && data.state === "UNKNOWN") {
+          setProjectJobTransientNotice(
+            "This is taking longer than expected, please check if the project got created before trying again."
+          );
+          scheduleNext(currentInterval * 2);
+          return;
+        }
+
+        setProjectJobTransientNotice(null);
+        if (data.state === "SUCCESS") {
+          setProjectJobState("SUCCESS");
+          const result = data.result || {};
+          // Accumulated `projectResult` reflects everything created across
+          // all jobs so far, so "did this specific job do anything" has to
+          // be reported separately -- otherwise, once anything has ever
+          // been created, the accumulated list is always non-empty and a
+          // later no-op job would look identical to one that made progress.
+          if (!(result.created_projects?.length) && !(result.topped_up_projects?.length)) {
+            showInfo(
+              "No project met its task-limit threshold yet, and there was nothing to top up."
+            );
+          }
+          setProjectResult((prev) => ({
+            language: result.language,
+            created_projects: [
+              ...(prev?.created_projects || []),
+              ...(result.created_projects || []),
+            ],
+            topped_up_projects: [
+              ...(prev?.topped_up_projects || []),
+              ...(result.topped_up_projects || []),
+            ],
+          }));
+          fetchDatasetStats(projectInstanceId);
+        } else if (data.state === "FAILURE") {
+          setProjectJobState("FAILURE");
+          setProjectJobError(data.error || "Project creation failed");
+        } else {
+          // Still running -- reset backoff once we get a normal response.
+          scheduleNext(POLL_INTERVAL_MS);
+        }
+      } catch (err) {
+        // Network-level failure (server unreachable) -- back off and retry
+        // rather than giving up permanently.
+        if (cancelled) return;
+        setProjectJobTransientNotice(
+          "This is taking longer than expected, please check if the project got created before trying again."
+        );
+        scheduleNext(currentInterval * 2);
+      }
+    };
+
+    poll();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectJobId, projectJobState]);
 
   const stepDetail = (name) =>
     pipelineState?.steps?.find((s) => s.name === name);
@@ -798,12 +891,37 @@ const CreateDatasetAndProject = () => {
 
         <Grid item xs={12} sx={{ mt: 1 }}>
           <Button
-            label="Create Project(s)"
-            disabled={!projectInstanceId || !workspaceId || !category}
+            label={isCreatingProjects ? "Creating project..." : "Create Project"}
+            disabled={
+              !projectInstanceId || !workspaceId || !category || isCreatingProjects
+            }
             onClick={handleCreateProjects}
           />
         </Grid>
       </Grid>
+
+      {isCreatingProjects && (
+        <Box sx={{ mt: 2 }}>
+          <LinearProgress />
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Creating project -- this can take a little while for large datasets.
+            Feel free to leave this page; it'll keep running, and the result will be
+            here if you come back and check.
+          </Typography>
+        </Box>
+      )}
+
+      {projectJobTransientNotice && (
+        <Alert severity="warning" sx={{ mt: 2 }}>
+          {projectJobTransientNotice}
+        </Alert>
+      )}
+
+      {projectJobState === "FAILURE" && projectJobError && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          Project creation failed: {projectJobError}
+        </Alert>
+      )}
 
       {projectResult && (
         <Box sx={{ mt: 3 }}>
